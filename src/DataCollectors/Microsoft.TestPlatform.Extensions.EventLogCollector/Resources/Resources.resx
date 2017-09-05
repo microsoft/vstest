@@ -117,17 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DataCollectors_EventLog_EventsLostWarning" xml:space="preserve">
-    <value>The '{0}' event log may have been cleared during collection; some events may not have been collected</value>
-  </data>
   <data name="EventLog_CleanupException" xml:space="preserve">
     <value>An exception occurred while collecting final entries from the event log '{0}': {1}</value>
   </data>
   <data name="EventLog_ContextNotFoundException" xml:space="preserve">
-    <value>EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</value>
+    <value>Event Log DataCollector did not find eventLogContext for DataCollectionContext: {0}</value>
   </data>
-  <data name="EventLog_FriendlyName" xml:space="preserve">
-    <value>Event Log</value>
+  <data name="EventLog_EventsLostWarning" xml:space="preserve">
+    <value>The '{0}' event log may have been cleared during collection; some events may not have been collected</value>
   </data>
   <data name="EventLog_InvalidEntryTypeInConfig" xml:space="preserve">
     <value>The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</value>

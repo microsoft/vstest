@@ -36,11 +36,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         #region Private fields
 
         /// <summary>
-        /// The event log file name.
-        /// </summary>
-        private static string eventLogFileName = "Event Log";
-
-        /// <summary>
         /// Event handler delegate for the SessionStart event
         /// </summary>
         private readonly EventHandler<SessionStartEventArgs> sessionStartEventHandler;
@@ -111,12 +106,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         private IFileHelper fileHelper;
 
         /// <summary>
-        /// The context data.
-        /// </summary>
-        private Dictionary<DataCollectionContext, EventLogCollectorContextData> contextData =
-            new Dictionary<DataCollectionContext, EventLogCollectorContextData>();
-
-        /// <summary>
         /// The event log map.
         /// </summary>
         private Dictionary<string, EventLog> eventLogMap = new Dictionary<string, EventLog>();
@@ -136,6 +125,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.testCaseEndEventHandler = this.OnTestCaseEnd;
 
             this.eventLogDirectories = new List<string>();
+            this.ContextData = new Dictionary<DataCollectionContext, IEventLogContainer>();
             this.fileHelper = new FileHelper();
         }
 
@@ -174,6 +164,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 return this.eventLogNames;
             }
         }
+
+        /// <summary>
+        /// Gets the context data.
+        /// </summary>
+        internal Dictionary<DataCollectionContext, IEventLogContainer> ContextData { get; private set; }
 
         #endregion
 
@@ -227,29 +222,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             events.TestCaseEnd += this.testCaseEndEventHandler;
         }
 
-        #endregion
-
-        #region Internal Methods
-        internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContextData)
-        {
-            EventLog eventLog;
-
-            if (!this.eventLogMap.TryGetValue(eventLogName, out eventLog))
-            {
-                eventLog = new EventLog(eventLogName);
-                this.eventLogMap.Add(eventLogName, eventLog);
-            }
-
-            int currentCount = eventLog.Entries.Count;
-            int nextEntryIndexToCollect =
-                (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
-            EventLogContainer eventLogContainer =
-                new EventLogContainer(eventLog, nextEntryIndexToCollect, this.eventSources, this.entryTypes, this.logger, this.dataCollectorContext, eventLogContextData);
-
-            eventLog.EntryWritten += eventLogContainer.OnEventLogEntryWritten;
-            eventLog.EnableRaisingEvents = true;
-            return eventLogContainer;
-        }
         #endregion
 
         #region IDisposable Members
@@ -391,10 +363,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void StartCollectionForContext(DataCollectionContext dataCollectionContext, bool isSessionContext)
         {
-            EventLogCollectorContextData eventLogContext;
-            lock (this.contextData)
+            IEventLogContainer eventLogContainer = null;
+            lock (this.ContextData)
             {
-                if (this.contextData.TryGetValue(dataCollectionContext, out eventLogContext))
+                if (this.ContextData.TryGetValue(dataCollectionContext, out eventLogContainer))
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -405,38 +377,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 }
                 else
                 {
-                    eventLogContext =
-                        new EventLogCollectorContextData(isSessionContext ? int.MaxValue : this.maxEntries);
-                    this.contextData.Add(dataCollectionContext, eventLogContext);
-                }
-            }
+                    eventLogContainer = new EventLogContainer(this.eventLogMap, this.eventSources, this.entryTypes, this.logger, this.dataCollectorContext, this.dataSink, isSessionContext ? int.MaxValue : this.maxEntries);
 
-            foreach (string eventLogName in this.eventLogNames.Keys)
-            {
-                try
-                {
-                    // Create an EventLog object and add it to the eventLogContext if one does not already exist
-                    if (!eventLogContext.EventLogContainers.ContainsKey(eventLogName))
-                    {
-                        var eventLogContainer = this.CreateEventLogContainer(eventLogName, eventLogContext);
-                        eventLogContext.EventLogContainers.Add(eventLogName, eventLogContainer);
-
-                        if (EqtTrace.IsVerboseEnabled)
-                        {
-                            EqtTrace.Verbose(
-                                string.Format(
-                                    CultureInfo.InvariantCulture,
-                                    "EventLogDataCollector: Enabling collection of '{0}' events for data collection context '{1}'",
-                                    eventLogName,
-                                    dataCollectionContext.ToString()));
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(
-                        dataCollectionContext,
-                        new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.EventLog_ReadError, eventLogName, Environment.MachineName), ex));
+                    this.ContextData.Add(dataCollectionContext, eventLogContainer);
                 }
             }
         }
@@ -447,21 +390,20 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             TimeSpan requestedDuration,
             DateTime timeRequestReceived)
         {
-            DateTime minDate = DateTime.MinValue;
-            EventLogCollectorContextData eventLogContext = this.GetEventLogContext(dataCollectionContext);
+            IEventLogContainer eventLogContainer = this.GetEventLogContainer(dataCollectionContext);
 
-            foreach (IEventLogContainer eventLogContainer in eventLogContext.EventLogContainers.Values)
+            foreach (var eventLog in this.eventLogMap.Values)
             {
                 try
                 {
-                    eventLogContainer.EventLog.EntryWritten -= eventLogContainer.OnEventLogEntryWritten;
+                    eventLog.EntryWritten -= eventLogContainer.OnEventLogEntryWritten;
 
-                    eventLogContainer.OnEventLogEntryWritten(eventLogContainer.EventLog, null);
+                    eventLogContainer.OnEventLogEntryWritten(eventLog, null);
 
                     if (disposeEventLogs)
                     {
-                        eventLogContainer.EventLog.EnableRaisingEvents = false;
-                        eventLogContainer.EventLog.Dispose();
+                        eventLog.EnableRaisingEvents = false;
+                        eventLog.Dispose();
                     }
                 }
                 catch (Exception e)
@@ -471,108 +413,32 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         string.Format(
                             CultureInfo.InvariantCulture,
                             Resource.EventLog_CleanupException,
-                            eventLogContainer.EventLog,
+                            eventLog,
                             e.ToString()));
                 }
             }
 
-            // Generate a unique but friendly Directory name in the temp directory
-            string eventLogDirName = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
-                Resource.EventLog_FriendlyName,
-                Environment.MachineName,
-                DateTime.Now);
-
-            string eventLogFilename = eventLogFileName;
-            string eventLogDirPath = Path.Combine(Path.GetTempPath(), eventLogDirName);
-
-            // Create the directory
-            Directory.CreateDirectory(eventLogDirPath);
+            var fileName = eventLogContainer.WriteEventLogs(dataCollectionContext, requestedDuration, timeRequestReceived);
 
             // Add the directory to the list
-            this.eventLogDirectories.Add(eventLogDirPath);
+            this.eventLogDirectories.Add(Path.GetDirectoryName(fileName));
 
-            string eventLogBasePath = Path.Combine(eventLogDirPath, eventLogFilename);
-            bool unusedFilenameFound = false;
-
-            string eventLogPath = eventLogBasePath + ".xml";
-
-            if (File.Exists(eventLogPath))
+            lock (this.ContextData)
             {
-                for (int i = 1; !unusedFilenameFound; i++)
-                {
-                    eventLogPath = eventLogBasePath + "-" + i.ToString(CultureInfo.InvariantCulture) + ".xml";
-
-                    if (!File.Exists(eventLogPath))
-                    {
-                        unusedFilenameFound = true;
-                    }
-                }
-            }
-
-            // Limit entries to a certain time range if requested
-            if (requestedDuration < TimeSpan.MaxValue)
-            {
-                try
-                {
-                    minDate = timeRequestReceived - requestedDuration;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    minDate = DateTime.MinValue;
-                }
-            }
-
-            // The lock here and in OnEventLogEntryWritten() ensure that all of the events have been processed
-            // and added to eventLogContext.EventLogEntries before we try to write them.
-            lock (eventLogContext.EventLogEntries)
-            {
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                    eventLogPath,
-                    eventLogContext.EventLogEntries,
-                    this.fileHelper,
-                    minDate,
-                    DateTime.MaxValue);
-
-                stopwatch.Stop();
-                EqtTrace.Verbose(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "EventLogDataCollector: Wrote {0} event log entries to file '{1}' in {2} seconds",
-                        eventLogContext.EventLogEntries.Count,
-                        eventLogPath,
-                        stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture)));
-            }
-
-            // Write the event log file
-            this.dataSink.SendFileAsync(dataCollectionContext, eventLogPath, true);
-
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataCollector: Event log successfully sent for data collection context '{0}'.",
-                    dataCollectionContext.ToString());
-            }
-
-            lock (this.contextData)
-            {
-                this.contextData.Remove(dataCollectionContext);
+                this.ContextData.Remove(dataCollectionContext);
             }
         }
 
-        private EventLogCollectorContextData GetEventLogContext(DataCollectionContext dataCollectionContext)
+        private IEventLogContainer GetEventLogContainer(DataCollectionContext dataCollectionContext)
         {
-            EventLogCollectorContextData eventLogContext;
-            bool eventLogContextFound;
-            lock (this.contextData)
+            IEventLogContainer eventLogContext;
+            bool eventLogContainerFound;
+            lock (this.ContextData)
             {
-                eventLogContextFound = this.contextData.TryGetValue(dataCollectionContext, out eventLogContext);
+                eventLogContainerFound = this.ContextData.TryGetValue(dataCollectionContext, out eventLogContext);
             }
 
-            if (!eventLogContextFound)
+            if (!eventLogContainerFound)
             {
                 string msg = string.Format(
                     CultureInfo.InvariantCulture,
@@ -604,6 +470,33 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 this.eventLogNames.Add("Security", false);
                 this.eventLogNames.Add("Application", false);
             }
+
+            foreach (string eventLogName in this.eventLogNames.Keys)
+            {
+                try
+                {
+                    // Create an EventLog object and add it to the eventLogContext if one does not already exist
+                    if (!this.eventLogMap.ContainsKey(eventLogName))
+                    {
+                        EventLog eventLog = new EventLog(eventLogName);
+                        this.eventLogMap.Add(eventLogName, eventLog);
+                    }
+
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose(string.Format(
+                            CultureInfo.InvariantCulture,
+                            "EventLogDataCollector: Created EventSource '{0}'",
+                            eventLogName));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(
+                        null,
+                        new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.EventLog_ReadError, eventLogName, Environment.MachineName), ex));
+                }
+            }
         }
 
         private void ConfigureEventSources(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
@@ -612,9 +505,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             if (!string.IsNullOrEmpty(eventSourcesStr))
             {
                 this.eventSources = ParseCommaSeparatedList(eventSourcesStr);
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
-                    + this.eventSources);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
+                        + this.eventSources);
+                }
             }
         }
 

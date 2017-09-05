@@ -86,5 +86,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             File.WriteAllText(filePath, content);
         }
+
+        /// <inheritdoc/>
+        public string GetFullPath(string path)
+        {
+            return Path.GetFullPath(path);
+        }
     }
 }

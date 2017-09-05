@@ -7,9 +7,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.IO;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
@@ -18,26 +22,48 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     /// </summary>
     internal class EventLogContainer : IEventLogContainer
     {
+        /// <summary>
+        /// The event log file name.
+        /// </summary>
+        private static string eventLogFileName = "Event Log";
+
         private Dictionary<string, bool> eventSources;
 
         private Dictionary<EventLogEntryType, bool> entryTypes;
 
         private DataCollectionLogger logger;
 
-        private DataCollectionContext context;
+        private DataCollectionContext dataCollectionContext;
 
-        private int nextEntryIndexToCollect;
+        private DataCollectionSink dataCollectionSink;
 
-        private EventLogCollectorContextData contextData;
+        private bool limitReached;
+
+        private Dictionary<string, IEventLogContainer> eventLogContainers;
+
+        private int maxLogEntries;
+
+        private Dictionary<string, EventLog> eventLogMap;
+
+        private IFileHelper fileHelper;
+
+        public EventLogContainer(
+            Dictionary<string, EventLog> eventLogMap,
+            Dictionary<string, bool> eventSources,
+            Dictionary<EventLogEntryType, bool> entryTypes,
+            DataCollectionLogger logger,
+            DataCollectionContext context,
+            DataCollectionSink dataCollectionSink,
+            int maxLogEntries)
+            : this(eventLogMap, eventSources, entryTypes, logger, context, dataCollectionSink, maxLogEntries, new FileHelper())
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventLogContainer"/> class.
         /// </summary>
-        /// <param name="eventLog">
-        /// The event log.
-        /// </param>
-        /// <param name="nextEntryIndexToCollect">
-        /// The next entry index to collect.
+        /// <param name="eventLogMap">
+        /// Event Log Map
         /// </param>
         /// <param name="eventSources">
         /// The event Sources.
@@ -51,29 +77,65 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="context">
         /// The context.
         /// </param>
-        /// <param name="contextData">
-        /// The context data.
+        /// <param name="dataCollectionSink">
+        /// Data Collection Sink for attaching file with Test Results.
+        /// </param>
+        /// <param name="maxLogEntries">
+        /// Max Log Entries
+        /// </param>
+        /// <param name="fileHelper">
+        /// File Helper
         /// </param>
         public EventLogContainer(
-            EventLog eventLog,
-            int nextEntryIndexToCollect,
+            Dictionary<string, EventLog> eventLogMap,
             Dictionary<string, bool> eventSources,
             Dictionary<EventLogEntryType, bool> entryTypes,
             DataCollectionLogger logger,
             DataCollectionContext context,
-            EventLogCollectorContextData contextData)
+            DataCollectionSink dataCollectionSink,
+            int maxLogEntries,
+            IFileHelper fileHelper)
         {
-            this.EventLog = eventLog;
-            this.nextEntryIndexToCollect = nextEntryIndexToCollect;
-            this.contextData = contextData;
+            this.eventLogMap = eventLogMap;
             this.eventSources = eventSources;
             this.entryTypes = entryTypes;
-            this.context = context;
+            this.dataCollectionContext = context;
+            this.dataCollectionSink = dataCollectionSink;
             this.logger = logger;
+            this.maxLogEntries = maxLogEntries;
+            this.fileHelper = fileHelper;
+
+            this.EventLogIndexMap = new Dictionary<string, int>();
+            this.SetCurrentIndexForEventLogs(this.eventLogMap);
+
+            this.eventLogContainers = new Dictionary<string, IEventLogContainer>();
+            this.EventLogEntries = new List<EventLogEntry>();
         }
 
-        /// <inheritdoc />
-        public EventLog EventLog { get; set; }
+        /// <summary>
+        /// Gets the max log entries.
+        /// </summary>
+        public int MaxLogEntries => this.maxLogEntries;
+
+        /// <summary>
+        /// Gets or sets the event log entries.
+        /// </summary>
+        internal List<EventLogEntry> EventLogEntries { get; set; }
+
+        /// <summary>
+        /// Gets or sets the event log index map.
+        /// </summary>
+        internal Dictionary<string, int> EventLogIndexMap { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether limit reached.
+        /// </summary>
+        internal bool LimitReached
+        {
+            get => this.limitReached;
+
+            set => this.limitReached = value;
+        }
 
         /// <summary>
         /// This is the event handler for the EntryWritten event of the System.Diagnostics.EventLog class.
@@ -103,52 +165,57 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="e">The System.Diagnostics.EntryWrittenEventArgs object describing the entry that was written.</param>
         public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
         {
-            while (this.contextData.ProcessEvents)
+            while (!this.limitReached)
             {
-                int currentCount = this.EventLog.Entries.Count;
+                EventLog eventLog = (EventLog)source;
+                string eventLogName = eventLog != null ? eventLog.Log : e.Entry.Source;
+
+                int nextEntryIndexToCollect = this.EventLogIndexMap[eventLogName];
+
+                int currentCount = eventLog.Entries.Count;
                 if (currentCount == 0)
                 {
                     break;
                 }
 
-                int firstIndexInLog = this.EventLog.Entries[0].Index;
-                int mostRecentIndexInLog = this.EventLog.Entries[currentCount - 1].Index;
+                int firstIndexInLog = eventLog.Entries[0].Index;
+                int mostRecentIndexInLog = eventLog.Entries[currentCount - 1].Index;
 
-                if (mostRecentIndexInLog == this.nextEntryIndexToCollect - 1)
+                if (mostRecentIndexInLog == nextEntryIndexToCollect - 1)
                 {
                     // We've already collected the most recent entry in the log
                     break;
                 }
 
-                if (mostRecentIndexInLog < this.nextEntryIndexToCollect - 1)
+                if (mostRecentIndexInLog < nextEntryIndexToCollect - 1)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
                         EqtTrace.Warning(
                             string.Format(
                                 CultureInfo.InvariantCulture,
-                                "EventLogDataCollector: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
+                                "EventLogDataContainer: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
                                 firstIndexInLog,
                                 mostRecentIndexInLog,
-                                this.nextEntryIndexToCollect));
+                                nextEntryIndexToCollect));
                     }
 
                     // Send warning; event log must have been cleared.
                     this.logger.LogWarning(
-                        this.context,
+                        this.dataCollectionContext,
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            Resource.DataCollectors_EventLog_EventsLostWarning,
-                            this.EventLog.Log));
+                            Resource.EventLog_EventsLostWarning,
+                            eventLog.Log));
 
-                    this.nextEntryIndexToCollect = 0;
+                    nextEntryIndexToCollect = 0;
                     firstIndexInLog = 0;
                 }
 
-                for (; this.nextEntryIndexToCollect <= mostRecentIndexInLog; ++this.nextEntryIndexToCollect)
+                for (; nextEntryIndexToCollect <= mostRecentIndexInLog; ++nextEntryIndexToCollect)
                 {
-                    int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
-                    EventLogEntry nextEntry = this.EventLog.Entries[nextEntryIndexInCurrentLog];
+                    int nextEntryIndexInCurrentLog = nextEntryIndexToCollect - firstIndexInLog;
+                    EventLogEntry nextEntry = eventLog.Entries[nextEntryIndexInCurrentLog];
 
                     // If an explicit list of event sources was provided, only report log entries from those sources
                     if (this.eventSources != null && this.eventSources.Count > 0)
@@ -167,30 +234,133 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         }
                     }
 
-                    lock (this.contextData.EventLogEntries)
+                    lock (this.EventLogEntries)
                     {
-                        if (this.contextData.EventLogEntries.Count < this.contextData.MaxLogEntries)
+                        if (this.EventLogEntries.Count < this.maxLogEntries)
                         {
-                            this.contextData.EventLogEntries.Add(nextEntry);
+                            this.EventLogEntries.Add(nextEntry);
 
                             if (EqtTrace.IsVerboseEnabled)
                             {
                                 EqtTrace.Verbose(
                                     string.Format(
                                         CultureInfo.InvariantCulture,
-                                        "EventLogDataCollector.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
+                                        "EventLogDataContainer.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
                                         nextEntry.Index,
                                         nextEntryIndexInCurrentLog,
-                                        this.EventLog.Log));
+                                        eventLog.Log));
                             }
                         }
                         else
                         {
-                            this.contextData.LimitReached = true;
+                            this.LimitReached = true;
                             break;
                         }
                     }
                 }
+
+                this.EventLogIndexMap[eventLogName] = nextEntryIndexToCollect;
+            }
+        }
+
+        /// <inheritdoc />
+        public string WriteEventLogs(DataCollectionContext dataCollectionContext, TimeSpan requestedDuration, DateTime timeRequestReceived)
+        {
+            // Generate a unique but friendly Directory name in the temp directory
+            string eventLogDirName = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
+                "Event Log",
+                Environment.MachineName,
+                DateTime.Now);
+
+            string eventLogDirPath = Path.Combine(Path.GetTempPath(), eventLogDirName);
+
+            // Create the directory
+            this.fileHelper.CreateDirectory(eventLogDirPath);
+
+            string eventLogBasePath = Path.Combine(eventLogDirPath, eventLogFileName);
+            bool unusedFilenameFound = false;
+
+            string eventLogPath = eventLogBasePath + ".xml";
+
+            if (this.fileHelper.Exists(eventLogPath))
+            {
+                for (int i = 1; !unusedFilenameFound; i++)
+                {
+                    eventLogPath = eventLogBasePath + "-" + i.ToString(CultureInfo.InvariantCulture) + ".xml";
+
+                    if (!this.fileHelper.Exists(eventLogPath))
+                    {
+                        unusedFilenameFound = true;
+                    }
+                }
+            }
+
+            DateTime minDate = DateTime.MinValue;
+
+            // Limit entries to a certain time range if requested
+            if (requestedDuration < TimeSpan.MaxValue)
+            {
+                try
+                {
+                    minDate = timeRequestReceived - requestedDuration;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    minDate = DateTime.MinValue;
+                }
+            }
+
+            // The lock here and in OnEventLogEntryWritten() ensure that all of the events have been processed
+            // and added to eventLogContext.EventLogEntries before we try to write them.
+            lock (this.EventLogEntries)
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
+                    eventLogPath,
+                    this.EventLogEntries.Where(
+                        entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).ToList(),
+                    this.fileHelper);
+
+                stopwatch.Stop();
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
+                            this.EventLogEntries.Count,
+                            eventLogPath,
+                            stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture)));
+                }
+            }
+
+            // Write the event log file
+            FileTransferInformation fileTransferInformation =
+                new FileTransferInformation(dataCollectionContext, eventLogPath, true, this.fileHelper);
+            this.dataCollectionSink.SendFileAsync(fileTransferInformation);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
+                    dataCollectionContext.ToString());
+            }
+
+            return eventLogPath;
+        }
+
+        private void SetCurrentIndexForEventLogs(Dictionary<string, EventLog> eventLogMap)
+        {
+            foreach (KeyValuePair<string, EventLog> kvp in eventLogMap)
+            {
+                int currentCount = kvp.Value.Entries.Count;
+                int nextEntryIndexToCollect =
+                    (currentCount == 0) ? 0 : kvp.Value.Entries[currentCount - 1].Index + 1;
+                this.EventLogIndexMap.Add(kvp.Key, nextEntryIndexToCollect);
             }
         }
     }

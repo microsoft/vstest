@@ -3,18 +3,17 @@
 
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// Event log container interface
     /// </summary>
     internal interface IEventLogContainer
     {
-        /// <summary>
-        /// Gets or sets the event log.
-        /// </summary>
-        EventLog EventLog { get; set; }
-
         /// <summary>
         /// Event Handler for handling log entries.
         /// </summary>
@@ -25,5 +24,23 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// Contains data related to EventLog entry.
         /// </param>
         void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e);
+
+        /// <summary>
+        /// Writes EventLogs to xml file
+        /// </summary>
+        /// <param name="dataCollectionContext">
+        /// The data Collection Context.
+        /// </param>
+        /// <param name="requestedDuration">
+        /// The duration for which the EventLogs are collected.
+        /// </param>
+        /// <param name="timeRequestReceived">
+        /// The time when the requrest for WriteEventLogs are received. Events received after this time will not be logged.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>
+        /// Path to the xml log file.
+        /// </returns>
+        string WriteEventLogs(DataCollectionContext dataCollectionContext, TimeSpan requestedDuration, DateTime timeRequestReceived);
     }
 }

@@ -20,24 +20,14 @@
       </count-group>
     </header>
     <body>
-      <trans-unit id="DataCollectors_EventLog_EventsLostWarning">
-        <source>The '{0}' event log may have been cleared during collection; some events may not have been collected</source>
-        <target state="new">The '{0}' event log may have been cleared during collection; some events may not have been collected</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="EventLog_CleanupException">
         <source>An exception occurred while collecting final entries from the event log '{0}': {1}</source>
         <target state="new">An exception occurred while collecting final entries from the event log '{0}': {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EventLog_ContextNotFoundException">
-        <source>EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</source>
+        <source>Event Log DataCollector did not find eventLogContext for DataCollectionContext: {0}</source>
         <target state="new">EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="EventLog_FriendlyName">
-        <source>Event Log</source>
-        <target state="new">Event Log</target>
         <note></note>
       </trans-unit>
       <trans-unit id="EventLog_InvalidEntryTypeInConfig">
@@ -53,6 +43,11 @@
       <trans-unit id="EventLog_ReadError">
         <source>Unable to read event log '{0}' from computer '{1}'</source>
         <target state="new">Unable to read event log '{0}' from computer '{1}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EventLog_EventsLostWarning">
+        <source>The '{0}' event log may have been cleared during collection; some events may not have been collected</source>
+        <target state="new">The '{0}' event log may have been cleared during collection; some events may not have been collected</target>
         <note></note>
       </trans-unit>
     </body>

@@ -44,9 +44,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
                 FileName,
                 this.eventLogEntries,
-                this.mockFileHelper.Object,
-                DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)),
-                DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)));
+                this.mockFileHelper.Object);
 
             this.mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.IsAny<string>()), Times.Once);
         }
@@ -56,29 +54,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         {
             this.eventLogEntries.Add(this.eventLogEntry);
 
-            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                FileName,
-                this.eventLogEntries,
-                this.mockFileHelper.Object,
-                DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)),
-                DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)));
+            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(FileName, this.eventLogEntries, this.mockFileHelper.Object);
 
             this.mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.Is<string>(str => str.Contains(this.eventLogEntry.Message))));
-        }
-
-        [TestMethod]
-        public void WriteEventLogEntriesToXmlFileShouldNotWriteEventIfNotPresentInGivenTime()
-        {
-            this.eventLogEntries.Add(this.eventLogEntry);
-
-            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                FileName,
-                this.eventLogEntries,
-                this.mockFileHelper.Object,
-                DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)),
-                DateTime.Now.Add(new TimeSpan(2, 0, 0, 0)));
-
-            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.Is<string>(str => !str.Contains(this.eventLogEntry.Message))));
         }
     }
 }

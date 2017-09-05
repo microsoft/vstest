@@ -61,15 +61,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; event log may have been cleared during collection; some events may not have been collected.
-        /// </summary>
-        internal static string DataCollectors_EventLog_EventsLostWarning {
-            get {
-                return ResourceManager.GetString("DataCollectors_EventLog_EventsLostWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to An exception occurred while collecting final entries from the event log &apos;{0}&apos;: {1}.
         /// </summary>
         internal static string EventLog_CleanupException {
@@ -79,7 +70,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}.
+        ///   Looks up a localized string similar to Event Log DataCollector did not find eventLogContext for DataCollectionContext: {0}.
         /// </summary>
         internal static string EventLog_ContextNotFoundException {
             get {
@@ -88,11 +79,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Event Log.
+        ///   Looks up a localized string similar to The &apos;{0}&apos; event log may have been cleared during collection; some events may not have been collected.
         /// </summary>
-        internal static string EventLog_FriendlyName {
+        internal static string EventLog_EventsLostWarning {
             get {
-                return ResourceManager.GetString("EventLog_FriendlyName", resourceCulture);
+                return ResourceManager.GetString("EventLog_EventsLostWarning", resourceCulture);
             }
         }
         

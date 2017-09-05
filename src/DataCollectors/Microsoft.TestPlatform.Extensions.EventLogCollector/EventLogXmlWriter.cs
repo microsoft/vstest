@@ -29,16 +29,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="eventLogEntries">
         /// The event log entries.
         /// </param>
-        /// <param name="streamWriter">
-        /// The stream Writer.
+        /// <param name="fileHelper">
+        /// The file Helper.
         /// </param>
-        /// <param name="minDate">
-        /// The min date.
-        /// </param>
-        /// <param name="maxDate">
-        /// The max date.
-        /// </param>
-        public static void WriteEventLogEntriesToXmlFile(string xmlFilePath, List<EventLogEntry> eventLogEntries, IFileHelper fileHelper, DateTime minDate, DateTime maxDate)
+        public static void WriteEventLogEntriesToXmlFile(string xmlFilePath, List<EventLogEntry> eventLogEntries, IFileHelper fileHelper)
         {
             using (DataTable dataTable = new DataTable())
             {
@@ -65,19 +59,16 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                 foreach (EventLogEntry entry in eventLogEntries)
                 {
-                    if (entry.TimeGenerated > minDate && entry.TimeGenerated < maxDate)
-                    {
-                        DataRow row = dataTable.NewRow();
-                        row["Type"] = entry.EntryType.ToString();
-                        row["DateTime"] = entry.TimeGenerated;
-                        row["Source"] = entry.Source;
-                        row["Category"] = entry.Category;
-                        row["EventID"] = entry.InstanceId;
-                        row["Description"] = entry.Message;
-                        row["User"] = entry.UserName;
-                        row["Computer"] = entry.MachineName;
-                        dataTable.Rows.Add(row);
-                    }
+                    DataRow row = dataTable.NewRow();
+                    row["Type"] = entry.EntryType.ToString();
+                    row["DateTime"] = entry.TimeGenerated;
+                    row["Source"] = entry.Source;
+                    row["Category"] = entry.Category;
+                    row["EventID"] = entry.InstanceId;
+                    row["Description"] = entry.Message;
+                    row["User"] = entry.UserName;
+                    row["Computer"] = entry.MachineName;
+                    dataTable.Rows.Add(row);
                 }
 
                 DataSet dataSet = new DataSet();

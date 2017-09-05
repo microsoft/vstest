@@ -87,5 +87,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// The content.
         /// </param>
         void WriteAllTextToFile(string filePath, string content);
+
+        /// <summary>
+        /// Gets full path if relative path is specified.
+        /// </summary>
+        /// <param name="path">
+        /// The path.
+        /// </param>
+        /// <returns>
+        /// Full path.
+        /// </returns>
+        string GetFullPath(string path);
     }
 }
