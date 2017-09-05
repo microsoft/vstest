@@ -25,5 +25,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets a value indicating whether discovery was aborted.
         /// </summary>
         public bool IsAborted { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Metrics
+        /// </summary>
+        public IDictionary<string, string> Metrics { get; set; }
     }
 }

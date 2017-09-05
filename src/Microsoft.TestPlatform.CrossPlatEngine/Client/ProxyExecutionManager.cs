@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using System.Diagnostics;
 
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
@@ -84,6 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
 
                 var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
@@ -105,7 +110,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     this.InitializeExtensions(testPackages);
 
+                    stopwatch.Stop();
+
+                    // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
+                    MetricCollector.Add(UnitTestTelemetryDataConstants.TimeTakenToStartExecutionEngineExe, stopwatch.Elapsed.TotalMilliseconds.ToString());
+
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
+
                     var executionContext = new TestExecutionContext(
                         testRunCriteria.FrequencyOfRunStatsChangeEvent,
                         testRunCriteria.RunStatsChangeEventTimeout,

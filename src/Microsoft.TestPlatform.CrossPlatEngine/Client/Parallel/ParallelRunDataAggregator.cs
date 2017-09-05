@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using System;
@@ -22,6 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private List<ITestRunStatistics> testRunStatsList;
 
+        private Dictionary<string, string> metricsAggregator;
+
         private object dataUpdateSyncObject = new object();
 
         #endregion
@@ -34,6 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             Exceptions = new List<Exception>();
             executorUris = new List<string>();
             testRunStatsList = new List<ITestRunStatistics>();
+
+            metricsAggregator = new Dictionary<string, string>();
 
             IsAborted = false;
             IsCanceled = false;
@@ -84,6 +89,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             return overallRunStats;
         }
 
+        public IDictionary<string, string> GetAggregatedRunDataMetrics()
+        {
+            if (metricsAggregator != null && metricsAggregator.Count != 0)
+            {
+                var adapterUsedCount = metricsAggregator.Count(metrics =>
+                    metrics.Key.Contains(UnitTestTelemetryDataConstants.TotalTestsRanByAdapter));
+
+                // Aggregating Total Adapter Used Count
+                metricsAggregator.Add(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToRunTests,
+                    adapterUsedCount.ToString());
+            }
+
+            return metricsAggregator;
+        }
+
         public Exception GetAggregatedException()
         {
             if (Exceptions == null || Exceptions.Count < 1) return null;
@@ -123,6 +143,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (exception != null) Exceptions.Add(exception);
                 if (executorUris != null) this.executorUris.AddRange(executorUris);
                 if (testRunStats != null) testRunStatsList.Add(testRunStats);
+            }
+        }
+
+        public void AggregateRunDataMetrics(IDictionary<string, string> metrics)
+        {
+            if (metrics == null || metrics.Count == 0 || metricsAggregator == null)
+            {
+                return;
+            }
+
+            foreach (var metric in metrics)
+            {
+                if (metric.Key.Contains(UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(UnitTestTelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(UnitTestTelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(UnitTestTelemetryDataConstants.TotalTestsRanByAdapter)))
+                {
+                    var newValue = Double.Parse(metric.Value);
+                    string oldValue;
+
+                    if (metricsAggregator.TryGetValue(metric.Key, out oldValue))
+                    {
+                        metricsAggregator[metric.Key] = (newValue + Double.Parse(oldValue)).ToString();
+                    }
+
+                    else
+                    {
+                        metricsAggregator.Add(metric.Key, newValue.ToString());
+                    }
+                }
             }
         }
 

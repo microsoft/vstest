@@ -18,6 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using System.Diagnostics;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
@@ -89,12 +91,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
+
+                    stopwatch.Stop();
+
+                    // Collecting Time Taken to Start Discovery Engine
+                    MetricCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, stopwatch.Elapsed.TotalMilliseconds.ToString());
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }

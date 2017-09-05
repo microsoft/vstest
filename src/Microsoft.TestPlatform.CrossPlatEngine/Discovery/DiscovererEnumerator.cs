@@ -21,6 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using System.Diagnostics;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Enumerates through all the discoverers.
@@ -29,22 +31,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     {
         private DiscoveryResultCache discoveryResultCache;
         private ITestPlatformEventSource testPlatformEventSource;
+        private IMetricsCollector metricsCollector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
-        /// <param name="testPlatformEventSource1"></param>
-        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache):this(discoveryResultCache, TestPlatformEventSource.Instance)
-        {            
+        /// <param name="metricsCollector">Metric Collector</param>
+        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache, IMetricsCollector metricsCollector):this(discoveryResultCache, TestPlatformEventSource.Instance, metricsCollector)
+        {
         }
 
         internal DiscovererEnumerator(
             DiscoveryResultCache discoveryResultCache,
-            ITestPlatformEventSource testPlatformEventSource)
+            ITestPlatformEventSource testPlatformEventSource,
+            IMetricsCollector metricsCollector)
         {
             this.discoveryResultCache = discoveryResultCache;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.metricsCollector = metricsCollector;
         }
 
         /// <summary>
@@ -75,14 +80,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "This methods must invoke all possible discoverers and not fail or crash in any one.")]
         private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, IMessageLogger logger)
-        {
+        {  
+            // Stopwatch to calculate how much time engine takes to load all adapter
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger);
+            sw.Stop();
+
+            // Collecting Data Point for TimeTaken to Load Adapters
+            this.metricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenToLoadAdaptersInSec, (sw.Elapsed.TotalMilliseconds).ToString());
 
             // Warning is logged for in the inner function
             if (discovererToSourcesMap == null || discovererToSourcesMap.Count() == 0)
             {
                 return;
             }
+
+
+            //Collecting Total Number of Adapters Discovered in Machine
+            this.metricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscoveredInTheMachine, (discovererToSourcesMap.Keys.Count()).ToString());
 
             var context = new DiscoveryContext { RunSettings = settings };
 
@@ -91,8 +108,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
 
+            double totalTimeTakenByAdapters = 0;
 
-            
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
                 Type discovererType = null;
@@ -124,10 +141,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             discoverer.Value.GetType().FullName);
                     }
 
+                    sw.Reset();
+                    sw.Start();
+
                     var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
 
                     this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
+
+                    sw.Stop();
+                  
                     this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
 
                     if (EqtTrace.IsVerboseEnabled)
@@ -148,8 +171,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     logger.SendMessage(TestMessageLevel.Error, message);
                     EqtTrace.Error(e);
                 }
-                
+
+                // Collecting Data Point for Time Taken to Discover Tests by each Adapter
+                this.metricsCollector.Add(string.Format("{0},{1}", UnitTestTelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), (sw.Elapsed.TotalSeconds).ToString());
+                totalTimeTakenByAdapters += sw.Elapsed.TotalSeconds;
             }
+
+            //Collecting Total Time Taken by Adapters
+            this.metricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters.ToString());
         }
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
@@ -178,8 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="sources"> The sources. </param>
         /// <param name="logger"> The logger instance. </param>
         /// <returns> The map between an extension type and a source. </returns>
-        internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>
-            GetDiscovererToSourcesMap(string extensionAssembly, IEnumerable<string> sources, IMessageLogger logger)
+        internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> GetDiscovererToSourcesMap(string extensionAssembly, IEnumerable<string> sources, IMessageLogger logger)
         {
             var allDiscoverers = GetDiscoverers(extensionAssembly, throwOnError: true);
 
@@ -189,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // No discoverer available, log a warning
                 logger.SendMessage(
                     TestMessageLevel.Warning,
-                    String.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
+                    string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
 
                 return null;
             }

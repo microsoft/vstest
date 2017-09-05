@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
@@ -19,11 +20,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// The discovery manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The discovery manager.</returns>
-        public IDiscoveryManager GetDiscoveryManager()
+        public IDiscoveryManager GetDiscoveryManager(IMetricsCollector metricsCollector)
         {
             if(this.discoveryManager == null)
             {
-                this.discoveryManager = new DiscoveryManager();
+                this.discoveryManager = new DiscoveryManager(metricsCollector);
             }
 
             return this.discoveryManager;
@@ -33,11 +34,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// The execution manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The execution manager.</returns>
-        public IExecutionManager GetExecutionManager()
+        public IExecutionManager GetExecutionManager(IMetricsCollector metricsCollector)
         {
             if (this.executionManager == null)
             {
-                this.executionManager = new ExecutionManager();
+                this.executionManager = new ExecutionManager(metricsCollector);
             }
 
             return this.executionManager;

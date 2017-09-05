@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
@@ -71,6 +73,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     new Collection<AttachmentSet>(runDataAggregator.RunCompleteArgsAttachments),
                     runDataAggregator.ElapsedTime);
 
+                // Collect Final RunState
+                MetricCollector.Add(UnitTestTelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+
+                // Collect Aggregated Metrics Data
+                var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();
+                if(aggregatedRunDataMetrics!= null && aggregatedRunDataMetrics.Count != 0)
+                {
+                    foreach (var aggregatedRunDataMetric in aggregatedRunDataMetrics)
+                    {
+                        MetricCollector.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
+                    }
+                }
+
                 HandleParallelTestRunComplete(completedArgs);
             }
         }
@@ -100,6 +115,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 testRunCompleteArgs.IsCanceled,
                 runContextAttachments,
                 testRunCompleteArgs.AttachmentSets);
+
+            // Aggregate Run Data Metrics
+            this.runDataAggregator.AggregateRunDataMetrics(testRunCompleteArgs.metrics);
 
             return this.parallelProxyExecutionManager.HandlePartialRunComplete(
                 this.proxyExecutionManager,

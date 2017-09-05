@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
@@ -27,10 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private BaseRunTests activeTestRun;
 
+        private IMetricsCollector metricsCollector;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
-        public ExecutionManager() : this(TestPlatformEventSource.Instance)
+        public ExecutionManager(IMetricsCollector metricsCollector) : this(TestPlatformEventSource.Instance, metricsCollector)
         {
         }
 
@@ -38,9 +41,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource)
+        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IMetricsCollector metricsCollector)
         {
             this.testPlatformEventSource = testPlatformEventSource;
+            this.metricsCollector = metricsCollector;
         }
 
         #region IExecutionManager Implementation
@@ -90,7 +94,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                      runSettings,
                      testExecutionContext,
                      testCaseEventsHandler,
-                     runEventsHandler);
+                     runEventsHandler,
+                     this.metricsCollector);
 
                 this.activeTestRun.RunTests();
             }
@@ -132,7 +137,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                                          runSettings,
                                          testExecutionContext,
                                          testCaseEventsHandler,
-                                         runEventsHandler);
+                                         runEventsHandler,
+                                         this.metricsCollector);
 
                 this.activeTestRun.RunTests();
             }

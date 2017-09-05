@@ -8,6 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Linq;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -31,7 +32,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockExecutionManager = new Mock<IExecutionManager>();
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
+            this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager(It.IsAny<IMetricsCollector>())).Returns(this.mockExecutionManager.Object);
             this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
         }
 

@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// The base run tests.
@@ -49,6 +50,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ITestEventsPublisher testEventsPublisher;
         private ITestRunCache testRunCache;
         private string package;
+
+        private IMetricsCollector metricsCollector;
 
         /// <summary>
         /// Specifies that the test run cancellation is requested
@@ -65,6 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
+
+        private Dictionary<string, int> adapterUrisAndTestCount;
 
         /// <summary>
         /// To create thread in given apartment state.
@@ -94,7 +99,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
-            ITestPlatformEventSource testPlatformEventSource) :
+            ITestPlatformEventSource testPlatformEventSource,
+            IMetricsCollector metricsCollector) :
             this(
                 package,
                 runSettings,
@@ -103,7 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testRunEventsHandler,
                 testPlatformEventSource,
                 testCaseEventsHandler as ITestEventsPublisher,
-                new PlatformThread())
+                new PlatformThread(),
+                metricsCollector)
         {
         }
 
@@ -125,13 +132,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestRunEventsHandler testRunEventsHandler,
             ITestPlatformEventSource testPlatformEventSource,
             ITestEventsPublisher testEventsPublisher,
-            IThread platformThread)
+            IThread platformThread,
+            IMetricsCollector metricsCollector)
         {
             this.package = package;
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
             this.testCaseEventsHandler = testCaseEventsHandler;
             this.testRunEventsHandler = testRunEventsHandler;
+            this.metricsCollector = metricsCollector;
 
             this.isCancellationRequested = false;
             this.testPlatformEventSource = testPlatformEventSource;
@@ -175,6 +184,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.frameworkHandle.TestRunMessage += this.OnTestRunMessage;
 
             this.executorUrisThatRanTests = new List<string>();
+
+            this.adapterUrisAndTestCount = new Dictionary<string, int>();
         }
 
         #endregion
@@ -350,8 +361,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must call all possible executors and not fail on crash in any executor.")]
         private bool RunTestInternalWithExecutors(IEnumerable<Tuple<Uri, string>> executorUriExtensionMap, long totalTests)
         {
+            double totalTimeTakenByAdapters = 0;
+
+            // Stopwatch to calculate how much time engine is taking to run tests
+            var stopwatch = new Stopwatch();
+
             // Call the executor for each group of tests.
             var exceptionsHitDuringRunTests = false;
+
+            //Collecting Total Number of Adapters Discovered in Machine
+            this.metricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscovered, (executorUriExtensionMap.Count()).ToString());
 
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
@@ -379,6 +398,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         {
                             break;
                         }
+
+                        stopwatch.Reset();
+                        stopwatch.Start();
+
                         var currentTotalTests = this.testRunCache.TotalExecutedTests;
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
@@ -396,6 +419,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             this.executorUrisThatRanTests.Add(executorUriExtensionTuple.Item1.AbsoluteUri);
                             totalTests = this.testRunCache.TotalExecutedTests;
                         }
+
+                        stopwatch.Stop();
 
                         if (EqtTrace.IsVerboseEnabled)
                         {
@@ -439,7 +464,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         TestMessageLevel.Warning,
                         string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.NoMatchingExecutor, executorUriExtensionTuple.Item1, runtimeVersion));
                 }
+
+                // Collecting Telemetry Event
+                this.metricsCollector.Add(string.Format("{0},{1}", UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUriExtensionTuple.Item1.AbsoluteUri), (stopwatch.Elapsed.TotalSeconds).ToString());
+                totalTimeTakenByAdapters += stopwatch.Elapsed.TotalSeconds;
             }
+
+            //Collecting Total Time Taken by Adapters
+            this.metricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters.ToString());
 
             return exceptionsHitDuringRunTests;
         }
@@ -502,6 +534,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             if (this.testRunEventsHandler != null)
             {
+                // For Collecting Metrics
+                AddTestRunToEachAdapter(lastChunk);
+
+                // Collecting TotalTestsRun
+                this.metricsCollector.Add(UnitTestTelemetryDataConstants.TotalTestsRun, runStats.ExecutedTests.ToString());
+
+                // Collecting the Test Run State
+                this.metricsCollector.Add(UnitTestTelemetryDataConstants.RunState, canceled ? "Canceled" : (aborted ? "Aborted" : "Completed"));
+
+                //Collecting Metrics
+                LogNumberOfTestRunByEachAdapter();
+
+                var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
+
+                // Adding Metrics along with Test Run Complete Event Args
                 Collection<AttachmentSet> attachments = this.frameworkHandle?.Attachments;
                 var testRunCompleteEventArgs = new TestRunCompleteEventArgs(
                     runStats,
@@ -509,14 +556,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     aborted,
                     exception,
                     attachments,
-                    elapsedTime);
+                    elapsedTime,
+                    this.metricsCollector.Metrics());
 
                 if (lastChunk.Any())
                 {
                     UpdateTestResults(lastChunk, this.package);
                 }
-
-                var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
 
                 this.testRunEventsHandler.HandleTestRunComplete(
                     testRunCompleteEventArgs,
@@ -538,6 +584,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
+
+                // For Collecting Metrics
+                AddTestRunToEachAdapter(results);
             }
             else
             {
@@ -567,6 +616,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return success;
         }
 
+
         private static void UpdateTestResults(IEnumerable<TestResult> testResults, string package)
         {
             // Before sending the testresults back, update the test case objects with source provided by IDE/User.
@@ -577,6 +627,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     tr.TestCase.Source = package;
                 }
             }
+        }
+
+        private void AddTestRunToEachAdapter(IEnumerable<TestResult> TotalTests)
+        {
+            var groupByUris = TotalTests.GroupBy(x => x.TestCase.ExecutorUri.ToString());
+
+            int currentCountOfTests = 0;
+            int alreadyExistTestCount = 0;
+
+            foreach (var uri in groupByUris)
+            {
+                currentCountOfTests = uri.Count();
+
+                if (adapterUrisAndTestCount.TryGetValue(uri.Key, out alreadyExistTestCount))
+                {
+                    adapterUrisAndTestCount[uri.Key] = alreadyExistTestCount + currentCountOfTests;
+                }
+                else
+                {
+                    adapterUrisAndTestCount.Add(uri.Key, currentCountOfTests);
+                }
+            }
+        }
+
+        private void LogNumberOfTestRunByEachAdapter()
+        {
+            // Collecting Total Tests Run by each Adapter
+            foreach (var key in adapterUrisAndTestCount.Keys)
+            {
+                this.metricsCollector.Add(String.Format("{0}.{1}", UnitTestTelemetryDataConstants.TotalTestsRanByAdapter, key), adapterUrisAndTestCount[key].ToString());
+            }
+
+            // Collecting Number Of Adapters used to Run tests.
+            this.metricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUrisAndTestCount.Count.ToString());
         }
 
         #endregion

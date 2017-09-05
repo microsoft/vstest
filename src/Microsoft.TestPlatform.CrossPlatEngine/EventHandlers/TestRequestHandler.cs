@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
@@ -33,6 +34,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private IDataSerializer dataSerializer;
 
+        private IMetricsCollector metricsCollector;
+        
         private Action<Message> onAckMessageRecieved;
 
         private int highestSupportedVersion = 2;
@@ -51,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager = communicationManager;
             this.transport = new SocketTransport(communicationManager, connectionInfo);
             this.dataSerializer = dataSerializer;
+            this.metricsCollector = new MetricsCollector();
         }
 
         /// <inheritdoc/>
@@ -109,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery Session Initialize.");
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetDiscoveryManager()
+                                () => testHostManagerFactory.GetDiscoveryManager(this.metricsCollector)
                                     .Initialize(pathToAdditionalExtensions),
                                 0);
                             break;
@@ -122,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
                             var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
                             jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetDiscoveryManager()
+                                () => testHostManagerFactory.GetDiscoveryManager(this.metricsCollector)
                                     .DiscoverTests(discoveryCriteria, discoveryEventsHandler),
                                 0);
 
@@ -134,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery Session Initialize.");
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetExecutionManager()
+                                () => testHostManagerFactory.GetExecutionManager(this.metricsCollector)
                                     .Initialize(pathToAdditionalExtensions),
                                 0);
                             break;
@@ -148,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
                             jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetExecutionManager()
+                                testHostManagerFactory.GetExecutionManager(this.metricsCollector)
                                     .StartTestRun(
                                         testRunCriteriaWithSources.AdapterSourceMap,
                                         testRunCriteriaWithSources.Package,
@@ -171,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                             jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetExecutionManager()
+                                testHostManagerFactory.GetExecutionManager(this.metricsCollector)
                                     .StartTestRun(
                                         testRunCriteriaWithTests.Tests,
                                         testRunCriteriaWithTests.Package,
@@ -186,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     case MessageType.CancelTestRun:
                         jobQueue.Pause();
-                        testHostManagerFactory.GetExecutionManager().Cancel();
+                        testHostManagerFactory.GetExecutionManager(this.metricsCollector).Cancel();
                         break;
 
                     case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
@@ -195,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     case MessageType.AbortTestRun:
                         jobQueue.Pause();
-                        testHostManagerFactory.GetExecutionManager().Abort();
+                        testHostManagerFactory.GetExecutionManager(this.metricsCollector).Abort();
                         break;
 
                     case MessageType.SessionEnd:
@@ -279,7 +283,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 TotalTests = totalTests,
                 LastDiscoveredTests = isAborted ? null : lastChunk,
-                IsAborted = isAborted
+                IsAborted = isAborted,
+                Metrics =  this.metricsCollector.Metrics()
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);
