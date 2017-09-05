@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
     using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
     /// <summary>
@@ -17,9 +18,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     /// </summary>
     internal class EventLogContainer : IEventLogContainer
     {
-        private List<string> eventSources;
+        private Dictionary<string, bool> eventSources;
 
-        private List<EventLogEntryType> entryTypes;
+        private Dictionary<EventLogEntryType, bool> entryTypes;
 
         private DataCollectionLogger logger;
 
@@ -56,8 +57,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         public EventLogContainer(
             EventLog eventLog,
             int nextEntryIndexToCollect,
-            List<string> eventSources,
-            List<EventLogEntryType> entryTypes,
+            Dictionary<string, bool> eventSources,
+            Dictionary<EventLogEntryType, bool> entryTypes,
             DataCollectionLogger logger,
             DataCollectionContext context,
             EventLogCollectorContextData contextData)
@@ -152,17 +153,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     // If an explicit list of event sources was provided, only report log entries from those sources
                     if (this.eventSources != null && this.eventSources.Count > 0)
                     {
-                        bool eventSourceFound = false;
-                        foreach (string eventSource in this.eventSources)
-                        {
-                            if (string.Equals(nextEntry.Source, eventSource, StringComparison.OrdinalIgnoreCase))
-                            {
-                                eventSourceFound = true;
-                                break;
-                            }
-                        }
-
-                        if (!eventSourceFound)
+                        if (!this.eventSources.ContainsKey(nextEntry.Source))
                         {
                             continue;
                         }
@@ -170,17 +161,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                     if (this.entryTypes != null && this.entryTypes.Count > 0)
                     {
-                        bool eventTypeFound = false;
-                        foreach (EventLogEntryType entryType in this.entryTypes)
-                        {
-                            if (nextEntry.EntryType == entryType)
-                            {
-                                eventTypeFound = true;
-                                break;
-                            }
-                        }
-
-                        if (!eventTypeFound)
+                        if (!this.entryTypes.ContainsKey(nextEntry.EntryType))
                         {
                             continue;
                         }

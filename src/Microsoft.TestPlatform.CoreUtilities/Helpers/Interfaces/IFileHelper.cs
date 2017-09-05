@@ -76,5 +76,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="sourcePath">Full path of the file.</param>
         /// <param name="destinationPath">Target path for the file.</param>
         void MoveFile(string sourcePath, string destinationPath);
+
+        /// <summary>
+        /// The write all text to file.
+        /// </summary>
+        /// <param name="filePath">
+        /// The file Path.
+        /// </param>
+        /// <param name="content">
+        /// The content.
+        /// </param>
+        void WriteAllTextToFile(string filePath, string content);
     }
 }

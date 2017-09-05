@@ -9,7 +9,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     using System.IO;
     using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
 
     [TestClass]
     public class EventLogXmlWriterTests
@@ -24,100 +27,58 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         private List<EventLogEntry> eventLogEntries;
 
+        private Mock<IFileHelper> mockFileHelper;
+
         public EventLogXmlWriterTests()
         {
             this.eventLog = new EventLog("Application");
             var count = this.eventLog.Entries.Count;
             this.eventLogEntry = this.eventLog.Entries[count - 1];
             this.eventLogEntries = new List<EventLogEntry>();
+            this.mockFileHelper = new Mock<IFileHelper>();
         }
 
         [TestMethod]
         public void WriteEventLogEntriesToXmlFileShouldWriteToXMLFile()
         {
-            try
-            {
-                EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                    FileName,
-                    this.eventLogEntries,
-                    DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)),
-                    DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)));
+            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
+                FileName,
+                this.eventLogEntries,
+                this.mockFileHelper.Object,
+                DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)),
+                DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)));
 
-                XmlDocument document = new XmlDocument();
-                document.LoadXml(DefaultEventLog);
-
-                XmlDocument document1 = new XmlDocument();
-                document1.Load(FileName);
-
-                Assert.AreEqual(document1.InnerText, document.InnerText);
-                Assert.IsTrue(File.Exists(FileName));
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                File.Delete(FileName);
-            }
+            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
         public void WriteEventLogEntriesToXmlFileShouldWriteLogEntryIfPresent()
         {
-            try
-            {
-                this.eventLogEntries.Add(this.eventLogEntry);
+            this.eventLogEntries.Add(this.eventLogEntry);
 
-                EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                    FileName,
-                    this.eventLogEntries,
-                    DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)),
-                    DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)));
+            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
+                FileName,
+                this.eventLogEntries,
+                this.mockFileHelper.Object,
+                DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0)),
+                DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)));
 
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(FileName);
-
-                Assert.IsTrue(xmlDoc.InnerText.Contains(this.eventLogEntry.Message));
-                Assert.IsTrue(File.Exists(FileName));
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                File.Delete(FileName);
-            }
+            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.Is<string>(str => str.Contains(this.eventLogEntry.Message))));
         }
 
         [TestMethod]
         public void WriteEventLogEntriesToXmlFileShouldNotWriteEventIfNotPresentInGivenTime()
         {
-            try
-            {
-                this.eventLogEntries.Add(this.eventLogEntry);
+            this.eventLogEntries.Add(this.eventLogEntry);
 
-                EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                    FileName,
-                    this.eventLogEntries,
-                    DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)),
-                    DateTime.Now.Add(new TimeSpan(2, 0, 0, 0)));
+            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
+                FileName,
+                this.eventLogEntries,
+                this.mockFileHelper.Object,
+                DateTime.Now.Add(new TimeSpan(1, 0, 0, 0)),
+                DateTime.Now.Add(new TimeSpan(2, 0, 0, 0)));
 
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(FileName);
-
-                Assert.IsFalse(xmlDoc.InnerText.Contains(this.eventLogEntry.Message));
-                Assert.IsTrue(File.Exists(FileName));
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                File.Delete(FileName);
-            }
+            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(FileName, It.Is<string>(str => !str.Contains(this.eventLogEntry.Message))));
         }
     }
 }

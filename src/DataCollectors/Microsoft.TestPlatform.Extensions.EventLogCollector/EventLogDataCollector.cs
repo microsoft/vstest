@@ -12,6 +12,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Resource = Resources.Resources;
 
@@ -86,22 +88,27 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// The event log names.
         /// </summary>
-        private List<string> eventLogNames;
+        private Dictionary<string, bool> eventLogNames;
 
         /// <summary>
         /// The event sources.
         /// </summary>
-        private List<string> eventSources;
+        private Dictionary<string, bool> eventSources;
 
         /// <summary>
         /// The entry types.
         /// </summary>
-        private List<EventLogEntryType> entryTypes;
+        private Dictionary<EventLogEntryType, bool> entryTypes;
 
         /// <summary>
         /// The max entries.
         /// </summary>
         private int maxEntries;
+
+        /// <summary>
+        /// The file helper.
+        /// </summary>
+        private IFileHelper fileHelper;
 
         /// <summary>
         /// The context data.
@@ -129,6 +136,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.testCaseEndEventHandler = this.OnTestCaseEnd;
 
             this.eventLogDirectories = new List<string>();
+            this.fileHelper = new FileHelper();
         }
 
         #endregion
@@ -143,7 +151,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal List<string> EventSources
+        internal Dictionary<string, bool> EventSources
         {
             get
             {
@@ -151,7 +159,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal List<EventLogEntryType> EntryTypes
+        internal Dictionary<EventLogEntryType, bool> EntryTypes
         {
             get
             {
@@ -159,7 +167,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal List<string> EventLogNames
+        internal Dictionary<string, bool> EventLogNames
         {
             get
             {
@@ -265,13 +273,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         #endregion
 
-        private static List<string> ParseCommaSeparatedList(string commaSeparatedList)
+        private static Dictionary<string, bool> ParseCommaSeparatedList(string commaSeparatedList)
         {
-            List<string> strings = new List<string>();
+            Dictionary<string, bool> strings = new Dictionary<string, bool>();
             string[] items = commaSeparatedList.Split(new char[] { ',' });
             foreach (string item in items)
             {
-                strings.Add(item.Trim());
+                strings.Add(item.Trim(), false);
             }
 
             return strings;
@@ -403,7 +411,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 }
             }
 
-            foreach (string eventLogName in this.eventLogNames)
+            foreach (string eventLogName in this.eventLogNames.Keys)
             {
                 try
                 {
@@ -525,6 +533,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
                     eventLogPath,
                     eventLogContext.EventLogEntries,
+                    this.fileHelper,
                     minDate,
                     DateTime.MaxValue);
 
@@ -577,7 +586,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
         {
-            this.eventLogNames = new List<string>();
+            this.eventLogNames = new Dictionary<string, bool>();
             string eventLogs = collectorNameValueConfigurationManager[EventLogConstants.SettingEventLogs];
             if (eventLogs != null)
             {
@@ -591,9 +600,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             else
             {
                 // Default to collecting these standard logs
-                this.eventLogNames.Add("System");
-                this.eventLogNames.Add("Security");
-                this.eventLogNames.Add("Application");
+                this.eventLogNames.Add("System", false);
+                this.eventLogNames.Add("Security", false);
+                this.eventLogNames.Add("Application", false);
             }
         }
 
@@ -611,16 +620,16 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void ConfigureEntryTypes(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
         {
-            this.entryTypes = new List<EventLogEntryType>();
+            this.entryTypes = new Dictionary<EventLogEntryType, bool>();
             string entryTypesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEntryTypes];
             if (entryTypesStr != null)
             {
-                foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr))
+                foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr).Keys)
                 {
                     try
                     {
                         this.entryTypes.Add(
-                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
+                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true), false);
                     }
                     catch (ArgumentException e)
                     {
@@ -642,9 +651,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
             else
             {
-                this.entryTypes.Add(EventLogEntryType.Error);
-                this.entryTypes.Add(EventLogEntryType.Warning);
-                this.entryTypes.Add(EventLogEntryType.FailureAudit);
+                this.entryTypes.Add(EventLogEntryType.Error, false);
+                this.entryTypes.Add(EventLogEntryType.Warning, false);
+                this.entryTypes.Add(EventLogEntryType.FailureAudit, false);
             }
         }
 

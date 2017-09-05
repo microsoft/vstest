@@ -18,9 +18,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     [TestClass]
     public class EventLogContainerTests
     {
-        private List<string> eventSources;
+        private Dictionary<string, bool> eventSources;
 
-        private List<EventLogEntryType> entryTypes;
+        private Dictionary<EventLogEntryType, bool> entryTypes;
 
         private Mock<DataCollectionLogger> logger;
 
@@ -28,8 +28,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public EventLogContainerTests()
         {
-            this.eventSources = new List<string>();
-            this.entryTypes = new List<EventLogEntryType>();
+            this.eventSources = new Dictionary<string, bool>();
+            this.entryTypes = new Dictionary<EventLogEntryType, bool>();
             this.logger = new Mock<DataCollectionLogger>();
             this.context = new DataCollectionContext(new SessionId(Guid.NewGuid()));
         }
@@ -111,8 +111,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             EventLog eventLog = new EventLog("Application");
             EntryWrittenEventArgs entryWrittenEventArgs = new EntryWrittenEventArgs();
 
-            this.entryTypes.Add(EventLogEntryType.Warning);
-            this.eventSources.Add("Application");
+            this.entryTypes.Add(EventLogEntryType.Warning, false);
+            this.eventSources.Add("Application", false);
             EventLogCollectorContextData eventLogCollectorContextData = new EventLogCollectorContextData(5);
             EventLogContainer container = new EventLogContainer(
                 eventLog,
@@ -136,7 +136,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             EventLog eventLog = new EventLog("Application");
             EntryWrittenEventArgs entryWrittenEventArgs = new EntryWrittenEventArgs();
 
-            this.eventSources.Add("Application1");
+            this.eventSources.Add("Application1", false);
             EventLogCollectorContextData eventLogCollectorContextData = new EventLogCollectorContextData(5);
             EventLogContainer container = new EventLogContainer(
                 eventLog,
@@ -160,7 +160,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             EventLog eventLog = new EventLog("Application");
             EntryWrittenEventArgs entryWrittenEventArgs = new EntryWrittenEventArgs();
 
-            this.entryTypes.Add(EventLogEntryType.FailureAudit);
+            this.entryTypes.Add(EventLogEntryType.FailureAudit, false);
             EventLogCollectorContextData eventLogCollectorContextData = new EventLogCollectorContextData(5);
             EventLogContainer container = new EventLogContainer(
                 eventLog,
