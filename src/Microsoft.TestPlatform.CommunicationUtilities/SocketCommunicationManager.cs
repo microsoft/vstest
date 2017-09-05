@@ -10,9 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Facilitates communication using sockets
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Stream to use read timeout
         /// </summary>
-        private NetworkStream stream;
+        private Stream stream;
 
         private Socket socket;
 
@@ -100,7 +100,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public IPEndPoint HostServer(IPEndPoint endpoint)
         {
             this.tcpListener = new TcpListener(endpoint);
-
             this.tcpListener.Start();
             EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)this.tcpListener.LocalEndpoint);
 
@@ -119,12 +118,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
                 this.socket = client.Client;
-                this.stream = client.GetStream();
-                this.binaryReader = new BinaryReader(this.stream);
+                this.socket.NoDelay = true;
+                this.stream = new PlatformStream().PlatformBufferedStream(client.GetStream(), SocketConstants.BUFFERSIZE);
+                this.binaryReader = new BinaryReader(client.GetStream());
                 this.binaryWriter = new BinaryWriter(this.stream);
 
                 this.clientConnectedEvent.Set();
-
+                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
                 EqtTrace.Info("Accepted Client request and set the flag");
             }
         }
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // for now added a check for validation of this.tcpclient
             this.clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
-            this.tcpClient = new TcpClient();
+            this.tcpClient = new TcpClient { NoDelay = true };
             this.socket = this.tcpClient.Client;
 
             Stopwatch watch = new Stopwatch();
@@ -178,10 +178,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     if (this.tcpClient.Connected)
                     {
-                        this.stream = this.tcpClient.GetStream();
-                        this.binaryReader = new BinaryReader(this.stream);
+                        this.stream = new PlatformStream().PlatformBufferedStream(this.tcpClient.GetStream(), SocketConstants.BUFFERSIZE);
+                        this.binaryReader = new BinaryReader(this.tcpClient.GetStream());
                         this.binaryWriter = new BinaryWriter(this.stream);
                         EqtTrace.Info("Connected to the server successfully ");
+                        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
                         this.clientConnectionAcceptedEvent.Set();
                     }
                 }
@@ -354,8 +355,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         && socketException.SocketErrorCode == SocketError.TimedOut)
                     {
                         EqtTrace.Info(
-                            "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
-                            ioException);
+                        "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                        ioException);
                     }
                     else
                     {

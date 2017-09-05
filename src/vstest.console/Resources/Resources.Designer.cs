@@ -693,6 +693,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to --InProcess|/InProcess
+        ///      Runs the tests in vstest.console.exe process.
+        ///      This is supported for framework ".NETFramework,Version=v4.*", Framework40 and Framework45.
+        /// </summary>
+        public static string InProcessHelp
+        {
+            get
+            {
+                return ResourceManager.GetString("InProcessHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10.
         /// </summary>
         public static string InvalidBatchSize
@@ -755,6 +768,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("InvalidParallelCommand", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;InProcess&apos; command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InProcess) and try again..
+        /// </summary>
+        public static string InvalidInProcessCommand
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidInProcessCommand", resourceCulture);
             }
         }
 

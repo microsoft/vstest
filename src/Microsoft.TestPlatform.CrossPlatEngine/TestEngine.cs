@@ -101,6 +101,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return new InProcessProxyExecutionManager(testHostManager);
             }
 
+            if (parallelLevel <= 1 && !isDataCollectorEnabled && this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings))
+            {
+                return new InProcessProxyExecutionManager();
+            }
+
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
             {

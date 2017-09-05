@@ -32,6 +32,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
             Assert.AreEqual(false, runConfiguration.DisableAppDomain);
             Assert.AreEqual(false, runConfiguration.DisableParallelization);
+            Assert.AreEqual(false, runConfiguration.InProcess);
             Assert.AreEqual(false, runConfiguration.DesignMode);
             Assert.AreEqual(false, runConfiguration.InIsolation);
             Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
@@ -70,6 +71,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <TreatTestAdapterErrorsAsWarnings>true</TreatTestAdapterErrorsAsWarnings>
                        <DisableAppDomain>true</DisableAppDomain>
                        <DisableParallelization>true</DisableParallelization>
+                       <InProcess>true</InProcess>
                        <MaxCpuCount>2</MaxCpuCount>
                        <BatchSize>5</BatchSize>
                        <TestSessionTimeout>10000</TestSessionTimeout>
@@ -105,6 +107,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(10000, runConfiguration.TestSessionTimeout);
             Assert.AreEqual(true, runConfiguration.DisableAppDomain);
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
+            Assert.AreEqual(true, runConfiguration.InProcess);
             Assert.AreEqual(true, runConfiguration.DesignMode);
             Assert.AreEqual(true, runConfiguration.InIsolation);
             Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
