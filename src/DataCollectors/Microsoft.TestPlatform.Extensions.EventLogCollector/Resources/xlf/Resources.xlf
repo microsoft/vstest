@@ -2,37 +2,37 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_CleanupException">
-        <source>An exception occurred while collecting final entries from the event log '{0}': {1}</source>
-        <target state="new">An exception occurred while collecting final entries from the event log '{0}': {1}</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_ContextNotFoundException">
-        <source>EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</source>
-        <target state="new">EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_EventsLostWarning">
+      <trans-unit id="DataCollectors_EventLog_EventsLostWarning">
         <source>The '{0}' event log may have been cleared during collection; some events may not have been collected</source>
         <target state="new">The '{0}' event log may have been cleared during collection; some events may not have been collected</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_FriendlyName">
+      <trans-unit id="EventLog_CleanupException">
+        <source>An exception occurred while collecting final entries from the event log '{0}': {1}</source>
+        <target state="new">An exception occurred while collecting final entries from the event log '{0}': {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EventLog_ContextNotFoundException">
+        <source>EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</source>
+        <target state="new">EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EventLog_FriendlyName">
         <source>Event Log</source>
         <target state="new">Event Log</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig">
-        <source>The event log diagnostic data adapter encountered an invalid event log entry type in its configuration: {0}</source>
-        <target state="new">The event log diagnostic data adapter encountered an invalid event log entry type in its configuration: {0}</target>
+      <trans-unit id="EventLog_InvalidEntryTypeInConfig">
+        <source>The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</source>
+        <target state="new">The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig">
-        <source>The event log diagnostic data adapter encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration: {0}</source>
-        <target state="new">The event log diagnostic data adapter encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration: {0}</target>
+      <trans-unit id="EventLog_InvalidMaxEntriesInConfig">
+        <source>The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration: {0}</source>
+        <target state="new">The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration: {0}</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="Execution_Agent_DataCollectors_EventLog_ReadError">
+      <trans-unit id="EventLog_ReadError">
         <source>Unable to read event log '{0}' from computer '{1}'</source>
         <target state="new">Unable to read event log '{0}' from computer '{1}'</target>
         <note></note>

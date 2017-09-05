@@ -109,6 +109,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         private Dictionary<DataCollectionContext, EventLogCollectorContextData> contextData =
             new Dictionary<DataCollectionContext, EventLogCollectorContextData>();
 
+        /// <summary>
+        /// The event log map.
+        /// </summary>
+        private Dictionary<string, EventLog> eventLogMap = new Dictionary<string, EventLog>();
+
         #endregion
 
         #region Constructor
@@ -219,7 +224,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         #region Internal Methods
         internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContextData)
         {
-            EventLog eventLog = new EventLog(eventLogName);
+            EventLog eventLog;
+
+            if (!this.eventLogMap.TryGetValue(eventLogName, out eventLog))
+            {
+                eventLog = new EventLog(eventLogName);
+                this.eventLogMap.Add(eventLogName, eventLog);
+            }
 
             int currentCount = eventLog.Entries.Count;
             int nextEntryIndexToCollect =
@@ -328,7 +339,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     e.TestOutcome);
             }
 
-            this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.Now);
+            this.WriteCollectedEventLogEntries(e.Context, false, TimeSpan.MaxValue, DateTime.Now);
         }
 
         #endregion
@@ -424,34 +435,36 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void WriteCollectedEventLogEntries(
             DataCollectionContext dataCollectionContext,
-            bool terminateCollectionForContext,
+            bool disposeEventLogs,
             TimeSpan requestedDuration,
             DateTime timeRequestReceived)
         {
             DateTime minDate = DateTime.MinValue;
             EventLogCollectorContextData eventLogContext = this.GetEventLogContext(dataCollectionContext);
 
-            if (terminateCollectionForContext)
+            foreach (IEventLogContainer eventLogContainer in eventLogContext.EventLogContainers.Values)
             {
-                foreach (IEventLogContainer eventLogContainer in eventLogContext.EventLogContainers.Values)
+                try
                 {
-                    try
+                    eventLogContainer.EventLog.EntryWritten -= eventLogContainer.OnEventLogEntryWritten;
+
+                    eventLogContainer.OnEventLogEntryWritten(eventLogContainer.EventLog, null);
+
+                    if (disposeEventLogs)
                     {
-                        eventLogContainer.EventLog.EntryWritten -= eventLogContainer.OnEventLogEntryWritten;
                         eventLogContainer.EventLog.EnableRaisingEvents = false;
-                        eventLogContainer.OnEventLogEntryWritten(eventLogContainer.EventLog, null);
                         eventLogContainer.EventLog.Dispose();
                     }
-                    catch (Exception e)
-                    {
-                        this.logger.LogWarning(
-                            dataCollectionContext,
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                Resource.EventLog_CleanupException,
-                                eventLogContainer.EventLog,
-                                e.ToString()));
-                    }
+                }
+                catch (Exception e)
+                {
+                    this.logger.LogWarning(
+                        dataCollectionContext,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resource.EventLog_CleanupException,
+                            eventLogContainer.EventLog,
+                            e.ToString()));
                 }
             }
 
@@ -528,16 +541,16 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             // Write the event log file
             this.dataSink.SendFileAsync(dataCollectionContext, eventLogPath, true);
 
-            EqtTrace.Verbose(
-                "EventLogDataCollector: Event log successfully sent for data collection context '{0}'.",
-                dataCollectionContext.ToString());
-
-            if (terminateCollectionForContext)
+            if (EqtTrace.IsVerboseEnabled)
             {
-                lock (this.contextData)
-                {
-                    this.contextData.Remove(dataCollectionContext);
-                }
+                EqtTrace.Verbose(
+                    "EventLogDataCollector: Event log successfully sent for data collection context '{0}'.",
+                    dataCollectionContext.ToString());
+            }
+
+            lock (this.contextData)
+            {
+                this.contextData.Remove(dataCollectionContext);
             }
         }
 
