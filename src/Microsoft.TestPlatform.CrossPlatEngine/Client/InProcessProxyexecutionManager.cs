@@ -16,12 +16,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IExecutionManager executionManager;
         private ITestRuntimeProvider testHostManager;
+        private IMetricsCollector metricsCollector;
+
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
@@ -41,7 +44,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
-            this.executionManager = this.testHostManagerFactory.GetExecutionManager();
+            this.metricsCollector = new MetricsCollector();
+            this.executionManager = this.testHostManagerFactory.GetExecutionManager(this.metricsCollector);
         }
 
         /// <summary>
@@ -110,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Abort());
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager(this.metricsCollector).Abort());
         }
 
         /// <summary>
@@ -118,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Cancel()
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Cancel());
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager(this.metricsCollector).Cancel());
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -23,8 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
 
-        public RunTestsWithTests(IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-            : this(testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
+        public RunTestsWithTests(IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, IMetricsCollector metricsCollector)
+            : this(testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null, metricsCollector)
         {
         }
 
@@ -39,8 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsTestList"></param>
-        internal RunTestsWithTests(IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
-            : base(package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
+        internal RunTestsWithTests(IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList, IMetricsCollector metricsCollector)
+            : base(package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance, metricsCollector)
         {
             this.testCases = testCases;
             this.executorUriVsTestList = executorUriVsTestList;

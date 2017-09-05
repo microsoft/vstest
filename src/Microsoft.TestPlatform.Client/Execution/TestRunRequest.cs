@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Client.Telemetry;
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 {
     using System;
@@ -8,16 +10,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Threading;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+    using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -49,6 +54,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private IDataSerializer dataSerializer;
 
         /// <summary>
+        /// The Run Request
+        /// </summary>
+        private UnitTestRunTelemetryCollector unitTestRunTelmetryCollector;
+
+        /// <summary>
         /// Time out for run provided by client.
         /// </summary>
         private long testSessionTimeout;
@@ -71,6 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             this.State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
+
+            this.unitTestRunTelmetryCollector = new UnitTestRunTelemetryCollector(this);
         }
 
         #region ITestRunRequest
@@ -94,6 +106,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 {
                     throw new InvalidOperationException(ClientResources.InvalidStateForExecution);
                 }
+
+                this.unitTestRunTelmetryCollector?.Start();
 
                 EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
 
@@ -127,6 +141,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // Start the stop watch for calculating the test run time taken overall
                     this.runRequestTimeTracker.Start();
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
+
+                    this.unitTestRunTelmetryCollector?.UpdateProcessId(processId);
+                    this.unitTestRunTelmetryCollector?.AddDataPoints();
+
                     EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
 
                     return processId;
@@ -391,6 +409,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Notify the waiting handle that run is complete
                     this.runCompletionEvent.Set();
+
+                    this.unitTestRunTelmetryCollector?.CollectAndPostTelemetrydata();
                 }
 
                 EqtTrace.Info("TestRunRequest:TestRunComplete: Completed.");
@@ -500,11 +520,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (disposing)
                     {
                         this.runCompletionEvent?.Dispose();
+                        this.unitTestRunTelmetryCollector?.Dispose();
+                        TelemetryClient.Dispose();
                     }
 
                     // Indicate that object has been disposed
                     this.runCompletionEvent = null;
                     this.disposed = true;
+                    this.unitTestRunTelmetryCollector = null;
                 }
             }
 
