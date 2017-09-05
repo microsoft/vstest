@@ -19,6 +19,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
 
         /// <summary>
+        /// Clear the extensions
+        /// </summary>
+        void ClearExtensions();
+
+        /// <summary>
         /// Creates a discovery request
         /// </summary>
         /// <param name="discoveryCriteria">Specifies the discovery parameters</param>

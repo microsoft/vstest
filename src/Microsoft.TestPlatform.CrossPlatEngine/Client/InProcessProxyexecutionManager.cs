@@ -4,25 +4,30 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    class InProcessProxyExecutionManager : IProxyExecutionManager
+    internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
+        private IExecutionManager executionManager;
+        private ITestRuntimeProvider testHostManager;
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
         /// </summary>
-        public InProcessProxyExecutionManager() : this(new TestHostManagerFactory())
+        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
         {
         }
 
@@ -32,36 +37,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManagerFactory">
         /// Manager factory
         /// </param>
-        internal InProcessProxyExecutionManager(ITestHostManagerFactory testHostManagerFactory)
+        internal InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
         {
+            this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
+            this.executionManager = this.testHostManagerFactory.GetExecutionManager();
         }
 
+        /// <summary>
+        /// Initialize adapters.
+        /// </summary>
         public void Initialize()
         {
-            if (!this.IsInitialized)
-            {
-                var executionManager = this.testHostManagerFactory.GetExecutionManager();
-
-                // We don't need to pass list of extension as we are running inside vstest.console and
-                // it will use TestPluginCache of vstest.console
-                executionManager.Initialize(Enumerable.Empty<string>());
-                this.IsInitialized = true;
-            }
         }
 
+        /// <inheritdoc/>
         public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
             try
             {
-                var executionManager = this.testHostManagerFactory.GetExecutionManager();
+                var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
+                                                    // If the test execution is with a test filter, group them by sources
+                                                    testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
-                // Initialize extension before execution if not already initialized
-                if (!this.IsInitialized)
-                {
-                    executionManager.Initialize(Enumerable.Empty<string>());
-                }
-
+                // This code should be in sync with ProxyExecutionManager.StartTestRun executionContext
                 var executionContext = new TestExecutionContext(
                             testRunCriteria.FrequencyOfRunStatsChangeEvent,
                             testRunCriteria.RunStatsChangeEventTimeout,
@@ -73,24 +72,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
                             testCaseFilter: testRunCriteria.TestCaseFilter);
 
+                // Initialize extension before execution
+                this.InitializeExtensions(testPackages);
 
                 if (testRunCriteria.HasSpecificSources)
                 {
-                    // [TODO]: we need to revisit to second-last argument if we will enable datacollector. 
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, testRunCriteria.TestRunSettings, executionContext, testPackages);
+
+                    Task.Run(() => executionManager.StartTestRun(runRequest.AdapterSourceMap, runRequest.Package,
+                        runRequest.RunSettings, runRequest.TestExecutionContext, null, eventHandler));
                 }
                 else
                 {
-                    // [TODO]: we need to revisit to second-last argument if we will enable datacollector. 
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.Tests, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, testRunCriteria.TestRunSettings, executionContext, testPackages);
+
+                    Task.Run(() => executionManager.StartTestRun(runRequest.Tests, runRequest.Package,
+                        runRequest.RunSettings, runRequest.TestExecutionContext, null, eventHandler));
                 }
             }
             catch (Exception exception)
             {
                 EqtTrace.Error("InProcessProxyexecutionManager.StartTestRun: Failed to start test run: {0}", exception);
 
-                // Send a discovery complete to caller.
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                // Send exception message.
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller.
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
@@ -122,6 +127,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Close()
         {
+        }
+
+
+        private void InitializeExtensions(IEnumerable<string> sources)
+        {
+            var extensionsFromSource = this.testHostManager.GetTestPlatformExtensions(sources, Enumerable.Empty<string>());
+            if (extensionsFromSource.Any())
+            {
+                TestPluginCache.Instance.UpdateExtensions(extensionsFromSource, false);
+            }
+
+            // We don't need to pass list of extension as we are running inside vstest.console and
+            // it will use TestPluginCache of vstest.console
+            executionManager.Initialize(Enumerable.Empty<string>());
         }
     }
 }

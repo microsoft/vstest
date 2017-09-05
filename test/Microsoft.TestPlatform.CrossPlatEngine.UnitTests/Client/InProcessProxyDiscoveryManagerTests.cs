@@ -7,10 +7,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
@@ -20,15 +22,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<ITestHostManagerFactory> mockTestHostManagerFactory;
         private InProcessProxyDiscoveryManager inProcessProxyDiscoveryManager;
         private Mock<IDiscoveryManager> mockDiscoveryManager;
+        private Mock<ITestRuntimeProvider> mockTestHostManager;
 
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockDiscoveryManager = new Mock<IDiscoveryManager>();
-            this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManagerFactory.Object);
-
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager()).Returns(this.mockDiscoveryManager.Object);
+            this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
         }
 
         [TestCleanup]
@@ -37,56 +40,48 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDiscoveryManager = null;
             this.mockTestHostManagerFactory = null;
             this.inProcessProxyDiscoveryManager = null;
+            this.mockTestHostManager = null;
         }
 
-        [TestMethod]
-        public void InitializeShouldCallDiscoveryManagerInitializeWithEmptyIEnumerable()
-        {
-            this.inProcessProxyDiscoveryManager.Initialize();
-            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
-        }
 
         [TestMethod]
-        public void InitializeShouldSetIsInitializedTotrue()
+        public void DiscoverTestsShouldCallInitialize()
         {
-            this.inProcessProxyDiscoveryManager.Initialize();
-            Assert.IsTrue(this.inProcessProxyDiscoveryManager.IsInitialized);
-        }
-
-        [TestMethod]
-        public void InitializeShouldCallDiscoveryManagerInitializeWithEmptyIEnumerableOnlyOnce()
-        {
-            this.inProcessProxyDiscoveryManager.Initialize();
-            this.inProcessProxyDiscoveryManager.Initialize();
-            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void DiscoverTestsShouldCallInitializeIfNotAlreadyInitialized()
-        {
-            var manualResetEvent = new ManualResetEvent(true);
+            var manualResetEvent = new ManualResetEvent(false);
 
             this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
                 () => manualResetEvent.Set());
 
-            this.inProcessProxyDiscoveryManager.DiscoverTests(null, null);
+            var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
+            this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000));
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldNotCallInitializeIfAlreadyInitialized()
+        public void DiscoverTestsShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
         {
-            var manualResetEvent = new ManualResetEvent(true);
+            var manualResetEvent = new ManualResetEvent(false);
 
             this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
                 () => manualResetEvent.Set());
 
-            this.inProcessProxyDiscoveryManager.Initialize();
-            this.inProcessProxyDiscoveryManager.DiscoverTests(null, null);
+            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\DiscoveryDummy.dll" });
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000));
-            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            List<string> expectedResult = new List<string>();
+            if (TestPluginCache.Instance.PathToExtensions != null)
+            {
+                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
+            }
+
+            expectedResult.Add("C:\\DiscoveryDummy.dll");
+
+            var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
+            this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
+
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
+
+            Assert.IsFalse(expectedResult.Except(TestPluginCache.Instance.PathToExtensions).Any());
         }
 
         [TestMethod]
@@ -94,7 +89,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
             var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
-            var manualResetEvent = new ManualResetEvent(true);
+            var manualResetEvent = new ManualResetEvent(false);
 
             this.mockDiscoveryManager.Setup(o => o.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object)).Callback(
                 () => manualResetEvent.Set());
@@ -109,7 +104,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
             var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
-            var manualResetEvent = new ManualResetEvent(true);
+            var manualResetEvent = new ManualResetEvent(false);
 
             this.mockDiscoveryManager.Setup(o => o.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object)).Callback(
                 () => throw new Exception());
@@ -125,7 +120,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AbortShouldCallDiscoveryManagerAbort()
         {
-            var manualResetEvent = new ManualResetEvent(true);
+            var manualResetEvent = new ManualResetEvent(false);
 
             this.mockDiscoveryManager.Setup(o => o.Abort()).Callback(
                 () => manualResetEvent.Set());
@@ -133,6 +128,49 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.inProcessProxyDiscoveryManager.Abort();
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.Abort should get called");
+        }
+
+        [TestMethod]
+        public void DiscoverTestRunShouldAllowRuntimeProviderToUpdateAdapterSource()
+        {
+            var inputSources = new List<string> { "test.dll" };
+            var discoveryCriteria = new DiscoveryCriteria(inputSources, 1, string.Empty);
+            var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var manualResetEvent = new ManualResetEvent(false);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources)).Returns(discoveryCriteria.Sources);
+            this.mockDiscoveryManager.Setup(o => o.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object)).Callback(
+                () => manualResetEvent.Set());
+
+            this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
+            this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.DiscoverTests should get called");
+            this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSources), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestRunShouldUpdateTestSourcesIfSourceDiffersFromTestHostManagerSource()
+        {
+            var actualSources = new List<string> { "actualSource.dll" };
+            var inputSource =  new List<string> { "inputPackage.appxrecipe" };
+
+            var discoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
+            var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var manualResetEvent = new ManualResetEvent(false);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources)).Returns(actualSources);
+
+            this.mockDiscoveryManager.Setup(o => o.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object)).Callback(
+                () => manualResetEvent.Set());
+
+            this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.DiscoverTests should get called");
+
+            // AdapterSourceMap should contail updated testSources.
+            Assert.AreEqual(actualSources.FirstOrDefault(), discoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
+            Assert.AreEqual(inputSource.FirstOrDefault(), discoveryCriteria.Package);
         }
     }
 }

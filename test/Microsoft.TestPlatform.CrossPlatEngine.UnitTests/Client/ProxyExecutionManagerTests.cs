@@ -89,6 +89,50 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunShouldUpdateTestCaseSourceIfTestCaseSourceDiffersFromTestHostManagerSource()
+        {
+            var actualSources = new List<string> { "actualSource.dll" };
+            var inputSource = new List<string> { "inputPackage.appxrecipe" };
+
+            var testRunCriteria = new TestRunCriteria(
+                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
+                    frequencyOfRunStatsChangeEvent: 10);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
+
+            this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
+            Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldNotUpdateTestCaseSourceIfTestCaseSourceDoNotDifferFromTestHostManagerSource()
+        {
+            var actualSources = new List<string> { "actualSource.dll" };
+            var inputSource = new List<string> { "actualSource.dll" };
+
+            var testRunCriteria = new TestRunCriteria(
+                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), inputSource.FirstOrDefault()) },
+                    frequencyOfRunStatsChangeEvent: 10);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(testRunCriteria, mockTestRunEventsHandler.Object);
+
+            this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
+            Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
+        }
+
+        [TestMethod]
         public void StartTestRunShouldNotInitializeExtensionsOnCommunicationFailure()
         {
             // Make sure TestPlugincache is refreshed.

@@ -85,15 +85,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
-                var testSources = testRunCriteria.Sources;
 
-                // If the test execution is with a test filter, group them by sources
-                if (testRunCriteria.HasSpecificTests)
-                {
-                    testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
-                }
+                var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
+                                                    // If the test execution is with a test filter, group them by sources
+                                                    testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
-                this.isCommunicationEstablished = this.SetupChannel(testSources, this.cancellationTokenSource.Token);
+                this.isCommunicationEstablished = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
@@ -106,8 +103,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         throw new TestPlatformException(Resources.Resources.CancelationRequested);
                     }
 
-                    this.InitializeExtensions(testSources);
+                    this.InitializeExtensions(testPackages);
 
+                    // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
                     var executionContext = new TestExecutionContext(
                         testRunCriteria.FrequencyOfRunStatsChangeEvent,
                         testRunCriteria.RunStatsChangeEventTimeout,
@@ -121,24 +119,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                     var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
+
                     if (testRunCriteria.HasSpecificSources)
                     {
-                        // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
-                        // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
-                        this.UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap);
-                        var runRequest = new TestRunCriteriaWithSources(
-                            testRunCriteria.AdapterSourceMap,
-                            runsettings,
-                            executionContext);
+                        var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, runsettings, executionContext, testPackages);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
                     }
                     else
                     {
-                        var runRequest = new TestRunCriteriaWithTests(
-                            testRunCriteria.Tests,
-                            runsettings,
-                            executionContext);
+                        var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, runsettings, executionContext, testPackages);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
                     }

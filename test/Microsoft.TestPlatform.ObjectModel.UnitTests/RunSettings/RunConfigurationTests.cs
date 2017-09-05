@@ -34,6 +34,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(false, runConfiguration.DisableParallelization);
             Assert.AreEqual(false, runConfiguration.InProcess);
             Assert.AreEqual(false, runConfiguration.DesignMode);
+            Assert.AreEqual(false, runConfiguration.InIsolation);
             Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(Constants.DefaultExecutionThreadApartmentState, runConfiguration.ExecutionThreadApartmentState);
         }
@@ -77,6 +78,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <TestAdaptersPaths>C:\a\b;D:\x\y</TestAdaptersPaths>
                        <BinariesRoot>E:\x\z</BinariesRoot>
                        <DesignMode>true</DesignMode>
+                       <InIsolation>true</InIsolation>
                        <CollectSourceInformation>false</CollectSourceInformation>
                        <ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>
                      </RunConfiguration>
@@ -107,6 +109,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
             Assert.AreEqual(true, runConfiguration.InProcess);
             Assert.AreEqual(true, runConfiguration.DesignMode);
+            Assert.AreEqual(true, runConfiguration.InIsolation);
             Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
         }

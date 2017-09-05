@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using MSTest.TestFramework.AssertExtensions;
+    using System.IO;
 
     [TestClass]
     public class InferRunSettingsHelperTests
@@ -304,6 +305,29 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.IsTrue(result.IndexOf("MaxCpuCount", StringComparison.OrdinalIgnoreCase) > 0);
             Assert.IsTrue(result.IndexOf("DisableParallelization", StringComparison.OrdinalIgnoreCase) > 0);
             Assert.IsTrue(result.IndexOf("DisableAppDomain", StringComparison.OrdinalIgnoreCase) > 0);
+        }
+
+        [TestMethod]
+        public void UpdateTargetDeviceValueFromOldMsTestSettings()
+        {
+            var settings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <DisableParallelization>False</DisableParallelization>
+                                    <DisableAppDomain>False</DisableAppDomain>
+                                </RunConfiguration>
+                                <MSPhoneTest>
+                                  <TargetDevice>169.254.193.190</TargetDevice>
+                                </MSPhoneTest>
+                            </RunSettings>";
+
+            var navigator = this.GetNavigator(settings);
+
+            var result = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
+            Assert.IsTrue(result);
+
+            InferRunSettingsHelper.UpdateTargetDeviceInformation(navigator, deviceXml);
+            Assert.AreEqual(deviceXml.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetDevice"));
         }
 
         #region private methods

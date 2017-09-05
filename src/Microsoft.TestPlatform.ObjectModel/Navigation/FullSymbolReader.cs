@@ -3,20 +3,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
-#if NET451
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
     using System.Runtime.InteropServices;
-
-    using Dia;
 
     /// <summary>
     /// To get method's file name, startline and endline from desktop assembly file.
     /// </summary>
-    internal class FullSymbolReader : ISymbolReader 
+    internal class FullSymbolReader : ISymbolReader
     {
         /// <summary>
         /// To check isDisposed
@@ -35,14 +31,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// Holds method symbols for all types in the source.
         /// Methods in different types can have same name, hence seprated dicitionary is created for each type.
         /// Bug: Method overrides in same type are not handled (not a regression)
+        /// ToDo(Solution): Use method token along with as identifier, this will always give unique method.The adapters would need to send this token to us to correct the behavior.
         /// </summary>
         private Dictionary<string, Dictionary<string, IDiaSymbol>> methodSymbols = new Dictionary<string, Dictionary<string, IDiaSymbol>>();
-
-        /// <summary>
-        /// Manifest files for Reg Free Com. This is essentially put in place for the msdia dependency.
-        /// </summary>
-        private const string ManifestFileNameX86 = "TestPlatform.ObjectModel.x86.manifest";
-        private const string ManifestFileNameX64 = "TestPlatform.ObjectModel.manifest";
 
         /// <summary>
         /// dispose caches
@@ -67,24 +58,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// </param>
         public void CacheSymbols(string binaryPath, string searchPath)
         {
-            using (var activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom()))
+            try
             {
-                // Activating and Deactivating the context here itself since deactivating context from a different thread would throw an SEH exception.
-                // We do not need the activation context post this point since the DIASession COM object is created here only.
-                try
+                if(OpenSession(binaryPath, searchPath))
                 {
-                    activationContext.ActivateContext();
-
-                    this.source = new DiaSource();
-                    this.source.loadDataForExe(binaryPath, searchPath, null);
-                    this.source.openSession(out this.session);
                     this.PopulateCacheForTypeAndMethodSymbols();
                 }
-                catch (COMException)
-                {
-                    this.Dispose();
-                    throw;
-                }
+            }
+            catch (COMException)
+            {
+                this.Dispose();
+                throw;
             }
         }
 
@@ -128,6 +112,56 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return navigationData;
         }
 
+        private bool OpenSession(string filename, string searchPath)
+        {
+            try
+            {
+                // Activate the DIA data source COM object
+                this.source = DiaSourceObject.GetDiaSourceObject();
+
+                if (this.source == null)
+                {
+                    return false;
+                }
+
+                // UWP(App model) scenario
+                if (!Path.IsPathRooted(filename))
+                {
+                    filename = Path.Combine(Directory.GetCurrentDirectory(), filename);
+                    if (string.IsNullOrEmpty(searchPath))
+                    {
+                        searchPath = Directory.GetCurrentDirectory();
+                    }
+                }
+
+                // Load the data for the executable
+                int hResult = this.source.LoadDataForExe(filename, searchPath, IntPtr.Zero);
+                if (HResult.Failed(hResult))
+                {
+                    throw new COMException(string.Format(Resources.Resources.FailedToCreateDiaSession, hResult));
+                }
+
+                // Open the session and return it
+                if (HResult.Failed(this.source.OpenSession(out this.session)))
+                {
+                    return false;
+                }
+            }
+            catch (COMException)
+            {
+                throw;
+            }
+            finally
+            {
+                if (this.source != null)
+                {
+                    Marshal.FinalReleaseComObject(this.source);
+                }
+            }
+
+            return true;
+        }
+
         private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol)
         {
             ValidateArg.NotNull(symbol, "symbol");
@@ -138,14 +172,29 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             try
             {
-                this.session.findLinesByAddr(symbol.addressSection, symbol.addressOffset, (uint)symbol.length, out lines);
+                // Get the address section
+                if (HResult.Failed(symbol.GetAddressSection(out uint section)))
+                {
+                    return navigationData;
+                }
 
-                uint celt;
-                IDiaLineNumber lineNumber;
+                // Get the address offset
+                if (HResult.Failed(symbol.GetAddressOffset(out uint offset)))
+                {
+                    return navigationData;
+                }
+
+                // Get the length of the symbol
+                if (HResult.Failed(symbol.GetLength(out long length)))
+                {
+                    return navigationData;
+                }
+
+                this.session.FindLinesByAddress(section, offset, (uint)length, out lines);
 
                 while (true)
                 {
-                    lines.Next(1, out lineNumber, out celt);
+                    lines.GetNext(1, out IDiaLineNumber lineNumber, out uint celt);
 
                     if (celt != 1)
                     {
@@ -155,19 +204,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     IDiaSourceFile sourceFile = null;
                     try
                     {
-                        sourceFile = lineNumber.sourceFile;
+                        lineNumber.GetSourceFile(out sourceFile);
 
+                        // Get startline
+                        lineNumber.GetLineNumber(out uint startLine);
+
+                        // Get endline
+                        lineNumber.GetLineNumberEnd(out uint endLine);
+                        
                         // The magic hex constant below works around weird data reported from GetSequencePoints.
                         // The constant comes from ILDASM's source code, which performs essentially the same test.
                         const uint Magic = 0xFEEFEE;
-                        if (lineNumber.lineNumber >= Magic || lineNumber.lineNumberEnd >= Magic)
+                        if (startLine >= Magic || endLine >= Magic)
                         {
                             continue;
                         }
 
-                        navigationData.FileName = sourceFile.fileName;
-                        navigationData.MinLineNumber = Math.Min(navigationData.MinLineNumber, (int)lineNumber.lineNumber);
-                        navigationData.MaxLineNumber = Math.Max(navigationData.MaxLineNumber, (int)lineNumber.lineNumberEnd);
+                        sourceFile.GetFilename(out string srcFileName);
+
+                        navigationData.FileName = srcFileName;
+                        navigationData.MinLineNumber = Math.Min(navigationData.MinLineNumber, (int)startLine);
+                        navigationData.MaxLineNumber = Math.Max(navigationData.MaxLineNumber, (int)endLine);
                     }
                     finally
                     {
@@ -190,36 +247,33 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             IDiaSymbol global = null;
             try
             {
-                global = this.session.globalScope;
-                global.findChildren(SymTagEnum.SymTagCompiland, null, 0, out enumTypeSymbols);
-                uint celtTypeSymbol;
-                IDiaSymbol typeSymbol = null;
+                this.session.GetGlobalScope(out global);
+                global.FindChildren(SymTagEnum.SymTagCompiland, null, 0, out enumTypeSymbols);
 
                 // NOTE::
                 // If foreach loop is used instead of Enumerator iterator, for some reason it leaves
                 // the reference to pdb active, which prevents pdb from being rebuilt (in VS IDE scenario).
-                enumTypeSymbols.Next(1, out typeSymbol, out celtTypeSymbol);
-                while (celtTypeSymbol == 1 && null != typeSymbol)
+                enumTypeSymbols.GetNext(1, out IDiaSymbol typeSymbol, out uint celtTypeSymbol);
+                while (celtTypeSymbol == 1 && typeSymbol != null)
                 {
-                    this.typeSymbols[typeSymbol.name] = typeSymbol;
+                    typeSymbol.GetName(out string name);
+                    this.typeSymbols[name] = typeSymbol;
 
                     IDiaEnumSymbols enumMethodSymbols = null;
                     try
                     {
                         Dictionary<string, IDiaSymbol> methodSymbolsForType = new Dictionary<string, IDiaSymbol>();
-                        typeSymbol.findChildren(SymTagEnum.SymTagFunction, null, 0, out enumMethodSymbols);
+                        typeSymbol.FindChildren(SymTagEnum.SymTagFunction, null, 0, out enumMethodSymbols);
 
-                        uint celtMethodSymbol;
-                        IDiaSymbol methodSymbol = null;
-
-                        enumMethodSymbols.Next(1, out methodSymbol, out celtMethodSymbol);
-                        while (celtMethodSymbol == 1 && null != methodSymbol)
+                        enumMethodSymbols.GetNext(1, out IDiaSymbol methodSymbol, out uint celtMethodSymbol);
+                        while (celtMethodSymbol == 1 && methodSymbol != null)
                         {
-                            UpdateMethodSymbolCache(methodSymbol.name, methodSymbol, methodSymbolsForType);
-                            enumMethodSymbols.Next(1, out methodSymbol, out celtMethodSymbol);
+                            methodSymbol.GetName(out string methodName);
+                            UpdateMethodSymbolCache(methodName, methodSymbol, methodSymbolsForType);
+                            enumMethodSymbols.GetNext(1, out methodSymbol, out celtMethodSymbol);
                         }
 
-                        this.methodSymbols[typeSymbol.name] = methodSymbolsForType;
+                        this.methodSymbols[name] = methodSymbolsForType;
                     }
                     catch (Exception ex)
                     {
@@ -228,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                             EqtTrace.Error(
                                 "Ignoring the exception while iterating method symbols:{0} for type:{1}",
                                 ex,
-                                typeSymbol.name);
+                                name);
                         }
                     }
                     finally
@@ -236,7 +290,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                         ReleaseComObject(ref enumMethodSymbols);
                     }
 
-                    enumTypeSymbols.Next(1, out typeSymbol, out celtTypeSymbol);
+                    enumTypeSymbols.GetNext(1, out typeSymbol, out celtTypeSymbol);
                 }
             }
             catch (Exception ex)
@@ -261,8 +315,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             IDiaSymbol typeSymbol = null;
             IDiaSymbol global = null;
 
-            uint celt;
-
             try
             {
                 typeName = typeName.Replace('+', '.');
@@ -271,10 +323,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     return this.typeSymbols[typeName];
                 }
 
-                global = this.session.globalScope;
-                global.findChildren(symTag, typeName, 0, out enumSymbols);
+                this.session.GetGlobalScope(out global);
+                global.FindChildren(symTag, typeName, 0, out enumSymbols);
 
-                enumSymbols.Next(1, out typeSymbol, out celt);
+                enumSymbols.GetNext(1, out typeSymbol, out uint celt);
 
 #if DEBUG
                 if (typeSymbol == null)
@@ -282,20 +334,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     IDiaEnumSymbols enumAllSymbols = null;
                     try
                     {
-                        global.findChildren(symTag, null, 0, out enumAllSymbols);
+                        global.FindChildren(symTag, null, 0, out enumAllSymbols);
                         List<string> children = new List<string>();
 
-                        IDiaSymbol childSymbol = null;
-                        uint fetchedCount = 0;
                         while (true)
                         {
-                            enumAllSymbols.Next(1, out childSymbol, out fetchedCount);
+                            enumAllSymbols.GetNext(1, out IDiaSymbol childSymbol, out uint fetchedCount);
                             if (fetchedCount == 0 || childSymbol == null)
                             {
                                 break;
                             }
 
-                            children.Add(childSymbol.name);
+                            childSymbol.GetName(out string childSymbolName);
+                            children.Add(childSymbolName);
                             ReleaseComObject(ref childSymbol);
                         }
 
@@ -315,7 +366,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 ReleaseComObject(ref global);
             }
 
-            if (null != typeSymbol)
+            if (typeSymbol != null)
             {
                 this.typeSymbols[typeName] = typeSymbol;
             }
@@ -334,26 +385,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             try
             {
-
-                if (this.methodSymbols.ContainsKey(typeSymbol.name))
+                typeSymbol.GetName(out string symbolName);
+                if (this.methodSymbols.ContainsKey(symbolName))
                 {
-                    methodSymbolsForType = this.methodSymbols[typeSymbol.name];
+                    methodSymbolsForType = this.methodSymbols[symbolName];
                     if (methodSymbolsForType.ContainsKey(methodName))
                     {
                         return methodSymbolsForType[methodName];
                     }
-
                 }
                 else
                 {
                     methodSymbolsForType = new Dictionary<string, IDiaSymbol>();
-                    this.methodSymbols[typeSymbol.name] = methodSymbolsForType;
+                    this.methodSymbols[symbolName] = methodSymbolsForType;
                 }
 
-                typeSymbol.findChildren(SymTagEnum.SymTagFunction, methodName, 0, out enumSymbols);
+                typeSymbol.FindChildren(SymTagEnum.SymTagFunction, methodName, 0, out enumSymbols);
 
-                uint celtFetched;
-                enumSymbols.Next(1, out methodSymbol, out celtFetched);
+                enumSymbols.GetNext(1, out methodSymbol, out uint celtFetched);
 
 #if DEBUG
                 if (methodSymbol == null)
@@ -361,20 +410,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     IDiaEnumSymbols enumAllSymbols = null;
                     try
                     {
-                        typeSymbol.findChildren(SymTagEnum.SymTagFunction, null, 0, out enumAllSymbols);
+                        typeSymbol.FindChildren(SymTagEnum.SymTagFunction, null, 0, out enumAllSymbols);
                         List<string> children = new List<string>();
 
-                        IDiaSymbol childSymbol = null;
-                        uint fetchedCount = 0;
                         while (true)
                         {
-                            enumAllSymbols.Next(1, out childSymbol, out fetchedCount);
+                            enumAllSymbols.GetNext(1, out IDiaSymbol childSymbol, out uint fetchedCount);
                             if (fetchedCount == 0 || childSymbol == null)
                             {
                                 break;
                             }
 
-                            children.Add(childSymbol.name);
+                            childSymbol.GetName(out string childSymbolName);
+                            children.Add(childSymbolName);
                             ReleaseComObject(ref childSymbol);
                         }
 
@@ -393,7 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 ReleaseComObject(ref enumSymbols);
             }
 
-            if (null != methodSymbol)
+            if (methodSymbol != null)
             {
                 methodSymbolsForType[methodName] = methodSymbol;
             }
@@ -412,8 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             // #827589, In case a type has overloaded methods, then there could be a method already in the 
             // cache which should be disposed. 
-            IDiaSymbol oldSymbol;
-            if (methodSymbolCache.TryGetValue(methodName, out oldSymbol))
+            if (methodSymbolCache.TryGetValue(methodName, out IDiaSymbol oldSymbol))
             {
                 ReleaseComObject(ref oldSymbol);
             }
@@ -431,32 +478,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             }
         }
 
-        private string GetManifestFileForRegFreeCom()
-        {
-            var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var manifestFieName = string.Empty;
-            if (IntPtr.Size == 4)
-            {
-                manifestFieName = ManifestFileNameX86;
-            }
-            else if (IntPtr.Size == 8)
-            {
-                manifestFieName = ManifestFileNameX64;
-            }
-
-            var manifestFile = Path.Combine(currentDirectory, manifestFieName);
-
-            if (!File.Exists(manifestFile))
-            {
-                throw new TestPlatformException(string.Format("Could not find the manifest file {0} for Registry free Com registration.", manifestFile));
-            }
-
-            return manifestFile;
-        }
-
         private void Dispose(bool disposing)
         {
-
             if (!this.isDisposed)
             {
                 if (disposing)
@@ -490,5 +513,4 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             }
         }
     }
-#endif
 }

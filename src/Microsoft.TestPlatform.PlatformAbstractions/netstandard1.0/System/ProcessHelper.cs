@@ -32,6 +32,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
+        public string GetCurrentProcessLocation()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
         public string GetTestEngineDirectory()
         {
             throw new NotImplementedException();

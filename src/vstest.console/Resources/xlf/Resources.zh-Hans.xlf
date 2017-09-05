@@ -419,15 +419,15 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
       <trans-unit id="InIsolationHelp">
-        <source>/InIsolation
+        <source>--InIsolation|/InIsolation
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="translated">/ InIsolation
+        <target state="new">/ InIsolation
       在独立进程中运行测试。虽然这可使 vstest.console.exe 
       进程在测试出现错误时停止的可能性较小，但是测试的
       运行速度会较慢。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       在独立进程中运行测试。这使得 vstest.console.exe 进程不太可能被停止的错误在测试中，但是测试运行速度将减慢。</target>

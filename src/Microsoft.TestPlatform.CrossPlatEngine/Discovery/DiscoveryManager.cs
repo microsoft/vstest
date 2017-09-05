@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private ITestPlatformEventSource testPlatformEventSource;
 
         private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
+        private DiscoveryCriteria discoveryCriteria;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -60,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         {
             this.testPlatformEventSource.AdapterSearchStart();
 
-            if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Count() > 0)
+            if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
             {
                 // Start using these additional extensions
                 TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
@@ -85,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             try
             {
+                this.discoveryCriteria = discoveryCriteria;
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
                 this.testDiscoveryEventsHandler = eventHandler;
 
@@ -121,6 +123,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (eventHandler != null)
                 {
+                    if(lastChunk != null)
+                    {
+                        UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
+                    }
                     eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
                 }
                 else
@@ -145,6 +151,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
         private void OnReportTestCases(IEnumerable<TestCase> testCases)
         {
+            UpdateTestCases(testCases, this.discoveryCriteria.Package);
+
             if (this.testDiscoveryEventsHandler != null)
             {
                 this.testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
@@ -231,6 +239,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     EqtTrace.Warning(
                         "DiscoveryManager: Could not pass the log message  '{0}' as the callback is null.",
                         e.Message);
+                }
+            }
+        }
+
+        private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
+        {
+            // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users),
+            // else these test cases are not displayed in TestWindow.
+            if (!string.IsNullOrEmpty(package))
+            {
+                foreach(var tc in testCases)
+                {
+                    tc.Source = package;
                 }
             }
         }

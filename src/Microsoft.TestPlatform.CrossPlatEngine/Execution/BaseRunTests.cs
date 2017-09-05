@@ -48,6 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ITestRunEventsHandler testRunEventsHandler;
         private ITestEventsPublisher testEventsPublisher;
         private ITestRunCache testRunCache;
+        private string package;
 
         /// <summary>
         /// Specifies that the test run cancellation is requested
@@ -82,17 +83,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
         /// </summary>
+        /// <param name="package">The user input test source(package) if it differs from actual test source otherwise null.</param>
         /// <param name="runSettings">The run settings.</param>
         /// <param name="testExecutionContext">The test execution context.</param>
         /// <param name="testCaseEventsHandler">The test case events handler.</param>
         /// <param name="testRunEventsHandler">The test run events handler.</param>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected BaseRunTests(string runSettings,
+        protected BaseRunTests(string package,
+            string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
             ITestPlatformEventSource testPlatformEventSource) :
             this(
+                package,
                 runSettings,
                 testExecutionContext,
                 testCaseEventsHandler,
@@ -106,6 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
         /// </summary>
+        /// <param name="package">The user input test source(package) list if it differs from actual test source otherwise null.</param>
         /// <param name="runSettings">The run settings.</param>
         /// <param name="testExecutionContext">The test execution context.</param>
         /// <param name="testCaseEventsHandler">The test case events handler.</param>
@@ -113,7 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testPlatformEventSource">Test platform event source.</param>
         /// <param name="testEventsPublisher">Publisher for test events.</param>
         /// <param name="platformThread">Platform Thread.</param>
-        protected BaseRunTests(string runSettings,
+        protected BaseRunTests(string package,
+            string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
@@ -121,6 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestEventsPublisher testEventsPublisher,
             IThread platformThread)
         {
+            this.package = package;
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
             this.testCaseEventsHandler = testCaseEventsHandler;
@@ -504,6 +511,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     attachments,
                     elapsedTime);
 
+                if (lastChunk.Any())
+                {
+                    UpdateTestResults(lastChunk, this.package);
+                }
+
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
 
                 this.testRunEventsHandler.HandleTestRunComplete(
@@ -522,6 +534,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testRunEventsHandler != null)
             {
+                UpdateTestResults(results, this.package);
+
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
             }
@@ -551,6 +565,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
 
             return success;
+        }
+
+        private static void UpdateTestResults(IEnumerable<TestResult> testResults, string package)
+        {
+            // Before sending the testresults back, update the test case objects with source provided by IDE/User.
+            if (!string.IsNullOrEmpty(package))
+            {
+                foreach (var tr in testResults)
+                {
+                    tr.TestCase.Source = package;
+                }
+            }
         }
 
         #endregion

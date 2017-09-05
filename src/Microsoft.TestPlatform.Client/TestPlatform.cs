@@ -46,6 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
+        /// <param name="isInIsolation">inIsolation command line arg value</param>
         public TestPlatform() : this(new TestEngine(), new FileHelper(), TestRuntimeProviderManager.Instance)
         {
         }
@@ -158,6 +159,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             this.TestEngine.GetExtensionManager()
                    .UseAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+        }
+
+        /// <summary>
+        /// Clears the cached extensions
+        /// </summary>
+        public void ClearExtensions()
+        {
+            this.TestEngine.GetExtensionManager().ClearExtensions();
         }
 
         /// <summary>

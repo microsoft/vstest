@@ -75,9 +75,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool designMode;
 
         /// <summary>
+        /// Specify to run tests in isolation
+        /// </summary>
+        private bool inIsolation;
+
+        /// <summary>
         /// False indicates that the test adapter should not collect source information for discovered tests
         /// </summary>
         private bool shouldCollectSourceInformation;
+
+        /// <summary>
+        /// Gets the targetDevice IP for UWP app deployment
+        /// </summary>
+        private string targetDevice;
 
         #endregion
 
@@ -103,7 +113,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.inProcess = false;
             this.disableParallelization = false;
             this.designMode = false;
+            this.inIsolation = false;
             this.shouldCollectSourceInformation = false;
+            this.targetDevice = null;
             this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         }
 
@@ -199,6 +211,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.designMode = value;
                 this.DesignModeSet = true;
+            }
+        }
+
+        /// <summary> 
+        /// Gets or sets a value indicating whether to run tests in isolation or not.
+        /// </summary>
+        public bool InIsolation
+        {
+            get
+            {
+                return this.inIsolation;
+            }
+
+            set
+            {
+                this.inIsolation = value;
             }
         }
 
@@ -301,6 +329,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.framework = value;
                 this.TargetFrameworkSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the target device IP. For Phone this value is Device, for emulators "Mobile Emulator 10.0.15063.0 WVGA 4 inch 1GB"
+        /// </summary>
+        public string TargetDevice
+        {
+            get
+            {
+                return this.targetDevice;
+            }
+
+            set
+            {
+                this.targetDevice = value;
             }
         }
 
@@ -488,6 +532,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             designMode.InnerXml = this.DesignMode.ToString();
             root.AppendChild(designMode);
 
+            XmlElement inIsolation = doc.CreateElement("InIsolation");
+            inIsolation.InnerXml = this.InIsolation.ToString();
+            root.AppendChild(inIsolation);
+
             XmlElement collectSourceInformation = doc.CreateElement("CollectSourceInformation");
             collectSourceInformation.InnerXml = this.ShouldCollectSourceInformation.ToString();
             root.AppendChild(collectSourceInformation);
@@ -528,6 +576,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement binariesRoot = doc.CreateElement("BinariesRoot");
                 binariesRoot.InnerXml = this.BinariesRoot;
                 root.AppendChild(binariesRoot);
+            }
+
+            if(!string.IsNullOrEmpty(this.TargetDevice))
+            {
+                XmlElement targetDevice = doc.CreateElement("TargetDevice");
+                targetDevice.InnerXml = this.TargetDevice;
+                root.AppendChild(targetDevice);
             }
 
             return root;
@@ -642,6 +697,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, designModeValueString, elementName));
                             }
                             runConfiguration.DesignMode = designMode;
+                            break;
+
+                        case "InIsolation":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string inIsolationValueString = reader.ReadElementContentAsString();
+                            bool inIsolation;
+                            if (!bool.TryParse(inIsolationValueString, out inIsolation))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inIsolationValueString, elementName));
+                            }
+                            runConfiguration.InIsolation = inIsolation;
                             break;
 
                         case "DisableAppDomain":
@@ -806,6 +874,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             }
 
                             runConfiguration.ExecutionThreadApartmentState = apartmentState;
+                            break;
+
+                        case "TargetDevice":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.TargetDevice = reader.ReadElementContentAsString();
                             break;
 
                         default:

@@ -94,7 +94,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private static ISymbolReader GetSymbolReader(string binaryPath)
         {
-#if NET451
             var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
             using (var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read))
             {
@@ -105,10 +104,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 return new FullSymbolReader();
             }
-#else
-            // We don't support full PDB files with .net core
-            return new PortableSymbolReader();
-#endif
         }
     }
 }
