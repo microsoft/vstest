@@ -104,47 +104,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return waitSucess && this.handShakeSuccessful;
         }
 
-        /// <summary>
-        /// Initializes the Extensions while probing additional extension paths 
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
+        /// <inheritdoc/>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
             this.communicationManager.SendMessage(MessageType.ExtensionsInitialize, pathToAdditionalExtensions, this.protocolVersion);
         }
 
-        /// <summary>
-        /// Discover Tests using criteria and send events through eventHandler
-        /// </summary>
-        /// <param name="sources"></param>
-        /// <param name="runSettings"></param>
-        /// <param name="eventHandler"></param>
+        /// <inheritdoc/>
         public void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler eventHandler)
         {
             this.SendMessageAndListenAndReportTestCases(sources, runSettings, eventHandler);
         }
 
-        /// <summary>
-        /// Starts the TestRun with given sources and criteria
-        /// </summary>
-        /// <param name="sources">Sources for test run</param>
-        /// <param name="runSettings">RunSettings for test run</param>
-        /// <param name="runEventsHandler">EventHandler for test run events</param>
-        public void StartTestRun(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler)
+        /// <inheritdoc/>
+        public void StartTestRun(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
         {
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings },
+                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestCaseFilter = options?.TestCaseFilter },
                 runEventsHandler,
                 null);
         }
 
-        /// <summary>
-        /// Starts the TestRun with given test cases and criteria
-        /// </summary>
-        /// <param name="testCases">TestCases to run</param>
-        /// <param name="runSettings">RunSettings for test run</param>
-        /// <param name="runEventsHandler">EventHandler for test run events</param>
+        /// <inheritdoc/>
         public void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
             this.SendMessageAndListenAndReportTestResults(
@@ -154,16 +136,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 null);
         }
 
-        /// <summary>
-        /// Starts the TestRun with given sources and criteria with custom test host
-        /// </summary>
-        /// <param name="sources">Sources for test run</param>
-        /// <param name="runSettings">RunSettings for test run</param>
-        /// <param name="runEventsHandler">EventHandler for test run events</param>
-        /// <param name="customHostLauncher">TestHostLauncher that launches the test host for the run</param>
+        /// <inheritdoc/>
         public void StartTestRunWithCustomHost(
             IEnumerable<string> sources,
             string runSettings,
+            TestPlatformOptions options,
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
@@ -173,19 +150,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     Sources = sources.ToList(),
                     RunSettings = runSettings,
-                    DebuggingEnabled = customHostLauncher.IsDebug
+                    DebuggingEnabled = customHostLauncher.IsDebug,
+                    TestCaseFilter = options?.TestCaseFilter
                 },
                 runEventsHandler,
                 customHostLauncher);
         }
 
-        /// <summary>
-        /// Starts the TestRun with given test cases and criteria with custom test host
-        /// </summary>
-        /// <param name="testCases">TestCases to run</param>
-        /// <param name="runSettings">RunSettings for test run</param>
-        /// <param name="runEventsHandler">EventHandler for test run events</param>
-        /// <param name="customHostLauncher">TestHostLauncher that launches the test host for the run</param>
+        /// <inheritdoc/>
         public void StartTestRunWithCustomHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -205,17 +177,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
 
-        /// <summary>
-        /// Send Cancel TestRun message
-        /// </summary>
+        /// <inheritdoc/>
         public void CancelTestRun()
         {
             this.communicationManager.SendMessage(MessageType.CancelTestRun);
         }
 
-        /// <summary>
-        /// Send Abort TestRun message
-        /// </summary>
+        /// <inheritdoc/>
         public void AbortTestRun()
         {
             this.communicationManager.SendMessage(MessageType.AbortTestRun);

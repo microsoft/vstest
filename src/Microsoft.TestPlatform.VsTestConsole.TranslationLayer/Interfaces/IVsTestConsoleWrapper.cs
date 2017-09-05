@@ -47,6 +47,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void RunTests(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// Starts a test run given a list of sources.
+        /// </summary>
+        /// <param name="sources">Sources to Run tests on</param>
+        /// <param name="runSettings">RunSettings XML to run the tests</param>
+        /// <param name="options">Options to be passed into the platform.</param>
+        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
+        void RunTests(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler);
+
+        /// <summary>
         /// Starts a test run given a list of test cases
         /// </summary>
         /// <param name="testCases">TestCases to run</param>
@@ -62,6 +71,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
         /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
         void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
+        /// Starts a test run given a list of sources by giving caller an option to start their own test host.
+        /// </summary>
+        /// <param name="sources">Sources to Run tests on</param>
+        /// <param name="runSettings">RunSettings XML to run the tests</param>
+        /// <param name="options">Options to be passed into the platform.</param>
+        /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
+        /// <param name="customTestHostLauncher">Custom test host launcher for the run.</param>
+        void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// Starts a test run given a list of test cases by giving caller an option to start their own test host
