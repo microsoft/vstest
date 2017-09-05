@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 {
     using System;
@@ -9,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using Client.Discovery;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     using Moq;
 
@@ -28,6 +30,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
             this.discoveryRequest = new DiscoveryRequest(this.discoveryCriteria, this.discoveryManager.Object);
+
+            var telemetryClient = new TelemetryClient();
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            TelemetryClient.Dispose();
         }
         
         [TestMethod]
@@ -125,6 +135,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);
             Assert.AreEqual("complete", events[1]);
+        }
+
+        [TestMethod]
+        public void DiscoverAsyncShouldAddMetricOfNumberOfSources()
+        {
+            this.discoveryRequest.DiscoverAsync();
+
+            string value;
+            Assert.AreEqual(TelemetryClient.GetMetrics().TryGetValue(UnitTestTelemetryDataConstants.NumberOfSourcesSentForDiscovery,out value),true);
+            Assert.AreEqual(this.discoveryCriteria.Sources.Count().ToString(),value);
         }
     }
 }
