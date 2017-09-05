@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         Stream PlatformBufferedStream(Stream stream);
 
         /// <summary>
-        /// Returns platrform specific Buffered Stream
+        /// Returns platrform specific Buffered Stream with desired buffer size.
         /// </summary>
         /// <param name="stream">Input Stream</param>
         /// <param name="bufferSize">Buffer Size</param>

@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // tcpClient.Close() not available for netstandard1.5.
                 this.tcpClient?.Dispose();
 #endif
-                this.channel?.Dispose();
+                this.channel.Dispose();
                 this.cancellation.Dispose();
 
                 this.ServerDisconnected?.SafeInvoke(this, new DisconnectedEventArgs(), "SocketClient: ServerDisconnected");
