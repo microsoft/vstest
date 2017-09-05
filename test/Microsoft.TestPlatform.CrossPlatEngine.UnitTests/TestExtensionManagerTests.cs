@@ -22,23 +22,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             this.testExtensionManager = new TestExtensionManager();
         }
 
+        [TestCleanup]
+        public void CleanUp()
+        {
+            TestPluginCache.Instance = null;
+        }
+
         [TestMethod]
         public void UseAdditionalExtensionsShouldUpdateAdditionalExtensionsInCache()
         {
-            TestPluginCache.Instance = null;
             var extensions = new List<string> { typeof(TestExtensionManagerTests).GetTypeInfo().Assembly.Location };
 
-            try
-            {
-                this.testExtensionManager.UseAdditionalExtensions(extensions, true);
+            this.testExtensionManager.UseAdditionalExtensions(extensions, true);
 
-                Assert.IsTrue(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
-                CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToExtensions.ToList());
-            }
-            finally
-            {
-                TestPluginCache.Instance = null;
-            }
+            Assert.IsTrue(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+            CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToExtensions.ToList());
+        }
+
+        [TestMethod]
+        public void ClearExtensionsShouldClearExtensionsInCache()
+        {
+            var extensions = new List<string> { @"Foo.dll" };
+            this.testExtensionManager.UseAdditionalExtensions(extensions, true);
+
+            this.testExtensionManager.ClearExtensions();
+
+            Assert.AreEqual(0, TestPluginCache.Instance.PathToExtensions.Count());
         }
     }
 }

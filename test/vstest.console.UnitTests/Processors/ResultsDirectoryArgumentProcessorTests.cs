@@ -7,8 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using TestPlatform.CommandLine.Processors;
     using System;
     using System.IO;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using vstest.console.UnitTests.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     [TestClass]
     public class ResultsDirectoryArgumentProcessorTests

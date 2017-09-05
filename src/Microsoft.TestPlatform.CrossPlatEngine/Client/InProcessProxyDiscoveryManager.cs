@@ -60,6 +60,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // Initialize extension before discovery
                     this.InitializeExtensions(discoveryCriteria.Sources);
+                    discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
+
                     this.discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
                 }
                 catch (Exception exception)
@@ -70,8 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
                     eventHandler.HandleDiscoveryComplete(-1, Enumerable.Empty<TestCase>(), true);
                 }
-            }
-            );
+            });
         }
 
         /// <summary>

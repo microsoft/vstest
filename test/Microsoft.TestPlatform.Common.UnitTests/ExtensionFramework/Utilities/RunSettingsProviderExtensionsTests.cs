@@ -4,15 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities
 {
     using System;
-    using System.IO;
-
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using vstest.console.UnitTests.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     [TestClass]
     public class RunSettingsProviderExtensionsTests
@@ -26,13 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             runSettingsProvider = new TestableRunSettingsProvider();
         }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            CommandLineOptions.Instance.Reset();
-        }
-
+        
         [TestMethod]
         public void UpdateRunSettingsShouldUpdateGivenSettingsXml()
         {
@@ -210,6 +202,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <TargetPlatform>x86</TargetPlatform></RunConfiguration>  </RunSettings>");
             Assert.AreEqual("x86", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.TargetPlatform"));
+        }
+        
+        private class TestableRunSettingsProvider : IRunSettingsProvider
+        {
+            public RunSettings ActiveRunSettings
+            {
+                get;
+                set;
+            }
+
+            public void SetActiveRunSettings(RunSettings runSettings)
+            {
+                this.ActiveRunSettings = runSettings;
+            }
         }
     }
 }

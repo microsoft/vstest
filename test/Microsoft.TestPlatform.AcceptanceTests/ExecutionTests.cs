@@ -34,6 +34,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
+        public void RunMultipleTestAssembliesWithoutTestAdapterPath(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var xunitAssemblyPath = this.testEnvironment.TargetFramework.Equals("net451")?
+                testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
+                testEnvironment.GetTestAsset("XUTestProject.dll");
+
+            assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
+            this.InvokeVsTestForExecution(assemblyPaths, string.Empty, string.Empty, this.FrameworkArgValue);
+            this.ValidateSummaryStatus(2, 2, 1);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETFullTargetFrameworkInIsolation]
+        [NETCORETargetFramework]
         public void RunMultipleTestAssembliesInParallel(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
