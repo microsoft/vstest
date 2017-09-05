@@ -61,8 +61,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "2.1.0-preview1-006329"
-$env:DOTNET_RUNTIME_VERSION = "2.0.0-preview2-25331-01"
+$env:DOTNET_CLI_VERSION = "LATEST"
+$env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
 
@@ -71,6 +71,7 @@ $env:MSBUILD_VERSION = "15.0"
 #
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
+$TPB_Assets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
 $TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
@@ -147,9 +148,9 @@ function Install-DotNetCli
     }
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
-    }
+    #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
+        #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
+    #}
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -160,8 +161,6 @@ function Restore-Package
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
 
-    Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
-    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
     & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
@@ -182,6 +181,9 @@ function Invoke-Build
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
     & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Log ".. .. Build: Source: $TPB_Assets_Solution"
+    Write-Verbose "$dotnetExe build $TPB_Assets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe build $TPB_Assets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -295,9 +297,9 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
-	
-	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir 
+
+    # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"

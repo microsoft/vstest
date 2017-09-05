@@ -1,0 +1,58 @@
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace UnitTestinProgress
+{
+    [TestClass]
+	public class MSTestClass4
+    {
+<#
+	int passedTests = 500;
+	int failedTests = 500;
+	String padding = "00";
+	double timePerTest = 1.5; //in seconds
+	int waitTime = (int)(timePerTest*1000);
+
+	int count = 1;
+	String testmethodprefix = "MSTest_P4_";
+
+
+#>
+
+		#region PassingTests
+<#
+	for(int i=0;i<passedTests;i++)
+	{
+	String methodName= testmethodprefix + count.ToString(padding);
+#>
+		[TestMethod]
+		public void <#=methodName#>()
+		{
+			//System.Threading.Thread.Sleep(<#= waitTime #>);
+			Assert.AreEqual(1, 1);
+		}
+<#		
+		count++;
+	}
+#>
+		#endregion
+
+		#region FailingTests
+<#
+	for(int i=0;i<failedTests;i++)
+	{
+	String methodName= testmethodprefix + count.ToString(padding);
+#>
+		[TestMethod]
+		public void <#=methodName#>()
+		{
+			//System.Threading.Thread.Sleep(<#= waitTime #>);
+			Assert.Fail();
+		}
+<#		
+		count++;
+	}
+#>
+		#endregion
+    }
+}
