@@ -16,5 +16,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Update the extensions data
         /// </summary>
         void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
+
+        /// <summary>
+        /// Clear the extensions data
+        /// </summary>
+        void ClearExtensions();
     }
 }

@@ -16,5 +16,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         // default values
         public const int DefaultMaxEntries = 50000;
+
+        public const int TypeColumnMaxLength = 64;
+        public const int SourceColumnMaxLength = 212;
     }
 }

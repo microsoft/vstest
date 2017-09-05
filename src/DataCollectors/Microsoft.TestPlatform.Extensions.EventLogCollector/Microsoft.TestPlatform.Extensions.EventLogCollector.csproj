@@ -5,9 +5,6 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />  
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector</AssemblyName>
     <TargetFrameworks>net451</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>

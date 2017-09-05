@@ -61,65 +61,65 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; event log may have been cleared during collection; some events may not have been collected.
+        /// </summary>
+        internal static string DataCollectors_EventLog_EventsLostWarning {
+            get {
+                return ResourceManager.GetString("DataCollectors_EventLog_EventsLostWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An exception occurred while collecting final entries from the event log &apos;{0}&apos;: {1}.
         /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_CleanupException {
+        internal static string EventLog_CleanupException {
             get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_CleanupException", resourceCulture);
+                return ResourceManager.GetString("EventLog_CleanupException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to EventLogDataCollector did not find eventLogContext for DataCollectionContext: {0}.
         /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_ContextNotFoundException {
+        internal static string EventLog_ContextNotFoundException {
             get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_ContextNotFoundException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &apos;{0}&apos; event log may have been cleared during collection; some events may not have been collected.
-        /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_EventsLostWarning {
-            get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_EventsLostWarning", resourceCulture);
+                return ResourceManager.GetString("EventLog_ContextNotFoundException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Event Log.
         /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_FriendlyName {
+        internal static string EventLog_FriendlyName {
             get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_FriendlyName", resourceCulture);
+                return ResourceManager.GetString("EventLog_FriendlyName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The event log diagnostic data adapter encountered an invalid event log entry type in its configuration: {0}.
+        ///   Looks up a localized string similar to The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}.
         /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig {
+        internal static string EventLog_InvalidEntryTypeInConfig {
             get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig", resourceCulture);
+                return ResourceManager.GetString("EventLog_InvalidEntryTypeInConfig", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The event log diagnostic data adapter encountered an invalid value for &apos;MaxEventLogEntriesToCollect&apos; in its configuration: {0}.
+        ///   Looks up a localized string similar to The Event Log DataCollector encountered an invalid value for &apos;MaxEventLogEntriesToCollect&apos; in its configuration: {0}.
         /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig {
+        internal static string EventLog_InvalidMaxEntriesInConfig {
             get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig", resourceCulture);
+                return ResourceManager.GetString("EventLog_InvalidMaxEntriesInConfig", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Unable to read event log &apos;{0}&apos; from computer &apos;{1}&apos;.
         /// </summary>
-        internal static string Execution_Agent_DataCollectors_EventLog_ReadError {
+        internal static string EventLog_ReadError {
             get {
-                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_ReadError", resourceCulture);
+                return ResourceManager.GetString("EventLog_ReadError", resourceCulture);
             }
         }
     }

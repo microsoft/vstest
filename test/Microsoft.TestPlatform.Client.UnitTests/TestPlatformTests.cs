@@ -81,6 +81,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
+        public void ClearExtensionsShouldClearTheExtensionsCachedInEngine()
+        {
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+
+            tp.ClearExtensions();
+
+            this.extensionManager.Verify(em => em.ClearExtensions());
+        }
+
+        [TestMethod]
         public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunAll()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };

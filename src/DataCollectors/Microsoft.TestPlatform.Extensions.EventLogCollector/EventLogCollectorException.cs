@@ -12,17 +12,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     internal class EventLogCollectorException : Exception
     {
         /// <summary>
-        /// Constructs a new EventLogCollectorException
+        /// Initializes a new instance of the <see cref="EventLogCollectorException"/> class.
         /// </summary>
         /// <param name="localizedMessage">the localized exception message</param>
         /// <param name="innerException">the inner exception</param>
         public EventLogCollectorException(string localizedMessage, Exception innerException)
             : base(localizedMessage, innerException)
-        {
-        }
-
-        protected EventLogCollectorException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }
