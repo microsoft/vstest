@@ -127,9 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 // UWP(App model) scenario
                 if (!Path.IsPathRooted(filename))
                 {
-                    // Big Big hack, talk to UWP deployement team as to how to fix this.
-                    // Do not check this PR till this is resolved
-                    filename = Path.Combine(Directory.GetCurrentDirectory(), "entrypoint", filename);
+                    filename = Path.Combine(Directory.GetCurrentDirectory(), filename);
                     if (string.IsNullOrEmpty(searchPath))
                     {
                         searchPath = Directory.GetCurrentDirectory();

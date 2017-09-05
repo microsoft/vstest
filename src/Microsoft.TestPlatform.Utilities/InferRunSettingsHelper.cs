@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string ResultsDirectoryNodeName = "ResultsDirectory";
         private const string TargetPlatformNodeName = "TargetPlatform";
         private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
+        private const string TargetDevice = "TargetDevice";
 
         private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
         private const string CollectSourceInformationNodePath = @"/RunSettings/RunConfiguration/CollectSourceInformation";
@@ -34,6 +35,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
+        private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
+
+        // To make things compatible for older runsettings
+        private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
 
 
         /// <summary>
@@ -186,6 +191,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         public static void UpdateCollectSourceInformation(XPathNavigator runSettingsNavigator, bool collectSourceInformationValue)
         {
             AddNodeIfNotPresent<bool>(runSettingsNavigator, CollectSourceInformationNodePath, CollectSourceInformationNodeName, collectSourceInformationValue);
+        }
+
+        /// <summary>
+        /// Updates the <c>RunConfiguration.CollectSourceInformation</c> value for a run settings. Doesn't do anything if the value is already set.
+        /// </summary>
+        /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
+        /// <param name="collectSourceInformationValue">Value to set</param>
+        public static void UpdateTargetDeviceInformation(XPathNavigator runSettingsNavigator, string targetDevice)
+        {
+            AddNodeIfNotPresent<string>(runSettingsNavigator, TargetDeviceNodePath, TargetDevice, targetDevice);
+        }
+
+        public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
+        {
+            ValidateArg.NotNull(runSettingsNavigator, "runSettingsNavigator");
+
+            deviceXml = null;
+            XPathNavigator targetDeviceNode = runSettingsNavigator.SelectSingleNode(MsTestTargetDeviceNodePath);
+            if (targetDeviceNode != null)
+            {
+                deviceXml = targetDeviceNode.InnerXml;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
