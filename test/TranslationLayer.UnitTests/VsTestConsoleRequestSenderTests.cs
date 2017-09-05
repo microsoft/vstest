@@ -893,7 +893,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                    }
                });
             this.requestSender.InitializeCommunication();
-            this.requestSender.StartTestRunWithCustomHost(sources, null, mockHandler.Object, mockLauncher.Object);
+            this.requestSender.StartTestRunWithCustomHost(sources, null, new TestPlatformOptions(), mockHandler.Object, mockLauncher.Object);
 
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
         }
