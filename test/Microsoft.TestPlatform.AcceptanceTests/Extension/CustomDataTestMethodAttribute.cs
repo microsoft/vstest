@@ -33,6 +33,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 dataRows.AddRange(netFullRows[0].DataRows);
             }
 
+            var netFullInProcessRows = testMethod.GetAttributes<NETFullTargetFrameworkInProcess>(false);
+            if (netFullInProcessRows != null && netFullInProcessRows.Length > 0 && netFullInProcessRows[0].DataRows.Count > 0)
+            {
+                dataRows.AddRange(netFullInProcessRows[0].DataRows);
+            }
+
+            var netFullInIsolationRows = testMethod.GetAttributes<NETFullTargetFrameworkInIsolation>(false);
+            if (netFullInIsolationRows != null && netFullInIsolationRows.Length > 0 && netFullInIsolationRows[0].DataRows.Count > 0)
+            {
+                dataRows.AddRange(netFullInIsolationRows[0].DataRows);
+            }
+
             var netcoreappRows = testMethod.GetAttributes<NETCORETargetFramework>(false);
             if (netcoreappRows != null && netcoreappRows.Length > 0 && netcoreappRows[0].DataRows.Count > 0)
             {
