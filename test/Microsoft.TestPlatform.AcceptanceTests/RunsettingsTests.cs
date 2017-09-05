@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, "/InIsolation", testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [CustomDataTestMethod]

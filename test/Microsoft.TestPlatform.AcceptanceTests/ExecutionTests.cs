@@ -152,7 +152,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -174,7 +173,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
-            arguments = string.Concat(arguments, $" /InIsolation");
 
             this.InvokeVsTest(arguments);
             var errorMessage = string.Empty;
