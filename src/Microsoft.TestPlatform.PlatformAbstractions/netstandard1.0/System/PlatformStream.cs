@@ -10,13 +10,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// <inheritdoc/>
     public class PlatformStream : IStream
     {
-        public Stream PlaformBufferedStream(Stream stream)
+        public Stream PlatformBufferedStream(Stream stream)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public Stream PlaformBufferedStreamWithBufferSize(Stream stream, int bufferSize)
+        public Stream PlatformBufferedStream(Stream stream, int bufferSize)
         {
             throw new NotImplementedException();
         }

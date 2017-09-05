@@ -15,14 +15,14 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// </summary>
         /// <param name="stream">Input Stream</param>
         /// <returns>Buffered Stream</returns>
-        Stream PlaformBufferedStream(Stream stream);
+        Stream PlatformBufferedStream(Stream stream);
 
         /// <summary>
-        /// Returns plarform specific Buffered Stream
+        /// Returns platrform specific Buffered Stream
         /// </summary>
         /// <param name="stream">Input Stream</param>
         /// <param name="bufferSize">Buffer Size</param>
         /// <returns>Buffered Stream</returns>
-        Stream PlaformBufferedStreamWithBufferSize(Stream stream, int bufferSize);
+        Stream PlatformBufferedStream(Stream stream, int bufferSize);
     }
 }

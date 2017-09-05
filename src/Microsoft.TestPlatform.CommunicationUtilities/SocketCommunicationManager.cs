@@ -28,7 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// The server stream read timeout constant (in microseconds).
         /// </summary>
         private const int STREAMREADTIMEOUT = 1000 * 1000;
-        private const int BUFFERSIZE = 8 * 1024;
 
         /// <summary>
         /// TCP Listener to host TCP channel and listen
@@ -120,12 +119,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var client = await this.tcpListener.AcceptTcpClientAsync();
                 this.socket = client.Client;
                 this.socket.NoDelay = true;
-                this.stream = new PlatformStream().PlaformBufferedStreamWithBufferSize(client.GetStream(), 8 * 1024);
-                this.binaryReader = new BinaryReader(this.stream);
+                this.stream = new PlatformStream().PlatformBufferedStream(client.GetStream(), SocketConstants.BUFFERSIZE);
+                this.binaryReader = new BinaryReader(client.GetStream());
                 this.binaryWriter = new BinaryWriter(this.stream);
 
                 this.clientConnectedEvent.Set();
-
+                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
                 EqtTrace.Info("Accepted Client request and set the flag");
             }
         }
@@ -179,10 +178,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     if (this.tcpClient.Connected)
                     {
-                        this.stream = new PlatformStream().PlaformBufferedStreamWithBufferSize(this.tcpClient.GetStream(), 8 * 1024);
-                        this.binaryReader = new BinaryReader(this.stream);
+                        this.stream = new PlatformStream().PlatformBufferedStream(this.tcpClient.GetStream(), SocketConstants.BUFFERSIZE);
+                        this.binaryReader = new BinaryReader(this.tcpClient.GetStream());
                         this.binaryWriter = new BinaryWriter(this.stream);
                         EqtTrace.Info("Connected to the server successfully ");
+                        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
                         this.clientConnectionAcceptedEvent.Set();
                     }
                 }
@@ -192,16 +192,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
             while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);
-
-            // EqtTrace.Info("Trying to connect to server on port : {0}", portNumber);
-            // this.tcpClient = new TcpClient { NoDelay = true };
-            // this.socket = this.tcpClient.Client;
-            // await this.tcpClient.ConnectAsync(IPAddress.Loopback, portNumber);
-            // this.stream = new BufferedStream(this.tcpClient.GetStream(), BUFFERSIZE);
-            // this.binaryReader = new BinaryReader(this.stream);
-            // this.binaryWriter = new BinaryWriter(this.stream);
-            // this.clientConnectionAcceptedEvent.Set();
-            // EqtTrace.Info("Connected to the server successfully ");
         }
 
         /// <summary>
@@ -352,8 +342,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 try
                 {
-                    str = this.ReceiveRawMessage();
-                    success = true;
+                    if (this.socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
+                    {
+                        str = this.ReceiveRawMessage();
+                        success = true;
+                    }
                 }
                 catch (IOException ioException)
                 {
