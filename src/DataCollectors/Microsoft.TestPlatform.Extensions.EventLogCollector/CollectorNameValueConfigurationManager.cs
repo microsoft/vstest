@@ -72,7 +72,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                 // Get the setting value
                 string settingValue = settingElement.GetAttribute(SettingValueAttributeName);
-                if (string.IsNullOrEmpty(settingValue))
+                if (string.IsNullOrWhiteSpace(settingValue))
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {

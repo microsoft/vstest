@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -98,7 +99,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
             this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(eventLogNames, this.eventLogDataCollector.EventLogNames.Keys);
+            CollectionAssert.AreEqual(eventLogNames, this.eventLogDataCollector.EventLogNames.ToList());
         }
 
         [TestMethod]
@@ -116,7 +117,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
             this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(eventLogNames, this.eventLogDataCollector.EventLogNames.Keys);
+            CollectionAssert.AreEqual(eventLogNames, this.eventLogDataCollector.EventLogNames.ToList());
         }
 
         [TestMethod]
@@ -129,7 +130,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
             this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(entryTypes, this.eventLogDataCollector.EntryTypes.Keys);
+            CollectionAssert.AreEqual(entryTypes, this.eventLogDataCollector.EntryTypes.ToList());
         }
 
         [TestMethod]
@@ -145,7 +146,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             expectedXmlDoc.LoadXml(configurationString);
             this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(entryTypes, this.eventLogDataCollector.EntryTypes.Keys);
+            CollectionAssert.AreEqual(entryTypes, this.eventLogDataCollector.EntryTypes.ToList());
         }
 
         [TestMethod]
@@ -161,7 +162,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             expectedXmlDoc.LoadXml(configurationString);
             this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
 
-            CollectionAssert.AreEqual(eventSources, this.eventLogDataCollector.EventSources.Keys);
+            CollectionAssert.AreEqual(eventSources, this.eventLogDataCollector.EventSources.ToList());
         }
 
         [TestMethod]

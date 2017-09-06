@@ -117,22 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="EventLog_CleanupException" xml:space="preserve">
+  <data name="CleanupException" xml:space="preserve">
     <value>An exception occurred while collecting final entries from the event log '{0}': {1}</value>
   </data>
-  <data name="EventLog_ContextNotFoundException" xml:space="preserve">
+  <data name="ContextNotFoundException" xml:space="preserve">
     <value>Event Log DataCollector did not find eventLogContext for DataCollectionContext: {0}</value>
   </data>
-  <data name="EventLog_EventsLostWarning" xml:space="preserve">
+  <data name="EventsLostWarning" xml:space="preserve">
     <value>The '{0}' event log may have been cleared during collection; some events may not have been collected</value>
   </data>
-  <data name="EventLog_InvalidEntryTypeInConfig" xml:space="preserve">
+  <data name="InvalidEntryTypeInConfig" xml:space="preserve">
     <value>The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</value>
   </data>
-  <data name="EventLog_InvalidMaxEntriesInConfig" xml:space="preserve">
+  <data name="InvalidMaxEntriesInConfig" xml:space="preserve">
     <value>The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration: {0}</value>
   </data>
-  <data name="EventLog_ReadError" xml:space="preserve">
+  <data name="ReadError" xml:space="preserve">
     <value>Unable to read event log '{0}' from computer '{1}'</value>
   </data>
 </root>

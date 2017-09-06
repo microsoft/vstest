@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 {
     using System;
-    using System.Runtime.Serialization;
 
     /// <summary>
     /// Private Exception class used for event log exceptions

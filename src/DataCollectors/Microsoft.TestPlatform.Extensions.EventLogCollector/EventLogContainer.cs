@@ -27,9 +27,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </summary>
         private static string eventLogFileName = "Event Log";
 
-        private Dictionary<string, bool> eventSources;
+        private ISet<string> eventSources;
 
-        private Dictionary<EventLogEntryType, bool> entryTypes;
+        private ISet<EventLogEntryType> entryTypes;
 
         private DataCollectionLogger logger;
 
@@ -39,8 +39,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private bool limitReached;
 
-        private Dictionary<string, IEventLogContainer> eventLogContainers;
-
         private int maxLogEntries;
 
         private Dictionary<string, EventLog> eventLogMap;
@@ -49,8 +47,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         public EventLogContainer(
             Dictionary<string, EventLog> eventLogMap,
-            Dictionary<string, bool> eventSources,
-            Dictionary<EventLogEntryType, bool> entryTypes,
+            ISet<string> eventSources,
+            ISet<EventLogEntryType> entryTypes,
             DataCollectionLogger logger,
             DataCollectionContext context,
             DataCollectionSink dataCollectionSink,
@@ -88,8 +86,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </param>
         public EventLogContainer(
             Dictionary<string, EventLog> eventLogMap,
-            Dictionary<string, bool> eventSources,
-            Dictionary<EventLogEntryType, bool> entryTypes,
+            ISet<string> eventSources,
+            ISet<EventLogEntryType> entryTypes,
             DataCollectionLogger logger,
             DataCollectionContext context,
             DataCollectionSink dataCollectionSink,
@@ -108,7 +106,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.EventLogIndexMap = new Dictionary<string, int>();
             this.SetCurrentIndexForEventLogs(this.eventLogMap);
 
-            this.eventLogContainers = new Dictionary<string, IEventLogContainer>();
             this.EventLogEntries = new List<EventLogEntry>();
         }
 
@@ -205,7 +202,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         this.dataCollectionContext,
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            Resource.EventLog_EventsLostWarning,
+                            Resource.EventsLostWarning,
                             eventLog.Log));
 
                     nextEntryIndexToCollect = 0;
@@ -220,7 +217,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     // If an explicit list of event sources was provided, only report log entries from those sources
                     if (this.eventSources != null && this.eventSources.Count > 0)
                     {
-                        if (!this.eventSources.ContainsKey(nextEntry.Source))
+                        if (!this.eventSources.Contains(nextEntry.Source))
                         {
                             continue;
                         }
@@ -228,7 +225,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                     if (this.entryTypes != null && this.entryTypes.Count > 0)
                     {
-                        if (!this.entryTypes.ContainsKey(nextEntry.EntryType))
+                        if (!this.entryTypes.Contains(nextEntry.EntryType))
                         {
                             continue;
                         }

@@ -83,17 +83,17 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// The event log names.
         /// </summary>
-        private Dictionary<string, bool> eventLogNames;
+        private ISet<string> eventLogNames;
 
         /// <summary>
         /// The event sources.
         /// </summary>
-        private Dictionary<string, bool> eventSources;
+        private ISet<string> eventSources;
 
         /// <summary>
         /// The entry types.
         /// </summary>
-        private Dictionary<EventLogEntryType, bool> entryTypes;
+        private ISet<EventLogEntryType> entryTypes;
 
         /// <summary>
         /// The max entries.
@@ -141,7 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal Dictionary<string, bool> EventSources
+        internal ISet<string> EventSources
         {
             get
             {
@@ -149,7 +149,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal Dictionary<EventLogEntryType, bool> EntryTypes
+        internal ISet<EventLogEntryType> EntryTypes
         {
             get
             {
@@ -157,7 +157,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal Dictionary<string, bool> EventLogNames
+        internal ISet<string> EventLogNames
         {
             get
             {
@@ -245,13 +245,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         #endregion
 
-        private static Dictionary<string, bool> ParseCommaSeparatedList(string commaSeparatedList)
+        private static ISet<string> ParseCommaSeparatedList(string commaSeparatedList)
         {
-            Dictionary<string, bool> strings = new Dictionary<string, bool>();
+            ISet<string> strings = new HashSet<string>();
             string[] items = commaSeparatedList.Split(new char[] { ',' });
             foreach (string item in items)
             {
-                strings.Add(item.Trim(), false);
+                strings.Add(item.Trim());
             }
 
             return strings;
@@ -412,7 +412,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         dataCollectionContext,
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            Resource.EventLog_CleanupException,
+                            Resource.CleanupException,
                             eventLog,
                             e.ToString()));
                 }
@@ -442,7 +442,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 string msg = string.Format(
                     CultureInfo.InvariantCulture,
-                    Resource.EventLog_ContextNotFoundException,
+                    Resource.ContextNotFoundException,
                     dataCollectionContext.ToString());
                 throw new EventLogCollectorException(msg, null);
             }
@@ -452,7 +452,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
         {
-            this.eventLogNames = new Dictionary<string, bool>();
+            this.eventLogNames = new HashSet<string>();
             string eventLogs = collectorNameValueConfigurationManager[EventLogConstants.SettingEventLogs];
             if (eventLogs != null)
             {
@@ -466,12 +466,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             else
             {
                 // Default to collecting these standard logs
-                this.eventLogNames.Add("System", false);
-                this.eventLogNames.Add("Security", false);
-                this.eventLogNames.Add("Application", false);
+                this.eventLogNames.Add("System");
+                this.eventLogNames.Add("Security");
+                this.eventLogNames.Add("Application");
             }
 
-            foreach (string eventLogName in this.eventLogNames.Keys)
+            foreach (string eventLogName in this.eventLogNames)
             {
                 try
                 {
@@ -494,7 +494,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 {
                     this.logger.LogError(
                         null,
-                        new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.EventLog_ReadError, eventLogName, Environment.MachineName), ex));
+                        new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.ReadError, eventLogName, Environment.MachineName), ex));
                 }
             }
         }
@@ -516,23 +516,23 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void ConfigureEntryTypes(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
         {
-            this.entryTypes = new Dictionary<EventLogEntryType, bool>();
+            this.entryTypes = new HashSet<EventLogEntryType>();
             string entryTypesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEntryTypes];
             if (entryTypesStr != null)
             {
-                foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr).Keys)
+                foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr))
                 {
                     try
                     {
                         this.entryTypes.Add(
-                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true), false);
+                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
                     }
                     catch (ArgumentException e)
                     {
                         throw new EventLogCollectorException(
                             string.Format(
                                 CultureInfo.InvariantCulture,
-                                Resource.EventLog_InvalidEntryTypeInConfig,
+                                Resource.InvalidEntryTypeInConfig,
                                 entryTypesStr),
                             e);
                     }
@@ -547,9 +547,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
             else
             {
-                this.entryTypes.Add(EventLogEntryType.Error, false);
-                this.entryTypes.Add(EventLogEntryType.Warning, false);
-                this.entryTypes.Add(EventLogEntryType.FailureAudit, false);
+                this.entryTypes.Add(EventLogEntryType.Error);
+                this.entryTypes.Add(EventLogEntryType.Warning);
+                this.entryTypes.Add(EventLogEntryType.FailureAudit);
             }
         }
 
@@ -573,7 +573,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     throw new EventLogCollectorException(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            Resource.EventLog_InvalidMaxEntriesInConfig,
+                            Resource.InvalidMaxEntriesInConfig,
                             maxEntriesstring),
                         e);
                 }

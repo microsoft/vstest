@@ -19,9 +19,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     [TestClass]
     public class EventLogContainerTests
     {
-        private Dictionary<string, bool> eventSources;
+        private HashSet<string> eventSources;
 
-        private Dictionary<EventLogEntryType, bool> entryTypes;
+        private HashSet<EventLogEntryType> entryTypes;
 
         private Mock<DataCollectionLogger> logger;
 
@@ -42,8 +42,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public EventLogContainerTests()
         {
-            this.eventSources = new Dictionary<string, bool>();
-            this.entryTypes = new Dictionary<EventLogEntryType, bool>();
+            this.eventSources = new HashSet<string>();
+            this.entryTypes = new HashSet<EventLogEntryType>();
 
             this.logger = new Mock<DataCollectionLogger>();
             this.mockDataCollectionSink = new Mock<DataCollectionSink>();
@@ -98,15 +98,15 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                     It.IsAny<DataCollectionContext>(),
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        Resource.EventLog_EventsLostWarning,
+                        Resource.EventsLostWarning,
                "Application")));
         }
 
         [TestMethod]
         public void OnEventLogEntryWrittenShoulFilterLogsBasedOnEventTypeAndEventSource()
         {
-            this.entryTypes.Add(EventLogEntryType.Warning, false);
-            this.eventSources.Add("Application", false);
+            this.entryTypes.Add(EventLogEntryType.Warning);
+            this.eventSources.Add("Application");
 
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
@@ -118,7 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void OnEventLogEntryWrittenShoulNotAddLogsIfEventSourceIsDifferent()
         {
-            this.eventSources.Add("Application1", false);
+            this.eventSources.Add("Application1");
 
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void OnEventLogEntryWrittenShoulNotAddLogsIfEventTypeIsDifferent()
         {
-            this.entryTypes.Add(EventLogEntryType.FailureAudit, false);
+            this.entryTypes.Add(EventLogEntryType.FailureAudit);
 
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
@@ -143,8 +143,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public void WriteEventLogsShouldCreateXmlFile()
         {
             this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
-            this.entryTypes.Add(EventLogEntryType.Warning, false);
-            this.eventSources.Add("Application", false);
+            this.entryTypes.Add(EventLogEntryType.Warning);
+            this.eventSources.Add("Application");
             this.eventLogContainer.WriteEventLogs(this.dataCollectionContext, TimeSpan.MaxValue, DateTime.Now);
 
             this.mockFileHelper.Verify(x => x.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -154,8 +154,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public void WriteEventLogsShouldThrowExceptionIfThrownByFileHelper()
         {
             this.mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Throws<Exception>();
-            this.entryTypes.Add(EventLogEntryType.Warning, false);
-            this.eventSources.Add("Application", false);
+            this.entryTypes.Add(EventLogEntryType.Warning);
+            this.eventSources.Add("Application");
             Assert.ThrowsException<Exception>(
                 () =>
                     {
