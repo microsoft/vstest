@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class ResultsDirectoryTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]

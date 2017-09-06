@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void CommandLineRunSettingsShouldWinAmongAllOptions(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Command line run settings should have high precedence btween cli runsettings and cli switches.
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -93,7 +93,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="targetFramework"></param>
         /// <param name="targetRuntime"></param>
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -120,7 +120,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #endregion
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void RunSettingsWithoutParallelAndPlatformX86(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -142,7 +142,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void RunSettingsParamsAsArguments(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -167,7 +167,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void RunSettingsAndRunSettingsParamsAsArguments(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -199,7 +199,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void RunSettingsWithParallelAndPlatformX64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -225,7 +225,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETFullTargetFrameworkInProcess]
         [NETCORETargetFramework]

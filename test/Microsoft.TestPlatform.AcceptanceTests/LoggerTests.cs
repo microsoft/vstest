@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class LoggerTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]

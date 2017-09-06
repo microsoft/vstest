@@ -16,8 +16,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// The run test execution with platform x64.
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkWithCoreRunner]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// The run test execution with platform x86.
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)

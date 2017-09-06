@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             List<DataRowAttribute> dataRows = new List<DataRowAttribute>();
 
-            var netFullRows = testMethod.GetAttributes<NETFullTargetFramework>(false);
+            var netFullRows = testMethod.GetAttributes<NETFullTargetFrameworkWithCoreRunner>(false);
             if (netFullRows != null && netFullRows.Length > 0 && netFullRows[0].DataRows.Count > 0)
             {
                 dataRows.AddRange(netFullRows[0].DataRows);
@@ -97,12 +97,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     /// Third argument (Target runtime) = This get used to find vstest.console dll/exe. 
     /// Fourth argument (InIsolation) = Run the test in isolation(inside testhost) or in process(inside vstest.console.exe)
     /// </summary>
-    public class NETFullTargetFramework : Attribute
+    public class NETFullTargetFrameworkWithCoreRunner : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NETFullTargetFramework"/> class.
+        /// Initializes a new instance of the <see cref="NETFullTargetFrameworkWithCoreRunner"/> class.
         /// </summary>
-        public NETFullTargetFramework()
+        public NETFullTargetFrameworkWithCoreRunner()
         {
             this.DataRows = new List<DataRowAttribute>(1);
             this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
@@ -125,7 +125,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class NETFullTargetFrameworkInIsolation : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NETFullTargetFramework"/> class.
+        /// Initializes a new instance of the <see cref="NETFullTargetFrameworkWithCoreRunner"/> class.
         /// </summary>
         public NETFullTargetFrameworkInIsolation()
         {
@@ -150,7 +150,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class NETFullTargetFrameworkInProcess : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NETFullTargetFramework"/> class.
+        /// Initializes a new instance of the <see cref="NETFullTargetFrameworkWithCoreRunner"/> class.
         /// </summary>
         public NETFullTargetFrameworkInProcess()
         {

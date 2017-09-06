@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         public void ChutzpahRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
         public void CPPRunAllTestExecutionPlatformx64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         public void NUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInIsolation]
         [NETFullTargetFrameworkInProcess]
         [NETCORETargetFramework]

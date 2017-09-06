@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class TestCaseFilterTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -131,7 +131,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
@@ -155,7 +155,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]

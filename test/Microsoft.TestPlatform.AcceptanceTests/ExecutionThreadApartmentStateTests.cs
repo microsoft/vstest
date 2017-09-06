@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         public void UITestShouldPassIfApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         public void UITestShouldFailWhenDefaultApartmentStateIsMTA(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [NETFullTargetFrameworkWithCoreRunner]
         [NETFullTargetFrameworkInProcess]
         [NETFullTargetFrameworkInIsolation]
         public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)

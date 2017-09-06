@@ -32,8 +32,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkWithCoreRunner]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
@@ -58,8 +58,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkWithCoreRunner]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollectionUsingCollectArgument(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {

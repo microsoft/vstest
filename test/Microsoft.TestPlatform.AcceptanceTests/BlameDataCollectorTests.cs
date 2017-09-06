@@ -28,8 +28,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkWithCoreRunner]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
         public void BlameDataCollectorShouldGiveCorrectTestCaseName(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
