@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// The discovery manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The discovery manager.</returns>
-        IDiscoveryManager GetDiscoveryManager(IMetricsCollector metricsCollector);
+        IDiscoveryManager GetDiscoveryManager();
 
         /// <summary>
         /// The execution manager instance for any discovery related operations inside of the test host.

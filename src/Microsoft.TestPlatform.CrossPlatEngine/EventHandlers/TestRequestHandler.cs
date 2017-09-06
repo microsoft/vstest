@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery Session Initialize.");
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetDiscoveryManager(this.metricsCollector)
+                                () => testHostManagerFactory.GetDiscoveryManager()
                                     .Initialize(pathToAdditionalExtensions),
                                 0);
                             break;
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
                             var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
                             jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetDiscoveryManager(this.metricsCollector)
+                                () => testHostManagerFactory.GetDiscoveryManager()
                                     .DiscoverTests(discoveryCriteria, discoveryEventsHandler),
                                 0);
 

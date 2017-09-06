@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
             this.metricsCollector = new MetricsCollector();
-            this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager(this.metricsCollector);
+            this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager(metricsCollector).Abort());
+            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort());
         }
 
         private void InitializeExtensions(IEnumerable<string> sources)

@@ -16,17 +16,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IDiscoveryManager discoveryManager;
         private IExecutionManager executionManager;
 
+        private IMetricsCollector metricsCollector;
+
+        public TestHostManagerFactory()
+        {
+        }
+
+        public TestHostManagerFactory(IMetricsCollector metricsCollector)
+        {
+            this.metricsCollector = metricsCollector;
+        }
+
+        //private IMetricsCollector metricsCollector;
+
+        //public TestHostManagerFactory(IMetricsCollector metricsCollector)
+        //{
+        //    this.metricsCollector = metricsCollector;
+        //}
         /// <summary>
         /// The discovery manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The discovery manager.</returns>
-        public IDiscoveryManager GetDiscoveryManager(IMetricsCollector metricsCollector)
+        public IDiscoveryManager GetDiscoveryManager()
         {
             if(this.discoveryManager == null)
             {
                 this.discoveryManager = new DiscoveryManager(metricsCollector);
             }
-
             return this.discoveryManager;
         }
 

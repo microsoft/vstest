@@ -31,7 +31,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockDiscoveryManager = new Mock<IDiscoveryManager>();
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager(It.IsAny<IMetricsCollector>())).Returns(this.mockDiscoveryManager.Object);
+            this.mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager()).Returns(this.mockDiscoveryManager.Object);
             this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
         }
 
