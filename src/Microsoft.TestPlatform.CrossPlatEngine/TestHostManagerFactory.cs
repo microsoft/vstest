@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
@@ -17,14 +18,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IExecutionManager executionManager;
 
         private IMetricsCollector metricsCollector;
-
-        public TestHostManagerFactory()
+        
+        public TestHostManagerFactory(IRequestData requestData)
         {
-        }
-
-        public TestHostManagerFactory(IMetricsCollector metricsCollector)
-        {
-            this.metricsCollector = metricsCollector ?? throw new System.ArgumentNullException(nameof(metricsCollector));
+            this.metricsCollector = requestData.MetricsCollector ?? throw new System.ArgumentNullException(nameof(metricsCollector));
         }
 
         /// <summary>
