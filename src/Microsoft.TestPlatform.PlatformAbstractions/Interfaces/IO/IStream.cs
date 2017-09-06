@@ -11,18 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     public interface IStream
     {
         /// <summary>
-        /// Returns plarform specific Buffered Stream
-        /// </summary>
-        /// <param name="stream">Input Stream</param>
-        /// <returns>Buffered Stream</returns>
-        Stream PlatformBufferedStream(Stream stream);
-
-        /// <summary>
         /// Returns platrform specific Buffered Stream with desired buffer size.
         /// </summary>
         /// <param name="stream">Input Stream</param>
         /// <param name="bufferSize">Buffer Size</param>
         /// <returns>Buffered Stream</returns>
-        Stream PlatformBufferedStream(Stream stream, int bufferSize);
+        Stream CreateBufferedStream(Stream stream, int bufferSize);
     }
 }

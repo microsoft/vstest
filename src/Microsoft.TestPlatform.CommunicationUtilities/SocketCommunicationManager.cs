@@ -70,11 +70,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private object sendSyncObject = new object();
 
-        /// <summary>
-        /// Stream to use read timeout
-        /// </summary>
-        private Stream stream;
-
         private Socket socket;
 
         /// <summary>
@@ -119,13 +114,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var client = await this.tcpListener.AcceptTcpClientAsync();
                 this.socket = client.Client;
                 this.socket.NoDelay = true;
-                this.stream = new PlatformStream().PlatformBufferedStream(client.GetStream(), SocketConstants.BUFFERSIZE);
-                this.binaryReader = new BinaryReader(client.GetStream());
-                this.binaryWriter = new BinaryWriter(this.stream);
+
+                // Using Buffered stream only in case of write, and Network stream in case of read.
+                var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BUFFERSIZE);
+                var networkStream = client.GetStream();
+                this.binaryReader = new BinaryReader(networkStream);
+                this.binaryWriter = new BinaryWriter(bufferedStream);
 
                 this.clientConnectedEvent.Set();
-                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
-                EqtTrace.Info("Accepted Client request and set the flag");
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
+                    EqtTrace.Info("Accepted Client request and set the flag");
+                }
             }
         }
 
@@ -178,11 +179,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     if (this.tcpClient.Connected)
                     {
-                        this.stream = new PlatformStream().PlatformBufferedStream(this.tcpClient.GetStream(), SocketConstants.BUFFERSIZE);
-                        this.binaryReader = new BinaryReader(this.tcpClient.GetStream());
-                        this.binaryWriter = new BinaryWriter(this.stream);
-                        EqtTrace.Info("Connected to the server successfully ");
-                        EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
+                        // Using Buffered stream only in case of write, and Network stream in case of read.
+                        var bufferedStream = new PlatformStream().CreateBufferedStream(this.tcpClient.GetStream(), SocketConstants.BUFFERSIZE);
+                        var networkStream = this.tcpClient.GetStream();
+                        this.binaryReader = new BinaryReader(networkStream);
+                        this.binaryWriter = new BinaryWriter(bufferedStream);
+
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("Connected to the server successfully ");
+                            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
+                        }
+
                         this.clientConnectionAcceptedEvent.Set();
                     }
                 }
@@ -355,8 +363,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         && socketException.SocketErrorCode == SocketError.TimedOut)
                     {
                         EqtTrace.Info(
-                        "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
-                        ioException);
+                            "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                            ioException);
                     }
                     else
                     {

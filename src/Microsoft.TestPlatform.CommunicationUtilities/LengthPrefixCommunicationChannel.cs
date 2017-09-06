@@ -7,9 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.IO;
     using System.Text;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -27,7 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.stream = stream;
             this.reader = new BinaryReader(stream, Encoding.UTF8, true);
-            this.writer = new BinaryWriter(stream, Encoding.UTF8, true);
+
+            // Using the Buffered stream while writing.
+            this.writer = new BinaryWriter(new PlatformStream().CreateBufferedStream(stream, SocketConstants.BUFFERSIZE), Encoding.UTF8, true);
         }
 
         /// <inheritdoc />

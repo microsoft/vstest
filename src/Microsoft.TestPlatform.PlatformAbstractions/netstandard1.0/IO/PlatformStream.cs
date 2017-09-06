@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
+    using System;
     using System.IO;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -10,15 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public class PlatformStream : IStream
     {
         /// <inheritdoc/>
-        public Stream PlatformBufferedStream(Stream stream)
+        public Stream CreateBufferedStream(Stream stream, int bufferSize)
         {
-            return stream;
-        }
-
-        /// <inheritdoc/>
-        public Stream PlatformBufferedStream(Stream stream, int bufferSize)
-        {
-            return stream;
+            throw new NotImplementedException();
         }
     }
 }
