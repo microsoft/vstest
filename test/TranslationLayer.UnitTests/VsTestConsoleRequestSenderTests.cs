@@ -490,6 +490,51 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public void StartTestRunShouldNotThrowIfTestPlatformOptionsIsNull()
+        {
+            // Arrange.
+            var sources = new List<string>() { "1.dll" };
+            TestRunRequestPayload receivedRequest = null;
+
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+
+            this.SetupMockCommunicationForRunRequest(mockHandler);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
+                Callback((string msg, object requestpayload, int protocol) => { receivedRequest = (TestRunRequestPayload)requestpayload; });
+
+            // Act.
+            this.requestSender.StartTestRun(sources, null, null, mockHandler.Object);
+
+            // Assert.
+            Assert.IsNotNull(receivedRequest);
+            CollectionAssert.AreEqual(sources, receivedRequest.Sources);
+            Assert.IsNull(receivedRequest.TestCaseFilter, "The run request message should include a null test case filter");
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldIncludeFilterInRequestPayload()
+        {
+            // Arrange.
+            var sources = new List<string>() { "1.dll" };
+            var filter = "GivingCampaign";
+            TestRunRequestPayload receivedRequest = null;
+
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+
+            this.SetupMockCommunicationForRunRequest(mockHandler);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
+                Callback((string msg, object requestpayload, int protocol) => { receivedRequest = (TestRunRequestPayload)requestpayload; });
+            
+            // Act.
+            this.requestSender.StartTestRun(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, mockHandler.Object);
+
+            // Assert.
+            Assert.IsNotNull(receivedRequest);
+            CollectionAssert.AreEqual(sources, receivedRequest.Sources);
+            Assert.AreEqual(filter, receivedRequest.TestCaseFilter, "The run request message should include test case filter");
+        }
+
+        [TestMethod]
         public void StartTestRunWithCustomHostShouldComplete()
         {
             this.InitializeCommunication();
@@ -600,6 +645,51 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+        }
+
+        [TestMethod]
+        public void StartTestRunWithCustomHostShouldNotThrowIfTestPlatformOptionsIsNull()
+        {
+            // Arrange.
+            var sources = new List<string>() { "1.dll" };
+            TestRunRequestPayload receivedRequest = null;
+
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+
+            this.SetupMockCommunicationForRunRequest(mockHandler);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
+                Callback((string msg, object requestpayload, int protocol) => { receivedRequest = (TestRunRequestPayload)requestpayload; });
+
+            // Act.
+            this.requestSender.StartTestRunWithCustomHost(sources, null, null, mockHandler.Object, new Mock<ITestHostLauncher>().Object);
+
+            // Assert.
+            Assert.IsNotNull(receivedRequest);
+            CollectionAssert.AreEqual(sources, receivedRequest.Sources);
+            Assert.IsNull(receivedRequest.TestCaseFilter, "The run request message should include a null test case filter");
+        }
+
+        [TestMethod]
+        public void StartTestRunWithCustomHostShouldIncludeFilterInRequestPayload()
+        {
+            // Arrange.
+            var sources = new List<string>() { "1.dll" };
+            var filter = "GivingCampaign";
+            TestRunRequestPayload receivedRequest = null;
+
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+
+            this.SetupMockCommunicationForRunRequest(mockHandler);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, It.IsAny<TestRunRequestPayload>(), It.IsAny<int>())).
+                Callback((string msg, object requestpayload, int protocol) => { receivedRequest = (TestRunRequestPayload)requestpayload; });
+
+            // Act.
+            this.requestSender.StartTestRunWithCustomHost(sources, null, new TestPlatformOptions() { TestCaseFilter = filter }, mockHandler.Object, new Mock<ITestHostLauncher>().Object);
+
+            // Assert.
+            Assert.IsNotNull(receivedRequest);
+            CollectionAssert.AreEqual(sources, receivedRequest.Sources);
+            Assert.AreEqual(filter, receivedRequest.TestCaseFilter, "The run request message should include test case filter");
         }
 
         [TestMethod]
@@ -988,6 +1078,30 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
             var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsTrue(connectionSuccess, "Connection must succeed.");
+        }
+        
+        private void SetupMockCommunicationForRunRequest(Mock<ITestRunEventsHandler> mockHandler)
+        {
+            this.InitializeCommunication();
+
+            var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+            testResult.Outcome = TestOutcome.Passed;
+
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
+
+            var payload = new TestRunCompletePayload()
+            {
+                ExecutorUris = null,
+                LastRunTests = dummyLastRunArgs,
+                RunAttachments = null,
+                TestRunCompleteArgs = dummyCompleteArgs
+            };
+
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
         }
 
         #endregion

@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class VsTestConsoleWrapperTests
@@ -154,6 +155,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public void RunTestsWithSourcesAndOptionsShouldThrowIfOptionsIsNull()
+        {
+            Assert.That.Throws<ArgumentNullException>(
+                () => this.consoleWrapper.RunTests(
+                            this.testSources,
+                            "RunSettings",
+                            null,
+                            new Mock<ITestRunEventsHandler>().Object)
+                 ).WithMessage("The test platform options cannot be null.");
+        }
+
+        [TestMethod]
+        public void RunTestsWithSourcesAndOptionsShouldPassOnOptions()
+        {
+            var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+            this.consoleWrapper.RunTests(
+                            this.testSources,
+                            "RunSettings",
+                            options,
+                            new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", options, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        }
+
+        [TestMethod]
         public void RunTestsWithSourcesAndCustomHostShouldSucceed()
         {
             this.consoleWrapper.RunTestsWithCustomTestHost(
@@ -163,6 +189,41 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestHostLauncher>().Object);
 
             this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testSources, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsWithSourcesAndOptionsUsingACustomHostShouldThrowIfOptionsIsNull()
+        {
+            Assert.That.Throws<ArgumentNullException>(
+                () => this.consoleWrapper.RunTestsWithCustomTestHost(
+                            this.testSources,
+                            "RunSettings",
+                            null,
+                            new Mock<ITestRunEventsHandler>().Object,
+                            new Mock<ITestHostLauncher>().Object)
+                 ).WithMessage("The test platform options cannot be null.");
+        }
+
+        [TestMethod]
+        public void RunTestsWithSourcesAndOptionsUsingACustomHostShouldPassOnOptions()
+        {
+            var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };
+            this.consoleWrapper.RunTestsWithCustomTestHost(
+                            this.testSources,
+                            "RunSettings",
+                            options,
+                            new Mock<ITestRunEventsHandler>().Object,
+                            new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(
+                rs => rs.StartTestRunWithCustomHost(
+                    this.testSources,
+                    "RunSettings",
+                    options,
+                    It.IsAny<ITestRunEventsHandler>(),
+                    It.IsAny<ITestHostLauncher>())
+                 , Times.Once
+                 );
         }
 
         [TestMethod]
