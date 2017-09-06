@@ -102,6 +102,38 @@ namespace Microsoft.TestPlatform.PerformanceTests
             Assert.IsTrue(watch.Elapsed < TimeSpan.FromSeconds(4), "Elapsed: " + watch.Elapsed);
         }
 
+        [TestMethod]
+        public void SocketCommunicationShouldNotHangServerClientCommunication()
+        {
+            // Measure the throughput with socket communication v1 (SocketCommunicationManager)
+            // implementation.
+            var server = new SocketCommunicationManager();
+            var client = new SocketCommunicationManager();
+            var watch = new Stopwatch();
+
+            int port = server.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait();
+            server.AcceptClientAsync().Wait();
+
+            server.WaitForClientConnection(1000);
+            client.WaitForServerConnection(1000);
+
+            var clientThread = new Thread(() => SendData3(client, watch));
+            clientThread.Start();
+
+            var dataReceived = 0;
+            while (dataReceived < 2048 * 10)
+            {
+                dataReceived += server.ReceiveRawMessageAsync(CancellationToken.None).Result.Length;
+                System.Threading.Tasks.Task.Delay(1000).Wait();
+            }
+
+            watch.Stop();
+            clientThread.Join();
+
+            Assert.IsTrue(true);
+        }
+
         private static void SendData(ICommunicationChannel channel, Stopwatch watch)
         {
             var dataBytes = new byte[65536];
@@ -131,6 +163,24 @@ namespace Microsoft.TestPlatform.PerformanceTests
 
             watch.Start();
             for (int i = 0; i < 20000; i++)
+            {
+                communicationManager.SendRawMessage(dataBytesStr);
+            }
+        }
+
+        private static void SendData3(ICommunicationManager communicationManager, Stopwatch watch)
+        {
+            // Having less than the buffer size in SocketConstants.BUFFERSIZE.
+            var dataBytes = new byte[2048];
+            for (int i = 0; i < dataBytes.Length; i++)
+            {
+                dataBytes[i] = 0x65;
+            }
+
+            var dataBytesStr = System.Text.Encoding.UTF8.GetString(dataBytes);
+
+            watch.Start();
+            for (int i = 0; i < 10; i++)
             {
                 communicationManager.SendRawMessage(dataBytesStr);
             }
