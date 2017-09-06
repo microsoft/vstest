@@ -33,8 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private ITransport transport;
 
         private IDataSerializer dataSerializer;
-
-        private IMetricsCollector metricsCollector;
         
         private Action<Message> onAckMessageRecieved;
 
@@ -54,7 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager = communicationManager;
             this.transport = new SocketTransport(communicationManager, connectionInfo);
             this.dataSerializer = dataSerializer;
-            this.metricsCollector = new MetricsCollector();
         }
 
         /// <inheritdoc/>
@@ -284,7 +281,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 TotalTests = totalTests,
                 LastDiscoveredTests = isAborted ? null : lastChunk,
                 IsAborted = isAborted,
-                Metrics =  this.metricsCollector.Metrics()
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);

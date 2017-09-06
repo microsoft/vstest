@@ -3,20 +3,20 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common
 {
-    using System;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     public class RequestData : IRequestData
     {
-        private MetricsCollector metricsCollector;
+        private IMetricsCollector metricsCollector;
 
-        public RequestData(MetricsCollector metricsCollector)
+        public RequestData(IMetricsCollector metricsCollector)
         {
-            this.metricsCollector = metricsCollector;
+            this.metricsCollector =
+                metricsCollector ?? throw new System.ArgumentNullException(nameof(metricsCollector));
         }
 
         /// <inheritdoc/>
-        public IMetricsCollector MetricsCollector => throw new NotImplementedException();
+        public IMetricsCollector MetricsCollector => this.metricsCollector;
     }
 }

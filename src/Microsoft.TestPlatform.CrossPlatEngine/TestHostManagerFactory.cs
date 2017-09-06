@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
@@ -17,11 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IDiscoveryManager discoveryManager;
         private IExecutionManager executionManager;
 
-        private IMetricsCollector metricsCollector;
+        private IRequestData requestData;
         
         public TestHostManagerFactory(IRequestData requestData)
         {
-            this.metricsCollector = requestData.MetricsCollector ?? throw new System.ArgumentNullException(nameof(metricsCollector));
+            this.requestData = requestData ?? throw new System.ArgumentNullException(nameof(requestData));
         }
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             if(this.discoveryManager == null)
             {
-                this.discoveryManager = new DiscoveryManager(this.metricsCollector);
+                this.discoveryManager = new DiscoveryManager(this.requestData);
             }
             return this.discoveryManager;
         }
@@ -45,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             if (this.executionManager == null)
             {
-                this.executionManager = new ExecutionManager(this.metricsCollector);
+                this.executionManager = new ExecutionManager(this.requestData);
             }
 
             return this.executionManager;

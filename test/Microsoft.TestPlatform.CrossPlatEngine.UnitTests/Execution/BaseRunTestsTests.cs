@@ -28,10 +28,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     using Moq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -44,7 +46,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
         private Mock<IThread> mockThread;
 
-        private IMetricsCollector dummyMetricsCollector;
+        private IRequestData requestData;
 
         private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
         private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
@@ -66,7 +68,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
 
-            this.dummyMetricsCollector = new DummyMetricCollector();
+            this.requestData = new RequestData(new DummyMetricCollector());
 
             this.runTestsInstance = new TestableBaseRunTests(
                 null,
@@ -74,7 +76,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
-                this.dummyMetricsCollector);
+                this.requestData);
 
             TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
         }
@@ -693,7 +695,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockTestPlatformEventSource.Object,
                 null,
                 this.mockThread.Object,
-                this.dummyMetricsCollector);
+                this.requestData);
             TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -714,8 +716,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestCaseEventsHandler testCaseEventsHandler,
                 ITestRunEventsHandler testRunEventsHandler,
                 ITestPlatformEventSource testPlatformEventSource,
-                IMetricsCollector metricsCollector)
-                : base(null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, metricsCollector)
+                IRequestData requestData)
+                : base(null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, requestData)
             {
             }
 
@@ -727,8 +729,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestPlatformEventSource testPlatformEventSource,
                 ITestEventsPublisher testEventsPublisher,
                 IThread platformThread,
-                IMetricsCollector metricsCollector)
-                : base(null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, testEventsPublisher, platformThread, metricsCollector)
+                IRequestData requestData)
+                : base(null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, testEventsPublisher, platformThread, requestData)
             {
             }
 

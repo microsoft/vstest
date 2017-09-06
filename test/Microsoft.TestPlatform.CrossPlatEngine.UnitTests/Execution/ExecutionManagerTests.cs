@@ -38,7 +38,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.executionManager = new ExecutionManager(new DummyMetricCollector());
+            this.executionManager = new ExecutionManager(new RequestData(new DummyMetricCollector()));
 
             TestPluginCache.Instance = null;
 

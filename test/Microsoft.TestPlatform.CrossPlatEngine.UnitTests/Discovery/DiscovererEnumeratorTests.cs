@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 {
     using System;
@@ -21,8 +19,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     [TestClass]
     public class DiscovererEnumeratorTests
@@ -30,15 +29,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         private DiscovererEnumerator discovererEnumerator;
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
         private DiscoveryResultCache discoveryResultCache;
-        private IMetricsCollector metricsCollector;
 
         [TestInitialize]
         public void TestInit()
         {
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
-            this.metricsCollector = new DummyMetricCollector();
             this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
-            this.discovererEnumerator = new DiscovererEnumerator(this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.metricsCollector);
+            this.discovererEnumerator = new DiscovererEnumerator(this.discoveryResultCache, this.mockTestPlatformEventSource.Object, new RequestData(new DummyMetricCollector()));
 
             TestDiscoveryExtensionManager.Destroy();
         }

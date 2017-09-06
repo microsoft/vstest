@@ -16,6 +16,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     using Moq;
 
@@ -31,7 +32,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestInitialize]
         public void TestInit()
         {
-            this.discoveryManager = new DiscoveryManager(new DummyMetricCollector());
+            this.discoveryManager = new DiscoveryManager(new RequestData(new DummyMetricCollector()));
         }
 
         [TestCleanup]

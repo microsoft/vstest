@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     /// <summary>
     /// The base run tests.
@@ -51,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ITestRunCache testRunCache;
         private string package;
 
-        private IMetricsCollector metricsCollector;
+        private IRequestData requestData;
 
         /// <summary>
         /// Specifies that the test run cancellation is requested
@@ -94,13 +95,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCaseEventsHandler">The test case events handler.</param>
         /// <param name="testRunEventsHandler">The test run events handler.</param>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
+        /// <param name="requestData">The Request Data</param>
         protected BaseRunTests(string package,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
             ITestPlatformEventSource testPlatformEventSource,
-            IMetricsCollector metricsCollector) :
+            IRequestData requestData) :
             this(
                 package,
                 runSettings,
@@ -110,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testPlatformEventSource,
                 testCaseEventsHandler as ITestEventsPublisher,
                 new PlatformThread(),
-                metricsCollector)
+                requestData)
         {
         }
 
@@ -125,6 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testPlatformEventSource">Test platform event source.</param>
         /// <param name="testEventsPublisher">Publisher for test events.</param>
         /// <param name="platformThread">Platform Thread.</param>
+        /// <param name="requestData">Provides services and data for execution</param>
         protected BaseRunTests(string package,
             string runSettings,
             TestExecutionContext testExecutionContext,
@@ -133,14 +136,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestPlatformEventSource testPlatformEventSource,
             ITestEventsPublisher testEventsPublisher,
             IThread platformThread,
-            IMetricsCollector metricsCollector)
+            IRequestData requestData)
         {
             this.package = package;
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
             this.testCaseEventsHandler = testCaseEventsHandler;
             this.testRunEventsHandler = testRunEventsHandler;
-            this.metricsCollector = metricsCollector;
+            this.requestData = requestData;
 
             this.isCancellationRequested = false;
             this.testPlatformEventSource = testPlatformEventSource;
@@ -370,7 +373,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var exceptionsHitDuringRunTests = false;
 
             //Collecting Total Number of Adapters Discovered in Machine
-            this.metricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscovered, (executorUriExtensionMap.Count()).ToString());
+            this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscovered, (executorUriExtensionMap.Count()).ToString());
 
             foreach (var executorUriExtensionTuple in executorUriExtensionMap)
             {
@@ -466,12 +469,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
 
                 // Collecting Telemetry Event
-                this.metricsCollector.Add(string.Format("{0},{1}", UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUriExtensionTuple.Item1.AbsoluteUri), (stopwatch.Elapsed.TotalSeconds).ToString());
+                this.requestData.MetricsCollector.Add(string.Format("{0},{1}", UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, executorUriExtensionTuple.Item1.AbsoluteUri), (stopwatch.Elapsed.TotalSeconds).ToString());
                 totalTimeTakenByAdapters += stopwatch.Elapsed.TotalSeconds;
             }
 
             //Collecting Total Time Taken by Adapters
-            this.metricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters.ToString());
+            this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters.ToString());
 
             return exceptionsHitDuringRunTests;
         }
@@ -538,10 +541,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 AddTestRunToEachAdapter(lastChunk);
 
                 // Collecting TotalTestsRun
-                this.metricsCollector.Add(UnitTestTelemetryDataConstants.TotalTestsRun, runStats.ExecutedTests.ToString());
+                this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TotalTestsRun, runStats.ExecutedTests.ToString());
 
                 // Collecting the Test Run State
-                this.metricsCollector.Add(UnitTestTelemetryDataConstants.RunState, canceled ? "Canceled" : (aborted ? "Aborted" : "Completed"));
+                this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.RunState, canceled ? "Canceled" : (aborted ? "Aborted" : "Completed"));
 
                 //Collecting Metrics
                 LogNumberOfTestRunByEachAdapter();
@@ -557,7 +560,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     exception,
                     attachments,
                     elapsedTime,
-                    this.metricsCollector.Metrics());
+                    this.requestData.MetricsCollector.Metrics());
 
                 if (lastChunk.Any())
                 {
@@ -656,11 +659,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Collecting Total Tests Run by each Adapter
             foreach (var key in adapterUrisAndTestCount.Keys)
             {
-                this.metricsCollector.Add(String.Format("{0}.{1}", UnitTestTelemetryDataConstants.TotalTestsRanByAdapter, key), adapterUrisAndTestCount[key].ToString());
+                this.requestData.MetricsCollector.Add(String.Format("{0}.{1}", UnitTestTelemetryDataConstants.TotalTestsRanByAdapter, key), adapterUrisAndTestCount[key].ToString());
             }
 
             // Collecting Number Of Adapters used to Run tests.
-            this.metricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUrisAndTestCount.Count.ToString());
+            this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUrisAndTestCount.Count.ToString());
         }
 
         #endregion

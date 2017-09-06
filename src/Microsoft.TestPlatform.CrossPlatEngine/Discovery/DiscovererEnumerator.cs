@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using System.Diagnostics;
@@ -31,25 +32,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     {
         private DiscoveryResultCache discoveryResultCache;
         private ITestPlatformEventSource testPlatformEventSource;
-        private IMetricsCollector metricsCollector;
+        private IRequestData requestData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
         /// <param name="metricsCollector">Metric Collector</param>
-        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache, IMetricsCollector metricsCollector):this(discoveryResultCache, TestPlatformEventSource.Instance, metricsCollector)
+        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache, IRequestData requestData):this(discoveryResultCache, TestPlatformEventSource.Instance, requestData)
         {
         }
 
         internal DiscovererEnumerator(
             DiscoveryResultCache discoveryResultCache,
             ITestPlatformEventSource testPlatformEventSource,
-            IMetricsCollector metricsCollector)
+            IRequestData requestData)
         {
             this.discoveryResultCache = discoveryResultCache;
             this.testPlatformEventSource = testPlatformEventSource;
-            this.metricsCollector = metricsCollector;
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             sw.Stop();
 
             // Collecting Data Point for TimeTaken to Load Adapters
-            this.metricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenToLoadAdaptersInSec, (sw.Elapsed.TotalMilliseconds).ToString());
+            this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenToLoadAdaptersInSec, (sw.Elapsed.TotalMilliseconds).ToString());
 
             // Warning is logged for in the inner function
             if (discovererToSourcesMap == null || discovererToSourcesMap.Count() == 0)
@@ -99,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
 
             //Collecting Total Number of Adapters Discovered in Machine
-            this.metricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscoveredInTheMachine, (discovererToSourcesMap.Keys.Count()).ToString());
+            this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscoveredInTheMachine, (discovererToSourcesMap.Keys.Count()).ToString());
 
             var context = new DiscoveryContext { RunSettings = settings };
 
@@ -173,12 +174,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
 
                 // Collecting Data Point for Time Taken to Discover Tests by each Adapter
-                this.metricsCollector.Add(string.Format("{0},{1}", UnitTestTelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), (sw.Elapsed.TotalSeconds).ToString());
+                this.requestData.MetricsCollector.Add(string.Format("{0},{1}", UnitTestTelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), (sw.Elapsed.TotalSeconds).ToString());
                 totalTimeTakenByAdapters += sw.Elapsed.TotalSeconds;
             }
 
             //Collecting Total Time Taken by Adapters
-            this.metricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters.ToString());
+            this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters.ToString());
         }
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)

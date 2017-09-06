@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
@@ -15,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
@@ -28,12 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private BaseRunTests activeTestRun;
 
-        private IMetricsCollector metricsCollector;
+        private IRequestData requestData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
-        public ExecutionManager(IMetricsCollector metricsCollector) : this(TestPlatformEventSource.Instance, metricsCollector)
+        public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
         {
         }
 
@@ -41,10 +42,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IMetricsCollector metricsCollector)
+        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IRequestData requestData)
         {
             this.testPlatformEventSource = testPlatformEventSource;
-            this.metricsCollector = metricsCollector;
+            this.requestData = requestData;
         }
 
         #region IExecutionManager Implementation
@@ -95,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                      testExecutionContext,
                      testCaseEventsHandler,
                      runEventsHandler,
-                     this.metricsCollector);
+                     this.requestData);
 
                 this.activeTestRun.RunTests();
             }
@@ -138,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                                          testExecutionContext,
                                          testCaseEventsHandler,
                                          runEventsHandler,
-                                         this.metricsCollector);
+                                         this.requestData);
 
                 this.activeTestRun.RunTests();
             }

@@ -4,25 +4,28 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+
 
     [TestClass]
     public class TestHostManagerFactoryTests
     {
         private TestHostManagerFactory testHostManagerFactory;
-        private IMetricsCollector metricsCollector;
+        private IRequestData requestData;
 
         public TestHostManagerFactoryTests()
         {
-            this.metricsCollector = new DummyMetricCollector();
-            this.testHostManagerFactory = new TestHostManagerFactory(this.metricsCollector);
+            this.requestData = new RequestData(new DummyMetricCollector());
+            this.testHostManagerFactory = new TestHostManagerFactory(this.requestData);
         }
 
         [TestMethod]
-        public void ConstructorShouldThrowIfMetricsCollectorIsNull()
+        public void ConstructorShouldThrowIfRequestDataIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
         }
