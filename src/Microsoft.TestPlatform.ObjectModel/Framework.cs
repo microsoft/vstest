@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public class Framework
     {
 #if NET451
-        private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.5.1");
+        private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.0");
 #else
         private static readonly Framework Default = Framework.FromString(".NETCoreApp,Version=v1.0");
 #endif
