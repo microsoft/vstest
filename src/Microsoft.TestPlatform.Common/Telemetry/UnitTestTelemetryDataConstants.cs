@@ -29,13 +29,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TargetDevice = "VS.UnitTest.TestRun.TargetDevice";
 
-        // Adapter name will get appended. eg:- VS.UnitTest.TestRun.TotalTests.executor//cppunittestexecutor/v1
+        // Adapter name will get appended. eg:- VS.UnitTest.TestRun.TotalTestsRanByAdapter.executor//cppunittestexecutor/v1
         // In case of parallel it will be sum of all tests ran by an adapter in different execution process
         public static string TotalTestsRanByAdapter = "VS.UnitTest.TestRun.TotalTestsRanByAdapter";
 
-        // Adapter name will get appended. eg:- VS.UnitTest.TestRun.TimeTaken.executor//cppunittestexecutor/v1
+        // Adapter name will get appended. eg:- VS.UnitTest.TestRun.TimeTakenToRunTestsByAnAdapter.executor//cppunittestexecutor/v1
         // In case of parallel it will be sum of all time taken by an adapter to run tests in different execution process
-        public static string TimeTakenToRunTestsByAnAdapter = "VS.UnitTest.TestRun.TimeTaken";
+        public static string TimeTakenToRunTestsByAnAdapter = "VS.UnitTest.TestRun.TimeTakenToRunTestsByAnAdapter";
 
         // Total number of adapter discovered on the machine.
         public static string NumberOfAdapterDiscovered = "VS.UnitTest.TestRun.AdaptersDiscoveredCount";
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         // It will be the sum of the times taken by all adapter to run tests.
         // In case of parallel it can be more than total time taken to complete run request.
-        public static string TimeTakenByAllAdaptersInSec = "VS.UnitTest.TestRun.TimeTakenByAllAdapters";
+        public static string TimeTakenByAllAdaptersInSec = "VS.UnitTest.TestRun.TimeTakenByAllAdaptersInSec";
 
 
         // *********************Discovery****************************

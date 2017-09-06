@@ -96,9 +96,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 var adapterUsedCount = metricsAggregator.Count(metrics =>
                     metrics.Key.Contains(UnitTestTelemetryDataConstants.TotalTestsRanByAdapter));
 
+                var adaptersDiscoveredCount = metricsAggregator.Count(metrics =>
+                    metrics.Key.Contains(UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter));
+
                 // Aggregating Total Adapter Used Count
                 metricsAggregator.Add(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToRunTests,
                     adapterUsedCount.ToString());
+
+                // Aggregating Total Adapters Discovered Count
+                metricsAggregator.Add(UnitTestTelemetryDataConstants.NumberOfAdapterDiscovered,
+                    adaptersDiscoveredCount.ToString());
             }
 
             return metricsAggregator;
