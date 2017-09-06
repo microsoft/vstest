@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery Session Initialize.");
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetExecutionManager(this.metricsCollector)
+                                () => testHostManagerFactory.GetExecutionManager()
                                     .Initialize(pathToAdditionalExtensions),
                                 0);
                             break;
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
                             jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetExecutionManager(this.metricsCollector)
+                                testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithSources.AdapterSourceMap,
                                         testRunCriteriaWithSources.Package,
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                             jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetExecutionManager(this.metricsCollector)
+                                testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithTests.Tests,
                                         testRunCriteriaWithTests.Package,
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     case MessageType.CancelTestRun:
                         jobQueue.Pause();
-                        testHostManagerFactory.GetExecutionManager(this.metricsCollector).Cancel();
+                        testHostManagerFactory.GetExecutionManager().Cancel();
                         break;
 
                     case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     case MessageType.AbortTestRun:
                         jobQueue.Pause();
-                        testHostManagerFactory.GetExecutionManager(this.metricsCollector).Abort();
+                        testHostManagerFactory.GetExecutionManager().Abort();
                         break;
 
                     case MessageType.SessionEnd:

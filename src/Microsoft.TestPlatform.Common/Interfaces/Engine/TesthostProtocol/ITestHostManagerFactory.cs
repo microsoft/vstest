@@ -20,6 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// The execution manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The execution manager.</returns>
-        IExecutionManager GetExecutionManager(IMetricsCollector metricsCollector);
+        IExecutionManager GetExecutionManager();
     }
 }

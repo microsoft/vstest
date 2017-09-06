@@ -21,14 +21,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private ITestHostManagerFactory testHostManagerFactory;
         private IDiscoveryManager discoveryManager;
         private ITestRuntimeProvider testHostManager;
-        private IMetricsCollector metricsCollector;
 
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
         /// </summary>
-        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
+        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new MetricsCollector()))
         {
         }
 
@@ -40,7 +39,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
-            this.metricsCollector = new MetricsCollector();
             this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
         }
 

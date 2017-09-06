@@ -23,14 +23,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private ITestHostManagerFactory testHostManagerFactory;
         private IExecutionManager executionManager;
         private ITestRuntimeProvider testHostManager;
-        private IMetricsCollector metricsCollector;
 
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
         /// </summary>
-        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
+        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new MetricsCollector()))
         {
         }
 
@@ -44,8 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
-            this.metricsCollector = new MetricsCollector();
-            this.executionManager = this.testHostManagerFactory.GetExecutionManager(this.metricsCollector);
+            this.executionManager = this.testHostManagerFactory.GetExecutionManager();
         }
 
         /// <summary>
@@ -114,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager(this.metricsCollector).Abort());
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Abort());
         }
 
         /// <summary>
@@ -122,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Cancel()
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager(this.metricsCollector).Cancel());
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Cancel());
         }
 
         /// <summary>

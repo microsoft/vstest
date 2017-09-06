@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    new DiscovererEnumerator(discoveryResultCache,this.metricsCollector).LoadTests(
+                    new DiscovererEnumerator(discoveryResultCache, this.metricsCollector).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
                         this.sessionMessageLogger);

@@ -171,9 +171,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                         // Add Metrics from TestHost Process
                         var metrics = discoveryCompletePayload.Metrics;
-                        foreach (var metric in metrics)
+                        if (metrics != null)
                         {
-                            MetricCollector.Add(metric.Key, metric.Value);
+                            foreach (var metric in metrics)
+                            {
+                                MetricCollector.Add(metric.Key, metric.Value);
+                            }
                         }
 
                         discoveryEventsHandler.HandleDiscoveryComplete(

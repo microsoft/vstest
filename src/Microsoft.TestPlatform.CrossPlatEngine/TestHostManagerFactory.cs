@@ -24,15 +24,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         public TestHostManagerFactory(IMetricsCollector metricsCollector)
         {
-            this.metricsCollector = metricsCollector;
+            this.metricsCollector = metricsCollector ?? throw new System.ArgumentNullException(nameof(metricsCollector));
         }
 
-        //private IMetricsCollector metricsCollector;
-
-        //public TestHostManagerFactory(IMetricsCollector metricsCollector)
-        //{
-        //    this.metricsCollector = metricsCollector;
-        //}
         /// <summary>
         /// The discovery manager instance for any discovery related operations inside of the test host.
         /// </summary>
@@ -41,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             if(this.discoveryManager == null)
             {
-                this.discoveryManager = new DiscoveryManager(metricsCollector);
+                this.discoveryManager = new DiscoveryManager(this.metricsCollector);
             }
             return this.discoveryManager;
         }
@@ -50,11 +44,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// The execution manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The execution manager.</returns>
-        public IExecutionManager GetExecutionManager(IMetricsCollector metricsCollector)
+        public IExecutionManager GetExecutionManager()
         {
             if (this.executionManager == null)
             {
-                this.executionManager = new ExecutionManager(metricsCollector);
+                this.executionManager = new ExecutionManager(this.metricsCollector);
             }
 
             return this.executionManager;

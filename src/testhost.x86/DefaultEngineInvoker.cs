@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     internal class DefaultEngineInvoker :
 #if NET451
@@ -106,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
+                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(new MetricsCollector()));
 
                 // Wait for processing to complete.
                 Task.WaitAny(processingTask);

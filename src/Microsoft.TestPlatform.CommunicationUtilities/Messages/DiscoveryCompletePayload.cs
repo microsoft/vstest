@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -29,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// <summary>
         /// Gets or sets the Metrics
         /// </summary>
+        [IgnoreDataMember]
         public IDictionary<string, string> Metrics { get; set; }
     }
 }

@@ -26,13 +26,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<IExecutionManager> mockExecutionManager;
         private Mock<ITestRuntimeProvider> mockTestHostManager;
 
-        [TestInitialize]
-        public void TestInitialize()
+        public InProcessProxyExecutionManagerTests()
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockExecutionManager = new Mock<IExecutionManager>();
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager(It.IsAny<IMetricsCollector>())).Returns(this.mockExecutionManager.Object);
+            this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
             this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
         }
 

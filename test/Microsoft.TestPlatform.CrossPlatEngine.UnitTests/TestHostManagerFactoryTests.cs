@@ -42,13 +42,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnAnExecutionManagerInstance()
         {
-            Assert.IsNotNull(this.testHostManagerFactory.GetExecutionManager(this.metricsCollector));
+            Assert.IsNotNull(this.testHostManagerFactory.GetExecutionManager());
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldCacheTheExecutionManagerInstance()
         {
-            Assert.AreEqual(this.testHostManagerFactory.GetExecutionManager(this.metricsCollector), this.testHostManagerFactory.GetExecutionManager(this.metricsCollector));
+            Assert.AreEqual(this.testHostManagerFactory.GetExecutionManager(), this.testHostManagerFactory.GetExecutionManager());
         }
     }
 }
