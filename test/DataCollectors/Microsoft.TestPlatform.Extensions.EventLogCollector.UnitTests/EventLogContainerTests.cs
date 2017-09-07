@@ -78,28 +78,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         }
 
         [TestMethod]
-        public void OnEventLogEntryWrittenShouldLogWarningIfNextEntryIndexToCollectIsGreaterThanMostRecentIndexLog()
-        {
-            this.eventLogContainer.NextEntryIndexToCollect =
-                this.eventLogContainer.NextEntryIndexToCollect + 1;
-            try
-            {
-                this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
-            }
-            catch
-            {
-            }
-
-            this.logger.Verify(
-                x => x.LogWarning(
-                    It.IsAny<DataCollectionContext>(),
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        Resource.EventsLostWarning,
-               "Application")));
-        }
-
-        [TestMethod]
         public void OnEventLogEntryWrittenShoulFilterLogsBasedOnEventTypeAndEventSource()
         {
             this.entryTypes.Add(EventLogEntryType.Warning);

@@ -79,6 +79,15 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; event log has encountered an exception, some events might get lost. Error : {1}.
+        /// </summary>
+        internal static string EventsLostError {
+            get {
+                return ResourceManager.GetString("EventsLostError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;{0}&apos; event log may have been cleared during collection; some events may not have been collected.
         /// </summary>
         internal static string EventsLostWarning {

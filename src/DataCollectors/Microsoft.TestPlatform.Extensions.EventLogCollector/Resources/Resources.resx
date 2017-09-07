@@ -123,6 +123,9 @@
   <data name="ContextNotFoundException" xml:space="preserve">
     <value>Event Log DataCollector did not find eventLogContext for DataCollectionContext: {0}</value>
   </data>
+  <data name="EventsLostError" xml:space="preserve">
+    <value>The '{0}' event log has encountered an exception, some events might get lost. Error : {1}</value>
+  </data>
   <data name="EventsLostWarning" xml:space="preserve">
     <value>The '{0}' event log may have been cleared during collection; some events may not have been collected</value>
   </data>

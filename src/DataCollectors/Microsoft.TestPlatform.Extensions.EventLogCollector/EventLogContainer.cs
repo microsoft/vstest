@@ -225,9 +225,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
-                    // todo : log exception
+                    this.dataCollectionLogger.LogError(
+                        this.dataCollectionContext,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resource.EventsLostError,
+                            this.eventLog.Log), exception);
                 }
             }
         }

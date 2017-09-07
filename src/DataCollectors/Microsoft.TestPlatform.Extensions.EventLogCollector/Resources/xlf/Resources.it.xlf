@@ -50,6 +50,11 @@
         <target state="new">Unable to read event log '{0}' from computer '{1}'</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="EventsLostError">
+        <source>The '{0}' event log has encountered an exception, some events might get lost. Error : {1}</source>
+        <target state="new">The '{0}' event log has encountered an exception, some events might get lost. Error : {1}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
