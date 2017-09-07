@@ -63,8 +63,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             ValidateArg.NotNull(fileTransferInformation, "fileTransferInformation");
 
-            Debug.Assert(System.IO.File.Exists(fileTransferInformation.Path), "DataCollector file '" + fileTransferInformation.Path + "' does not exist!");
-
             this.AttachmentManager.AddAttachment(fileTransferInformation, this.SendFileCompleted, this.DataCollectorConfig.TypeUri, this.DataCollectorConfig.FriendlyName);
         }
     }
