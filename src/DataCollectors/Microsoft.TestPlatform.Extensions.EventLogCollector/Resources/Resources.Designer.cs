@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}.
+        ///   Looks up a localized string similar to The Event Log DataCollector encountered an invalid value for &apos;EntryTypes&apos; in its configuration: {0}.
         /// </summary>
         internal static string InvalidEntryTypeInConfig {
             get {

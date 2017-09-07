@@ -32,20 +32,20 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// Gets the end index for EventLogs Entries
         /// </summary>
-        internal Dictionary<string, int> EventLogContainerMapEndIndexMap { get; private set; }
+        internal Dictionary<string, int> EventLogContainerEndIndexMap { get; private set; }
 
         /// <summary>
         /// Creates the end index map for EventLogs Entries
         /// </summary>
         public void CreateEventLogContainerEndIndexMap()
         {
-            this.EventLogContainerMapEndIndexMap = new Dictionary<string, int>(this.eventLogContainerMap.Count);
+            this.EventLogContainerEndIndexMap = new Dictionary<string, int>(this.eventLogContainerMap.Count);
 
             foreach (KeyValuePair<string, IEventLogContainer> kvp in this.eventLogContainerMap)
             {
                 kvp.Value.OnEventLogEntryWritten(kvp.Value.EventLog, null);
 
-                this.EventLogContainerMapEndIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count == 0 ? 0 : kvp.Value.EventLogEntries.Count - 1);
+                this.EventLogContainerEndIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count == 0 ? 0 : kvp.Value.EventLogEntries.Count - 1);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             foreach (KeyValuePair<string, IEventLogContainer> kvp in this.eventLogContainerMap)
             {
-                this.EventLogContainerStartIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count);
+                this.EventLogContainerStartIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count == 0 ? 0 : kvp.Value.EventLogEntries.Count - 1);
             }
         }
     }

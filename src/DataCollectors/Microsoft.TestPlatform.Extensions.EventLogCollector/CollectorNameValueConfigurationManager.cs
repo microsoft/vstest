@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// The name/value pairs loaded from the configuration XML element
         /// </summary>
-        private Dictionary<string, string> nameValuePairs = new Dictionary<string, string>();
+        private IDictionary<string, string> nameValuePairs = new Dictionary<string, string>();
 
         #endregion
 
@@ -102,7 +102,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         #region Public properties
 
-        internal Dictionary<string, string> NameValuePairs => this.nameValuePairs;
+        internal IDictionary<string, string> NameValuePairs => this.nameValuePairs;
 
         /// <summary>
         /// Gets the value of the setting specified by name, or null if it was not found

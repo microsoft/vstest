@@ -474,28 +474,15 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             EventLogSessionContext eventLogSessionContext = null;
             lock (this.ContextMap)
             {
-                if (this.ContextMap.TryGetValue(dataCollectionContext, out eventLogSessionContext))
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "EventLogDataCollector: Context data already in dictionary"));
-                    }
-                }
-                else
-                {
-                    eventLogSessionContext =
-                        new EventLogSessionContext(this.eventLogContainerMap);
-                    this.ContextMap.Add(dataCollectionContext, eventLogSessionContext);
-                }
+                eventLogSessionContext =
+                    new EventLogSessionContext(this.eventLogContainerMap);
+                this.ContextMap.Add(dataCollectionContext, eventLogSessionContext);
             }
         }
 
         private void WriteCollectedEventLogEntries(
             DataCollectionContext dataCollectionContext,
-            bool disposeEventLogs,
+            bool isSessionEnd,
             TimeSpan requestedDuration,
             DateTime timeRequestReceived)
         {
@@ -507,13 +494,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 try
                 {
-                    if (disposeEventLogs)
+                    if (isSessionEnd)
                     {
                         kvp.Value.EventLog.EnableRaisingEvents = false;
-                        kvp.Value.EventLog.Dispose();
                     }
 
-                    for (int i = context.EventLogContainerStartIndexMap[kvp.Key]; i <= context.EventLogContainerMapEndIndexMap[kvp.Key]; i++)
+                    for (int i = context.EventLogContainerStartIndexMap[kvp.Key]; i <= context.EventLogContainerEndIndexMap[kvp.Key]; i++)
                     {
                         eventLogEntries.Add(kvp.Value.EventLogEntries[i]);
                     }
@@ -530,7 +516,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 }
             }
 
-            var fileName = this.WriteEventLogs(eventLogEntries, disposeEventLogs ? int.MaxValue : this.maxEntries, dataCollectionContext, requestedDuration, timeRequestReceived);
+            var fileName = this.WriteEventLogs(eventLogEntries, isSessionEnd ? int.MaxValue : this.maxEntries, dataCollectionContext, requestedDuration, timeRequestReceived);
 
             // Add the directory to the list
             this.eventLogDirectories.Add(Path.GetDirectoryName(fileName));
@@ -619,20 +605,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr))
                 {
-                    try
-                    {
-                        this.entryTypes.Add(
-                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
-                    }
-                    catch (ArgumentException e)
-                    {
-                        throw new EventLogCollectorException(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                Resource.InvalidEntryTypeInConfig,
-                                entryTypesStr),
-                            e);
-                    }
+                    this.entryTypes.Add(
+                        (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
                 }
 
                 if (EqtTrace.IsVerboseEnabled)

@@ -18,7 +18,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidEntryTypeInConfig">
-        <source>The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</source>
+        <source>The Event Log DataCollector encountered an invalid value for 'EntryTypes' in its configuration: {0}</source>
         <target state="new">The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</target>
         <note></note>
       </trans-unit>

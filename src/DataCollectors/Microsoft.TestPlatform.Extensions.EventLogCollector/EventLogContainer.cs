@@ -137,90 +137,97 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         {
             while (!this.limitReached)
             {
-                lock (this.eventLogEntries)
+                try
                 {
-                    int currentCount = this.eventLog.Entries.Count;
-                    if (currentCount == 0)
+                    lock (this.eventLogEntries)
                     {
-                        break;
-                    }
-
-                    int firstIndexInLog = this.eventLog.Entries[0].Index;
-                    int mostRecentIndexInLog = this.eventLog.Entries[currentCount - 1].Index;
-
-                    if (mostRecentIndexInLog == this.nextEntryIndexToCollect - 1)
-                    {
-                        // We've already collected the most recent entry in the log
-                        break;
-                    }
-
-                    if (mostRecentIndexInLog < this.nextEntryIndexToCollect - 1)
-                    {
-                        if (EqtTrace.IsWarningEnabled)
+                        int currentCount = this.eventLog.Entries.Count;
+                        if (currentCount == 0)
                         {
-                            EqtTrace.Warning(
+                            break;
+                        }
+
+                        int firstIndexInLog = this.eventLog.Entries[0].Index;
+                        int mostRecentIndexInLog = this.eventLog.Entries[currentCount - 1].Index;
+
+                        if (mostRecentIndexInLog == this.nextEntryIndexToCollect - 1)
+                        {
+                            // We've already collected the most recent entry in the log
+                            break;
+                        }
+
+                        if (mostRecentIndexInLog < this.nextEntryIndexToCollect - 1)
+                        {
+                            if (EqtTrace.IsWarningEnabled)
+                            {
+                                EqtTrace.Warning(
+                                    string.Format(
+                                        CultureInfo.InvariantCulture,
+                                        "EventLogDataContainer: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
+                                        firstIndexInLog,
+                                        mostRecentIndexInLog,
+                                        this.nextEntryIndexToCollect));
+                            }
+
+                            // Send warning; event log must have been cleared.
+                            this.dataCollectionLogger.LogWarning(
+                                this.dataCollectionContext,
                                 string.Format(
                                     CultureInfo.InvariantCulture,
-                                    "EventLogDataContainer: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
-                                    firstIndexInLog,
-                                    mostRecentIndexInLog,
-                                    this.nextEntryIndexToCollect));
+                                    Resource.EventsLostWarning,
+                                    this.eventLog.Log));
+
+                            this.nextEntryIndexToCollect = 0;
+                            firstIndexInLog = 0;
                         }
 
-                        // Send warning; event log must have been cleared.
-                        this.dataCollectionLogger.LogWarning(
-                            this.dataCollectionContext,
-                            string.Format(CultureInfo.InvariantCulture, Resource.EventsLostWarning, this.eventLog.Log));
-
-                        this.nextEntryIndexToCollect = 0;
-                        firstIndexInLog = 0;
-                    }
-
-                    for (;
-                        this.nextEntryIndexToCollect <= mostRecentIndexInLog;
-                        this.nextEntryIndexToCollect = this.nextEntryIndexToCollect + 1)
-                    {
-                        int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
-                        EventLogEntry nextEntry = this.eventLog.Entries[nextEntryIndexInCurrentLog];
-
-                        // If an explicit list of event sources was provided, only report log entries from those sources
-                        if (this.eventSources != null && this.eventSources.Count > 0)
+                        for (;
+                            this.nextEntryIndexToCollect <= mostRecentIndexInLog;
+                            this.nextEntryIndexToCollect = this.nextEntryIndexToCollect + 1)
                         {
-                            if (!this.eventSources.Contains(nextEntry.Source))
+                            int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
+                            EventLogEntry nextEntry = this.eventLog.Entries[nextEntryIndexInCurrentLog];
+
+                            // If an explicit list of event sources was provided, only report log entries from those sources
+                            if (this.eventSources != null && this.eventSources.Count > 0)
                             {
-                                continue;
+                                if (!this.eventSources.Contains(nextEntry.Source))
+                                {
+                                    continue;
+                                }
                             }
-                        }
 
-                        if (this.entryTypes != null && this.entryTypes.Count > 0)
-                        {
                             if (!this.entryTypes.Contains(nextEntry.EntryType))
                             {
                                 continue;
                             }
-                        }
 
-                        if (this.eventLogEntries.Count < this.maxLogEntries)
-                        {
-                            this.eventLogEntries.Add(nextEntry);
-
-                            if (EqtTrace.IsVerboseEnabled)
+                            if (this.eventLogEntries.Count < this.maxLogEntries)
                             {
-                                EqtTrace.Verbose(
-                                    string.Format(
-                                        CultureInfo.InvariantCulture,
-                                        "EventLogDataContainer.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
-                                        nextEntry.Index,
-                                        nextEntryIndexInCurrentLog,
-                                        this.eventLog.Log));
+                                this.eventLogEntries.Add(nextEntry);
+
+                                if (EqtTrace.IsVerboseEnabled)
+                                {
+                                    EqtTrace.Verbose(
+                                        string.Format(
+                                            CultureInfo.InvariantCulture,
+                                            "EventLogDataContainer.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
+                                            nextEntry.Index,
+                                            nextEntryIndexInCurrentLog,
+                                            this.eventLog.Log));
+                                }
+                            }
+                            else
+                            {
+                                this.LimitReached = true;
+                                break;
                             }
                         }
-                        else
-                        {
-                            this.LimitReached = true;
-                            break;
-                        }
                     }
+                }
+                catch (Exception)
+                {
+                    // todo : log exception
                 }
             }
         }
@@ -239,6 +246,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 {
                     this.eventLog.EnableRaisingEvents = false;
                     this.eventLog.EntryWritten -= this.OnEventLogEntryWritten;
+                    this.eventLog.Dispose();
                 }
 
                 this.isDisposed = true;

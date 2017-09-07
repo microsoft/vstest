@@ -127,7 +127,7 @@
     <value>The '{0}' event log may have been cleared during collection; some events may not have been collected</value>
   </data>
   <data name="InvalidEntryTypeInConfig" xml:space="preserve">
-    <value>The Event Log DataCollector encountered an invalid event log entry type in its configuration: {0}</value>
+    <value>The Event Log DataCollector encountered an invalid value for 'EntryTypes' in its configuration: {0}</value>
   </data>
   <data name="InvalidMaxEntriesInConfig" xml:space="preserve">
     <value>The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration: {0}</value>

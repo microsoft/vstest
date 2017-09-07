@@ -375,6 +375,49 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                                && str.Contains(filteredEntries[3].InstanceId.ToString())
                                && str.Contains(filteredEntries[4].InstanceId.ToString()))));
         }
+
+        [TestMethod]
+        public void WriteEventLogsShouldFilterTestIfMaxValueExceedsEntries()
+        {
+            string configurationString =
+                @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
+
+            XmlDocument expectedXmlDoc = new XmlDocument();
+            expectedXmlDoc.LoadXml(configurationString);
+
+            this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
+            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+
+            var entries = new List<EventLogEntry>();
+
+            var eventLog = new EventLog("Application");
+            int endIndex = eventLog.Entries[eventLog.Entries.Count - 1].Index;
+            int firstIndexInLog = eventLog.Entries[0].Index;
+            for (int i = endIndex; i > endIndex - 5; i--)
+            {
+                entries.Add(eventLog.Entries[i - firstIndexInLog]);
+            }
+
+            var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
+                .OrderBy(x => x.TimeGenerated).ToList().Take(10).ToList();
+
+            this.eventLogDataCollector.WriteEventLogs(
+                entries,
+                5,
+                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                TimeSpan.MaxValue,
+                DateTime.Now);
+
+            this.mockFileHelper.Verify(
+                x => x.WriteAllTextToFile(
+                    It.IsAny<string>(),
+                    It.Is<string>(
+                        str => str.Contains(filteredEntries[0].InstanceId.ToString())
+                               && str.Contains(filteredEntries[1].InstanceId.ToString())
+                               && str.Contains(filteredEntries[2].InstanceId.ToString())
+                               && str.Contains(filteredEntries[3].InstanceId.ToString())
+                               && str.Contains(filteredEntries[4].InstanceId.ToString()))));
+        }
     }
 
     /// <summary>
