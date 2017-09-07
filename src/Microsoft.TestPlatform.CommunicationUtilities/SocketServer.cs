@@ -9,9 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -88,10 +88,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void OnClientConnected(TcpClient client)
         {
             this.tcpClient = client;
+            this.tcpClient.Client.NoDelay = true;
 
             if (this.ClientConnected != null)
             {
-                this.channel = this.channelFactory(client.GetStream());
+                this.channel = this.channelFactory(this.tcpClient.GetStream());
                 this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
