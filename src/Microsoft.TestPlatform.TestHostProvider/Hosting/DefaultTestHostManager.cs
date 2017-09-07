@@ -188,6 +188,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
             }
 
+            extensions = this.FilterExtensionsBasedOnVersion(extensions);
+
             return extensions;
         }
 
@@ -242,6 +244,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
+        }
+
+        private IEnumerable<string> FilterExtensionsBasedOnVersion(IEnumerable<string> extensions)
+        {
+            Dictionary<string, Tuple<Version, string>> extensionMap = new Dictionary<string, Tuple<Version, string>>();
+
+            foreach (var extensionFullPath in extensions)
+            {
+                // assemblyName is the key
+                var extensionAssemblyName = Path.GetFileNameWithoutExtension(extensionFullPath);
+
+                var currentFileVersion = this.fileHelper.GetVersionInfo(extensionFullPath)?.FileVersion;
+                if (Version.TryParse(currentFileVersion, out var currentVersion))
+                {
+                    if (extensionMap.TryGetValue(extensionAssemblyName, out var oldExtensionInfo))
+                    {
+                        // If the version of current file is higher than the one in the map
+                        // replace the older with the current file
+                        if (currentVersion > oldExtensionInfo.Item1)
+                        {
+                            extensionMap[extensionAssemblyName] = new Tuple<Version, string>(currentVersion, extensionFullPath);
+                        }
+                    }
+                    else
+                    {
+                        extensionMap.Add(extensionAssemblyName, new Tuple<Version, string>(currentVersion, extensionFullPath));
+                    }
+                }
+            }
+
+            // List of highest versioned files.
+            return extensionMap.Select(p => p.Value.Item2);
         }
 
         /// <summary>

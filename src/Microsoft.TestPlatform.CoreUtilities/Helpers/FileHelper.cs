@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
@@ -67,6 +68,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         public FileAttributes GetFileAttributes(string path)
         {
             return new FileInfo(path).Attributes;
+        }
+
+        /// <inheritdoc/>
+        public FileVersionInfo GetVersionInfo(string path)
+        {
+            return FileVersionInfo.GetVersionInfo(path);
         }
 
         /// <inheritdoc/>

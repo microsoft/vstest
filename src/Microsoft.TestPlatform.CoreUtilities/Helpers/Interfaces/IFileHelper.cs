@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
 
     /// <summary>
@@ -62,6 +63,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="path">Full path of the file.</param>
         /// <returns>Attributes of the file.</returns>
         FileAttributes GetFileAttributes(string path);
+
+        /// <summary>
+        /// Gets the version information of the file.
+        /// </summary>
+        /// <param name="path">Full path to the file.</param>
+        /// <returns>File Version information of the file.</returns>
+        FileVersionInfo GetVersionInfo(string path);
 
         /// <summary>
         /// Copy a file in the file system.
