@@ -124,6 +124,17 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
         /// </summary>
         public EventLogDataCollector()
+            : this(new FileHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventLogDataCollector"/> class.
+        /// </summary>
+        /// <param name="fileHelper">
+        /// File Helper.
+        /// </param>
+        internal EventLogDataCollector(IFileHelper fileHelper)
         {
             this.sessionStartEventHandler = this.OnSessionStart;
             this.sessionEndEventHandler = this.OnSessionEnd;
@@ -132,7 +143,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             this.eventLogDirectories = new List<string>();
             this.ContextMap = new Dictionary<DataCollectionContext, EventLogSessionContext>();
-            this.fileHelper = new FileHelper();
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -230,6 +241,114 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         #endregion
 
+        #region Internal
+
+        /// <summary>
+        /// The write event logs.
+        /// </summary>
+        /// <param name="eventLogEntries">
+        /// The event log entries.
+        /// </param>
+        /// <param name="maxLogEntries">
+        /// Max Log Entries.
+        /// </param>
+        /// <param name="dataCollectionContext">
+        /// The data collection context.
+        /// </param>
+        /// <param name="requestedDuration">
+        /// The requested duration.
+        /// </param>
+        /// <param name="timeRequestReceived">
+        /// The time request received.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        internal string WriteEventLogs(List<EventLogEntry> eventLogEntries, int maxLogEntries, DataCollectionContext dataCollectionContext, TimeSpan requestedDuration, DateTime timeRequestReceived)
+        {
+            // Generate a unique but friendly Directory name in the temp directory
+            string eventLogDirName = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
+                "Event Log",
+                Environment.MachineName,
+                DateTime.Now);
+
+            string eventLogDirPath = Path.Combine(Path.GetTempPath(), eventLogDirName);
+
+            // Create the directory
+            this.fileHelper.CreateDirectory(eventLogDirPath);
+
+            string eventLogBasePath = Path.Combine(eventLogDirPath, EventLogFileName);
+            bool unusedFilenameFound = false;
+
+            string eventLogPath = eventLogBasePath + ".xml";
+
+            if (this.fileHelper.Exists(eventLogPath))
+            {
+                for (int i = 1; !unusedFilenameFound; i++)
+                {
+                    eventLogPath = eventLogBasePath + "-" + i.ToString(CultureInfo.InvariantCulture) + ".xml";
+
+                    if (!this.fileHelper.Exists(eventLogPath))
+                    {
+                        unusedFilenameFound = true;
+                    }
+                }
+            }
+
+            DateTime minDate = DateTime.MinValue;
+
+            // Limit entries to a certain time range if requested
+            if (requestedDuration < TimeSpan.MaxValue)
+            {
+                try
+                {
+                    minDate = timeRequestReceived - requestedDuration;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    minDate = DateTime.MinValue;
+                }
+            }
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
+                eventLogPath,
+                eventLogEntries.Where(
+                    entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).OrderBy(x => x.TimeGenerated).ToList().Take(maxLogEntries).ToList(),
+                this.fileHelper);
+
+            stopwatch.Stop();
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
+                        eventLogEntries.Count,
+                        eventLogPath,
+                        stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture)));
+            }
+
+            // Write the event log file
+            FileTransferInformation fileTransferInformation =
+                new FileTransferInformation(dataCollectionContext, eventLogPath, true, this.fileHelper);
+            this.dataSink.SendFileAsync(fileTransferInformation);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
+                    dataCollectionContext.ToString());
+            }
+
+            return eventLogPath;
+        }
+        #endregion
+
         #region IDisposable Members
 
         /// <summary>
@@ -243,6 +362,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.events.SessionEnd -= this.sessionEndEventHandler;
             this.events.TestCaseStart -= this.testCaseStartEventHandler;
             this.events.TestCaseEnd -= this.testCaseEndEventHandler;
+
+            // Unregister EventLogEntry Written.
+            foreach (var eventLogContainer in this.eventLogContainerMap.Values)
+            {
+                eventLogContainer.Dispose();
+            }
 
             // Delete all the temp event log directories
             this.RemoveTempEventLogDirs(this.eventLogDirectories);
@@ -398,7 +523,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             DateTime timeRequestReceived)
         {
             var context = this.GetEventLogSessionContext(dataCollectionContext);
-            context.CreateEventLogContainerMapEndIndexMap();
+            context.CreateEventLogContainerEndIndexMap();
 
             List<EventLogEntry> eventLogEntries = new List<EventLogEntry>();
             foreach (KeyValuePair<string, IEventLogContainer> kvp in this.eventLogContainerMap)
@@ -411,7 +536,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         kvp.Value.EventLog.Dispose();
                     }
 
-                    for (int i = context.EventLogContainerIndexMap[kvp.Key]; i <= context.EventLogContainerMapEndIndexMap[kvp.Key]; i++)
+                    for (int i = context.EventLogContainerStartIndexMap[kvp.Key]; i <= context.EventLogContainerMapEndIndexMap[kvp.Key]; i++)
                     {
                         eventLogEntries.Add(kvp.Value.EventLogEntries[i]);
                     }
@@ -428,7 +553,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 }
             }
 
-            var fileName = this.WriteEventLogs(eventLogEntries, dataCollectionContext, requestedDuration, timeRequestReceived);
+            var fileName = this.WriteEventLogs(eventLogEntries, disposeEventLogs ? int.MaxValue : this.maxEntries, dataCollectionContext, requestedDuration, timeRequestReceived);
 
             // Add the directory to the list
             this.eventLogDirectories.Add(Path.GetDirectoryName(fileName));
@@ -581,108 +706,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 this.maxEntries = EventLogConstants.DefaultMaxEntries;
             }
-        }
-
-        /// <summary>
-        /// The write event logs.
-        /// </summary>
-        /// <param name="eventLogEntries">
-        /// The event log entries.
-        /// </param>
-        /// <param name="dataCollectionContext">
-        /// The data collection context.
-        /// </param>
-        /// <param name="requestedDuration">
-        /// The requested duration.
-        /// </param>
-        /// <param name="timeRequestReceived">
-        /// The time request received.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        private string WriteEventLogs(List<EventLogEntry> eventLogEntries, DataCollectionContext dataCollectionContext, TimeSpan requestedDuration, DateTime timeRequestReceived)
-        {
-            // Generate a unique but friendly Directory name in the temp directory
-            string eventLogDirName = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
-                "Event Log",
-                Environment.MachineName,
-                DateTime.Now);
-
-            string eventLogDirPath = Path.Combine(Path.GetTempPath(), eventLogDirName);
-
-            // Create the directory
-            this.fileHelper.CreateDirectory(eventLogDirPath);
-
-            string eventLogBasePath = Path.Combine(eventLogDirPath, EventLogFileName);
-            bool unusedFilenameFound = false;
-
-            string eventLogPath = eventLogBasePath + ".xml";
-
-            if (this.fileHelper.Exists(eventLogPath))
-            {
-                for (int i = 1; !unusedFilenameFound; i++)
-                {
-                    eventLogPath = eventLogBasePath + "-" + i.ToString(CultureInfo.InvariantCulture) + ".xml";
-
-                    if (!this.fileHelper.Exists(eventLogPath))
-                    {
-                        unusedFilenameFound = true;
-                    }
-                }
-            }
-
-            DateTime minDate = DateTime.MinValue;
-
-            // Limit entries to a certain time range if requested
-            if (requestedDuration < TimeSpan.MaxValue)
-            {
-                try
-                {
-                    minDate = timeRequestReceived - requestedDuration;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    minDate = DateTime.MinValue;
-                }
-            }
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            EventLogXmlWriter.WriteEventLogEntriesToXmlFile(
-                eventLogPath,
-                eventLogEntries.Where(
-                    entry => entry.TimeGenerated > minDate && entry.TimeGenerated < DateTime.MaxValue).ToList(),
-                this.fileHelper);
-
-            stopwatch.Stop();
-
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "EventLogDataContainer: Wrote {0} event log entries to file '{1}' in {2} seconds",
-                        eventLogEntries.Count,
-                        eventLogPath,
-                        stopwatch.Elapsed.TotalSeconds.ToString(CultureInfo.InvariantCulture)));
-            }
-
-            // Write the event log file
-            FileTransferInformation fileTransferInformation =
-                new FileTransferInformation(dataCollectionContext, eventLogPath, true, this.fileHelper);
-            this.dataSink.SendFileAsync(fileTransferInformation);
-
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose(
-                    "EventLogDataContainer: Event log successfully sent for data collection context '{0}'.",
-                    dataCollectionContext.ToString());
-            }
-
-            return eventLogPath;
         }
 
         private EventLogSessionContext GetEventLogSessionContext(DataCollectionContext dataCollectionContext)

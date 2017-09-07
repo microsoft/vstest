@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -32,16 +33,19 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         private EventLogDataCollector eventLogDataCollector;
 
+        private Mock<IFileHelper> mockFileHelper;
+
         public EventLogDataCollectorTests()
         {
             this.mockDataCollectionEvents = new Mock<DataCollectionEvents>();
             this.mockDataCollectionSink = new TestableDataCollectionSink();
+            this.mockFileHelper = new Mock<IFileHelper>();
             TestCase tc = new TestCase();
             DataCollectionContext dataCollectionContext =
                 new DataCollectionContext(new SessionId(Guid.NewGuid()));
             this.dataCollectionEnvironmentContext = new TestableDataCollectionEnvironmentContext(dataCollectionContext);
             this.mockDataCollectionLogger = new Mock<DataCollectionLogger>();
-            this.eventLogDataCollector = new EventLogDataCollector();
+            this.eventLogDataCollector = new EventLogDataCollector(this.mockFileHelper.Object);
         }
 
         [TestMethod]
@@ -285,6 +289,91 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
             this.mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
             Assert.IsTrue(this.mockDataCollectionSink.IsSendFileAsyncInvoked);
+        }
+
+        [TestMethod]
+        public void WriteEventLogsShouldCreateXmlFile()
+        {
+            string configurationString =
+                @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
+
+            XmlDocument expectedXmlDoc = new XmlDocument();
+            expectedXmlDoc.LoadXml(configurationString);
+
+            this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
+            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            this.eventLogDataCollector.WriteEventLogs(
+                new List<EventLogEntry>(),
+                20,
+                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                TimeSpan.MaxValue,
+                DateTime.Now);
+
+            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void WriteEventLogsShouldThrowExceptionIfThrownByFileHelper()
+        {
+            string configurationString =
+                @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
+
+            XmlDocument expectedXmlDoc = new XmlDocument();
+            expectedXmlDoc.LoadXml(configurationString);
+            this.mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Throws<Exception>();
+            Assert.ThrowsException<Exception>(
+                () =>
+                    {
+                        this.eventLogDataCollector.WriteEventLogs(
+                            new List<EventLogEntry>(),
+                            20,
+                            this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                            TimeSpan.MaxValue,
+                            DateTime.Now);
+                    });
+        }
+
+        [TestMethod]
+        public void WriteEventLogsShouldFilterTestsBasedOnTimeAndMaxValue()
+        {
+            string configurationString =
+                @"<Configuration><Setting name=""MaxEventLogEntriesToCollect"" value=""20"" /><Setting name=""EventLog"" value=""Application"" /><Setting name=""EntryTypes"" value=""Warning"" /></Configuration>";
+
+            XmlDocument expectedXmlDoc = new XmlDocument();
+            expectedXmlDoc.LoadXml(configurationString);
+
+            this.mockFileHelper.SetupSequence(x => x.Exists(It.IsAny<string>())).Returns(false).Returns(true);
+            this.eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+
+            var entries = new List<EventLogEntry>();
+
+            var eventLog = new EventLog("Application");
+            int endIndex = eventLog.Entries[eventLog.Entries.Count - 1].Index;
+            int firstIndexInLog = eventLog.Entries[0].Index;
+            for (int i = endIndex; i > endIndex - 10; i--)
+            {
+                entries.Add(eventLog.Entries[i - firstIndexInLog]);
+            }
+
+            var filteredEntries = entries.Where(entry => entry.TimeGenerated > DateTime.MinValue && entry.TimeGenerated < DateTime.MaxValue)
+                .OrderBy(x => x.TimeGenerated).ToList().Take(5).ToList();
+
+            this.eventLogDataCollector.WriteEventLogs(
+                entries,
+                5,
+                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                TimeSpan.MaxValue,
+                DateTime.Now);
+
+            this.mockFileHelper.Verify(
+                x => x.WriteAllTextToFile(
+                    It.IsAny<string>(),
+                    It.Is<string>(
+                        str => str.Contains(filteredEntries[0].InstanceId.ToString())
+                               && str.Contains(filteredEntries[1].InstanceId.ToString())
+                               && str.Contains(filteredEntries[2].InstanceId.ToString())
+                               && str.Contains(filteredEntries[3].InstanceId.ToString())
+                               && str.Contains(filteredEntries[4].InstanceId.ToString()))));
         }
     }
 

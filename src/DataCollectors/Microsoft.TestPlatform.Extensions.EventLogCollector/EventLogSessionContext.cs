@@ -4,14 +4,13 @@
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
 
     /// <summary>
     /// Stores the start and end index for EventLogEntries correspoinding to a data collection session.
     /// </summary>
     internal class EventLogSessionContext
     {
-        private Dictionary<string, IEventLogContainer> eventLogContainerMap;
+        private IDictionary<string, IEventLogContainer> eventLogContainerMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventLogSessionContext"/> class.
@@ -19,26 +18,26 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="eventLogContainerMap">
         /// Event Log container map.
         /// </param>
-        public EventLogSessionContext(Dictionary<string, IEventLogContainer> eventLogContainerMap)
+        public EventLogSessionContext(IDictionary<string, IEventLogContainer> eventLogContainerMap)
         {
             this.eventLogContainerMap = eventLogContainerMap;
             this.CreateEventLogContainerStartIndexMap();
         }
 
         /// <summary>
-        /// Gets the event log container index map.
+        /// Gets the start index for EventLogs Entries.
         /// </summary>
         internal Dictionary<string, int> EventLogContainerStartIndexMap { get; private set; }
 
         /// <summary>
-        /// Gets the event log container map end index map.
+        /// Gets the end index for EventLogs Entries
         /// </summary>
         internal Dictionary<string, int> EventLogContainerMapEndIndexMap { get; private set; }
 
         /// <summary>
-        /// The create event log container map end index map.
+        /// Creates the end index map for EventLogs Entries
         /// </summary>
-        public void CreateEventLogContainerMapEndIndexMap()
+        public void CreateEventLogContainerEndIndexMap()
         {
             this.EventLogContainerMapEndIndexMap = new Dictionary<string, int>(this.eventLogContainerMap.Count);
 
@@ -50,7 +49,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        private void CreateEventLogContainerStartIndexMap()
+        /// <summary>
+        /// Creates the start index map for EventLogs Entries
+        /// </summary>
+        public void CreateEventLogContainerStartIndexMap()
         {
             this.EventLogContainerStartIndexMap = new Dictionary<string, int>(this.eventLogContainerMap.Count);
 
