@@ -218,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
+                runCriteria.TestCaseFilter = commandLineOptions.IsDesignMode ? testRunRequestPayload.TestCaseFilter : this.commandLineOptions.TestCaseFilterValue;
             }
             else
             {

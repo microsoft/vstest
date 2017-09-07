@@ -51,6 +51,9 @@
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
       </PropertyGroup>
+      <ItemGroup>
+        <ProjectCapability Include="TestContainer" />
+      </ItemGroup>
 
       <!-- Test projects are not discovered in test window without test container capability -->
       <ItemGroup>
