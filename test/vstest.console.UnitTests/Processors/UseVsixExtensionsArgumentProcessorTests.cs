@@ -7,6 +7,7 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System.Collections.Generic;
@@ -15,15 +16,18 @@ namespace vstest.console.UnitTests.Processors
     public class UseVsixExtensionsArgumentProcessorTests
     {
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
+        private const string DeprecationMessage = @"/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.";
         private Mock<ITestRequestManager> testRequestManager;
         private Mock<IVSExtensionManager> extensionManager;
+        private Mock<IOutput> output;
         private UseVsixExtensionsArgumentExecutor executor;                  
         
         public UseVsixExtensionsArgumentProcessorTests()
         {
             this.testRequestManager = new Mock<ITestRequestManager>();
             this.extensionManager = new Mock<IVSExtensionManager>();
-            this.executor = new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object, this.extensionManager.Object);
+            this.output = new Mock<IOutput>();
+            this.executor = new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object, this.extensionManager.Object, this.output.Object);
         }
 
         [TestMethod]
@@ -48,8 +52,8 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new UseVsixExtensionsArgumentProcessorCapabilities();
 
             Assert.AreEqual("/UseVsixExtensions", capabilities.CommandName);
-            Assert.AreEqual("/UseVsixExtensions\n      This makes vstest.console.exe process use or skip the VSIX extensions \n      installed(if any) in the test run. \n      Example  /UseVsixExtensions:true", capabilities.HelpContentResourceName);
-            Assert.AreEqual(HelpContentPriority.UseVsixArgumentProcessorHelpPriority, capabilities.HelpPriority);
+            Assert.AreEqual(null, capabilities.HelpContentResourceName);
+            Assert.AreEqual(HelpContentPriority.None, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
@@ -86,6 +90,7 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("true");
 
+            this.output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
             this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Once);
             this.testRequestManager.Verify(trm => trm.InitializeExtensions(extensions), Times.Once);
         }
@@ -95,6 +100,7 @@ namespace vstest.console.UnitTests.Processors
         {
             this.executor.Initialize("false");
 
+            this.output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
             this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Never);
             this.testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
         }

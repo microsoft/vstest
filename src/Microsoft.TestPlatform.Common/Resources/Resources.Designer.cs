@@ -325,7 +325,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio..
+        ///   Looks up a localized string similar to This option works only with vstest.console.exe installed as part of Visual Studio..
         /// </summary>
         internal static string VSInstallationNotFound {
             get {

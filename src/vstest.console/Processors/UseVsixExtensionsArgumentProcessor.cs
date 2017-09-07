@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The argument processor for initializing the vsix based adapters.
@@ -56,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance, new VSExtensionManager()));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new UseVsixExtensionsArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance, new VSExtensionManager(), ConsoleOutput.Instance));
                 }
 
                 return this.executor;
@@ -80,9 +81,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
-        public override string HelpContentResourceName => CommandLineResources.UseVsixExtensionsHelp;
-
-        public override HelpContentPriority HelpPriority => HelpContentPriority.UseVsixArgumentProcessorHelpPriority;
+        // Commenting out the help for this processor as it on the deprecation path.
+        // public override string HelpContentResourceName => CommandLineResources.UseVsixExtensionsHelp;
+        // public override HelpContentPriority HelpPriority => HelpContentPriority.UseVsixArgumentProcessorHelpPriority;
     }
 
     /// <summary>
@@ -93,12 +94,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private CommandLineOptions commandLineOptions;
         private ITestRequestManager testRequestManager;
         private IVSExtensionManager extensionManager;
+        private IOutput output;
 
-        internal UseVsixExtensionsArgumentExecutor(CommandLineOptions commandLineOptions, ITestRequestManager testRequestManager, IVSExtensionManager extensionManager)
+        internal UseVsixExtensionsArgumentExecutor(CommandLineOptions commandLineOptions, ITestRequestManager testRequestManager, IVSExtensionManager extensionManager, IOutput output)
         {
             this.commandLineOptions = commandLineOptions;
             this.testRequestManager = testRequestManager;
             this.extensionManager = extensionManager;
+            this.output = output;
         }
 
         /// <inheritdoc />
@@ -116,6 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidUseVsixExtensionsCommand, argument));
             }
 
+            this.output.Warning(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.UseVsixExtensionsDeprecation));
             commandLineOptions.UseVsixExtensions = value;
 
             if (commandLineOptions.UseVsixExtensions)

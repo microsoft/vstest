@@ -132,7 +132,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="VSInstallationNotFound">
-        <source>Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</source>
+        <source>This option works only with vstest.console.exe installed as part of Visual Studio.</source>
         <target state="new">Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</target>
         <note></note>
       </trans-unit>

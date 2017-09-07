@@ -17,6 +17,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Resources;
 
+    /// <summary>
+    /// Manager for VisualStudio based extensions
+    /// </summary>
     public class VSExtensionManager : IVSExtensionManager
     {
         private const string PrivateAssembliesDirName = "PrivateAssemblies";
@@ -30,8 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private const string SettingsManagerAssemblyName = @"Microsoft.VisualStudio.Settings.15.0";
         
         private IFileHelper fileHelper;
-        private string vsInstallPath;
-        private string pathToDevenv;
 
         private Assembly extensionManagerAssembly;
         private Assembly extensionManagerImplAssembly;
@@ -40,6 +41,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private Assembly settingsManagerAssembly;
         private Type settingsManagerType;
 
+        /// <summary>
+        /// Default constructor for manager for Visual Studio based extensions
+        /// </summary>
         public VSExtensionManager() : this(new FileHelper())
         {
         }
@@ -75,49 +79,66 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             IEnumerable<string> installedExtensions = new List<string>();
 
-            // Navigate to the IDE folder
-            this.vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.FullName;
-            this.pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
+            // Navigate up to the IDE folder
+            // In case of xcopyable vstest.console, this functionality is not supported.
+            var vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent?.Parent?.Parent?.FullName;
+            string pathToDevenv = null;
 
-            // Check for devenv
-            if (!this.fileHelper.Exists(this.pathToDevenv))
+            if (vsInstallPath != null)
             {
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound, this.vsInstallPath));
+                pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
+            }
+
+            if (pathToDevenv == null || !this.fileHelper.Exists(pathToDevenv))
+            {
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));
             }
 
             // Adding resolution paths for resolving dependencies.
-            var resolutionPaths = new List<string>() {
-                this.vsInstallPath,
-                Path.Combine(this.vsInstallPath, PrivateAssembliesDirName),
-                Path.Combine(this.vsInstallPath, PublicAssembliesDirName)
+            var resolutionPaths = new string[] {
+                vsInstallPath,
+                Path.Combine(vsInstallPath, PrivateAssembliesDirName),
+                Path.Combine(vsInstallPath, PublicAssembliesDirName)
             };
-            var assemblyResolver = new AssemblyResolver(resolutionPaths);
-
-            object extensionManager;
-            object settingsManager;
-                                       
-            settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { pathToDevenv });
-            if (settingsManager != null)
+            using (var assemblyResolver = new AssemblyResolver(resolutionPaths))
             {
-                // create extension manager
-                extensionManager = Activator.CreateInstance(ExtensionManagerServiceType, settingsManager);
+                object extensionManager;
+                object settingsManager;
 
-                if (extensionManager != null)
+                settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { pathToDevenv });
+                if (settingsManager != null)
                 {
-                    installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
-                                               extensionManager, new object[] { extensionType }) as IEnumerable<string>;
+                    // create extension manager
+                    extensionManager = Activator.CreateInstance(ExtensionManagerServiceType, settingsManager);
+
+                    if (extensionManager != null)
+                    {
+                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
+                                                   extensionManager, new object[] { extensionType }) as IEnumerable<string>;
+                    }
+                    else
+                    {
+                        if (EqtTrace.IsWarningEnabled)
+                        {
+                            EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
+                        }
+                    }
+
+                    // Dispose the settings manager
+                    IDisposable disposable = (settingsManager as IDisposable);
+                    if (disposable != null)
+                    {
+                        disposable.Dispose();
+                    }
                 }
-            
-                // Dispose the settings manager
-                IDisposable disposable = (settingsManager as IDisposable);
-                if (disposable != null)
+                else
                 {
-                    disposable.Dispose();
+                    if(EqtTrace.IsWarningEnabled)
+                    {
+                        EqtTrace.Warning("VSExtensionManager : Unable to create settings manager");
+                    }
                 }
             }
-
-            // Unregister the resolver by disposing
-            assemblyResolver.Dispose();
 
             return installedExtensions;
         }
@@ -145,10 +166,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             get
             {
                 if (extensionManagerImplAssembly == null)
-                { 
+                {
                     // Make sure ExtensionManager assembly is already loaded.
-                    Assembly a = ExtensionManagerDefAssembly;
-                    extensionManagerImplAssembly = Assembly.Load(new AssemblyName(ExtensionManagerImplAssemblyName));
+                    Assembly extensionMgrAssembly = ExtensionManagerDefAssembly;
+                    if (extensionMgrAssembly != null)
+                    {
+                        extensionManagerImplAssembly = Assembly.Load(new AssemblyName(ExtensionManagerImplAssemblyName));
+                    }
                 }
 
                 return extensionManagerImplAssembly;
