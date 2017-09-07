@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System.Collections.Generic;
@@ -15,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// ParallelRunEventsHandler for handling the run events in case of parallel execution
@@ -31,16 +31,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IDataSerializer dataSerializer;
 
-        public ParallelRunEventsHandler(IProxyExecutionManager proxyExecutionManager,
+        private IRequestData requestData;
+
+        public ParallelRunEventsHandler(IRequestData requestData,
+            IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator) : 
-            this(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
+            this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
 
 
-        internal ParallelRunEventsHandler(IProxyExecutionManager proxyExecutionManager,
+        internal ParallelRunEventsHandler(IRequestData requestData,
+            IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
@@ -51,6 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             this.parallelProxyExecutionManager = parallelProxyExecutionManager;
             this.runDataAggregator = runDataAggregator;
             this.dataSerializer = dataSerializer;
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -74,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     runDataAggregator.ElapsedTime);
 
                 // Collect Final RunState
-                MetricCollector.Add(UnitTestTelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+                this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
 
                 // Collect Aggregated Metrics Data
                 var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();
@@ -82,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     foreach (var aggregatedRunDataMetric in aggregatedRunDataMetrics)
                     {
-                        MetricCollector.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
+                        this.requestData.MetricsCollector.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
                     }
                 }
 

@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         }
 
         [TestMethod]
-        public void AddShouldNotUpdateMetricIfSameKeyIsPresentAlready()
+        public void AddShouldUpdateMetricIfSameKeyIsPresentAlready()
         {
             this.metricsCollector.Add("DummyMessage", "DummyValue");
 
@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
 
             string newValue;
             Assert.AreEqual(metricsCollector.Metrics().TryGetValue("DummyMessage", out newValue), true);
-            Assert.AreEqual(newValue, "DummyValue");
+            Assert.AreEqual(newValue, "newValue");
         }
 
 

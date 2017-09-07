@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using System.Diagnostics;
 
@@ -26,10 +27,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
-        internal DiscoveryRequest(DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
+        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
         {
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
+            this.requestData = requestData;
             this.stopwatch = new Stopwatch();
             this.metricsPublisher = new MetricsPublisher();
         }
@@ -60,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     this.stopwatch.Start();
 
                     // Collecting Data Point Number of sources sent for discovery
-                    MetricCollector.Add(UnitTestTelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
+                    this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
 
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
@@ -187,6 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         internal IProxyDiscoveryManager DiscoveryManager { get; private set; }
 
+
         #region ITestDiscoveryEventsHandler Methods
 
         /// <inheritdoc/>
@@ -259,11 +262,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     this.stopwatch.Stop();
 
                     // Collecting Total Time Taken
-                    MetricCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecForDiscovery,
+                    this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecForDiscovery,
                         this.stopwatch.Elapsed.TotalSeconds.ToString());
 
                     // Publishing Metrics
-                    this.metricsPublisher.PublishMetrics(UnitTestTelemetryDataConstants.TestDiscoveryCompleteEvent,MetricCollector.Metrics());
+                    this.metricsPublisher.PublishMetrics(UnitTestTelemetryDataConstants.TestDiscoveryCompleteEvent, this.requestData.MetricsCollector.Metrics());
                 }
             }
 
@@ -376,7 +379,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         if (this.discoveryCompleted != null)
                         {
                             this.discoveryCompleted.Dispose();
-                            MetricCollector.Dispose();
+                            this.requestData.MetricsCollector.Clear();
                         }
                     }
 
@@ -425,6 +428,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// The metric publish
         /// </summary>
         private IMetricsPublisher metricsPublisher;
+
+        /// <summary>
+        /// Request Data
+        /// </summary>
+        private IRequestData requestData;
 
         #endregion
     }

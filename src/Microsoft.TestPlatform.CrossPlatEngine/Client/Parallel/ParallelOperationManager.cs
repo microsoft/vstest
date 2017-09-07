@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System.Collections.Concurrent;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     /// <summary>
     /// Abstract class having common parallel manager implementation

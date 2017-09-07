@@ -20,6 +20,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     [TestClass]
     public class ProxyDiscoveryManagerTests
@@ -45,6 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.testDiscoveryManager = new ProxyDiscoveryManager(
+                                            new RequestData(new DummyMetricCollector()), 
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
                                             this.mockDataSerializer.Object,

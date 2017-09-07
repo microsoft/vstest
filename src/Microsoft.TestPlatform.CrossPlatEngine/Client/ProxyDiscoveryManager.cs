@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
@@ -30,16 +32,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
+        private IRequestData requestData;
 
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
+        /// <param name="requestData">Request Data</param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        public ProxyDiscoveryManager(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
+        public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
+            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
         }
@@ -59,6 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// The client Connection Timeout
         /// </param>
         internal ProxyDiscoveryManager(
+            IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
@@ -69,6 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.cancellationTokenSource = new CancellationTokenSource();
             this.isCommunicationEstablished = false;
+            this.requestData = requestData;
         }
 
         #endregion
@@ -104,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     stopwatch.Stop();
 
                     // Collecting Time Taken to Start Discovery Engine
-                    MetricCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, stopwatch.Elapsed.TotalMilliseconds.ToString());
+                    this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, stopwatch.Elapsed.TotalMilliseconds.ToString());
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }

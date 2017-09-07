@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System.Threading;
     using System.Collections.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
@@ -40,7 +41,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private ITestRunEventsHandler currentRunEventsHandler;
 
         private ParallelRunDataAggregator currentRunDataAggregator;
-        
+
+        private IRequestData requestData;
+
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
 
@@ -52,17 +55,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// LockObject to update execution status in parallel
         /// </summary>
         private readonly object executionStatusLockObject = new object();
+     
 
         #endregion
 
-        public ParallelProxyExecutionManager(Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel)
+        public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel)
             : base(actualProxyManagerCreator, parallelLevel, true)
         {
+            this.requestData = requestData;
         }
 
-        public ParallelProxyExecutionManager(Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+        public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
+            this.requestData = requestData;
         }
 
         #region IProxyExecutionManager
@@ -290,6 +296,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (concurrentManager is ProxyExecutionManagerWithDataCollection)
             {
                 return new ParallelDataCollectionEventsHandler(
+                            this.requestData,
                             concurrentManager,
                             this.currentRunEventsHandler,
                             this,
@@ -297,6 +304,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             }
 
             return new ParallelRunEventsHandler(
+                        this.requestData,
                         concurrentManager,
                         this.currentRunEventsHandler,
                         this,

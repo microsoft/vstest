@@ -20,7 +20,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
             ValidateArg.NotNull(metric, "metric");
             ValidateArg.NotNull(value, "value");
 
-            if (!metricCollector.ContainsKey(metric))
+            if (metricCollector.ContainsKey(metric))
+            {
+                metricCollector[metric] = value;
+            }
+            else
             {
                 metricCollector?.Add(metric, value);
             }

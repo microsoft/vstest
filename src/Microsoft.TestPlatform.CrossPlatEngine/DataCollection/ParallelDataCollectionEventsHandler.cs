@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
@@ -15,26 +14,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
 
-        public ParallelDataCollectionEventsHandler(IProxyExecutionManager proxyExecutionManager, 
+        public ParallelDataCollectionEventsHandler(IRequestData requestData,
+            IProxyExecutionManager proxyExecutionManager, 
             ITestRunEventsHandler actualRunEventsHandler, 
             IParallelProxyExecutionManager parallelProxyExecutionManager, 
             ParallelRunDataAggregator runDataAggregator) : 
-            this(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
+            this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
 
-        internal ParallelDataCollectionEventsHandler(IProxyExecutionManager proxyExecutionManager,
+        internal ParallelDataCollectionEventsHandler(IRequestData requestData,
+            IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
             IDataSerializer dataSerializer) : 
-            base(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, dataSerializer)
+            base(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, dataSerializer)
         {
             this.runDataAggregator = runDataAggregator;
         }

@@ -572,6 +572,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     testRunChangedEventArgs,
                     attachments,
                     this.executorUrisThatRanTests);
+
+                // Clear the Metrics
+                this.requestData.MetricsCollector.Clear();
             }
             else
             {

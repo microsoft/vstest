@@ -19,6 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using ObjectModel;
     using ObjectModel.Client;
     using ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     [TestClass]
     public class TestRunRequestTests
@@ -31,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         {
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
+            testRunRequest = new TestRunRequest(new RequestData(new DummyMetricCollector()), testRunCriteria, executionManager.Object);
         }
 
         [TestMethod]
@@ -186,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, true, settingsXml);
             var executionManager = new Mock<IProxyExecutionManager>();
-            var testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
+            var testRunRequest = new TestRunRequest(new RequestData(new DummyMetricCollector()), testRunCriteria, executionManager.Object);
 
             ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
             onTestSessionTimeoutCalled.Reset();
@@ -277,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
+            testRunRequest = new TestRunRequest(new RequestData(new DummyMetricCollector()), testRunCriteria, executionManager.Object);
 
             var testProcessStartInfo = new TestProcessStartInfo();
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
@@ -291,7 +293,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
+            testRunRequest = new TestRunRequest(new RequestData(new DummyMetricCollector()), testRunCriteria, executionManager.Object);
 
             testRunRequest.ExecuteAsync();
 
@@ -307,7 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             executionManager = new Mock<IProxyExecutionManager>();
-            testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
+            testRunRequest = new TestRunRequest(new RequestData(new DummyMetricCollector()), testRunCriteria, executionManager.Object);
 
             testRunRequest.ExecuteAsync();
 

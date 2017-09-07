@@ -24,10 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
             ValidateArg.NotNull(metric, "metric");
             ValidateArg.NotNull(value, "value");
 
-            if (!metricDictionary.ContainsKey(metric))
+            if (metricDictionary.ContainsKey(metric))
             {
-                this.metricDictionary?.Add(metric, value);
-            }           
+                metricDictionary[metric] = value;
+            }
+            else
+            {
+                metricDictionary?.Add(metric, value);
+            }
         }
 
         public IDictionary<string, string> Metrics()

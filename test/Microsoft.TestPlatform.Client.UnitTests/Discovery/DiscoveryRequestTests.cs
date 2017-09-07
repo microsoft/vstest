@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 {
     using System;
@@ -15,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using ObjectModel;
     using ObjectModel.Client;
     using ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     [TestClass]
     public class DiscoveryRequestTests
@@ -27,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         {
             this.discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
-            this.discoveryRequest = new DiscoveryRequest(this.discoveryCriteria, this.discoveryManager.Object);
+            this.discoveryRequest = new DiscoveryRequest(new RequestData(new DummyMetricCollector()), this.discoveryCriteria, this.discoveryManager.Object);
         }
         
         [TestMethod]
