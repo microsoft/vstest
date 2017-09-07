@@ -144,8 +144,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
-            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
-            testHostProcessName = Path.Combine("TestHost", testHostProcessName);
+            // check in current location for testhost exe
+            var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+
+            if (!File.Exists(testhostProcessPath))
+            {
+                // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
+                testHostProcessName = Path.Combine("TestHost", testHostProcessName);
+                testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            }
 
             if (!this.Shared)
             {
@@ -154,7 +161,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 argumentsString += " " + "--testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
             }
 
-            var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
             EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
             var launcherPath = testhostProcessPath;
