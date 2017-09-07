@@ -5,8 +5,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 
     [TestClass]
     public class EventLogCollectorTests : AcceptanceTestBase
@@ -32,7 +33,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 0, 0);
+            this.ValidateSummaryStatus(3, 0, 0);
             this.VaildateDataCollectorOutput();
         }
 
@@ -65,24 +66,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         private void VaildateDataCollectorOutput()
         {
             // Verify attachments
-            var isTestRunLevelAttachmentFound = false;
+            var di = new DirectoryInfo(this.resultsDir);
+            var resultFiles = di.EnumerateFiles("Event Log.xml", SearchOption.AllDirectories)
+                .OrderBy(d => d.CreationTime)
+                .Select(d => d.FullName)
+                .ToList();
 
-            var resultFiles = Directory.GetFiles(this.resultsDir, "Event Log.xml", SearchOption.AllDirectories);
+            Assert.AreEqual(4, resultFiles.Count);
+            this.StdOutputContains("Event Log.xml");
 
-            foreach (var file in resultFiles)
-            {
-                // Test Run level attachments are logged in standard output.
-                if (file.Contains("Event Log.xml"))
-                {
-                    this.StdOutputContains(file);
-                    isTestRunLevelAttachmentFound = true;
-                }
-            }
+            var fileContent1 = File.ReadAllText(resultFiles[0]);
+            var fileContent2 = File.ReadAllText(resultFiles[1]);
+            var fileContent3 = File.ReadAllText(resultFiles[2]);
+            var fileContent4 = File.ReadAllText(resultFiles[3]);
 
-            Assert.IsTrue(isTestRunLevelAttachmentFound);
-            var fileContent = File.ReadAllText(resultFiles[0]);
-            Assert.IsTrue(fileContent.Contains("<Source>Application</Source>"));
-            Assert.IsTrue(fileContent.Contains("<Source>Application</Source>"));
+            Assert.IsTrue(fileContent1.Contains("123"));
+            Assert.IsTrue(fileContent2.Contains("234"));
+            Assert.IsTrue(fileContent3.Contains("345"));
+            Assert.IsTrue(fileContent4.Contains("123") && fileContent4.Contains("234") && fileContent4.Contains("345"));
         }
     }
 }
