@@ -4,6 +4,7 @@
 namespace EventLogUnitTestProject
 {
     using System.Diagnostics;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,7 +15,19 @@ namespace EventLogUnitTestProject
         [TestMethod]
         public void TestMethod1()
         {
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);
+            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 123);
+        }
+
+        [TestMethod]
+        public void TestMethod2()
+        {
+            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 234);
+        }
+
+        [TestMethod]
+        public void TestMethod3()
+        {
+            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 345);
         }
     }
 }

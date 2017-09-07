@@ -208,30 +208,30 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void TestSessionStartEventShouldCreateEventLogContainer()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            Assert.AreEqual(testableEventLogDataCollector.ContextData.Count, 0);
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var eventLogDataCollector = new EventLogDataCollector();
+            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 0);
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
-            Assert.AreEqual(testableEventLogDataCollector.ContextData.Count, 1);
+            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 1);
         }
 
         [TestMethod]
         public void TestCaseStartEventShouldCreateEventLogContainer()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            Assert.AreEqual(testableEventLogDataCollector.ContextData.Count, 0);
+            var eventLogDataCollector = new EventLogDataCollector();
+            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 0);
 
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid())), new TestCase()));
-            Assert.AreEqual(testableEventLogDataCollector.ContextData.Count, 1);
+            Assert.AreEqual(eventLogDataCollector.ContextMap.Count, 1);
         }
 
         [TestMethod]
 
         public void TestCaseEndEventShouldWriteEventLogEntriesAndSendFile()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var eventLogDataCollector = new EventLogDataCollector();
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var tc = new TestCase();
             var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
             this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
@@ -241,8 +241,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public void TestCaseEndEventShouldInvokeSendFileAsync()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var eventLogDataCollector = new EventLogDataCollector();
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var tc = new TestCase();
             var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
             this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
@@ -253,8 +253,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void TestCaseEndEventShouldThrowIfTestCaseStartIsNotInvoked()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var eventLogDataCollector = new EventLogDataCollector();
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var tc = new TestCase();
             var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
 
@@ -266,8 +266,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public void SessionEndEventShouldThrowIfSessionStartEventtIsNotInvoked()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var eventLogDataCollector = new EventLogDataCollector();
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var tc = new TestCase();
 
             Assert.ThrowsException<EventLogCollectorException>(() =>
@@ -279,8 +279,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void TestSessionEndEventShouldWriteEventLogEntriesAndSendFile()
         {
-            var testableEventLogDataCollector = new EventLogDataCollector();
-            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var eventLogDataCollector = new EventLogDataCollector();
+            eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var testcase = new TestCase() { Id = Guid.NewGuid() };
             this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
             this.mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
