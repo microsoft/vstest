@@ -17,19 +17,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class LengthPrefixCommunicationChannel : ICommunicationChannel
     {
-        private readonly Stream stream;
-
         private readonly BinaryReader reader;
 
         private readonly BinaryWriter writer;
 
         public LengthPrefixCommunicationChannel(Stream stream)
         {
-            this.stream = stream;
             this.reader = new BinaryReader(stream, Encoding.UTF8, true);
 
-            // Using the Buffered stream while writing.
-            this.writer = new BinaryWriter(new PlatformStream().CreateBufferedStream(stream, SocketConstants.BUFFERSIZE), Encoding.UTF8, true);
+            // Using the Buffered stream while writing, improves the write performance. By reducing the number of writes.
+            this.writer = new BinaryWriter(new PlatformStream().CreateBufferedStream(stream, SocketConstants.BufferSize), Encoding.UTF8, true);
         }
 
         /// <inheritdoc />

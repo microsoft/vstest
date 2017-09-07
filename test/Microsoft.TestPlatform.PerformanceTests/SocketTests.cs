@@ -4,10 +4,8 @@
 namespace Microsoft.TestPlatform.PerformanceTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net;
-    using System.Text;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;

@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.socket.NoDelay = true;
 
                 // Using Buffered stream only in case of write, and Network stream in case of read.
-                var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BUFFERSIZE);
+                var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
                 var networkStream = client.GetStream();
                 this.binaryReader = new BinaryReader(networkStream);
                 this.binaryWriter = new BinaryWriter(bufferedStream);
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.clientConnectedEvent.Set();
                 if (EqtTrace.IsInfoEnabled)
                 {
-                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
+                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
                     EqtTrace.Info("Accepted Client request and set the flag");
                 }
             }
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     if (this.tcpClient.Connected)
                     {
                         // Using Buffered stream only in case of write, and Network stream in case of read.
-                        var bufferedStream = new PlatformStream().CreateBufferedStream(this.tcpClient.GetStream(), SocketConstants.BUFFERSIZE);
+                        var bufferedStream = new PlatformStream().CreateBufferedStream(this.tcpClient.GetStream(), SocketConstants.BufferSize);
                         var networkStream = this.tcpClient.GetStream();
                         this.binaryReader = new BinaryReader(networkStream);
                         this.binaryWriter = new BinaryWriter(bufferedStream);
@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("Connected to the server successfully ");
-                            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BUFFERSIZE);
+                            EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
                         }
 
                         this.clientConnectionAcceptedEvent.Set();
