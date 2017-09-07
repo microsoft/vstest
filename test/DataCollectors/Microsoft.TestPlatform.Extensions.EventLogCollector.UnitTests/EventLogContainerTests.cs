@@ -39,8 +39,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public EventLogContainerTests()
         {
             this.eventSources = new HashSet<string>();
-            this.eventSources.Add("TestPlatform");
+            this.eventSources.Add("Application");
             this.entryTypes = new HashSet<EventLogEntryType>();
+            this.entryTypes.Add(EventLogEntryType.Error);
 
             this.logger = new Mock<DataCollectionLogger>();
             this.eventLog = new EventLog("Application");
@@ -60,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void OnEventLogEntryWrittenShouldAddLogs()
         {
-            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 234);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);
             this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
             var newCount = this.eventLogContainer.EventLogEntries.Count;
 
@@ -104,7 +105,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             this.entryTypes.Add(EventLogEntryType.Warning);
             this.eventSources.Add("Application");
 
-            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Warning, 234);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
             var newCount = this.eventLogContainer.EventLogEntries.Count;
 
@@ -123,7 +124,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 int.MaxValue,
                 this.logger.Object,
                 this.dataCollectionContext);
-            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Warning, 234);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             this.eventLogContainer.OnEventLogEntryWritten(this.eventLog, this.entryWrittenEventArgs);
             var newCount = this.eventLogContainer.EventLogEntries.Count;
 
