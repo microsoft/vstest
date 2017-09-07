@@ -92,5 +92,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return Path.GetFullPath(path);
         }
+
+        /// <inheritdoc/>
+        public void DeleteEmptyDirectroy(string dirPath)
+        {
+            try
+            {
+                if (Directory.Exists(dirPath) && Directory.GetFiles(dirPath).Length == 0
+                    && Directory.GetDirectories(dirPath).Length == 0)
+                {
+                    Directory.Delete(dirPath, true);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
     }
 }

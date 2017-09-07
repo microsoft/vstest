@@ -34,14 +34,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="testCaseName">
         /// The test case name
         /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case.
+        /// </param>
         protected TestCaseEventArgs(
             DataCollectionContext context,
             Guid testCaseId,
-            string testCaseName)
+            string testCaseName,
+            bool isChildTestCase)
             : base(context)
         {
             this.TestCaseId = testCaseId;
             this.TestCaseName = testCaseName == null ? string.Empty : testCaseName;
+            this.IsChildTestCase = isChildTestCase;
         }
 
         /// <summary>
@@ -56,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         protected TestCaseEventArgs(
             DataCollectionContext context,
             TestCase testElement)
-            : this(context, Guid.Empty, null)
+            : this(context, Guid.Empty, null, false)
         {
             // NOTE: ONLY USE FOR UNIT TESTING!
             //  This overload is only here for 3rd parties to use for unit testing
@@ -94,6 +99,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         [DataMember]
         public string TestCaseName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this is a child test case, false if this is a top-level test case
+        /// </summary>
+        [DataMember]
+        public bool IsChildTestCase
         {
             get;
             private set;
@@ -179,8 +194,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         internal TestCaseStartEventArgs(
             DataCollectionContext context,
             Guid testCaseId,
-            string testCaseName)
-            : base(context, testCaseId, testCaseName)
+            string testCaseName,
+            bool isChildTestCase)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
         {
             Debug.Assert(context.HasTestCase, "Context is not for a test case");
         }
@@ -259,11 +275,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="testCaseName">
         /// The test case name
         /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
         internal TestCaseEndEventArgs(
             DataCollectionContext context,
             Guid testCaseId,
-            string testCaseName)
-            : this(context, testCaseId, testCaseName, TestOutcome.Failed)
+            string testCaseName,
+            bool isChildTestCase)
+            : this(context, testCaseId, testCaseName, isChildTestCase, TestOutcome.Failed)
         {
         }
 
@@ -290,8 +310,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             DataCollectionContext context,
             Guid testCaseId,
             string testCaseName,
+            bool isChildTestCase,
             TestOutcome testOutcome)
-            : base(context, testCaseId, testCaseName)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
         {
             Debug.Assert(context.HasTestCase, "Context is not for a test case");
             this.TestOutcome = testOutcome;
@@ -390,8 +411,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             DataCollectionContext context,
             Guid testCaseId,
             string testCaseName,
+            bool isChildTestCase,
             TestResult testResult)
-            : base(context, testCaseId, testCaseName)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
         {
             Debug.Assert(context.HasTestCase, "Context is not for a test case");
             this.TestResult = testResult;

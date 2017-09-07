@@ -464,31 +464,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 foreach (string dir in tempDirs)
                 {
                     // Delete only if the directory is empty
-                    this.DeleteEmptyDirectory(dir);
+                    this.fileHelper.DeleteEmptyDirectroy(dir);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Helper for deleting a directory. It deletes the directory only if its empty.
-        /// </summary>
-        /// <param name="dirPath">Path of the directory to be deleted</param>
-        private void DeleteEmptyDirectory(string dirPath)
-        {
-            try
-            {
-                if (Directory.Exists(dirPath) && Directory.GetFiles(dirPath).Length == 0
-                    && Directory.GetDirectories(dirPath).Length == 0)
-                {
-                    Directory.Delete(dirPath, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Warning(
-                    "Error occurred while trying to delete the temporary event log directory {0} :{1}",
-                    dirPath,
-                    ex);
             }
         }
 
@@ -688,19 +665,17 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         this.maxEntries = int.MaxValue;
                     }
                 }
-                catch (FormatException e)
+                catch (FormatException)
                 {
-                    throw new EventLogCollectorException(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            Resource.InvalidMaxEntriesInConfig,
-                            maxEntriesstring),
-                        e);
+                    this.maxEntries = EventLogConstants.DefaultMaxEntries;
                 }
 
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
-                    + maxEntriesstring);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
+                        + this.maxEntries);
+                }
             }
             else
             {

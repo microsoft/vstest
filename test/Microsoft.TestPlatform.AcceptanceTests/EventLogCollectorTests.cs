@@ -24,12 +24,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void EventLogDataCollectorShoudCreateLogFile(string runnerFramework, string targetFramework, string targetRuntime)
         {
             SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
-            var assemblyPaths = this.BuildMultipleAssemblyPath("EventLogUnitTestProject.dll").Trim('\"');
             string runSettings = this.GetRunsettingsFilePath();
-            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
 
             this.InvokeVsTest(arguments);
 
@@ -53,7 +52,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
       <DataCollectionRunSettings>  
         <DataCollectors>  
             <DataCollector friendlyName=""Event Log"" >
-                <Configuration><Setting name = ""EventLogs"" value = ""Application"" /></Configuration>
+                <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /></Configuration>
             </DataCollector>
         </DataCollectors>
       </DataCollectionRunSettings>
@@ -80,10 +79,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var fileContent3 = File.ReadAllText(resultFiles[2]);
             var fileContent4 = File.ReadAllText(resultFiles[3]);
 
-            Assert.IsTrue(fileContent1.Contains("123"));
-            Assert.IsTrue(fileContent2.Contains("234"));
-            Assert.IsTrue(fileContent3.Contains("345"));
-            Assert.IsTrue(fileContent4.Contains("123") && fileContent4.Contains("234") && fileContent4.Contains("345"));
+            Assert.IsTrue(fileContent1.Contains("10") && fileContent1.Contains("11") && fileContent1.Contains("12"));
+            Assert.IsTrue(fileContent2.Contains("20") && fileContent2.Contains("21") && fileContent2.Contains("22") && fileContent2.Contains("23"));
+            Assert.IsTrue(fileContent3.Contains("30") && fileContent3.Contains("31") && fileContent3.Contains("32"));
+
+            Assert.IsTrue(fileContent4.Contains("10") && fileContent4.Contains("11") && fileContent4.Contains("12") && fileContent4.Contains("20") && fileContent4.Contains("21") && fileContent4.Contains("22") && fileContent4.Contains("23") && fileContent3.Contains("30") && fileContent4.Contains("31") && fileContent4.Contains("32"));
         }
     }
 }

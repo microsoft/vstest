@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         private Mock<DataCollectionLogger> mockDataCollectionLogger;
 
-        private TestableDataCollectionEnvironmentContext dataCollectionEnvironmentContext;
+        private DataCollectionEnvironmentContext dataCollectionEnvironmentContext;
 
         private EventLogDataCollector eventLogDataCollector;
 
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             TestCase tc = new TestCase();
             DataCollectionContext dataCollectionContext =
                 new DataCollectionContext(new SessionId(Guid.NewGuid()));
-            this.dataCollectionEnvironmentContext = new TestableDataCollectionEnvironmentContext(dataCollectionContext);
+            this.dataCollectionEnvironmentContext = new DataCollectionEnvironmentContext(dataCollectionContext);
             this.mockDataCollectionLogger = new Mock<DataCollectionLogger>();
             this.eventLogDataCollector = new EventLogDataCollector(this.mockFileHelper.Object);
         }
@@ -374,17 +374,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                                && str.Contains(filteredEntries[2].InstanceId.ToString())
                                && str.Contains(filteredEntries[3].InstanceId.ToString())
                                && str.Contains(filteredEntries[4].InstanceId.ToString()))));
-        }
-    }
-
-    /// <summary>
-    /// The testable data collection environment context.
-    /// </summary>
-    public class TestableDataCollectionEnvironmentContext : DataCollectionEnvironmentContext
-    {
-        public TestableDataCollectionEnvironmentContext(DataCollectionContext sessionDataCollectionContext)
-            : base(sessionDataCollectionContext)
-        {
         }
     }
 

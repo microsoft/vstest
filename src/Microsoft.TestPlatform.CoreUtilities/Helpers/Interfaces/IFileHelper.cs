@@ -98,5 +98,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// Full path.
         /// </returns>
         string GetFullPath(string path);
+
+        /// <summary>
+        /// Helper for deleting a directory. It deletes the directory only if its empty.
+        /// </summary>
+        /// <param name="directoryPath">
+        /// The directory path.
+        /// </param>
+        void DeleteEmptyDirectroy(string directoryPath);
     }
 }

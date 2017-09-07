@@ -26,6 +26,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         private static readonly string DefaultTestCaseName = string.Empty;
 
+        /// <summary>
+        /// Default value for flag indicating whether this is a child test case
+        /// </summary>
+        private const bool DefaultIsChildTestCase = false;
+
         #endregion
 
         #region Constructors
@@ -36,11 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="context">Context information for the test case</param>
         /// <param name="requestedDuration">How much of the previously collected data the requestor is interested in.</param>
         internal DataRequestEventArgs(DataCollectionContext context, TimeSpan requestedDuration)
-            : this(context, DefaultTestCaseId, DefaultTestCaseName, requestedDuration)
+            : this(context, DefaultTestCaseId, DefaultTestCaseName, DefaultIsChildTestCase, requestedDuration)
         {
             Debug.Assert(
-                    !context.HasTestCase,
-                "This constructor overload is to be used only for a session data request");
+                !context.HasTestCase,
+                "This constructor overload is to be used only for a session data request"
+            );
         }
 
         /// <summary>
@@ -48,15 +54,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         /// <param name="context">Context information for the test case</param>
         /// <param name="testCaseId">The test case ID</param>
+        /// <param name="tcmInformation">
+        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
+        /// or null if the test did not originate from TCM.
+        /// </param>
         /// <param name="testCaseName">The test case name</param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
         /// <param name="requestedDuration">How much of the previously collected data the requestor is interested in.</param>
         internal DataRequestEventArgs(
             DataCollectionContext context,
             Guid testCaseId,
             //TcmInformation tcmInformation,
             string testCaseName,
+            bool isChildTestCase,
             TimeSpan requestedDuration)
-            : base(context, testCaseId, testCaseName)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
         {
             RequestId = new RequestId();
             RequestedDuration = requestedDuration;

@@ -15,19 +15,26 @@ namespace EventLogUnitTestProject
         [TestMethod]
         public void TestMethod1()
         {
-            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 123);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 10);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 11);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 12);
         }
 
         [TestMethod]
         public void TestMethod2()
         {
-            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 234);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 20);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 21);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 22);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 23);
         }
 
         [TestMethod]
         public void TestMethod3()
         {
-            EventLog.WriteEntry("TestPlatform", "Application", EventLogEntryType.Error, 345);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 30);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 31);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 32);
         }
     }
 }

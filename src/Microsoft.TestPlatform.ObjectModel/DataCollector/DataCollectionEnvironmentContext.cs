@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 #if NET451
     [Serializable]
 #endif
-    public class DataCollectionEnvironmentContext
+    public sealed class DataCollectionEnvironmentContext
     {
         #region Fields
         /// <summary>
