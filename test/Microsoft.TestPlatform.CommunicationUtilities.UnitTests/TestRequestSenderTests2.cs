@@ -327,7 +327,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.RaiseClientDisconnectedEvent();
 
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Never);
-            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Never);
+            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
         }
 
         [TestMethod]
