@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithCategoryTrait(RunnnerInfo runnerInfo)
         {
@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithClassNameTrait(RunnnerInfo runnerInfo)
         {
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnnerInfo runnerInfo)
         {
@@ -83,7 +83,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithNameTrait(RunnnerInfo runnerInfo)
         {
@@ -101,7 +101,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithOrOperatorTrait(RunnnerInfo runnerInfo)
         {
@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithPriorityTrait(RunnnerInfo runnerInfo)
         {
@@ -141,7 +141,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnnerInfo runnerInfo)
         {

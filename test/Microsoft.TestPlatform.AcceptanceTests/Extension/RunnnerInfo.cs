@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public override string ToString()
         {
-            return string.Join(",", new[] { "RunnerFramework = " + RunnerFramework, "TargetFramework = " + TargetFramework, string.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation" });
+            return string.Join(",", new[] { "RunnerFramework = " + RunnerFramework, " TargetFramework = " + TargetFramework, string.IsNullOrEmpty(InIsolationValue) ? " InProcess" : " InIsolation" });
         }
     }
 }
