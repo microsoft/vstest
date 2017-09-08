@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref this.effectiveRunSettings);
 
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
-                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive };
+                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestCaseFilter = this.commandLineOptions.TestCaseFilterValue };
                 result &= this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
             }
             else

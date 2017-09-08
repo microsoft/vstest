@@ -312,13 +312,13 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
             string testCaseFilterValue = "TestFilter";
-            CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterValue;
+            payload.TestCaseFilter = testCaseFilterValue;
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
-
+            
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsTrue(success, "RunTests call must succeed");
@@ -329,60 +329,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual(2, observedCriteria.Sources.Count(), "All Sources must be used for discovery request");
             Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
             Assert.AreEqual("b", observedCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
-
-            // Check for the default value for the frequency
-            Assert.AreEqual(10, observedCriteria.FrequencyOfRunStatsChangeEvent);
-            mockRunEventsRegistrar.Verify(md => md.RegisterTestRunEvents(It.IsAny<ITestRunRequest>()), Times.Once);
-            mockRunEventsRegistrar.Verify(md => md.UnregisterTestRunEvents(It.IsAny<ITestRunRequest>()), Times.Once);
-
-            mockRunRequest.Verify(md => md.ExecuteAsync(), Times.Once);
-
-            mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStart(), Times.Once);
-            mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStop(), Times.Once);
-        }
-
-        [TestMethod]
-        public void RunTestsWithSourceAndFilterInDesignModeShouldUseFilterFromPayload()
-        {
-            string testCaseFilterFromConsole = "TestFilterFromConsole";
-            string testCaseFilterFromPayload = "TestFilterFromPayload";
-
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a" },
-                TestCaseFilter = testCaseFilterFromPayload
-            };
-
-            var createRunRequestCalled = 0;
-            TestRunCriteria observedCriteria = null;
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
-                (TestRunCriteria runCriteria, ProtocolConfig config) =>
-                {
-                    createRunRequestCalled++;
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterFromConsole;
-            CommandLineOptions.Instance.IsDesignMode = true;
-            this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
-                this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
-                TestRunResultAggregator.Instance,
-                this.mockTestPlatformEventSource.Object);
-
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
-
-            Assert.IsTrue(success, "RunTests call must succeed");
-
-            Assert.AreEqual(testCaseFilterFromPayload, observedCriteria.TestCaseFilter, "TestCaseFilter must be set from payload in desgin mode");
-
-            Assert.AreEqual(createRunRequestCalled, 1, "CreateRunRequest must be invoked only once.");
-            Assert.AreEqual(1, observedCriteria.Sources.Count(), "All Sources must be used for discovery request");
-            Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
 
             // Check for the default value for the frequency
             Assert.AreEqual(10, observedCriteria.FrequencyOfRunStatsChangeEvent);
