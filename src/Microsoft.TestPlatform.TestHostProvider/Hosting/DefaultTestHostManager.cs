@@ -246,36 +246,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Task.FromResult(true);
         }
 
+        /// <summary>
+        /// Filter duplicate extensions, include only the highest versioned extension
+        /// </summary>
+        /// <param name="extensions">Entire list of extensions</param>
+        /// <returns>Filtered list of extensions</returns>
         private IEnumerable<string> FilterExtensionsBasedOnVersion(IEnumerable<string> extensions)
         {
-            Dictionary<string, Tuple<Version, string>> extensionMap = new Dictionary<string, Tuple<Version, string>>();
+            var filteredExtensions = new List<string>();
 
-            foreach (var extensionFullPath in extensions)
+            var extensionGroups = extensions.GroupBy(ext => Path.GetFileNameWithoutExtension(ext));
+
+            foreach (var extensionGroup in extensionGroups)
             {
-                // assemblyName is the key
-                var extensionAssemblyName = Path.GetFileNameWithoutExtension(extensionFullPath);
-
-                var currentFileVersion = this.fileHelper.GetVersionInfo(extensionFullPath)?.FileVersion;
-                if (Version.TryParse(currentFileVersion, out var currentVersion))
+                if (extensionGroup.Count() > 1)
                 {
-                    if (extensionMap.TryGetValue(extensionAssemblyName, out var oldExtensionInfo))
-                    {
-                        // If the version of current file is higher than the one in the map
-                        // replace the older with the current file
-                        if (currentVersion > oldExtensionInfo.Item1)
-                        {
-                            extensionMap[extensionAssemblyName] = new Tuple<Version, string>(currentVersion, extensionFullPath);
-                        }
-                    }
-                    else
-                    {
-                        extensionMap.Add(extensionAssemblyName, new Tuple<Version, string>(currentVersion, extensionFullPath));
-                    }
+                    var maxFile = extensionGroup.OrderByDescending(a => this.fileHelper.GetFileVersion(a)).First();
+                    filteredExtensions.Add(maxFile);
+                }
+                else
+                {
+                    filteredExtensions.Add(extensionGroup.Single());
                 }
             }
 
-            // List of highest versioned files.
-            return extensionMap.Select(p => p.Value.Item2);
+            return filteredExtensions;
         }
 
         /// <summary>

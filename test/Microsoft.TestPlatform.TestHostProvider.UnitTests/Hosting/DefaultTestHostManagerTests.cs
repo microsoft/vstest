@@ -245,7 +245,54 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, new List<string>()).ToList();
 
             // Verify
-            extensionsList1.AddRange(extensionsList2);
+            CollectionAssert.AreEqual(extensionsList1, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnPathTheHigherVersionedFileExtensions()
+        {
+            List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll", @"C:\Source2\source2.dll" };
+
+            List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll" };
+            List<string> extensionsList2 = new List<string> { @"C:\Source2\ext1.TestAdapter.dll" };
+
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[0])).Returns(new Version(2, 2));
+
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion></RunConfiguration> </RunSettings>");
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, new List<string>()).ToList();
+
+            // Verify
+            CollectionAssert.AreEqual(extensionsList2, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnPathToSingleFileExtensionOfATypeIfVersionsAreSame()
+        {
+            List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll", @"C:\Source2\source2.dll" };
+
+            List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll" };
+            List<string> extensionsList2 = new List<string> { @"C:\Source2\ext1.TestAdapter.dll" };
+
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[0])).Returns(new Version(2, 0));
+
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion></RunConfiguration> </RunSettings>");
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, new List<string>()).ToList();
+
+            // Verify
             CollectionAssert.AreEqual(extensionsList1, resultExtensions);
         }
 

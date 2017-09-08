@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     /// </summary>
     public class FileHelper : IFileHelper
     {
+        private static readonly Version DefaultFileVersion = new Version(0, 0);
+
         /// <inheritdoc/>
         public DirectoryInfo CreateDirectory(string path)
         {
@@ -71,9 +73,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        public FileVersionInfo GetVersionInfo(string path)
+        public Version GetFileVersion(string path)
         {
-            return FileVersionInfo.GetVersionInfo(path);
+            var currentFileVersion = FileVersionInfo.GetVersionInfo(path)?.FileVersion;
+            return Version.TryParse(currentFileVersion, out var currentVersion) ? currentVersion : DefaultFileVersion;
         }
 
         /// <inheritdoc/>
