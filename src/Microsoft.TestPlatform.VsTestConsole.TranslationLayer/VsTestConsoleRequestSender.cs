@@ -105,9 +105,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return waitSucess && this.handShakeSuccessful;
         }
 
-        /// <summary>
-        /// Asynchronous equivalent to <see cref="InitializeCommunication"/> and <see cref="WaitForRequestHandlerConnection(int)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
         {
             this.processExitCancellationTokenSource = new CancellationTokenSource();
@@ -162,9 +160,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 null);
         }
 
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="StartTestRun(IEnumerable{string}, string, ITestRunEventsHandler)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
             await this.SendMessageAndListenAndReportTestResultsAsync(
@@ -184,9 +180,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 null);
         }
 
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="StartTestRun(IEnumerable{TestCase}, string, ITestRunEventsHandler)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task StartTestRunAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
             await this.SendMessageAndListenAndReportTestResultsAsync(
@@ -217,9 +211,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customHostLauncher);
         }
 
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="StartTestRunWithCustomHost(IEnumerable{string}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task StartTestRunWithCustomHostAsync(
             IEnumerable<string> sources,
             string runSettings,
@@ -237,7 +229,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 runEventsHandler,
                 customHostLauncher);
         }
-        
+
         /// <inheritdoc/>
         public void StartTestRunWithCustomHost(
             IEnumerable<TestCase> testCases,
@@ -257,9 +249,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 customHostLauncher);
         }
 
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="StartTestRunWithCustomHost(IEnumerable{TestCase}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task StartTestRunWithCustomHostAsync(
             IEnumerable<TestCase> testCases,
             string runSettings,
