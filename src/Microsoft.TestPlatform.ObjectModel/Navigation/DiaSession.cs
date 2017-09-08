@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             // For remote scenario, also look for pdb in current directory, (esp for UWP)
             var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
-            pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(additionalSearchPath, Path.GetFileName(pdbFilePath)) : pdbFilePath;
+            pdbFilePath = (!File.Exists(pdbFilePath) && !string.IsNullOrEmpty(additionalSearchPath)) ? Path.Combine(additionalSearchPath, Path.GetFileName(pdbFilePath)) : pdbFilePath;
             using (var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read))
             {
                 if (PortablePdbReader.IsPortable(stream))
