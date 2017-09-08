@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
 {
     using System.Collections.Generic;
-
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
@@ -23,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler);
+        void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler);
 
         /// <summary>
         /// Aborts the test discovery.

@@ -12,15 +12,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// ParallelDiscoveryEventsHandler for handling the discovery events in case of parallel discovery
     /// </summary>
-    internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler
+    internal class ParallelDiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     {
         private IProxyDiscoveryManager proxyDiscoveryManager;
 
-        private ITestDiscoveryEventsHandler actualDiscoveryEventsHandler;
+        private ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler;
 
         private IParallelProxyDiscoveryManager parallelProxyDiscoveryManager;
 
@@ -29,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private IDataSerializer dataSerializer;
 
         public ParallelDiscoveryEventsHandler(IProxyDiscoveryManager proxyDiscoveryManager,
-            ITestDiscoveryEventsHandler actualDiscoveryEventsHandler,
+            ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler,
             IParallelProxyDiscoveryManager parallelProxyDiscoveryManager,
             ParallelDiscoveryDataAggregator discoveryDataAggregator) :
             this(proxyDiscoveryManager, actualDiscoveryEventsHandler, parallelProxyDiscoveryManager, discoveryDataAggregator, JsonDataSerializer.Instance)
@@ -37,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
         
         internal ParallelDiscoveryEventsHandler(IProxyDiscoveryManager proxyDiscoveryManager,
-            ITestDiscoveryEventsHandler actualDiscoveryEventsHandler,
+            ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler,
             IParallelProxyDiscoveryManager parallelProxyDiscoveryManager,
             ParallelDiscoveryDataAggregator discoveryDataAggregator,
             IDataSerializer dataSerializer)
@@ -50,8 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <inheritdoc/>
-        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
+            var totalTests = discoveryCompleteEventArgs.TotalCount;
+            var isAborted = discoveryCompleteEventArgs.IsAborted;
+
             // we get discovery complete events from each host process
             // so we cannot "complete" the actual operation until all sources are consumed
             // We should not block last chunk results while we aggregate overall discovery data 
@@ -86,8 +90,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 // we have to send raw messages as we block the discoverycomplete actual raw messages
                 this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
+                var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryDataAggregator.TotalTests,
+                    discoveryDataAggregator.IsAborted);
+
                 // send actual test discoverycomplete to clients
-                this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryDataAggregator.TotalTests, null, discoveryDataAggregator.IsAborted);
+                this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
             }
         }
 

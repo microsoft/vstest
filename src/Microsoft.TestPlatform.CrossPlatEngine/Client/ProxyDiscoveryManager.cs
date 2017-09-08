@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
@@ -85,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
             {
@@ -114,7 +115,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
                 // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
+
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }
         }
 

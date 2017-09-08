@@ -3,23 +3,20 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
-
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     [TestClass]
@@ -66,7 +63,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void DiscoverTestsShouldLogIfTheSourceDoesNotExist()
         {
             var criteria = new DiscoveryCriteria(new List<string> { "imaginary.dll" }, 100, null);
-            var mockLogger = new Mock<ITestDiscoveryEventsHandler>();
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
@@ -84,7 +81,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             var sources = new List<string> { "imaginary.dll" };
             var criteria = new DiscoveryCriteria(sources, 100, null);
-            var mockLogger = new Mock<ITestDiscoveryEventsHandler>();
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
@@ -112,7 +109,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                               };
 
             var criteria = new DiscoveryCriteria(sources, 100, null);
-            var mockLogger = new Mock<ITestDiscoveryEventsHandler>();
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
@@ -138,12 +135,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                               };
 
             var criteria = new DiscoveryCriteria(sources, 1, null);
-            var mockLogger = new Mock<ITestDiscoveryEventsHandler>();
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
             
             // Assert that the tests are passed on via the handletestruncomplete event.
-            mockLogger.Verify(l => l.HandleDiscoveryComplete(1, It.IsAny<IEnumerable<TestCase>>(), false), Times.Once);
+            mockLogger.Verify(l => l.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()), Times.Once);
         }
 
         #endregion

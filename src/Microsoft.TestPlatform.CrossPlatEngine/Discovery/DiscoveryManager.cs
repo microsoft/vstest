@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -30,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private TestSessionMessageLogger sessionMessageLogger;
         private ITestPlatformEventSource testPlatformEventSource;
 
-        private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
+        private ITestDiscoveryEventsHandler2 testDiscoveryEventsHandler;
         private DiscoveryCriteria discoveryCriteria;
 
         /// <summary>
@@ -77,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             var discoveryResultCache = new DiscoveryResultCache(
                 discoveryCriteria.FrequencyOfDiscoveredTestsEvent,
@@ -127,7 +128,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     {
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                     }
-                    eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
+                    
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false);
+                    eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
                 }
                 else
                 {

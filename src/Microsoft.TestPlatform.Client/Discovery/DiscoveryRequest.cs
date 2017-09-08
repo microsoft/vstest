@@ -13,11 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// The discovery request.
     /// </summary>
-    public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler
+    public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
@@ -181,11 +182,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         #region ITestDiscoveryEventsHandler Methods
 
         /// <inheritdoc/>
-        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs , IEnumerable<TestCase> lastChunk)
         {
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", isAborted, totalTests);
+                EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
             }
 
             lock (this.syncObject)
@@ -205,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
-                        EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete:Ignoring duplicate DiscoveryComplete. Aborted:{0}, TotalTests:{1}", isAborted, totalTests);
+                        EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete:Ignoring duplicate DiscoveryComplete. Aborted:{0}, TotalTests:{1}", discoveryCompleteEventArgs.IsAborted, discoveryCompleteEventArgs.TotalCount);
                     }
 
                     return;
@@ -225,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         this.OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(lastChunk), "DiscoveryRequest.DiscoveryComplete");
                     }
 
-                    this.OnDiscoveryComplete.SafeInvoke(this, new DiscoveryCompleteEventArgs(totalTests, isAborted), "DiscoveryRequest.DiscoveryComplete");
+                    this.OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
                 }
                 finally
                 {
