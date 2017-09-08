@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
-
+            
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
                 runCriteria = new TestRunCriteria(
@@ -221,7 +221,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
+                runCriteria.TestCaseFilter = testRunRequestPayload.TestCaseFilter;
             }
             else
             {

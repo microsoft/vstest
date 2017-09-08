@@ -3,7 +3,6 @@
     <PropertyGroup>
         <!-- Not able to add TargetFrameworks here due to: https://github.com/dotnet/sdk/issues/1110 -->
         <NetCoreAppTargetFrameWork Condition="'$(TargetFramework)' != '' AND $(TargetFramework.StartsWith('netcoreapp'))">true</NetCoreAppTargetFrameWork>
-	    <PackageTargetFallback Condition="$(NetCoreAppTargetFrameWork) == 'true' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
     </PropertyGroup>
     <!-- TODO Remove when implicit references are available for netcoreapp2.0 -->
     <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
