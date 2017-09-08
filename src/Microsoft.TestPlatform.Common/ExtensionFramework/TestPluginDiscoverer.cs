@@ -63,6 +63,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
 #if !WINDOWS_UAP
 
+            if(!extensionPaths.Any())
+            {
+                // C++ UWP adaters do not follow TestAdapater naming convention, so making this exception)
+                extensionPaths = extensionPaths.Concat<string>(new List<string> { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll",
+                                                             "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppExecutor.dll",
+                                                             "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll",
+                                                             "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll",
+                                                             "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll",
+                                                             "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll"});
+
+            }
             this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);
 
 #else

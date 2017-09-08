@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// search path.
         /// </param>
         public DiaSession(string binaryPath, string searchPath)
-            : this(binaryPath, searchPath, GetSymbolReader(binaryPath))
+            : this(binaryPath, searchPath, GetSymbolReader(binaryPath, !Path.IsPathRooted(binaryPath) ? Directory.GetCurrentDirectory() : null))
         {
         }
 
@@ -92,9 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return this.symbolReader.GetNavigationData(declaringTypeName, methodName);
         }
 
-        private static ISymbolReader GetSymbolReader(string binaryPath)
+        private static ISymbolReader GetSymbolReader(string binaryPath, string additionalSearchPath)
         {
+            // For remote scenario, also look for pdb in current directory, (esp for UWP)
             var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
+            pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(additionalSearchPath, Path.GetFileName(pdbFilePath)) : pdbFilePath;
             using (var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read))
             {
                 if (PortablePdbReader.IsPortable(stream))
