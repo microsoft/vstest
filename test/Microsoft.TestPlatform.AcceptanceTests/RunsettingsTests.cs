@@ -218,7 +218,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(true, true)]
+        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
         public void TestAdapterPathFromRunSettings(RunnnerInfo runnerInfo)
         {

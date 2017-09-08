@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class DiscoveryTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework(true, true)]
+        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
         public void DiscoverAllTests(RunnnerInfo runnerInfo)
         {
@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework(true, true)]
+        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
         public void MultipleSourcesDiscoverAllTests(RunnnerInfo runnerInfo)
         {

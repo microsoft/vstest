@@ -9,10 +9,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
         }
 
-        public RunnnerInfo(string runnerType, string tragetFramework, string inIsolation)
+        public RunnnerInfo(string runnerType, string targetFramework, string inIsolation)
         {
             this.RunnerFramework = runnerType;
-            this.TargetFramework = tragetFramework;
+            this.TargetFramework = targetFramework;
             this.InIsolationValue = inIsolation;
         }
         /// <summary>
@@ -40,6 +40,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             get;
             set;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(",", new[] { "RunnerFramework = " + RunnerFramework, "TargetFramework = " + TargetFramework, string.IsNullOrEmpty(InIsolationValue) ? "InProcess" : "InIsolation" });
         }
     }
 }

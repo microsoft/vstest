@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class ExecutionTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFramework(true, true)]
+        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
         public void RunMultipleTestAssemblies(RunnnerInfo runnerInfo)
         {

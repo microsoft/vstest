@@ -67,8 +67,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 }
                 else
                 {
-                    var atc = (RunnnerInfo)dataRow.Data[0];
-                    result.DisplayName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testMethod.TestMethodName, string.Join(",", new[] { atc.RunnerFramework, atc.TargetFramework, atc.InIsolationValue }));
+                    var runnnerInfo = (RunnnerInfo)dataRow.Data[0];
+                    result.DisplayName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testMethod.TestMethodName, runnnerInfo.ToString());
                 }
 
                 results.Add(result);
