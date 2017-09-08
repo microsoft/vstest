@@ -28,15 +28,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void BlameDataCollectorShouldGiveCorrectTestCaseName(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnnerInfo runnerInfo)
         {
-
-            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             this.InvokeVsTest(arguments);

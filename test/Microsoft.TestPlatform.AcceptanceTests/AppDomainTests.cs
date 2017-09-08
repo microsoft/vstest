@@ -18,11 +18,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class AppDomainTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
-        public void RunTestExecutionWithDisableAppDomain(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        [NETFullTargetFramework]
+        public void RunTestExecutionWithDisableAppDomain(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var testAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
             var dataCollectorAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
@@ -36,7 +35,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
                 this.FrameworkArgValue,
-                inIsolation);
+                runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);
 

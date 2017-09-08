@@ -16,12 +16,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// The run test execution with platform x64.
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void RunTestExecutionWithPlatformx64(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x64";
             string testhostProcessName = string.Empty;
@@ -36,12 +35,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// The run test execution with platform x86.
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void RunTestExecutionWithPlatformx86(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x86";
             string testhostProcessName = string.Empty;

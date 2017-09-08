@@ -20,12 +20,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void CommandLineRunSettingsShouldWinAmongAllOptions(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -58,12 +57,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Command line run settings should have high precedence btween cli runsettings and cli switches.
         /// </summary>
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -93,12 +91,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="targetFramework"></param>
         /// <param name="targetRuntime"></param>
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -120,12 +117,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #endregion
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsWithoutParallelAndPlatformX86(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void RunSettingsWithoutParallelAndPlatformX86(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -142,12 +138,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsParamsAsArguments(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void RunSettingsParamsAsArguments(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -167,12 +162,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsAndRunSettingsParamsAsArguments(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void RunSettingsAndRunSettingsParamsAsArguments(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x86";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -199,12 +193,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsWithParallelAndPlatformX64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void RunSettingsWithParallelAndPlatformX64(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var targetPlatform = "x64";
             var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
@@ -225,13 +218,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInIsolation]
-        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFramework(true, true)]
         [NETCORETargetFramework]
-        public void TestAdapterPathFromRunSettings(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void TestAdapterPathFromRunSettings(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
@@ -243,7 +234,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 string.Empty,
                 runsettingsFilePath,
                 this.FrameworkArgValue,
-                inIsolation);
+                runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
             File.Delete(runsettingsFilePath);

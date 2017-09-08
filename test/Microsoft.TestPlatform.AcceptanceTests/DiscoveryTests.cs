@@ -9,13 +9,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class DiscoveryTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInProcess]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework(true, true)]
         [NETCORETargetFramework]
-        public void DiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void DiscoverAllTests(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
@@ -23,13 +21,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFrameworkWithCoreRunner]
-        [NETFullTargetFrameworkInProcess]
-        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFramework(true, true)]
         [NETCORETargetFramework]
-        public void MultipleSourcesDiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        public void MultipleSourcesDiscoverAllTests(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');

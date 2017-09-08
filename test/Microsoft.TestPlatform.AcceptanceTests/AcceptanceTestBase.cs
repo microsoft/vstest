@@ -21,17 +21,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public const string DesktopRunnerTargetRuntime = "win7-x64";
         public const string CoreRunnerTargetRuntime = "";
         public const string InIsolation = "/InIsolation";
-        public const string NoIsolation = "";
 
         protected string FrameworkArgValue => DeriveFrameworkArgValue(this.testEnvironment);
 
-        protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment,
-            string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
+        protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnnerInfo runnnerInfo)
         {
-            testEnvironment.RunnerFramework = runnerFramework;
-            testEnvironment.TargetFramework = targetFramework;
-            testEnvironment.TargetRuntime = targetRuntime;
-            testEnvironment.InIsolationValue = inIsolation;
+            testEnvironment.RunnerFramework = runnnerInfo.RunnerFramework;
+            testEnvironment.TargetFramework = runnnerInfo.TargetFramework;
+            testEnvironment.InIsolationValue = runnnerInfo.InIsolationValue;
         }
 
         protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)
