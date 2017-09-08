@@ -233,7 +233,11 @@ function Publish-Package
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkNS1_4 $testhostNS1_4PackageDir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
-    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
+    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir    
+
+    # Copy MSTestV1 dependencies to testhost folder
+    $mstestDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-977265\contentFiles\any\any"
+    Copy-Item -Recurse $mstestDir\* $testhostFullPackageDir -Force
 
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $netFull_Dir = ""
@@ -342,11 +346,7 @@ function Create-VsixPackage
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-974666\contentFiles\any\any"
-    Copy-Item -Recurse $legacyDir\* $packageDir -Force
-
-    # Copy MSTestV1 dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-974666\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-977265\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
