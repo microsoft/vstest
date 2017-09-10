@@ -46,7 +46,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[] endsWithSearchPatterns)
+        public IEnumerable<string> EnumerateFiles(
+            string directory,
+            SearchOption searchOption,
+            params string[] endsWithSearchPatterns)
         {
             if (endsWithSearchPatterns == null || endsWithSearchPatterns.Length == 0)
             {
@@ -56,7 +59,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
             var files = Directory.EnumerateFiles(directory, "*", searchOption);
 
             return files.Where(
-                    file => endsWithSearchPatterns.Any(pattern => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)));
+                file => endsWithSearchPatterns.Any(
+                    pattern => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)));
         }
 
         /// <inheritdoc/>
@@ -75,6 +79,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         public void MoveFile(string sourcePath, string destinationPath)
         {
             File.Move(sourcePath, destinationPath);
+        }
+
+        /// <inheritdoc/>
+        public void WriteAllTextToFile(string filePath, string content)
+        {
+            File.WriteAllText(filePath, content);
+        }
+
+        /// <inheritdoc/>
+        public string GetFullPath(string path)
+        {
+            return Path.GetFullPath(path);
+        }
+
+        /// <inheritdoc/>
+        public void DeleteEmptyDirectroy(string dirPath)
+        {
+            try
+            {
+                if (Directory.Exists(dirPath) && Directory.GetFiles(dirPath).Length == 0
+                    && Directory.GetDirectories(dirPath).Length == 0)
+                {
+                    Directory.Delete(dirPath, true);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 }

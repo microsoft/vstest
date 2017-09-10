@@ -4,8 +4,6 @@
 namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 {
     using System;
-
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -44,9 +44,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             : this(context, DefaultTestCaseId, DefaultTestCaseName, DefaultIsChildTestCase, requestedDuration)
         {
             Debug.Assert(
-                    !context.HasTestCase,
-                    "This constructor overload is to be used only for a session data request"
-                );
+                !context.HasTestCase,
+                "This constructor overload is to be used only for a session data request"
+            );
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// indicate that all the data has been flushed into the result sink.
     /// </summary>
 #if NET451
-    [Serializable] 
+    [Serializable]
 #endif
     internal sealed class FlushDataEventArgs : DataCollectionEventArgs
     {
