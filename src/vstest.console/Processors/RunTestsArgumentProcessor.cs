@@ -50,7 +50,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     new RunTestsArgumentExecutor(
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
-                        TestRequestManager.Instance));
+                        TestRequestManager.Instance,
+                        ConsoleOutput.Instance));
                 }
 
                 return this.executor;
@@ -120,17 +121,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public RunTestsArgumentExecutor(
             CommandLineOptions commandLineOptions,
             IRunSettingsProvider runSettingsProvider,
-            ITestRequestManager testRequestManager)
+            ITestRequestManager testRequestManager,
+            IOutput output)
         {
             Contract.Requires(commandLineOptions != null);
 
             this.commandLineOptions = commandLineOptions;
-
-            this.output = ConsoleOutput.Instance;
-
             this.runSettingsManager = runSettingsProvider;
             this.testRequestManager = testRequestManager;
-            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar();
+            this.output = output;
+            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output);
         }
 
         #endregion
@@ -211,10 +211,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar
         {
-            /// <summary>
-            /// Specifies whether some tests were found in the test run or not. 
-            /// </summary>
-            protected bool? testsFoundInAnySource = null;
+            private IOutput output;
+
+            public TestRunRequestEventsRegistrar(IOutput output)
+            {
+                this.output = output;
+            }
 
             public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
             {
@@ -224,8 +226,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
             {
                 testRunRequest.OnRunCompletion -= TestRunRequest_OnRunCompletion;
-                // reset
-                this.testsFoundInAnySource = null;
             }
 
             /// <summary>
@@ -239,15 +239,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
                 if (!e.IsAborted && !e.IsCanceled)
                 {
-                    this.testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
+                    var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
 
-                    // TODO: We need to show a message to check for vsix extensions if no tests are executed
-                    // Indicate the user to use vsix extensions command if there are no tests found
-                    //if (Utilities.ShouldIndicateTheUserToUseVsixExtensionsCommand(testsFoundInAnySource, commandLineOptions))
-                    //{
-                    //    output.Information(CommandLineResources.SuggestUseVsixExtensionsIfNoTestsIsFound);
-                    //    output.WriteLine(string.Empty, OutputLevel.Information);
-                    //}
+                    // Indicate the user to use testadapterpath command if there are no tests found
+                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath))
+                    {
+                        this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                    }
                 }
             }
         }
