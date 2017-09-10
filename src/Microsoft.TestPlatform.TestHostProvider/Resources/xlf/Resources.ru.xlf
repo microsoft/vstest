@@ -7,6 +7,13 @@
         <target state="translated">Нет доступных тестов в {0}. Убедитесь, что в проекте теста есть ссылка NuGet для пакета "Microsoft.NET.Test.Sdk", а параметры версий платформ верны, и повторите попытку.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

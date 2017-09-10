@@ -7,6 +7,13 @@
         <target state="translated">{0} で使用できるテストはありません。テスト プロジェクトにパッケージ "Microsoft.NET.Test.Sdk" の NuGet 参照があることを確認し、フレームワークのバージョン設定が適切であることを確認して、もう一度お試しください。</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

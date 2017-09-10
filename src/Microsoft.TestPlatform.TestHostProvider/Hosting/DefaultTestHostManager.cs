@@ -6,14 +6,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
+    using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -253,24 +254,69 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>Filtered list of extensions</returns>
         private IEnumerable<string> FilterExtensionsBasedOnVersion(IEnumerable<string> extensions)
         {
-            var filteredExtensions = new List<string>();
+            Dictionary<string, string> selectedExtensions = new Dictionary<string, string>();
+            Dictionary<string, Version> highestFileVersions = new Dictionary<string, Version>();
+            Dictionary<string, Version> conflictingExtensions = new Dictionary<string, Version>();
 
-            var extensionGroups = extensions.GroupBy(ext => Path.GetFileNameWithoutExtension(ext));
-
-            foreach (var extensionGroup in extensionGroups)
+            foreach (var extensionFullPath in extensions)
             {
-                if (extensionGroup.Count() > 1)
+                // assemblyName is the key
+                var extensionAssemblyName = Path.GetFileNameWithoutExtension(extensionFullPath);
+
+                if (selectedExtensions.TryGetValue(extensionAssemblyName, out var oldExtensionPath))
                 {
-                    var maxFile = extensionGroup.OrderByDescending(a => this.fileHelper.GetFileVersion(a)).First();
-                    filteredExtensions.Add(maxFile);
+                    // This extension is duplicate
+                    var currentVersion = this.GetAndLogFileVersion(extensionFullPath);
+
+                    var oldVersionFound = highestFileVersions.TryGetValue(extensionAssemblyName, out var oldVersion);
+                    if (!oldVersionFound)
+                    {
+                        oldVersion = this.GetAndLogFileVersion(oldExtensionPath);
+                    }
+
+                    // If the version of current file is higher than the one in the map
+                    // replace the older with the current file
+                    if (currentVersion > oldVersion)
+                    {
+                        highestFileVersions[extensionAssemblyName] = currentVersion;
+                        conflictingExtensions[extensionAssemblyName] = currentVersion;
+                        selectedExtensions[extensionAssemblyName] = extensionFullPath;
+                    }
+                    else
+                    {
+                        if (currentVersion < oldVersion)
+                        {
+                            conflictingExtensions[extensionAssemblyName] = oldVersion;
+                        }
+
+                        if (!oldVersionFound)
+                        {
+                            highestFileVersions.Add(extensionAssemblyName, oldVersion);
+                        }
+                    }
                 }
                 else
                 {
-                    filteredExtensions.Add(extensionGroup.Single());
+                    selectedExtensions.Add(extensionAssemblyName, extensionFullPath);
                 }
             }
 
-            return filteredExtensions;
+            // Log warning if conflicting version extensions are found
+            if (conflictingExtensions.Any())
+            {
+                var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => string.Format("  {0} : {1}", kv.Key, kv.Value)));
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
+                this.messageLogger.SendMessage(TestMessageLevel.Warning, message);
+            }
+
+            return selectedExtensions.Values;
+        }
+
+        private Version GetAndLogFileVersion(string path)
+        {
+            var fileVersion = this.fileHelper.GetFileVersion(path);
+            EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
+            return fileVersion;
         }
 
         /// <summary>

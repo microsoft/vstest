@@ -7,6 +7,13 @@
         <target state="translated">{0} içinde kullanılabilir test yok. Test projesinde "Microsoft.NET.Test.Sdk" paketine bir NuGet başvurusu olduğundan ve çerçeve sürümü ayarlarının doğru olduğundan emin olup tekrar deneyin.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

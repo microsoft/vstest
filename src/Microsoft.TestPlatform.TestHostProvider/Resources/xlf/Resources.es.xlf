@@ -7,6 +7,13 @@
         <target state="translated">No hay pruebas disponibles en {0}. Asegúrese de que el proyecto tiene una referencia NuGet del paquete "Microsoft.NET.Test.Sdk" y de que la configuración de la versión del marco es correcta e inténtelo de nuevo.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

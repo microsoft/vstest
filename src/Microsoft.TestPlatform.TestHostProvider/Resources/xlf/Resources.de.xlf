@@ -7,6 +7,13 @@
         <target state="translated">In {0} ist kein Test verfügbar. Stellen Sie sicher, dass das Testprojekt über einen NuGet-Verweis des Pakets "Microsoft.NET.Test.Sdk" verfügt und die Einstellungen für die Frameworkversion korrekt sind, und versuchen Sie es anschließend noch mal.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

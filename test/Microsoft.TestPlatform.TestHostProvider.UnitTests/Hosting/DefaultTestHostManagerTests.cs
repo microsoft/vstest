@@ -236,6 +236,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
             List<string> extensionsList2 = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source2\ext2.TestAdapter.dll" };
 
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[1])).Returns(new Version(5, 5));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[0])).Returns(new Version(2, 2));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[1])).Returns(new Version(5, 0));
+
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
 
@@ -245,7 +250,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, new List<string>()).ToList();
 
             // Verify
-            CollectionAssert.AreEqual(extensionsList1, resultExtensions);
+            List<string> expectedList = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            CollectionAssert.AreEqual(expectedList, resultExtensions);
         }
 
         [TestMethod]

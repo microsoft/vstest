@@ -7,6 +7,13 @@
         <target state="translated">W elemencie {0} nie są dostępne żadne testy. Upewnij się, że projekt testowy ma odwołanie nuget do pakietu „Microsoft.NET.Test.Sdk” oraz że ustawienia wersji platformy i struktury są odpowiednie, a następnie spróbuj ponownie.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -7,6 +7,13 @@
         <target state="translated">V {0} není k dispozici žádný test. Ověřte, jestli má testovací projekt odkaz na balíček nuget Microsoft.NET.Test.Sdk a jestli je nastavení verze rozhraní správné. Pak to zkuste znovu.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple extensions with different file versions found. Selected extensions with version:
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
