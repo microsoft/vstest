@@ -228,11 +228,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             private IOutput output;
 
-            /// <summary>
-            /// Specifies whether some tests were found in the sources or not.        
-            /// </summary>
-            private bool? testsFoundInAnySource = false;
-
             public DiscoveryEventsRegistrar(IOutput output)
             {
                 this.output = output;
@@ -246,7 +241,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
                 discoveryRequest.OnDiscoveredTests -= this.discoveryRequest_OnDiscoveredTests;
-                this.testsFoundInAnySource = null;
             }
 
             private void discoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
@@ -254,12 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // List out each of the tests.
                 foreach (var test in args.DiscoveredTestCases)
                 {
-                    if (!testsFoundInAnySource.Value)
-                    {
-                        testsFoundInAnySource = true;
-                    }
-
-                    output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
+                    this.output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
                                                     CommandLineResources.AvailableTestsFormat,
                                                     test.DisplayName),
                                        OutputLevel.Information);

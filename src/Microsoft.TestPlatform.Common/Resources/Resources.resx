@@ -147,6 +147,9 @@
   <data name="EmptyParenthesis" xml:space="preserve">
     <value>Error: Empty parenthesis ( )</value>
   </data>
+  <data name="FailedToFindInstalledUnitTestExtensions" xml:space="preserve">
+    <value>Failed to find the list of installed unit test extensions. Reason: {0}</value>
+  </data>
   <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
     <value>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</value>
   </data>
@@ -200,6 +203,9 @@
   </data>
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>
+  </data>
+  <data name="VSInstallationNotFound" xml:space="preserve">
+    <value>This option works only with vstest.console.exe installed as part of Visual Studio.</value>
   </data>
   <data name="WrongDataCollectionContextType" xml:space="preserve">
     <value>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</value>
