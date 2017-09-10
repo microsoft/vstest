@@ -108,27 +108,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { pathToDevenv });
                 if (settingsManager != null)
                 {
-                    // create extension manager
-                    extensionManager = Activator.CreateInstance(ExtensionManagerServiceType, settingsManager);
+                    try
+                    {
+                        // create extension manager
+                        extensionManager = Activator.CreateInstance(ExtensionManagerServiceType, settingsManager);
 
-                    if (extensionManager != null)
-                    {
-                        installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
-                                                   extensionManager, new object[] { extensionType }) as IEnumerable<string>;
-                    }
-                    else
-                    {
-                        if (EqtTrace.IsWarningEnabled)
+                        if (extensionManager != null)
                         {
-                            EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
+                            installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
+                                                       extensionManager, new object[] { extensionType }) as IEnumerable<string>;
+                        }
+                        else
+                        {
+                            if (EqtTrace.IsWarningEnabled)
+                            {
+                                EqtTrace.Warning("VSExtensionManager : Unable to create extension manager");
+                            }
                         }
                     }
-
-                    // Dispose the settings manager
-                    IDisposable disposable = (settingsManager as IDisposable);
-                    if (disposable != null)
+                    finally
                     {
-                        disposable.Dispose();
+                        // Dispose the settings manager
+                        IDisposable disposable = (settingsManager as IDisposable);
+                        if (disposable != null)
+                        {
+                            disposable.Dispose();
+                        }
                     }
                 }
                 else
