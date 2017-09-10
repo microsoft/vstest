@@ -84,12 +84,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             var vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent?.Parent?.Parent?.FullName;
             string pathToDevenv = null;
 
-            if (vsInstallPath != null)
+            if (!string.IsNullOrEmpty(vsInstallPath))
             {
                 pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
             }
 
-            if (pathToDevenv == null || !this.fileHelper.Exists(pathToDevenv))
+            if (string.IsNullOrEmpty(pathToDevenv) || !this.fileHelper.Exists(pathToDevenv))
             {
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));
             }
