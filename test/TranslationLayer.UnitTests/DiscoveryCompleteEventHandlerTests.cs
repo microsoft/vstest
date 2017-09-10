@@ -24,13 +24,13 @@ namespace TranslationLayer.UnitTests
         [TestMethod]
         public void ConstructorShouldThrowArgumentExceptionIfTestDiscoveryEventHandlerIsNull()
         {
-            Assert.ThrowsException<ArgumentNullException>( () => new DiscoveryCompleteEventsHandler(null));
+            Assert.ThrowsException<ArgumentNullException>( () => new DiscoveryEventsHandler(null));
         }
 
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCallTestDiscoveryHandler1Method()
         {
-            var discoveryCompleteEventHandler = new DiscoveryCompleteEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
+            var discoveryCompleteEventHandler = new DiscoveryEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
 
             discoveryCompleteEventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(-1, false), null);
             this.mockTestDiscoveryCompleteEventHandler.Verify(o => o.HandleDiscoveryComplete(-1, null, false), Times.Once);
@@ -39,7 +39,7 @@ namespace TranslationLayer.UnitTests
         [TestMethod]
         public void HandleDiscoveryTestShouldCallTestDiscoveryHandler1Method()
         {
-            var discoveryCompleteEventHandler = new DiscoveryCompleteEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
+            var discoveryCompleteEventHandler = new DiscoveryEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
 
             discoveryCompleteEventHandler.HandleDiscoveredTests(null);
 
@@ -49,7 +49,7 @@ namespace TranslationLayer.UnitTests
         [TestMethod]
         public void HandleRawMessageShouldCallTestDiscoveryHandler1Method()
         {
-            var discoveryCompleteEventHandler = new DiscoveryCompleteEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
+            var discoveryCompleteEventHandler = new DiscoveryEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
 
             discoveryCompleteEventHandler.HandleRawMessage("DummyMessage");
 
@@ -59,7 +59,7 @@ namespace TranslationLayer.UnitTests
         [TestMethod]
         public void HandleLogMessageShouldCallTestDiscoveryHandler1Method()
         {
-            var discoveryCompleteEventHandler = new DiscoveryCompleteEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
+            var discoveryCompleteEventHandler = new DiscoveryEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
 
             discoveryCompleteEventHandler.HandleLogMessage(TestMessageLevel.Warning, "DummyMessage");
 

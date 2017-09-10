@@ -11,18 +11,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// 
+    /// The Discovery Events Handler.
+    /// Converts the ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
     /// </summary>
-    public class DiscoveryCompleteEventsHandler : ITestDiscoveryEventsHandler2
+    public class DiscoveryEventsHandler : ITestDiscoveryEventsHandler2
     {
         private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
 
         /// <summary>
-        /// The Discovery Complete Handler.
-        /// Converts the ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
+        /// The Discovery Events Handler.
         /// </summary>
         /// <param name="testDiscoveryEventsHandler"></param>
-        public DiscoveryCompleteEventsHandler(ITestDiscoveryEventsHandler testDiscoveryEventsHandler)
+        public DiscoveryEventsHandler(ITestDiscoveryEventsHandler testDiscoveryEventsHandler)
         {
             this.testDiscoveryEventsHandler = testDiscoveryEventsHandler ?? throw new ArgumentNullException(nameof(testDiscoveryEventsHandler));
         }

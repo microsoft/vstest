@@ -44,7 +44,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="lastChunk"> The last chunk. </param>
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
+            }
+
             this.requestHandler.DiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
         }
 
