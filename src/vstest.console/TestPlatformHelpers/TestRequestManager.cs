@@ -292,6 +292,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
+                    if(InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
+                    {
+                        InferRunSettingsHelper.UpdateTargetDeviceInformation(navigator, deviceXml);
+                        settingsUpdated = true;
+                    }
+
                     updatedRunSettingsXml = navigator.OuterXml;
                 }
             }

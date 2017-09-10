@@ -76,5 +76,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="sourcePath">Full path of the file.</param>
         /// <param name="destinationPath">Target path for the file.</param>
         void MoveFile(string sourcePath, string destinationPath);
+
+        /// <summary>
+        /// The write all text to file.
+        /// </summary>
+        /// <param name="filePath">
+        /// The file Path.
+        /// </param>
+        /// <param name="content">
+        /// The content.
+        /// </param>
+        void WriteAllTextToFile(string filePath, string content);
+
+        /// <summary>
+        /// Gets full path if relative path is specified.
+        /// </summary>
+        /// <param name="path">
+        /// The path.
+        /// </param>
+        /// <returns>
+        /// Full path.
+        /// </returns>
+        string GetFullPath(string path);
+
+        /// <summary>
+        /// Helper for deleting a directory. It deletes the directory only if its empty.
+        /// </summary>
+        /// <param name="directoryPath">
+        /// The directory path.
+        /// </param>
+        void DeleteEmptyDirectroy(string directoryPath);
     }
 }

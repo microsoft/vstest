@@ -315,7 +315,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <summary>
         /// When test run is targeted for .Net4.0, set target framework of test appdomain to be v4.0.
         /// With this done tests would be executed in 4.0 compatiblity mode even when  .Net4.5 is installed.
-        /// This needs to be done using reflection, as this dll is compiled for .Net3.5.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Failure to set this property should be ignored.")]
         internal static void SetNETFrameworkCompatiblityMode(AppDomainSetup setup, IRunContext runContext)
@@ -323,24 +322,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             try
             {
                 RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runContext.RunSettings.SettingsXml);
-                if (null != runConfiguration && Enum.Equals(runConfiguration.TargetFrameworkVersion, FrameworkVersion.Framework40))
+                if (null != runConfiguration && (Enum.Equals(runConfiguration.TargetFrameworkVersion, FrameworkVersion.Framework40) ||
+                    string.Equals(runConfiguration.TargetFrameworkVersion.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
                 {
-                    PropertyInfo pInfo = typeof(AppDomainSetup).GetProperty(Constants.TargetFrameworkName);
-                    if (null != pInfo)
+                    if (EqtTrace.IsVerboseEnabled)
                     {
-                        if (EqtTrace.IsVerboseEnabled)
-                        {
-                            EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatiblity mode.");
-                        }
-                        pInfo.SetValue(setup, Constants.DotNetFramework40, null);
+                        EqtTrace.Verbose("AssemblyHelper.SetNETFrameworkCompatiblityMode: setting .NetFramework,Version=v4.0 compatiblity mode.");
                     }
-                    else
-                    {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("AssemblyHelper:SetNETFrameworkCompatiblityMode: Binary compatiblity mode needed, but AppDomainSetup.TargetFrameworkName property not found. Ignoring compatiblity mode.");
-                        }
-                    }
+                    setup.TargetFrameworkName = Constants.DotNetFramework40;
                 }
             }
             catch (Exception e)
