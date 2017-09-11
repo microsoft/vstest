@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="lastChunk">Last set of test cases discovered.</param>
         void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk);
 
-
         /// <summary>
         /// Dispatch DiscoveredTest event to listeners.
         /// </summary>

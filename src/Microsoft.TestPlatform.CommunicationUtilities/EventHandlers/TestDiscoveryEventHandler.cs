@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Initializes a new instance of the <see cref="TestDiscoveryEventHandler"/> class.
         /// </summary>
-        /// <param name="requestHandler"> The client. </param>
+        /// <param name="requestHandler"> The Request Handler. </param>
         public TestDiscoveryEventHandler(ITestRequestHandler requestHandler)
         {
             this.requestHandler = requestHandler;
