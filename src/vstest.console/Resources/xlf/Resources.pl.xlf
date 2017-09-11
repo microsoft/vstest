@@ -392,15 +392,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
-      <trans-unit id="SuggestUseVsixExtensionsIfNoTestsIsFound">
-        <source>Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</source>
-        <target state="translated">Dodatkowo możesz spróbować określić polecenie „/UseVsixExtensions”, jeśli wykrywacz testów i moduł wykonywania testów zostały zainstalowane na maszynie jako rozszerzenia vsix, a instalacja obsługuje rozszerzenia vsix. Przykład: vstest.console.exe mojeTesty.dll /UseVsixExtensions:true</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Dodatkowo, można spróbować określić ' / UseVsixExtensions' polecenie if test discoverer &amp; wykonawca jest zainstalowany na tym komputerze jako rozszerzenie vsix i instalacji obsługuje rozszerzenia vsix. Przykład: myTests.dll vstest.console.exe/usevsixextensions: true</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
-      </trans-unit>
       <trans-unit id="UseVsixExtensionsValueRequired">
         <source>The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</source>
         <target state="translated">Parametr /UseVsixExtensions wymaga podania wartości. Jeśli wartość to „true”, zainstalowane rozszerzenia VSIX (jeśli istnieją) zostaną użyte w ramach uruchomienia testu. Jeśli wartość to „false”, rozszerzenia zostaną zignorowane. Przykład: /UseVsixExtensions:true</target>
@@ -637,15 +628,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
-      <trans-unit id="NoTestsFoundWarningMessageWithSuggestionToUseVsix">
-        <source>{0} {1}</source>
-        <target state="translated">{0} {1}</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} {1}.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
-      </trans-unit>
       <trans-unit id="LoggerFriendlyNameFormat">
         <source>        FriendlyName: {0}</source>
         <target state="translated">        Przyjazna nazwa: {0}</target>
@@ -663,42 +645,6 @@
           <target state-qualifier="mt-suggestion">Identyfikator URI: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
-      </trans-unit>
-      <trans-unit id="SuggestUseVsixExtensionsInListLoggersCommand">
-        <source>The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="translated">Dodatki rejestratora testów zainstalowane za pomocą instalacji VSIX są ignorowane. Aby je uwzględnić, użyj parametru /UseVsixExtensions, jeśli instalacja obsługuje rozszerzenia vsix. Przykład: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test rejestratora dodatki instalowany za pomocą instalacji VSIX są ignorowane. Aby uwzględnić je, należy użyć parametru /UseVsixExtensions, jeśli instalację obsługuje rozszerzenia vsix. Przykład: {0} vstest.console.exe/usevsixextensions: true</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
-      </trans-unit>
-      <trans-unit id="SuggestUseVsixExtensionsInListExecutorsCommand">
-        <source>The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="translated">Dodatki modułu wykonywania testów zainstalowane za pomocą instalacji VSIX są ignorowane. Aby je uwzględnić, użyj parametru /UseVsixExtensions, jeśli instalacja obsługuje rozszerzenia vsix. Przykład: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test wykonawca dodatki instalowany za pomocą instalacji VSIX są ignorowane. Aby uwzględnić je, należy użyć parametru /UseVsixExtensions, jeśli instalację obsługuje rozszerzenia vsix. Przykład: {0} vstest.console.exe/usevsixextensions: true</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
-      </trans-unit>
-      <trans-unit id="SuggestUseVsixExtensionsInListDiscoverersCommand">
-        <source>The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="translated">Dodatki służące do wykrywania testów zainstalowane za pomocą instalacji VSIX są ignorowane. Aby je uwzględnić, użyj parametru /UseVsixExtensions, jeśli instalacja obsługuje rozszerzenia vsix. Przykład: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test odnajdowanie dodatków instalowany za pomocą instalacji VSIX są ignorowane. Aby uwzględnić je, należy użyć parametru /UseVsixExtensions, jeśli instalację obsługuje rozszerzenia vsix. Przykład: {0} vstest.console.exe/usevsixextensions: true</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
-      </trans-unit>
-      <trans-unit id="SuggestUseVsixExtensionsInListSettingsProviderCommand">
-        <source>The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="translated">Dodatki dostawców ustawień zainstalowane za pomocą instalacji VSIX są ignorowane. Aby je uwzględnić, użyj parametru /UseVsixExtensions, jeśli instalacja obsługuje rozszerzenia vsix. Przykład: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ustawienia dostawcy dodatki instalowany za pomocą instalacji VSIX są ignorowane. Aby uwzględnić je, należy użyć parametru /UseVsixExtensions, jeśli instalację obsługuje rozszerzenia vsix. Przykład: {0} vstest.console.exe/usevsixextensions: true</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="SettingFormat">
         <source>        SettingName: {0}</source>
@@ -1584,6 +1530,21 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
         <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StringFormatToJoinTwoStrings">
+        <source>{0} {1}</source>
+        <target state="new">{0} {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
+        <source>Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
+        <target state="new">Additionally, you can point to location of test executors and discoverers by specifying &amp;apos;/TestAdapterPath&amp;apos; command. Example  /TestAdapterPath:&amp;lt;pathToCustomAdapters&amp;gt;.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="UseVsixExtensionsDeprecation">
+        <source>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</source>
+        <target state="new">/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</target>
         <note></note>
       </trans-unit>
     </body>
