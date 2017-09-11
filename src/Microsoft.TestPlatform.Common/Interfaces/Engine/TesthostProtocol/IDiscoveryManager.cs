@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
 {
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>

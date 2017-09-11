@@ -1,22 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
 namespace TranslationLayer.UnitTests
 {
     using System;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
 
     [TestClass]
-    public class DiscoveryCompleteEventHandlerTests
+    public class DiscoveryEventsHandlerTests
     {
         private Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryCompleteEventHandler;
-        public DiscoveryCompleteEventHandlerTests()
+        public DiscoveryEventsHandlerTests()
         {
             this.mockTestDiscoveryCompleteEventHandler = new Mock<ITestDiscoveryEventsHandler>();
         }
@@ -37,7 +37,7 @@ namespace TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void HandleDiscoveryTestShouldCallTestDiscoveryHandler1Method()
+        public void HandleDiscoveredTestShouldCallTestDiscoveryHandler1Method()
         {
             var discoveryCompleteEventHandler = new DiscoveryEventsHandler(this.mockTestDiscoveryCompleteEventHandler.Object);
 

@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -15,7 +16,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+
     using Moq;
 
     [TestClass]

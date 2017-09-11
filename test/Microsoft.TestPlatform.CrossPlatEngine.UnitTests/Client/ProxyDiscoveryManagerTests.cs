@@ -4,6 +4,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -15,12 +16,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-    using System.Linq;
 
     [TestClass]
     public class ProxyDiscoveryManagerTests

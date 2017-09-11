@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

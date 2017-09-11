@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Defines contract to send test platform requests to test host

@@ -3,6 +3,8 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -12,9 +14,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
-    using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     [TestClass]
     public class ParallelDiscoveryEventsHandlerTests

@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.

@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// ParallelDiscoveryEventsHandler for handling the discovery events in case of parallel discovery

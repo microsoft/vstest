@@ -3,11 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    using System;
     using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using TestPlatform.ObjectModel.Client;
 

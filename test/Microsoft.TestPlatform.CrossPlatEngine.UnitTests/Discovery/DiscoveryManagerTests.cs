@@ -3,20 +3,23 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
     using TestPlatform.Common.UnitTests.ExtensionFramework;
+
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     [TestClass]

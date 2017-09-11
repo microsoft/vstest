@@ -13,7 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// The discovery request.
@@ -179,10 +178,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         internal IProxyDiscoveryManager DiscoveryManager { get; private set; }
 
-        #region ITestDiscoveryEventsHandler Methods
+        #region ITestDiscoveryEventsHandler2 Methods
 
         /// <inheritdoc/>
-        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs , IEnumerable<TestCase> lastChunk)
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
             if (EqtTrace.IsVerboseEnabled)
             {

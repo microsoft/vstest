@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
