@@ -61,8 +61,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "2.1.0-preview1-006329"
-$env:DOTNET_RUNTIME_VERSION = "2.0.0-preview2-25331-01"
+$env:DOTNET_CLI_VERSION = "LATEST"
+$env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
 
@@ -147,9 +147,9 @@ function Install-DotNetCli
     }
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
-    }
+    #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
+        #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
+    #}
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -296,7 +296,7 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
     
-# Copy Event Log Datacollector to Extensions folder.
+    # Copy Event Log Datacollector to Extensions folder.
     $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
     $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $fullCLRExtensionsDir -Force
@@ -304,7 +304,7 @@ function Publish-Package
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
     
-	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
