@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -15,6 +16,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
 
     [TestClass]
@@ -23,7 +25,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private const int taskTimeout = 15 * 1000; // In milliseconds.
         private List<Mock<IProxyDiscoveryManager>> createdMockManagers;
         private Func<IProxyDiscoveryManager> proxyManagerFunc;
-        private Mock<ITestDiscoveryEventsHandler> mockHandler;
+        private Mock<ITestDiscoveryEventsHandler2> mockHandler;
         private List<string> sources = new List<string>() { "1.dll", "2.dll" };
         private DiscoveryCriteria testDiscoveryCriteria;
         private bool proxyManagerFuncCalled;
@@ -41,7 +43,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.createdMockManagers.Add(manager);
                 return manager.Object;
             };
-            this.mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            this.mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
             this.discoveryCompleted = new ManualResetEventSlim(false);
         }
@@ -111,10 +113,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Override DiscoveryComplete since overall aborted should be true
             var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false, totalTests: 10);
             this.createdMockManagers[1].Reset();
-            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler>()))
+            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
                 .Throws<NotImplementedException>();
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true))
-                .Callback<long, IEnumerable<TestCase>, bool>((t, l, a) => { this.discoveryCompleted.Set(); });
+            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => { this.discoveryCompleted.Set(); });
 
             Task.Run(() =>
             {
@@ -144,9 +146,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.SetupDiscoveryTests(this.processedSources, abortDiscovery);
 
             // Setup a complete handler for parallel discovery manager
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(totalTests, null, abortDiscovery))
-                .Callback<long, IEnumerable<TestCase>, bool>(
-                    (totalTests1, lastChunk, aborted) => { this.discoveryCompleted.Set(); });
+            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>(
+                    (discoveryCompleteEventArgs, lastChunk) => { this.discoveryCompleted.Set(); });
 
             return parallelDiscoveryManager;
         }
@@ -156,8 +158,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var syncObject = new object();
             foreach (var manager in this.createdMockManagers)
             {
-                manager.Setup(m => m.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler>())).
-                    Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler>(
+                manager.Setup(m => m.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>())).
+                    Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler2>(
                         (criteria, handler) =>
                         {
                             lock (syncObject)
@@ -167,7 +169,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             Task.Delay(100).Wait();
 
-                            handler.HandleDiscoveryComplete(isAbort ? -1 : 10, null, isAbort);
+                            handler.HandleDiscoveryComplete(isAbort ? new DiscoveryCompleteEventArgs(-1, isAbort) : new DiscoveryCompleteEventArgs(10, isAbort) , null);
                         });
             }
         }
