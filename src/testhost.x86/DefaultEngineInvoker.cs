@@ -8,6 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Net;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -64,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 endpoint = IPAddress.Loopback + ":" + port;
             }
 
-            ConnectionRole connectionRole = ConnectionRole.Client;
+            var connectionRole = ConnectionRole.Client;
             string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
             if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
             {
@@ -106,7 +108,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
+                var requestData = new RequestData(new MetricsCollector());
+                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData));
 
                 // Wait for processing to complete.
                 Task.WaitAny(processingTask);

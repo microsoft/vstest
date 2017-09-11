@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void TestRunCompletionHandlerForTestRunStatisticsNullSetsOutcomeToFailed()
         {
-            var messageArgs = new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan());
+            var messageArgs = new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null);
             mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
         }
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             testOutcomeDict.Add(TestOutcome.Failed, 1);
             var stats = new TestableTestRunStats(testOutcomeDict);
             
-            var messageArgs = new TestRunCompleteEventArgs(stats, false, false, null, null, new TimeSpan());
+            var messageArgs = new TestRunCompleteEventArgs(stats, false, false, null, null, new TimeSpan(), null);
             this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
         }
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             testOutcomeDict.Add(TestOutcome.Passed, 1);
             var stats = new TestableTestRunStats(testOutcomeDict);
 
-            var messageArgs = new TestRunCompleteEventArgs(stats, true, false, null, null, new TimeSpan());
+            var messageArgs = new TestRunCompleteEventArgs(stats, true, false, null, null, new TimeSpan(), null);
             this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
         }
@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             testOutcomeDict.Add(TestOutcome.Passed, 1);
             var stats = new TestableTestRunStats(testOutcomeDict);
 
-            var messageArgs = new TestRunCompleteEventArgs(stats, false, true, null, null, new TimeSpan());
+            var messageArgs = new TestRunCompleteEventArgs(stats, false, true, null, null, new TimeSpan(), null);
             this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
         }

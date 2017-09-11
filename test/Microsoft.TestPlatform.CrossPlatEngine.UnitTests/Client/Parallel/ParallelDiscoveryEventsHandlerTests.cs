@@ -5,6 +5,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -30,6 +32,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IDataSerializer> mockDataSerializer;
 
+        private Mock<IRequestData> mockRequestData;
+
         [TestInitialize]
         public void TestInit()
         {
@@ -37,8 +41,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.mockParallelProxyDiscoveryManager = new Mock<IParallelProxyDiscoveryManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
 
-            this.parallelDiscoveryEventsHandler = new ParallelDiscoveryEventsHandler(this.mockProxyDiscoveryManager.Object,
+            this.parallelDiscoveryEventsHandler = new ParallelDiscoveryEventsHandler(this.mockRequestData.Object,mockProxyDiscoveryManager.Object,
                 this.mockTestDiscoveryEventsHandler.Object, this.mockParallelProxyDiscoveryManager.Object,
                 new ParallelDiscoveryDataAggregator(), this.mockDataSerializer.Object);
         }
@@ -51,7 +57,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
                    this.mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(false);
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
             // Raw message must be sent 
@@ -77,7 +84,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
                     this.mockProxyDiscoveryManager.Object, totalTests, lastChunk, aborted)).Returns(false);
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
 
             // Raw message must be sent 
@@ -102,7 +110,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
             // Act
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
             // Verify

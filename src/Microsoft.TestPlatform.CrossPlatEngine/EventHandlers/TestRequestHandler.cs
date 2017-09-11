@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private ITransport transport;
 
         private IDataSerializer dataSerializer;
-
+        
         private Action<Message> onAckMessageRecieved;
 
         private int highestSupportedVersion = 2;
@@ -279,7 +279,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 TotalTests = discoveryCompleteEventArgs.TotalCount,
                 LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
-                IsAborted = discoveryCompleteEventArgs.IsAborted
+                IsAborted = discoveryCompleteEventArgs.IsAborted,
+                Metrics = discoveryCompleteEventArgs.Metrics
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);

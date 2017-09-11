@@ -7,7 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -49,6 +51,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
+        /// <param name="requestData">
+        /// Request Data
+        /// </param>
         /// <param name="testHostManager">
         /// Test host manager
         /// </param>
@@ -59,9 +64,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>
         /// ITestDiscoveryManager object that can do discovery
         /// </returns>
-        public IProxyDiscoveryManager GetDiscoveryManager(ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig)
+        public IProxyDiscoveryManager GetDiscoveryManager(IRequestData requestData, ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig)
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
+
+            // Collecting IsParallel Enabled
+            requestData.MetricsCollector.Add(TelemetryDataConstants.ParallelEnabledDuringDiscovery, parallelLevel > 1 ? "True" : "False");
 
             if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
@@ -73,27 +81,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-                return new ProxyDiscoveryManager(new TestRequestSender(protocolConfig, hostManager.GetTestHostConnectionInfo()), hostManager);
+                return new ProxyDiscoveryManager(requestData, new TestRequestSender(protocolConfig, hostManager.GetTestHostConnectionInfo()), hostManager);
             };
 
-            return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
+            return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(requestData, proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
         }
 
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
+        /// <param name="requestData">Request Data</param>
         /// <param name="testHostManager">Test host manager.</param>
         /// <param name="testRunCriteria">Test run criterion.</param>
         /// <param name="config">Protocol related information</param>
         /// <returns>
         /// ITestExecutionManager object that can do execution
         /// </returns>
-        public IProxyExecutionManager GetExecutionManager(ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria, ProtocolConfig config)
+        public IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria, ProtocolConfig config)
         {
             var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
 
+            // Collecting IsParallel Enabled
+            requestData.MetricsCollector.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, parallelLevel > 1 ? "True" : "False");
+
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
+
+            // Collecting IsDataCollector Enabled
+            requestData.MetricsCollector.Add(TelemetryDataConstants.DataCollectorsEnabled, isDataCollectorEnabled.ToString());
+
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
@@ -115,14 +131,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(config, hostManager.GetTestHostConnectionInfo());
 
-                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestSender, hostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
-                                                : new ProxyExecutionManager(requestSender, hostManager);
+                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
+                                                : new ProxyExecutionManager(requestData, requestSender, hostManager);
             };
 
             // parallelLevel = 1 for desktop should go via else route.
             if (parallelLevel > 1 || !testHostManager.Shared)
             {
-                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared);
+                return new ParallelProxyExecutionManager(requestData, proxyExecutionManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared);
             }
             else
             {

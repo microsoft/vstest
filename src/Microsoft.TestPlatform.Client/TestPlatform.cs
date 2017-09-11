@@ -15,12 +15,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -95,10 +95,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
+            var requestData = new RequestData(new MetricsCollector());
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
-            return new DiscoveryRequest(discoveryCriteria, discoveryManager);
+            return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager);
         }
 
         /// <summary>
@@ -136,10 +137,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria, protocolConfig);
+            var requestData = new RequestData(new MetricsCollector());
+            var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria, protocolConfig);
             executionManager.Initialize();
 
-            return new TestRunRequest(testRunCriteria, executionManager);
+            return new TestRunRequest(requestData, testRunCriteria, executionManager);
         }
 
         /// <summary>

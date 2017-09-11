@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
@@ -13,7 +14,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -29,22 +32,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     {
         private DiscoveryResultCache discoveryResultCache;
         private ITestPlatformEventSource testPlatformEventSource;
+        private IRequestData requestData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
+        /// <param name="requestData"></param>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
-        /// <param name="testPlatformEventSource1"></param>
-        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache):this(discoveryResultCache, TestPlatformEventSource.Instance)
-        {            
+        /// <param name="metricsCollector">Metric Collector</param>
+        public DiscovererEnumerator(IRequestData requestData, DiscoveryResultCache discoveryResultCache):this(requestData, discoveryResultCache, TestPlatformEventSource.Instance)
+        {
         }
 
-        internal DiscovererEnumerator(
-            DiscoveryResultCache discoveryResultCache,
+        internal DiscovererEnumerator(IRequestData requestData, 
+            DiscoveryResultCache discoveryResultCache, 
             ITestPlatformEventSource testPlatformEventSource)
         {
             this.discoveryResultCache = discoveryResultCache;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -76,13 +82,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             Justification = "This methods must invoke all possible discoverers and not fail or crash in any one.")]
         private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, IMessageLogger logger)
         {
+            var totalAdaptersUsed = 0;
+
+            // Stopwatch to collect metrics
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger);
+            stopwatch.Stop();
+
+            // Collecting Data Point for TimeTaken to Load Adapters
+            this.requestData.MetricsCollector.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, (stopwatch.Elapsed.TotalMilliseconds).ToString());
 
             // Warning is logged for in the inner function
             if (discovererToSourcesMap == null || discovererToSourcesMap.Count() == 0)
             {
                 return;
             }
+
+
+            //Collecting Total Number of Adapters Discovered in Machine
+            this.requestData.MetricsCollector.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, (discovererToSourcesMap.Keys.Count()).ToString());
 
             var context = new DiscoveryContext { RunSettings = settings };
 
@@ -91,8 +111,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
 
+            double totalTimeTakenByAdapters = 0;
 
-            
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
                 Type discovererType = null;
@@ -124,11 +144,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             discoverer.Value.GetType().FullName);
                     }
 
+                    stopwatch.Reset();
+                    stopwatch.Start();
+
                     var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
 
                     this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
+
+                    stopwatch.Stop();
+                  
                     this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
+
+                    // Collecting Total Tests Discovered By each Adapter.
+                    if (this.discoveryResultCache.TotalDiscoveredTests > currentTotalTests)
+                    {
+                        var totalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
+                        this.requestData.MetricsCollector.Add(String.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter, discoverer.Metadata.DefaultExecutorUri), totalDiscoveredTests.ToString());
+                        totalAdaptersUsed ++;
+                    }
 
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -148,8 +182,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     logger.SendMessage(TestMessageLevel.Error, message);
                     EqtTrace.Error(e);
                 }
-                
+
+                // Collecting Data Point for Time Taken to Discover Tests by each Adapter
+                this.requestData.MetricsCollector.Add(string.Format("{0},{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), (stopwatch.Elapsed.TotalSeconds).ToString());
+                totalTimeTakenByAdapters += stopwatch.Elapsed.TotalSeconds;
             }
+
+            //Collecting Total Time Taken by Adapters
+            this.requestData.MetricsCollector.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters.ToString());
+
+            // Collecting Total Adapters Used to Discover tests
+            this.requestData.MetricsCollector.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, totalAdaptersUsed.ToString());
         }
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
@@ -178,8 +221,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="sources"> The sources. </param>
         /// <param name="logger"> The logger instance. </param>
         /// <returns> The map between an extension type and a source. </returns>
-        internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>
-            GetDiscovererToSourcesMap(string extensionAssembly, IEnumerable<string> sources, IMessageLogger logger)
+        internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> GetDiscovererToSourcesMap(string extensionAssembly, IEnumerable<string> sources, IMessageLogger logger)
         {
             var allDiscoverers = GetDiscoverers(extensionAssembly, throwOnError: true);
 
@@ -189,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // No discoverer available, log a warning
                 logger.SendMessage(
                     TestMessageLevel.Warning,
-                    String.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
+                    string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
 
                 return null;
             }

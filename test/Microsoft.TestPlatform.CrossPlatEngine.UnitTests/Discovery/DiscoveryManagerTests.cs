@@ -10,6 +10,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -26,11 +28,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     public class DiscoveryManagerTests
     {
         private DiscoveryManager discoveryManager;
+        private Mock<IRequestData> mockRequestData;
 
         [TestInitialize]
         public void TestInit()
         {
-            this.discoveryManager = new DiscoveryManager();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.discoveryManager = new DiscoveryManager(this.mockRequestData.Object);
         }
 
         [TestCleanup]
@@ -144,6 +149,45 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             
             // Assert that the tests are passed on via the handletestruncomplete event.
             mockLogger.Verify(l => l.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldSendMetricsOnDiscoveryComplete()
+        {
+            var metricsCollector = new MetricsCollector();
+            metricsCollector.Add("DummyMessage", "DummyValue");
+
+            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(metricsCollector);
+
+            DiscoveryCompleteEventArgs receivedDiscoveryCompleteEventArgs = null;
+
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+                () => { });
+
+            var sources = new List<string>
+            {
+                typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location
+            };
+
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
+            var criteria = new DiscoveryCriteria(sources, 1, null);
+
+            mockLogger.Setup(ml => ml.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+                .Callback(
+                    (DiscoveryCompleteEventArgs complete,
+                        IEnumerable<TestCase> tests) =>
+                    {
+                        receivedDiscoveryCompleteEventArgs = complete;
+                    });
+
+            // Act.
+            this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
+
+            // Assert
+            Assert.IsNotNull(receivedDiscoveryCompleteEventArgs.Metrics);
+            Assert.IsTrue(receivedDiscoveryCompleteEventArgs.Metrics.Any());
+            Assert.IsTrue(receivedDiscoveryCompleteEventArgs.Metrics.ContainsKey("DummyMessage"));
         }
 
         #endregion

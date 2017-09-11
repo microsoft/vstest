@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
@@ -15,6 +16,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private IDiscoveryManager discoveryManager;
         private IExecutionManager executionManager;
 
+        private IRequestData requestData;
+        
+        public TestHostManagerFactory(IRequestData requestData)
+        {
+            this.requestData = requestData ?? throw new System.ArgumentNullException(nameof(requestData));
+        }
+
         /// <summary>
         /// The discovery manager instance for any discovery related operations inside of the test host.
         /// </summary>
@@ -23,9 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             if(this.discoveryManager == null)
             {
-                this.discoveryManager = new DiscoveryManager();
+                this.discoveryManager = new DiscoveryManager(this.requestData);
             }
-
             return this.discoveryManager;
         }
 
@@ -37,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             if (this.executionManager == null)
             {
-                this.executionManager = new ExecutionManager();
+                this.executionManager = new ExecutionManager(this.requestData);
             }
 
             return this.executionManager;

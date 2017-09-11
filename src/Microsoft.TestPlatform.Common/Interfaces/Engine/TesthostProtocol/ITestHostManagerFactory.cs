@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
-{
+{    
     /// <summary>
     /// The factory that provides discovery and execution managers to the test host.
     /// </summary>

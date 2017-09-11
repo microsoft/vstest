@@ -8,7 +8,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -45,6 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.testDiscoveryManager = new ProxyDiscoveryManager(
+                                            new RequestData(new NullMetricCollector()), 
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
                                             this.mockDataSerializer.Object,

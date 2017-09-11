@@ -5,7 +5,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
 
     using Common.UnitTests.ExtensionFramework;
@@ -13,11 +12,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -37,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.executionManager = new ExecutionManager();
+            this.executionManager = new ExecutionManager(new RequestData(new NullMetricCollector()));
 
             TestPluginCache.Instance = null;
 

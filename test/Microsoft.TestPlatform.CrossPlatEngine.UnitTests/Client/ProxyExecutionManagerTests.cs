@@ -9,7 +9,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -45,7 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
+            this.testExecutionManager = new ProxyExecutionManager(new RequestData(new NullMetricCollector()), this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
