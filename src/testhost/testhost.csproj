@@ -14,7 +14,7 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs" />
+    <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs;..\testhost.x86\UnitTestClient.cs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
@@ -27,6 +27,11 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
+    <PackageReference Include="System.Xml.ReaderWriter">
+      <Version>4.0.11</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="System.ComponentModel.TypeConverter">
