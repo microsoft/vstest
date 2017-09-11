@@ -146,16 +146,17 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-                if(string.IsNullOrEmpty(this.targetRuntime))
+                if (this.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
                 {
-                    if(this.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
+                    if (string.IsNullOrEmpty(this.targetRuntime))
                     {
+
                         this.targetRuntime = "win7-x64";
                     }
-                    else
-                    {
-                        this.targetRuntime = "";
-                    }
+                }
+                else
+                {
+                    this.targetRuntime = "";
                 }
 
                 return this.targetRuntime;
