@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MultipleFileVersions" xml:space="preserve">
-    <value>Multiple extensions with different file versions found. Selected extensions with version:
+    <value>Multiple versions of same extension found. Selecting the highest version.
 {0}</value>
   </data>
   <data name="NoTestHostFileExist" xml:space="preserve">

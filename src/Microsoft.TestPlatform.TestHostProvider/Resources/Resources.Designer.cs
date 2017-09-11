@@ -62,7 +62,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Multiple extensions with different file versions found. Selected extensions with version:
+        ///   Looks up a localized string similar to Multiple versions of same extension found. Selecting the highest version.
         ///{0}.
         /// </summary>
         internal static string MultipleFileVersions {

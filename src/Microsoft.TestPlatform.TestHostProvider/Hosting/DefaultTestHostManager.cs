@@ -315,7 +315,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Version GetAndLogFileVersion(string path)
         {
             var fileVersion = this.fileHelper.GetFileVersion(path);
-            EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
+            }
+
             return fileVersion;
         }
 
