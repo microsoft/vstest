@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -52,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             Task.Run(() =>
             {
@@ -70,7 +71,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     // Send a discovery complete to caller.
                     eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
-                    eventHandler.HandleDiscoveryComplete(-1, Enumerable.Empty<TestCase>(), true);
+
+                    var discoveryCompeleteEventsArg = new DiscoveryCompleteEventArgs(-1, true);
+                    eventHandler.HandleDiscoveryComplete(discoveryCompeleteEventsArg, Enumerable.Empty<TestCase>());
                 }
             });
         }

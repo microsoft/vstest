@@ -12,7 +12,7 @@
     <OutputType Condition="'$(TargetFramework)' != 'netstandard1.4'">Exe</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
