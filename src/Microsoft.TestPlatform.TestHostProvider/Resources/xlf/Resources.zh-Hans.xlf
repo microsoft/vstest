@@ -7,6 +7,13 @@
         <target state="translated">{0} 中没有可用的测试。请确保测试项目具有包“Microsoft.NET.Test.Sdk”的 nuget 参考并确保框架版本设置适当，然后重试。</target>
         <note />
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple versions of same extension found. Selecting the highest version.
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
