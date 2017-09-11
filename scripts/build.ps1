@@ -233,20 +233,19 @@ function Publish-Package
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkNS1_4 $testhostNS1_4PackageDir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
-    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
+    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir  
 
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
-    $netFull_Dir = "TestHost"
-    $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
+    $coreCLRFull_Dir = "TestHost"
+    $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
-
-    $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
-    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
+    
+    New-Item -ItemType directory -Path $fullCLRPackageDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force -recurse
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
@@ -344,17 +343,21 @@ function Create-VsixPackage
     $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
     $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
-    $testhostPackageDir = Join-Path $packageDir "TestHost"
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-972135\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-981363\contentFiles\any\any"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+    # Copy QtAgent Related depedencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-981363\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+    
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     if (-not (Test-Path $testImpactComComponentsDir)) {
