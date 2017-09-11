@@ -7,6 +7,13 @@
         <target state="new">Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdkt". And also check the framework passed when running test.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="MultipleFileVersions">
+        <source>Multiple versions of same extension found. Selecting the highest version.
+{0}</source>
+        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+{0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
