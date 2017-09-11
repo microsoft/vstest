@@ -61,45 +61,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             var pluginInfos = new Dictionary<string, TPluginInfo>();
 
-#if !WINDOWS_UAP
+            // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
+            if (!extensionPaths.Any())
+            {
+                AddKnownExtensions(ref extensionPaths);
+            }
 
             this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);
 
-#else
-            var fileSearchTask = Windows.ApplicationModel.Package.Current.InstalledLocation.GetFilesAsync().AsTask();
-            fileSearchTask.Wait();
-
-            var binaries = fileSearchTask.Result.Where(storageFile =>
-
-                                (storageFile.Name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
-                                || storageFile.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
-                                && !storageFile.Name.StartsWith(SYSTEM_ASSEMBLY_PREFIX, StringComparison.OrdinalIgnoreCase)
-                                && !platformAssemblies.Contains(storageFile.Name.ToUpperInvariant())
-
-                                ).
-                                Select<IStorageFile, string>(file => file.Name);
-
-            GetTestExtensionsFromFiles<TPluginInfo, TExtension>(binaries.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);
-
-            // In Release mode - managed dlls are packaged differently
-            // So, file search will not find them - do it manually
-            if (testDiscoverers.Count < 1)
-            {
-                GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
-                        new string[3] {
-                        "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll",
-                        "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll",
-                        "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",},
-                        loadOnlyWellKnownExtensions,
-                        pluginInfos);
-            }
-#endif
             return pluginInfos;
         }
 
         #endregion
 
         #region Private Methods
+
+        private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
+        {
+            // For C++ UWP adatper
+            if(File.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll"))
+            {
+                extensionPaths = extensionPaths.Concat(new List<string> { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" });
+            }
+
+            // For OLD C# UWP(MSTest V1) adatper
+            if (File.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll"))
+            {
+                extensionPaths = extensionPaths.Concat(new List <string> { "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
+            }
+        }
 
         /// <summary>
         /// Gets test extension information from the given colletion of files.

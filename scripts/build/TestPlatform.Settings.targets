@@ -25,6 +25,7 @@
     <!-- Disable default inclusion of .resx file. We generate files in the Resources directory only
          if localization is enabled, default inclusion ends up including the generated files by default. -->
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
