@@ -215,10 +215,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     // the argument processor, but also initializes it.
                     executorInstance = processor.Executor.Value;
                 }
-                catch (CommandLineException e)
+                catch (Exception ex)
                 {
-                    this.Output.Error(false, e.Message);
-                    result = 1;
+                    if (ex is CommandLineException || ex is TestPlatformException)
+                    {
+                        this.Output.Error(false, ex.Message);
+                        result = 1;
+                    }
+                    else
+                    {
+                        // Let it throw - User must see crash and report it with stack trace!
+                        // No need for recoverability as user will start a new vstest.console anwyay
+                        throw;
+                    }
                 }
             }
 
