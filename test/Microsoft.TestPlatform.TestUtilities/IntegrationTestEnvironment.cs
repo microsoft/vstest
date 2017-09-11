@@ -21,6 +21,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private readonly string testPlatformRootDirectory;
         private readonly bool runningInCli;
+        private string targetRuntime;
 
         public IntegrationTestEnvironment()
         {
@@ -34,11 +35,6 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Run integration tests for net451 by default.
                 this.TargetFramework = "net451";
-            }
-
-            if (string.IsNullOrEmpty(this.TargetRuntime))
-            {
-                this.TargetRuntime = "win7-x64";
             }
 
             if (string.IsNullOrEmpty(this.testPlatformRootDirectory))
@@ -147,6 +143,35 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Supported values = <c>win7-x64</c>.
         /// </summary>
         public string TargetRuntime
+        {
+            get
+            {
+                if (this.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework)
+                {
+                    if (string.IsNullOrEmpty(this.targetRuntime))
+                    {
+
+                        this.targetRuntime = "win7-x64";
+                    }
+                }
+                else
+                {
+                    this.targetRuntime = "";
+                }
+
+                return this.targetRuntime;
+            }
+            set
+            {
+                this.targetRuntime = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the inIsolation.
+        /// Supported values = <c>/InIsolation</c>.
+        /// </summary>
+        public string InIsolationValue
         {
             get; set;
         }
