@@ -19,8 +19,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     [TestClass]
     public class DiscovererEnumeratorTests
@@ -34,7 +35,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
-            this.discovererEnumerator = new DiscovererEnumerator(this.discoveryResultCache, this.mockTestPlatformEventSource.Object);
+            this.discovererEnumerator = new DiscovererEnumerator(this.discoveryResultCache, this.mockTestPlatformEventSource.Object, new RequestData(new DummyMetricCollector()));
 
             TestDiscoveryExtensionManager.Destroy();
         }

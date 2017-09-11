@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     [TestClass]
     public class TestPlatformTests
@@ -49,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
                 .Returns(discoveryCriteria.Sources);
 
-            this.testEngine.Setup(te => te.GetDiscoveryManager(this.hostManager.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.discoveryManager.Object);
+            this.testEngine.Setup(te => te.GetDiscoveryManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.discoveryManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
 
@@ -112,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
                 .Returns(testRunCriteria.Sources);
 
-            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExecutionManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
@@ -140,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), "xyz\\1.dll") }, 10, false, settingsXml);
 
-            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExecutionManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
@@ -170,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.hostManager.Setup(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()))
                 .Returns(new List<string> { "xyz\\1.dll" });
 
-            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExecutionManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
@@ -184,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateTestRunRequestShouldInitializeManagersAndCreateTestRunRequestWithSpecifiedCriteria()
         {
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
-            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExecutionManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
@@ -205,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
-            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExecutionManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, null, TimeSpan.Zero, mockCustomLauncher.Object);

@@ -41,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.

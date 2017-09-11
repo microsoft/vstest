@@ -14,18 +14,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IDiscoveryManager discoveryManager;
         private ITestRuntimeProvider testHostManager;
+
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
         /// </summary>
-        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
+        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new RequestData(new MetricsCollector())))
         {
         }
 

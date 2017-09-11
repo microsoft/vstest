@@ -13,6 +13,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using System.Diagnostics;
 
     /// <summary>
     /// The discovery request.
@@ -24,10 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
-        internal DiscoveryRequest(DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
+        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
         {
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
+            this.requestData = requestData;
+            this.stopwatch = new Stopwatch();
+            this.metricsPublisher = new MetricsPublisher();
         }
 
         /// <summary>
@@ -53,6 +59,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 this.discoveryInProgress = true;
                 try
                 {
+                    this.stopwatch.Start();
+
+                    // Collecting Data Point Number of sources sent for discovery
+                    this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
+
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
                 catch
@@ -178,6 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         internal IProxyDiscoveryManager DiscoveryManager { get; private set; }
 
+
         #region ITestDiscoveryEventsHandler Methods
 
         /// <inheritdoc/>
@@ -247,6 +259,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     }
 
                     this.discoveryInProgress = false;
+                    this.stopwatch.Stop();
+
+                    // Collecting Total Time Taken
+                    this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenInSecForDiscovery,
+                        this.stopwatch.Elapsed.TotalSeconds.ToString());
+
+                    // Publishing Metrics
+                    this.metricsPublisher.PublishMetrics(UnitTestTelemetryDataConstants.TestDiscoveryCompleteEvent, this.requestData.MetricsCollector.Metrics());
                 }
             }
 
@@ -259,6 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
+          
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
@@ -291,7 +312,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="level">Output level of the message being sent.</param>
         /// <param name="message">Actual contents of the message</param>
         public void HandleLogMessage(TestMessageLevel level, string message)
-        {
+        { 
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");
@@ -358,6 +379,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         if (this.discoveryCompleted != null)
                         {
                             this.discoveryCompleted.Dispose();
+                            this.requestData.MetricsCollector.Clear();
                         }
                     }
 
@@ -396,6 +418,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// Whether or not the test discovery is in progress.
         /// </summary>
         private bool discoveryInProgress;
+
+        /// <summary>
+        /// StopWatch
+        /// </summary>
+        private Stopwatch stopwatch;
+
+        /// <summary>
+        /// The metric publish
+        /// </summary>
+        private IMetricsPublisher metricsPublisher;
+
+        /// <summary>
+        /// Request Data
+        /// </summary>
+        private IRequestData requestData;
 
         #endregion
     }

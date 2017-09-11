@@ -3,18 +3,31 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
+    using System;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+
 
     [TestClass]
     public class TestHostManagerFactoryTests
     {
         private TestHostManagerFactory testHostManagerFactory;
+        private IRequestData requestData;
 
-        [TestInitialize]
-        public void TestInit()
+        public TestHostManagerFactoryTests()
         {
-            this.testHostManagerFactory = new TestHostManagerFactory();
+            this.requestData = new RequestData(new DummyMetricCollector());
+            this.testHostManagerFactory = new TestHostManagerFactory(this.requestData);
+        }
+
+        [TestMethod]
+        public void ConstructorShouldThrowIfRequestDataIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
         }
 
         [TestMethod]

@@ -16,18 +16,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IExecutionManager executionManager;
         private ITestRuntimeProvider testHostManager;
+
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
         /// </summary>
-        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
+        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new RequestData(new MetricsCollector())))
         {
         }
 

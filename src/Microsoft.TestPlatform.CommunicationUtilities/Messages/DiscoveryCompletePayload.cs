@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -25,5 +26,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets a value indicating whether discovery was aborted.
         /// </summary>
         public bool IsAborted { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Metrics
+        /// </summary>
+        [IgnoreDataMember]
+        public IDictionary<string, string> Metrics { get; set; }
     }
 }

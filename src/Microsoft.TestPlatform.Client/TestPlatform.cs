@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+
 namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using System;
@@ -95,10 +97,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
+            var requestData = new RequestData(new MetricsCollector());
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
-            return new DiscoveryRequest(discoveryCriteria, discoveryManager);
+            return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager);
         }
 
         /// <summary>
@@ -136,10 +139,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria, protocolConfig);
+            var requestData = new RequestData(new MetricsCollector());
+            var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria, protocolConfig);
             executionManager.Initialize();
 
-            return new TestRunRequest(testRunCriteria, executionManager);
+            return new TestRunRequest(requestData, testRunCriteria, executionManager);
         }
 
         /// <summary>

@@ -15,6 +15,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
@@ -39,7 +41,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
 
-            this.parallelRunEventsHandler = new ParallelRunEventsHandler(this.mockProxyExecutionManager.Object,
+            this.parallelRunEventsHandler = new ParallelRunEventsHandler(new RequestData(new DummyMetricCollector()), this.mockProxyExecutionManager.Object,
                 this.mockTestRunEventsHandler.Object, this.mockParallelProxyExecutionManager.Object,
                 new ParallelRunDataAggregator(), this.mockDataSerializer.Object);
         }

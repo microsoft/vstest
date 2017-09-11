@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
@@ -32,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private ITransport transport;
 
         private IDataSerializer dataSerializer;
-
+        
         private Action<Message> onAckMessageRecieved;
 
         private int highestSupportedVersion = 2;
@@ -279,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 TotalTests = totalTests,
                 LastDiscoveredTests = isAborted ? null : lastChunk,
-                IsAborted = isAborted
+                IsAborted = isAborted,
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);

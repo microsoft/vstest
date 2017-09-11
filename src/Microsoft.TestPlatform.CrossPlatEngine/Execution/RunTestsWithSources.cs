@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
@@ -11,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
@@ -29,8 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri,string>, IEnumerable<string>> executorUriVsSourceList;
 
-        public RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-            : this(adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
+        public RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, IRequestData requestData)
+            : this(adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null, requestData)
         {
         }
 
@@ -44,9 +47,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testExecutionContext"></param>
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
-        /// <param name="executorUriVsSourceList"></param>  
-        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
-            : base(package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
+        /// <param name="executorUriVsSourceList"></param>
+        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList, IRequestData requestData)
+            : base(package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance, requestData)
         {
             this.adapterSourceMap = adapterSourceMap;
             this.executorUriVsSourceList = executorUriVsSourceList;

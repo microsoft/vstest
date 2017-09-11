@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    
     /// <summary>
     /// The factory that provides discovery and execution managers to the test host.
     /// </summary>

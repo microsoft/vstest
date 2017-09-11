@@ -20,6 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using System.Diagnostics;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
@@ -30,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
+        private IRequestData requestData;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -39,9 +43,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
+        /// <param name="requestData">Request Data</param>
         /// <param name="requestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
-        public ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
+        public ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
         {
         }
 
@@ -49,17 +54,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
+        /// <param name="requestData">Request Data</param>
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
         /// <param name="dataSerializer"></param>
         /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
-        internal ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
+        internal ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;
             this.cancellationTokenSource = new CancellationTokenSource();
             this.isCommunicationEstablished = false;
+            this.requestData = requestData;
         }
 
         #endregion
@@ -84,6 +91,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
 
                 var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
@@ -105,7 +115,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     this.InitializeExtensions(testPackages);
 
+                    stopwatch.Stop();
+
+                    // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
+                    this.requestData.MetricsCollector.Add(UnitTestTelemetryDataConstants.TimeTakenToStartExecutionEngineExe, stopwatch.Elapsed.TotalMilliseconds.ToString());
+
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
+
                     var executionContext = new TestExecutionContext(
                         testRunCriteria.FrequencyOfRunStatsChangeEvent,
                         testRunCriteria.RunStatsChangeEventTimeout,

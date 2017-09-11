@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     /// <summary>
     /// ParallelProxyDiscoveryManager that manages parallel discovery
@@ -32,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
 
+        private IRequestData requestData;
+
         #endregion
 
         #region Concurrency Keeper Objects
@@ -43,9 +46,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
         
-        public ParallelProxyDiscoveryManager(Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+        public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
+            this.requestData = requestData;
         }
 
         #region IProxyDiscoveryManager

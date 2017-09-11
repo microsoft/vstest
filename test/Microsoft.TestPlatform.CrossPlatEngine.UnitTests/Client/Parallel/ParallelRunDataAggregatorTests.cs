@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 {
@@ -239,6 +240,85 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             Assert.AreEqual(runStats.Stats[TestOutcome.Skipped], 3, "RunStats must have aggregated data.");
             Assert.AreEqual(runStats.Stats[TestOutcome.NotFound], 5, "RunStats must have aggregated data.");
             Assert.AreEqual(runStats.Stats[TestOutcome.None], 5, "RunStats must have aggregated data.");
+        }
+
+        [TestMethod]
+        public void AggregateRunDataMetricsShouldAggregateMetricsCorrectly()
+        {
+            var aggregator = new ParallelRunDataAggregator();
+
+            aggregator.AggregateRunDataMetrics(null);
+
+            var runMetrics = aggregator.GetAggregatedRunDataMetrics();
+            Assert.AreEqual(runMetrics.Count, 0);
+        }
+
+        [TestMethod]
+        public void AggregateRunDataMetricsShouldAddTotalTestsRun()
+        {
+            var aggregator = new ParallelRunDataAggregator();
+
+            var dict = new Dictionary<string, string>();
+            dict.Add(UnitTestTelemetryDataConstants.TotalTestsRanByAdapter, "2");
+
+            aggregator.AggregateRunDataMetrics(dict);
+
+            var runMetrics = aggregator.GetAggregatedRunDataMetrics();
+
+            string value;
+            Assert.AreEqual(runMetrics.TryGetValue(UnitTestTelemetryDataConstants.TotalTestsRanByAdapter, out value), true);
+            Assert.AreEqual(value, "2");
+        }
+
+        [TestMethod]
+        public void AggregateRunDataMetricsShouldAddTotalAdaptersUsed()
+        {
+            var aggregator = new ParallelRunDataAggregator();
+
+            var dict = new Dictionary<string, string>();
+            dict.Add(UnitTestTelemetryDataConstants.TotalTestsRanByAdapter, "2");
+
+            aggregator.AggregateRunDataMetrics(dict);
+
+            var runMetrics = aggregator.GetAggregatedRunDataMetrics();
+
+            string value;
+            Assert.AreEqual(runMetrics.TryGetValue(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value), true);
+            Assert.AreEqual(value, "1");
+        }
+
+        [TestMethod]
+        public void AggregateRunDataMetricsShouldShouldAddTimeTakenToRunTests()
+        {
+            var aggregator = new ParallelRunDataAggregator();
+
+            var dict = new Dictionary<string, string>();
+            dict.Add(UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, ".02091");
+
+            aggregator.AggregateRunDataMetrics(dict);
+            aggregator.AggregateRunDataMetrics(dict);
+
+            var runMetrics = aggregator.GetAggregatedRunDataMetrics();
+
+            string value;
+            Assert.AreEqual(runMetrics.TryGetValue(UnitTestTelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, out value), true);
+            Assert.AreEqual(value, .04182.ToString());
+        }
+
+        [TestMethod]
+        public void AggregateRunDataMetricsShouldShouldAddTimeTakenByAllAdapters()
+        {
+            var aggregator = new ParallelRunDataAggregator();
+
+            var dict = new Dictionary<string, string>();
+            dict.Add(UnitTestTelemetryDataConstants.TimeTakenByAllAdaptersInSec, ".02091");
+
+            aggregator.AggregateRunDataMetrics(dict);
+            var runMetrics = aggregator.GetAggregatedRunDataMetrics();
+
+            string value;
+            Assert.AreEqual(runMetrics.TryGetValue(UnitTestTelemetryDataConstants.TimeTakenByAllAdaptersInSec, out value), true);
+            Assert.AreEqual(value, .02091.ToString());
         }
     }
 }

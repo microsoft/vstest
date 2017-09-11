@@ -19,8 +19,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
 
     [TestClass]
     public class ParallelProxyExecutionManagerTests
@@ -44,6 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private bool proxyManagerFuncCalled;
         private ManualResetEventSlim executionCompleted;
+        private Mock<IRequestData> mockRequestData;
 
         public ParallelProxyExecutionManagerTests()
         {
@@ -67,12 +71,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testCases = CreateTestCases();
             this.processedTestCases = new List<TestCase>();
             this.testRunCriteriaWithTests = new TestRunCriteria(this.testCases, 100);
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new DummyMetricCollector());
         }
 
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, 3);
 
             parallelExecutionManager.Initialize();
 
@@ -83,7 +89,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AbortShouldCallAllConcurrentManagersOnce()
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 4);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 4);
 
             parallelExecutionManager.Abort();
 
@@ -94,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void CancelShouldCallAllConcurrentManagersOnce()
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 4);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 4);
 
             parallelExecutionManager.Cancel();
 
@@ -150,7 +156,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
-            var proxyDataCollectionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var proxyDataCollectionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2, setupTestCases: true);
 
             parallelExecutionManager.StartTestRun(this.testRunCriteriaWithTests, this.mockHandler.Object);
@@ -173,7 +179,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
 
             this.proxyManagerFuncCalled = false;
-            var proxyExecutionManagerManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object);
+            var proxyExecutionManagerManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object);
             parallelExecutionManager.HandlePartialRunComplete(proxyExecutionManagerManager, completeArgs, null, null, null);
             Assert.IsTrue(this.proxyManagerFuncCalled);
         }
@@ -197,7 +203,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldNotProcessAllSourcesOnExecutionCancelsForAnySource()
         {
             var executionManagerMock = new Mock<IProxyExecutionManager>();
-            var parallelExecutionManager = new ParallelProxyExecutionManager(() => executionManagerMock.Object, 1);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, () => executionManagerMock.Object, 1);
             this.createdMockManagers.Add(executionManagerMock);
             this.SetupMockManagers(this.processedSources, isCanceled: true, isAborted: false);
             SetupHandleTestRunComplete(this.executionCompleted);
@@ -212,7 +218,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldProcessAllSourcesOnExecutionAbortsForAnySource()
         {
             var executionManagerMock = new Mock<IProxyExecutionManager>();
-            var parallelExecutionManager = new ParallelProxyExecutionManager(() => executionManagerMock.Object, 1);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, () => executionManagerMock.Object, 1);
             this.createdMockManagers.Add(executionManagerMock);
             this.SetupMockManagers(processedSources, isCanceled: false, isAborted: true);
             SetupHandleTestRunComplete(this.executionCompleted);
@@ -246,7 +252,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartTestRunShouldAggregateRunData()
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 2);
             var syncObject = new object();
 
             foreach (var manager in createdMockManagers)
@@ -341,7 +347,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private ParallelProxyExecutionManager SetupExecutionManager(Func<IProxyExecutionManager> proxyManagerFunc, int parallelLevel, bool setupTestCases)
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 2);
 
             if (setupTestCases)
             {

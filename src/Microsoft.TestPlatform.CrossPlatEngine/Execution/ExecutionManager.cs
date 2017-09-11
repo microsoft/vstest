@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
@@ -27,10 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private BaseRunTests activeTestRun;
 
+        private IRequestData requestData;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
-        public ExecutionManager() : this(TestPlatformEventSource.Instance)
+        public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
         {
         }
 
@@ -38,9 +42,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource)
+        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IRequestData requestData)
         {
             this.testPlatformEventSource = testPlatformEventSource;
+            this.requestData = requestData;
         }
 
         #region IExecutionManager Implementation
@@ -90,7 +95,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                      runSettings,
                      testExecutionContext,
                      testCaseEventsHandler,
-                     runEventsHandler);
+                     runEventsHandler,
+                     this.requestData);
 
                 this.activeTestRun.RunTests();
             }
@@ -132,7 +138,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                                          runSettings,
                                          testExecutionContext,
                                          testCaseEventsHandler,
-                                         runEventsHandler);
+                                         runEventsHandler,
+                                         this.requestData);
 
                 this.activeTestRun.RunTests();
             }
