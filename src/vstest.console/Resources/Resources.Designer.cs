@@ -1096,11 +1096,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         /// <summary>
         ///   Looks up a localized string similar to {0} {1}.
         /// </summary>
-        public static string NoTestsFoundWarningMessageWithSuggestionToUseVsix
+        public static string StringFormatToJoinTwoStrings
         {
             get
             {
-                return ResourceManager.GetString("NoTestsFoundWarningMessageWithSuggestionToUseVsix", resourceCulture);
+                return ResourceManager.GetString("StringFormatToJoinTwoStrings", resourceCulture);
             }
         }
 
@@ -1500,57 +1500,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Additionally, you can try specifying &apos;/UseVsixExtensions&apos; command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true.
+        ///   Looks up a localized string similar to Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;..
         /// </summary>
-        public static string SuggestUseVsixExtensionsIfNoTestsIsFound
+        public static string SuggestTestAdapterPathIfNoTestsIsFound
         {
             get
             {
-                return ResourceManager.GetString("SuggestUseVsixExtensionsIfNoTestsIsFound", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
-        /// </summary>
-        public static string SuggestUseVsixExtensionsInListDiscoverersCommand
-        {
-            get
-            {
-                return ResourceManager.GetString("SuggestUseVsixExtensionsInListDiscoverersCommand", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
-        /// </summary>
-        public static string SuggestUseVsixExtensionsInListExecutorsCommand
-        {
-            get
-            {
-                return ResourceManager.GetString("SuggestUseVsixExtensionsInListExecutorsCommand", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
-        /// </summary>
-        public static string SuggestUseVsixExtensionsInListLoggersCommand
-        {
-            get
-            {
-                return ResourceManager.GetString("SuggestUseVsixExtensionsInListLoggersCommand", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
-        /// </summary>
-        public static string SuggestUseVsixExtensionsInListSettingsProviderCommand
-        {
-            get
-            {
-                return ResourceManager.GetString("SuggestUseVsixExtensionsInListSettingsProviderCommand", resourceCulture);
+                return ResourceManager.GetString("SuggestTestAdapterPathIfNoTestsIsFound", resourceCulture);
             }
         }
 
@@ -1817,6 +1773,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("UriOfDefaultExecutor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to /UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead..
+        /// </summary>
+        public static string UseVsixExtensionsDeprecation
+        {
+            get
+            {
+                return ResourceManager.GetString("UseVsixExtensionsDeprecation", resourceCulture);
             }
         }
 

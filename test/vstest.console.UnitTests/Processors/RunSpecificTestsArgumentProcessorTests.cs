@@ -21,24 +21,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using CoreUtilities.Tracing.Interfaces;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     [TestClass]
     public class RunSpecificTestsArgumentProcessorTests
     {
+        private const string NoDiscoveredTestsWarning = @"No test is available in DummyTest.dll. Make sure that installed test discoverers & executors, platform & framework version settings are appropriate and try again.";
+        private const string TestAdapterPathSuggestion = @"Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:<pathToCustomAdapters>.";
         private readonly Mock<IFileHelper> mockFileHelper;
+        private readonly Mock<IOutput> mockOutput;
         private string dummyTestFilePath = "DummyTest.dll";
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
-        private static RunSpecificTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
+        private RunSpecificTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
         {
             var runSettingsProvider = new TestableRunSettingsProvider();
             runSettingsProvider.AddDefaultRunSettings();
-            return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager);
+            return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, this.mockOutput.Object);
         }
 
         public RunSpecificTestsArgumentProcessorTests()
         {
             this.mockFileHelper = new Mock<IFileHelper>();
+            this.mockOutput = new Mock<IOutput>();
             this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
             this.mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
@@ -244,6 +249,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void ExecutorExecuteShouldForValidSourcesAndNoTestsDiscoveredShouldLogWarningAndReturnSuccess()
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+
+            this.ResetAndAddSourceToCommandLineOptions();
+
+            // Setting some testdapterpath
+            CommandLineOptions.Instance.TestAdapterPath = @"C:\Foo";
+
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(new List<TestCase>()));
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockDiscoveryRequest.Object);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
+            var executor = GetExecutor(testRequestManager);
+
+            executor.Initialize("Test1");
+            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
+
+            this.mockOutput.Verify(o => o.WriteLine("Starting test discovery, please wait...", OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine(NoDiscoveredTestsWarning, OutputLevel.Warning), Times.Once);
+            Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
+        }
+
+        [TestMethod]
+        public void ExecutorExecuteShouldForValidSourcesAndNoTestsDiscoveredShouldLogAppropriateWarningIfTestAdapterPathIsNotSetAndReturnSuccess()
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+
+            this.ResetAndAddSourceToCommandLineOptions();
+
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(new List<TestCase>()));
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockDiscoveryRequest.Object);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
+            var executor = GetExecutor(testRequestManager);
+
+            executor.Initialize("Test1");
+            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
+
+            this.mockOutput.Verify(o => o.WriteLine("Starting test discovery, please wait...", OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine(NoDiscoveredTestsWarning + " " + TestAdapterPathSuggestion, OutputLevel.Warning), Times.Once);
+            Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
+        }
+
+        [TestMethod]
         public void ExecutorExecuteShouldForValidSourcesAndValidSelectedTestsRunsTestsAndReturnSuccess()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
@@ -274,9 +326,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.TestCaseFilterValue = null;
-
             CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
-
             CommandLineOptions.Instance.AddSource(this.dummyTestFilePath);
         }
     }
