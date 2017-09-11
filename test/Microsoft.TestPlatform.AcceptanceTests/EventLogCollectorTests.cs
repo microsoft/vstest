@@ -21,9 +21,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void EventLogDataCollectorShoudCreateLogFile(string runnerFramework, string targetFramework, string targetRuntime)
+        public void EventLogDataCollectorShoudCreateLogFile(RunnnerInfo runnnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            SetTestEnvironment(this.testEnvironment, runnnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
