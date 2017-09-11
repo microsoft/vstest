@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler);
+        void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler);
 
         /// <summary>
         /// Aborts the test operation.

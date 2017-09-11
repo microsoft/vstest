@@ -5,17 +5,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using System.Linq;
 
     /// <summary>
     /// ParallelProxyDiscoveryManager that manages parallel discovery
     /// </summary>
-    internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler>, IParallelProxyDiscoveryManager
+    internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2>, IParallelProxyDiscoveryManager
     {
         #region DiscoverySpecificData
 
@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         
         private Task lastParallelDiscoveryCleanUpTask = null;
 
-        private ITestDiscoveryEventsHandler currentDiscoveryEventsHandler;
+        private ITestDiscoveryEventsHandler2 currentDiscoveryEventsHandler;
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
 
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <inheritdoc/>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             this.actualDiscoveryCriteria = discoveryCriteria;
                 
@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
 
-        private void DiscoverTestsPrivate(ITestDiscoveryEventsHandler discoveryEventsHandler)
+        private void DiscoverTestsPrivate(ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             this.currentDiscoveryEventsHandler = discoveryEventsHandler;
 
@@ -266,7 +266,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Total tests must be zero here since parallel discovery events handler adds the count
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(-1, null, true);
+                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
             }
