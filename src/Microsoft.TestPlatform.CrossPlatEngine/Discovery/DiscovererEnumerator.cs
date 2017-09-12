@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
-        /// <param name="requestData"></param>
+        /// <param name="requestData">The request data for providing common discovery services and data</param>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
         /// <param name="metricsCollector">Metric Collector</param>
         public DiscovererEnumerator(IRequestData requestData, DiscoveryResultCache discoveryResultCache):this(requestData, discoveryResultCache, TestPlatformEventSource.Instance)

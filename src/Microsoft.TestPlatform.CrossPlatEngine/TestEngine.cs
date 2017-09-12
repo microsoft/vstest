@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
         /// <param name="requestData">
-        /// Request Data
+        /// The request data for providing common discovery services and data.
         /// </param>
         /// <param name="testHostManager">
         /// Test host manager
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
-        /// <param name="requestData">Request Data</param>
+        /// <param name="requestData">The request data for providing common execution services and data</param>
         /// <param name="testHostManager">Test host manager.</param>
         /// <param name="testRunCriteria">Test run criterion.</param>
         /// <param name="config">Protocol related information</param>

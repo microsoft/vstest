@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
-        /// <param name="requestData">Request Data</param>
+        /// <param name="requestData">the request data for providing common discovery services and data</param>
         /// <param name="testHostManager">Test host manager for the current test discovery.</param>
         /// <param name="discoveryCriteria">The discovery Criteria.</param>
         /// <param name="protocolConfig">Protocol related information.</param>
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
-        /// <param name="requestData">Request Data</param>
+        /// <param name="requestData">The request data for providing common execution services and data</param>
         /// <param name="testHostManager">Test host manager for current test run.</param>
         /// <param name="testRunCriteria">TestRunCriteria of the current test run</param>
         /// <param name="protocolConfig">Protocol related information</param>

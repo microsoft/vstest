@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
         /// </summary>
-        /// <param name="requestData">The Request Data</param>
+        /// <param name="requestData">The request data for providing common execution services and data</param>
         /// <param name="package">The user input test source(package) if it differs from actual test source otherwise null.</param>
         /// <param name="runSettings">The run settings.</param>
         /// <param name="testExecutionContext">The test execution context.</param>

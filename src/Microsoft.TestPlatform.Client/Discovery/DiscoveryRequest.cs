@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
         /// </summary>
-        /// <param name="requestData">The Request Data</param>
+        /// <param name="requestData">The Request Data instance providing common services and data for discovery</param>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
         internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
