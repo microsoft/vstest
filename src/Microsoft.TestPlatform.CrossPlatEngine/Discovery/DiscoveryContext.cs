@@ -3,8 +3,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Specifies the user specified RunSettings and framework provided context of the discovery. 
@@ -15,6 +23,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Gets the run settings specified for this request.
         /// </summary>
         public IRunSettings RunSettings { get; internal set; }
+
+        /// <summary>
+        /// Returns TestCaseFilterExpression validated for supportedProperties.
+        /// If there is a parsing error in filter expression, TestPlatformFormatException() is thrown.
+        /// </summary>
+        /// <param name="supportedProperties"> The supported Properties. </param>
+        /// <param name="propertyProvider"> The property Provider. </param>
+        /// <returns> The <see cref="ITestCaseFilterExpression"/>. </returns>
+        public virtual ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
+        {
+            TestCaseFilterExpression adapterSpecificTestCaseFilter = null;
+            if (this.FilterExpressionWrapper != null)
+            {
+                if (!string.IsNullOrEmpty(this.FilterExpressionWrapper.ParseError))
+                {
+                    throw new TestPlatformFormatException(this.FilterExpressionWrapper.ParseError, this.FilterExpressionWrapper.FilterString);
+                }
+
+                adapterSpecificTestCaseFilter = new TestCaseFilterExpression(this.FilterExpressionWrapper);
+                var invalidProperties = adapterSpecificTestCaseFilter.ValidForProperties(supportedProperties, propertyProvider);
+
+                if (invalidProperties != null)
+                {
+                    var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
+                    var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
+                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
+
+                    // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
+                    EqtTrace.Info(errorMessage);
+                }
+            }
+
+            return adapterSpecificTestCaseFilter;
+        }
 
         /// <summary>
         /// Gets or sets the FilterExpressionWrapper instance as created from filter string.
