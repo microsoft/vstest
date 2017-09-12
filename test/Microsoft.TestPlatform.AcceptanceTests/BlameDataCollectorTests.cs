@@ -30,12 +30,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void BlameDataCollectorShouldGiveCorrectTestCaseName(string runnerFramework, string targetFramework, string targetRuntime)
+        public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnnerInfo runnerInfo)
         {
-
-            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /Blame");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             this.InvokeVsTest(arguments);
