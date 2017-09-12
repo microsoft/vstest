@@ -18,7 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestExecutor
         {
         }
 
-
         /// <summary>
         /// Entry point for testhost, in App Model(UWP) scenario
         /// </summary>

@@ -25,6 +25,8 @@
     <!-- Disable default inclusion of .resx file. We generate files in the Resources directory only
          if localization is enabled, default inclusion ends up including the generated files by default. -->
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <!-- .NetStandardLibrary1.6.0 brings in dependencies which are supported in UWP,
+         any higher version will bring in dependencies which are not supported by current UWP version -->
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 

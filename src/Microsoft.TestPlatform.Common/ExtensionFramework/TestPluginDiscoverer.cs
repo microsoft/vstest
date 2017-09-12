@@ -13,12 +13,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Discovers test extensions in a directory.
     /// </summary>
     internal class TestPluginDiscoverer
     {
+        private IFileHelper fileHelper;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
+        /// </summary>
+        public TestPluginDiscoverer() : this(new Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
+        /// </summary>
+        /// <param name="fileHelper">
+        /// The file Helper.
+        /// </param>
+        internal TestPluginDiscoverer(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
+
         #region Fields
 
 #if WINDOWS_UAP
@@ -79,15 +100,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
         {
             // For C++ UWP adatper
-            if(File.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll"))
+            if(this.fileHelper.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll"))
             {
-                extensionPaths = extensionPaths.Concat(new List<string> { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" });
+                extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" });
             }
 
             // For OLD C# UWP(MSTest V1) adatper
-            if (File.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll"))
+            if (this.fileHelper.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll"))
             {
-                extensionPaths = extensionPaths.Concat(new List <string> { "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
+                extensionPaths = extensionPaths.Concat(new[]{ "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
             }
         }
 
