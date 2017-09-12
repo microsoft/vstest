@@ -5,6 +5,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <AssemblyName>NUTestProject</AssemblyName>
   </PropertyGroup>
 

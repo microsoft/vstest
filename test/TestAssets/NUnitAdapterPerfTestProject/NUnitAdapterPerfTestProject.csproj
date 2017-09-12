@@ -3,6 +3,7 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.1;net452</TargetFrameworks>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

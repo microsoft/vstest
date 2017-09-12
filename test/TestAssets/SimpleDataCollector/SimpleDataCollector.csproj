@@ -4,6 +4,7 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <PropertyGroup>
