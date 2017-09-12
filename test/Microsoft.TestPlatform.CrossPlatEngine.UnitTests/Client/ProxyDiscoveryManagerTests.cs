@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -36,6 +37,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IDataSerializer> mockDataSerializer;
 
+        private Mock<IRequestData> mockRequestData;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -46,8 +49,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+
             this.testDiscoveryManager = new ProxyDiscoveryManager(
-                                            new RequestData(new NullMetricCollector()), 
+                                            this.mockRequestData.Object, 
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
                                             this.mockDataSerializer.Object,
@@ -287,6 +293,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Assert.
             this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), null), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectMetrics()
+        {
+            TestPluginCache.Instance = null;
+            try
+            {
+                var mockMetricsCollector = new Mock<IMetricsCollection>();
+                this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+                // Act.
+                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<string>()), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
         }
     }
 }

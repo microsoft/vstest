@@ -71,7 +71,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.processedTestCases = new List<TestCase>();
             this.testRunCriteriaWithTests = new TestRunCriteria(this.testCases, 100);
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
         }
 
         [TestMethod]

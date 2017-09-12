@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 };
 
                 // Collecting Final Discovery State
-                this.requestData.MetricsCollector.Add(TelemetryDataConstants.DiscoveryState, isAborted? "Aborted" : "Completed");
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, isAborted ? "Aborted" : "Completed");
 
                 // Collect Aggregated Metrics Data
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     foreach (var aggregatedRunDataMetric in aggregatedDiscoveryDataMetrics)
                     {
-                        this.requestData.MetricsCollector.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
+                        this.requestData.MetricsCollection.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
                     }
                 }
 

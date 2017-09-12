@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
     /// <summary>
     /// If Telemtry is opted out, this class will be initialized and will do No operation.
     /// </summary>
-    public class NullMetricCollector : IMetricsCollector
+    public class NoOpMetricsCollection : IMetricsCollection
     {
         public void Add(string message, string value)
         {
@@ -20,9 +20,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
             // No Operation
         }
 
-        public IDictionary<string, string> Metrics()
+        public IDictionary<string, string> Metrics
         {
-            return new Dictionary<string, string>();
+            get
+            {
+                return new Dictionary<string, string>();
+            }
         }
     }
 }

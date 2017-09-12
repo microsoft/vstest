@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
 
             // Collecting IsParallel Enabled
-            requestData.MetricsCollector.Add(TelemetryDataConstants.ParallelEnabledDuringDiscovery, parallelLevel > 1 ? "True" : "False");
+            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringDiscovery, parallelLevel > 1 ? "True" : "False");
 
             if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
@@ -103,12 +103,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
 
             // Collecting IsParallel Enabled
-            requestData.MetricsCollector.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, parallelLevel > 1 ? "True" : "False");
+            requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, parallelLevel > 1 ? "True" : "False");
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             // Collecting IsDataCollector Enabled
-            requestData.MetricsCollector.Add(TelemetryDataConstants.DataCollectorsEnabled, isDataCollectorEnabled.ToString());
+            requestData.MetricsCollection.Add(TelemetryDataConstants.DataCollectorsEnabled, isDataCollectorEnabled.ToString());
 
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 

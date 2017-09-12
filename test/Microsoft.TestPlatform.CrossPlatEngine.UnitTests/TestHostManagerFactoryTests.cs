@@ -19,7 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
         public TestHostManagerFactoryTests()
         {
-            this.requestData = new RequestData(new NullMetricCollector());
+            this.requestData = new RequestData(new NoOpMetricsCollection());
             this.testHostManagerFactory = new TestHostManagerFactory(this.requestData);
         }
 

@@ -11,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -36,6 +37,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private readonly Mock<IDataSerializer> mockDataSerializer;
 
+        private readonly Mock<IRequestData> mockRequestData;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -47,7 +50,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testExecutionManager = new ProxyExecutionManager(new RequestData(new NullMetricCollector()), this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
@@ -348,6 +354,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(
                 runCriteria.Object.TestRunSettings,
                 testRunCriteriaPassed.RunSettings);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCollectMetrics()
+        {
+            var mockMetricsCollector = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            var runCriteria = new Mock<TestRunCriteria>(
+                new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
+                10);
+
+            this.testExecutionManager.StartTestRun(runCriteria.Object, null);
+
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]

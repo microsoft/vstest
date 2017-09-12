@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(true);
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
         }
 
         [TestInitialize]

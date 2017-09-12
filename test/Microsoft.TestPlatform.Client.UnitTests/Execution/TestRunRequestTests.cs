@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1);
             executionManager = new Mock<IProxyExecutionManager>();
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object);
         }
 
@@ -259,6 +259,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             Assert.AreEqual(rawMessage, messageReceived, "RunRequest should just pass the message as is.");
             testRunRequest.OnRawMessageReceived -= handler;
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldCollectMetrics()
+        {
+            var mockMetricsCollector = new Mock<IMetricsCollection>();
+            var dict = new Dictionary<string, string>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+            this.testRunRequest.ExecuteAsync();
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), dict), null, null, null);
+
+            // Verify.
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
         }
 
         [TestMethod]

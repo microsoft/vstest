@@ -79,15 +79,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     runDataAggregator.ElapsedTime, null);
 
                 // Collect Final RunState
-                this.requestData.MetricsCollector.Add(TelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
 
                 // Collect Aggregated Metrics Data
                 var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();
-                if(aggregatedRunDataMetrics!= null && aggregatedRunDataMetrics.Count != 0)
+                if(aggregatedRunDataMetrics != null && aggregatedRunDataMetrics.Count != 0)
                 {
                     foreach (var aggregatedRunDataMetric in aggregatedRunDataMetrics)
                     {
-                        this.requestData.MetricsCollector.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
+                        this.requestData.MetricsCollection.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
                     }
                 }
 

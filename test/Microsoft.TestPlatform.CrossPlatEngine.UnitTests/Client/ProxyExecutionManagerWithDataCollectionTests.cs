@@ -53,7 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.testableClientConnectionTimeout);
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
@@ -145,7 +145,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData(new NullMetricCollector()), testRequestSender, testHostManager, proxyDataCollectionManager)
+        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData(new NoOpMetricsCollection()), testRequestSender, testHostManager, proxyDataCollectionManager)
         {
         }
 

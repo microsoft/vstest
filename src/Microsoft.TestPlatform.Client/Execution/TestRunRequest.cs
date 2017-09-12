@@ -61,9 +61,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private Timer timer;
         
         /// <summary>
-        /// StopWatch
+        /// Execution Start Time
         /// </summary>
-        private Stopwatch stopwatch;
+        private DateTime executionStartTime;
 
         /// <summary>
         /// Request Data
@@ -79,6 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             Debug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
             Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
+            Debug.Assert(requestData != null, "request Data is null");
 
             EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
             this.testRunCriteria = testRunCriteria;
@@ -87,7 +88,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             this.State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
 
-            this.stopwatch = new Stopwatch();
             this.requestData = requestData;
         }
 
@@ -113,11 +113,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     throw new InvalidOperationException(ClientResources.InvalidStateForExecution);
                 }
 
-                this.stopwatch.Start();
-
+                this.executionStartTime = DateTime.UtcNow;
+                
                 // Collecting Number of sources Sent For Execution
                 var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count<string>() : 0);
-                this.requestData.MetricsCollector.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources.ToString());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources.ToString());
 
                 EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
 
@@ -418,10 +418,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     this.runCompletionEvent.Set();
 
 
-                    this.stopwatch.Stop();
+                    var executionTotalTimeTaken = this.executionStartTime - DateTime.UtcNow;
 
                     // Fill in the time taken to complete the run
-                    this.requestData.MetricsCollector.Add(TelemetryDataConstants.TimeTakenInSecForRun, this.stopwatch.Elapsed.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds.ToString());
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = runCompleteArgs.Metrics;
@@ -429,7 +429,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         foreach (var metric in metrics)
                         {
-                            this.requestData.MetricsCollector.Add(metric.Key, metric.Value);
+                            this.requestData.MetricsCollection.Add(metric.Key, metric.Value);
                         }
                     }
                 }
@@ -541,7 +541,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (disposing)
                     {
                         this.runCompletionEvent?.Dispose();
-                        this.requestData.MetricsCollector.Clear();
+                        this.requestData.MetricsCollection.Clear();
                     }
 
                     // Indicate that object has been disposed

@@ -43,7 +43,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void TestInit()
         {
             this.testableTestRunCache = new TestableTestRunCache();
-            this.requestData = new RequestData(new NullMetricCollector());
+            this.requestData = new RequestData(new NoOpMetricsCollection());
             this.testExecutionContext = new TestExecutionContext(
                                 frequencyOfRunStatsChangeEvent: 100,
                                 runStatsChangeEventTimeout: TimeSpan.MaxValue,

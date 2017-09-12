@@ -10,15 +10,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
     /// <summary>
     /// This Class will collect Metrics.
     /// </summary>
-    public class MetricsCollector : IMetricsCollector
+    public class MetricsCollection : IMetricsCollection
     {
         private Dictionary<string, string> metricDictionary;
 
-        public MetricsCollector()
+        /// <summary>
+        /// The Metrics Collector
+        /// </summary>
+        public MetricsCollection()
         {
             this.metricDictionary = new Dictionary<string, string>();
         }
 
+        /// <summary>
+        /// Add The Metrics
+        /// </summary>
+        /// <param name="metric"></param>
+        /// <param name="value"></param>
         public void Add(string metric, string value)
         {
             ValidateArg.NotNull(metric, "metric");
@@ -34,18 +42,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
             }
         }
 
-        public IDictionary<string, string> Metrics()
+        /// <summary>
+        /// Returns the Metrics
+        /// </summary>
+        public IDictionary<string, string> Metrics
         {
-            if (this.metricDictionary == null || this.metricDictionary.Count == 0)
+            get
             {
-                return new Dictionary<string, string>();
-            }
-            else
-            {
-                return this.metricDictionary;
+                if (this.metricDictionary == null || this.metricDictionary.Count == 0)
+                {
+                    return new Dictionary<string, string>();
+                }
+                else
+                {
+                    return this.metricDictionary;
+                }
             }
         }
 
+        /// <summary>
+        /// Clears the Metrics
+        /// </summary>
         public void Clear()
         {
             this.metricDictionary?.Clear();

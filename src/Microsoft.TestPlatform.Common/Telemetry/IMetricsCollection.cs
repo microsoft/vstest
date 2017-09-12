@@ -8,20 +8,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
     /// <summary>
     /// This Interface Provides API's to Collect Metrics.
     /// </summary>
-    public interface IMetricsCollector
+    public interface IMetricsCollection
     { 
         /// <summary>
         /// Add Metric in the Metrics Cache
         /// </summary>
-        /// <param name="metric">Metirc Message</param>
+        /// <param name="metric">Metric Message</param>
         /// <param name="value">Value associated with Metric</param>
         void Add(string metric, string value);
 
         /// <summary>
         /// Get Metrics
         /// </summary>
-        /// <returns>Returns the Telemetry Data Points</returns>
-        IDictionary<string, string> Metrics();
+        /// <value>Returns the Telemetry Data Points</value>
+        IDictionary<string, string> Metrics { get; }
 
         /// <summary>
         /// Clear the Metrics

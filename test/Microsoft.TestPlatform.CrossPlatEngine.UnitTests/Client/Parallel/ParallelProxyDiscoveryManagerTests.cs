@@ -50,7 +50,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
             this.discoveryCompleted = new ManualResetEventSlim(false);
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
         }
 
         [TestMethod]

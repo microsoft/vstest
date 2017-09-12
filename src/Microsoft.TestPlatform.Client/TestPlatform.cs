@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var requestData = new RequestData(new MetricsCollector());
+            var requestData = new RequestData(new MetricsCollection());
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var requestData = new RequestData(new MetricsCollector());
+            var requestData = new RequestData(new MetricsCollection());
             var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria, protocolConfig);
             executionManager.Initialize();
 

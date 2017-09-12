@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
@@ -33,7 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
             this.requestData = requestData;
-            this.stopwatch = new Stopwatch();
         }
 
         /// <summary>
@@ -59,10 +57,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 this.discoveryInProgress = true;
                 try
                 {
-                    this.stopwatch.Start();
+                    this.discoveryStartTime = DateTime.UtcNow;
 
                     // Collecting Data Point Number of sources sent for discovery
-                    this.requestData.MetricsCollector.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
 
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
@@ -258,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     }
 
                     this.discoveryInProgress = false;
-                    this.stopwatch.Stop();
+                    var discoveryFinalTimeTaken = this.discoveryStartTime - DateTime.UtcNow;
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = discoveryCompleteEventArgs.Metrics;
@@ -266,14 +264,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     {
                         foreach (var metric in metrics)
                         {
-                            this.requestData.MetricsCollector.Add(metric.Key, metric.Value);
+                            this.requestData.MetricsCollection.Add(metric.Key, metric.Value);
                         }
                     }
 
                     // Collecting Total Time Taken
-                    this.requestData.MetricsCollector.Add(
-                        TelemetryDataConstants.TimeTakenInSecForDiscovery,
-                        this.stopwatch.Elapsed.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(
+                        TelemetryDataConstants.TimeTakenInSecForDiscovery,discoveryFinalTimeTaken.TotalSeconds.ToString());
                 }
             }
 
@@ -285,8 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
-        {
-          
+        {  
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
@@ -386,7 +382,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         if (this.discoveryCompleted != null)
                         {
                             this.discoveryCompleted.Dispose();
-                            this.requestData.MetricsCollector.Clear();
+                            this.requestData.MetricsCollection.Clear();
                         }
                     }
 
@@ -427,9 +423,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         private bool discoveryInProgress;
 
         /// <summary>
-        /// StopWatch
+        /// Discovery Start Time
         /// </summary>
-        private Stopwatch stopwatch;
+        private DateTime discoveryStartTime;
 
         /// <summary>
         /// Request Data

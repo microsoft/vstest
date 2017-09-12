@@ -58,7 +58,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                             isDebug: false,
                                             testCaseFilter: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            this.requestData = new RequestData(new NullMetricCollector());
+            this.requestData = new RequestData(new NoOpMetricsCollection());
 
             TestPluginCacheTests.SetupMockExtensions(
                 new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },

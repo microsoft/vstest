@@ -51,7 +51,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // In case of parallel it can be more than total time taken to complete run request.
         public static string TimeTakenByAllAdaptersInSec = "VS.TestRun.TimeTakenByAllAdaptersInSec";
 
-
         // *********************Discovery****************************
         public static string TotalTestsDiscovered = "VS.TestDiscovery.TotalTestsDiscovered";
 
@@ -80,8 +79,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string NumberOfAdapterDiscoveredDuringDiscovery = "VS.TestDiscovery.AdaptersDiscoveredCount";
 
         public static string NumberOfAdapterUsedToDiscoverTests = "VS.TestDiscovery.AdaptersUsedCount";
-
-
 
         // **************Events Name **********************************
         public static string TestDiscoveryCompleteEvent = "vs/testdiscoverysession";

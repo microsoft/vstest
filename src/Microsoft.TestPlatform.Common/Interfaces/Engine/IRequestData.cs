@@ -11,8 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine
     public interface IRequestData
     {
         /// <summary>
-        /// Gets an instance of <see cref="IMetricsCollector"/>.
+        /// Gets an instance of <see cref="IMetricsCollection"/>.
         /// </summary>
-        IMetricsCollector MetricsCollector { get; }
+        IMetricsCollection MetricsCollection { get; }
     }
 }

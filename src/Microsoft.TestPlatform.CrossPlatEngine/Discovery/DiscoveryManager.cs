@@ -136,12 +136,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
 
                     // Collecting Discovery State
-                    this.requestData.MetricsCollector.Add(TelemetryDataConstants.DiscoveryState, "Completed");
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, "Completed");
 
                     // Collecting Total Tests Discovered
-                    this.requestData.MetricsCollector.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount.ToString());
                     
-                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false, requestData.MetricsCollector.Metrics());
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false, this.requestData.MetricsCollection.Metrics);
 
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
                 }

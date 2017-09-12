@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollector).Returns(new NullMetricCollector());
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object);
         }
         
@@ -130,6 +130,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);
             Assert.AreEqual("complete", events[1]);
+        }
+
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldCollectMetrics()
+        {
+            var mockMetricsCollector = new Mock<IMetricsCollection>();
+            var dict = new Dictionary<string, string>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+
+            // Act
+            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false, dict), Enumerable.Empty<TestCase>());
+
+            // Verify.
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
         }
     }
 }

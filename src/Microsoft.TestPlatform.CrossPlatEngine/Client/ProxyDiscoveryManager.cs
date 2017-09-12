@@ -96,8 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
+                var discoveryEngineStartTime = DateTime.UtcNow;
 
                 this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
@@ -106,10 +105,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
-                    stopwatch.Stop();
-
                     // Collecting Time Taken to Start Discovery Engine
-                    this.requestData.MetricsCollector.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, stopwatch.Elapsed.TotalMilliseconds.ToString());
+                    var discoveryEngineTotalTime = discoveryEngineStartTime - DateTime.UtcNow;
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds.ToString());
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }
