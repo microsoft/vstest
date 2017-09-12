@@ -219,7 +219,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value), false);
         }
 
-
         [TestMethod]
         public void GetDiscoveryDataMetricsShouldNotAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
         {

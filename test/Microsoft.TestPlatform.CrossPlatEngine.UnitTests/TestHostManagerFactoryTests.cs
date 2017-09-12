@@ -3,8 +3,6 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
-    using System;
-
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -21,12 +19,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             this.requestData = new RequestData(new NoOpMetricsCollection());
             this.testHostManagerFactory = new TestHostManagerFactory(this.requestData);
-        }
-
-        [TestMethod]
-        public void ConstructorShouldThrowIfRequestDataIsNull()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
         }
 
         [TestMethod]

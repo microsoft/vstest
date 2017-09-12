@@ -79,7 +79,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             Assert.AreEqual(aggregator.RunContextAttachments.Count, 2, "RunContextAttachments List must have aggregated data.");
         }
 
-
         [TestMethod]
         public void AggregateShouldAggregateAbortedAndCanceledCorrectly()
         {
@@ -398,7 +397,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
             string value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value), false);
         }
-
 
         [TestMethod]
         public void GetRunDataMetricsShouldNotAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()

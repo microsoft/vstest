@@ -84,10 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
             this.testRunCriteria = testRunCriteria;
             this.ExecutionManager = executionManager;
-
             this.State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
-
             this.requestData = requestData;
         }
 
