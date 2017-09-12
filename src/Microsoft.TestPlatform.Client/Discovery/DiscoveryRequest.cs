@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using System.Linq;
     using System.Threading;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -53,6 +54,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 this.discoveryInProgress = true;
                 try
                 {
+                    TestCaseFilterExpression filterExpression = this.GetTestCaseFilter();
+                    this.OnDiscoveryStart.SafeInvoke(this, new DiscoveryStartEventArgs(this.DiscoveryCriteria, filterExpression), "DiscoveryRequest.DiscoveryStart");
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
                 catch
@@ -131,6 +134,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             return true;
         }
+
+        /// <summary>
+        /// Gets TestCaseFilterExpression from discovery criteria's test case filter
+        /// </summary>
+        private TestCaseFilterExpression GetTestCaseFilter()
+        {
+            FilterExpressionWrapper filterExpressionWrapper = !string.IsNullOrEmpty(this.DiscoveryCriteria.TestCaseFilter) ? new FilterExpressionWrapper(this.DiscoveryCriteria.TestCaseFilter) : null;
+            return (filterExpressionWrapper != null && string.IsNullOrEmpty(filterExpressionWrapper.ParseError)) ?
+                new TestCaseFilterExpression(filterExpressionWrapper) : null;
+        }
+
+        /// <summary>
+        /// Raised when the test discovery starts.
+        /// </summary>
+        public event EventHandler<DiscoveryStartEventArgs> OnDiscoveryStart;
 
         /// <summary>
         /// Raised when the test discovery completes.

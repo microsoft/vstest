@@ -125,5 +125,61 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             Assert.AreEqual("close", events[0]);
             Assert.AreEqual("complete", events[1]);
         }
+
+        [TestMethod]
+        public void DiscoverAsyncShouldInvokeOnDiscoveryStart()
+        {
+            bool onDiscoveryStartHandlerCalled = false;
+            this.discoveryRequest.OnDiscoveryStart += (s, e) => onDiscoveryStartHandlerCalled = true;
+
+            // Action
+            this.discoveryRequest.DiscoverAsync();
+
+            // Assert
+            Assert.IsTrue(onDiscoveryStartHandlerCalled, "DiscoverAsync should invoke OnDiscoveryStart event");
+        }
+
+        [TestMethod]
+        public void DiscoverAsyncShouldInvokeOnDiscoveryStartWithNullFilterExpressionIfFilterIsNull()
+        {
+            this.discoveryCriteria.TestCaseFilter = null;
+            DiscoveryStartEventArgs receivedArgs = null;
+            this.discoveryRequest.OnDiscoveryStart += (s, e) => receivedArgs = e;
+
+            // Action
+            this.discoveryRequest.DiscoverAsync();
+
+            // Assert
+            Assert.IsNull(receivedArgs.FilterExpression);
+        }
+
+        [TestMethod]
+        public void DiscoverAsyncShouldInvokeOnDiscoveryStartWithNullFilterExpressionIfFilterIsInvalid()
+        {
+            this.discoveryCriteria.TestCaseFilter = "Name=Test1=Test2";
+            DiscoveryStartEventArgs receivedArgs = null;
+            this.discoveryRequest.OnDiscoveryStart += (s, e) => receivedArgs = e;
+
+            // Action
+            this.discoveryRequest.DiscoverAsync();
+
+            // Assert
+            Assert.IsNull(receivedArgs.FilterExpression);
+        }
+
+        [TestMethod]
+        public void DiscoverAsyncShouldInvokeOnDiscoveryStartWithProperFilterExpressionIfFilterIsValid()
+        {
+            this.discoveryCriteria.TestCaseFilter = "Name=Test1";
+            DiscoveryStartEventArgs receivedArgs = null;
+            this.discoveryRequest.OnDiscoveryStart += (s, e) => receivedArgs = e;
+
+            // Action
+            this.discoveryRequest.DiscoverAsync();
+
+            // Assert
+            Assert.IsNotNull(receivedArgs.FilterExpression);
+            Assert.AreEqual(this.discoveryCriteria.TestCaseFilter, receivedArgs.FilterExpression.TestCaseFilterValue);
+        }
     }
 }

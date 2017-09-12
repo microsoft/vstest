@@ -126,6 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Start the stop watch for calculating the test run time taken overall
                     this.runRequestTimeTracker.Start();
+                    this.OnRunStart.SafeInvoke(this, new TestRunStartEventArgs(this.testRunCriteria), "TestRun.TestRunStart");
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
                     EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
 
@@ -261,6 +262,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// Raised when the test run statistics change.
         /// </summary>
         public event EventHandler<TestRunChangedEventArgs> OnRunStatsChange;
+
+        /// <summary>
+        /// Raised when the test run starts.
+        /// </summary>
+        public event EventHandler<TestRunStartEventArgs> OnRunStart;
 
         /// <summary>
         /// Raised when the test message is received.
