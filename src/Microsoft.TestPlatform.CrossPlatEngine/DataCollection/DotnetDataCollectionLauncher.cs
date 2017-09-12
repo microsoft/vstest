@@ -4,14 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -29,13 +26,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IFileHelper fileHelper;
 
-        private IDotnetHostHelper dotnetHostHelper;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class. 
         /// </summary>
         public DotnetDataCollectionLauncher()
-            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper(), TestSessionMessageLogger.Instance)
+            : this(new ProcessHelper(), new FileHelper(), TestSessionMessageLogger.Instance)
         {
         }
 
@@ -48,18 +43,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="fileHelper">
         /// The file Helper.
         /// </param>
-        /// <param name="dotnetHostHelper">
-        /// The dotnet Host Helper.
-        /// </param>
         /// <param name="messageLogger">
         /// The message Logger.
         /// </param>
-        internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetHostHelper, IMessageLogger messageLogger) : base(processHelper, messageLogger)
+        internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper, IMessageLogger messageLogger) : base(processHelper, messageLogger)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.DataCollectorProcessId = -1;
-            this.dotnetHostHelper = dotnetHostHelper;
         }
 
         /// <summary>
