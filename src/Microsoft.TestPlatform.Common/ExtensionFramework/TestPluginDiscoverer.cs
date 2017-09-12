@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
         /// </summary>
-        public TestPluginDiscoverer() : this(new Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper())
+        public TestPluginDiscoverer() : this(new FileHelper())
         {
         }
 
@@ -85,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
             if (!extensionPaths.Any())
             {
-                AddKnownExtensions(ref extensionPaths);
+                this.AddKnownExtensions(ref extensionPaths);
             }
 
             this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);

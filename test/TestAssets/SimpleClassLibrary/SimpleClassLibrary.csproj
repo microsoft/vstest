@@ -4,7 +4,6 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net451</TargetFrameworks>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>

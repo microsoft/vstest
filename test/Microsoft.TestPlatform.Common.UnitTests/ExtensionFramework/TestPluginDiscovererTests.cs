@@ -142,6 +142,21 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             mockFileHelper.Verify(fh => fh.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll"), Times.Once);
         }
 
+        [TestMethod]
+        public void GetTestExtensionsInformationShouldAddMSTestV1UWPAdaptersIfTheyExists()
+        {
+            var pathToExtensions = new List<string>();
+
+            Mock<IFileHelper> mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll")).Returns(true);
+
+            this.testPluginDiscoverer = new TestPluginDiscoverer(mockFileHelper.Object);
+
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+
+            mockFileHelper.Verify(fh => fh.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll"), Times.Once);
+        }
+
         #region implementations
 
         #region Discoverers
