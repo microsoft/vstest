@@ -95,6 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static ISymbolReader GetSymbolReader(string binaryPath)
         {
             var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
+
+            // For remote scenario, also look for pdb in current directory, (esp for UWP)
+            // The alternate search path should be an input from Adapters, but since it is not so currently adding a HACK
+            pdbFilePath = !File.Exists(pdbFilePath) ? Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(pdbFilePath)) : pdbFilePath;
             using (var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read))
             {
                 if (PortablePdbReader.IsPortable(stream))
