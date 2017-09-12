@@ -161,6 +161,8 @@ function install_cli()
     $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
     log "install_cli: Get the shared netcoreapp1.1 runtime..."
     $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
+    log "install_cli: Get the shared netcoreapp2.0 runtime..."
+    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
     #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
     #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
 
