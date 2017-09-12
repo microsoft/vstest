@@ -7,13 +7,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
+    using System.Reflection;
+    using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -76,7 +80,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         internal ProxyDataCollectionManager(string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper, IDataCollectionLauncher dataCollectionLauncher)
         {
-            this.settingsXml = settingsXml;
+            // DataCollector process needs the information of the Extensions folder
+            // Add the Extensions folder path to runsettings.
+            this.settingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
+
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
@@ -240,6 +247,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     new PlatformEnvironment().GetCurrentManagedThreadId(),
                     Path.GetExtension(logFile))).AddDoubleQuote();
+        }
+
+        /// <summary>
+        /// Update Extensions path folder in testadapterspaths in runsettings.
+        /// </summary>
+        /// <param name="settingsXml"></param>
+        private static string UpdateExtensionsFolderInRunSettings(string settingsXml)
+        {
+            if (string.IsNullOrWhiteSpace(settingsXml))
+            {
+                return settingsXml;
+            }
+
+            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions");
+
+            using (var stream = new StringReader(settingsXml))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var tapNode = RunSettingsProviderExtensions.GetXmlNode(document, "RunConfiguration.TestAdaptersPaths");
+
+                if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
+                {
+                    extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
+                }
+
+                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
+
+                return document.OuterXml;
+            }
         }
     }
 }

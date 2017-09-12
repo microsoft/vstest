@@ -18,9 +18,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime)
+        public void RunTestExecutionWithPlatformx64(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x64";
             string testhostProcessName = string.Empty;
@@ -37,9 +37,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime)
+        public void RunTestExecutionWithPlatformx86(RunnnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var platformArg = " /Platform:x86";
             string testhostProcessName = string.Empty;
@@ -77,10 +77,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue);
+                this.FrameworkArgValue,
+                this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, platformArg);
-
-            arguments = arguments + " /InIsolation";
 
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(

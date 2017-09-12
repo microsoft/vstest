@@ -4,14 +4,15 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -264,8 +265,54 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
             Assert.AreEqual(DummyPayload, message);
         }
-
         #endregion
+
+        [TestMethod]
+        public void SocketPollShouldNotHangServerClientCommunication()
+        {
+            // Measure the throughput with socket communication v1 (SocketCommunicationManager)
+            // implementation.
+            var server = new SocketCommunicationManager();
+            var client = new SocketCommunicationManager();
+
+            int port = server.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait();
+            server.AcceptClientAsync().Wait();
+
+            server.WaitForClientConnection(1000);
+            client.WaitForServerConnection(1000);
+
+            var clientThread = new Thread(() => SendData(client));
+            clientThread.Start();
+
+            var dataReceived = 0;
+            while (dataReceived < 2048 * 5)
+            {
+                dataReceived += server.ReceiveRawMessageAsync(CancellationToken.None).Result.Length;
+                Task.Delay(1000).Wait();
+            }
+
+            clientThread.Join();
+
+            Assert.IsTrue(true);
+        }
+
+        private static void SendData(ICommunicationManager communicationManager)
+        {
+            // Having less than the buffer size in SocketConstants.BUFFERSIZE.
+            var dataBytes = new byte[2048];
+            for (int i = 0; i < dataBytes.Length; i++)
+            {
+                dataBytes[i] = 0x65;
+            }
+
+            var dataBytesStr = Encoding.UTF8.GetString(dataBytes);
+
+            for (int i = 0; i < 5; i++)
+            {
+                communicationManager.SendRawMessage(dataBytesStr);
+            }
+        }
 
         private int StartServer()
         {

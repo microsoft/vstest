@@ -151,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithSources.AdapterSourceMap,
+                                        testRunCriteriaWithSources.Package,
                                         testRunCriteriaWithSources.RunSettings,
                                         testRunCriteriaWithSources.TestExecutionContext,
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
@@ -173,6 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithTests.Tests,
+                                        testRunCriteriaWithTests.Package,
                                         testRunCriteriaWithTests.RunSettings,
                                         testRunCriteriaWithTests.TestExecutionContext, 
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
@@ -271,13 +273,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc/>
-        public void DiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        public void DiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
             var discoveryCompletePayload = new DiscoveryCompletePayload
             {
-                TotalTests = totalTests,
-                LastDiscoveredTests = isAborted ? null : lastChunk,
-                IsAborted = isAborted
+                TotalTests = discoveryCompleteEventArgs.TotalCount,
+                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
+                IsAborted = discoveryCompleteEventArgs.IsAborted
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);

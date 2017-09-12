@@ -4,9 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using vstest.console.UnitTests.Processors;
+
+    using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
 
     [TestClass]
     public class InIsolationArgumentProcessorTests

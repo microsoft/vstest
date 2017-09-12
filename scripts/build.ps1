@@ -61,8 +61,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "2.1.0-preview1-006329"
-$env:DOTNET_RUNTIME_VERSION = "2.0.0-preview2-25331-01"
+$env:DOTNET_CLI_VERSION = "LATEST"
+$env:DOTNET_RUNTIME_VERSION = "LATEST"
 $env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
 
@@ -74,6 +74,8 @@ $TPB_Solution = "TestPlatform.sln"
 $TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
+$TPB_TargetFrameworkUap = "uap10.0"
+$TPB_TargetFrameworkNS1_4 = "netstandard1.4"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 # Version suffix is empty for RTM releases
@@ -144,10 +146,15 @@ function Install-DotNetCli
         & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
     }
 
-    # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
+    # Get netcoreapp2.0 shared components.
+    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.0.0")) {
+        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.0.0' -Channel 'release/2.0.0'
     }
+
+    # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
+    #if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
+        #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
+    #}
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -158,8 +165,6 @@ function Restore-Package
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
 
-    Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
-    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
     & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
@@ -203,6 +208,7 @@ function Publish-Package
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
+    $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS1_4")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
@@ -227,22 +233,22 @@ function Publish-Package
     Write-Log "Package: Publish testhost\testhost.csproj"
     Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore $testhostCorePackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkNS1_4 $testhostNS1_4PackageDir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
-    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
+    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir  
 
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
-    $netFull_Dir = "TestHost"
-    $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
+    $coreCLRFull_Dir = "TestHost"
+    $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
-
-    $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
-    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
+    
+    New-Item -ItemType directory -Path $fullCLRPackageDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force -recurse
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
@@ -252,13 +258,16 @@ function Publish-Package
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
     $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+    $platformAbstractionUap = Join-Path $platformAbstraction $TPB_TargetFrameworkUap
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
+    Copy-Item $platformAbstractionUap\* $testhostNS1_4PackageDir -Force
     
     # Publish msdia
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostNS1_4PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
     # Copy over the logger assemblies to the Extensions folder.
@@ -269,7 +278,7 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force | Out-Null
     New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force | Out-Null
 
-    # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
+    # If there are some dependencies for the logger assemblies, those need to be moved too.
     # Ideally we should just be publishing the loggers to the Extensions folder.
     $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
     foreach($file in $loggers) {
@@ -289,8 +298,16 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
-	
-	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    
+    # Copy Event Log Datacollector to Extensions folder.
+    $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
+    $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework
+    Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $fullCLRExtensionsDir -Force
+    Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $fullCLRExtensionsDir -Force
+    Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $coreCLRExtensionsDir -Force
+    Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
+    
+    # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
@@ -329,17 +346,21 @@ function Create-VsixPackage
     $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
     $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
-    $testhostPackageDir = Join-Path $packageDir "TestHost"
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-955793\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-981363\contentFiles\any\any"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+    # Copy QtAgent Related depedencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-981363\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+    
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     if (-not (Test-Path $testImpactComComponentsDir)) {
@@ -398,6 +419,11 @@ function Create-NugetPackages
     Copy-Item $tpNuspecDir\"Microsoft.Net.Test.Sdk.props" $stagingDir -Force
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
+
+    #Copy Uap target, & props
+    $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS1_4")
+    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.targets -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"

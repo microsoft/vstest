@@ -52,7 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     new RunSpecificTestsArgumentExecutor(
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
-                        TestRequestManager.Instance));
+                        TestRequestManager.Instance,
+                        ConsoleOutput.Instance));
                 }
 
                 return this.executor;
@@ -144,7 +145,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public RunSpecificTestsArgumentExecutor(
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
-            ITestRequestManager testRequestManager)
+            ITestRequestManager testRequestManager,
+            IOutput output)
         {
             Contract.Requires(options != null);
             Contract.Requires(testRequestManager != null);
@@ -153,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.testRequestManager = testRequestManager;
 
             this.runSettingsManager = runSettingsProvider;
-            this.output = ConsoleOutput.Instance;
+            this.output = output;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
         }
 
@@ -228,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+                this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
             return this.testRequestManager.DiscoverTests(
@@ -247,7 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     string missingFilters = string.Join(", ", this.undiscoveredFilters);
                     string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, this.discoveredTestCount, missingFilters);
-                    this.output.Warning(warningMessage);
+                    this.output.Warning(false, warningMessage);
                 }
 
                 // for command line keep alive is always false.
@@ -272,13 +274,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     // No tests were discovered from the given sources.
                     warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", this.commandLineOptions.Sources));
 
-                    if (!this.commandLineOptions.UseVsixExtensions)
+                    if (string.IsNullOrEmpty(this.commandLineOptions.TestAdapterPath))
                     {
-                        warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsFoundWarningMessageWithSuggestionToUseVsix, warningMessage, CommandLineResources.SuggestUseVsixExtensionsIfNoTestsIsFound);
+                        warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.StringFormatToJoinTwoStrings, warningMessage, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
                 }
 
-                this.output.Warning(warningMessage);
+                this.output.Warning(false, warningMessage);
             }
 
             return result;

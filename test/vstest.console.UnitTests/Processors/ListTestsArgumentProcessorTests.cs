@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using vstest.console.UnitTests.Processors;
 
@@ -22,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using CoreUtilities.Tracing.Interfaces;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     // <summary>
     // Tests for ListTestsArgumentProcessor

@@ -10,9 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.IO;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;

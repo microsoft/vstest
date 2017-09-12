@@ -79,6 +79,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private bool shouldCollectSourceInformation;
 
+        /// <summary>
+        /// Gets the targetDevice IP for UWP app deployment
+        /// </summary>
+        private string targetDevice;
+
         #endregion
 
         #region Constructor
@@ -104,6 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.designMode = false;
             this.inIsolation = false;
             this.shouldCollectSourceInformation = false;
+            this.targetDevice = null;
             this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         }
 
@@ -300,6 +306,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.framework = value;
                 this.TargetFrameworkSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the target device IP. For Phone this value is Device, for emulators "Mobile Emulator 10.0.15063.0 WVGA 4 inch 1GB"
+        /// </summary>
+        public string TargetDevice
+        {
+            get
+            {
+                return this.targetDevice;
+            }
+
+            set
+            {
+                this.targetDevice = value;
             }
         }
 
@@ -518,6 +540,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement binariesRoot = doc.CreateElement("BinariesRoot");
                 binariesRoot.InnerXml = this.BinariesRoot;
                 root.AppendChild(binariesRoot);
+            }
+
+            if(!string.IsNullOrEmpty(this.TargetDevice))
+            {
+                XmlElement targetDevice = doc.CreateElement("TargetDevice");
+                targetDevice.InnerXml = this.TargetDevice;
+                root.AppendChild(targetDevice);
             }
 
             return root;
@@ -796,6 +825,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             }
 
                             runConfiguration.ExecutionThreadApartmentState = apartmentState;
+                            break;
+
+                        case "TargetDevice":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.TargetDevice = reader.ReadElementContentAsString();
                             break;
 
                         default:

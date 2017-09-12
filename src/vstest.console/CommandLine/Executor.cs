@@ -20,6 +20,7 @@
 //   Help output.
 //   Required
 //   Single or multiple
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
@@ -27,21 +28,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using System.IO;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -182,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 else
                 {
                     // No known processor was found, report an error and continue
-                    this.Output.Error(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
+                    this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
 
                     // Add the help processor
                     if (result == 0)
@@ -216,10 +215,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     // the argument processor, but also initializes it.
                     executorInstance = processor.Executor.Value;
                 }
-                catch (CommandLineException e)
+                catch (Exception ex)
                 {
-                    this.Output.Error(e.Message);
-                    result = 1;
+                    if (ex is CommandLineException || ex is TestPlatformException)
+                    {
+                        this.Output.Error(false, ex.Message);
+                        result = 1;
+                    }
+                    else
+                    {
+                        // Let it throw - User must see crash and report it with stack trace!
+                        // No need for recoverability as user will start a new vstest.console anwyay
+                        throw;
+                    }
                 }
             }
 
@@ -258,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                         // Update the count so we do not print the error out for this argument multiple times.
                         commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
-                        this.Output.Error(string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
+                        this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
                     }
                 }
             }
@@ -305,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 if (ex is CommandLineException || ex is TestPlatformException)
                 {
                     EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
-                    this.Output.Error(ex.Message);
+                    this.Output.Error(false, ex.Message);
                     result = ArgumentProcessorResult.Fail;
                 }
                 else
@@ -408,7 +416,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             catch (Exception)
             {
-                this.Output.Error(string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fullPath));
+                this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fullPath));
                 responseFileArguments = new string[0];
                 result = 1;
             }

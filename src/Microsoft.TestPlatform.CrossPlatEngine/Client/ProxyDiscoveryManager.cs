@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             try
             {
@@ -94,10 +94,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
+                    discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
-                    // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
-                    // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
-                    this.UpdateTestSources(discoveryCriteria.Sources, discoveryCriteria.AdapterSourceMap);
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }
             }
@@ -116,7 +114,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
                 // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
+
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }
         }
 

@@ -29,8 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri,string>, IEnumerable<string>> executorUriVsSourceList;
 
-        public RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-            : this(adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
+        public RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+            : this(adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
         {
         }
 
@@ -38,14 +38,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Used for unit testing only.
         /// </summary>
         /// <param name="adapterSourceMap"></param>
+        /// <param name="package">The user input test source(package) if it differ from actual test source otherwise null.</param>
         /// <param name="testRunCache"></param>
         /// <param name="runSettings"></param>
         /// <param name="testExecutionContext"></param>
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsSourceList"></param>  
-        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
-            : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
+        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
+            : base(package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.adapterSourceMap = adapterSourceMap;
             this.executorUriVsSourceList = executorUriVsSourceList;

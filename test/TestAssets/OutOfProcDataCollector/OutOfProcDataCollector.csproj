@@ -2,11 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net451</TargetFrameworks>
     <Version>15.0.0.0</Version>
-  </PropertyGroup>
-
-  <!-- TODO Remove when implicit references are available for netcoreapp2.0 -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <RuntimeFrameworkVersion>2.0.0-beta-001737-00</RuntimeFrameworkVersion>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -12,12 +12,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 

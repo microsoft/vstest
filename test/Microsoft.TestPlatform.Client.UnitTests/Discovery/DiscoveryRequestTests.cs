@@ -1,20 +1,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Client.Discovery;
-
+    using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using ObjectModel;
-    using ObjectModel.Client;
-    using ObjectModel.Engine;
 
     [TestClass]
     public class DiscoveryRequestTests
@@ -105,9 +104,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCloseDiscoveryManager()
         {
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler;
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
 
-            eventsHandler.HandleDiscoveryComplete(1, Enumerable.Empty<TestCase>(), false);
+            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
 
             this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
         }
@@ -118,9 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             var events = new List<string>();
             this.discoveryManager.Setup(dm => dm.Close()).Callback(() => events.Add("close"));
             this.discoveryRequest.OnDiscoveryComplete += (s, e) => events.Add("complete");
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler;
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
 
-            eventsHandler.HandleDiscoveryComplete(1, Enumerable.Empty<TestCase>(), false);
+            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);

@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public class Framework
     {
 #if NET451
-        private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.5.1");
+        private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.0");
 #else
         private static readonly Framework Default = Framework.FromString(".NETCoreApp,Version=v1.0");
 #endif
@@ -63,6 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         break;
                     case "FrameworkCore10":
                         frameworkName = new FrameworkName(".NETCoreApp,Version=1.0");
+                        break;
+                    case "FrameworkUap10":
+                        frameworkName = new FrameworkName("Uap,Version=10.0");
                         break;
                     default:
                         return null;

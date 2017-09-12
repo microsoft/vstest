@@ -3,7 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
 
     /// <summary>
@@ -64,6 +66,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         FileAttributes GetFileAttributes(string path);
 
         /// <summary>
+        /// Gets the version information of the file.
+        /// </summary>
+        /// <param name="path">Full path to the file.</param>
+        /// <returns>File Version information of the file.</returns>
+        Version GetFileVersion(string path);
+
+        /// <summary>
         /// Copy a file in the file system.
         /// </summary>
         /// <param name="sourcePath">Full path of the file.</param>
@@ -76,5 +85,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="sourcePath">Full path of the file.</param>
         /// <param name="destinationPath">Target path for the file.</param>
         void MoveFile(string sourcePath, string destinationPath);
+
+        /// <summary>
+        /// The write all text to file.
+        /// </summary>
+        /// <param name="filePath">
+        /// The file Path.
+        /// </param>
+        /// <param name="content">
+        /// The content.
+        /// </param>
+        void WriteAllTextToFile(string filePath, string content);
+
+        /// <summary>
+        /// Gets full path if relative path is specified.
+        /// </summary>
+        /// <param name="path">
+        /// The path.
+        /// </param>
+        /// <returns>
+        /// Full path.
+        /// </returns>
+        string GetFullPath(string path);
+
+        /// <summary>
+        /// Helper for deleting a directory. It deletes the directory only if its empty.
+        /// </summary>
+        /// <param name="directoryPath">
+        /// The directory path.
+        /// </param>
+        void DeleteEmptyDirectroy(string directoryPath);
     }
 }
