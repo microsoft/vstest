@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
     /// <summary>
@@ -14,5 +15,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Gets the run settings specified for this request.
         /// </summary>
         public IRunSettings RunSettings { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets the FilterExpressionWrapper instance as created from filter string.
+        /// </summary>
+        internal FilterExpressionWrapper FilterExpressionWrapper {get; set; }
     }
 }

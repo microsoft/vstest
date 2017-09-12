@@ -73,6 +73,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldProcessAllSources()
         {
+            // Testcase filter should be passed to all parallel discovery criteria.
+            this.testDiscoveryCriteria.TestCaseFilter = "Name~Test";
             var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false);
 
             Task.Run(() =>
@@ -169,6 +171,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             Task.Delay(100).Wait();
 
+                            Assert.AreEqual(this.testDiscoveryCriteria.TestCaseFilter, criteria.TestCaseFilter);
                             handler.HandleDiscoveryComplete(isAbort ? new DiscoveryCompleteEventArgs(-1, isAbort) : new DiscoveryCompleteEventArgs(10, isAbort) , null);
                         });
             }

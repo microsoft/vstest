@@ -108,6 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     new DiscovererEnumerator(discoveryResultCache).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
+                        discoveryCriteria.TestCaseFilter,
                         this.sessionMessageLogger);
                 }
             }

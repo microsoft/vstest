@@ -51,15 +51,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public string SolutionDirectory { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the FilterExpressionWrapper instance as created from filter string.
-        /// </summary>
-        internal FilterExpressionWrapper FilterExpressionWrapper
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Returns TestCaseFilterExpression validated for supportedProperties.
         /// If there is a parsing error or filter expression has unsupported properties, TestPlatformFormatException() is thrown.
         /// </summary>
