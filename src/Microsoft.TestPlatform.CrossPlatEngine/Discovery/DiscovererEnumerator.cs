@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -52,13 +53,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="testExtensionSourceMap"> The test extension source map. </param>
         /// <param name="settings"> The settings. </param>
+        /// <param name="testCaseFilter"> The test case filter. </param>
         /// <param name="logger"> The logger. </param>
-        internal void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, IMessageLogger logger)
+        internal void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
         {
             this.testPlatformEventSource.DiscoveryStart();
             foreach (var kvp in testExtensionSourceMap)
             {
-                this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, logger);
+                this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, testCaseFilter, logger);
             }
             this.testPlatformEventSource.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
         }
@@ -71,10 +73,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="extensionAssembly"> The extension Assembly. </param>
         /// <param name="sources"> The sources.   </param>
         /// <param name="settings"> The settings.   </param>
+        /// <param name="settings"> The test case filter. </param>
         /// <param name="logger"> The logger.  </param>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
             Justification = "This methods must invoke all possible discoverers and not fail or crash in any one.")]
-        private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, IMessageLogger logger)
+        private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
         {
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger);
 
@@ -85,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
 
             var context = new DiscoveryContext { RunSettings = settings };
+            context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
 
             // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
             this.SetAdapterLoggingSettings(logger, settings);
