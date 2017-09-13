@@ -338,6 +338,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             // Redirect the events to the InternalTestLoggerEvents
             testRunRequest.TestRunMessage += this.TestRunMessageHandler;
+            testRunRequest.OnRunStart += this.TestRunStartHandler;
             testRunRequest.OnRunStatsChange += this.TestRunStatsChangedHandler;
             testRunRequest.OnRunCompletion += this.TestRunCompleteHandler;
             testRunRequest.DataCollectionMessage += this.DataCollectionMessageHandler;
@@ -355,6 +356,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.CheckDisposed();
             this.discoveryRequest = discoveryRequest;
             discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
+            discoveryRequest.OnDiscoveryStart += this.DiscoveryStartHandler;
         }
 
         /// <summary>
@@ -366,6 +368,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
 
             testRunRequest.TestRunMessage -= this.TestRunMessageHandler;
+            testRunRequest.OnRunStart -= this.TestRunStartHandler;
             testRunRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
             testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
             this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
@@ -379,6 +382,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
             discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
+            discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
         }
 
         /// <summary>
@@ -437,6 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     if (this.runRequest != null)
                     {
                         this.runRequest.TestRunMessage -= this.TestRunMessageHandler;
+                        this.runRequest.OnRunStart -= this.TestRunStartHandler;
                         this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
                         this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
                         this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
@@ -445,6 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     if (this.discoveryRequest != null)
                     {
                         this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
+                        this.discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
                     }
 
                     this.loggerEvents.Dispose();
@@ -531,6 +537,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         }
 
         /// <summary>
+        /// Called when a test run starts.
+        /// </summary>
+        private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+        {
+            this.loggerEvents.RaiseTestRunStart(e);
+        }
+
+        /// <summary>
         /// Called when a test run is complete.
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
@@ -564,6 +578,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
         {
             this.loggerEvents.RaiseMessage(e);
+        }
+
+        /// <summary>
+        /// Called when test discovery starts.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DiscoveryStartHandler(object sender, DiscoveryStartEventArgs e)
+        {
+            this.loggerEvents.RaiseDiscoveryStart(e);
         }
         #endregion
 

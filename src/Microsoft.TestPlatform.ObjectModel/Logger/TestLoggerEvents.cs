@@ -30,6 +30,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public abstract event EventHandler<TestRunMessageEventArgs> TestRunMessage;
 
         /// <summary>
+        /// Raised when a test run starts.
+        /// </summary>
+        public abstract event EventHandler<TestRunStartEventArgs> TestRunStart;
+
+        /// <summary>
         /// Raised when a test result is received.
         /// </summary>
         public abstract event EventHandler<TestResultEventArgs> TestResult;
@@ -39,6 +44,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         public abstract event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
 
+        /// <summary>
+        /// Raised when test discovery starts
+        /// </summary>
+        public abstract event EventHandler<DiscoveryStartEventArgs> DiscoveryStart;
         #endregion
     }
 }

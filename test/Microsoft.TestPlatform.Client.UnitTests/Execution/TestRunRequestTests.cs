@@ -343,6 +343,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo), Times.Once);
         }
 
+        /// <summary>
+        /// ExecuteAsync should invoke OnRunStart event.
+        /// </summary>
         [TestMethod]
         public void ExecuteAsyncShouldInvokeOnRunStart()
         {

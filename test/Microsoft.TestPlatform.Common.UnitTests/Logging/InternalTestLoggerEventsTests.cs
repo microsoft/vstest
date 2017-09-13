@@ -3,13 +3,17 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Threading;
+
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
@@ -251,6 +255,132 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             Assert.IsFalse(receivedRunMessage);
         }
+
+        /// <summary>
+        /// Exception should be thrown if event args passed is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryStartShouldThrowExceptionIfNullDiscoveryStartEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryStart(null);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryStartShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
+            TestCaseFilterExpression testCaseFilter = new TestCaseFilterExpression(new FilterExpressionWrapper("Name=Test2"));
+            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria, testCaseFilter);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryStart(discoveryStartEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryStartShouldInvokeRegisteredEventHandler()
+        {
+            bool discoveryStartReceived = false;
+            DiscoveryStartEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
+            TestCaseFilterExpression testCaseFilter = new TestCaseFilterExpression(new FilterExpressionWrapper("Name=Test2"));
+            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria, testCaseFilter);
+
+            // Register for the discovery start event.
+            loggerEvents.DiscoveryStart += (sender, e) =>
+            {
+                discoveryStartReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the discovery start event.
+            loggerEvents.RaiseDiscoveryStart(discoveryStartEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(discoveryStartReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, discoveryStartEventArgs);
+            Assert.AreEqual("Name=Test2", receivedEventArgs.FilterExpression.TestCaseFilterValue);
+            Assert.AreEqual("Name=Test1", receivedEventArgs.DiscoveryCriteria.TestCaseFilter);
+        }
+
+        /// <summary>
+        /// Exception should be thrown if event args passed is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseTestRunStartShouldThrowExceptionIfNullTestRunStartEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseTestRunStart(null);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseTestRunStartShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseTestRunStartShouldInvokeRegisteredEventHandler()
+        {
+            bool testRunStartReceived = false;
+            TestRunStartEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
+
+            // Register for the test run start event.
+            loggerEvents.TestRunStart += (sender, e) =>
+            {
+                testRunStartReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the test run start event.
+            loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(testRunStartReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, testRunStartEventArgs);
+            Assert.AreEqual("Name=Test1", receivedEventArgs.TestRunCriteria.TestCaseFilter);
+        }
+
         /// <summary>
         /// Gets a disposed instance of the logger events.
         /// </summary>
