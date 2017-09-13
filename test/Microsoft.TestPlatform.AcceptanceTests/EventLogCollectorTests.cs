@@ -34,13 +34,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.ValidateSummaryStatus(3, 0, 0);
             this.VaildateDataCollectorOutput();
-            this.StdErrorDoesNotContains("An exception occurred while collecting final entries from the event log");
+            this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
             this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-            this.StdErrorDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'EntryTypes' in its configuration:");             
-            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration:");             
-            this.StdErrorDoesNotContains("Unable to read event log");             
-    }
+            this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            this.StdErrorDoesNotContains("Unable to read event log");
+        }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
@@ -56,11 +54,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
-            this.StdErrorDoesNotContains("An exception occurred while collecting final entries from the event log");
+            this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
             this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
-            this.StdErrorDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
-            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'EntryTypes' in its configuration:");
-            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration:");
+            this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
             this.StdErrorDoesNotContains("Unable to read event log");
         }
 
@@ -133,11 +129,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var fileContent3 = File.ReadAllText(resultFiles[2]);
             var fileContent4 = File.ReadAllText(resultFiles[3]);
 
-            Assert.IsTrue(fileContent1.Contains("110") && fileContent1.Contains("111") && fileContent1.Contains("112"));
-            Assert.IsTrue(fileContent2.Contains("220") && fileContent2.Contains("221") && fileContent2.Contains("222") && fileContent2.Contains("223"));
-            Assert.IsTrue(fileContent3.Contains("330") && fileContent3.Contains("331") && fileContent3.Contains("332"));
+            Assert.IsTrue(this.VerifyOrder(fileContent1, new[] { "110", "111", "112" }));
+            Assert.IsTrue(this.VerifyOrder(fileContent2, new[] { "220", "221", "222", "223" }));
+            Assert.IsTrue(this.VerifyOrder(fileContent3, new[] { "330", "331", "332" }));
+            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }));
+        }
 
-            Assert.IsTrue(fileContent4.Contains("110") && fileContent4.Contains("111") && fileContent4.Contains("112") && fileContent4.Contains("220") && fileContent4.Contains("221") && fileContent4.Contains("222") && fileContent4.Contains("23") && fileContent3.Contains("330") && fileContent4.Contains("331") && fileContent4.Contains("332"));
+        private bool VerifyOrder(string content, string[] eventIds)
+        {
+            int currentIndex = 0;
+            for (int i = 0; i < eventIds.Length; i++)
+            {
+                currentIndex = content.IndexOf(eventIds[i], currentIndex);
+                if (currentIndex == -1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
