@@ -131,11 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private IRunSettingsProvider runSettingsManager;
 
-        /// <summary>
-        /// Registers for discovery events during discovery
-        /// </summary>
-        private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
-
         #endregion
 
         #region Constructor
@@ -173,7 +168,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.testRequestManager = testRequestManager;
 
             this.runSettingsManager = runSettingsProvider;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
         }
 
         #endregion
@@ -217,43 +211,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             var success = this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
-                this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
+                null, Constants.DefaultProtocolConfig);
 
             return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
         }
 
         #endregion
-
-        private class DiscoveryEventsRegistrar : ITestDiscoveryEventsRegistrar
-        {
-            private IOutput output;
-
-            public DiscoveryEventsRegistrar(IOutput output)
-            {
-                this.output = output;
-            }
-
-            public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
-            {
-                discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;
-            }
-
-            public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
-            {
-                discoveryRequest.OnDiscoveredTests -= this.discoveryRequest_OnDiscoveredTests;
-            }
-
-            private void discoveryRequest_OnDiscoveredTests(Object sender, DiscoveredTestsEventArgs args)
-            {
-                // List out each of the tests.
-                foreach (var test in args.DiscoveredTestCases)
-                {
-                    this.output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
-                                                    CommandLineResources.AvailableTestsFormat,
-                                                    test.DisplayName),
-                                       OutputLevel.Information);
-                }
-            }
-        }
     }
 }

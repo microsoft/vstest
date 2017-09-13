@@ -136,10 +136,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 ConsoleLogger.Output = ConsoleOutput.Instance;
             }
 
-            // Register for the events.
+            // Register for the test run events.
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
+
+            // Register for the discovery events.
+            events.DiscoveredTests += DiscoveredTestsHandler;
         }
 
         public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
@@ -464,6 +467,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     EqtTrace.Info("Skipped printing test execution time on console because it looks like the test run had faced some errors");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Called when discovered tests are received.
+        /// </summary>
+        private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+        {
+            ValidateArg.NotNull<object>(sender, "sender");
+            ValidateArg.NotNull<DiscoveredTestsEventArgs>(e, "e");
+
+            foreach (TestCase test in e.DiscoveredTestCases)
+            {
+                String output = String.Format(CultureInfo.CurrentUICulture, CommandLineResources.AvailableTestsFormat, test.DisplayName);
+                Output.WriteLine(output, OutputLevel.Information);
             }
         }
         #endregion

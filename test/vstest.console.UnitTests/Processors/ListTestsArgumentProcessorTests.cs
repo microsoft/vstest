@@ -199,21 +199,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldOutputDiscoveredTestsAndReturnSuccess()
-        {
-            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            var mockConsoleOutput = new Mock<IOutput>();
-
-            this.RunListTestArgumentProcessorExecuteWithMockSetup(mockDiscoveryRequest, mockConsoleOutput);
-
-            // Assert
-            mockDiscoveryRequest.Verify(dr => dr.DiscoverAsync(), Times.Once);
-
-            mockConsoleOutput.Verify((IOutput co) => co.WriteLine("    Test1", OutputLevel.Information));
-            mockConsoleOutput.Verify((IOutput co) => co.WriteLine("    Test2", OutputLevel.Information));
-        }
-
-        [TestMethod]
         public void ListTestArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStart()
         {
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();

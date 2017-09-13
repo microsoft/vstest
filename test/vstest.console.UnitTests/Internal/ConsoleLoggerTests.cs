@@ -25,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     public class ConsoleLoggerTests
     {
         private Mock<ITestRunRequest> testRunRequest;
+        private Mock<IDiscoveryRequest> discoveryRequest;
         private Mock<TestLoggerEvents> events;
         private Mock<IOutput> mockOutput;
         private TestLoggerManager testLoggerManager;
@@ -603,12 +604,62 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         /// <summary>
+        /// Exception should be thrown if event args is null.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveredTestsHandlerShouldThowExceptionIfEventArgsIsNull()
+        {
+            // Raise an event on mock object
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                this.discoveryRequest.Raise(m => m.OnDiscoveredTests += null, default(DiscoveredTestsEventArgs));
+            });
+        }
+
+        /// <summary>
+        /// Console output should be written in case tests are discovered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveredTestsHandlerShouldWriteToConsoleIfTestsPresent()
+        {
+            List<TestCase> testCases = new List<TestCase>();
+            testCases.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
+            testCases.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            // Raise an event on mock object
+            this.discoveryRequest.Raise(m => m.OnDiscoveredTests += null, discoveredTestsEventArgs);
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(String.Format(CultureInfo.CurrentUICulture, CommandLineResources.AvailableTestsFormat, "Test1"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(String.Format(CultureInfo.CurrentUICulture, CommandLineResources.AvailableTestsFormat, "Test2"), OutputLevel.Information), Times.Once());
+        }
+
+        /// <summary>
+        /// Console output should not be written in case there are no tests discovered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveredTestsHandlerShouldNotWriteToConsoleIfNoTestsPresent()
+        {
+            List<TestCase> testCases = new List<TestCase>();
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            // Raise an event on mock object
+            this.discoveryRequest.Raise(m => m.OnDiscoveredTests += null, discoveredTestsEventArgs);
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>()), Times.Never());
+        }
+
+        /// <summary>
         /// Setup Mocks and other dependencies
         /// </summary>
         private void Setup()
         {
-            // mock for ITestRunRequest
+            // mock for ITestRunRequest and IDiscoveryRequest
             this.testRunRequest = new Mock<ITestRunRequest>();
+            this.discoveryRequest = new Mock<IDiscoveryRequest>();
+
             this.events = new Mock<TestLoggerEvents>();
             this.mockOutput = new Mock<IOutput>();
 
@@ -623,6 +674,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             // Register TestRunRequest object
             this.testLoggerManager.RegisterTestRunEvents(this.testRunRequest.Object);
+
+            // Register DiscoveryRequest object
+            this.testLoggerManager.RegisterDiscoveryEvents(this.discoveryRequest.Object);
         }
 
         private void FlushLoggerMessages()
