@@ -51,20 +51,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void MetricsShouldThrowNullExceptionIfValueIsNull()
-        {
-            this.metricsCollection.Add("DummyMessage", null);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void MetricsShouldThrowNullExceptionIfKeyIsNull()
-        {
-            this.metricsCollection.Add(null, "DummyMessage");
-        }
-
-        [TestMethod]
         public void MetricsShouldReturnValidMetricsIfValidItemsAreThere()
         {
             this.metricsCollection.Add("DummyMessage", "DummyValue");
@@ -77,12 +63,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
 
         [TestMethod]
         public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
-        {
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
-        }
-
-        [TestMethod]
-        public void MetricsShouldReturnEmptyDictionaryIfMetricsIsNull()
         {
             Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
         }

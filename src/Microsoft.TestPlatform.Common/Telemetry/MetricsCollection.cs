@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         private Dictionary<string, string> metricDictionary;
 
         /// <summary>
-        /// The Metrics Collector
+        /// The Metrics Collection
         /// </summary>
         public MetricsCollection()
         {
@@ -38,14 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         {
             get
             {
-                if (this.metricDictionary == null || this.metricDictionary.Count == 0)
-                {
-                    return new Dictionary<string, string>();
-                }
-                else
-                {
-                    return this.metricDictionary;
-                }
+                return this.metricDictionary;
             }
         }
 
