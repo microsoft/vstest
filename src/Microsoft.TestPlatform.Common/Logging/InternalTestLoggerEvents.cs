@@ -202,10 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="args">Arguments to to be raised.</param>
         internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args)
         {
-            if (args == null)
-            {
-                throw new ArgumentNullException("args");
-            }
+            ValidateArg.NotNull<TestRunMessageEventArgs>(args, "args");
 
             this.CheckDisposed();
 
