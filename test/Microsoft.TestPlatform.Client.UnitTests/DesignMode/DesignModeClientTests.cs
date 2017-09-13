@@ -161,8 +161,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                      ITestRunEventsRegistrar testRunEventsRegistrar,
                      ProtocolConfig config) =>
                         {
-                            allTasksComplete.Set();
                             receivedTestRunPayload = trp;
+                            allTasksComplete.Set();
                         });
 
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.designModeClient.ConnectToClientAndProcessRequests(0, this.mockTestRequestManager.Object);
 
             // wait for the internal spawned of tasks to complete.
-            allTasksComplete.WaitOne(1000);
+            Assert.IsTrue(allTasksComplete.WaitOne(1000), "Timed out waiting for mock request manager.");
 
             // Assert.
             Assert.IsNotNull(receivedTestRunPayload);
