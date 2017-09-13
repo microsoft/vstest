@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -32,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
 
+        private IRequestData requestData;
+
         #endregion
 
         #region Concurrency Keeper Objects
@@ -43,9 +46,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
         
-        public ParallelProxyDiscoveryManager(Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+        public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
+            this.requestData = requestData;
         }
 
         #region IProxyDiscoveryManager
@@ -138,6 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
                 proxyDiscoveryManager = this.CreateNewConcurrentManager();
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
+                                               this.requestData,
                                                proxyDiscoveryManager,
                                                this.currentDiscoveryEventsHandler,
                                                this,
@@ -215,6 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
+                                                this.requestData,
                                                 concurrentManager,
                                                 discoveryEventsHandler,
                                                 this,
@@ -267,7 +273,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Total tests must be zero here since parallel discovery events handler adds the count
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
-                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+
                         this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);

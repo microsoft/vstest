@@ -3,18 +3,21 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
+
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-    using TestPlatform.Common.UnitTests.Utilities;
+
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -174,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
         }
@@ -197,7 +200,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
@@ -206,7 +209,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
             Assert.AreEqual(counter, 1);
         }
 
