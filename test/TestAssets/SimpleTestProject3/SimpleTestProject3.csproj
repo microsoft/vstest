@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-  <!-- Package dependency versions -->
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+  <!-- Package dependency versions -->
 
   <PropertyGroup>
     <AssemblyName>SimpleTestProject3</AssemblyName>

@@ -33,7 +33,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         [TestMethod]
         public void HandleDiscoveryCompleteShouldInformClient()
         {
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(0, false);
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(0, false, null);
+
             this.testDiscoveryEventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
             this.mockClient.Verify(th => th.DiscoveryComplete(discoveryCompleteEventArgs, null), Times.Once);
         }
@@ -41,7 +42,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         [TestMethod]
         public void HandleDiscoveryCompleteShouldNotSendASeparateTestFoundMessageToClient()
         {
-            this.testDiscoveryEventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(0, false), null);
+            this.testDiscoveryEventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(0, false, null), null);
+
             this.mockClient.Verify(th => th.SendTestCases(null), Times.Never);
         }
 
