@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
 
         public EventLogSessionContextTests()
         {
-            this.mockEventLogContainer = new DummyEventLogContainer();
+            this.mockEventLogContainer = new DummyEventLogContainer(true);
             this.eventLogContainersMap = new Dictionary<string, IEventLogContainer>();
             this.eventLogContainersMap.Add("LogName", this.mockEventLogContainer);
         }
@@ -34,23 +34,53 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         }
 
         [TestMethod]
-        public void CreateEventLogContainerEndIndexMapShouldEndIndexCreateMap()
+        public void CreateEventLogContainerEndIndexMapShouldCreateEndIndexMap()
         {
             this.eventLogSessionContext = new EventLogSessionContext(this.eventLogContainersMap);
             this.eventLogSessionContext.CreateEventLogContainerEndIndexMap();
             Assert.IsTrue(this.eventLogSessionContext.EventLogContainerEndIndexMap["LogName"] == 1);
         }
+
+        [TestMethod]
+        public void CreateEventLogContainerShouldNotAddIndexEntriesIfEventLogContainerMapsIsEmpty()
+        {
+            this.eventLogSessionContext = new EventLogSessionContext(new Dictionary<string, IEventLogContainer>());
+            this.eventLogSessionContext.CreateEventLogContainerStartIndexMap();
+            this.eventLogSessionContext.CreateEventLogContainerEndIndexMap();
+
+            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap.Count == 0);
+            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerEndIndexMap.Count == 0);
+        }
+
+        [TestMethod]
+        public void CreateEventLogContainerShouldCreateNegativeEndIndexIfLogEntriesAreEmpty()
+        {
+            var dict = new Dictionary<string, IEventLogContainer>();
+            var dummyEventLogContainer = new DummyEventLogContainer(false);
+            dict.Add("DummyEventLog", dummyEventLogContainer);
+
+            this.eventLogSessionContext = new EventLogSessionContext(dict);
+            this.eventLogSessionContext.CreateEventLogContainerStartIndexMap();
+            this.eventLogSessionContext.CreateEventLogContainerEndIndexMap();
+
+            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["DummyEventLog"] == 0);
+            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerEndIndexMap["DummyEventLog"] == -1);
+        }
     }
 
     public class DummyEventLogContainer : IEventLogContainer
     {
-        public DummyEventLogContainer()
+        public DummyEventLogContainer(bool initialize)
         {
             this.EventLogEntries = new List<EventLogEntry>(10);
             EventLog eventLog = new EventLog("Application");
-            int currentIndex = eventLog.Entries[eventLog.Entries.Count - 1].Index - eventLog.Entries[0].Index;
-            this.EventLogEntries.Add(eventLog.Entries[currentIndex]);
-            this.EventLogEntries.Add(eventLog.Entries[currentIndex - 1]);
+
+            if (initialize)
+            {
+                int currentIndex = eventLog.Entries[eventLog.Entries.Count - 1].Index - eventLog.Entries[0].Index;
+                this.EventLogEntries.Add(eventLog.Entries[currentIndex]);
+                this.EventLogEntries.Add(eventLog.Entries[currentIndex - 1]);
+            }
         }
 
         public void Dispose()

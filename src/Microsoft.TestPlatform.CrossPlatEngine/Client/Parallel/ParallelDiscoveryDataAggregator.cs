@@ -3,6 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+
     /// <summary>
     /// ParallelDiscoveryDataAggregator aggregates discovery data from parallel discovery managers
     /// </summary>
@@ -11,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #region PrivateFields
                 
         private object dataUpdateSyncObject = new object();
+        private ConcurrentDictionary<string, string> metricsAggregator;
 
         #endregion
 
@@ -18,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             IsAborted = false;
             TotalTests = 0;
+            this.metricsAggregator = new ConcurrentDictionary<string, string>();
         }
 
         #region Public Properties
@@ -35,6 +44,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// Returns the Aggregated Metrcis.
+        /// </summary>
+        /// <returns></returns>
+        public IDictionary<string, string> GetAggregatedDiscoveryDataMetrics()
+        {
+            if (this.metricsAggregator == null || this.metricsAggregator.Count == 0)
+            {
+                return new ConcurrentDictionary<string, string>();
+            }
+
+            var adapterUsedCount = this.metricsAggregator.Count(metrics =>
+                metrics.Key.Contains(TelemetryDataConstants.TotalTestsByAdapter));
+
+            var adaptersDiscoveredCount = this.metricsAggregator.Count(metrics =>
+                metrics.Key.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter));
+
+            // Aggregating Total Adapter Used Count
+            this.metricsAggregator.TryAdd(
+                TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests,
+                adapterUsedCount.ToString());
+
+            // Aggregating Total Adapters Discovered Count
+            this.metricsAggregator.TryAdd(
+                TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery,
+                adaptersDiscoveredCount.ToString());
+
+            return this.metricsAggregator;
+        }
 
         /// <summary>
         /// Aggregate discovery data 
@@ -56,6 +95,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
 
                 this.TotalTests = this.TotalTests + totalTests;
+            }
+        }
+
+        /// <summary>
+        /// Aggregates the metrics from Test Host Process.
+        /// </summary>
+        /// <param name="metrics"></param>
+        public void AggregateDiscoveryDataMetrics(IDictionary<string, string> metrics)
+        {
+            if (metrics == null || metrics.Count == 0 || metricsAggregator == null)
+            {
+                return;
+            }
+
+            foreach (var metric in metrics)
+            {
+                if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenInSecByAllAdapters) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsDiscovered) || metric.Key.Contains(TelemetryDataConstants.TotalTestsByAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec)))
+                {
+                    var newValue = Double.Parse(metric.Value);
+                    string oldValue;
+
+                    if (this.metricsAggregator.TryGetValue(metric.Key, out oldValue))
+                    {
+                        this.metricsAggregator[metric.Key] = (newValue + Double.Parse(oldValue)).ToString();
+                    }
+
+                    else
+                    {
+                        this.metricsAggregator.TryAdd(metric.Key, newValue.ToString());
+                    }
+                }
             }
         }
 
