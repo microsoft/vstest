@@ -3,13 +3,16 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Threading;
+
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
@@ -251,6 +254,125 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             Assert.IsFalse(receivedRunMessage);
         }
+
+        /// <summary>
+        /// Exception should be thrown if event args passed is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveredTestsShouldThrowExceptionIfNullDiscoveredTestsEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseDiscoveredTests(null);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveredTestsShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseDiscoveredTests(discoveredTestsEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveredTestsShouldInvokeRegisteredEventHandler()
+        {
+            bool discoveredTestsReceived = false;
+            DiscoveredTestsEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            // Register for the discovered tests event.
+            loggerEvents.DiscoveredTests += (sender, e) =>
+            {
+                discoveredTestsReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the discovered tests event.
+            loggerEvents.RaiseDiscoveredTests(discoveredTestsEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(discoveredTestsReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, discoveredTestsEventArgs);
+        }
+
+        /// <summary>
+        /// Exception should be thrown if event args passed is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryCompleteShouldThrowExceptionIfNullDiscoveryCompleteEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryComplete(null);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryCompleteShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryComplete(discoveryCompleteEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryCompleteShouldInvokeRegisteredEventHandler()
+        {
+            bool discoveryCompleteReceived = false;
+            DiscoveryCompleteEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
+
+            // Register for the discovery complete event.
+            loggerEvents.DiscoveryComplete += (sender, e) =>
+            {
+                discoveryCompleteReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the discovery complete event.
+            loggerEvents.RaiseDiscoveryComplete(discoveryCompleteEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(discoveryCompleteReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, discoveryCompleteEventArgs);
+        }
+
         /// <summary>
         /// Gets a disposed instance of the logger events.
         /// </summary>

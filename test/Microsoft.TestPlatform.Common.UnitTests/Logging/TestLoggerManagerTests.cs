@@ -372,6 +372,91 @@ namespace TestPlatform.Common.UnitTests.Logging
                     });
         }
 
+        /// <summary>
+        /// DiscoveredTests event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveredTestsHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+
+            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveredTests += null,
+                discoveredTestsEventArgs);
+
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveredTests += null,
+                discoveredTestsEventArgs);
+
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
+        /// <summary>
+        /// DiscoveryComplete event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveryCompleteHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
+
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryComplete += null,
+                discoveryCompleteEventArgs);
+
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryComplete += null,
+                discoveryCompleteEventArgs);
+
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
         [ExtensionUri("testlogger://logger")]
         [FriendlyName("TestLoggerExtension")]
         private class ValidLogger3 : ITestLogger
@@ -381,6 +466,8 @@ namespace TestPlatform.Common.UnitTests.Logging
                 events.TestRunMessage += TestMessageHandler;
                 events.TestRunComplete += Events_TestRunComplete;
                 events.TestResult += Events_TestResult;
+                events.DiscoveredTests += DiscoveredTestsHandler;
+                events.DiscoveryComplete += DiscoveryCompleteHandler;
             }
 
             private void Events_TestResult(object sender, TestResultEventArgs e)
@@ -404,6 +491,18 @@ namespace TestPlatform.Common.UnitTests.Logging
                     TestLoggerManagerTests.waitHandle.Set();
 
                 }
+            }
+
+            private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
+            }
+
+            private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
             }
 
         }

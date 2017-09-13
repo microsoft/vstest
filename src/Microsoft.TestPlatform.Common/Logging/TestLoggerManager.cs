@@ -355,6 +355,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.CheckDisposed();
             this.discoveryRequest = discoveryRequest;
             discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
+            discoveryRequest.OnDiscoveredTests += this.DiscoveredTestsHandler;
+            discoveryRequest.OnDiscoveryComplete += this.DiscoveryCompleteHandler;
         }
 
         /// <summary>
@@ -379,6 +381,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
             discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
+            discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
+            discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
         }
 
         /// <summary>
@@ -445,6 +449,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     if (this.discoveryRequest != null)
                     {
                         this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
+                        this.discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
+                        this.discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
                     }
 
                     this.loggerEvents.Dispose();
@@ -564,6 +570,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
         {
             this.loggerEvents.RaiseMessage(e);
+        }
+
+        /// <summary>
+        /// Send discovered tests to all registered listeners.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+        {
+            this.loggerEvents.RaiseDiscoveredTests(e);
+        }
+
+        /// <summary>
+        /// Called when test discovery is complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
+        {
+            this.loggerEvents.RaiseDiscoveryComplete(e);
         }
         #endregion
 

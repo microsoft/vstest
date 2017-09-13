@@ -95,6 +95,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
 
+        /// <summary>
+        /// Raised when discovered tests are received
+        /// </summary>
+        public override event EventHandler<DiscoveredTestsEventArgs> DiscoveredTests;
+
+        /// <summary>
+        /// Raised when test discovery is complete
+        /// </summary>
+        public override event EventHandler<DiscoveryCompleteEventArgs> DiscoveryComplete;
+
 #endregion
 
         #region IDisposable
@@ -179,6 +189,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
 
             this.SafeInvokeAsync(() => this.TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
+        }
+
+        /// <summary>
+        /// Raises discovered tests event to the enabled loggers.
+        /// </summary>
+        /// <param name="args"> Arguments to to be raised. </param>
+        internal void RaiseDiscoveredTests(DiscoveredTestsEventArgs args)
+        {
+            ValidateArg.NotNull<DiscoveredTestsEventArgs>(args, "args");
+
+            CheckDisposed();
+
+            SafeInvokeAsync(() => this.DiscoveredTests, args, 0, "InternalTestLoggerEvents.SendDiscoveredTests");
+        }
+
+        /// <summary>
+        /// Raises discovery complete event to the enabled loggers.
+        /// </summary>
+        /// <param name="args"> Arguments to to be raised. </param>
+        internal void RaiseDiscoveryComplete(DiscoveryCompleteEventArgs args)
+        {
+            ValidateArg.NotNull<DiscoveryCompleteEventArgs>(args, "args");
+
+            CheckDisposed();
+
+            // Sending 0 size as this event is not expected to contain any data.
+            SafeInvokeAsync(() => this.DiscoveryComplete, args, 0, "InternalTestLoggerEvents.SendDiscoveryComplete");
+
+            // Wait for the loggers to finish processing the messages for the run.
+            this.loggerEventQueue.Flush();
         }
 
         /// <summary>
