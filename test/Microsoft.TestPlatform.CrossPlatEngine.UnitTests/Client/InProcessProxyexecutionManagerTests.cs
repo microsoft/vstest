@@ -133,8 +133,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
             this.mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
-
             this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
             Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
         }
@@ -155,8 +155,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.StartTestRun should get called");
             this.mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, null, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
-
             this.mockTestHostManager.Verify(hm => hm.GetTestSources(actualSources));
             Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
         }
