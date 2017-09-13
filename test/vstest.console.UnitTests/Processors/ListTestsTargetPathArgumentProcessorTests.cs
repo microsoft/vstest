@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             ListTestsTargetPathArgumentExecutor executor = new ListTestsTargetPathArgumentExecutor(options);
 
             executor.Initialize(@"C:\sample.txt");
-            Assert.AreEqual(@"C:\sample.txt", options.TestCaseFilterValue);
+            Assert.AreEqual(@"C:\sample.txt", options.ListTestsTargetPath);
         }
 
         [TestMethod]
