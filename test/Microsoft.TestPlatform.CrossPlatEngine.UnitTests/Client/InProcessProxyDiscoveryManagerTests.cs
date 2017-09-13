@@ -26,8 +26,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<IDiscoveryManager> mockDiscoveryManager;
         private Mock<ITestRuntimeProvider> mockTestHostManager;
 
-        [TestInitialize]
-        public void TestInitialize()
+        public InProcessProxyDiscoveryManagerTests()
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockDiscoveryManager = new Mock<IDiscoveryManager>();
@@ -44,7 +43,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.inProcessProxyDiscoveryManager = null;
             this.mockTestHostManager = null;
         }
-
 
         [TestMethod]
         public void DiscoverTestsShouldCallInitialize()
