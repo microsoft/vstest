@@ -31,7 +31,7 @@ Param(
 # Variables
 #
 Write-Verbose "Setup environment variables."
-$env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
+$env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.Parent.FullName
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
@@ -44,7 +44,7 @@ $TPT_TargetFrameworkCore = "netcoreapp1.0"
 $TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
-$Script:TPT_SourceFolders =  @("..\test\TestAssets")
+$Script:TPT_SourceFolders =  @(Join-Path $env:TP_ROOT_DIR "test\TestAssets")
 $Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR, "net452")
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
@@ -53,9 +53,7 @@ $Script:TPT_Parallel = $Parallel
 $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
 $Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
-$Script:TPT_PayLoads = @([PSCustomObject]@{payload="MSTestAdapterPerfTestProject"; adapter="MsTest"; runners=@("vstest.console"); discoverygoal=@(3500); executiongoal=@(9500)},
-                         [PSCustomObject]@{payload="NUnitAdapterPerfTestProject"; adapter="nUnit"; runners=@("vstest.console","nunit.consolerunner"); discoverygoal=@(6500, 3500); executiongoal=@(45000,40000)},
-                         [PSCustomObject]@{payload="XUnitAdapterPerfTestProject"; adapter="xUnit"; runners=@("vstest.console","xunit.runner.console"); discoverygoal=@(6500, 0); executiongoal=@(50000, 38000)})
+$Script:TPT_PayLoads=New-Object System.Collections.ArrayList
 $Script:TPT_PerfIterations = 5
 $Script:TPT_Results = New-Object System.Collections.ArrayList
 $Script:TPT_DependencyProps = [xml] (Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)
@@ -78,14 +76,17 @@ $Script:ScriptFailed = $false
 #
 #Import module Benchmark
 #
-Write-Host "Installing NuGet Package provider"
-Install-PackageProvider -Name NuGet
-Write-Host "Saving BenchMark module into tools folder"
-Save-Module -Name Benchmark -Path $env:TP_TOOLS_DIR
-Write-Host "Setting InstallationPolicy to Trusted for PSGallery Repository"
-Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-Write-Host "Installing Benchmark module"
-Install-Module -Name Benchmark -Force
+function Invoke-InstallBenchmarkModule
+{
+    Write-Host "Installing NuGet Package provider"
+    Install-PackageProvider -Name NuGet
+    Write-Host "Saving BenchMark module into tools folder"
+    Save-Module -Name Benchmark -Path $env:TP_TOOLS_DIR
+    Write-Host "Setting InstallationPolicy to Trusted for PSGallery Repository"
+    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+    Write-Host "Installing Benchmark module"
+    Install-Module -Name Benchmark -Force
+}
 
 #
 # Helper functions
@@ -93,6 +94,26 @@ Install-Module -Name Benchmark -Force
 function Get-PackageDirectory($framework, $targetRuntime)
 {
     return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($framework)\$($targetRuntime)")
+}
+
+function Get-PerfConfigurations
+{
+    $configPath = Join-Path $env:TP_ROOT_DIR "scripts\perf\perfconfig.csv"
+    if(Test-Path $configPath)
+    {
+        $fileContent = Import-Csv -Path $configPath -Delimiter ";"
+        foreach($row in $fileContent)
+        {
+            $row.runners = $row.runners.Trim("(").Trim(")").Split(",")
+            $row.discoverygoal = $row.discoverygoal.Trim("(").Trim(")").Split(",")
+            $row.executiongoal = $row.executiongoal.Trim("(").Trim(")").Split(",")
+            $Script:TPT_PayLoads.Add($row) > $null
+        }
+    }
+    else
+    {
+        Write-Error "Unable to find the configuartion file: $configPath"
+    }
 }
 
 function Get-TestAdapterPath($testadapter)
@@ -129,9 +150,6 @@ function Get-AdapterVersion($testadapter)
 
 function Get-ConsoleRunnerPath($runner, $targetFrameWork)
 {
-    [xml]$dependencyProps = Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props
-
-
     if($runner -eq "vstest.console")
     {
         if($targetFrameWork -eq $TPT_TargetFrameworkCore)
@@ -144,9 +162,8 @@ function Get-ConsoleRunnerPath($runner, $targetFrameWork)
             $targetRunTime = $Script:TPT_TargetRuntime
             $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
         }
-        return $vstestConsolePath
+        return $vstestConsolePath;
     }
-
     if($runner -eq "xunit.runner.console")
     {
         return "$env:TP_PACKAGES_DIR\xunit.runner.console\$($Script:TPT_DependencyProps.Project.PropertyGroup.XUnitConsoleRunnerVersion)\tools\net452\xunit.console.exe"
@@ -182,6 +199,8 @@ function Set-CommonProperties($result, $payload)
     $result.AdapterVersion = if($($payload.currentAdapter) -ne $null -and $($payload.currentAdapter) -ne "") {(Get-AdapterVersion($result.Adapter))} else {""}
     $result.Delta = [math]::Round(($result.Goal - $result.ElapsedTime), 2)
     $result.Status = If($result.Delta -lt 0) {"FAIL"} Else {"PASS"}
+    $result.Delta = [math]::Round((($result.Delta*100)/[int]$result.ElapsedTime),2)
+    $result.Delta = [string]$result.Delta+"%"
 }
 
 function Measure-DiscoveryTime($commandtorun, $payload)
@@ -234,120 +253,132 @@ function Get-SystemInfo
     $osInfo.OSVersion=$sysinfo.Version
     $sysinfo = Get-CimInstance CIM_ComputerSystem | Select-Object -Property TotalPhysicalMemory, Domain
     $osInfo.RAMSize=$sysinfo.TotalPhysicalMemory/1GB
+    $osInfo.RAMSize = "$($osInfo.RAMSize)"+"GB"
     $osInfo.MachineName += "."+$sysinfo.Domain
     return New-Object -TypeName psobject -Property $osInfo
 }
 
-foreach ($src in $Script:TPT_SourceFolders)
+function Invoke-PerformanceTests
 {
-    $assets = Get-ChildItem -Recurse -Path $src -Include *.csproj
-
-        foreach($payload in $Script:TPT_PayLoads)
-        {
-            foreach($asset in $assets)
+    foreach ($src in $Script:TPT_SourceFolders)
+    {
+        $assets = Get-ChildItem -Recurse -Path $src -Include *.csproj
+            foreach($payload in $Script:TPT_PayLoads)
             {
-                if($payload.payload -eq $asset.Directory.Name)
+                foreach($asset in $assets)
                 {
-                    $testContainerName = $payload.payload
-                    $testOutputPath = Join-Path $asset.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
-                    $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
-                     foreach($fx in $Script:TPT_TargetFrameworks)
+                    if($payload.payload -eq $asset.Directory.Name)
                     {
-                        if ($Script:TPT_TargetFramework -ne "" -and $fx -ne $Script:TPT_TargetFramework) 
+                        $testContainerName = $payload.payload
+                        $testOutputPath = Join-Path $asset.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
+                        $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
+                         foreach($fx in $Script:TPT_TargetFrameworks)
                         {
-                            # Write-Log "Skipped framework $fx based on user setting."
-                            continue;
-                        }
-
-                        $testContainer = [System.String]::Format($testContainerPath, $fx)
-
-                        if (Test-Path $testContainer)
-                        {
-                            $adapter = $payload.adapter
-                            $testAdapterPath = Get-TestAdapterPath($adapter)
-                            if(Test-Path $testAdapterPath)
+                            if ($Script:TPT_TargetFramework -ne "" -and $fx -ne $Script:TPT_TargetFramework) 
                             {
-                                foreach($runner in $payload.runners)
+                                # Write-Log "Skipped framework $fx based on user setting."
+                                continue;
+                            }
+    
+                            $testContainer = [System.String]::Format($testContainerPath, $fx)
+    
+                            if (Test-Path $testContainer)
+                            {
+                                $adapter = $payload.adapter
+                                $testAdapterPath = Get-TestAdapterPath($adapter)
+                                if(Test-Path $testAdapterPath)
                                 {
-                                    if($runner -eq $null)
+                                    foreach($runner in $payload.runners)
                                     {
-                                        return
-                                    }
-                                    $runnerPath = Get-ConsoleRunnerPath($runner)
-                                    if(($runnerPath -ne $null) -and (Test-Path $runnerPath))
-                                    {
-                                        $payload | Add-Member containerPath $testContainer -Force
-                                        $payload | Add-Member adapterPath $testAdapterPath -Force
-                                        $payload | Add-Member currentRunner $runner -Force
-                                        $payload | Add-Member currentAdapter $null -Force
-                                        $payload | Add-Member currentAdapterVersion $null -Force
-
-                                        if($runner -eq "vstest.console")
+                                        if($runner -eq $null)
                                         {
-                                            $payload | Add-Member currentRunnerVersion (Get-ProductVersion($runnerPath)) -Force
-                                            $payload.currentAdapter = $adapter
-
-                                            Measure-DiscoveryTime {&$runnerPath $testContainer --listtests --testadapterpath:$testAdapterPath} $payload
-                                            Measure-ExecutionTime {&$runnerPath $testContainer --listtests} $payload
+                                            return
                                         }
-                                        elseif($runner -eq "nunit.consolerunner")
+                                        $runner = $runner -replace '"', ""
+                                        $runnerPath = Get-ConsoleRunnerPath($runner)
+                                        if(($runnerPath -ne $null) -and (Test-Path $runnerPath))
                                         {
-                                            $payload | Add-Member currentRunnerVersion "$($Script:TPT_DependencyProps.Project.PropertyGroup.NUnitConsoleRunnerVersion)" -Force
-                                            Measure-DiscoveryTime {&$runnerPath $testContainer --explore} $payload
-                                            Measure-ExecutionTime {&$runnerPath $testContainer} $payload
+                                            $payload | Add-Member containerPath $testContainer -Force
+                                            $payload | Add-Member adapterPath $testAdapterPath -Force
+                                            $payload | Add-Member currentRunner $runner -Force
+                                            $payload | Add-Member currentAdapter $null -Force
+                                            $payload | Add-Member currentAdapterVersion $null -Force
+    
+                                            if($runner -eq "vstest.console")
+                                            {
+                                                $payload | Add-Member currentRunnerVersion (Get-ProductVersion($runnerPath)) -Force
+                                                $payload.currentAdapter = $adapter
+    
+                                                Measure-DiscoveryTime {&$runnerPath $testContainer --listtests --testadapterpath:$testAdapterPath} $payload
+                                                Measure-ExecutionTime {&$runnerPath $testContainer --listtests} $payload
+                                            }
+                                            elseif($runner -eq "nunit.consolerunner")
+                                            {
+                                                $payload | Add-Member currentRunnerVersion "$($Script:TPT_DependencyProps.Project.PropertyGroup.NUnitConsoleRunnerVersion)" -Force
+                                                Measure-DiscoveryTime {&$runnerPath $testContainer --explore} $payload
+                                                Measure-ExecutionTime {&$runnerPath $testContainer} $payload
+                                            }
+                                            elseif($runner -eq "xunit.runner.console")
+                                            {
+                                                $payload | Add-Member currentRunnerVersion "$($Script:TPT_DependencyProps.Project.PropertyGroup.XUnitConsoleRunnerVersion)" -Force
+                                                Measure-ExecutionTime {&$runnerPath $testContainer} $payload
+                                            }
                                         }
-                                        elseif($runner -eq "xunit.runner.console")
-                                        {
-                                            $payload | Add-Member currentRunnerVersion "$($Script:TPT_DependencyProps.Project.PropertyGroup.XUnitConsoleRunnerVersion)" -Force
-                                            Measure-ExecutionTime {&$runnerPath $testContainer} $payload
+                                        else {
+                                            Write-Log "Specified runner $runner doesn't exist at $runnerPath"
                                         }
                                     }
-                                    else {
-                                        Write-Log "Specified runner $runner doesn't exist at $runnerPath"
-                                    }
+    
                                 }
-
+                                else
+                                {
+                                    Write-Log "Unable to find $testAdapterPath, Did you restore ?"
+                                }
                             }
                             else
                             {
-                                Write-Log "Unable to find $testAdapterPath, Did you restore ?"
+                                Write-Log "Unable to find $testContainer, Did you build the Test Assets?"
                             }
                         }
-                        else
-                        {
-                            Write-Log "Unable to find $testContainer, Did you build the Test Assets?"
-                        }
+                        break
                     }
-                    break
                 }
             }
-        }
+    }
 }
 
 #
 # Displaying the results in table format
 #
-$currentColor = $Host.UI.RawUI.ForegroundColor
-$Host.UI.RawUI.ForegroundColor = "Green"
-$osDetails = Get-SystemInfo
-"`n"
-"Machine Configuration"
-$osDetails | Format-List 'MachineName', 'OSName', 'OSVersion', 'MachineType' , 'Processor', 'LogicalCores', 'RAMSize'
-
-if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
+function Invoke-DisplayResults
 {
-    $Script:TPT_Results | Where-Object {$_.Action -like "Discovery"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+    $currentColor = $Host.UI.RawUI.ForegroundColor
+    $Host.UI.RawUI.ForegroundColor = "Green"
+    $osDetails = Get-SystemInfo
+    "`n"
+    "Machine Configuration"
+    $osDetails | Format-List 'MachineName', 'OSName', 'OSVersion', 'MachineType' , 'Processor', 'LogicalCores', 'RAMSize'
+    
+    if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
+    {
+        $Script:TPT_Results | Where-Object {$_.Action -like "Discovery"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+    }
+    
+    if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
+    {
+        $Script:TPT_Results | Where-Object {$_.Action -like "Execution"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
+    }
+    
+    $Host.UI.RawUI.ForegroundColor = $currentColor
+    
+    if($ExportResults -ne $null -and $ExportResults -eq "csv")
+    {
+        $Script:TPT_Results | Export-Csv -Path "PerformanceResults.csv" -Force -NoTypeInformation
+        "Exported results to PerformanceResults.csv"
+    }
 }
 
-if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
-{
-    $Script:TPT_Results | Where-Object {$_.Action -like "Execution"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
-}
-
-$Host.UI.RawUI.ForegroundColor = $currentColor
-
-if($ExportResults -ne $null -and $ExportResults -eq "csv")
-{
-    $Script:TPT_Results | Export-Csv -Path "PerformanceResults.csv" -Force -NoTypeInformation
-    "Exported results to PerformanceResults.csv"
-}
+Get-PerfConfigurations
+Invoke-InstallBenchmarkModule
+Invoke-PerformanceTests
+Invoke-DisplayResults
