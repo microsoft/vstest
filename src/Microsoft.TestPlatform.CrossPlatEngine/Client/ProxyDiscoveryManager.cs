@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
                     // Collecting Time Taken to Start Discovery Engine
-                    var discoveryEngineTotalTime = discoveryEngineStartTime - DateTime.UtcNow;
+                    var discoveryEngineTotalTime = DateTime.UtcNow - discoveryEngineStartTime;
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds.ToString());
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);

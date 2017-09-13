@@ -256,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     }
 
                     this.discoveryInProgress = false;
-                    var discoveryFinalTimeTaken = this.discoveryStartTime - DateTime.UtcNow;
+                    var discoveryFinalTimeTaken = DateTime.UtcNow - this.discoveryStartTime;
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = discoveryCompleteEventArgs.Metrics;

@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             var timeStart = DateTime.UtcNow;
             
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger);
-            var totalAdapterLoadTIme = timeStart - DateTime.UtcNow;
+            var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
             // Collecting Data Point for TimeTaken to Load Adapters
             this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, (totalAdapterLoadTIme.TotalSeconds).ToString());
@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
 
-                    var totalAdapterRunTime = newTimeStart - DateTime.UtcNow;
+                    var totalAdapterRunTime = DateTime.UtcNow - newTimeStart;
                   
                     this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
 

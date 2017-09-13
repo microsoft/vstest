@@ -429,7 +429,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     this.runCompletionEvent.Set();
 
 
-                    var executionTotalTimeTaken = this.executionStartTime - DateTime.UtcNow;
+                    var executionTotalTimeTaken = DateTime.UtcNow - this.executionStartTime;
 
                     // Fill in the time taken to complete the run
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds.ToString());

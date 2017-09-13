@@ -391,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             break;
                         }
 
-                        var timeStartUtcNow = DateTime.UtcNow;
+                        var timeStartNow = DateTime.UtcNow;
 
                         var currentTotalTests = this.testRunCache.TotalExecutedTests;
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
@@ -416,7 +416,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             totalTests = this.testRunCache.TotalExecutedTests;
                         }
 
-                        var totalTimeTaken = timeStartUtcNow - DateTime.UtcNow;
+                        var totalTimeTaken = DateTime.UtcNow - timeStartNow;
 
                         if (EqtTrace.IsVerboseEnabled)
                         {

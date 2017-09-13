@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.InitializeExtensions(testPackages);
 
                     // Collecting Time Taken to Start Discovery Engine
-                    var executionEngineTotalTime = executionEngineStartTime - DateTime.UtcNow;
+                    var executionEngineTotalTime = DateTime.UtcNow - executionEngineStartTime;
 
                     // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds.ToString());
