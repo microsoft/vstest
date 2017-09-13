@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="supportedProperties"> The supported Properties. </param>
         /// <param name="propertyProvider"> The property Provider. </param>
         /// <returns> The <see cref="ITestCaseFilterExpression"/>. </returns>
-        public virtual ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
+        public ITestCaseFilterExpression GetTestCaseFilter(IEnumerable<string> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
             TestCaseFilterExpression adapterSpecificTestCaseFilter = null;
             if (this.FilterExpressionWrapper != null)
