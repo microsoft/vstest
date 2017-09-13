@@ -179,6 +179,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             Assert.IsTrue(this.standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", this.standardTestError, substring);
         }
 
+        public void StdErrorDoesNotContains(string substring)
+        {
+            Assert.IsFalse(this.standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", this.standardTestError, substring);
+        }
+
         public void StdOutputContains(string substring)
         {
             Assert.IsTrue(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
