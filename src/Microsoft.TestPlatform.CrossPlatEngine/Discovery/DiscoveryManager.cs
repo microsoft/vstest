@@ -127,10 +127,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 var lastChunk = discoveryResultCache.Tests;
 
                 EqtTrace.Verbose("TestDiscoveryManager.DiscoveryComplete: Calling DiscoveryComplete callback.");
- 
+
                 if (eventHandler != null)
                 {
-                    if(lastChunk != null)
+                    if (lastChunk != null)
                     {
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                     }
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                     // Collecting Total Tests Discovered
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount.ToString());
-                    
+
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false, this.requestData.MetricsCollection.Metrics);
 
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
@@ -266,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // else these test cases are not displayed in TestWindow.
             if (!string.IsNullOrEmpty(package))
             {
-                foreach(var tc in testCases)
+                foreach (var tc in testCases)
                 {
                     tc.Source = package;
                 }

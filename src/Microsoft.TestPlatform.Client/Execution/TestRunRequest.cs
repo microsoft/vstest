@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private long testSessionTimeout;
 
         private Timer timer;
-        
+
         /// <summary>
         /// Execution Start Time
         /// </summary>
@@ -81,7 +81,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
             Debug.Assert(requestData != null, "request Data is null");
 
-            EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
+            }
+
             this.testRunCriteria = testRunCriteria;
             this.ExecutionManager = executionManager;
             this.State = TestRunState.Pending;
@@ -112,15 +116,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
 
                 this.executionStartTime = DateTime.UtcNow;
-                
+
                 // Collecting Number of sources Sent For Execution
                 var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count<string>() : 0);
                 this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources.ToString());
 
-                EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
+                }
 
-                // Waiting for warm up to be over.
-                EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    // Waiting for warm up to be over.
+                    EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
+                }
 
                 this.State = TestRunState.InProgress;
 
@@ -132,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 try
                 {
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.TestRunCriteria.TestRunSettings);
-                    this.testSessionTimeout  = runConfiguration.TestSessionTimeout;
+                    this.testSessionTimeout = runConfiguration.TestSessionTimeout;
 
                     if (testSessionTimeout > 0)
                     {
@@ -150,7 +160,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     this.runRequestTimeTracker.Start();
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
 
-                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
+                    }
 
                     return processId;
                 }

@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private ITransport transport;
 
         private IDataSerializer dataSerializer;
-        
+
         private Action<Message> onAckMessageRecieved;
 
         private int highestSupportedVersion = 2;
@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                         testRunCriteriaWithTests.Tests,
                                         testRunCriteriaWithTests.Package,
                                         testRunCriteriaWithTests.RunSettings,
-                                        testRunCriteriaWithTests.TestExecutionContext, 
+                                        testRunCriteriaWithTests.TestExecutionContext,
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
                                         testRunEventsHandler),
                                 0);

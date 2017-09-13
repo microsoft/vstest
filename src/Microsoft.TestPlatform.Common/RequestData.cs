@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common
 {
-    using System.Diagnostics;
+    using System;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -23,9 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </param>
         public RequestData(IMetricsCollection metricsCollection)
         {
-            Debug.Assert(metricsCollection != null, "metrics collection is null");
-
-            this.metricsCollection = metricsCollection;
+            this.metricsCollection = metricsCollection ?? throw new ArgumentNullException(nameof(metricsCollection));
         }
 
         /// <inheritdoc/>

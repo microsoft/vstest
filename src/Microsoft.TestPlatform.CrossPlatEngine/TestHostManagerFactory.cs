@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
+    using System;
     using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
@@ -27,8 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </param>
         public TestHostManagerFactory(IRequestData requestData)
         {
-            Debug.Assert(requestData != null, "request Data is null");
-            this.requestData = requestData;
+            this.requestData = requestData ?? throw new System.ArgumentNullException(nameof(requestData));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>The discovery manager.</returns>
         public IDiscoveryManager GetDiscoveryManager()
         {
-            if(this.discoveryManager == null)
+            if (this.discoveryManager == null)
             {
                 this.discoveryManager = new DiscoveryManager(this.requestData);
             }

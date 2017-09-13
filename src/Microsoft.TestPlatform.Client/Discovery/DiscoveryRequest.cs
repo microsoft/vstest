@@ -270,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                     // Collecting Total Time Taken
                     this.requestData.MetricsCollection.Add(
-                        TelemetryDataConstants.TimeTakenInSecForDiscovery,discoveryFinalTimeTaken.TotalSeconds.ToString());
+                        TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds.ToString());
                 }
             }
 
@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
-        {  
+        {
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
@@ -315,7 +315,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="level">Output level of the message being sent.</param>
         /// <param name="message">Actual contents of the message</param>
         public void HandleLogMessage(TestMessageLevel level, string message)
-        { 
+        {
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");

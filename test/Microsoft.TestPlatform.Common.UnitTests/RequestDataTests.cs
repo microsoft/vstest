@@ -3,6 +3,8 @@
 
 namespace Microsoft.TestPlatform.Common.UnitTests
 {
+    using System;
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,6 +12,12 @@ namespace Microsoft.TestPlatform.Common.UnitTests
     [TestClass]
     public class RequestDataTests
     {
+        [TestMethod]
+        public void ConstructorShouldThrowIfMetricsCollectionIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => new RequestData(null));
+        }
+
         [TestMethod]
         public void RequestDataShouldReturnNonNullInstanceOfMetricsCollector()
         {

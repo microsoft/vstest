@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 {
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <inheritdoc />
     /// <summary>
@@ -29,9 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// <param name="value"></param>
         public void Add(string metric, string value)
         {
-            ValidateArg.NotNull(metric, "metric");
-            ValidateArg.NotNull(value, "value");
-
             this.metricDictionary[metric] = value;
         }
 

@@ -94,7 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 var executionEngineStartTime = DateTime.UtcNow;
 
-                EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
+                }
 
                 var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
                                                     // If the test execution is with a test filter, group them by sources
