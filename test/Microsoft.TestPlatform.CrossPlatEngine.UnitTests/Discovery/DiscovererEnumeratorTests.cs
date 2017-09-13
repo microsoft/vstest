@@ -55,7 +55,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
             extensionSourceMap.Add("_none_", sources);
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, new Mock<IRunSettings>().Object, mockLogger.Object);
+            this.discovererEnumerator.LoadTests(extensionSourceMap, new Mock<IRunSettings>().Object, null, mockLogger.Object);
 
             var messageFormat =
                 "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
@@ -77,7 +77,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
             extensionSourceMap.Add("_none_", sources);
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, new Mock<IRunSettings>().Object, new Mock<IMessageLogger>().Object);
+            this.discovererEnumerator.LoadTests(extensionSourceMap, new Mock<IRunSettings>().Object, null, new Mock<IMessageLogger>().Object);
 
             Assert.IsFalse(DllTestDiscoverer.IsDiscoverTestCalled);
         }
@@ -102,8 +102,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
                 var settings = new Mock<IRunSettings>().Object;
                 var logger = new Mock<IMessageLogger>().Object;
+                string testCaseFilter = "TestFilter";
 
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
@@ -111,6 +112,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 // Also validate that the right set of arguments were passed on to the discoverer.
                 CollectionAssert.AreEqual(sources, DllTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(logger, DllTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
             }
@@ -147,8 +149,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
                 var settings = new Mock<IRunSettings>().Object;
                 var logger = new Mock<IMessageLogger>().Object;
+                string testCaseFilter = "TestFilter";
 
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.IsTrue(JsonTestDiscoverer.IsDiscoverTestCalled);
@@ -156,11 +159,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 // Also validate that the right set of arguments were passed on to the discoverer.
                 CollectionAssert.AreEqual(dllsources, DllTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(logger, DllTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
                 CollectionAssert.AreEqual(jsonsources, JsonTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, JsonTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (JsonTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(logger, JsonTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
             }
@@ -190,8 +195,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
                 var settings = new Mock<IRunSettings>().Object;
                 var logger = new Mock<IMessageLogger>().Object;
+                string testCaseFilter = "TestFilter";
 
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.IsFalse(SingletonTestDiscoverer.IsDiscoverTestCalled);
@@ -199,6 +205,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 // Also validate that the right set of arguments were passed on to the discoverer.
                 CollectionAssert.AreEqual(new List<string> { sources[1] }, DllTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(logger, DllTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
             }
@@ -228,8 +235,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
                 var settings = new Mock<IRunSettings>().Object;
                 var mocklogger = new Mock<IMessageLogger>();
+                string testCaseFilter = "TestFilter";
 
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, mocklogger.Object);
+                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, mocklogger.Object);
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.IsTrue(NotImplementedTestDiscoverer.IsDiscoverTestCalled);
@@ -237,6 +245,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 // Also validate that the right set of arguments were passed on to the discoverer.
                 CollectionAssert.AreEqual(new List<string> { sources[1] }, DllTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(mocklogger.Object, DllTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
@@ -398,8 +407,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
                 var settings = new Mock<IRunSettings>().Object;
                 var logger = new Mock<IMessageLogger>().Object;
+                string testCaseFilter = "TestFilter";
 
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.IsTrue(JsonTestDiscoverer.IsDiscoverTestCalled);
@@ -407,11 +417,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 // Also validate that the right set of arguments were passed on to the discoverer.
                 CollectionAssert.AreEqual(dllsources, DllTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, DllTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (DllTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(logger, DllTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(DllTestDiscoverer.DiscoverySink);
 
                 CollectionAssert.AreEqual(jsonsources, JsonTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, JsonTestDiscoverer.DiscoveryContext.RunSettings);
+                Assert.AreEqual(testCaseFilter, (JsonTestDiscoverer.DiscoveryContext as DiscoveryContext).FilterExpressionWrapper.FilterString);
                 Assert.AreEqual(logger, JsonTestDiscoverer.MessageLogger);
                 Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
             }
@@ -445,7 +457,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var settings = new Mock<IRunSettings>().Object;
             var logger = new Mock<IMessageLogger>().Object;
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+            this.discovererEnumerator.LoadTests(extensionSourceMap, settings, null, logger);
         }
 
 
