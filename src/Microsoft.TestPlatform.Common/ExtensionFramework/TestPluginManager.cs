@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     filteredExtensions.Add(testExtension);
                 }
 
-                unfilteredExtensions.Add(new LazyExtension<IExtension, Dictionary<string, object>>(plugin, plugin.Metadata.ToDictionary<string, object>(m => m.ToString())));
+                unfilteredExtensions.Add(new LazyExtension<IExtension, Dictionary<string, object>>(plugin, new Dictionary<string, object>()));
             }
 
             unfiltered = unfilteredExtensions;
