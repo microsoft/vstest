@@ -31,7 +31,7 @@ Param(
     [Switch] $FailFast = $false,
 
     [Parameter(Mandatory=$false)]
-    [Switch] $Parallel = $false
+    [Switch] $Parallel = $true
 )
 
 function Get-DotNetPath
@@ -208,7 +208,12 @@ function Invoke-Test
 
             if ($TPT_Parallel) {
                 # Fill in the framework in test containers
-                $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
+                $testContainerSet = $testContainers | % {
+                    $testContainerPath = [System.String]::Format($_, $fx)
+                    if (Test-Path $testContainerPath) {
+                        $testContainerPath
+                    }
+                }
                 $trxLogFileName  =  [System.String]::Format("Parallel_{0}_{1}", $fx, $Script:TPT_DefaultTrxFileName)
 
                 # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break
