@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var fileContent4 = File.ReadAllText(resultFiles[3]);
 
             Assert.IsTrue(fileContent1.Contains("110") && fileContent1.Contains("111") && fileContent1.Contains("112"));
-            Assert.IsTrue(fileContent2.Contains("20") && fileContent2.Contains("221") && fileContent2.Contains("222") && fileContent2.Contains("223"));
+            Assert.IsTrue(fileContent2.Contains("220") && fileContent2.Contains("221") && fileContent2.Contains("222") && fileContent2.Contains("223"));
             Assert.IsTrue(fileContent3.Contains("330") && fileContent3.Contains("331") && fileContent3.Contains("332"));
 
             Assert.IsTrue(fileContent4.Contains("110") && fileContent4.Contains("111") && fileContent4.Contains("112") && fileContent4.Contains("220") && fileContent4.Contains("221") && fileContent4.Contains("222") && fileContent4.Contains("23") && fileContent3.Contains("330") && fileContent4.Contains("331") && fileContent4.Contains("332"));
