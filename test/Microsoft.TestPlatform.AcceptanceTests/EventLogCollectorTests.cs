@@ -34,11 +34,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.ValidateSummaryStatus(3, 0, 0);
             this.VaildateDataCollectorOutput();
-        }
+            this.StdErrorDoesNotContains("An exception occurred while collecting final entries from the event log");
+            this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+            this.StdErrorDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'EntryTypes' in its configuration:");             
+            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration:");             
+            this.StdErrorDoesNotContains("Unable to read event log");             
+    }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void EventLogDataCollectorShoudCreateLogFile(RunnnerInfo runnnerInfo)
+        public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnnerInfo runnnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
@@ -50,8 +56,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
-            this.StdErrorDoesNotContains("Data collector 'Event Log' message: Data collector 'Event Log' threw an exception during type loading, construction, or initialization:");
-            this.StdErrorDoesNotContains("Parameter name:");
+            this.StdErrorDoesNotContains("An exception occurred while collecting final entries from the event log");
+            this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+            this.StdErrorDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'EntryTypes' in its configuration:");
+            this.StdErrorDoesNotContains("The Event Log DataCollector encountered an invalid value for 'MaxEventLogEntriesToCollect' in its configuration:");
+            this.StdErrorDoesNotContains("Unable to read event log");
         }
 
         private string GetRunsettingsFilePath()
