@@ -40,6 +40,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public abstract event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
 
         /// <summary>
+        /// Raised when a discovery message is received.
+        /// </summary>
+        public abstract event EventHandler<TestRunMessageEventArgs> DiscoveryMessage;
+
+        /// <summary>
         /// Raised when discovered tests are received
         /// </summary>
         public abstract event EventHandler<DiscoveredTestsEventArgs> DiscoveredTests;

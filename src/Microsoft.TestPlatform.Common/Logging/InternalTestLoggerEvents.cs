@@ -96,6 +96,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
 
         /// <summary>
+        /// Raised when a discovery message is received.
+        /// </summary>
+        public override event EventHandler<TestRunMessageEventArgs> DiscoveryMessage;
+
+        /// <summary>
         /// Raised when discovered tests are received
         /// </summary>
         public override event EventHandler<DiscoveredTestsEventArgs> DiscoveredTests;
@@ -155,10 +160,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         }
 
         /// <summary>
-        /// Raises a message event to the enabled loggers.
+        /// Raises a test run message event to the enabled loggers.
         /// </summary>
         /// <param name="args">Arguments to to be raised.</param>
-        internal void RaiseMessage(TestRunMessageEventArgs args)
+        internal void RaiseTestRunMessage(TestRunMessageEventArgs args)
         {
             if (args == null)
             {
@@ -168,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.CheckDisposed();
 
             // Sending 0 size as this event is not expected to contain any data. 
-            this.SafeInvokeAsync(() => this.TestRunMessage, args, 0, "InternalTestLoggerEvents.SendMessage");
+            this.SafeInvokeAsync(() => this.TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
         }
 
         /// <summary>
@@ -189,6 +194,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
 
             this.SafeInvokeAsync(() => this.TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
+        }
+
+        /// <summary>
+        /// Raises a discovery message event to the enabled loggers.
+        /// </summary>
+        /// <param name="args">Arguments to to be raised.</param>
+        internal void RaiseDiscoveryMessage(TestRunMessageEventArgs args)
+        {
+            if (args == null)
+            {
+                throw new ArgumentNullException("args");
+            }
+
+            this.CheckDisposed();
+
+            // Sending 0 size as this event is not expected to contain any data.
+            this.SafeInvokeAsync(() => this.DiscoveryMessage, args, 0, "InternalTestLoggerEvents.SendDiscoveryMessage");
         }
 
         /// <summary>

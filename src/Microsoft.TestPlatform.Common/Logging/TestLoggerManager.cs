@@ -370,7 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             testRunRequest.TestRunMessage -= this.TestRunMessageHandler;
             testRunRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
             testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-            this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
+            testRunRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
         }
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         this.runRequest.TestRunMessage -= this.TestRunMessageHandler;
                         this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
                         this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-                        this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
+                        this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
                     }
 
                     if (this.discoveryRequest != null)
@@ -522,7 +522,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            this.loggerEvents.RaiseMessage(e);
+            this.loggerEvents.RaiseTestRunMessage(e);
         }
 
         /// <summary>
@@ -567,9 +567,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Send discovery message to all registered listeners.
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            this.loggerEvents.RaiseMessage(e);
+            this.loggerEvents.RaiseDiscoveryMessage(e);
         }
 
         /// <summary>

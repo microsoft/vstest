@@ -457,6 +457,49 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.AreEqual(counter, 1);
         }
 
+        /// <summary>
+        /// DiscoveryMessage event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveryMessageHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+
+            string message = "This is the test message";
+            TestRunMessageEventArgs testRunMessageEventArgs = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
+
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryMessage += null,
+                testRunMessageEventArgs);
+
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryMessage += null,
+                testRunMessageEventArgs);
+
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
         [ExtensionUri("testlogger://logger")]
         [FriendlyName("TestLoggerExtension")]
         private class ValidLogger3 : ITestLogger
@@ -466,6 +509,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 events.TestRunMessage += TestMessageHandler;
                 events.TestRunComplete += Events_TestRunComplete;
                 events.TestResult += Events_TestResult;
+                events.DiscoveryMessage += DiscoveryMessageHandler;
                 events.DiscoveredTests += DiscoveredTestsHandler;
                 events.DiscoveryComplete += DiscoveryCompleteHandler;
             }
@@ -491,6 +535,12 @@ namespace TestPlatform.Common.UnitTests.Logging
                     TestLoggerManagerTests.waitHandle.Set();
 
                 }
+            }
+
+            private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
             }
 
             private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
