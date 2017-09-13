@@ -97,24 +97,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Event Log DataCollector encountered an invalid value for &apos;EntryTypes&apos; in its configuration: {0}.
-        /// </summary>
-        internal static string InvalidEntryTypeInConfig {
-            get {
-                return ResourceManager.GetString("InvalidEntryTypeInConfig", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The Event Log DataCollector encountered an invalid value for &apos;MaxEventLogEntriesToCollect&apos; in its configuration: {0}.
-        /// </summary>
-        internal static string InvalidMaxEntriesInConfig {
-            get {
-                return ResourceManager.GetString("InvalidMaxEntriesInConfig", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Unable to read event log &apos;{0}&apos; from computer &apos;{1}&apos;.
         /// </summary>
         internal static string ReadError {
