@@ -292,8 +292,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
                 this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+                string testCaseFilter = "TestFilter";
+                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
 
                 // Verify.
                 mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, It.IsAny<string>()), Times.Once);
