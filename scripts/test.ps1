@@ -33,6 +33,8 @@ Param(
     [Parameter(Mandatory=$false)]
     [Switch] $Parallel = $true,
 
+    # Only test cases matching the filter are run. This input is converted to
+    # /testCaseFilter:<filter>
     [Parameter(Mandatory=$false)]
     [System.String] $Filter
 )
