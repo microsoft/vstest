@@ -241,7 +241,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new ListDiscoverersArgumentProcessor(),
                 new ListExecutorsArgumentProcessor(),
                 new ListLoggersArgumentProcessor(),
-                new ListSettingsProvidersArgumentProcessor()
+                new ListSettingsProvidersArgumentProcessor(),
+                new ListFullyQualifiedTestsArgumentProcessor(),
+                new ListTestsTargetPathArgumentProcessor()
         };
 
         /// <summary>
