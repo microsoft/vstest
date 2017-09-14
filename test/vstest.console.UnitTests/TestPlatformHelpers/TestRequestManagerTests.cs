@@ -157,9 +157,18 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 }).Returns(mockDiscoveryRequest.Object);
 
             var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            string testCaseFilterValue = "TestFilter";
+            CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterValue;
+            this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object);
             var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsTrue(success, "DiscoverTests call must succeed");
+            Assert.AreEqual(testCaseFilterValue, actualDiscoveryCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
             Assert.AreEqual(createDiscoveryRequestCalled, 1, "CreateDiscoveryRequest must be invoked only once.");
             Assert.AreEqual(2, actualDiscoveryCriteria.Sources.Count(), "All Sources must be used for discovery request");
