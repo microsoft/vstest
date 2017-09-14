@@ -31,7 +31,10 @@ Param(
     [Switch] $FailFast = $false,
 
     [Parameter(Mandatory=$false)]
-    [Switch] $Parallel = $true
+    [Switch] $Parallel = $true,
+
+    [Parameter(Mandatory=$false)]
+    [System.String] $Filter
 )
 
 function Get-DotNetPath
@@ -80,6 +83,7 @@ $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("_none_");
 $Script:TPT_Pattern = $Pattern
+$Script:TPT_TestFilter = $Filter
 $Script:TPT_FailFast = $FailFast
 $Script:TPT_Parallel = $Parallel
 $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
@@ -186,6 +190,10 @@ function Invoke-Test
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
             $testAdapterPath = Get-TestAdapterPath
             $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
+            if (-not [System.String]::IsNullOrEmpty($TPT_TestFilter))
+            {
+                $testFilter = "/testCaseFilter:`"$TPT_TestFilter`""
+            }
 
             if($fx -eq $TPT_TargetFrameworkCore)
             {
@@ -225,12 +233,12 @@ function Invoke-Test
                 Set-TestEnvironment
                 if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
-                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`""
-                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName"
+                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
+                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
                 } else {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`""
-                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName"
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
+                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
                 }
 
                 Reset-TestEnvironment
@@ -274,12 +282,12 @@ function Invoke-Test
 
                     if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
-                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger"
-                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger
+                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"
+                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger $testFilter
                     } else {
 
-                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger"
-                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger
+                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"
+                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger $testFilter
                     }
 
                     Reset-TestEnvironment
