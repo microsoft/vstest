@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -473,7 +474,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue, null),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };
@@ -576,7 +577,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue, null),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };

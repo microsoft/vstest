@@ -5,11 +5,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -28,16 +31,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
+        private IRequestData requestData;
 
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
+        /// <param name="requestData">Request Data</param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        public ProxyDiscoveryManager(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
+        public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
+            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
         }
@@ -57,6 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// The client Connection Timeout
         /// </param>
         internal ProxyDiscoveryManager(
+            IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
@@ -67,6 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.cancellationTokenSource = new CancellationTokenSource();
             this.isCommunicationEstablished = false;
+            this.requestData = requestData;
         }
 
         #endregion
@@ -89,12 +96,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var discoveryEngineStartTime = DateTime.UtcNow;
+
                 this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
+
+                    // Collecting Time Taken to Start Discovery Engine
+                    var discoveryEngineTotalTime = DateTime.UtcNow - discoveryEngineStartTime;
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds.ToString());
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }
@@ -115,7 +128,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
-                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }
         }
