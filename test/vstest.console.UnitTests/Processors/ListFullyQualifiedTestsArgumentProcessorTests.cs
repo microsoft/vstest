@@ -215,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         [ExpectedException(typeof(CommandLineException))]
         [TestMethod]
-        public void ExecutorExecuteShouldThrowWhenListTestsTargetPathIsEmpty()
+        public void ExecutorExecuteShouldThrowWhenListFullyQualifiedTestsTargetPathIsEmpty()
         {
             
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ListTestArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStart()
+        public void ListFullyQualifiedTestsArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStart()
         {
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             var mockConsoleOutput = new Mock<IOutput>();
@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ListTestArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStop()
+        public void ListFullyQualifiedTestsArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStop()
         {
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             var mockConsoleOutput = new Mock<IOutput>();
@@ -254,12 +254,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
-
             mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockDiscoveryRequest.Object);
 
-
             this.ResetAndAddSourceToCommandLineOptions(legitPath);
-
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             GetExecutor(testRequestManager, mockConsoleOutput.Object).Execute();
         }

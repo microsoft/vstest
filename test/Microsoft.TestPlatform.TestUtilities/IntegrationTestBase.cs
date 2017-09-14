@@ -128,7 +128,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/listTests" is appended to the arguments.
+        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'" 
+        /// is appended to the arguments.
         /// </summary>
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
