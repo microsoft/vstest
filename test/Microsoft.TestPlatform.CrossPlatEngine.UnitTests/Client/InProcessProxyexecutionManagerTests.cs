@@ -25,8 +25,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<IExecutionManager> mockExecutionManager;
         private Mock<ITestRuntimeProvider> mockTestHostManager;
 
-        [TestInitialize]
-        public void TestInitialize()
+        public InProcessProxyExecutionManagerTests()
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockExecutionManager = new Mock<IExecutionManager>();

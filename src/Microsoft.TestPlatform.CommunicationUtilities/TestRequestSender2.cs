@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Collections.Generic;
     using System.Globalization;
     using System.Threading;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -209,7 +208,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 var discoveryCompletePayload =
                                     this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
 
-                                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted, discoveryCompletePayload.Metrics);
+
                                 discoveryEventsHandler.HandleDiscoveryComplete(
                                     discoveryCompleteEventsArgs,
                                     discoveryCompletePayload.LastDiscoveredTests);
@@ -410,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
 
             // notify test run abort to vstest console wrapper.
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero, null);
             var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -445,7 +445,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             eventHandler.HandleRawMessage(rawMessage);
 
             // Complete discovery
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+
             eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
         }
 
