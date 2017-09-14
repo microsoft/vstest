@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
 
         /// <summary>
-        /// Raised when test discovery starts
+        /// Raised when test discovery starts.
         /// </summary>
         public override event EventHandler<DiscoveryStartEventArgs> DiscoveryStart;
 #endregion
