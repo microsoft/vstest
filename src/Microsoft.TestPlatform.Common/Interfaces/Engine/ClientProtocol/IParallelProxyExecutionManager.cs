@@ -3,9 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
-    using System;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Interface defining the parallel execution manager
