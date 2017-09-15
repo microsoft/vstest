@@ -404,6 +404,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
+                        var totalTimeTaken = DateTime.UtcNow - timeStartNow;
+
                         // Identify whether the executor did run any tests at all
                         if (this.testRunCache.TotalExecutedTests > totalTests)
                         {
@@ -415,8 +417,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                             totalTests = this.testRunCache.TotalExecutedTests;
                         }
-
-                        var totalTimeTaken = DateTime.UtcNow - timeStartNow;
 
                         if (EqtTrace.IsVerboseEnabled)
                         {

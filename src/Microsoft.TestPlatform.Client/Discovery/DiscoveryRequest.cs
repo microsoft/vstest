@@ -24,14 +24,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
         /// </summary>
-        /// <param name="requestData">The Request Data instance providing common services and data for discovery</param>
+        /// <param name="requestData">The Request Data instance providing services and data for discovery</param>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
-        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
+        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager) :
+            this(requestData, criteria, discoveryManager, new MetricsPublisherFactory(requestData.MetricsCollection is NoOpMetricsCollection).GetMetricsPublisher())
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
+        /// </summary>
+        /// <param name="requestData">
+        /// The Request Data instance providing common services and data for discovery.
+        /// </param>
+        /// <param name="criteria">
+        /// Discovery criterion.
+        /// </param>
+        /// <param name="discoveryManager">
+        /// Discovery manager instance.
+        /// </param>
+        /// <param name="metricsPublisher">
+        /// The metrics publisher.
+        /// </param>
+        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager, IMetricsPublisher metricsPublisher)
+        {
+            this.requestData = requestData;
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
-            this.requestData = requestData;
+            this.metricsPublisher = metricsPublisher;
         }
 
         /// <summary>
@@ -271,6 +292,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     // Collecting Total Time Taken
                     this.requestData.MetricsCollection.Add(
                         TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds.ToString());
+
+                    this.metricsPublisher.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, this.requestData.MetricsCollection.Metrics);
                 }
             }
 
@@ -383,6 +406,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         {
                             this.discoveryCompleted.Dispose();
                             this.requestData.MetricsCollection.Clear();
+                            this.metricsPublisher.Dispose();
                         }
                     }
 
@@ -431,6 +455,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// Request Data
         /// </summary>
         private IRequestData requestData;
+
+        /// <summary>
+        /// The Metrics Publisher
+        /// </summary>
+        private IMetricsPublisher metricsPublisher;
 
         #endregion
     }

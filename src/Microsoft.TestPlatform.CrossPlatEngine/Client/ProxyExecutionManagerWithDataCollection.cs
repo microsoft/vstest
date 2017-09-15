@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -22,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private IDictionary<string, string> dataCollectionEnvironmentVariables;
         private int dataCollectionPort;
+        private IRequestData requestData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
@@ -36,13 +38,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// The proxy Data Collection Manager.
         /// </param>
         /// <param name="requestData">
-        /// The request data for providing common execution services and data
+        /// The request data for providing execution services and data.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) 
+        public ProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager)
             : base(requestData, requestSender, testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -147,7 +150,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
             }
 
-            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionPort;
+            // Update Telemetry Status
+            var telemetryOptedIn = this.requestData.MetricsCollection is MetricsCollection ? 1 : 0;
+            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionPort
+                                              + " --telemetryoptedin " + telemetryOptedIn;
 
             return testProcessStartInfo;
         }
@@ -171,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public List<Tuple<TestMessageLevel, string>> Messages { get; private set; }
 
-       /// <inheritdoc />
+        /// <inheritdoc />
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.Messages.Add(new Tuple<TestMessageLevel, string>(level, message));

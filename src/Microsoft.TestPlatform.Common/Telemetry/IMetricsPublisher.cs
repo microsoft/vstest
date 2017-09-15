@@ -13,8 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// <summary>
         /// Publish the Metrics
         /// </summary>
-        /// <param name="eventName"></param>
-        /// <param name="metrics"></param>
+        /// <param name="eventName">The event Name</param>
+        /// <param name="metrics">Key/Value pair of Properties and Values</param>
         void PublishMetrics(string eventName, IDictionary<string, string> metrics);
+
+        /// <summary>
+        /// Dispose the Telemetry Session
+        /// </summary>
+        void Dispose();
     }
 }

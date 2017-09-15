@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -279,6 +280,45 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<string>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldPublishMetrics()
+        {
+            var mockMetricsCollector = new Mock<IMetricsCollection>();
+            var mockMetricsPublisher = new Mock<IMetricsPublisher>();
+            var mockDataSerializer = new Mock<IDataSerializer>();
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+            var testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, mockDataSerializer.Object, mockMetricsPublisher.Object);
+            testRunRequest.ExecuteAsync();
+
+            // Act
+            testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), dict), null, null, null);
+
+            // Verify.
+            mockMetricsPublisher.Verify(rd => rd.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, dict), Times.Once);
+        }
+
+        [TestMethod]
+        public void DisposeShouldDisposeMetricsPublisher()
+        {
+            var mockMetricsPublisher = new Mock<IMetricsPublisher>();
+            var mockDataSerializer = new Mock<IDataSerializer>();
+
+            var testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, mockDataSerializer.Object, mockMetricsPublisher.Object);
+            testRunRequest.ExecuteAsync();
+
+            // Act
+            testRunRequest.Dispose();
+
+            // Verify.
+            mockMetricsPublisher.Verify(rd => rd.Dispose(), Times.Once);
         }
 
         [TestMethod]

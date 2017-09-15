@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
         /// <param name="requestData">
-        ///     The Request Data
+        ///     The Request Data for providing discovery services and data.
         /// </param>
         /// <param name="testPlatformEventSource">
         ///     The test platform event source.

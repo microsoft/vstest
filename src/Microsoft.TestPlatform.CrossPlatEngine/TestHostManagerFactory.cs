@@ -3,9 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
-    using System;
-    using System.Diagnostics;
-
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;

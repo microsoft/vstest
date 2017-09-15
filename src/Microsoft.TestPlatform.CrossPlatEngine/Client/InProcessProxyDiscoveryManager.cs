@@ -8,9 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -29,15 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
         /// </summary>
-        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new RequestData(new MetricsCollection())))
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
-        /// </summary>
-        /// <param name="testHostManagerFactory">Manager factory</param>
-        internal InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
+        /// <param name="testHostManager">
+        /// The test Host Manager.
+        /// </param>
+        /// <param name="testHostManagerFactory">
+        /// Manager factory
+        /// </param>
+        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;

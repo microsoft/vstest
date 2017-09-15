@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object);
         }
-        
+
         [TestMethod]
         public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
         {
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void DiscoveryAsycIfDiscoveryRequestIsDisposedThrowsObjectDisposedException()
         {
             this.discoveryRequest.Dispose();
-            
+
             Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.DiscoverAsync());
         }
 
@@ -151,6 +151,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<string>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldPublishMetrics()
+        {
+            var mockMetricsCollector = new Mock<IMetricsCollection>();
+            var mockPubishMetrics = new Mock<IMetricsPublisher>();
+            var discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object, mockPubishMetrics.Object);
+
+            var eventsHandler = discoveryRequest as ITestDiscoveryEventsHandler2;
+            var dict = new Dictionary<string, string>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+            // Act.
+            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false, dict), Enumerable.Empty<TestCase>());
+
+            // Verify.
+            mockPubishMetrics.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, dict), Times.Once);
+        }
+
+        [TestMethod]
+        public void DisposeShouldDisposeMetrics()
+        {
+            var mockPubishMetrics = new Mock<IMetricsPublisher>();
+            var discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object, mockPubishMetrics.Object);
+
+            // Act.
+            discoveryRequest.Dispose();
+
+            // Verify.
+            mockPubishMetrics.Verify(mp => mp.Dispose(), Times.Once);
         }
     }
 }
