@@ -63,22 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             }
         }
 
-        [TestMethod]
-        public void ExecutorInitializeWithInvalidTestCaseFilterShouldThrowCommandLineException()
-        {
-            var options = CommandLineOptions.Instance;
-            TestCaseFilterArgumentExecutor executor = new TestCaseFilterArgumentExecutor(options);
-
-            try
-            {
-                executor.Initialize("Foo");
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex is CommandLineException);
-                StringAssert.Contains(ex.Message, @"The /TestCaseFilter argument requires the filter value.");
-            }
-        }
+        
 
         [TestMethod]
         public void ExecutorInitializeWithValidTestCaseFilterShouldAddTestCaseFilterToCommandLineOptions()
