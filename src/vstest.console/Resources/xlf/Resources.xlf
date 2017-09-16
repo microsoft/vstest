@@ -95,6 +95,9 @@
 
       Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+	  
+      Add the verbosity level as prefix in log messages for console logger. Allowed values for prefix: true and false.
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;

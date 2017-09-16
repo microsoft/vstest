@@ -220,6 +220,9 @@
 
       Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+	  
+      Add the verbosity level as prefix in log messages for console logger. Allowed values for prefix: true and false.
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -229,7 +232,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;Protokollierungs-Uri/FriendlyName&gt;
+        <target state="new">--logger|/logger:&lt;Protokollierungs-Uri/FriendlyName&gt;
       Gibt eine Protokollierung für die Testergebnisse an. Zum Protokollieren der Ergebnisse in eine 
       Visual Studio-Testergebnisdatei (TRX-Datei) verwenden Sie z.B.: /logger:trx [;LogFileName=&lt;Entspricht standardmäßig einem eindeutigen Dateinamen&gt;]
        Erstellt eine Datei im TestResults-Verzeichnis mit dem entsprechenden LogFileName.
@@ -245,7 +248,7 @@
                 [;Platform=&lt;Standardwert ist "Any CPU"&gt;]
                 [;Flavor=&lt;Standardwert ist "Debug"&gt;]
                 [;RunTitle=&lt;Titel&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Protokollierung | / Logger: &lt; Logger Uri/FriendlyName &gt;
       Geben Sie eine Protokollierung für Testergebnisse.  Z. B. protokollieren Ergebnisse in ein Visual Studio--Hardwareabstraktionsschicht (Test Ergebnisse Datei, TK) /logger:trx.

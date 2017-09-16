@@ -220,6 +220,9 @@
 
       Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+	  
+      Add the verbosity level as prefix in log messages for console logger. Allowed values for prefix: true and false.
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -229,7 +232,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
+        <target state="new">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
       Specifica un logger per i risultati dei test. Ad esempio, per registrare risultati in un 
       file di risultati dei test di Visual Studio (TRX), usare /logger:trx. [;LogFileName=&lt;il valore predefinito è un nome file univoco&gt;]
       Crea nella directory TestResults il file con il valore specificato per LogFileName.
@@ -245,7 +248,7 @@
                 [;Platform=&lt;valore predefinito "Any CPU"&gt;]
                 [;Flavor=&lt;valore predefinito "Debug"&gt;]
                 [;RunTitle=&lt;titolo&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Logger Uri/FriendlyName &gt;
       Specificare un logger per risultati di test.  Ad esempio, per registrare i risultati in un Visual Studio Test risultati File (TRX) utilizzano /logger:trx.
