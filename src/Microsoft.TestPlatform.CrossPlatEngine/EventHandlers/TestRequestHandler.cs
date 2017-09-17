@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                         testRunCriteriaWithTests.Tests,
                                         testRunCriteriaWithTests.Package,
                                         testRunCriteriaWithTests.RunSettings,
-                                        testRunCriteriaWithTests.TestExecutionContext, 
+                                        testRunCriteriaWithTests.TestExecutionContext,
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
                                         testRunEventsHandler),
                                 0);
@@ -283,7 +283,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 TotalTests = discoveryCompleteEventArgs.TotalCount,
                 LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
-                IsAborted = discoveryCompleteEventArgs.IsAborted
+                IsAborted = discoveryCompleteEventArgs.IsAborted,
+                Metrics = discoveryCompleteEventArgs.Metrics
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);

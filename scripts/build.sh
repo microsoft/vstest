@@ -80,8 +80,8 @@ TP_SRC_DIR="$TP_ROOT_DIR/src"
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="2.1.0-preview1-006329"
-DOTNET_RUNTIME_VERSION="2.0.0-preview2-25331-01"
+DOTNET_CLI_VERSION="LATEST"
+DOTNET_RUNTIME_VERSION="LATEST"
 
 #
 # Build configuration
@@ -161,8 +161,10 @@ function install_cli()
     $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
     log "install_cli: Get the shared netcoreapp1.1 runtime..."
     $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
-    log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
+    log "install_cli: Get the shared netcoreapp2.0 runtime..."
+    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
+    #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
+    #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
 
     log "install_cli: Complete. Elapsed $(( SECONDS - start ))s."
     return 0
@@ -176,13 +178,6 @@ function restore_package()
 
     log "restore_package: Start restoring packages to $TP_PACKAGES_DIR."
     local start=$SECONDS
-
-    log ".. .. Restore: Source: $TPB_Solution"
-    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
-    if [ "$failed" = true ]; then
-        error "Failed to restore packages."
-        return 1
-    fi
 
     log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
     $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true

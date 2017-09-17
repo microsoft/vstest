@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void EventLogDataCollectorShoudCreateLogFile(RunnnerInfo runnnerInfo)
+        public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnnerInfo runnnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
@@ -34,6 +34,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.ValidateSummaryStatus(3, 0, 0);
             this.VaildateDataCollectorOutput();
+            this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+            this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+            this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            this.StdErrorDoesNotContains("Unable to read event log");
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnnerInfo runnnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnnerInfo);
+            var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+
+            string runSettings = this.GetRunsettingsFilePath();
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 1);
+            this.StdOutputDoesNotContains("An exception occurred while collecting final entries from the event log");
+            this.StdErrorDoesNotContains("event log has encountered an exception, some events might get lost");
+            this.StdOutputDoesNotContains("event log may have been cleared during collection; some events may not have been collected");
+            this.StdErrorDoesNotContains("Unable to read event log");
         }
 
         private string GetRunsettingsFilePath()
@@ -62,6 +86,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return runsettingsPath;
         }
 
+        private string GetRunsettingsFilePathWithCustomSource()
+        {
+            var runsettingsPath = Path.Combine(
+                Path.GetTempPath(),
+                "test_" + Guid.NewGuid() + ".runsettings");
+
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+    <RunSettings>     
+      <RunConfiguration> 
+        <MaxCpuCount>0</MaxCpuCount>       
+        <TargetPlatform> x64 </TargetPlatform>     
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
+      </RunConfiguration>
+      <DataCollectionRunSettings>  
+        <DataCollectors>  
+            <DataCollector friendlyName=""Event Log"" >
+                <Configuration><Setting name = ""EventLogs"" value = ""Application,System"" /><Setting name=""EntryTypes"" value=""Error,Warning"" /><Setting name=""EventSources"" value=""CustomEventSource"" /></Configuration>
+            </DataCollector>
+        </DataCollectors>
+      </DataCollectionRunSettings>
+    </RunSettings> ";
+
+            File.WriteAllText(runsettingsPath, runSettingsXml);
+            return runsettingsPath;
+        }
+
         private void VaildateDataCollectorOutput()
         {
             // Verify attachments
@@ -79,11 +129,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var fileContent3 = File.ReadAllText(resultFiles[2]);
             var fileContent4 = File.ReadAllText(resultFiles[3]);
 
-            Assert.IsTrue(fileContent1.Contains("10") && fileContent1.Contains("11") && fileContent1.Contains("12"));
-            Assert.IsTrue(fileContent2.Contains("20") && fileContent2.Contains("21") && fileContent2.Contains("22") && fileContent2.Contains("23"));
-            Assert.IsTrue(fileContent3.Contains("30") && fileContent3.Contains("31") && fileContent3.Contains("32"));
+            Assert.IsTrue(this.VerifyOrder(fileContent1, new[] { "110", "111", "112" }));
+            Assert.IsTrue(this.VerifyOrder(fileContent2, new[] { "220", "221", "222", "223" }));
+            Assert.IsTrue(this.VerifyOrder(fileContent3, new[] { "330", "331", "332" }));
+            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }));
+        }
 
-            Assert.IsTrue(fileContent4.Contains("10") && fileContent4.Contains("11") && fileContent4.Contains("12") && fileContent4.Contains("20") && fileContent4.Contains("21") && fileContent4.Contains("22") && fileContent4.Contains("23") && fileContent3.Contains("30") && fileContent4.Contains("31") && fileContent4.Contains("32"));
+        private bool VerifyOrder(string content, string[] eventIds)
+        {
+            int currentIndex = 0;
+            for (int i = 0; i < eventIds.Length; i++)
+            {
+                currentIndex = content.IndexOf(eventIds[i], currentIndex);
+                if (currentIndex == -1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

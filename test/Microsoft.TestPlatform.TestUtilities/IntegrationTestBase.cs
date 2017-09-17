@@ -122,6 +122,20 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
+        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'" 
+        /// is appended to the arguments.
+        /// </summary>
+        /// <param name="testAssembly">A test assembly.</param>
+        /// <param name="testAdapterPath">Path to test adapters.</param>
+        /// <param name="runSettings">Run settings for execution.</param>
+        public void InvokeVsTestForFullyQualifiedDiscovery(string testAssembly, string testAdapterPath, string dummyFilePath, string runSettings = "", string targetFramework = "")
+        {
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue);
+            arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
+            this.InvokeVsTest(arguments);
+        }
+
+        /// <summary>
         /// Validate if the overall test count and results are matching.
         /// </summary>
         /// <param name="passedTestsCount">Passed test count</param>
@@ -171,6 +185,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void StdErrorContains(string substring)
         {
             Assert.IsTrue(this.standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", this.standardTestError, substring);
+        }
+
+        public void StdErrorDoesNotContains(string substring)
+        {
+            Assert.IsFalse(this.standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", this.standardTestError, substring);
         }
 
         public void StdOutputContains(string substring)
@@ -244,6 +263,21 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 var flag = this.standardTestOutput.Contains(test)
                            || this.standardTestOutput.Contains(GetTestMethodName(test));
+                Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
+                                    $"{System.Environment.NewLine}Std Output: {this.standardTestOutput}" +
+                                    $"{System.Environment.NewLine}Std Error: { this.standardTestError}");
+            }
+        }
+
+        public void ValidateFullyQualifiedDiscoveredTests(string filePath, params string[] discoveredTestsList)
+        {
+            var fileOutput = File.ReadAllLines(filePath);
+            Assert.IsTrue(fileOutput.Length == 3);
+            
+            foreach (var test in discoveredTestsList)
+            {
+                var flag = fileOutput.Contains(test)
+                           || fileOutput.Contains(GetTestMethodName(test));
                 Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
                                     $"{System.Environment.NewLine}Std Output: {this.standardTestOutput}" +
                                     $"{System.Environment.NewLine}Std Error: { this.standardTestError}");
