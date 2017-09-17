@@ -40,16 +40,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
             // Updating framework and platform here, As ExecuteSelectedTests won't pass sources to testRequestManager determine the same.
             if (!commandLineOptions.ArchitectureSpecified)
             {
-                var arch = inferHelper.AutoDetectArchitecture(commandLineOptions.Sources.ToList());
-                runSettingsProvider.UpdateRunSettingsNodeInnerXml(PlatformArgumentExecutor.RunSettingsPath,
-                    arch.ToString());
+                var arch = inferHelper.AutoDetectArchitecture(commandLineOptions.Sources?.ToList());
+                runSettingsProvider?.UpdateRunSettingsNodeInnerXml(PlatformArgumentExecutor.RunSettingsPath,
+                    arch.Equals(Architecture.Default)? Constants.DefaultPlatform.ToString(): arch .ToString());
             }
 
             if (!commandLineOptions.FrameworkVersionSpecified)
             {
-                var fx = inferHelper.AutoDetectFramework(commandLineOptions.Sources.ToList());
-                runSettingsProvider.UpdateRunSettingsNodeInnerXml(FrameworkArgumentExecutor.RunSettingsPath,
-                    fx.ToString());
+                var fx = inferHelper.AutoDetectFramework(commandLineOptions.Sources?.ToList());
+                runSettingsProvider?.UpdateRunSettingsNodeInnerXml(FrameworkArgumentExecutor.RunSettingsPath,
+                    fx == null? Framework.DefaultFramework.ToString(): fx.ToString());
             }
         }
 
