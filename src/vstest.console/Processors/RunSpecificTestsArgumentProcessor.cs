@@ -53,7 +53,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
                         TestRequestManager.Instance,
-                        ConsoleOutput.Instance));
+                        ConsoleOutput.Instance,
+                        InferHelper.Instance));
                 }
 
                 return this.executor;
@@ -135,7 +136,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
-#endregion
+        /// <summary>
+        /// To determine framework and platform.
+        /// </summary>
+        private IInferHelper inferHelper;
+
+        #endregion
 
         #region Constructor
 
@@ -146,14 +152,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
             ITestRequestManager testRequestManager,
-            IOutput output)
+            IOutput output,
+            IInferHelper inferHelper)
         {
             Contract.Requires(options != null);
             Contract.Requires(testRequestManager != null);
 
             this.commandLineOptions = options;
             this.testRequestManager = testRequestManager;
-
+            this.inferHelper = inferHelper;
             this.runSettingsManager = runSettingsProvider;
             this.output = output;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
@@ -206,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             bool result = false;
 
-            InferSettingsUtilities.UpdateSettingsIfNotSpecified(this.commandLineOptions, this.runSettingsManager);
+            InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
 
             this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 

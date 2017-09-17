@@ -15,7 +15,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -43,6 +45,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private static ITestRequestManager testRequestManagerInstance;
 
+        private IInferHelper inferHelper;
+
         private const int runRequestTimeout = 5000;
 
         /// <summary>
@@ -62,17 +66,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestPlatformFactory.GetTestPlatform(),
             TestLoggerManager.Instance,
             TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance)
+            TestPlatformEventSource.Instance, InferHelper.Instance)
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, IInferHelper inferHelper)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
             this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.inferHelper = inferHelper;
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -287,14 +292,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         if (updateFramework)
                         {
                             InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                                AssemblyUtilities.AutoDetectFramework(sources)?.ToString());
+                                inferHelper.AutoDetectFramework(sources)?.ToString());
                             settingsUpdated = true;
                         }
 
                         if (updatePlatform)
                         {
                             InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                                AssemblyUtilities.AutoDetectArchitecture(sources).ToString());
+                                inferHelper.AutoDetectArchitecture(sources).ToString());
                             settingsUpdated = true;
                         }
                     }

@@ -137,6 +137,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
+        /// <summary>
+        /// To determine framework and platform.
+        /// </summary>
+        private IInferHelper inferHelper;
+
         #endregion
 
         #region Constructor
@@ -151,28 +156,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
             ITestRequestManager testRequestManager) : 
-                this(options, runSettingsProvider, testRequestManager, ConsoleOutput.Instance)
+                this(options, runSettingsProvider, testRequestManager, ConsoleOutput.Instance, InferHelper.Instance)
         {
         }
 
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="options">
-        /// The options.
-        /// </param>
         internal ListTestsArgumentExecutor(
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
             ITestRequestManager testRequestManager,
-            IOutput output)
+            IOutput output,
+            IInferHelper inferHelper)
         {
             Contract.Requires(options != null);
 
             this.commandLineOptions = options;
             this.output = output;
             this.testRequestManager = testRequestManager;
-
+            this.inferHelper = inferHelper;
             this.runSettingsManager = runSettingsProvider;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
         }
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            InferSettingsUtilities.UpdateSettingsIfNotSpecified(this.commandLineOptions, this.runSettingsManager);
+            InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             var success = this.testRequestManager.DiscoverTests(

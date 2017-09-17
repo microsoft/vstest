@@ -13,115 +13,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     using System.Text;
     using ObjectModel;
 
-    internal class AssemblyUtilities
+    internal class AssemblyHelper : IAssemblyHelper
     {
-        internal static Architecture AutoDetectArchitecture(List<string> sources)
-        {
-            Architecture architecture = Constants.DefaultPlatform;
-            try
-            {
-                if (sources != null && sources.Count > 0)
-                {
-                    Architecture? finalArch = null;
-                    foreach (string source in sources)
-                    {
-                        var arch = GetArchitecture(source);
+        private static AssemblyHelper _instance;
 
-                        if (Architecture.AnyCPU.Equals(arch))
-                        {
-                            // If arch is AnyCPU ignore it.
-                            continue;
-                        }
+        /// <summary>
+        /// Gets the instance.
+        /// </summary>
+        internal static AssemblyHelper Instance => _instance ?? (_instance = new AssemblyHelper());
 
-                        if (finalArch == null)
-                        {
-                            finalArch = arch;
-                            continue;
-                        }
-
-                        if (!finalArch.Equals(arch))
-                        {
-                            finalArch = Constants.DefaultPlatform;
-                            EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
-                            break;
-                        }
-                    }
-
-                    if (finalArch != null)
-                    {
-                        architecture = (Architecture) finalArch;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, architecture);
-            }
-            return architecture;
-        }
-
-        internal static Framework AutoDetectFramework(List<string> sources)
-        {
-            Framework framework = Framework.DefaultFramework;
-            try
-            {
-                if (sources != null && sources.Count > 0)
-                {
-                    var finalFx = DetermineFrameworkName(sources, out var conflictInFxIdentifier);
-                    framework = Framework.FromString(finalFx.FullName);
-                    if (conflictInFxIdentifier && EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info(
-                            "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
-                            framework);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error("Failed to determine framework:{0}, using defaulf: {1}", ex, framework);
-            }
-
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Determined framework: {0}",framework);
-            }
-
-            return framework;
-        }
-
-        private static FrameworkName DetermineFrameworkName(IEnumerable<string> sources, out bool conflictInFxIdentifier)
-        {
-            FrameworkName finalFx = null;
-            conflictInFxIdentifier = false;
-            foreach (string source in sources)
-            {
-                var fx = GetFrameWorkFromMetadata(source);
-                if (finalFx == null)
-                {
-                    finalFx = fx;
-                    continue;
-                }
-
-                if (finalFx.Identifier.Equals(fx.Identifier))
-                {
-                    // Use latest version.
-                    if (finalFx.Version < fx.Version)
-                    {
-                        finalFx = fx;
-                    }
-                }
-                else
-                {
-                    conflictInFxIdentifier = true;
-                    finalFx = new FrameworkName(Framework.DefaultFramework.Name);
-                    break;
-                }
-            }
-            return finalFx;
-        }
-
-        public static FrameworkName GetFrameWorkFromMetadata(string filePath)
+        /// <inheritdoc />
+        public FrameworkName GetFrameWork(string filePath)
         {
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             try
@@ -130,31 +32,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 {
                     using (var assemblyStream = File.Open(filePath, FileMode.Open))
                     {
-                        var peReader = new PEReader(assemblyStream);
-                        var metadataReader = peReader.GetMetadataReader();
-
-                        foreach (var customAttributeHandle in metadataReader.CustomAttributes)
-                        {
-                            var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
-                            var result = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(attr.Value));
-                            if (result.Contains(".NET") && result.Contains(",Version="))
-                            {
-                                var fxStartIndex = result.IndexOf(".NET", StringComparison.Ordinal);
-                                var fxEndIndex = result.IndexOf("\u0001", fxStartIndex, StringComparison.Ordinal);
-                                if (fxStartIndex > -1 && fxEndIndex > fxStartIndex)
-                                {
-                                    // Using -3 because custom attribute values seperated by unicode characters.
-                                    result = result.Substring(fxStartIndex, fxEndIndex - 3);
-                                    frameworkName = new FrameworkName(result);
-                                    break;
-                                }
-                            }
-                        }
+                        frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream, frameworkName);
                     }
                 }
                 else
                 {
-                    //TODO What to do with appx, js and other?
+                    // TODO What else to do with appx, js and other?
                     var extension = Path.GetExtension(filePath);
                     if (extension.Equals(".js", StringComparison.OrdinalIgnoreCase))
                     {
@@ -173,18 +56,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 EqtTrace.Warning("GetFrameWorkFromMetadata: failed to determine TargetFrameworkVersion: {0} for assembly: {1}", ex, filePath);
             }
 
-            EqtTrace.Info("Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
+            }
+
             return frameworkName;
         }
 
-        public static bool IsDotNETAssembly(string filePath)
-        {
-            var extType = Path.GetExtension(filePath);
-            return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
-                                       extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static Architecture GetArchitecture(string assemblyPath)
+        /// <inheritdoc />
+        public Architecture GetArchitecture(string assemblyPath)
         {
             Architecture archType = Architecture.AnyCPU;
             try
@@ -216,8 +97,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             return archType;
         }
+        private static FrameworkName GetFrameworkNameFromAssemblyMetadata(FileStream assemblyStream,
+            FrameworkName frameworkName)
+        {
+            var peReader = new PEReader(assemblyStream);
+            var metadataReader = peReader.GetMetadataReader();
 
-        private static Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture)
+            foreach (var customAttributeHandle in metadataReader.CustomAttributes)
+            {
+                var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
+                var result = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(attr.Value));
+                if (result.Contains(".NET") && result.Contains(",Version="))
+                {
+                    var fxStartIndex = result.IndexOf(".NET", StringComparison.Ordinal);
+                    var fxEndIndex = result.IndexOf("\u0001", fxStartIndex, StringComparison.Ordinal);
+                    if (fxStartIndex > -1 && fxEndIndex > fxStartIndex)
+                    {
+                        // Using -3 because custom attribute values seperated by unicode characters.
+                        result = result.Substring(fxStartIndex, fxEndIndex - 3);
+                        frameworkName = new FrameworkName(result);
+                        break;
+                    }
+                }
+            }
+            return frameworkName;
+        }
+
+        private bool IsDotNETAssembly(string filePath)
+        {
+            var extType = Path.GetExtension(filePath);
+            return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
+                                       extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture)
         {
             Architecture arch = Architecture.AnyCPU;
             // Mapping to Architecture based on https://msdn.microsoft.com/en-us/library/system.reflection.processorarchitecture(v=vs.110).aspx
@@ -244,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return arch;
         }
 
-        public static Architecture GetArchitectureForSource(string imagePath)
+        public Architecture GetArchitectureForSource(string imagePath)
         {
             // For details refer to below code available on MSDN.
             //https://code.msdn.microsoft.com/windowsapps/CSCheckExeType-aab06100#content

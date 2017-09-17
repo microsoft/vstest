@@ -12,6 +12,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -34,6 +35,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         private Mock<ITestPlatform> mockTestPlatform;
         private Mock<IDiscoveryRequest> mockDiscoveryRequest;
         private Mock<ITestRunRequest> mockRunRequest;
+        private Mock<IInferHelper> mockInferHelper;
         private ITestRequestManager testRequestManager;
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
@@ -45,11 +47,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockTestPlatform = new Mock<ITestPlatform>();
             this.mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             this.mockRunRequest = new Mock<ITestRunRequest>();
+            this.mockInferHelper = new Mock<IInferHelper>();
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             var testRunResultAggregator = new DummyTestRunResultAggregator();
 
             this.testRequestManager = new TestRequestManager(this.commandLineOptions, this.mockTestPlatform.Object,
-                mockLoggerManager, testRunResultAggregator, mockTestPlatformEventSource.Object);
+                mockLoggerManager, testRunResultAggregator, mockTestPlatformEventSource.Object, this.mockInferHelper.Object);
             this.mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>()))
                 .Returns(this.mockDiscoveryRequest.Object);
             this.mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>()))
@@ -70,7 +73,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 new Mock<ITestPlatform>().Object,
                 this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
-                new Mock<ITestPlatformEventSource>().Object);
+                new Mock<ITestPlatformEventSource>().Object,
+                this.mockInferHelper.Object);
 
             Assert.IsTrue(this.mockLoggerEvents.EventsSubscribed());
         }
@@ -85,7 +89,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 new Mock<ITestPlatform>().Object,
                 this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
-                new Mock<ITestPlatformEventSource>().Object);
+                new Mock<ITestPlatformEventSource>().Object,
+                this.mockInferHelper.Object);
 
             Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
         }
@@ -318,7 +323,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockTestPlatform.Object,
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
-                this.mockTestPlatformEventSource.Object);
+                this.mockTestPlatformEventSource.Object,
+                this.mockInferHelper.Object);
 
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
 
