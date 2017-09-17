@@ -10,6 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Event arguments used when a test run has completed.
     /// </summary>
@@ -26,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="attachmentSets">Attachment sets associated with the run.</param>
         /// <param name="elapsedTime">Time elapsed in just running tests</param>
         /// <param name="metrics">Metrics</param>
+        [JsonConstructor]
         public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime, IDictionary<string, string> metrics)
         {
             this.TestRunStatistics = stats;
@@ -35,6 +38,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.AttachmentSets = attachmentSets;
             this.ElapsedTimeInRunningTests = elapsedTime;
             this.Metrics = metrics;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="stats">The final stats for the test run. This parameter is only set for communications between the test host and the clients (like VS)</param>
+        /// <param name="isCanceled">Specifies whether the test run is canceled.</param>
+        /// <param name="isAborted">Specifies whether the test run is aborted.</param>
+        /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
+        /// <param name="attachmentSets">Attachment sets associated with the run.</param>
+        /// <param name="elapsedTime">Time elapsed in just running tests</param>
+        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime)
+        {
+            this.TestRunStatistics = stats;
+            this.IsCanceled = isCanceled;
+            this.IsAborted = isAborted;
+            this.Error = error;
+            this.AttachmentSets = attachmentSets;
+            this.ElapsedTimeInRunningTests = elapsedTime;
         }
 
         /// <summary>
