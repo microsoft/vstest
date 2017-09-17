@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Runtime.Versioning;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -22,12 +23,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
 
         internal InferHelper(IAssemblyHelper assemblyHelper)
         {
-            _instance.assemblyHelper = assemblyHelper;
+            this.assemblyHelper = assemblyHelper;
         }
 
-        private InferHelper()
+        private InferHelper():this(AssemblyHelper.Instance)
         {
-            _instance.assemblyHelper = assemblyHelper;
         }
         /// <summary>
         /// Gets the instance.
@@ -64,7 +64,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                     Architecture? finalArch = null;
                     foreach (string source in sources)
                     {
-                        var arch = assemblyHelper.GetArchitecture(source);
+                        Architecture arch;
+                        if (IsDotNETAssembly(source))
+                        {
+                            arch = assemblyHelper.GetArchitecture(source);
+                        }
+                        else
+                        {
+                            //TODO what to do for js, appx and others? Using default for now.
+                            arch = Constants.DefaultPlatform;
+                        }
 
                         if (Architecture.AnyCPU.Equals(arch))
                         {
@@ -138,7 +147,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
             conflictInFxIdentifier = false;
             foreach (string source in sources)
             {
-                var fx = assemblyHelper.GetFrameWork(source);
+                FrameworkName fx;
+                if (IsDotNETAssembly(source))
+                {
+                    fx = assemblyHelper.GetFrameWork(source);
+                }
+                else
+                {
+                    // TODO What else to do with appx, js and other?
+                    var extension = Path.GetExtension(source);
+                    if (extension.Equals(".js", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Currently to run tests for .NET Core, assembly need dependency to Microsoft.NET.Test.Sdk. Which is not
+                        // possible for js files. So using default .NET Full framework version.
+                        fx = new FrameworkName(Constants.DotNetFramework40);
+                    }
+                    else if (extension.Equals(".appx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fx = new FrameworkName(Constants.DotNetFrameworkUap10);
+                    }
+                    else
+                    {
+                        fx = new FrameworkName(Framework.DefaultFramework.Name);
+                    }
+                }
+
                 if (finalFx == null)
                 {
                     finalFx = fx;
@@ -161,6 +194,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                 }
             }
             return finalFx;
+        }
+
+        private bool IsDotNETAssembly(string filePath)
+        {
+            var extType = Path.GetExtension(filePath);
+            return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
+                                       extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

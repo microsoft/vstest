@@ -169,7 +169,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockTestPlatform.Object,
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
-                this.mockTestPlatformEventSource.Object);
+                this.mockTestPlatformEventSource.Object,new Mock<IInferHelper>().Object);
             var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsTrue(success, "DiscoverTests call must succeed");

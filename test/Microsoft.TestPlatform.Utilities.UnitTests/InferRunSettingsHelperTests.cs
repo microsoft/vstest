@@ -330,6 +330,72 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(deviceXml.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetDevice"));
         }
 
+        [TestMethod]
+        public void UpdateTargetPlatformShouldNotModifyXmlIfNodeIsAlreadyPresentForOverwriteFalse()
+        {
+            var settings = @"<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateTargetPlatform(navigator, "X64", overwrite: false);
+
+            Assert.AreEqual("x86", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetPlatform"));
+        }
+
+        [TestMethod]
+        public void UpdateTargetPlatformShouldModifyXmlIfNodeIsAlreadyPresentForOverwriteTrue()
+        {
+            var settings = @"<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateTargetPlatform(navigator, "X64", overwrite: true);
+
+            Assert.AreEqual("X64", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetPlatform"));
+        }
+
+        [TestMethod]
+        public void UpdateTargetPlatformShouldAddPlatformXmlNodeIfNotPresent()
+        {
+            var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateTargetPlatform(navigator, "X64");
+
+            Assert.AreEqual("X64", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetPlatform"));
+        }
+
+        [TestMethod]
+        public void UpdateTargetFrameworkShouldNotModifyXmlIfNodeIsAlreadyPresentForOverwriteFalse()
+        {
+            var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.5</TargetFrameworkVersion></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateTargetFramework(navigator, ".NETCoreApp,Version=v1.0", overwrite: false);
+
+            Assert.AreEqual(".NETFramework,Version=v4.5", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
+        }
+
+        [TestMethod]
+        public void UpdateTargetFrameworkShouldModifyXmlIfNodeIsAlreadyPresentForOverwriteTrue()
+        {
+            var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.5</TargetFrameworkVersion></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateTargetFramework(navigator, ".NETCoreApp,Version=v1.0", overwrite: true);
+
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
+        }
+
+        [TestMethod]
+        public void UpdateTargetFrameworkShouldAddFrameworkXmlNodeIfNotPresent()
+        {
+            var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateTargetFramework(navigator, ".NETCoreApp,Version=v1.0");
+
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
+        }
+
         #region private methods
 
         private XPathNavigator GetNavigator(string settingsXml)

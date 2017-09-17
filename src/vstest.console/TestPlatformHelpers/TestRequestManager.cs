@@ -293,14 +293,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         if (updateFramework)
                         {
                             InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                                inferHelper.AutoDetectFramework(sources)?.ToString());
+                                inferHelper.AutoDetectFramework(sources)?.ToString(), overwrite:true);
                             settingsUpdated = true;
                         }
 
                         if (updatePlatform)
                         {
                             InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                                inferHelper.AutoDetectArchitecture(sources).ToString());
+                                inferHelper.AutoDetectArchitecture(sources).ToString(), overwrite: true);
                             settingsUpdated = true;
                         }
                     }

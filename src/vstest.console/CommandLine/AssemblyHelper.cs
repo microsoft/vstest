@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
     using System.Reflection.Metadata;
@@ -28,27 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             try
             {
-                if (IsDotNETAssembly(filePath))
+                using (var assemblyStream = File.Open(filePath, FileMode.Open))
                 {
-                    using (var assemblyStream = File.Open(filePath, FileMode.Open))
-                    {
-                        frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream, frameworkName);
-                    }
-                }
-                else
-                {
-                    // TODO What else to do with appx, js and other?
-                    var extension = Path.GetExtension(filePath);
-                    if (extension.Equals(".js", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Currently to run tests for .NET Core, assembly need dependency to Microsoft.NET.Test.Sdk. Which is not
-                        // possible for js files. So using default .NET Full framework version.
-                        frameworkName = new FrameworkName(Constants.DotNetFramework40);
-                    }
-                    else if (extension.Equals(".appx", StringComparison.OrdinalIgnoreCase))
-                    {
-                        frameworkName = new FrameworkName(Constants.DotNetFrameworkUap10);
-                    }
+                    frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream, frameworkName);
                 }
             }
             catch (Exception ex)
@@ -70,11 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             Architecture archType = Architecture.AnyCPU;
             try
             {
-                if (IsDotNETAssembly(assemblyPath))
-                {
-                    // AssemblyName won't load the assembly into current domain.
-                    archType  = MapToArchitecture(new AssemblyName(assemblyPath).ProcessorArchitecture);
-                }
+                // AssemblyName won't load the assembly into current domain.
+                archType  = MapToArchitecture(new AssemblyName(assemblyPath).ProcessorArchitecture);
             }
             catch (Exception)
             {
