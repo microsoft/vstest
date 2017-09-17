@@ -326,7 +326,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var result = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
             Assert.IsTrue(result);
 
-            InferRunSettingsHelper.UpdateTargetDeviceInformation(navigator, deviceXml);
+            InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
             Assert.AreEqual(deviceXml.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetDevice"));
         }
 

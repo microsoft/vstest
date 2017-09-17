@@ -22,7 +22,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testJSFileAbsolutePath,
                 this.GetTestAdapterPath(UnitTestFramework.Chutzpah),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -54,7 +53,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -82,7 +80,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -106,10 +103,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 assemblyAbsolutePath,
                 string.Empty,
                 string.Empty,
-                this.FrameworkArgValue,
                 this.testEnvironment.InIsolationValue);
 
-            arguments = string.Concat(arguments, $" /platform:{platform}");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }

@@ -194,13 +194,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Updates the <c>RunConfiguration.CollectSourceInformation</c> value for a run settings. Doesn't do anything if the value is already set.
+        /// Updates the <c>RunConfiguration.TargetDevice</c> value for a run settings. Doesn't do anything if the value is already set.
         /// </summary>
         /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
-        /// <param name="collectSourceInformationValue">Value to set</param>
-        public static void UpdateTargetDeviceInformation(XPathNavigator runSettingsNavigator, string targetDevice)
+        /// <param name="targetDevice">Value to set</param>
+        public static void UpdateTargetDevice(XPathNavigator runSettingsNavigator, string targetDevice)
         {
             AddNodeIfNotPresent<string>(runSettingsNavigator, TargetDeviceNodePath, TargetDevice, targetDevice);
+        }
+
+        /// <summary>
+        /// Updates the <c>RunConfiguration.TargetFrameworkVersion</c> value for a run settings. Doesn't do anything if the value is already set.
+        /// </summary>
+        /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
+        /// <param name="framework">Value to set</param>
+        public static void UpdateTargetFramework(XPathNavigator runSettingsNavigator, string framework)
+        {
+            AddNodeIfNotPresent<string>(runSettingsNavigator, TargetDeviceNodePath, TargetFrameworkNodeName, framework);
+        }
+
+        /// <summary>
+        /// Updates the <c>RunConfiguration.TargetPlatform</c> value for a run settings. Doesn't do anything if the value is already set.
+        /// </summary>
+        /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
+        /// <param name="platform">Value to set</param>
+        public static void UpdateTargetPlatform(XPathNavigator runSettingsNavigator, string platform)
+        {
+            AddNodeIfNotPresent<string>(runSettingsNavigator, TargetDeviceNodePath, TargetPlatformNodeName, platform);
         }
 
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
@@ -332,7 +352,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             navigator.MoveToRoot();
         }
 
-        private static bool TryGetPlatformXml(XPathNavigator runSettingsNavigator, out string platformXml)
+        public static bool TryGetPlatformXml(XPathNavigator runSettingsNavigator, out string platformXml)
         {
             platformXml = XmlUtilities.GetNodeXml(runSettingsNavigator, TargetPlatformNodePath);
 
@@ -359,7 +379,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Validate if TargetFrameworkVersion in run settings has valid value.
         /// </summary>
-        private static bool TryGetFrameworkXml(XPathNavigator runSettingsNavigator, out string frameworkXml)
+        public static bool TryGetFrameworkXml(XPathNavigator runSettingsNavigator, out string frameworkXml)
         {
             frameworkXml = XmlUtilities.GetNodeXml(runSettingsNavigator, TargetFrameworkNodePath);
 

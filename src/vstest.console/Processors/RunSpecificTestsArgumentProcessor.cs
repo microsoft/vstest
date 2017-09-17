@@ -206,6 +206,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             bool result = false;
 
+            InferSettingsUtilities.UpdateSettingsIfNotSpecified(this.commandLineOptions, this.runSettingsManager);
+
             this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             // Discover tests from sources and filter on every discovery reported.

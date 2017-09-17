@@ -233,7 +233,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 string.Empty,
                 runsettingsFilePath,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -262,7 +261,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 runsettingsPath = this.GetRunsettingsFilePath(runConfigurationDictionary);
             }
 
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.testEnvironment.InIsolationValue);
 
             if (!string.IsNullOrWhiteSpace(additionalArgs))
             {

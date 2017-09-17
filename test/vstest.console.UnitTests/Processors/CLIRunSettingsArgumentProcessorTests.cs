@@ -27,7 +27,7 @@ namespace vstest.console.UnitTests.Processors
         public void Init()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new CLIRunSettingsArgumentExecutor(this.settingsProvider);
+            this.executor = new CLIRunSettingsArgumentExecutor(this.settingsProvider, CommandLineOptions.Instance);
         }
 
         [TestMethod]

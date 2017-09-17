@@ -19,7 +19,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
             this.InvokeVsTest(arguments);
@@ -37,7 +36,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=CategoryA\"");
             this.InvokeVsTest(arguments);
@@ -55,7 +53,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
             this.InvokeVsTest(arguments);
@@ -73,7 +70,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(
                 arguments,
@@ -93,7 +89,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
             this.InvokeVsTest(arguments);
@@ -111,7 +106,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
             this.InvokeVsTest(arguments);
@@ -129,7 +123,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
             this.InvokeVsTest(arguments);
@@ -151,7 +144,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
             this.InvokeVsTest(arguments);

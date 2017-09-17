@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Reflection;
     using System.Threading;
     using System.Xml;
+    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -137,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var batchSize = runConfiguration.BatchSize;
 
             var runsettings = discoveryPayload.RunSettings;
-            if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources.ToList(), out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -204,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
-            if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, testRunRequestPayload.Sources, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -261,10 +262,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #endregion
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml,List<string> sources, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
+
 
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
@@ -276,6 +278,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     document.Load(reader);
 
                     var navigator = document.CreateNavigator();
+                    if (this.commandLineOptions.IsDesignMode)
+                    {
+                        // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
+                        bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
+                        bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
+
+                        if (updateFramework)
+                        {
+                            InferRunSettingsHelper.UpdateTargetFramework(navigator,
+                                AssemblyUtilities.AutoDetectFramework(sources)?.ToString());
+                            settingsUpdated = true;
+                        }
+
+                        if (updatePlatform)
+                        {
+                            InferRunSettingsHelper.UpdateTargetPlatform(navigator,
+                                AssemblyUtilities.AutoDetectArchitecture(sources).ToString());
+                            settingsUpdated = true;
+                        }
+                    }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
@@ -294,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if(InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
-                        InferRunSettingsHelper.UpdateTargetDeviceInformation(navigator, deviceXml);
+                        InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
                         settingsUpdated = true;
                     }
 
@@ -358,6 +380,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 return success;
             }
+        }
+
+        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator)
+        {
+            bool required = false;
+            bool isValidFx =
+                InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
+            if (!isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml))
+            {
+                // Not specified/valid in design mode scenario.
+                required = true;
+            }
+
+            return required;
+        }
+
+        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator)
+        {
+            bool required = false;
+            bool isValidPlatform =
+                InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
+            if (!isValidPlatform || string.IsNullOrWhiteSpace(platformXml))
+            {
+                // Not specified/valid in design mode scenario.
+                required = true;
+            }
+
+            return required;
         }
     }
 }

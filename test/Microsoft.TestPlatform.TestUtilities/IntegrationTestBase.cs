@@ -53,9 +53,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">Name of the test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapter.</param>
         /// <param name="runSettings">Text of run settings.</param>
-        /// <param name="framework"></param>
+        /// <param name="inIsolation"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.5.1", string inIsolation = "")
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string inIsolation = "")
         {
             var arguments = testAssembly.AddDoubleQuote();
 
@@ -69,12 +69,6 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Append run settings
                 arguments = string.Concat(arguments, " /settings:", runSettings.AddDoubleQuote());
-            }
-
-            if (!string.IsNullOrWhiteSpace(framework))
-            {
-                // Append framework setting
-                arguments = string.Concat(arguments, " /Framework:", framework.AddDoubleQuote());
             }
 
             arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
@@ -110,7 +104,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             string runSettings = "",
             string framework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
             this.InvokeVsTest(arguments);
         }
 
@@ -122,7 +116,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
         }
