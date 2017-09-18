@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void WebTestRunAllTests(RunnnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            WebTestRunAllTests(runnerInfo.RunnerFramework, "x86");
+            WebTestRunAllTests(runnerInfo.RunnerFramework);
         }
 
         [CustomDataTestMethod]
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void CodedWebTestRunAllTests(RunnnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            CodedWebTestRunAllTests(runnerInfo.RunnerFramework, "x86");
+            CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
         }
 
         [CustomDataTestMethod]
@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 		
-        private void WebTestRunAllTests(string runnerFramework, string platform)
+        private void WebTestRunAllTests(string runnerFramework)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
             {
@@ -138,11 +138,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            string assemblyRelativePathFormat =
-                @"microsoft.testplatform.qtools.assets\1.0.0\contentFiles\any\any\WebTestAssets\{0}\WebTest1.webtest";
-            var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
-                ? string.Format(assemblyRelativePathFormat, platform)
-                : string.Format(assemblyRelativePathFormat, "");
+            string assemblyRelativePath =
+                @"microsoft.testplatform.qtools.assets\1.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
@@ -150,12 +147,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 string.Empty,
                 this.FrameworkArgValue);
 
-            arguments = string.Concat(arguments, $" /platform:{platform}");
             this.InvokeVsTest(arguments);
             this.StdOutputContains("WebTest1");
+            this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        private void CodedWebTestRunAllTests(string runnerFramework, string platform)
+        private void CodedWebTestRunAllTests(string runnerFramework)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
             {
@@ -163,21 +160,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            string assemblyRelativePathFormat =
-                @"microsoft.testplatform.qtools.assets\1.0.0\contentFiles\any\any\WebTestAssets\{0}\BingWebTest.dll";
-            var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
-                ? string.Format(assemblyRelativePathFormat, platform)
-                : string.Format(assemblyRelativePathFormat, "");
+            string assemblyRelativePath =
+                @"microsoft.testplatform.qtools.assets\1.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
                 string.Empty,
                 this.FrameworkArgValue);
-
-            arguments = string.Concat(arguments, $" /platform:{platform}");
+                
             this.InvokeVsTest(arguments);
             this.StdOutputContains("WebTest1Coded");
+            this.ValidateSummaryStatus(1, 0, 0);
         }
     }
 }
