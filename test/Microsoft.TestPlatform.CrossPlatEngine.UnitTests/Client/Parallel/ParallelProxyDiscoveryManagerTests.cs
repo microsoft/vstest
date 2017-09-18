@@ -8,6 +8,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -31,6 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private bool proxyManagerFuncCalled;
         private List<string> processedSources;
         private ManualResetEventSlim discoveryCompleted;
+        private Mock<IRequestData> mockRequestData;
 
         public ParallelProxyDiscoveryManagerTests()
         {
@@ -46,12 +49,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
             this.discoveryCompleted = new ManualResetEventSlim(false);
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
         }
 
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 3, false);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 3, false);
 
             parallelDiscoveryManager.Initialize();
 
@@ -62,7 +67,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AbortShouldCallAllConcurrentManagersOnce()
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 4, false);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 4, false);
 
             parallelDiscoveryManager.Abort();
 
@@ -73,6 +78,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldProcessAllSources()
         {
+            // Testcase filter should be passed to all parallel discovery criteria.
+            this.testDiscoveryCriteria.TestCaseFilter = "Name~Test";
             var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false);
 
             Task.Run(() =>
@@ -132,8 +139,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void HandlePartialDiscoveryCompleteShouldCreateANewProxyDiscoveryManagerIfIsAbortedIsTrue()
         {
             this.proxyManagerFuncCalled = false;
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 1, false);
-            var proxyDiscovermanager = new ProxyDiscoveryManager(new Mock<ITestRequestSender>().Object, new Mock<ITestRuntimeProvider>().Object);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 1, false);
+            var proxyDiscovermanager = new ProxyDiscoveryManager(this.mockRequestData.Object, new Mock<ITestRequestSender>().Object, new Mock<ITestRuntimeProvider>().Object);
 
             parallelDiscoveryManager.HandlePartialDiscoveryComplete(proxyDiscovermanager, 20, new List<TestCase>(), isAborted: true);
 
@@ -142,7 +149,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private IParallelProxyDiscoveryManager SetupDiscoveryManager(Func<IProxyDiscoveryManager> getProxyManager, int parallelLevel, bool abortDiscovery, int totalTests = 20)
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(getProxyManager, parallelLevel, false);
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, getProxyManager, parallelLevel, false);
             this.SetupDiscoveryTests(this.processedSources, abortDiscovery);
 
             // Setup a complete handler for parallel discovery manager
@@ -169,7 +176,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             Task.Delay(100).Wait();
 
-                            handler.HandleDiscoveryComplete(isAbort ? new DiscoveryCompleteEventArgs(-1, isAbort) : new DiscoveryCompleteEventArgs(10, isAbort) , null);
+                            Assert.AreEqual(this.testDiscoveryCriteria.TestCaseFilter, criteria.TestCaseFilter);
+                            handler.HandleDiscoveryComplete(isAbort ? new DiscoveryCompleteEventArgs(-1, isAbort, null) : new DiscoveryCompleteEventArgs(10, isAbort, null) , null);
                         });
             }
         }

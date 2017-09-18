@@ -738,7 +738,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -767,7 +767,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -800,7 +800,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null,
@@ -855,7 +855,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null,
@@ -910,7 +910,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -974,7 +974,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1038,7 +1038,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1087,7 +1087,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1131,7 +1131,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.InitializeCommunication();
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -1158,7 +1158,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             await this.InitializeCommunicationAsync();
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
@@ -1192,7 +1192,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1246,7 +1246,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1303,7 +1303,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
             var payload = new TestRunCompletePayload()
@@ -1359,7 +1359,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
             var payload = new TestRunCompletePayload()
@@ -1415,7 +1415,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(
@@ -1472,7 +1472,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(
@@ -1526,7 +1526,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1588,7 +1588,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCaseList = new List<TestCase>() { testCase };
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
@@ -1647,7 +1647,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var p2 = new TestProcessStartInfo() { FileName = "Y" };
             var message1 = CreateMessage(MessageType.CustomTestHostLaunch, p1);
             var message2 = CreateMessage(MessageType.CustomTestHostLaunch, p2);
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var completepayload = new TestRunCompletePayload()
             {
                 ExecutorUris = null,
@@ -1686,7 +1686,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var p2 = new TestProcessStartInfo() { FileName = "Y" };
             var message1 = CreateMessage(MessageType.CustomTestHostLaunch, p1);
             var message2 = CreateMessage(MessageType.CustomTestHostLaunch, p2);
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var completepayload = new TestRunCompletePayload()
             {
                 ExecutorUris = null,
@@ -1756,7 +1756,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var manualEvent = new ManualResetEvent(false);
             var sources = new List<string> { "1.dll" };
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
             var payload = new TestRunCompletePayload()
             {
@@ -1788,7 +1788,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var sources = new List<string> { "1.dll" };
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
             var payload = new TestRunCompletePayload()
             {

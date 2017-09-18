@@ -3,11 +3,14 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class DiscoveryTests : AcceptanceTestBase
     {
+        private string dummyFilePath = Path.Combine(Path.GetTempPath(), $"{System.Guid.NewGuid()}.txt");
+
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
@@ -39,6 +42,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 "SampleUnitTestProject.UnitTest1.SkippingTest2"
             };
             this.ValidateDiscoveredTests(listOfTests);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETCORETargetFramework]
+        public void DiscoverFullyQualifiedTests(RunnnerInfo runnerInfo)
+        {
+            try
+            {
+                AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+                this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty, this.FrameworkArgValue);
+                var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
+                this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
+            }
+            finally
+            {
+                File.Delete(this.dummyFilePath);
+            }
         }
     }
 }
