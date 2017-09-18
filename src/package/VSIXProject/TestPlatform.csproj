@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot>..\..\..\</TestPlatformRoot>
@@ -101,12 +101,12 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.*" Exclude="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.pdb">
       <VSIXSubPath>Extensions\CppUnitFramework</VSIXSubPath>
     </VsixSourceItem>
-
-    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\x64\*.*">
-      <VSIXSubPath>Extensions\TestImpact\x64</VSIXSubPath>
+    
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\ComComponents\x64\*.*">
+      <VSIXSubPath>Extensions\TestImpact\ComComponents\x64</VSIXSubPath>
     </VsixSourceItem>
-    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\x86\*.*">
-      <VSIXSubPath>Extensions\TestImpact\x86</VSIXSubPath>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\ComComponents\x86\*.*">
+      <VSIXSubPath>Extensions\TestImpact\ComComponents\x86</VSIXSubPath>
     </VsixSourceItem>
 
     <!-- Test host dependencies -->
