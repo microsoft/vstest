@@ -209,8 +209,8 @@ function Measure-DiscoveryTime($commandtorun, $payload)
     {
         Write-Log "Discovering Tests in $($payload.containerPath) using $($payload.currentRunner)"
         $result = Get-TimeTaken $commandtorun
-        $result.Action = "Discovery"
-        $result.Goal = $payload.discoverygoal[$payload.runners.IndexOf($payload.currentRunner)]
+        $result.Action = "Discovery"                                
+        $result.Goal = $payload.discoverygoal[$payload.runners.IndexOf("`"$($payload.currentRunner)`"")]
         Set-CommonProperties $result $payload
         $Script:TPT_Results.Add($result) > $null
     }
@@ -223,7 +223,7 @@ function Measure-ExecutionTime($commandtorun, $payload)
         Write-Log "Executing Tests in $($payload.containerPath) using $($payload.currentRunner)"
         $result = Get-TimeTaken $commandtorun
         $result.Action = "Execution"
-        $result.Goal = $payload.executiongoal[$payload.runners.IndexOf($payload.currentRunner)]
+        $result.Goal = $payload.executiongoal[$payload.runners.IndexOf("`"$($payload.currentRunner)`"")]
         Set-CommonProperties $result $payload
         $Script:TPT_Results.Add($result) > $null
     }
@@ -310,7 +310,7 @@ function Invoke-PerformanceTests
                                                 $payload.currentAdapter = $adapter
     
                                                 Measure-DiscoveryTime {&$runnerPath $testContainer --listtests --testadapterpath:$testAdapterPath} $payload
-                                                Measure-ExecutionTime {&$runnerPath $testContainer --listtests} $payload
+                                                Measure-ExecutionTime {&$runnerPath $testContainer --testadapterpath:$testAdapterPath} $payload
                                             }
                                             elseif($runner -eq "nunit.consolerunner")
                                             {
@@ -364,7 +364,7 @@ function Invoke-DisplayResults
         $Script:TPT_Results | Where-Object {$_.Action -like "Discovery"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
     }
     
-    if($DefaultAction -eq "Both" -or $DefaultAction -eq "Discovery")
+    if($DefaultAction -eq "Both" -or $DefaultAction -eq "Execution")
     {
         $Script:TPT_Results | Where-Object {$_.Action -like "Execution"} | Format-Table 'Runner', 'Adapter', 'Action', 'ElapsedTime', 'Goal', 'Delta', 'Status', 'PayLoad', 'RunnerVersion', 'AdapterVersion' -AutoSize
     }
@@ -379,6 +379,14 @@ function Invoke-DisplayResults
 }
 
 Get-PerfConfigurations
-Invoke-InstallBenchmarkModule
+
+if (-not (Get-Module -Name "Benchmark")) {
+    Invoke-InstallBenchmarkModule
+}
+else
+{
+    Write-Log "Benchmark module is already installed"
+}
+
 Invoke-PerformanceTests
 Invoke-DisplayResults
