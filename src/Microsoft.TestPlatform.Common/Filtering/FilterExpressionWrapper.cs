@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -17,7 +18,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// FilterExpression corresponding to filter criteria
         /// </summary>
         private FilterExpression filterExpression;
-        
+
+        private HashSet<string> filterForRunByFullyQualifiedName;
+
+        private bool IsRunByFullyQualifiedName => filterForRunByFullyQualifiedName != null;
+
         /// <summary>
         /// Initializes FilterExpressionWrapper with given filterString.  
         /// </summary>
@@ -28,14 +33,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             this.FilterString = filterString;
             try
             {
-                this.filterExpression = FilterExpression.Parse(filterString);
+                this.filterExpression = FilterExpression.Parse(filterString, out this.filterForRunByFullyQualifiedName);
+                if (IsRunByFullyQualifiedName)
+                {
+                    this.filterExpression = null;
+                }
             }
             catch (FormatException ex)
             {
                 this.ParseError = ex.Message;
             }
         }
-        
+
         /// <summary>
         /// User specified filter criteria.
         /// </summary>
@@ -59,6 +68,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
+            if (this.IsRunByFullyQualifiedName)
+            {
+                return supportedProperties.Contains(FilterExpression.FullyQualifiedNamePropertyName, StringComparer.OrdinalIgnoreCase) 
+                    ? null 
+                    : new[] { FilterExpression.FullyQualifiedNamePropertyName };
+            }
+
             string[] invalidProperties = null;
             if (null != this.filterExpression)
             {
@@ -66,19 +82,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             return invalidProperties;
         }
-        
+
         /// <summary>
         /// Evaluate filterExpression with given propertyValueProvider.
         /// </summary>
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
-            if (null == this.filterExpression)
+            if (this.IsRunByFullyQualifiedName)
             {
-                return false;
+                if (!TryGetPropertyValue(FilterExpression.FullyQualifiedNamePropertyName, propertyValueProvider, out var value, out var _) || value == null)
+                {
+                    return false;
+                }
+                return this.filterForRunByFullyQualifiedName.Contains(value);
             }
-            return this.filterExpression.Evaluate(propertyValueProvider);
+            else
+            {
+                if (null == this.filterExpression)
+                {
+                    return false;
+                }
+                return this.filterExpression.Evaluate(propertyValueProvider);
+            }
         }
 
+        private bool TryGetPropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue, out string[] multiValue)
+        {
+            var propertyValue = propertyValueProvider(name);
+            if (null != propertyValue)
+            {
+                singleValue = propertyValue as string;
+                multiValue = singleValue != null ? null : propertyValue as string[];
+                return true;
+            }
+
+            singleValue = null;
+            multiValue = null;
+            return false;
+        }
     }
 }

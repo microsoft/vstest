@@ -28,6 +28,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private static string filterExpressionSeperatorString = @"(\&)|(\|)|(\()|(\))";
 
+
+        internal const string FullyQualifiedNamePropertyName = "FullyQualifiedName";
+
         /// <summary>
         /// Condition, if expression is conditional expression.
         /// </summary>
@@ -196,9 +199,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
 
         /// <summary>
-        /// Return FilterExpression after parsing the given filter expression.        
+        /// Return FilterExpression after parsing the given filter expression, and in case of the filter consists of
+        /// only "FullyQualifiedName equals" operations and "|" operators, a HashSet contains all the FQN's as well.
         /// </summary>
-        internal static FilterExpression Parse(string filterString)
+        internal static FilterExpression Parse(string filterString, out HashSet<string> filterForRunByFullyQulifiedName)
         {
             ValidateArg.NotNull(filterString, "filterString");
 
@@ -212,6 +216,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             var tokens = Regex.Split(filterString, filterExpressionSeperatorString);
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
+
+            // We try to build a hash table of FQN's for an filter expression consists of only "FullyQualifiedName=" and "|" in parallel.
+            // If by the time we finished parsing the entire expression and `isRunByFullyQualifiedName` is still true, then this hash table will be used instead
+            // for "run by fully qualified name".
+            var isRunByFullyQualifiedName = true;
+            var filterHashSet = new HashSet<string>();
 
             // This is based on standard parsing of inorder expression using two stacks (operand stack and operator stack)
             // Predence(And) > Predence(Or)
@@ -228,6 +238,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     case "&":
                     case "|":
+                        if (token == "&")
+                        {
+                            isRunByFullyQualifiedName = false;
+                        }
+
                         Operator currentOperator = Operator.And;
                         if (string.Equals("|", token))
                         {
@@ -282,6 +297,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         Condition condition = Condition.Parse(token);
                         FilterExpression filter = new FilterExpression(condition);
                         filterStack.Push(filter);
+                        if (isRunByFullyQualifiedName 
+                            && condition.Operation == Operation.Equal 
+                            && condition.Name.Equals(FullyQualifiedNamePropertyName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            filterHashSet.Add(condition.Value);
+                        }
+                        else
+                        {
+                            isRunByFullyQualifiedName = false;
+                        }
                         break;
                 }
             }
@@ -296,6 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
             }
 
+            filterForRunByFullyQulifiedName = isRunByFullyQualifiedName ? filterHashSet : null;
             return filterStack.Pop();
         }
 
