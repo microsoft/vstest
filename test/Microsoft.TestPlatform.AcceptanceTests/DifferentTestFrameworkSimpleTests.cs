@@ -148,7 +148,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.FrameworkArgValue);
 
             this.InvokeVsTest(arguments);
-            this.StdOutputContains("WebTest1");
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
@@ -170,7 +169,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.FrameworkArgValue);
                 
             this.InvokeVsTest(arguments);
-            this.StdOutputContains("WebTest1Coded");
             this.ValidateSummaryStatus(1, 0, 0);
         }
     }

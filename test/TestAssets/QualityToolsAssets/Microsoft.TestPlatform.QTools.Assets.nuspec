@@ -17,6 +17,6 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="WebTestProject\bin\*.*" target="contentFiles\any\any\WebTestAssets" />
+    <file src="BingWebTest\bin\*.*" target="contentFiles\any\any\WebTestAssets" />
   </files>
 </package>
