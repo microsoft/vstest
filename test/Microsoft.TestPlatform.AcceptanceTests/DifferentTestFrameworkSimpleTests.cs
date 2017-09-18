@@ -139,7 +139,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             string assemblyRelativePath =
-                @"microsoft.testplatform.qtools.assets\1.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
+                @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
@@ -160,7 +160,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             string assemblyRelativePath =
-                @"microsoft.testplatform.qtools.assets\1.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
+                @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
