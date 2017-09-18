@@ -43,6 +43,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x64");
         }
+		
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void WebTestRunAllTests(RunnnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            WebTestRunAllTests(runnerInfo.RunnerFramework);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void CodedWebTestRunAllTests(RunnnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
+        }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
@@ -112,6 +128,48 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /platform:{platform}");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
+        }
+		
+        private void WebTestRunAllTests(string runnerFramework)
+        {
+            if (runnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("WebTests tests not supported with .Netcore runner.");
+                return;
+            }
+
+            string assemblyRelativePath =
+                @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
+            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            var arguments = PrepareArguments(
+                assemblyAbsolutePath,
+                string.Empty,
+                string.Empty,
+                this.FrameworkArgValue);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        private void CodedWebTestRunAllTests(string runnerFramework)
+        {
+            if (runnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("WebTests tests not supported with .Netcore runner.");
+                return;
+            }
+
+            string assemblyRelativePath =
+                @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
+            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            var arguments = PrepareArguments(
+                assemblyAbsolutePath,
+                string.Empty,
+                string.Empty,
+                this.FrameworkArgValue);
+                
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
         }
     }
 }
