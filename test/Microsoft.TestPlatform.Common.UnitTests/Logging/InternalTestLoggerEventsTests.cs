@@ -256,7 +256,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         /// <summary>
-        /// Exception should be thrown if event args passed is null.
+        /// Exception should be thrown if discovered tests event args is null.
         /// </summary>
         [TestMethod]
         public void RaiseDiscoveredTestsShouldThrowExceptionIfNullDiscoveredTestsEventArgsIsPassed()
