@@ -201,6 +201,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             {
                 Sources = new List<string>() { "a", "b" }
             };
+
             var mockProtocolConfig = new ProtocolConfig { Version = 4 };
 
             IRequestData actualRequestData = null;
