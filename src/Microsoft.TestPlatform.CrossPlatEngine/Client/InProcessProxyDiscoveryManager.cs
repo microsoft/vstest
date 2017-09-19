@@ -7,7 +7,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -20,12 +23,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private ITestHostManagerFactory testHostManagerFactory;
         private IDiscoveryManager discoveryManager;
         private ITestRuntimeProvider testHostManager;
+
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
         /// </summary>
-        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
+        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new RequestData(new MetricsCollection())))
         {
         }
 
@@ -52,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             Task.Run(() =>
             {
@@ -70,7 +74,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     // Send a discovery complete to caller.
                     eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
-                    eventHandler.HandleDiscoveryComplete(-1, Enumerable.Empty<TestCase>(), true);
+
+                    var discoveryCompeleteEventsArg = new DiscoveryCompleteEventArgs(-1, true, null);
+
+                    eventHandler.HandleDiscoveryComplete(discoveryCompeleteEventsArg, Enumerable.Empty<TestCase>());
                 }
             });
         }

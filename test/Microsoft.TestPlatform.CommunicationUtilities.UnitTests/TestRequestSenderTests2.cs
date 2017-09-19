@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -29,7 +30,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
         private readonly ConnectedEventArgs connectedEventArgs;
         private readonly List<string> pathToAdditionalExtensions = new List<string> { "Hello", "World" };
-        private readonly Mock<ITestDiscoveryEventsHandler> mockDiscoveryEventsHandler;
+        private readonly Mock<ITestDiscoveryEventsHandler2> mockDiscoveryEventsHandler;
         private readonly Mock<ITestRunEventsHandler> mockExecutionEventsHandler;
         private readonly TestRunCriteriaWithSources testRunCriteriaWithSources;
 
@@ -41,7 +42,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender = new TestableTestRequestSender(this.mockServer.Object, this.mockDataSerializer.Object, new ProtocolConfig { Version = DUMMYPROTOCOLVERSION });
 
             this.connectedEventArgs = new ConnectedEventArgs(this.mockChannel.Object);
-            this.mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            this.mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.mockExecutionEventsHandler = new Mock<ITestRunEventsHandler>();
             this.testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), null, "runsettings", null);
         }
@@ -266,14 +267,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldNotifyDiscoveryCompleteOnCompleteMessageReceived()
         {
-            var completePayload = new DiscoveryCompletePayload { TotalTests = 10, IsAborted = true };
+            var completePayload = new DiscoveryCompletePayload { TotalTests = 10, IsAborted = false };
             this.SetupDeserializeMessage(MessageType.DiscoveryComplete, completePayload);
             this.SetupFakeCommunicationChannel();
 
             this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
 
             this.RaiseMessageReceivedEvent();
-            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(10, null, true));
+            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null));
         }
 
         [TestMethod]
@@ -311,7 +312,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
 
             this.RaiseMessageReceivedEvent();
-            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(-1, null, true));
+            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null));
         }
 
         [TestMethod]
@@ -326,7 +327,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.RaiseClientDisconnectedEvent();
 
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Never);
-            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(-1, null, true), Times.Never);
+            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
         }
 
         [TestMethod]
@@ -368,7 +369,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.RaiseClientDisconnectedEvent();
 
-            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(-1, null, true));
+            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null));
         }
 
         #endregion
@@ -473,7 +474,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue, null),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };
@@ -576,7 +577,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue, null),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };

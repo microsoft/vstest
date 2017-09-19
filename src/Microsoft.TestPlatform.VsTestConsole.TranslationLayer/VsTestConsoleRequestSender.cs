@@ -528,7 +528,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero, null);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
                 this.CleanupCommunicationIfProcessExit();
             }
@@ -582,7 +582,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero, null);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
                 this.CleanupCommunicationIfProcessExit();
             }

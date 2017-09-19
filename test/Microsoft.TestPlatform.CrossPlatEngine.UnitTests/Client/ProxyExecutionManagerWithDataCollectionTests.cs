@@ -5,6 +5,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -36,6 +39,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IDataSerializer> mockDataSerializer;
 
+        private Mock<IRequestData> mockRequestData;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -47,10 +52,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.testableClientConnectionTimeout);
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            this.testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.testableClientConnectionTimeout);
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
         }
 
         [TestMethod]
@@ -95,7 +102,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
             var proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize();
             Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
             Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
@@ -138,7 +145,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testRequestSender, testHostManager, proxyDataCollectionManager)
+        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData(new NoOpMetricsCollection()), testRequestSender, testHostManager, proxyDataCollectionManager)
         {
         }
 

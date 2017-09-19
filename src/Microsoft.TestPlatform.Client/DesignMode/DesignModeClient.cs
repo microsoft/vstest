@@ -302,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
                     var runCompletePayload = new TestRunCompletePayload()
                     {
-                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
+                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue, null),
                         LastRunTests = null
                     };
 

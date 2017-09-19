@@ -35,12 +35,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     public class RunTestsArgumentProcessorTests
     {
         private readonly Mock<IFileHelper> mockFileHelper;
+        private readonly Mock<IOutput> mockOutput;
         private string dummyTestFilePath = "DummyTest.dll";
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public RunTestsArgumentProcessorTests()
         {
             this.mockFileHelper = new Mock<IFileHelper>();
+            this.mockOutput = new Mock<IOutput>();
             this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
             this.mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
@@ -91,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.IsDesignMode = true;
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
-            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager);
+            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, this.mockOutput.Object);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }
@@ -108,14 +110,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
-        private static RunTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
+        private RunTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager)
         {
             var runSettingsProvider = new TestableRunSettingsProvider();
             runSettingsProvider.AddDefaultRunSettings();
             var executor = new RunTestsArgumentExecutor(
                 CommandLineOptions.Instance,
                 runSettingsProvider,
-                testRequestManager);
+                testRequestManager,
+                this.mockOutput.Object);
             return executor;
         }
 
@@ -233,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
             var mockTestRunStats = new Mock<ITestRunStatistics>();
 
-            var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan());
+            var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan(), null);
 
             mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(testRunRequest);
 

@@ -144,6 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
+            criteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
 
             using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria, protocolConfig))
             {

@@ -176,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                         testRunCriteriaWithTests.Tests,
                                         testRunCriteriaWithTests.Package,
                                         testRunCriteriaWithTests.RunSettings,
-                                        testRunCriteriaWithTests.TestExecutionContext, 
+                                        testRunCriteriaWithTests.TestExecutionContext,
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
                                         testRunEventsHandler),
                                 0);
@@ -273,13 +273,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc/>
-        public void DiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        public void DiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
             var discoveryCompletePayload = new DiscoveryCompletePayload
             {
-                TotalTests = totalTests,
-                LastDiscoveredTests = isAborted ? null : lastChunk,
-                IsAborted = isAborted
+                TotalTests = discoveryCompleteEventArgs.TotalCount,
+                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
+                IsAborted = discoveryCompleteEventArgs.IsAborted,
+                Metrics = discoveryCompleteEventArgs.Metrics
             };
 
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);

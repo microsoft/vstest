@@ -26,12 +26,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client
                                          new[] { "sampleTest.dll" },
                                          100,
                                          "<RunConfiguration></RunConfiguration>");
+            this.discoveryCriteria.TestCaseFilter = "TestFilter";
         }
 
         [TestMethod]
         public void DiscoveryCriteriaSerializesToExpectedJson()
         {
-            var expectedJson = "{\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\"}";
+            var expectedJson = "{\"Package\":null,\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\"}";
 
             var json = JsonConvert.SerializeObject(this.discoveryCriteria, Settings);
 
@@ -41,13 +42,14 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Client
         [TestMethod]
         public void DiscoveryCriteriaShouldBeDeserializable()
         {
-            var json = "{\"Sources\":[\"sampleTest.dll\"],\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\"}";
+            var json = "{\"Sources\":[\"sampleTest.dll\"],\"AdapterSourceMap\":{\"_none_\":[\"sampleTest.dll\"]},\"FrequencyOfDiscoveredTestsEvent\":100,\"DiscoveredTestEventTimeout\":\"10675199.02:48:05.4775807\",\"RunSettings\":\"<RunConfiguration></RunConfiguration>\",\"TestCaseFilter\":\"TestFilter\"}";
 
             var criteria = JsonConvert.DeserializeObject<DiscoveryCriteria>(json, Settings);
 
             Assert.AreEqual(TimeSpan.MaxValue, criteria.DiscoveredTestEventTimeout);
             Assert.AreEqual(100, criteria.FrequencyOfDiscoveredTestsEvent);
             Assert.AreEqual("<RunConfiguration></RunConfiguration>", criteria.RunSettings);
+            Assert.AreEqual("TestFilter", criteria.TestCaseFilter);
             Assert.AreEqual("sampleTest.dll", criteria.AdapterSourceMap["_none_"].Single());
             CollectionAssert.AreEqual(new[] { "sampleTest.dll" }, criteria.Sources.ToArray());
         }

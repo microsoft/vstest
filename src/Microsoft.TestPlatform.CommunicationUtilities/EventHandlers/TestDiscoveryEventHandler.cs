@@ -3,9 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    using System;
     using System.Collections.Generic;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -14,14 +12,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// <summary>
     /// The test discovery event handler.
     /// </summary>
-    public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler
+    public class TestDiscoveryEventHandler : ITestDiscoveryEventsHandler2
     {
         private ITestRequestHandler requestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestDiscoveryEventHandler"/> class.
         /// </summary>
-        /// <param name="client"> The client. </param>
+        /// <param name="requestHandler"> The Request Handler. </param>
         public TestDiscoveryEventHandler(ITestRequestHandler requestHandler)
         {
             this.requestHandler = requestHandler;
@@ -40,13 +38,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Handle discovery complete.
         /// </summary>
-        /// <param name="totalTests"> The total tests. </param>
+        /// <param name="discoveryCompleteEventArgs"> Discovery Compelete Events Args. </param>
         /// <param name="lastChunk"> The last chunk. </param>
-        /// <param name="isAborted"> The is aborted. </param>
-        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            EqtTrace.Info(isAborted ? "Discover Aborted." : "Discover Finished.");
-            this.requestHandler.DiscoveryComplete(totalTests, lastChunk, isAborted);
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info(discoveryCompleteEventArgs.IsAborted ? "Discover Aborted." : "Discover Finished.");
+            }
+
+            this.requestHandler.DiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
         }
 
         /// <summary>
