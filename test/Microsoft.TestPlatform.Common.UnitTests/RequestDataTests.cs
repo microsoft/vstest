@@ -39,5 +39,13 @@ namespace Microsoft.TestPlatform.Common.UnitTests
             var requestData = new RequestData();
             requestData.MetricsCollection = null;
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RequestDataShouldThrowArgumentNullExpectionOnNullProtocolConfig()
+        {
+            var requestData = new RequestData();
+            requestData.ProtocolConfig = null;
+        }
     }
 }

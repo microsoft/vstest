@@ -29,7 +29,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
         /// </summary>
-        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new RequestData{MetricsCollection = new MetricsCollection()}))
+        public InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager)
+            : this(
+                testHostManager,
+                new TestHostManagerFactory(new RequestData { MetricsCollection = new MetricsCollection() }))
         {
         }
 

@@ -32,7 +32,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
         /// </summary>
-        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory(new RequestData{MetricsCollection = new MetricsCollection()}))
+        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager)
+            : this(
+                testHostManager,
+                new TestHostManagerFactory(new RequestData { MetricsCollection = new MetricsCollection() }))
         {
         }
 

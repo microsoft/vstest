@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         public ProtocolConfig ProtocolConfig
         {
             get => this.protocolConfig;
-            set => this.protocolConfig = value;
+            set => this.protocolConfig = value ?? throw new ArgumentNullException(nameof(value));
         }
     }
 }
