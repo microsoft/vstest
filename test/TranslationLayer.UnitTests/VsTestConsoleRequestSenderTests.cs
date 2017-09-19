@@ -1952,7 +1952,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
-            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1), null);
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
