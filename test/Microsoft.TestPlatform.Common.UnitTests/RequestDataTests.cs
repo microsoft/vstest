@@ -7,24 +7,37 @@ namespace Microsoft.TestPlatform.Common.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class RequestDataTests
     {
         [TestMethod]
-        public void ConstructorShouldThrowIfMetricsCollectionIsNull()
+        public void RequestDataShouldReturnValidMetricsCollector()
         {
-            Assert.ThrowsException<ArgumentNullException>(() => new RequestData(null));
+            var requestData = new RequestData();
+            var metricsCollection = new MetricsCollection();
+            requestData.MetricsCollection = metricsCollection;
+
+            Assert.AreEqual(metricsCollection, requestData.MetricsCollection);
         }
 
         [TestMethod]
-        public void RequestDataShouldReturnNonNullInstanceOfMetricsCollector()
+        public void RequestDataShouldReturnValidProtocolConfig()
         {
-            var metricsCollector = new MetricsCollection();
-            var requestData = new RequestData(metricsCollector);
+            var requestData = new RequestData();
+            requestData.ProtocolConfig = new ProtocolConfig { Version = 2 };
 
-            Assert.AreEqual(metricsCollector, requestData.MetricsCollection);
+            Assert.AreEqual(2, requestData.ProtocolConfig.Version);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void RequestDataShouldThrowArgumentNullExpectionOnNullMetricsCollection()
+        {
+            var requestData = new RequestData();
+            requestData.MetricsCollection = null;
         }
     }
 }
