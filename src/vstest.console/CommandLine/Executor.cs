@@ -90,18 +90,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.testPlatformEventSource.VsTestConsoleStart();
 
+            this.PrintSplashScreen();
+
             int exitCode = 0;
 
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
             if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
             {
-                args = args ?? new string[0];
+                this.Output.Error(true, CommandLineResources.NoArgumentsProvided);
+                args = new string[] { HelpArgumentProcessor.CommandName };
                 exitCode = 1;
-
-                // Do not add help processor as we will go and try to check for project.json files in current dir
             }
-
-            this.PrintSplashScreen();
 
             // Flatten arguments and process response files.
             string[] flattenedArguments;
