@@ -357,6 +357,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.discoveryRequest = discoveryRequest;
             discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
             discoveryRequest.OnDiscoveryStart += this.DiscoveryStartHandler;
+            discoveryRequest.OnDiscoveredTests += this.DiscoveredTestsHandler;
+            discoveryRequest.OnDiscoveryComplete += this.DiscoveryCompleteHandler;
         }
 
         /// <summary>
@@ -371,7 +373,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             testRunRequest.OnRunStart -= this.TestRunStartHandler;
             testRunRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
             testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-            this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
+            testRunRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
         }
 
         /// <summary>
@@ -383,6 +385,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
             discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
             discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
+            discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
+            discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
         }
 
         /// <summary>
@@ -444,13 +448,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         this.runRequest.OnRunStart -= this.TestRunStartHandler;
                         this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
                         this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-                        this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
+                        this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
                     }
 
                     if (this.discoveryRequest != null)
                     {
                         this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
                         this.discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
+                        this.discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
+                        this.discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
                     }
 
                     this.loggerEvents.Dispose();
@@ -522,7 +528,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            this.loggerEvents.RaiseMessage(e);
+            this.loggerEvents.RaiseTestRunMessage(e);
         }
 
         /// <summary>
@@ -575,9 +581,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Send discovery message to all registered listeners.
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            this.loggerEvents.RaiseMessage(e);
+            this.loggerEvents.RaiseDiscoveryMessage(e);
+        }
+
+        /// <summary>
+        /// Send discovered tests to all registered listeners.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+        {
+            this.loggerEvents.RaiseDiscoveredTests(e);
+        }
+
+        /// <summary>
+        /// Called when test discovery is complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
+        {
+            this.loggerEvents.RaiseDiscoveryComplete(e);
         }
 
         /// <summary>

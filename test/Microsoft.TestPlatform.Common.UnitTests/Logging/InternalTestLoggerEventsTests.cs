@@ -37,14 +37,14 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        public void RaiseMessageShouldNotThrowExceptionIfNoEventHandlersAreRegistered()
+        public void RaiseTestRunMessageShouldNotThrowExceptionIfNoEventHandlersAreRegistered()
         {
             // Send the test mesage event.
-            loggerEvents.RaiseMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational,"This is a string."));
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational,"This is a string."));
         }
 
         [TestMethod]
-        public void RaiseMessageShouldInvokeRegisteredEventHandlerIfTestRunMessageEventArgsIsPassed()
+        public void RaiseTestRunMessageShouldInvokeRegisteredEventHandlerIfTestRunMessageEventArgsIsPassed()
         {
             EventWaitHandle waitHandle = new AutoResetEvent(false);
             bool testMessageReceived = false;
@@ -61,7 +61,7 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             loggerEvents.EnableEvents();
             // Send the test mesage event.
-            loggerEvents.RaiseMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, message));
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, message));
 
             var waitSuccess = waitHandle.WaitOne(500);
             Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
@@ -73,7 +73,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        public void RaiseMessageShouldInvokeRegisteredEventHandlerIfTestTestResultEventArgsIsPassed()
+        public void RaiseTestResultShouldInvokeRegisteredEventHandlerIfTestResultEventArgsIsPassed()
         {
             EventWaitHandle waitHandle = new AutoResetEvent(false);
             bool testResultReceived = false;
@@ -110,11 +110,11 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        public void RaiseMessageShouldThrowExceptioIfNullTestRunMessageEventArgsIsPassed()
+        public void RaiseTestRunMessageShouldThrowExceptioIfNullTestRunMessageEventArgsIsPassed()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                loggerEvents.RaiseMessage(null);
+                loggerEvents.RaiseTestRunMessage(null);
             });
         }
 
@@ -151,7 +151,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             bool testMessageReceived = false;
 
             // Send the events.
-            loggerEvents.RaiseMessage(new TestRunMessageEventArgs(TestMessageLevel.Error,"This is a string."));
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Error,"This is a string."));
             loggerEvents.RaiseTestResult(new TestResultEventArgs(new TestResult(new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName"))));
 
             // Register for the events.
@@ -191,13 +191,13 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        public void RaiseMessageShouldThrowExceptionIfDisposeIsAlreadyCalled()
+        public void RaiseTestRunMessageShouldThrowExceptionIfDisposeIsAlreadyCalled()
         {
             var loggerEvents = GetDisposedLoggerEvents();
 
             Assert.ThrowsException<ObjectDisposedException>(() =>
             {
-                loggerEvents.RaiseMessage(new TestRunMessageEventArgs(TestMessageLevel.Error,"This is a string."));
+                loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Error,"This is a string."));
             });
         }
 
@@ -268,6 +268,78 @@ namespace TestPlatform.Common.UnitTests.Logging
             });
         }
 
+        /// <summary> 
+        /// Exception should be thrown if discovered tests event args is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveredTestsShouldThrowExceptionIfNullDiscoveredTestsEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseDiscoveredTests(null);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveredTestsShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseDiscoveredTests(discoveredTestsEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveredTestsShouldInvokeRegisteredEventHandler()
+        {
+            bool discoveredTestsReceived = false;
+            DiscoveredTestsEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            // Register for the discovered tests event.
+            loggerEvents.DiscoveredTests += (sender, e) =>
+            {
+                discoveredTestsReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the discovered tests event.
+            loggerEvents.RaiseDiscoveredTests(discoveredTestsEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(discoveredTestsReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, discoveredTestsEventArgs);
+        }
+
+        /// <summary>
+        /// Exception should be thrown if event args passed is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryCompleteShouldThrowExceptionIfNullDiscoveryCompleteEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryComplete(null);
+            });
+        }
+
         /// <summary>
         /// Exception should be thrown if logger events are already disposed.
         /// </summary>
@@ -282,6 +354,21 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.ThrowsException<ObjectDisposedException>(() =>
             {
                 loggerEvents.RaiseDiscoveryStart(discoveryStartEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryCompleteShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryComplete(discoveryCompleteEventArgs);
             });
         }
 
@@ -321,6 +408,37 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryCompleteShouldInvokeRegisteredEventHandler()
+        {
+            bool discoveryCompleteReceived = false;
+            DiscoveryCompleteEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
+
+            // Register for the discovery complete event.
+            loggerEvents.DiscoveryComplete += (sender, e) =>
+            {
+                discoveryCompleteReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the discovery complete event.
+            loggerEvents.RaiseDiscoveryComplete(discoveryCompleteEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(discoveryCompleteReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, discoveryCompleteEventArgs);
+        }
+
+        /// <summary>
         /// Exception should be thrown if event args passed is null.
         /// </summary>
         [TestMethod]
@@ -329,6 +447,18 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 loggerEvents.RaiseTestRunStart(null);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if event args passed is null.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryMessageShouldThrowExceptionIfNullTestRunMessageEventArgsIsPassed()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryMessage(null);
             });
         }
 
@@ -345,6 +475,22 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.ThrowsException<ObjectDisposedException>(() =>
             {
                 loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+            });
+        }
+
+        /// <summary>
+        /// Exception should be thrown if logger events are already disposed.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryMessageShouldThrowExceptionIfAlreadyDisposed()
+        {
+            var loggerEvents = GetDisposedLoggerEvents();
+            string message = "This is the test message";
+            TestRunMessageEventArgs testRunMessageEventArgs = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
+
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                loggerEvents.RaiseDiscoveryMessage(testRunMessageEventArgs);
             });
         }
 
@@ -379,6 +525,40 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.IsNotNull(receivedEventArgs);
             Assert.AreEqual(receivedEventArgs, testRunStartEventArgs);
             Assert.AreEqual("Name=Test1", receivedEventArgs.TestRunCriteria.TestCaseFilter);
+        }
+
+        /// <summary>
+        /// Check for invocation to registered event handlers.
+        /// </summary>
+        [TestMethod]
+        public void RaiseDiscoveryMessageShouldInvokeRegisteredEventHandler()
+        {
+            bool discoveryMessageReceived = false;
+            TestRunMessageEventArgs receivedEventArgs = null;
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+
+            string message = "This is the test message";
+            TestRunMessageEventArgs testRunMessageEventArgs = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
+
+            // Register for the discovery message event.
+            loggerEvents.DiscoveryMessage += (sender, e) =>
+            {
+                discoveryMessageReceived = true;
+                receivedEventArgs = e;
+                waitHandle.Set();
+            };
+
+            loggerEvents.EnableEvents();
+            // Send the discovery message event.
+            loggerEvents.RaiseDiscoveryMessage(testRunMessageEventArgs);
+
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+            Assert.IsTrue(discoveryMessageReceived);
+            Assert.IsNotNull(receivedEventArgs);
+            Assert.AreEqual(receivedEventArgs, testRunMessageEventArgs);
+            Assert.AreEqual(message, receivedEventArgs.Message);
+            Assert.AreEqual(TestMessageLevel.Informational, receivedEventArgs.Level);
         }
 
         /// <summary>
