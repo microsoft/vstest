@@ -86,6 +86,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         public override event EventHandler<TestRunMessageEventArgs> TestRunMessage;
 
         /// <summary>
+        /// Raised when a test run starts.
+        /// </summary>
+        public override event EventHandler<TestRunStartEventArgs> TestRunStart;
+
+        /// <summary>
         /// Raised when a test result is received.
         /// </summary>
         public override event EventHandler<TestResultEventArgs> TestResult;
@@ -94,6 +99,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// Raised when a test run is complete.
         /// </summary>
         public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
+
+        /// <summary>
+        /// Raised when test discovery starts.
+        /// </summary>
+        public override event EventHandler<DiscoveryStartEventArgs> DiscoveryStart;
 
         /// <summary>
         /// Raised when a discovery message is received.
@@ -194,6 +204,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
 
             this.SafeInvokeAsync(() => this.TestResult, args, resultSize, "InternalTestLoggerEvents.SendTestResult");
+        }
+
+        /// <summary>
+        /// Raises the test run start event to enabled loggers.
+        /// </summary>
+        /// <param name="args">Arguments to to be raised.</param>
+        internal void RaiseTestRunStart(TestRunStartEventArgs args)
+        {
+            ValidateArg.NotNull<TestRunStartEventArgs>(args, "args");
+
+            CheckDisposed();
+
+            this.SafeInvokeAsync(() => this.TestRunStart, args, 0, "InternalTestLoggerEvents.SendTestRunStart");
+        }
+
+        /// <summary>
+        /// Raises a discovery start event to the enabled loggers.
+        /// </summary>
+        /// <param name="args">Arguments to to be raised.</param>
+        internal void RaiseDiscoveryStart(DiscoveryStartEventArgs args)
+        {
+            ValidateArg.NotNull<DiscoveryStartEventArgs>(args, "args");
+
+            CheckDisposed();
+
+            SafeInvokeAsync(() => this.DiscoveryStart, args, 0, "InternalTestLoggerEvents.SendDiscoveryStart");
         }
 
         /// <summary>
