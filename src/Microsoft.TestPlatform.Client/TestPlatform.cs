@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <returns></returns>
         private IRequestData GetRequestData()
         {
-            var isTelemetryOptedOut = false;
+            var isTelemetryOptedOut = true;
             var telemetryOptedOut = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDOUT");
 
             if (!string.IsNullOrEmpty(telemetryOptedOut) && telemetryOptedOut.Equals("1", StringComparison.Ordinal))
