@@ -7,7 +7,6 @@ namespace TestPlatform.Common.UnitTests.Logging
     using System.Collections.Generic;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -348,8 +347,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             var loggerEvents = GetDisposedLoggerEvents();
             DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
-            TestCaseFilterExpression testCaseFilter = new TestCaseFilterExpression(new FilterExpressionWrapper("Name=Test2"));
-            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria, testCaseFilter);
+            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
 
             Assert.ThrowsException<ObjectDisposedException>(() =>
             {
@@ -383,8 +381,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             EventWaitHandle waitHandle = new AutoResetEvent(false);
 
             DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
-            TestCaseFilterExpression testCaseFilter = new TestCaseFilterExpression(new FilterExpressionWrapper("Name=Test2"));
-            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria, testCaseFilter);
+            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
 
             // Register for the discovery start event.
             loggerEvents.DiscoveryStart += (sender, e) =>
@@ -403,7 +400,6 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.IsTrue(discoveryStartReceived);
             Assert.IsNotNull(receivedEventArgs);
             Assert.AreEqual(receivedEventArgs, discoveryStartEventArgs);
-            Assert.AreEqual("Name=Test2", receivedEventArgs.FilterExpression.TestCaseFilterValue);
             Assert.AreEqual("Name=Test1", receivedEventArgs.DiscoveryCriteria.TestCaseFilter);
         }
 

@@ -148,58 +148,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             Assert.IsTrue(onDiscoveryStartHandlerCalled, "DiscoverAsync should invoke OnDiscoveryStart event");
         }
 
-        /// <summary>
-        /// OnDiscoveryStart should be invoked with null filter expression if filter is null.
-        /// </summary>
-        [TestMethod]
-        public void DiscoverAsyncShouldInvokeOnDiscoveryStartWithNullFilterExpressionIfFilterIsNull()
-        {
-            this.discoveryCriteria.TestCaseFilter = null;
-            DiscoveryStartEventArgs receivedArgs = null;
-            this.discoveryRequest.OnDiscoveryStart += (s, e) => receivedArgs = e;
-
-            // Action
-            this.discoveryRequest.DiscoverAsync();
-
-            // Assert
-            Assert.IsNull(receivedArgs.FilterExpression);
-        }
-
-        /// <summary>
-        /// OnDiscoveryStart should be invoked with null filter expression if filter is invalid.
-        /// </summary>
-        [TestMethod]
-        public void DiscoverAsyncShouldInvokeOnDiscoveryStartWithNullFilterExpressionIfFilterIsInvalid()
-        {
-            this.discoveryCriteria.TestCaseFilter = "Name=Test1=Test2";
-            DiscoveryStartEventArgs receivedArgs = null;
-            this.discoveryRequest.OnDiscoveryStart += (s, e) => receivedArgs = e;
-
-            // Action
-            this.discoveryRequest.DiscoverAsync();
-
-            // Assert
-            Assert.IsNull(receivedArgs.FilterExpression);
-        }
-
-        /// <summary>
-        /// OnDiscoveryStart should be invoked with proper filter expression if filter is valid.
-        /// </summary>
-        [TestMethod]
-        public void DiscoverAsyncShouldInvokeOnDiscoveryStartWithProperFilterExpressionIfFilterIsValid()
-        {
-            this.discoveryCriteria.TestCaseFilter = "Name=Test1";
-            DiscoveryStartEventArgs receivedArgs = null;
-            this.discoveryRequest.OnDiscoveryStart += (s, e) => receivedArgs = e;
-
-            // Action
-            this.discoveryRequest.DiscoverAsync();
-
-            // Assert
-            Assert.IsNotNull(receivedArgs.FilterExpression);
-            Assert.AreEqual(this.discoveryCriteria.TestCaseFilter, receivedArgs.FilterExpression.TestCaseFilterValue);
-        }
-
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCollectMetrics()
         {

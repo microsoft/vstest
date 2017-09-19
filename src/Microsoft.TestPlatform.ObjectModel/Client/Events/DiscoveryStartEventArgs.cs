@@ -17,21 +17,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Constructor for creating event args object
         /// </summary>
         /// <param name="discoveryCriteria"> Discovery criteria to be used for test discovery. </param>
-        /// <param name="filterExpression"> Test case filter expression. </param>
-        public DiscoveryStartEventArgs(DiscoveryCriteria discoveryCriteria, ITestCaseFilterExpression filterExpression)
+        public DiscoveryStartEventArgs(DiscoveryCriteria discoveryCriteria)
         {
             DiscoveryCriteria = discoveryCriteria;
-            FilterExpression = filterExpression;
         }
 
         /// <summary>
         /// Discovery criteria to be used for test discovery
         /// </summary>
         public DiscoveryCriteria DiscoveryCriteria { get; private set; }
-
-        /// <summary>
-        /// Test case filter expression
-        /// </summary>
-        public ITestCaseFilterExpression FilterExpression { get; private set; }
     }
 }

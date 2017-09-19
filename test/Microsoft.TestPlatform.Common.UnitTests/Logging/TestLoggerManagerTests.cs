@@ -8,7 +8,6 @@ namespace TestPlatform.Common.UnitTests.Logging
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -386,8 +385,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             waitHandle.Reset();
           
             DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
-            TestCaseFilterExpression testCaseFilter = new TestCaseFilterExpression(new FilterExpressionWrapper("Name=Test2"));
-            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria, testCaseFilter);
+            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
           
             // mock for IDiscoveryRequest
             var discoveryRequest = new Mock<IDiscoveryRequest>();
@@ -427,10 +425,10 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             counter = 0;
             waitHandle.Reset();
-  
+
             List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
             DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
-          
+
             // mock for IDiscoveryRequest
             var discoveryRequest = new Mock<IDiscoveryRequest>();
 
@@ -445,7 +443,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             discoveryRequest.Raise(
                 m => m.OnDiscoveredTests += null,
                 discoveredTestsEventArgs);
-          
+
             // Assertions when discovery events registered
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
@@ -457,7 +455,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             discoveryRequest.Raise(
                 m => m.OnDiscoveredTests += null,
                 discoveredTestsEventArgs);
-          
+
             // Assertions when discovery events unregistered
             Assert.AreEqual(counter, 1);
         }
@@ -513,16 +511,16 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             counter = 0;
             waitHandle.Reset();
-  
+
             DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
 
             // mock for IDiscoveryRequest
             var discoveryRequest = new Mock<IDiscoveryRequest>();
-  
+
             // setup TestLogger
             TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
             TestLoggerManager.Instance.EnableLogging();
-  
+
             // Register DiscoveryRequest object
             TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
 
