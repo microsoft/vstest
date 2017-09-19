@@ -142,6 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             events.TestRunComplete += this.TestRunCompleteHandler;
 
             // Register for the discovery events.
+            events.DiscoveryMessage += this.TestMessageHandler;
             events.DiscoveredTests += DiscoveredTestsHandler;
         }
 
