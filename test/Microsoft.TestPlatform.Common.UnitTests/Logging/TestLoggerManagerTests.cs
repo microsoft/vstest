@@ -3,18 +3,21 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
+
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-    using TestPlatform.Common.UnitTests.Utilities;
+
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -174,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
         }
@@ -197,7 +200,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
@@ -206,7 +209,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
             Assert.AreEqual(counter, 1);
         }
 
@@ -372,6 +375,219 @@ namespace TestPlatform.Common.UnitTests.Logging
                     });
         }
 
+        /// <summary>
+        /// DiscoveryStart event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveryStartHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+          
+            DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
+            DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
+          
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryStart += null,
+                discoveryStartEventArgs);
+          
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryStart += null,
+                discoveryStartEventArgs);
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
+        /// <summary>
+        /// DiscoveredTests event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveredTestsHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+
+            List<TestCase> testCases = new List<TestCase> { new TestCase("This is a string.", new Uri("some://uri"), "DummySourceFileName") };
+            DiscoveredTestsEventArgs discoveredTestsEventArgs = new DiscoveredTestsEventArgs(testCases);
+
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveredTests += null,
+                discoveredTestsEventArgs);
+
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveredTests += null,
+                discoveredTestsEventArgs);
+
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
+        /// <summary>
+        /// TestRunStart event handler of loggers should be called only if test run events are registered.
+        /// </summary>
+        [TestMethod]
+        public void TestRunRequestRaiseShouldInvokeTestRunStartHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+  
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
+
+            // mock for ITestRunRequest
+            var testRunRequest = new Mock<ITestRunRequest>();
+  
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register TestRunRequest object
+            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+
+            //Raise an event on mock object
+            testRunRequest.Raise(
+                m => m.OnRunStart += null,
+                testRunStartEventArgs);
+
+            // Assertions when test run events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister TestRunRequest object
+            TestLoggerManager.Instance.UnregisterTestRunEvents(testRunRequest.Object);
+
+            //Raise an event on mock object
+            testRunRequest.Raise(
+                m => m.OnRunStart += null,
+                testRunStartEventArgs);
+
+            // Assertions when test run events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
+        /// <summary>
+        /// DiscoveryComplete event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveryCompleteHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
+
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryComplete += null,
+                discoveryCompleteEventArgs);
+
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryComplete += null,
+                discoveryCompleteEventArgs);
+
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
+        /// <summary>
+        /// DiscoveryMessage event handler of loggers should be called only if discovery events are registered.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryRequestRaiseShouldInvokeDiscoveryMessageHandlerOfLoggersOnlyIfRegistered()
+        {
+            counter = 0;
+            waitHandle.Reset();
+
+            string message = "This is the test message";
+            TestRunMessageEventArgs testRunMessageEventArgs = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
+
+            // mock for IDiscoveryRequest
+            var discoveryRequest = new Mock<IDiscoveryRequest>();
+
+            // setup TestLogger
+            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            TestLoggerManager.Instance.EnableLogging();
+
+            // Register DiscoveryRequest object
+            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryMessage += null,
+                testRunMessageEventArgs);
+
+            // Assertions when discovery events registered
+            waitHandle.WaitOne();
+            Assert.AreEqual(counter, 1);
+
+            // Unregister DiscoveryRequest object
+            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+
+            //Raise an event on mock object
+            discoveryRequest.Raise(
+                m => m.OnDiscoveryMessage += null,
+                testRunMessageEventArgs);
+
+            // Assertions when discovery events unregistered
+            Assert.AreEqual(counter, 1);
+        }
+
         [ExtensionUri("testlogger://logger")]
         [FriendlyName("TestLoggerExtension")]
         private class ValidLogger3 : ITestLogger
@@ -381,6 +597,12 @@ namespace TestPlatform.Common.UnitTests.Logging
                 events.TestRunMessage += TestMessageHandler;
                 events.TestRunComplete += Events_TestRunComplete;
                 events.TestResult += Events_TestResult;
+                events.TestRunStart += TestRunStartHandler;
+              
+                events.DiscoveryStart += DiscoveryStartHandler;
+                events.DiscoveryMessage += DiscoveryMessageHandler;
+                events.DiscoveredTests += DiscoveredTestsHandler;
+                events.DiscoveryComplete += DiscoveryCompleteHandler;
             }
 
             private void Events_TestResult(object sender, TestResultEventArgs e)
@@ -404,6 +626,36 @@ namespace TestPlatform.Common.UnitTests.Logging
                     TestLoggerManagerTests.waitHandle.Set();
 
                 }
+            }
+
+            private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
+            }
+
+            private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
+            }
+
+            private void DiscoveryStartHandler(object sender, DiscoveryStartEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
+            }
+
+            private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
+            }
+
+            private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
+            {
+                TestLoggerManagerTests.counter++;
+                TestLoggerManagerTests.waitHandle.Set();
             }
 
         }

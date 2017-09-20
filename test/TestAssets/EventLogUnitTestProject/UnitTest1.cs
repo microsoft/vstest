@@ -15,26 +15,26 @@ namespace EventLogUnitTestProject
         [TestMethod]
         public void TestMethod1()
         {
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 10);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 11);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 12);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 110);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 111);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 112);
         }
 
         [TestMethod]
         public void TestMethod2()
         {
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 20);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 21);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 22);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 23);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 220);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 221);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 222);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 223);
         }
 
         [TestMethod]
         public void TestMethod3()
         {
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 30);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 31);
-            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 32);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 330);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 331);
+            EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 332);
         }
     }
 }

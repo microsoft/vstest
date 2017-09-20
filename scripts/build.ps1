@@ -363,10 +363,11 @@ function Create-VsixPackage
     
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
+    $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
     if (-not (Test-Path $testImpactComComponentsDir)) {
         New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
     }
-    Copy-Item -Recurse $comComponentsDirectory\* $testImpactComComponentsDir -Force
+    Copy-Item -Recurse $comComponentsDirectoryTIA\* $testImpactComComponentsDir -Force
     
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force

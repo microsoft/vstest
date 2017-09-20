@@ -15,12 +15,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -92,13 +92,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             // Update cache with Extension Folder's files
             this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
+            // Update and initialize loggers only when DesignMode is false
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
+            if (runConfiguration.DesignMode == false)
+            {
+                this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
+
+                // Initialize loggers
+                TestLoggerManager.Instance.InitializeLoggers();
+            }
+
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
+            var requestData = new RequestData(new MetricsCollection());
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
-            return new DiscoveryRequest(discoveryCriteria, discoveryManager);
+            return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager);
         }
 
         /// <summary>
@@ -136,10 +147,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria, protocolConfig);
+            var requestData = new RequestData(new MetricsCollection());
+            var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria, protocolConfig);
             executionManager.Initialize();
 
-            return new TestRunRequest(testRunCriteria, executionManager);
+            return new TestRunRequest(requestData, testRunCriteria, executionManager);
         }
 
         /// <summary>
@@ -204,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Update the test logger paths from source directory
+        /// Update the extension assemblies from source directory
         /// </summary>
         /// <param name="testRunCriteria">
         /// The test Run Criteria.
@@ -218,6 +230,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
             }
 
+            AddExtensionAssembliesFromSource(sources);
+        }
+
+        /// <summary>
+        /// Update the test logger paths from source directory
+        /// </summary>
+        /// <param name="sources"></param>
+        private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
+        {
             // Currently we support discovering loggers only from Source directory
             var loggersToUpdate = new List<string>();
 
