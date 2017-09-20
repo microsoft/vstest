@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 {
     using System.Collections.Generic;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     /// <summary>
     /// If Telemtry is opted out, this class will be initialized and will do No operation.
     /// </summary>

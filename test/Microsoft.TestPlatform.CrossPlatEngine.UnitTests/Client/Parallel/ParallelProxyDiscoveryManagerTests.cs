@@ -8,7 +8,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;

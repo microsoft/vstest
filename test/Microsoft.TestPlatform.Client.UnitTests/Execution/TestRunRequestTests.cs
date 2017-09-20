@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
     using Client.Execution;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;

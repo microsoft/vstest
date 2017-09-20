@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;

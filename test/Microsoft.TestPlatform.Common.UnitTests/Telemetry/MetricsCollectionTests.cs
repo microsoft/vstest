@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
 {
-    using System;
-
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

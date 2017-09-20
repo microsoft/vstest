@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var requestData = new RequestData(new MetricsCollection());
+                var requestData = new RequestData { MetricsCollection = new MetricsCollection() };
                 var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData));
 
                 // Wait for processing to complete.

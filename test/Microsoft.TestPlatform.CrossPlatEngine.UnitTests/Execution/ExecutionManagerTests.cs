@@ -36,7 +36,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.executionManager = new ExecutionManager(new RequestData(new NoOpMetricsCollection()));
+            this.executionManager = new ExecutionManager(new RequestData
+                                                             {
+                                                                 MetricsCollection = new NoOpMetricsCollection()
+                                                             });
 
             TestPluginCache.Instance = null;
 

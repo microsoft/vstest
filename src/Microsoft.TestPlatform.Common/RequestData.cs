@@ -5,28 +5,42 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
 {
     using System;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
+    /// <inheritdoc />
     /// <summary>
     /// Provide common services and data for a discovery/run request.
     /// </summary>
     public class RequestData : IRequestData
     {
+        /// <summary>
+        /// The metrics collection.
+        /// </summary>
         private IMetricsCollection metricsCollection;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequestData"/> class.
+        /// The protocol config.
         /// </summary>
-        /// <param name="metricsCollection">
-        /// The metrics collection.
-        /// </param>
-        public RequestData(IMetricsCollection metricsCollection)
+        private ProtocolConfig protocolConfig;
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the metrics collection.
+        /// </summary>
+        public IMetricsCollection MetricsCollection
         {
-            this.metricsCollection = metricsCollection ?? throw new ArgumentNullException(nameof(metricsCollection));
+            get => this.metricsCollection;
+            set => this.metricsCollection = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        /// <inheritdoc/>
-        public IMetricsCollection MetricsCollection => this.metricsCollection;
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the protocol config.
+        /// </summary>
+        public ProtocolConfig ProtocolConfig
+        {
+            get => this.protocolConfig;
+            set => this.protocolConfig = value ?? throw new ArgumentNullException(nameof(value));
+        }
     }
 }
