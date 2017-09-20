@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;

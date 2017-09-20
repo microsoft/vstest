@@ -1,10 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-
     /// <summary>
     /// Provide common services and data for a discovery/run request.
     /// </summary>
@@ -13,6 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine
         /// <summary>
         /// Gets an instance of <see cref="IMetricsCollection"/>.
         /// </summary>
-        IMetricsCollection MetricsCollection { get; }
+        IMetricsCollection MetricsCollection { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ProtocolConfig <see cref="ProtocolConfig"/>
+        /// </summary>
+        ProtocolConfig ProtocolConfig { get; set; }
     }
 }

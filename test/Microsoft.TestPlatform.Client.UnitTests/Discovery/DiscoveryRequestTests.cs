@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 
     using Client.Discovery;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;

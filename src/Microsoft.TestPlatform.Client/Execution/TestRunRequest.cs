@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Linq;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;

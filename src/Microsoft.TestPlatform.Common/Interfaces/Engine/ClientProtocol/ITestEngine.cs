@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
@@ -18,11 +17,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="requestData">the request data for providing common discovery services and data</param>
         /// <param name="testHostManager">Test host manager for the current test discovery.</param>
         /// <param name="discoveryCriteria">The discovery Criteria.</param>
-        /// <param name="protocolConfig">Protocol related information.</param>
         /// <returns>
         /// ITestDiscoveryManager object that can do discovery
         /// </returns>
-        IProxyDiscoveryManager GetDiscoveryManager(IRequestData requestData, ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig);
+        IProxyDiscoveryManager GetDiscoveryManager(IRequestData requestData, ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria);
 
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
@@ -30,9 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="requestData">The request data for providing common execution services and data</param>
         /// <param name="testHostManager">Test host manager for current test run.</param>
         /// <param name="testRunCriteria">TestRunCriteria of the current test run</param>
-        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>ITestExecutionManager object that can do execution</returns>
-        IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria, ProtocolConfig protocolConfig);
+        IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria);
 
         /// <summary>
         /// Fetches the extension manager for this engine. This manager would provide extensibility

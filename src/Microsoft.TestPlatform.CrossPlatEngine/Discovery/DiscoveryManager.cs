@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
