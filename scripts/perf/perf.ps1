@@ -209,7 +209,7 @@ function Measure-DiscoveryTime($commandtorun, $payload)
     {
         Write-Log "Discovering Tests in $($payload.containerPath) using $($payload.currentRunner)"
         $result = Get-TimeTaken $commandtorun
-        $result.Action = "Discovery"                                
+        $result.Action = "Discovery"
         $result.Goal = $payload.discoverygoal[$payload.runners.IndexOf("`"$($payload.currentRunner)`"")]
         Set-CommonProperties $result $payload
         $Script:TPT_Results.Add($result) > $null
