@@ -383,13 +383,13 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
             string testCaseFilterValue = "TestFilter";
-            CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterValue;
+            payload.TestCaseFilter = testCaseFilterValue;
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
-
+          
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
             Assert.IsTrue(success, "RunTests call must succeed");

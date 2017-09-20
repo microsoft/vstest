@@ -233,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
+                runCriteria.TestCaseFilter = testRunRequestPayload.TestCaseFilter;
             }
             else
             {
