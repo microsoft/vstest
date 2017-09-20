@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 {
     using System.Collections.Generic;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     /// <inheritdoc />
     /// <summary>
     /// This Class will collect Metrics.
