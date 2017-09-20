@@ -353,7 +353,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             this.testsTotal++;
 
             string name = null;
-            name = !string.IsNullOrEmpty(e.Result.DisplayName) ? e.Result.DisplayName : e.Result.TestCase.FullyQualifiedName;
+            name = !string.IsNullOrEmpty(e.Result.TestCase.DisplayName) ? e.Result.TestCase.DisplayName : e.Result.TestCase.FullyQualifiedName;
 
             if (e.Result.Outcome == TestOutcome.Skipped)
             {
