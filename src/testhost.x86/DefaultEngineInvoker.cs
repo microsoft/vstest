@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
@@ -39,6 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private const string LogFileArgument = "--diag";
 
         private const string DataCollectionPortArgument = "--datacollectionport";
+
+        private const string TelemetryOptedIn = "--telemetryoptedin";
 
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
@@ -106,9 +109,29 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
                 }
 
+                // Checks for Telemetry Opted in or not from Command line Arguments.
+                // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
+                var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
+                var telemetryOptedIn = false;
+                if (!string.IsNullOrWhiteSpace(telemetryStatus))
+                {
+                    if (telemetryStatus.Equals("true"))
+                    {
+                        telemetryOptedIn = true;
+                    }
+                }
+
+                var requestData = new RequestData
+                                      {
+                                          MetricsCollection =
+                                              telemetryOptedIn
+                                                  ? (IMetricsCollection)new MetricsCollection()
+                                                  : new NoOpMetricsCollection(),
+                                          IsTelemetryOptedOut = !telemetryOptedIn
+                };
+
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var requestData = new RequestData { MetricsCollection = new MetricsCollection() };
                 var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData));
 
                 // Wait for processing to complete.

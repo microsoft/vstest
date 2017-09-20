@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Xml;
 
@@ -15,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -46,6 +46,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private const int runRequestTimeout = 5000;
 
+        private bool telemetryOptedOut;
+
+        private IMetricsPublisher metricsPublisher;
+
         /// <summary>
         /// Maintains the current active execution request
         /// Assumption : There can only be one active execution request.
@@ -63,17 +67,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestPlatformFactory.GetTestPlatform(),
             TestLoggerManager.Instance,
             TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance)
+            TestPlatformEventSource.Instance,
+            IsTelemetryOptedOut() ? (IMetricsPublisher)new NoOpMetricsPublisher() : new MetricsPublisher())
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource)
+        /// <summary>
+        /// Finalizes an instance of the <see cref="TestRequestManager"/> class. 
+        /// </summary>
+        ~TestRequestManager()
+        {
+            this.metricsPublisher.Dispose();
+        }
+
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, IMetricsPublisher metricsPublisher)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
             this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.metricsPublisher = metricsPublisher;
+            this.telemetryOptedOut = IsTelemetryOptedOut();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -142,7 +157,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var requestData = new RequestData
                                   {
                                       ProtocolConfig = protocolConfig,
-                                      MetricsCollection = new MetricsCollection()
+                                      MetricsCollection =
+                                          this.telemetryOptedOut
+                                              ? (IMetricsCollection)new NoOpMetricsCollection()
+                                              : new MetricsCollection()
                                   };
 
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
@@ -193,6 +211,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
+
+            // Publish the Metrics
+            this.metricsPublisher.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+            requestData.MetricsCollection.Clear();
+
             return success;
         }
 
@@ -215,8 +238,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runsettings = testRunRequestPayload.RunSettings;
             var requestData = new RequestData
                                   {
-                                      ProtocolConfig = protocolConfig,
-                                      MetricsCollection = new MetricsCollection()
+                                      MetricsCollection =
+                                          this.telemetryOptedOut
+                                              ? (IMetricsCollection)new NoOpMetricsCollection()
+                                              : new MetricsCollection(),
+                                      ProtocolConfig = protocolConfig
                                   };
 
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
@@ -249,6 +275,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar, protocolConfig);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
+
+            this.metricsPublisher.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+            requestData.MetricsCollection.Clear();
+
             return success;
         }
 
@@ -373,6 +403,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 return success;
             }
+        }
+
+        /// <summary>
+        /// Checks whether Telemetry opted out or not.
+        /// </summary>
+        /// <returns>Returns Telemetry Opted out or not</returns>
+        private static bool IsTelemetryOptedOut()
+        {
+            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDOUT");
+
+            return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
         }
     }
 }

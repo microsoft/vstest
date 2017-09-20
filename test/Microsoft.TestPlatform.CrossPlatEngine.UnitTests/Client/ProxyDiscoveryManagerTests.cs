@@ -63,6 +63,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default setup test host manager as shared (desktop)
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(
+                    m => m.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<TestRunnerConnectionInfo>()))
+                .Returns(new TestProcessStartInfo());
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
                 .Callback(
                     () =>

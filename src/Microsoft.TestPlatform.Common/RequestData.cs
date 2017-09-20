@@ -42,5 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             get => this.protocolConfig;
             set => this.protocolConfig = value ?? throw new ArgumentNullException(nameof(value));
         }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets a value indicating whether is telemetry opted out.
+        /// </summary>
+        public bool IsTelemetryOptedOut { get; set; }
     }
 }

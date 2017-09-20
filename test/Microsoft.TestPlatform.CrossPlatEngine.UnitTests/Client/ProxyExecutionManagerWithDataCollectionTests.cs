@@ -143,11 +143,55 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
         }
+
+        [TestMethod]
+        public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgTrueIfTelemetryOptedIn()
+        {
+            var mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedOut).Returns(false);
+
+            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+            var testProcessStartInfo = new TestProcessStartInfo();
+            testProcessStartInfo.Arguments = string.Empty;
+
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+
+            // Act.
+            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+            // Verify.
+            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin true"));
+        }
+
+        [TestMethod]
+        public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgFalseIfTelemetryOptedOut()
+        {
+            var mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedOut).Returns(true);
+
+            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+            var testProcessStartInfo = new TestProcessStartInfo();
+            testProcessStartInfo.Arguments = string.Empty;
+
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+
+            // Act.
+            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+            // Verify.
+            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin false"));
+        }
     }
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData(){MetricsCollection = new NoOpMetricsCollection()}, testRequestSender, testHostManager, proxyDataCollectionManager)
+        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData{MetricsCollection = new NoOpMetricsCollection()}, testRequestSender, testHostManager, proxyDataCollectionManager)
+        {
+        }
+
+        public TestableProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(requestData, testRequestSender, testHostManager, proxyDataCollectionManager)
         {
         }
 

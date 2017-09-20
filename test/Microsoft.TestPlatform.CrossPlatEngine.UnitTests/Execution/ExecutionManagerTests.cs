@@ -32,10 +32,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     {
         private ExecutionManager executionManager;
         private TestExecutionContext testExecutionContext;
+        private Mock<IRequestData> mockRequestData;
 
         [TestInitialize]
         public void TestInit()
         {
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.executionManager = new ExecutionManager(new RequestData
                                                              {
                                                                  MetricsCollection = new NoOpMetricsCollection()

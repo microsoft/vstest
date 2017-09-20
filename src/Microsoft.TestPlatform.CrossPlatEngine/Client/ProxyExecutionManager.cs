@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
-        /// <param name="requestData">The Request Data for providing Common services and data for Run.</param>
+        /// <param name="requestData">The Request Data for providing services and data for Run.</param>
         /// <param name="requestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
         public ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="dataSerializer"></param>
         /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
         internal ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
-            : base(requestSender, testHostManager, clientConnectionTimeout)
+            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;

@@ -22,12 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
             // No Operation
         }
 
-        public IDictionary<string, string> Metrics
-        {
-            get
-            {
-                return new Dictionary<string, string>();
-            }
-        }
+        public IDictionary<string, string> Metrics => new Dictionary<string, string>();
     }
 }
