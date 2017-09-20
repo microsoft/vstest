@@ -46,6 +46,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         event EventHandler<TestRunChangedEventArgs> OnRunStatsChange;
 
         /// <summary>
+        ///  Handler for notifying test run started
+        /// </summary>
+        event EventHandler<TestRunStartEventArgs> OnRunStart;
+
+        /// <summary>
         ///  Handler for notifying test run is complete
         /// </summary>
         event EventHandler<TestRunCompleteEventArgs> OnRunCompletion;

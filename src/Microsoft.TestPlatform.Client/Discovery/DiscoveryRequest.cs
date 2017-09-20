@@ -61,6 +61,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     // Collecting Data Point Number of sources sent for discovery
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
 
+                    // Invoke OnDiscoveryStart event
+                    this.OnDiscoveryStart.SafeInvoke(this, new DiscoveryStartEventArgs(this.DiscoveryCriteria), "DiscoveryRequest.DiscoveryStart");
+
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
                 catch
@@ -139,6 +142,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             return true;
         }
+
+        /// <summary>
+        /// Raised when the test discovery starts.
+        /// </summary>
+        public event EventHandler<DiscoveryStartEventArgs> OnDiscoveryStart;
 
         /// <summary>
         /// Raised when the test discovery completes.

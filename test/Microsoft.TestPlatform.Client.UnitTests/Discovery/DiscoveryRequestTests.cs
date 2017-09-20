@@ -131,6 +131,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             Assert.AreEqual("complete", events[1]);
         }
 
+        /// <summary>
+        /// DiscoverAsync should invoke OnDiscoveryStart event.
+        /// </summary>
+        [TestMethod]
+        public void DiscoverAsyncShouldInvokeOnDiscoveryStart()
+        {
+            bool onDiscoveryStartHandlerCalled = false;
+            this.discoveryRequest.OnDiscoveryStart += (s, e) => onDiscoveryStartHandlerCalled = true;
+
+            // Action
+            this.discoveryRequest.DiscoverAsync();
+
+            // Assert
+            Assert.IsTrue(onDiscoveryStartHandlerCalled, "DiscoverAsync should invoke OnDiscoveryStart event");
+        }
 
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCollectMetrics()
