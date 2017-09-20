@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -52,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
         /// <param name="requestData">
-        /// The request data for providing common discovery services and data.
+        /// The request data for providing discovery services and data.
         /// </param>
         /// <param name="testHostManager">
         /// Test host manager
@@ -73,7 +74,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
-                return new InProcessProxyDiscoveryManager(testHostManager);
+                var isTelemetryOptedOut = requestData.MetricsCollection is NoOpMetricsCollection;
+                var newRequestData = new RequestData(new MetricsCollectionFactory(isTelemetryOptedOut).GetMetricsCollection());
+                return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
             }
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
@@ -90,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
-        /// <param name="requestData">The request data for providing common execution services and data</param>
+        /// <param name="requestData">The request data for providing execution services and data</param>
         /// <param name="testHostManager">Test host manager.</param>
         /// <param name="testRunCriteria">Test run criterion.</param>
         /// <param name="config">Protocol related information</param>
@@ -114,7 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
-                return new InProcessProxyExecutionManager(testHostManager);
+                var isTelemetryOptedOut = requestData.MetricsCollection is NoOpMetricsCollection;
+                var newRequestData = new RequestData(new MetricsCollectionFactory(isTelemetryOptedOut).GetMetricsCollection());
+                return new InProcessProxyExecutionManager(testHostManager, new TestHostManagerFactory(newRequestData));
             }
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.

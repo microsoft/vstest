@@ -70,12 +70,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// </summary>
         private IRequestData requestData;
 
+        /// <summary>
+        /// Metrics Publisher
+        /// </summary>
+        private IMetricsPublisher metricsPublisher;
+
         internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager) :
-            this(requestData, testRunCriteria, executionManager, JsonDataSerializer.Instance)
+            this(requestData, testRunCriteria, executionManager, JsonDataSerializer.Instance, new MetricsPublisherFactory(requestData.MetricsCollection is NoOpMetricsPublisher).GetMetricsPublisher())
         {
         }
 
-        private TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer)
+        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer, IMetricsPublisher metricsPublisher)
         {
             Debug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
             Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
@@ -91,6 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             this.State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
             this.requestData = requestData;
+            this.metricsPublisher = metricsPublisher;
         }
 
         #region ITestRunRequest
@@ -449,6 +455,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             this.requestData.MetricsCollection.Add(metric.Key, metric.Value);
                         }
                     }
+
+                    // Publish the Metrics
+                    this.metricsPublisher.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, this.requestData.MetricsCollection.Metrics);
                 }
 
                 EqtTrace.Info("TestRunRequest:TestRunComplete: Completed.");
@@ -559,6 +568,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         this.runCompletionEvent?.Dispose();
                         this.requestData.MetricsCollection.Clear();
+                        this.metricsPublisher.Dispose();
                     }
 
                     // Indicate that object has been disposed

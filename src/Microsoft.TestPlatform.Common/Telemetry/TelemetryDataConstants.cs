@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // *********************Discovery****************************
         public static string TotalTestsDiscovered = "VS.TestDiscovery.TotalTestsDiscovered";
 
-        public static string ParallelEnabledDuringDiscovery = "VS.TestRun.ParallelEnabledDuringDiscovery";
+        public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabledDuringDiscovery";
 
         // All the times are in sec
         public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";

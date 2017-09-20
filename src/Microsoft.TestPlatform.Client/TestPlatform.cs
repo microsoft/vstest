@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -105,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var requestData = new RequestData(new MetricsCollection());
+            var requestData = this.GetRequestData();
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
@@ -147,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var requestData = new RequestData(new MetricsCollection());
+            var requestData = this.GetRequestData();
             var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria, protocolConfig);
             executionManager.Initialize();
 
@@ -270,6 +271,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe");
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
             }
+        }
+
+        /// <summary>
+        /// Gets Request Data on basis of Temetry opted out or not.
+        /// </summary>
+        /// <returns></returns>
+        private IRequestData GetRequestData()
+        {
+            var isTelemetryOptedOut = true;
+            var telemetryOptedOut = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDOUT");
+
+            if (!string.IsNullOrEmpty(telemetryOptedOut) && telemetryOptedOut.Equals("1", StringComparison.Ordinal))
+            {
+                isTelemetryOptedOut = true;
+            }
+
+            return new RequestData(new MetricsCollectionFactory(isTelemetryOptedOut).GetMetricsCollection());
         }
     }
 }

@@ -37,15 +37,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
-        /// <param name="requestData">The request data for providing common discovery services and data</param>
+        /// <param name="requestData">The request data for providing discovery services and data.</param>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
         /// <param name="metricsCollector">Metric Collector</param>
-        public DiscovererEnumerator(IRequestData requestData, DiscoveryResultCache discoveryResultCache):this(requestData, discoveryResultCache, TestPlatformEventSource.Instance)
+        public DiscovererEnumerator(IRequestData requestData, DiscoveryResultCache discoveryResultCache) : this(requestData, discoveryResultCache, TestPlatformEventSource.Instance)
         {
         }
 
-        internal DiscovererEnumerator(IRequestData requestData, 
-            DiscoveryResultCache discoveryResultCache, 
+        internal DiscovererEnumerator(IRequestData requestData,
+            DiscoveryResultCache discoveryResultCache,
             ITestPlatformEventSource testPlatformEventSource)
         {
             this.discoveryResultCache = discoveryResultCache;
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
-            
+
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
@@ -144,15 +144,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             discoverer.Value.GetType().FullName);
                     }
 
+                    var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
                     var newTimeStart = DateTime.UtcNow;
 
-                    var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
-
-                    this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
+                    this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
 
                     var totalAdapterRunTime = DateTime.UtcNow - newTimeStart;
-                  
+
                     this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
 
                     // Collecting Total Tests Discovered By each Adapter.

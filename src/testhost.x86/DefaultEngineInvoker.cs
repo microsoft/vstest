@@ -40,6 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private const string DataCollectionPortArgument = "--datacollectionport";
 
+        private const string TelemetryOptedIn = "--telemetryoptedin";
+
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
             // Setup logging if enabled
@@ -106,9 +108,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
                 }
 
+                // Checks for Telemetry Opted in or not from Command line Arguments.
+                // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
+                var telemetryOptedIn = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TelemetryOptedIn) > 0;
+                var requestData = new RequestData(new MetricsCollectionFactory(!telemetryOptedIn).GetMetricsCollection());
+
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var requestData = new RequestData(new MetricsCollection());
                 var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData));
 
                 // Wait for processing to complete.
