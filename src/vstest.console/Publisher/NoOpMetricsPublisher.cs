@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         /// <param name="metrics"></param>
         public void PublishMetrics(string eventName, IDictionary<string, string> metrics)
         {
-            // No Opertation
+            // No Operation
         }
 
         /// <summary>

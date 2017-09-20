@@ -46,9 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private const int runRequestTimeout = 5000;
 
-        private bool telemetryOptedOut;
-
-        private IMetricsPublisher metricsPublisher;
+        private bool telemetryOptedIn;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -62,33 +60,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #region Constructor
 
-        public TestRequestManager() :
-            this(CommandLineOptions.Instance,
-            TestPlatformFactory.GetTestPlatform(),
-            TestLoggerManager.Instance,
-            TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance,
-            IsTelemetryOptedOut() ? (IMetricsPublisher)new NoOpMetricsPublisher() : new MetricsPublisher())
+        public TestRequestManager()
+            : this(
+                CommandLineOptions.Instance,
+                TestPlatformFactory.GetTestPlatform(),
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                TestPlatformEventSource.Instance)
         {
         }
 
-        /// <summary>
-        /// Finalizes an instance of the <see cref="TestRequestManager"/> class. 
-        /// </summary>
-        ~TestRequestManager()
-        {
-            this.metricsPublisher.Dispose();
-        }
-
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, IMetricsPublisher metricsPublisher)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
             this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
             this.testPlatformEventSource = testPlatformEventSource;
-            this.metricsPublisher = metricsPublisher;
-            this.telemetryOptedOut = IsTelemetryOptedOut();
+            this.telemetryOptedIn = IsTelemetryOptedIn();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -154,14 +143,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var batchSize = runConfiguration.BatchSize;
 
             var runsettings = discoveryPayload.RunSettings;
-            var requestData = new RequestData
-                                  {
-                                      ProtocolConfig = protocolConfig,
-                                      MetricsCollection =
-                                          this.telemetryOptedOut
-                                              ? (IMetricsCollection)new NoOpMetricsCollection()
-                                              : new MetricsCollection()
-                                  };
+            var requestData = this.GetRequestData(protocolConfig);
+            var metricsPublisher = this.telemetryOptedIn ? (IMetricsPublisher)new MetricsPublisher() : new NoOpMetricsPublisher();
 
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
             {
@@ -213,8 +196,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testPlatformEventSource.DiscoveryRequestStop();
 
             // Publish the Metrics
-            this.metricsPublisher.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
-            requestData.MetricsCollection.Clear();
+            metricsPublisher.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+            metricsPublisher.Dispose();
 
             return success;
         }
@@ -236,14 +219,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
-            var requestData = new RequestData
-                                  {
-                                      MetricsCollection =
-                                          this.telemetryOptedOut
-                                              ? (IMetricsCollection)new NoOpMetricsCollection()
-                                              : new MetricsCollection(),
-                                      ProtocolConfig = protocolConfig
-                                  };
+            var requestData = this.GetRequestData(protocolConfig);
+            var metricsPublisher = this.telemetryOptedIn ? (IMetricsPublisher)new MetricsPublisher() : new NoOpMetricsPublisher();
 
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
             {
@@ -276,8 +253,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
 
-            this.metricsPublisher.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
-            requestData.MetricsCollection.Clear();
+            metricsPublisher.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+            metricsPublisher.Dispose();
 
             return success;
         }
@@ -406,14 +383,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
-        /// Checks whether Telemetry opted out or not.
+        /// Checks whether Telemetry opted in or not. 
+        /// By Default opting out
         /// </summary>
         /// <returns>Returns Telemetry Opted out or not</returns>
-        private static bool IsTelemetryOptedOut()
+        private static bool IsTelemetryOptedIn()
         {
-            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDOUT");
-
+            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
             return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Gets Request Data
+        /// </summary>
+        /// <param name="protocolConfig"></param>
+        /// <returns></returns>
+        private IRequestData GetRequestData(ProtocolConfig protocolConfig)
+        {
+            return new RequestData
+                       {
+                           ProtocolConfig = protocolConfig,
+                           MetricsCollection =
+                               this.telemetryOptedIn
+                                   ? (IMetricsCollection)new MetricsCollection()
+                                   : new NoOpMetricsCollection(),
+                           IsTelemetryOptedIn = this.telemetryOptedIn
+                       };
         }
     }
 }

@@ -148,7 +148,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgTrueIfTelemetryOptedIn()
         {
             var mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedOut).Returns(false);
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
 
             this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 
@@ -168,7 +168,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgFalseIfTelemetryOptedOut()
         {
             var mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedOut).Returns(true);
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(false);
 
             this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
 

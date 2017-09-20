@@ -72,14 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
-                var isTelemetryOptedOut = requestData.IsTelemetryOptedOut;
-                var newRequestData = new RequestData
-                {
-                    MetricsCollection = isTelemetryOptedOut
-                                                     ? (IMetricsCollection)new NoOpMetricsCollection()
-                                                     : new MetricsCollection(),
-                    IsTelemetryOptedOut = isTelemetryOptedOut
-                };
+                var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
+                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
                 return new InProcessProxyDiscoveryManager(testHostManager, new TestHostManagerFactory(newRequestData));
             }
 
@@ -120,15 +114,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
-                var isTelemetryOptedOut = requestData.IsTelemetryOptedOut;
-                var newRequestData = new RequestData()
-                {
-                    MetricsCollection = isTelemetryOptedOut
-                                                     ? (IMetricsCollection)new NoOpMetricsCollection()
-                                                     : new MetricsCollection(),
-                    IsTelemetryOptedOut = isTelemetryOptedOut
-                };
-
+                var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
+                var newRequestData = this.GetRequestData(isTelemetryOptedIn);
                 return new InProcessProxyExecutionManager(testHostManager, new TestHostManagerFactory(newRequestData));
             }
 
@@ -284,6 +271,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Get Request Data on basis of Telemetry OptedIn or not
+        /// </summary>
+        /// <param name="isTelemetryOptedIn"></param>
+        /// <returns></returns>
+        private IRequestData GetRequestData(bool isTelemetryOptedIn)
+        {
+            return new RequestData
+                       {
+                           MetricsCollection = isTelemetryOptedIn
+                                                   ? (IMetricsCollection)new MetricsCollection()
+                                                   : new NoOpMetricsCollection(),
+                           IsTelemetryOptedIn = isTelemetryOptedIn
+                       };
         }
     }
 }

@@ -3,12 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
     /// Publish the metrics
     /// </summary>
-    public interface IMetricsPublisher
+    public interface IMetricsPublisher : IDisposable
     {
         /// <summary>
         /// Publish the Metrics
@@ -16,10 +17,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         /// <param name="eventName">The event Name</param>
         /// <param name="metrics">Key/Value pair of Properties and Values</param>
         void PublishMetrics(string eventName, IDictionary<string, string> metrics);
-
-        /// <summary>
-        /// Dispose the Telemetry Session
-        /// </summary>
-        void Dispose();
     }
 }

@@ -19,8 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         ProtocolConfig ProtocolConfig { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether is telemetry opted out.
+        /// Gets or sets a value indicating whether is telemetry opted in.
         /// </summary>
-        bool IsTelemetryOptedOut { get; set; }
+        bool IsTelemetryOptedIn { get; set; }
     }
 }

@@ -355,7 +355,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestProcessStartInfo receivedTestProcessInfo = new TestProcessStartInfo();
             var mockRequestData = new Mock<IRequestData>();
 
-            mockRequestData.Setup(rd => rd.IsTelemetryOptedOut).Returns(false);
+            mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
 
             var testOperationManager = new TestableProxyOperationManager(mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
 
@@ -381,7 +381,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestProcessStartInfo receivedTestProcessInfo = new TestProcessStartInfo();
             var mockRequestData = new Mock<IRequestData>();
 
-            mockRequestData.Setup(rd => rd.IsTelemetryOptedOut).Returns(true);
+            mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(false);
 
             var testOperationManager = new TestableProxyOperationManager(mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
 

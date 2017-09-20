@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var telemetryOptedIn = false;
                 if (!string.IsNullOrWhiteSpace(telemetryStatus))
                 {
-                    if (telemetryStatus.Equals("true"))
+                    if (telemetryStatus.Equals("true", StringComparison.Ordinal))
                     {
                         telemetryOptedIn = true;
                     }
@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                                               telemetryOptedIn
                                                   ? (IMetricsCollection)new MetricsCollection()
                                                   : new NoOpMetricsCollection(),
-                                          IsTelemetryOptedOut = !telemetryOptedIn
+                                          IsTelemetryOptedIn = telemetryOptedIn
                 };
 
                 // Start processing async in a different task

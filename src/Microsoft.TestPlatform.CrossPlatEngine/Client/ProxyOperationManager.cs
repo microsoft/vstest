@@ -229,7 +229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
             // Update Telemetry Opt in status because by default in Test Host Telemetry is opted out
-            var telemetryOptedIn = this.requestData.IsTelemetryOptedOut ? "false" : "true";
+            var telemetryOptedIn = this.requestData.IsTelemetryOptedIn ? "true" : "false";
             testProcessStartInfo.Arguments += " --telemetryoptedin " + telemetryOptedIn;
             return testProcessStartInfo;
         }

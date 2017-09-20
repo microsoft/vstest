@@ -49,21 +49,21 @@ namespace Microsoft.TestPlatform.Common.UnitTests
         }
 
         [TestMethod]
-        public void RequestDataShouldReturnIsTelemetryOptedOutTrueIfTelemetryOptedOut()
+        public void RequestDataShouldReturnIsTelemetryOptedInTrueIfTelemetryOptedIn()
         {
             var requestData = new RequestData();
-            requestData.IsTelemetryOptedOut = true;
+            requestData.IsTelemetryOptedIn = true;
 
-            Assert.AreEqual(true, requestData.IsTelemetryOptedOut);
+            Assert.AreEqual(true, requestData.IsTelemetryOptedIn);
         }
 
         [TestMethod]
-        public void RequestDataShouldReturnIsTelemetryOptedOutFalseIfTelemetryOptedIn()
+        public void RequestDataShouldReturnIsTelemetryOptedInFalseIfTelemetryOptedOut()
         {
             var requestData = new RequestData();
-            requestData.IsTelemetryOptedOut = false;
+            requestData.IsTelemetryOptedIn = false;
 
-            Assert.AreEqual(false, requestData.IsTelemetryOptedOut);
+            Assert.AreEqual(false, requestData.IsTelemetryOptedIn);
         }
     }
 }
