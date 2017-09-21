@@ -79,8 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    runDataAggregator.RunContextAttachments,
-                    runDataAggregator.ElapsedTime, null);
+                    this.runDataAggregator.RunContextAttachments,
+                    this.runDataAggregator.ElapsedTime);
 
                 HandleParallelTestRunComplete(completedArgs);
             }

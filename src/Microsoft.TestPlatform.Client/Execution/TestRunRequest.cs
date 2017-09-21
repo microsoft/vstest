@@ -408,7 +408,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
                             runContextAttachments as Collection<AttachmentSet>,
-                            this.runRequestTimeTracker.Elapsed, null);
+                            this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
                     // by either engines - as both calculate at different points

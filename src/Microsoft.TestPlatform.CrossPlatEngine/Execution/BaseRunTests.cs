@@ -548,9 +548,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     aborted,
                     exception,
                     attachments,
-                    elapsedTime,
-                    this.requestData.MetricsCollection.Metrics);
-
+                    elapsedTime);
+                testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                 if (lastChunk.Any())
                 {
                     UpdateTestResults(lastChunk, this.package);
