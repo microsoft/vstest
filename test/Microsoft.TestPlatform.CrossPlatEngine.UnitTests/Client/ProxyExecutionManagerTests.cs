@@ -9,7 +9,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -58,6 +57,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(
+                    m => m.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<TestRunnerConnectionInfo>()))
+                .Returns(new TestProcessStartInfo());
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
                 .Callback(
                     () =>

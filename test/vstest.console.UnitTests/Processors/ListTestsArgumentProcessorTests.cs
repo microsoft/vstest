@@ -37,7 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     {
         private readonly Mock<IFileHelper> mockFileHelper;
         private string dummyTestFilePath = "DummyTest.dll";
-
         private readonly Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         private static ListTestsArgumentExecutor GetExecutor(ITestRequestManager testRequestManager, IOutput output)

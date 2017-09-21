@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
@@ -37,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
-        /// <param name="requestData">Request Data</param>
+        /// <param name="requestData">The Request Data for providing discovery services and data.</param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
@@ -66,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
             int clientConnectionTimeout)
-            : base(requestSender, testHostManager, clientConnectionTimeout)
+            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;

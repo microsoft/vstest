@@ -17,12 +17,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection = new MetricsCollection();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            this.metricsCollection.Clear();
-        }
-
         [TestMethod]
         public void AddShouldAddMetric()
         {
@@ -63,19 +57,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         [TestMethod]
         public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
         {
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
-        }
-
-        [TestMethod]
-        public void ClearMetricsShouldClearMetrics()
-        {
-            this.metricsCollection.Add("DummyMessage", "DummyValue");
-            this.metricsCollection.Add("DummyMessage2", "DummyValue");
-
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 2);
-
-            this.metricsCollection.Clear();
-
             Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
         }
     }

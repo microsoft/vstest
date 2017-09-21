@@ -31,9 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private TestSessionMessageLogger sessionMessageLogger;
         private ITestPlatformEventSource testPlatformEventSource;
         private IRequestData requestData;
-
         private ITestDiscoveryEventsHandler2 testDiscoveryEventsHandler;
-
         private DiscoveryCriteria discoveryCriteria;
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
         /// <param name="requestData">
-        ///     The Request Data
+        /// The Request Data for providing discovery services and data.
         /// </param>
         /// <param name="testPlatformEventSource">
         ///     The test platform event source.

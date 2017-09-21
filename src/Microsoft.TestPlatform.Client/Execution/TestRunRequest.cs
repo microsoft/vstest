@@ -557,7 +557,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (disposing)
                     {
                         this.runCompletionEvent?.Dispose();
-                        this.requestData.MetricsCollection.Clear();
                     }
 
                     // Indicate that object has been disposed

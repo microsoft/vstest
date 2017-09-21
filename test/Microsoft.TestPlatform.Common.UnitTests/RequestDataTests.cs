@@ -47,5 +47,23 @@ namespace Microsoft.TestPlatform.Common.UnitTests
             var requestData = new RequestData();
             requestData.ProtocolConfig = null;
         }
+
+        [TestMethod]
+        public void RequestDataShouldReturnIsTelemetryOptedInTrueIfTelemetryOptedIn()
+        {
+            var requestData = new RequestData();
+            requestData.IsTelemetryOptedIn = true;
+
+            Assert.AreEqual(true, requestData.IsTelemetryOptedIn);
+        }
+
+        [TestMethod]
+        public void RequestDataShouldReturnIsTelemetryOptedInFalseIfTelemetryOptedOut()
+        {
+            var requestData = new RequestData();
+            requestData.IsTelemetryOptedIn = false;
+
+            Assert.AreEqual(false, requestData.IsTelemetryOptedIn);
+        }
     }
 }
