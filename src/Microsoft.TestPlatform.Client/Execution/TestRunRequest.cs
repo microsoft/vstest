@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Linq;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -409,7 +408,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
                             runContextAttachments as Collection<AttachmentSet>,
-                            this.runRequestTimeTracker.Elapsed, null);
+                            this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
                     // by either engines - as both calculate at different points
@@ -558,7 +557,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (disposing)
                     {
                         this.runCompletionEvent?.Dispose();
-                        this.requestData.MetricsCollection.Clear();
                     }
 
                     // Indicate that object has been disposed
