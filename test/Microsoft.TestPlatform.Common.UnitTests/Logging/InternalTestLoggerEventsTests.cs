@@ -362,7 +362,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         public void RaiseDiscoveryCompleteShouldThrowExceptionIfAlreadyDisposed()
         {
             var loggerEvents = GetDisposedLoggerEvents();
-            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
 
             Assert.ThrowsException<ObjectDisposedException>(() =>
             {
@@ -413,7 +413,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             DiscoveryCompleteEventArgs receivedEventArgs = null;
             EventWaitHandle waitHandle = new AutoResetEvent(false);
 
-            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
 
             // Register for the discovery complete event.
             loggerEvents.DiscoveryComplete += (sender, e) =>

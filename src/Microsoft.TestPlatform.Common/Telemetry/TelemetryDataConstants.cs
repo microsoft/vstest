@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
     public static class TelemetryDataConstants
     {
         // ******************** Execution ***********************
-        public static string ParallelEnabledDuringExecution = "VS.TestRun.ParallelEnabledDuringExecution";
+        public static string ParallelEnabledDuringExecution = "VS.TestRun.ParallelEnabled";
 
         // Total number of tests ran under one test request
         public static string TotalTestsRun = "VS.TestRun.TotalTestsRun";
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // *********************Discovery****************************
         public static string TotalTestsDiscovered = "VS.TestDiscovery.TotalTestsDiscovered";
 
-        public static string ParallelEnabledDuringDiscovery = "VS.TestRun.ParallelEnabledDuringDiscovery";
+        public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled";
 
         // All the times are in sec
         public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";
@@ -81,8 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string NumberOfAdapterUsedToDiscoverTests = "VS.TestDiscovery.AdaptersUsedCount";
 
         // **************Events Name **********************************
-        public static string TestDiscoveryCompleteEvent = "vs/testdiscoverysession";
+        public static string TestDiscoveryCompleteEvent = "vs/testplatform/testdiscoverysession";
 
-        public static string TestExecutionCompleteEvent = "vs/testexecutionsession";
+        public static string TestExecutionCompleteEvent = "vs/testplatform/testrunsession";
     }
 }

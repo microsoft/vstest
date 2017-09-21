@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -71,12 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (parallelRunComplete)
             {
-                var completedArgs = new TestRunCompleteEventArgs(runDataAggregator.GetAggregatedRunStats(),
-                    runDataAggregator.IsCanceled,
-                    runDataAggregator.IsAborted,
-                    runDataAggregator.GetAggregatedException(),
-                    new Collection<AttachmentSet>(runDataAggregator.RunCompleteArgsAttachments),
-                    runDataAggregator.ElapsedTime, null);
+                var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
+                    this.runDataAggregator.IsCanceled,
+                    this.runDataAggregator.IsAborted,
+                    this.runDataAggregator.GetAggregatedException(),
+                    new Collection<AttachmentSet>(this.runDataAggregator.RunCompleteArgsAttachments),
+                    this.runDataAggregator.ElapsedTime);
 
                 // Collect Final RunState
                 this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");

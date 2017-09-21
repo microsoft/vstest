@@ -162,7 +162,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 default(TestRunnerConnectionInfo));
 
             Assert.AreEqual("/usr/bin/mono", info.FileName);
-            StringAssert.Contains(info.Arguments, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
+            StringAssert.Contains(info.Arguments, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe\"");
         }
 
         [TestMethod]
