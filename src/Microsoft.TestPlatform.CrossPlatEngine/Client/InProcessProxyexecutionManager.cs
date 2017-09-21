@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller.
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero, null);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 

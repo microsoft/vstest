@@ -290,7 +290,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             this.CheckDisposed();
 
-            var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, elapsedTime, null);
+            var args = new TestRunCompleteEventArgs(stats, isCanceled, isAborted, error, attachmentSet, elapsedTime);
 
             // Sending 0 size as this event is not expected to contain any data. 
             this.SafeInvokeAsync(() => this.TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");

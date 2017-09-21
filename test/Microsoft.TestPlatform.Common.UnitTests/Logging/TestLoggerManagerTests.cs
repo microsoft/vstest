@@ -177,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
         }
@@ -200,7 +200,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
@@ -209,7 +209,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             //Raise an event on mock object
             testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(), null));
+                new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
             Assert.AreEqual(counter, 1);
         }
 
