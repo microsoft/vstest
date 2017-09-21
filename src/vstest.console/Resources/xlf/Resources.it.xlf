@@ -910,15 +910,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
-      <trans-unit id="MalformedRunSettingsFile">
-        <source>Settings file provided do not confirm to required format. </source>
-        <target state="translated">Il file di impostazioni specificato non è conforme al formato richiesto. </target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">File di impostazioni fornito conforme al formato richiesto.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
-      </trans-unit>
       <trans-unit id="NoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
         <target state="translated">Il pacchetto dell'app '{0}' non contiene un punto di ingresso dell'executor di test. Per eseguire unit test per le app di Windows Store, creare il pacchetto dell'app usando il progetto Libreria unit test per app di Windows Store.</target>

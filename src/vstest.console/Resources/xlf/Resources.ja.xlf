@@ -910,15 +910,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
-      <trans-unit id="MalformedRunSettingsFile">
-        <source>Settings file provided do not confirm to required format. </source>
-        <target state="translated">指定された設定ファイルでは、必要な形式が確認できません。</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">用意されている設定ファイルは、必要な形式を確認しません。</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
-      </trans-unit>
       <trans-unit id="NoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
         <target state="translated">アプリ パッケージ '{0}' に、テスト実行プログラムのエントリ ポイントがありません。Windows ストア アプリの単体テストを実行する場合は、Windows ストア アプリ単体テスト ライブラリ プロジェクトを使用して、アプリ パッケージを作成してください。</target>

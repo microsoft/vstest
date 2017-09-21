@@ -14,6 +14,11 @@
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <note></note>
       </trans-unit>
+      <trans-unit id="MalformedRunSettingsFile">
+        <source>Settings file does not conform with to required format.</source>
+        <target state="new">Settings file does not conform with to required format.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
