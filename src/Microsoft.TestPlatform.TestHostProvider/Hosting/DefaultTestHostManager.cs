@@ -6,14 +6,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
+    using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -144,8 +145,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
-            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
-            testHostProcessName = Path.Combine("TestHost", testHostProcessName);
+            // check in current location for testhost exe
+            var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+
+            if (!File.Exists(testhostProcessPath))
+            {
+                // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
+                testHostProcessName = Path.Combine("TestHost", testHostProcessName);
+                testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            }
 
             if (!this.Shared)
             {
@@ -154,7 +162,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 argumentsString += " " + "--testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
             }
 
-            var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
             EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
             var launcherPath = testhostProcessPath;
@@ -162,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 !this.processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
             {
                 launcherPath = this.dotnetHostHelper.GetMonoPath();
-                argumentsString = testhostProcessPath + " " + argumentsString;
+                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
             }
 
             // For IDEs and other scenario, current directory should be the
@@ -187,6 +194,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
             }
+
+            extensions = this.FilterExtensionsBasedOnVersion(extensions);
 
             return extensions;
         }
@@ -242,6 +251,82 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Filter duplicate extensions, include only the highest versioned extension
+        /// </summary>
+        /// <param name="extensions">Entire list of extensions</param>
+        /// <returns>Filtered list of extensions</returns>
+        private IEnumerable<string> FilterExtensionsBasedOnVersion(IEnumerable<string> extensions)
+        {
+            Dictionary<string, string> selectedExtensions = new Dictionary<string, string>();
+            Dictionary<string, Version> highestFileVersions = new Dictionary<string, Version>();
+            Dictionary<string, Version> conflictingExtensions = new Dictionary<string, Version>();
+
+            foreach (var extensionFullPath in extensions)
+            {
+                // assemblyName is the key
+                var extensionAssemblyName = Path.GetFileNameWithoutExtension(extensionFullPath);
+
+                if (selectedExtensions.TryGetValue(extensionAssemblyName, out var oldExtensionPath))
+                {
+                    // This extension is duplicate
+                    var currentVersion = this.GetAndLogFileVersion(extensionFullPath);
+
+                    var oldVersionFound = highestFileVersions.TryGetValue(extensionAssemblyName, out var oldVersion);
+                    if (!oldVersionFound)
+                    {
+                        oldVersion = this.GetAndLogFileVersion(oldExtensionPath);
+                    }
+
+                    // If the version of current file is higher than the one in the map
+                    // replace the older with the current file
+                    if (currentVersion > oldVersion)
+                    {
+                        highestFileVersions[extensionAssemblyName] = currentVersion;
+                        conflictingExtensions[extensionAssemblyName] = currentVersion;
+                        selectedExtensions[extensionAssemblyName] = extensionFullPath;
+                    }
+                    else
+                    {
+                        if (currentVersion < oldVersion)
+                        {
+                            conflictingExtensions[extensionAssemblyName] = oldVersion;
+                        }
+
+                        if (!oldVersionFound)
+                        {
+                            highestFileVersions.Add(extensionAssemblyName, oldVersion);
+                        }
+                    }
+                }
+                else
+                {
+                    selectedExtensions.Add(extensionAssemblyName, extensionFullPath);
+                }
+            }
+
+            // Log warning if conflicting version extensions are found
+            if (conflictingExtensions.Any())
+            {
+                var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => string.Format("  {0} : {1}", kv.Key, kv.Value)));
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
+                this.messageLogger.SendMessage(TestMessageLevel.Warning, message);
+            }
+
+            return selectedExtensions.Values;
+        }
+
+        private Version GetAndLogFileVersion(string path)
+        {
+            var fileVersion = this.fileHelper.GetFileVersion(path);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("FileVersion for {0} : {1}", path, fileVersion);
+            }
+
+            return fileVersion;
         }
 
         /// <summary>

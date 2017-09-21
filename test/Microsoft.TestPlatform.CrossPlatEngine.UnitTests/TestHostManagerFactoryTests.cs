@@ -3,18 +3,33 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
+    using System;
+
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
 
     [TestClass]
     public class TestHostManagerFactoryTests
     {
         private TestHostManagerFactory testHostManagerFactory;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
-        [TestInitialize]
-        public void TestInit()
+        public TestHostManagerFactoryTests()
         {
-            this.testHostManagerFactory = new TestHostManagerFactory();
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            this.testHostManagerFactory = new TestHostManagerFactory(this.mockRequestData.Object);
+        }
+
+        [TestMethod]
+        public void ConstructorShouldThrowIfRequestDataIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => new TestHostManagerFactory(null));
         }
 
         [TestMethod]

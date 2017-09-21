@@ -16,9 +16,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
-
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     [TestClass]
@@ -183,7 +181,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var sources = new List<string>() { "Hello", "World" };
             string settingsXml = "SettingsXml";
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
 
             var testCases = new List<TestCase>() { new TestCase("x.y.z", new Uri("x://y"), "x.dll") };
@@ -220,7 +218,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var sources = new List<string>() { "Hello", "World" };
             string settingsXml = "SettingsXml";
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
 
             var rawMessage = "TestMessage";
@@ -257,7 +255,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var sources = new List<string>() { "Hello", "World" };
             string settingsXml = "SettingsXml";
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
 
             var rawMessage = "RunComplete";
@@ -276,7 +274,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.protocolConfig.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Once);
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(1, null, false), Times.Once);
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Once);
         }
 
@@ -285,7 +283,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var sources = new List<string>() { "Hello", "World" };
             string settingsXml = "SettingsXml";
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
             var exception = new Exception();
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, discoveryCriteria, this.protocolConfig.Version))
@@ -293,7 +291,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once);
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(It.IsAny<string>()), Times.Exactly(2));
         }
@@ -314,7 +312,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var sources = new List<string>() { "Hello", "World" };
             string settingsXml = "SettingsXml";
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveRawMessageAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult((string)null))
@@ -326,7 +324,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.InitializeCommunication();
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once);
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once);
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(CommunicationUtilitiesResources.AbortedTestDiscovery, errorMessage)), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(It.IsAny<string>()), Times.Exactly(2));
         }

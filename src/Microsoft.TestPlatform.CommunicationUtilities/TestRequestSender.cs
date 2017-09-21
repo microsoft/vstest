@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -138,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc/>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler discoveryEventsHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             try
             {
@@ -168,10 +167,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                     {
                         var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+
+                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted, discoveryCompletePayload.Metrics);
+
                         discoveryEventsHandler.HandleDiscoveryComplete(
-                            discoveryCompletePayload.TotalTests,
-                            discoveryCompletePayload.LastDiscoveredTests,
-                            discoveryCompletePayload.IsAborted);
+                            discoveryCompleteEventArgs,
+                            discoveryCompletePayload.LastDiscoveredTests);
                         isDiscoveryComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
@@ -361,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 testRunEventsHandler.HandleRawMessage(rawMessage);
 
                 // notify test run abort to vstest console wrapper.
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero, null);
                 var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
                 rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
                 testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -378,7 +379,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
         }
 
-        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception)
+        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler2 eventHandler, Exception exception)
         {
             try
             {
@@ -405,7 +406,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 eventHandler.HandleRawMessage(rawMessage);
 
                 // Complete discovery
-                eventHandler.HandleDiscoveryComplete(-1, null, true);
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+
+                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
                 this.CleanupCommunicationIfProcessExit();
             }

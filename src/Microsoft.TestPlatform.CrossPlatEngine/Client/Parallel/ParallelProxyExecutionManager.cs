@@ -6,15 +6,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using System.Threading;
-    using System.Collections.ObjectModel;
 
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
@@ -40,7 +40,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private ITestRunEventsHandler currentRunEventsHandler;
 
         private ParallelRunDataAggregator currentRunDataAggregator;
-        
+
+        private IRequestData requestData;
+
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
 
@@ -52,17 +54,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// LockObject to update execution status in parallel
         /// </summary>
         private readonly object executionStatusLockObject = new object();
+     
 
         #endregion
 
-        public ParallelProxyExecutionManager(Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel)
+        public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel)
             : base(actualProxyManagerCreator, parallelLevel, true)
         {
+            this.requestData = requestData;
         }
 
-        public ParallelProxyExecutionManager(Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+        public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
+            this.requestData = requestData;
         }
 
         #region IProxyExecutionManager
@@ -290,6 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (concurrentManager is ProxyExecutionManagerWithDataCollection)
             {
                 return new ParallelDataCollectionEventsHandler(
+                            this.requestData,
                             concurrentManager,
                             this.currentRunEventsHandler,
                             this,
@@ -297,6 +303,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             }
 
             return new ParallelRunEventsHandler(
+                        this.requestData,
                         concurrentManager,
                         this.currentRunEventsHandler,
                         this,
@@ -378,7 +385,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Aborted is sent to allow the current execution manager replaced with another instance
                     // Ensure that the test run aggregator in parallel run events handler doesn't add these statistics
                     // (since the test run didn't even start)
-                    var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                    var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero, null);
                     this.GetHandlerForGivenManager(proxyExecutionManager).HandleTestRunComplete(completeArgs, null, null, null);
                 },
                 TaskContinuationOptions.OnlyOnFaulted);

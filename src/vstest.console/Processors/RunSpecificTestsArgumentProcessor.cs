@@ -52,7 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     new RunSpecificTestsArgumentExecutor(
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
-                        TestRequestManager.Instance));
+                        TestRequestManager.Instance,
+                        ConsoleOutput.Instance));
                 }
 
                 return this.executor;
@@ -144,7 +145,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public RunSpecificTestsArgumentExecutor(
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
-            ITestRequestManager testRequestManager)
+            ITestRequestManager testRequestManager,
+            IOutput output)
         {
             Contract.Requires(options != null);
             Contract.Requires(testRequestManager != null);
@@ -153,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.testRequestManager = testRequestManager;
 
             this.runSettingsManager = runSettingsProvider;
-            this.output = ConsoleOutput.Instance;
+            this.output = output;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
         }
 
@@ -256,7 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref this.effectiveRunSettings);
 
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
-                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive };
+                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestCaseFilter = this.commandLineOptions.TestCaseFilterValue };
                 result &= this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
             }
             else
@@ -272,9 +274,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     // No tests were discovered from the given sources.
                     warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", this.commandLineOptions.Sources));
 
-                    if (!this.commandLineOptions.UseVsixExtensions)
+                    if (string.IsNullOrEmpty(this.commandLineOptions.TestAdapterPath))
                     {
-                        warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsFoundWarningMessageWithSuggestionToUseVsix, warningMessage, CommandLineResources.SuggestUseVsixExtensionsIfNoTestsIsFound);
+                        warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.StringFormatToJoinTwoStrings, warningMessage, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }
                 }
 

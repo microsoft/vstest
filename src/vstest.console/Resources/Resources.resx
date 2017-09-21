@@ -415,7 +415,7 @@
   <data name="NoTestsAvailableInSources" xml:space="preserve">
     <value>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</value>
   </data>
-  <data name="NoTestsFoundWarningMessageWithSuggestionToUseVsix" xml:space="preserve">
+  <data name="StringFormatToJoinTwoStrings" xml:space="preserve">
     <value>{0} {1}</value>
   </data>
   <data name="OutputArgumentHelp" xml:space="preserve">
@@ -522,20 +522,8 @@
   <data name="StdOutMessagesBanner" xml:space="preserve">
     <value>Standard Output Messages:</value>
   </data>
-  <data name="SuggestUseVsixExtensionsIfNoTestsIsFound" xml:space="preserve">
-    <value>Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</value>
-  </data>
-  <data name="SuggestUseVsixExtensionsInListDiscoverersCommand" xml:space="preserve">
-    <value>The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</value>
-  </data>
-  <data name="SuggestUseVsixExtensionsInListExecutorsCommand" xml:space="preserve">
-    <value>The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</value>
-  </data>
-  <data name="SuggestUseVsixExtensionsInListLoggersCommand" xml:space="preserve">
-    <value>The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</value>
-  </data>
-  <data name="SuggestUseVsixExtensionsInListSettingsProviderCommand" xml:space="preserve">
-    <value>The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</value>
+  <data name="SuggestTestAdapterPathIfNoTestsIsFound" xml:space="preserve">
+    <value>Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</value>
   </data>
   <data name="SupportedFileTypesIndicator" xml:space="preserve">
     <value>        Supported File Types:</value>
@@ -674,5 +662,8 @@
   </data>
   <data name="TestRunSummaryForCanceledOrAbortedRun" xml:space="preserve">
     <value>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</value>
+  </data>
+  <data name="UseVsixExtensionsDeprecation" xml:space="preserve">
+    <value>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</value>
   </data>
 </root>

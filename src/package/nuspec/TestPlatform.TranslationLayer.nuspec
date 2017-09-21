@@ -18,16 +18,16 @@
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
       </group>
       <group targetFramework="netstandard1.5">
-        <dependency id="NETStandard.Library" version="[1.6.1, )" />
-        <dependency id="System.ComponentModel.TypeConverter" version="[4.3.0, )" />
-        <dependency id="System.Diagnostics.Process" version="[4.3.0, )" />
-        <dependency id="System.Runtime.InteropServices" version="[4.3.0, )" />
-        <dependency id="System.Runtime.Serialization.Primitives" version="[4.3.0, )" />
+        <dependency id="NETStandard.Library" version="[1.6.0, )" />
+        <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
+        <dependency id="System.Diagnostics.Process" version="[4.1.0, )" />
+        <dependency id="System.Runtime.InteropServices" version="[4.1.0, )" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="[4.1.1, )" />
         <dependency id="System.Xml.XPath.XmlDocument" version="[4.0.1, )" />
 
         <!-- CommunicationUtilities dependencies are covered above -->
         <!-- TestPlatform.Common dependencies -->
-        <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
+        <dependency id="System.Runtime.Loader" version="[4.0.0, )" />
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
         <dependency id="Newtonsoft.Json" version="9.0.1"/>
       </group>

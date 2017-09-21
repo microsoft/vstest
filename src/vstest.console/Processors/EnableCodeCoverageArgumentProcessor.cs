@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
-            CollectArgumentExecutor.AddDataCollectorToRunSettings(argument, this.runSettingsManager);
+            CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
         }
 
         /// <inheritdoc />

@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -29,16 +30,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IDataSerializer dataSerializer;
 
-        public ParallelRunEventsHandler(IProxyExecutionManager proxyExecutionManager,
+        private IRequestData requestData;
+
+        public ParallelRunEventsHandler(IRequestData requestData,
+            IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator) : 
-            this(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
+            this(requestData, proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
 
 
-        internal ParallelRunEventsHandler(IProxyExecutionManager proxyExecutionManager,
+        internal ParallelRunEventsHandler(IRequestData requestData,
+            IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
@@ -49,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             this.parallelProxyExecutionManager = parallelProxyExecutionManager;
             this.runDataAggregator = runDataAggregator;
             this.dataSerializer = dataSerializer;
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -69,7 +75,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     runDataAggregator.IsAborted,
                     runDataAggregator.GetAggregatedException(),
                     new Collection<AttachmentSet>(runDataAggregator.RunCompleteArgsAttachments),
-                    runDataAggregator.ElapsedTime);
+                    runDataAggregator.ElapsedTime, null);
+
+                // Collect Final RunState
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+
+                // Collect Aggregated Metrics Data
+                var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();
+                if(aggregatedRunDataMetrics != null && aggregatedRunDataMetrics.Count != 0)
+                {
+                    foreach (var aggregatedRunDataMetric in aggregatedRunDataMetrics)
+                    {
+                        this.requestData.MetricsCollection.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
+                    }
+                }
 
                 HandleParallelTestRunComplete(completedArgs);
             }
@@ -100,6 +119,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 testRunCompleteArgs.IsCanceled,
                 runContextAttachments,
                 testRunCompleteArgs.AttachmentSets);
+
+            // Aggregate Run Data Metrics
+            this.runDataAggregator.AggregateRunDataMetrics(testRunCompleteArgs.Metrics);
 
             return this.parallelProxyExecutionManager.HandlePartialRunComplete(
                 this.proxyExecutionManager,

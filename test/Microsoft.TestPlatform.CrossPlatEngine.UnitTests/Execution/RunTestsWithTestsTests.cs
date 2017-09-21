@@ -14,6 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,15 +22,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Moq;
 
     using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     [TestClass]
     public class RunTestsWithTestsTests
     {
         private TestableTestRunCache testableTestRunCache;
         private TestExecutionContext testExecutionContext;
         private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
-
         private TestableRunTestsWithTests runTestsInstance;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         private const string RunTestsWithSourcesTestsExecutorUri = "executor://RunTestWithSourcesDiscoverer/";
 
@@ -37,6 +39,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void TestInit()
         {
             this.testableTestRunCache = new TestableTestRunCache();
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
             this.testExecutionContext = new TestExecutionContext(
                                 frequencyOfRunStatsChangeEvent: 100,
                                 runStatsChangeEventTimeout: TimeSpan.MaxValue,
@@ -64,7 +69,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object);
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
 
             var map = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
@@ -91,7 +97,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object);
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
 
             var map = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
@@ -124,7 +131,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
-                executorUriVsTestList);
+                executorUriVsTestList,
+                this.mockRequestData.Object);
             
             var testExecutor = new RunTestsWithSourcesTests.RunTestWithSourcesExecutor();
             var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));
@@ -143,17 +151,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             public TestableRunTestsWithTests(IEnumerable<TestCase> testCases,
                 string runSettings, TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-                : base(
-                    testCases, null, runSettings, testExecutionContext, testCaseEventsHandler,
-                    testRunEventsHandler)
+                ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler,
+                IRequestData requestData)
+                : base(requestData, testCases, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
             {
             }
 
-            internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+
+            internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList, IRequestData requestData)
                 : base(
-                    testCases, null, runSettings, testExecutionContext, testCaseEventsHandler,
-                    testRunEventsHandler, executorUriVsTestList)
+requestData, testCases, null, runSettings, testExecutionContext,
+                    testCaseEventsHandler, testRunEventsHandler, executorUriVsTestList)
             {
             }
 

@@ -58,7 +58,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("--InIsolation|/InIsolation\n      Runs the tests in an isolated process. This makes vstest.console.exe \n      process less likely to be stopped on an error in the tests, but tests \n      may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName);
         }
 
-        
         [TestMethod]
         public void InIsolationArgumentProcessorExecutorShouldThrowIfArgumentIsProvided()
         {
