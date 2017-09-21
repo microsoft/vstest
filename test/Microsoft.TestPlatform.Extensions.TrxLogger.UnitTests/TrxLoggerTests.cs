@@ -457,7 +457,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private static TestRunCompleteEventArgs CreateTestRunCompleteEventArgs()
         {
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null,
-                new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0), null);
+                new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
             return testRunCompleteEventArgs;
         }
 

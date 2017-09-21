@@ -279,6 +279,41 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldCollectMetricsOnHandleDiscoveryComplete()
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            var rawMessage = "RunComplete";
+            var completePayload = new DiscoveryCompletePayload()
+                                      {
+                                          IsAborted = false,
+                                          LastDiscoveredTests = null,
+                                          TotalTests = 1,
+                                          Metrics = dict
+                                      };
+            var message = new Message() { MessageType = MessageType.DiscoveryComplete, Payload = null };
+
+            this.SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize(rawMessage, message);
+            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(message)).Returns(completePayload);
+
+            DiscoveryCompleteEventArgs actualDiscoveryCompleteEventArgs = null;
+            mockHandler.Setup(md => md.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>(
+                    (discoveryCompleteEventArgs, testCase) =>
+                        {
+                            actualDiscoveryCompleteEventArgs = discoveryCompleteEventArgs;
+                        });
+
+            // Act.
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), mockHandler.Object);
+
+            // Verify
+            Assert.AreEqual(dict, actualDiscoveryCompleteEventArgs.Metrics);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldHandleExceptionOnSendMessage()
         {
             var sources = new List<string>() { "Hello", "World" };

@@ -111,8 +111,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 // we have to send raw messages as we block the discoverycomplete actual raw messages
                 this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
-                var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryDataAggregator.TotalTests,
-                    discoveryDataAggregator.IsAborted, null);
+                var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
+                    this.discoveryDataAggregator.IsAborted);
 
                 // send actual test discoverycomplete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);

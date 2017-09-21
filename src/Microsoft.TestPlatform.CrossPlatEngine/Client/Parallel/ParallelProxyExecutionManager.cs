@@ -385,7 +385,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Aborted is sent to allow the current execution manager replaced with another instance
                     // Ensure that the test run aggregator in parallel run events handler doesn't add these statistics
                     // (since the test run didn't even start)
-                    var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero, null);
+                    var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero);
                     this.GetHandlerForGivenManager(proxyExecutionManager).HandleTestRunComplete(completeArgs, null, null, null);
                 },
                 TaskContinuationOptions.OnlyOnFaulted);
