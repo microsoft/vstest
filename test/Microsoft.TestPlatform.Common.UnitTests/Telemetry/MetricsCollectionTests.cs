@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
 {
-    using System;
-
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -16,12 +15,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         public MetricsCollectionTests()
         {
             this.metricsCollection = new MetricsCollection();
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            this.metricsCollection.Clear();
         }
 
         [TestMethod]
@@ -64,19 +57,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         [TestMethod]
         public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
         {
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
-        }
-
-        [TestMethod]
-        public void ClearMetricsShouldClearMetrics()
-        {
-            this.metricsCollection.Add("DummyMessage", "DummyValue");
-            this.metricsCollection.Add("DummyMessage2", "DummyValue");
-
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 2);
-
-            this.metricsCollection.Clear();
-
             Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
         }
     }

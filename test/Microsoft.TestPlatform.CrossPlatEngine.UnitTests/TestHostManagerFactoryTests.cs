@@ -5,22 +5,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 {
     using System;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
 
     [TestClass]
     public class TestHostManagerFactoryTests
     {
         private TestHostManagerFactory testHostManagerFactory;
-        private IRequestData requestData;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         public TestHostManagerFactoryTests()
         {
-            this.requestData = new RequestData(new NoOpMetricsCollection());
-            this.testHostManagerFactory = new TestHostManagerFactory(this.requestData);
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            this.testHostManagerFactory = new TestHostManagerFactory(this.mockRequestData.Object);
         }
 
         [TestMethod]

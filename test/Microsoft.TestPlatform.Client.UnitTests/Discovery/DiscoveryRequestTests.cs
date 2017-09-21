@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 
     using Client.Discovery;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -35,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object);
         }
-        
+
         [TestMethod]
         public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
         {
@@ -47,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void DiscoveryAsycIfDiscoveryRequestIsDisposedThrowsObjectDisposedException()
         {
             this.discoveryRequest.Dispose();
-            
+
             Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.DiscoverAsync());
         }
 
