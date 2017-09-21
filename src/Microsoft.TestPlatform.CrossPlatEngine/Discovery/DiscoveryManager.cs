@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, "Completed");
 
                     // Collecting Total Tests Discovered
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
 
                     var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false);
                     discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
