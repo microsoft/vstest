@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -78,11 +77,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// The create discovery request.
         /// </summary>
+        /// <param name="requestData"></param>
         /// <param name="discoveryCriteria"> The discovery criteria. </param>
-        /// <param name="protocolConfig"> Protocol related information.  </param>
         /// <returns> The <see cref="IDiscoveryRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig)
+        public IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria)
         {
             if (discoveryCriteria == null)
             {
@@ -92,11 +91,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             // Update cache with Extension Folder's files
             this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
+            // Update and initialize loggers only when DesignMode is false
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
+            if (runConfiguration.DesignMode == false)
+            {
+                this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
+
+                // Initialize loggers
+                TestLoggerManager.Instance.InitializeLoggers();
+            }
+
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-            var requestData = new RequestData(new MetricsCollection());
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria, protocolConfig);
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
             discoveryManager.Initialize();
 
             return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager);
@@ -109,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="protocolConfig"> Protocol related information.  </param>
         /// <returns> The <see cref="ITestRunRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria, ProtocolConfig protocolConfig)
+        public ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria)
         {
             if (testRunCriteria == null)
             {
@@ -137,8 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var requestData = new RequestData(new MetricsCollection());
-            var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria, protocolConfig);
+            var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
             executionManager.Initialize();
 
             return new TestRunRequest(requestData, testRunCriteria, executionManager);
@@ -206,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Update the test logger paths from source directory
+        /// Update the extension assemblies from source directory
         /// </summary>
         /// <param name="testRunCriteria">
         /// The test Run Criteria.
@@ -220,6 +227,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
             }
 
+            AddExtensionAssembliesFromSource(sources);
+        }
+
+        /// <summary>
+        /// Update the test logger paths from source directory
+        /// </summary>
+        /// <param name="sources"></param>
+        private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
+        {
             // Currently we support discovering loggers only from Source directory
             var loggersToUpdate = new List<string>();
 

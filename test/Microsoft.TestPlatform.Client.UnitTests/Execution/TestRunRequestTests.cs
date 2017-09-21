@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
     using Client.Execution;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -341,6 +340,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
             mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo), Times.Once);
+        }
+
+        /// <summary>
+        /// ExecuteAsync should invoke OnRunStart event.
+        /// </summary>
+        [TestMethod]
+        public void ExecuteAsyncShouldInvokeOnRunStart()
+        {
+            bool onRunStartHandlerCalled = false;
+            this.testRunRequest.OnRunStart += (s, e) => onRunStartHandlerCalled = true;
+
+            // Action
+            this.testRunRequest.ExecuteAsync();
+
+            // Assert
+            Assert.IsTrue(onRunStartHandlerCalled, "ExecuteAsync should invoke OnRunstart event");
         }
     }
 }

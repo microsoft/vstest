@@ -12,6 +12,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public interface IDiscoveryRequest : IRequest
     {
         /// <summary>
+        /// Handler for notifying discovery process is started
+        /// </summary>
+        event EventHandler<DiscoveryStartEventArgs> OnDiscoveryStart;
+
+        /// <summary>
         /// Handler for notifying discovery process is complete
         /// </summary>
         event EventHandler<DiscoveryCompleteEventArgs> OnDiscoveryComplete;

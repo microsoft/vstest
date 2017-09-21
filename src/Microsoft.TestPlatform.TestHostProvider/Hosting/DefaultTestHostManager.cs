@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 !this.processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
             {
                 launcherPath = this.dotnetHostHelper.GetMonoPath();
-                argumentsString = testhostProcessPath + " " + argumentsString;
+                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
             }
 
             // For IDEs and other scenario, current directory should be the

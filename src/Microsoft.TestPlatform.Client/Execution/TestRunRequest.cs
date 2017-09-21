@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Linq;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -158,6 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Start the stop watch for calculating the test run time taken overall
                     this.runRequestTimeTracker.Start();
+                    this.OnRunStart.SafeInvoke(this, new TestRunStartEventArgs(this.testRunCriteria), "TestRun.TestRunStart");
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
 
                     if (EqtTrace.IsInfoEnabled)
@@ -297,6 +297,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// Raised when the test run statistics change.
         /// </summary>
         public event EventHandler<TestRunChangedEventArgs> OnRunStatsChange;
+
+        /// <summary>
+        /// Raised when the test run starts.
+        /// </summary>
+        public event EventHandler<TestRunStartEventArgs> OnRunStart;
 
         /// <summary>
         /// Raised when the test message is received.
@@ -552,7 +557,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (disposing)
                     {
                         this.runCompletionEvent?.Dispose();
-                        this.requestData.MetricsCollection.Clear();
                     }
 
                     // Indicate that object has been disposed
