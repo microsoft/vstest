@@ -382,9 +382,6 @@
   <data name="LoggerUriInvalid" xml:space="preserve">
     <value>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</value>
   </data>
-  <data name="MalformedRunSettingsFile" xml:space="preserve">
-    <value>Settings file provided do not confirm to required format. </value>
-  </data>
   <data name="MicrosoftCommandLineTitle" xml:space="preserve">
     <value>Microsoft (R) Test Execution Command Line Tool Version {0}</value>
   </data>

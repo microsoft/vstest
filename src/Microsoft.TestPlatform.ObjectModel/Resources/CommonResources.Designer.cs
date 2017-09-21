@@ -78,7 +78,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("DisplayChosenSettings", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Settings file does not conform with to required format..
+        /// </summary>
+        public static string MalformedRunSettingsFile{
+            get {
+                return ResourceManager.GetString("MalformedRunSettingsFile", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings..
         /// </summary>

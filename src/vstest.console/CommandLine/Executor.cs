@@ -217,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    if (ex is CommandLineException || ex is TestPlatformException)
+                    if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                     {
                         this.Output.Error(false, ex.Message);
                         result = 1;
@@ -310,7 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             catch (Exception ex)
             {
-                if (ex is CommandLineException || ex is TestPlatformException)
+                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                 {
                     EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
                     this.Output.Error(false, ex.Message);

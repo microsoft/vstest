@@ -315,48 +315,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             lock (syncobject)
             {
                 bool success = true;
-                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria, protocolConfig))
+                try
                 {
-                    this.currentTestRunRequest = testRunRequest;
-                    this.runRequestCreatedEventHandle.Set();
-                    try
+                    using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria, protocolConfig))
                     {
-                        this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
-                        this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
-                        testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
-
-                        this.testPlatformEventSource.ExecutionRequestStart();
-
-                        testRunRequest.ExecuteAsync();
-
-                        // Wait for the run completion event
-                        testRunRequest.WaitForCompletion();
-                    }
-                    catch (Exception ex)
-                    {
-                        EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
-                        if (ex is TestPlatformException ||
-                            ex is SettingsException ||
-                            ex is InvalidOperationException)
+                        try
                         {
-                            LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
-                            success = false;
+                            this.currentTestRunRequest = testRunRequest;
+                            this.runRequestCreatedEventHandle.Set();
+
+                            this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
+                            this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
+                            testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
+
+                            this.testPlatformEventSource.ExecutionRequestStart();
+
+                            testRunRequest.ExecuteAsync();
+
+                            // Wait for the run completion event
+                            testRunRequest.WaitForCompletion();
                         }
-                        else
+                        finally
                         {
-                            throw;
+                            this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
+                            this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
+                            testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
                         }
                     }
-                    finally
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
+                    if (ex is TestPlatformException ||
+                        ex is SettingsException ||
+                        ex is InvalidOperationException)
                     {
-                        this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
-                        this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
-                        testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
+                        LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
+                        success = false;
+                    }
+                    else
+                    {
+                        throw;
                     }
                 }
 
                 this.currentTestRunRequest = null;
-
                 return success;
             }
         }
