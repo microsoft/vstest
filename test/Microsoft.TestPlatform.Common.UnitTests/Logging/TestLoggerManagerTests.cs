@@ -512,7 +512,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             counter = 0;
             waitHandle.Reset();
 
-            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false, null);
+            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
 
             // mock for IDiscoveryRequest
             var discoveryRequest = new Mock<IDiscoveryRequest>();

@@ -56,7 +56,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
                    this.mockProxyDiscoveryManager.Object, totalTests, null, aborted)).Returns(false);
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 
@@ -83,7 +83,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockParallelProxyDiscoveryManager.Setup(mp => mp.HandlePartialDiscoveryComplete(
                     this.mockProxyDiscoveryManager.Object, totalTests, lastChunk, aborted)).Returns(false);
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
 
@@ -111,7 +111,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockMetricsCollector = new Mock<IMetricsCollection>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
             // Act.
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
@@ -133,7 +133,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.DiscoveryComplete)).Returns(payload);
 
             // Act
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted, null);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalTests, aborted);
 
             this.parallelDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
 

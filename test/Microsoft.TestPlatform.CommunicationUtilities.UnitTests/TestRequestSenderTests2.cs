@@ -372,6 +372,39 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null));
         }
 
+        [TestMethod]
+        public void DiscoverTestsShouldCollectMetricsOnHandleDiscoveryComplete()
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            var completePayload = new DiscoveryCompletePayload()
+                                      {
+                                          IsAborted = false,
+                                          LastDiscoveredTests = null,
+                                          TotalTests = 1,
+                                          Metrics = dict
+                                      };
+            this.SetupDeserializeMessage(MessageType.DiscoveryComplete, completePayload);
+            this.SetupFakeCommunicationChannel();
+
+            DiscoveryCompleteEventArgs actualDiscoveryCompleteEventArgs = null;
+            mockHandler.Setup(md => md.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>(
+                    (discoveryCompleteEventArgs, testCase) =>
+                        {
+                            actualDiscoveryCompleteEventArgs = discoveryCompleteEventArgs;
+                        });
+
+            // Act.
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), mockHandler.Object);
+            this.RaiseMessageReceivedEvent();
+
+            // Verify
+            Assert.AreEqual(dict, actualDiscoveryCompleteEventArgs.Metrics);
+        }
+
         #endregion
 
         #region Execution Protocol Tests

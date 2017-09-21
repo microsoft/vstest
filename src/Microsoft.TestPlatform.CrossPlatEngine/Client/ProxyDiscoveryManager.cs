@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
-                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }

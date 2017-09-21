@@ -168,8 +168,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted, discoveryCompletePayload.Metrics);
-
+                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                        discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
                         discoveryEventsHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
                             discoveryCompletePayload.LastDiscoveredTests);
@@ -406,7 +406,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 eventHandler.HandleRawMessage(rawMessage);
 
                 // Complete discovery
-                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 

@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // Send a discovery complete to caller.
                     eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
-                    var discoveryCompeleteEventsArg = new DiscoveryCompleteEventArgs(-1, true, null);
+                    var discoveryCompeleteEventsArg = new DiscoveryCompleteEventArgs(-1, true);
 
                     eventHandler.HandleDiscoveryComplete(discoveryCompeleteEventsArg, Enumerable.Empty<TestCase>());
                 }
