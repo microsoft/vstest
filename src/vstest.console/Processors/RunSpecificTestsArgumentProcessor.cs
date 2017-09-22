@@ -213,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             bool result = false;
 
-            InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
+            // InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
 
             this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 

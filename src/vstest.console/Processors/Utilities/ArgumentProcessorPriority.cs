@@ -59,6 +59,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         CLIRunSettings = 12,
 
         /// <summary>
+        /// Priority of processors related to merge Run Settings.
+        /// </summary>
+        TestSource = 14,
+
+        /// <summary>
+        /// Priority of processors related to merge Run Settings.
+        /// </summary>
+        MergeRunsettings = 16,
+
+        /// <summary>
         /// Priority of processors related to logging.
         /// </summary>
         Logging = 20,

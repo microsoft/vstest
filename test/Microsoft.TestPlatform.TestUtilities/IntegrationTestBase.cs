@@ -128,11 +128,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
         /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForFullyQualifiedDiscovery(string testAssembly, string testAdapterPath, string dummyFilePath, string runSettings = "", string targetFramework = "")
+        public void InvokeVsTestForFullyQualifiedDiscovery(string testAssembly, string testAdapterPath, string dummyFilePath, string runSettings = "")
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
-            arguments = string.Concat(arguments, " /Framework:" + targetFramework);
+           // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
             this.InvokeVsTest(arguments);
         }
 

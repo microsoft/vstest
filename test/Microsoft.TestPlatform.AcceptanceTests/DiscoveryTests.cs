@@ -52,7 +52,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             try
             {
                 AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-                this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty, this.FrameworkArgValue);
+                this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty);
                 var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
                 this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
             }

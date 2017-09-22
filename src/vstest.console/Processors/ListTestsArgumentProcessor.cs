@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
+            // InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             var success = this.testRequestManager.DiscoverTests(

@@ -196,6 +196,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Examples: processors to enable loggers that are statically configured, and to start logging,
             // should always be executed.
             var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
+            foreach (var argumentProcessor in processorsToAlwaysExecute)
+            {
+                // Setup lazy initialization.
+                processorFactory.CreateArgumentProcessor(argumentProcessor.Metadata.Value.CommandName);
+            }
+
             processors.AddRange(processorsToAlwaysExecute);
 
             // Initialize Runsettings with defaults

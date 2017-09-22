@@ -192,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
             }
 
-            InferHelper.UpdateSettingsIfNotSpecified(inferHelper, this.commandLineOptions, this.runSettingsManager);
+            // InferHelper.UpdateSettingsIfNotSpecified(inferHelper, this.commandLineOptions, this.runSettingsManager);
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             if (EqtTrace.IsVerboseEnabled)

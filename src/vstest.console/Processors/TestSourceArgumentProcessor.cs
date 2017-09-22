@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// The command name.
         /// </summary>
-        public const string CommandName = "TestSource";
+        public const string CommandName = "/TestSource";
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         public override string CommandName => TestSourceArgumentProcessor.CommandName;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.TestSource;
 
         public override bool IsSpecialCommand => true;
     }

@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x64");
         }
-		
+
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void WebTestRunAllTests(RunnnerInfo runnerInfo)
@@ -124,7 +124,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }
-		
+
         private void WebTestRunAllTests(string runnerFramework)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
@@ -139,8 +139,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty,
-                this.FrameworkArgValue);
+                string.Empty);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -160,9 +159,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty,
-                this.FrameworkArgValue);
-                
+                string.Empty);
+
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
         }

@@ -142,6 +142,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             IArgumentProcessor argumentProcessor;
             CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
 
+            if (argumentProcessor == null)
+            {
+                SpecialCommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
+            }
+
             // If an argument processor was not found for the command, then consider it as a test source argument.
             if (argumentProcessor == null)
             {
@@ -239,7 +244,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new EnableBlameArgumentProcessor(),
                 new UseVsixExtensionsArgumentProcessor(),
                 new ListFullyQualifiedTestsArgumentProcessor(),
-                new ListTestsTargetPathArgumentProcessor()
+                new ListTestsTargetPathArgumentProcessor(),
+                new MergeRunsettingsArgumentProcessor()
         };
 
         /// <summary>
@@ -257,16 +263,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                                       ? this.specialCommandToProcessorMap
                                       : this.commandToProcessorMap;
 
-                string commandName = argumentProcessor.Metadata.Value.CommandName;
+                var processorCapabilities = argumentProcessor.Metadata.Value;
+                string commandName = processorCapabilities.CommandName;
                 processorsMap.Add(commandName, argumentProcessor);
 
-                // Add xplat name for the command name
-                commandName = string.Concat("--", commandName.Remove(0, 1));
-                processorsMap.Add(commandName, argumentProcessor);
-
-                if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
+                // AlwaysExecute are auto argument processors which are not required xplat names
+                if (!processorCapabilities.AlwaysExecute)
                 {
-                    string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
+                    // Add xplat name for the command name.
+                    commandName = string.Concat("--", commandName.Remove(0, 1));
+                    processorsMap.Add(commandName, argumentProcessor);
+                }
+
+                if (!string.IsNullOrEmpty(processorCapabilities.ShortCommandName))
+                {
+                    string shortCommandName = processorCapabilities.ShortCommandName;
                     processorsMap.Add(shortCommandName, argumentProcessor);
 
                     // Add xplat short name for the command name
