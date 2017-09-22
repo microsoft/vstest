@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var mockTestRunRequest = new Mock<ITestRunRequest>();
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
 
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var mockTestRunRequest = new Mock<ITestRunRequest>();
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new SettingsException("DummySettingsException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
 
@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var mockTestRunRequest = new Mock<ITestRunRequest>();
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new InvalidOperationException("DummyInvalidOperationException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
 
@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var mockTestRunRequest = new Mock<ITestRunRequest>();
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new Exception("DummyException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
 
@@ -239,9 +239,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
             var mockTestRunStats = new Mock<ITestRunStatistics>();
 
-            var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan(), null);
+            var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan());
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(testRunRequest);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(testRunRequest);
 
             this.ResetAndAddSourceToCommandLineOptions();
 

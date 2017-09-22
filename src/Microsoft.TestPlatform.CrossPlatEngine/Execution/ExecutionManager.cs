@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -147,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.activeTestRun == null)
             {
-                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, TimeSpan.Zero, null);
+                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, TimeSpan.Zero);
                 this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else
@@ -163,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.activeTestRun == null)
             {
-                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero, null);
+                var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero);
                 this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else

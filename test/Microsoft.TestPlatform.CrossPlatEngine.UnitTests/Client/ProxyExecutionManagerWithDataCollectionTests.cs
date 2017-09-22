@@ -6,7 +6,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -41,6 +40,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IRequestData> mockRequestData;
 
+        private Mock<IMetricsCollection> mockMetricsCollection;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -53,8 +54,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
-            this.testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.testableClientConnectionTimeout);
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.testableClientConnectionTimeout);
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
@@ -141,11 +143,55 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
         }
+
+        [TestMethod]
+        public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgTrueIfTelemetryOptedIn()
+        {
+            var mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+            var testProcessStartInfo = new TestProcessStartInfo();
+            testProcessStartInfo.Arguments = string.Empty;
+
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+
+            // Act.
+            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+            // Verify.
+            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin true"));
+        }
+
+        [TestMethod]
+        public void UpdateTestProcessStartInfoShouldUpdateTelemetryOptedInArgFalseIfTelemetryOptedOut()
+        {
+            var mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(false);
+
+            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+            var testProcessStartInfo = new TestProcessStartInfo();
+            testProcessStartInfo.Arguments = string.Empty;
+
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+
+            // Act.
+            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+            // Verify.
+            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin false"));
+        }
     }
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData(new NoOpMetricsCollection()), testRequestSender, testHostManager, proxyDataCollectionManager)
+        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(new RequestData{MetricsCollection = new NoOpMetricsCollection()}, testRequestSender, testHostManager, proxyDataCollectionManager)
+        {
+        }
+
+        public TestableProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(requestData, testRequestSender, testHostManager, proxyDataCollectionManager)
         {
         }
 

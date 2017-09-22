@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -273,7 +272,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Total tests must be zero here since parallel discovery events handler adds the count
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
-                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                         this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },

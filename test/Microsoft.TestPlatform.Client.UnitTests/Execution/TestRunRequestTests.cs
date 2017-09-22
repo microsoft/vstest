@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
     using Client.Execution;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -272,9 +271,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+            testRunCompeleteEventsArgs.Metrics = dict;
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), dict), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
 
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<string>()), Times.Once);
@@ -289,7 +296,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
             this.testRunRequest.ExecuteAsync();
 
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), null), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0)), null, null, null);
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);
@@ -341,6 +348,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
             mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo), Times.Once);
+        }
+
+        /// <summary>
+        /// ExecuteAsync should invoke OnRunStart event.
+        /// </summary>
+        [TestMethod]
+        public void ExecuteAsyncShouldInvokeOnRunStart()
+        {
+            bool onRunStartHandlerCalled = false;
+            this.testRunRequest.OnRunStart += (s, e) => onRunStartHandlerCalled = true;
+
+            // Action
+            this.testRunRequest.ExecuteAsync();
+
+            // Assert
+            Assert.IsTrue(onRunStartHandlerCalled, "ExecuteAsync should invoke OnRunstart event");
         }
     }
 }

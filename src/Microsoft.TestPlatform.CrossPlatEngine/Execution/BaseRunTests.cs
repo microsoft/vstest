@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -404,6 +403,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
+                        var totalTimeTaken = DateTime.UtcNow - timeStartNow;
+
                         // Identify whether the executor did run any tests at all
                         if (this.testRunCache.TotalExecutedTests > totalTests)
                         {
@@ -415,8 +416,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                             totalTests = this.testRunCache.TotalExecutedTests;
                         }
-
-                        var totalTimeTaken = DateTime.UtcNow - timeStartNow;
 
                         if (EqtTrace.IsVerboseEnabled)
                         {
@@ -549,9 +548,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     aborted,
                     exception,
                     attachments,
-                    elapsedTime,
-                    this.requestData.MetricsCollection.Metrics);
-
+                    elapsedTime);
+                testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                 if (lastChunk.Any())
                 {
                     UpdateTestResults(lastChunk, this.package);

@@ -10,7 +10,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -151,7 +150,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfDataCollectionEnabled()
         {
-            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
@@ -169,7 +168,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfIsAbortedIsTrue()
         {
-            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2, setupTestCases: true);
@@ -284,7 +283,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             }
 
                             var completeArgs = new TestRunCompleteEventArgs(new
-                                TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, timespan, null);
+                                TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, timespan);
                             handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
                         });
             }
@@ -402,7 +401,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 isAborted,
                 null,
                 null,
-                TimeSpan.FromMilliseconds(1), null);
+                TimeSpan.FromMilliseconds(1));
         }
 
         private static void AssertMissingAndDuplicateTestCases(List<TestCase> tests, List<TestCase> processedTestCases)

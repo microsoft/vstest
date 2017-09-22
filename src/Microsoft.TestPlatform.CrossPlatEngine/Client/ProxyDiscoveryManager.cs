@@ -5,13 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -38,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
-        /// <param name="requestData">Request Data</param>
+        /// <param name="requestData">The Request Data for providing discovery services and data.</param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
@@ -67,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
             int clientConnectionTimeout)
-            : base(requestSender, testHostManager, clientConnectionTimeout)
+            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
@@ -128,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
-                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }

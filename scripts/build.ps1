@@ -71,6 +71,7 @@ $env:MSBUILD_VERSION = "15.0"
 #
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
+$TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
 $TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
@@ -185,6 +186,11 @@ function Invoke-Build
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
     & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Log ".. .. Build: Complete."
+
+    Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
+    Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
+    & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -350,11 +356,15 @@ function Create-VsixPackage
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-981363\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1006826\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy QtAgent Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-981363\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-1006826\contentFiles\any\any"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+    # Copy Legacy data collectors Related depedencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\15.5.0-preview-1006826\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over

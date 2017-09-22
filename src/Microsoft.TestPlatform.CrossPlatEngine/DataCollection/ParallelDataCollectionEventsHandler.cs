@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -80,8 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    runDataAggregator.RunContextAttachments,
-                    runDataAggregator.ElapsedTime, null);
+                    this.runDataAggregator.RunContextAttachments,
+                    this.runDataAggregator.ElapsedTime);
 
                 HandleParallelTestRunComplete(completedArgs);
             }

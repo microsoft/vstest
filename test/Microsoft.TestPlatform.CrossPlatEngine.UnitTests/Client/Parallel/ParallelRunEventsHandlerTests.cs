@@ -6,7 +6,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System;
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -117,7 +116,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void HandleRunCompleteShouldNotCallLastChunkResultsIfNotPresent()
         {
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
              this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
                     this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
@@ -138,7 +137,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             string payload = "RunStats";
             var lastChunk = new TestRunChangedEventArgs(null, null, null);
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
             this.mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestRunStatsChange, lastChunk))
                 .Returns(payload);
@@ -161,7 +160,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void HandleRunCompleteShouldCallTestRunCompleteOnActualHandlerIfParallelMaangerReturnsCompleteAsTrue()
         {
             string payload = "ExecComplete";
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
                     this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
@@ -190,7 +189,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockMetricsCollector = new Mock<IMetricsCollection>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
-            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
                 this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
