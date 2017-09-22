@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object);
         }
-        
+
         [TestMethod]
         public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
         {
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void DiscoveryAsycIfDiscoveryRequestIsDisposedThrowsObjectDisposedException()
         {
             this.discoveryRequest.Dispose();
-            
+
             Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.DiscoverAsync());
         }
 
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         {
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
 
-            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false, null), Enumerable.Empty<TestCase>());
+            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
             this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
         }
 
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.discoveryRequest.OnDiscoveryComplete += (s, e) => events.Add("complete");
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
 
-            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false, null), Enumerable.Empty<TestCase>());
+            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);
@@ -158,9 +158,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
+            discoveryCompleteEventArgs.Metrics = dict;
 
             // Act
-            eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false, dict), Enumerable.Empty<TestCase>());
+            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
 
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<string>()), Times.Once);

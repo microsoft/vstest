@@ -23,7 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         private ProtocolConfig protocolConfig;
 
-        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the metrics collection.
         /// </summary>
@@ -33,7 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             set => this.metricsCollection = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the protocol config.
         /// </summary>
@@ -42,5 +40,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             get => this.protocolConfig;
             set => this.protocolConfig = value ?? throw new ArgumentNullException(nameof(value));
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether is telemetry opted in.
+        /// </summary>
+        public bool IsTelemetryOptedIn { get; set; }
     }
 }

@@ -172,6 +172,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
+
             var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
 
             Assert.IsTrue(success, "DiscoverTests call must succeed");
@@ -201,6 +202,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             {
                 Sources = new List<string>() { "a", "b" }
             };
+
             var mockProtocolConfig = new ProtocolConfig { Version = 4 };
 
             IRequestData actualRequestData = null;
@@ -246,10 +248,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                {
-                    Thread.Sleep(1);
-                    createRunRequestTime = sw.ElapsedMilliseconds;
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
+                   Thread.Sleep(1);
+                   createRunRequestTime = sw.ElapsedMilliseconds;
+                   observedCriteria = runCriteria;
+               }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
             {
@@ -342,9 +344,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void RunTestsShouldPassSameProtocolConfigInRequestData()
         {
             var payload = new TestRunRequestPayload()
-                              {
-                                  Sources = new List<string>() { "a" },
-                              };
+            {
+                Sources = new List<string>() { "a" },
+            };
             var mockProtocolConfig = new ProtocolConfig { Version = 4 };
             IRequestData actualRequestData = null;
             var mockDiscoveryRequest = new Mock<ITestRunRequest>();
@@ -389,7 +391,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
-          
+
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
             Assert.IsTrue(success, "RunTests call must succeed");
@@ -646,7 +648,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var payload = new TestRunRequestPayload
             {
                 RunSettings = runsettings,
-                Sources = new List<string> {"c:\\testproject.dll"}
+                Sources = new List<string> { "c:\\testproject.dll" }
             };
             this.commandLineOptions.IsDesignMode = designModeValue;
 
@@ -663,7 +665,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         {
             var runsettings = $"<RunSettings><RunConfiguration><CollectSourceInformation>{val}</CollectSourceInformation></RunConfiguration></RunSettings>";
             var discoveryPayload = CreateDiscoveryPayload(runsettings);
-            
+
             this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
 
             var collectSourceInformation = $"<CollectSourceInformation>{val}</CollectSourceInformation>";
@@ -676,7 +678,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var discoveryPayload = new DiscoveryRequestPayload
             {
                 RunSettings = runsettings,
-                Sources = new[] {"c:\\testproject.dll"}
+                Sources = new[] { "c:\\testproject.dll" }
             };
             return discoveryPayload;
         }

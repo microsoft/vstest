@@ -36,13 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// <summary>
         /// Returns the Metrics
         /// </summary>
-        public IDictionary<string, string> Metrics
-        {
-            get
-            {
-                return this.metricDictionary;
-            }
-        }
+        public IDictionary<string, string> Metrics => this.metricDictionary;
 
         /// <summary>
         /// Clears the Metrics

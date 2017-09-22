@@ -29,11 +29,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private TestableTestRunCache testableTestRunCache;
         private TestExecutionContext testExecutionContext;
         private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
-
         private TestableRunTestsWithTests runTestsInstance;
-
         private Mock<IRequestData> mockRequestData;
-
         private Mock<IMetricsCollection> mockMetricsCollection;
 
         private const string RunTestsWithSourcesTestsExecutorUri = "executor://RunTestWithSourcesDiscoverer/";
