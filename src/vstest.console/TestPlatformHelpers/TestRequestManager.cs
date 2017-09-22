@@ -155,43 +155,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
             criteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
 
-            using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria))
+            try
             {
-                try
+                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria))
                 {
-                    this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
-                    discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
-
-                    this.testPlatformEventSource.DiscoveryRequestStart();
-
-                    discoveryRequest.DiscoverAsync();
-                    discoveryRequest.WaitForCompletion();
-
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-                    if (ex is TestPlatformException ||
-                        ex is SettingsException ||
-                        ex is InvalidOperationException)
+                    try
                     {
-#if TODO
-                        Utilities.RaiseTestRunError(testLoggerManager, null, ex);
-#endif
-                        success = false;
+                        this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
+                        discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
+
+                        this.testPlatformEventSource.DiscoveryRequestStart();
+
+                        discoveryRequest.DiscoverAsync();
+                        discoveryRequest.WaitForCompletion();
+
+                        success = true;
                     }
-                    else
+
+                    finally
                     {
-                        throw;
+                        this.testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
+                        discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
                     }
-                }
-                finally
-                {
-                    this.testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
-                    discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
                 }
             }
-
+            catch (Exception ex)
+            {
+                if (ex is TestPlatformException ||
+                    ex is SettingsException ||
+                    ex is InvalidOperationException)
+                {
+                    LoggerUtilities.RaiseTestRunError(testLoggerManager, null, ex);
+                    success = false;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
 
@@ -339,13 +341,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 try
                 {
-                    using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria, protocolConfig))
+                    using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria))
                     {
+                        this.currentTestRunRequest = testRunRequest;
+                        this.runRequestCreatedEventHandle.Set();
+
                         try
                         {
-                            this.currentTestRunRequest = testRunRequest;
-                            this.runRequestCreatedEventHandle.Set();
-
                             this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
                             this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
                             testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
