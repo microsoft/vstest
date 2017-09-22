@@ -228,7 +228,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var requestData = this.GetRequestData(protocolConfig);
             var metricsPublisher = this.telemetryOptedIn ? (IMetricsPublisher)new MetricsPublisher() : new NoOpMetricsPublisher();
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, testRunRequestPayload.Sources, out string updatedRunsettings))
+            // Get sources to auto detect fx and arch for both run selected or run all scenario.
+            var sources = GetSources(testRunRequestPayload);
+
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -464,6 +467,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                    : new NoOpMetricsCollection(),
                            IsTelemetryOptedIn = this.telemetryOptedIn
                        };
+        }
+
+        private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
+        {
+            List<string> sources = new List<string>();
+            if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Count > 0)
+            {
+                sources = testRunRequestPayload.Sources;
+            }
+            else if (testRunRequestPayload.TestCases != null && testRunRequestPayload.TestCases.Count > 0)
+            {
+                ISet<string> sourcesSet = new HashSet<string>();
+                foreach (var testCase in testRunRequestPayload.TestCases)
+                {
+                    sourcesSet.Add(testCase.Source);
+                }
+                sources = sourcesSet.ToList();
+            }
+            return sources;
         }
     }
 }

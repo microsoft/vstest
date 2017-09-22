@@ -44,12 +44,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void CapabilitiesShouldReturnAppropriateProperties()
         {
             TestSourceArgumentProcessorCapabilities capabilities = new TestSourceArgumentProcessorCapabilities();
-            Assert.AreEqual("TestSource", capabilities.CommandName);
+            Assert.AreEqual("/TestSource", capabilities.CommandName);
             Assert.IsNull(capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.None, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.TestSource, capabilities.Priority);
 
             Assert.AreEqual(true, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
