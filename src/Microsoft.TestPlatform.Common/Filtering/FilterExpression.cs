@@ -30,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
 
         internal const string FullyQualifiedNamePropertyName = "FullyQualifiedName";
+        internal const string NormalizedFullyQualifiedNameFilterKeyword = "NFQN";
 
         /// <summary>
         /// Condition, if expression is conditional expression.
@@ -78,7 +79,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     (this.condition == null);
             }
         }
-
 
 
         /// <summary>
@@ -200,9 +200,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         /// <summary>
         /// Return FilterExpression after parsing the given filter expression, and in case of the filter consists of
-        /// only "FullyQualifiedName equals" operations and "|" operators, a HashSet contains all the FQN's as well.
+        /// a single kind of property with 'equal' operation and '|' operator, a HashSet contains all the property values and the property name as well.
         /// </summary>
-        internal static FilterExpression Parse(string filterString, out HashSet<string> filterForRunByFullyQulifiedName)
+        internal static FilterExpression Parse(string filterString, out HashSet<string> fastFilter, out string fastFilterPropertyName)
         {
             ValidateArg.NotNull(filterString, "filterString");
 
@@ -217,10 +217,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
 
-            // We try to build a hash table of FQN's for an filter expression consists of only "FullyQualifiedName=" and "|" in parallel.
+            // We try to build a hash table for an filter expression consists of only a single kind of property with 'equal' operation and '|' operator in parallel.
             // If by the time we finished parsing the entire expression and `isRunByFullyQualifiedName` is still true, then this hash table will be used instead
             // for "run by fully qualified name".
-            var isRunByFullyQualifiedName = true;
+            var canUseFastFilter = true;
+            string filterPropertyName = null;
             var filterHashSet = new HashSet<string>();
 
             // This is based on standard parsing of inorder expression using two stacks (operand stack and operator stack)
@@ -240,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     case "|":
                         if (token == "&")
                         {
-                            isRunByFullyQualifiedName = false;
+                            canUseFastFilter = false;
                         }
 
                         Operator currentOperator = Operator.And;
@@ -297,15 +298,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         Condition condition = Condition.Parse(token);
                         FilterExpression filter = new FilterExpression(condition);
                         filterStack.Push(filter);
-                        if (isRunByFullyQualifiedName 
+
+                        if (filterPropertyName == null)
+                        {
+                            filterPropertyName = condition.Name;
+                        }
+
+                        if (canUseFastFilter
                             && condition.Operation == Operation.Equal 
-                            && condition.Name.Equals(FullyQualifiedNamePropertyName, StringComparison.OrdinalIgnoreCase))
+                            && condition.Name.Equals(filterPropertyName, StringComparison.OrdinalIgnoreCase))
                         {
                             filterHashSet.Add(condition.Value);
                         }
                         else
                         {
-                            isRunByFullyQualifiedName = false;
+                            canUseFastFilter = false;
                         }
                         break;
                 }
@@ -321,7 +328,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
             }
 
-            filterForRunByFullyQulifiedName = isRunByFullyQualifiedName ? filterHashSet : null;
+            fastFilter = canUseFastFilter ? filterHashSet : null;
+            fastFilterPropertyName = canUseFastFilter ? filterPropertyName : null;
+
             return filterStack.Pop();
         }
 

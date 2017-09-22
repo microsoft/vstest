@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -19,9 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private FilterExpression filterExpression;
 
-        private HashSet<string> filterForRunByFullyQualifiedName;
+        private string fastFilterPropertyName;
+        private HashSet<string> fastFilter;
 
-        private bool IsRunByFullyQualifiedName => filterForRunByFullyQualifiedName != null;
+        private bool UseFastFilter => fastFilter != null;
 
         /// <summary>
         /// Initializes FilterExpressionWrapper with given filterString.  
@@ -29,12 +31,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public FilterExpressionWrapper(string filterString)
         {
             ValidateArg.NotNullOrEmpty(filterString, "filterString");
-
+            
             this.FilterString = filterString;
             try
             {
-                this.filterExpression = FilterExpression.Parse(filterString, out this.filterForRunByFullyQualifiedName);
-                if (IsRunByFullyQualifiedName)
+                this.filterExpression = FilterExpression.Parse(filterString, out this.fastFilter, out this.fastFilterPropertyName);
+                if (UseFastFilter)
                 {
                     this.filterExpression = null;
                 }
@@ -68,11 +70,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
-            if (this.IsRunByFullyQualifiedName)
+            if (this.UseFastFilter)
             {
-                return supportedProperties.Contains(FilterExpression.FullyQualifiedNamePropertyName, StringComparer.OrdinalIgnoreCase) 
+                // If the property name for fast filter is "NFQN", we will check if FQN is supported.
+                var propertyName = fastFilterPropertyName.Equals(FilterExpression.NormalizedFullyQualifiedNameFilterKeyword, StringComparison.OrdinalIgnoreCase) 
+                    ? FilterExpression.FullyQualifiedNamePropertyName 
+                    : fastFilterPropertyName;
+
+                return supportedProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase) 
                     ? null 
-                    : new[] { FilterExpression.FullyQualifiedNamePropertyName };
+                    : new[] { propertyName };
             }
 
             string[] invalidProperties = null;
@@ -89,37 +96,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
-            if (this.IsRunByFullyQualifiedName)
+            if (this.UseFastFilter)
             {
-                if (!TryGetPropertyValue(FilterExpression.FullyQualifiedNamePropertyName, propertyValueProvider, out var value, out var _) || value == null)
+                if (fastFilterPropertyName.Equals(FilterExpression.NormalizedFullyQualifiedNameFilterKeyword, StringComparison.OrdinalIgnoreCase))
                 {
-                    return false;
+                    return TryGetSinglePropertyValue(FilterExpression.FullyQualifiedNamePropertyName, propertyValueProvider, out var value)
+                            && this.fastFilter.Contains(MakeNormalizedFQN(value));
                 }
-                return this.filterForRunByFullyQualifiedName.Contains(value);
+                else
+                {
+                    return TryGetSinglePropertyValue(fastFilterPropertyName, propertyValueProvider, out var value)
+                            && this.fastFilter.Contains(value);
+                }
             }
             else
             {
-                if (null == this.filterExpression)
-                {
-                    return false;
-                }
-                return this.filterExpression.Evaluate(propertyValueProvider);
+                return this.filterExpression != null &&this.filterExpression.Evaluate(propertyValueProvider);
             }
         }
 
-        private bool TryGetPropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue, out string[] multiValue)
+        private static string MakeNormalizedFQN(string value)
         {
-            var propertyValue = propertyValueProvider(name);
-            if (null != propertyValue)
-            {
-                singleValue = propertyValue as string;
-                multiValue = singleValue != null ? null : propertyValue as string[];
-                return true;
-            }
+            var indexOfSpace = value.IndexOf(" ");
+            return indexOfSpace > 0 ? value.Substring(0, value.IndexOf(" ")) : value;
+        }
 
-            singleValue = null;
-            multiValue = null;
-            return false;
+        private bool TryGetSinglePropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue)
+        {
+            singleValue = propertyValueProvider(name) as string;
+            return singleValue != null;
         }
     }
 }
