@@ -376,7 +376,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(runCriteria.Object, null);
 
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]
