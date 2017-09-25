@@ -375,7 +375,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldCollectMetricsOnHandleDiscoveryComplete()
         {
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
@@ -402,7 +402,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.RaiseMessageReceivedEvent();
 
             // Verify
-            Assert.AreEqual(dict, actualDiscoveryCompleteEventArgs.Metrics);
+            Assert.AreEqual(actualDiscoveryCompleteEventArgs.Metrics, dict);
         }
 
         #endregion

@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// </summary>
         /// <param name="message"></param>
         /// <param name="value"></param>
-        public void Add(string message, string value)
+        public void Add(string message, object value)
         {
             // No operation
         }
@@ -25,6 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// <summary>
         /// Will return empty list
         /// </summary>
-        public IDictionary<string, string> Metrics => new Dictionary<string, string>();
+        public IDictionary<string, object> Metrics => new Dictionary<string, object>();
     }
 }
