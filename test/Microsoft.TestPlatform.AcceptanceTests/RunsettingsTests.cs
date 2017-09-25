@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnnerInfo runnerInfo)
+        public void CommandLineRunSettingsShouldWinAmongAllOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnnerInfo runnerInfo)
+        public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -93,7 +93,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnnerInfo runnerInfo)
+        public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsWithoutParallelAndPlatformX86(RunnnerInfo runnerInfo)
+        public void RunSettingsWithoutParallelAndPlatformX86(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsParamsAsArguments(RunnnerInfo runnerInfo)
+        public void RunSettingsParamsAsArguments(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -164,7 +164,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsAndRunSettingsParamsAsArguments(RunnnerInfo runnerInfo)
+        public void RunSettingsAndRunSettingsParamsAsArguments(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSettingsWithParallelAndPlatformX64(RunnnerInfo runnerInfo)
+        public void RunSettingsWithParallelAndPlatformX64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -220,7 +220,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void TestAdapterPathFromRunSettings(RunnnerInfo runnerInfo)
+        public void TestAdapterPathFromRunSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 

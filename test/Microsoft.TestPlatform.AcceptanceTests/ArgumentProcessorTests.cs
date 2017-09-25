@@ -11,9 +11,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(string runnerFramework, string targetFramework, string targetRuntime)
+        public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             this.InvokeVsTest(null);
 

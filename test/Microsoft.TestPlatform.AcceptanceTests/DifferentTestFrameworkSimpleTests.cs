@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void ChutzpahRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void CPPRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void CPPRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x86");
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void CPPRunAllTestExecutionPlatformx64(RunnnerInfo runnerInfo)
+        public void CPPRunAllTestExecutionPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x64");
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 		
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void WebTestRunAllTests(RunnnerInfo runnerInfo)
+        public void WebTestRunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             WebTestRunAllTests(runnerInfo.RunnerFramework);
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void CodedWebTestRunAllTests(RunnnerInfo runnerInfo)
+        public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
@@ -62,7 +62,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void NUnitRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void XUnitRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             string testAssemblyPath = null;
