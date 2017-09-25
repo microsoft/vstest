@@ -264,7 +264,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
@@ -284,7 +284,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
 
             // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
         }
 
