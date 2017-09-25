@@ -18,6 +18,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using MSTest.TestFramework.AssertExtensions;
+    using Moq;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     [TestClass]
     public class TestPluginDiscovererTests
@@ -123,6 +125,36 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true);
 
             Assert.That.DoesNotThrow(() =>this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true));
+        }
+
+        [TestMethod]
+        public void GetTestExtensionsInformationShouldAddUWPCppAdatersIfTheyExists()
+        {
+            var pathToExtensions = new List<string>();
+
+            Mock<IFileHelper> mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll")).Returns(true);
+
+            this.testPluginDiscoverer = new TestPluginDiscoverer(mockFileHelper.Object);
+
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+
+            mockFileHelper.Verify(fh => fh.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll"), Times.Once);
+        }
+
+        [TestMethod]
+        public void GetTestExtensionsInformationShouldAddMSTestV1UWPAdaptersIfTheyExists()
+        {
+            var pathToExtensions = new List<string>();
+
+            Mock<IFileHelper> mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll")).Returns(true);
+
+            this.testPluginDiscoverer = new TestPluginDiscoverer(mockFileHelper.Object);
+
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+
+            mockFileHelper.Verify(fh => fh.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll"), Times.Once);
         }
 
         #region implementations

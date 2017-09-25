@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -27,10 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private BaseRunTests activeTestRun;
 
+        private IRequestData requestData;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
-        public ExecutionManager() : this(TestPlatformEventSource.Instance)
+        public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
         {
         }
 
@@ -38,9 +41,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource)
+        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource, IRequestData requestData)
         {
             this.testPlatformEventSource = testPlatformEventSource;
+            this.requestData = requestData;
         }
 
         #region IExecutionManager Implementation
@@ -84,13 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testRunEventsHandler = runEventsHandler;
             try
             {
-                this.activeTestRun = new RunTestsWithSources(
-                     adapterSourceMap,
-                     package,
-                     runSettings,
-                     testExecutionContext,
-                     testCaseEventsHandler,
-                     runEventsHandler);
+                this.activeTestRun = new RunTestsWithSources(this.requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
             }
@@ -126,13 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             try
             {
-                this.activeTestRun = new RunTestsWithTests(
-                                         tests,
-                                         package,
-                                         runSettings,
-                                         testExecutionContext,
-                                         testCaseEventsHandler,
-                                         runEventsHandler);
+                this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
             }

@@ -43,8 +43,6 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new EnableCodeCoverageArgumentProcessorCapabilities();
 
             Assert.AreEqual("/EnableCodeCoverage", capabilities.CommandName);
-            //Assert.AreEqual("/EnableCodeCoverage\n      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default \n      settings are used if not specified using settings file.", capabilities.HelpContentResourceName);
-            //Assert.AreEqual(HelpContentPriority.EnableCodeCoverageArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
@@ -65,7 +63,7 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("Code Coverage");
+            this.executor.Initialize(string.Empty);
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
@@ -79,7 +77,7 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("Code Coverage");
+            this.executor.Initialize(string.Empty);
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
@@ -93,7 +91,7 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("Code Coverage");            
+            this.executor.Initialize(string.Empty);
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
@@ -106,7 +104,7 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("Code Coverage");
+            this.executor.Initialize(string.Empty);
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }

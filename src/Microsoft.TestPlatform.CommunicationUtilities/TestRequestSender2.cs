@@ -7,13 +7,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Collections.Generic;
     using System.Globalization;
     using System.Threading;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -177,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler discoveryEventsHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             this.messageEventHandler = discoveryEventsHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
@@ -209,10 +207,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             case MessageType.DiscoveryComplete:
                                 var discoveryCompletePayload =
                                     this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
+
+                                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                                discoveryCompleteEventsArgs.Metrics = discoveryCompletePayload.Metrics;
                                 discoveryEventsHandler.HandleDiscoveryComplete(
-                                    discoveryCompletePayload.TotalTests,
-                                    discoveryCompletePayload.LastDiscoveredTests,
-                                    discoveryCompletePayload.IsAborted);
+                                    discoveryCompleteEventsArgs,
+                                    discoveryCompletePayload.LastDiscoveredTests);
 
                                 this.SetOperationComplete();
                                 break;
@@ -419,7 +419,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }
 
-        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception, bool getClientError)
+        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler2 eventHandler, Exception exception, bool getClientError)
         {
             if (this.IsOperationComplete())
             {
@@ -445,7 +445,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             eventHandler.HandleRawMessage(rawMessage);
 
             // Complete discovery
-            eventHandler.HandleDiscoveryComplete(-1, null, true);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+
+            eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
         }
 
         private string GetAbortErrorMessage(Exception exception, bool getClientError)

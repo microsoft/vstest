@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Runtime.Serialization;
 
@@ -33,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.AttachmentSets = attachmentSets;
             this.ElapsedTimeInRunningTests = elapsedTime;
         }
-        
+
         /// <summary>
         /// Gets the statistics on the state of the test run.
         /// </summary>
@@ -70,5 +71,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public TimeSpan ElapsedTimeInRunningTests { get; private set; }
+
+        /// <summary>
+        /// Get or Sets the Metrics
+        /// </summary>
+        [DataMember]
+        public IDictionary<string, string> Metrics { get; set; }
     }    
 }

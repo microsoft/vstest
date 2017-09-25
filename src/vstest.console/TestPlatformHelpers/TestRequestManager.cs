@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Xml;
 
@@ -15,8 +14,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -44,6 +46,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private const int runRequestTimeout = 5000;
 
+        private bool telemetryOptedIn;
+
         /// <summary>
         /// Maintains the current active execution request
         /// Assumption : There can only be one active execution request.
@@ -56,12 +60,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #region Constructor
 
-        public TestRequestManager() :
-            this(CommandLineOptions.Instance,
-            TestPlatformFactory.GetTestPlatform(),
-            TestLoggerManager.Instance,
-            TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance)
+        public TestRequestManager()
+            : this(
+                CommandLineOptions.Instance,
+                TestPlatformFactory.GetTestPlatform(),
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                TestPlatformEventSource.Instance)
         {
         }
 
@@ -72,6 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.telemetryOptedIn = IsTelemetryOptedIn();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -137,6 +143,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var batchSize = runConfiguration.BatchSize;
 
             var runsettings = discoveryPayload.RunSettings;
+            var requestData = this.GetRequestData(protocolConfig);
+            var metricsPublisher = this.telemetryOptedIn ? (IMetricsPublisher)new MetricsPublisher() : new NoOpMetricsPublisher();
+
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
@@ -144,8 +153,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
+            criteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
 
-            using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria, protocolConfig))
+            using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria))
             {
                 try
                 {
@@ -184,6 +194,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
+
+            // Publish the Metrics
+            metricsPublisher.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+            metricsPublisher.Dispose();
+
             return success;
         }
 
@@ -204,6 +219,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
+            var requestData = this.GetRequestData(protocolConfig);
+            var metricsPublisher = this.telemetryOptedIn ? (IMetricsPublisher)new MetricsPublisher() : new NoOpMetricsPublisher();
+
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
@@ -218,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
+                runCriteria.TestCaseFilter = testRunRequestPayload.TestCaseFilter;
             }
             else
             {
@@ -231,9 +249,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher);
             }
 
-            var success = this.RunTests(runCriteria, testRunEventsRegistrar, protocolConfig);
+            var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar, protocolConfig);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
+
+            metricsPublisher.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+            metricsPublisher.Dispose();
+
             return success;
         }
 
@@ -305,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
-        private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
+        private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -314,7 +336,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             lock (syncobject)
             {
                 bool success = true;
-                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria, protocolConfig))
+                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria))
                 {
                     this.currentTestRunRequest = testRunRequest;
                     this.runRequestCreatedEventHandle.Set();
@@ -358,6 +380,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 return success;
             }
+        }
+
+        /// <summary>
+        /// Checks whether Telemetry opted in or not. 
+        /// By Default opting out
+        /// </summary>
+        /// <returns>Returns Telemetry Opted out or not</returns>
+        private static bool IsTelemetryOptedIn()
+        {
+            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
+            return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Gets Request Data
+        /// </summary>
+        /// <param name="protocolConfig"></param>
+        /// <returns></returns>
+        private IRequestData GetRequestData(ProtocolConfig protocolConfig)
+        {
+            return new RequestData
+                       {
+                           ProtocolConfig = protocolConfig,
+                           MetricsCollection =
+                               this.telemetryOptedIn
+                                   ? (IMetricsCollection)new MetricsCollection()
+                                   : new NoOpMetricsCollection(),
+                           IsTelemetryOptedIn = this.telemetryOptedIn
+                       };
         }
     }
 }

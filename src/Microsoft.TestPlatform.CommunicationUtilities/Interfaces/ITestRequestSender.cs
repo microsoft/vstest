@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         /// <param name="discoveryCriteria">DiscoveryCriteria for discovery</param>
         /// <param name="discoveryEventsHandler">EventHandler for discovery events</param>
-        void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler discoveryEventsHandler);
+        void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
         /// Starts the TestRun with given sources and criteria

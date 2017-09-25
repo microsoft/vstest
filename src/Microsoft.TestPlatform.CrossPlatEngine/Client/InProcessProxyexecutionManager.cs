@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -16,28 +17,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IExecutionManager executionManager;
         private ITestRuntimeProvider testHostManager;
+
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
         /// </summary>
-        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(testHostManager, new TestHostManagerFactory())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
-        /// </summary>
+        /// <param name="testHostManager">
+        /// The test Host Manager.
+        /// </param>
         /// <param name="testHostManagerFactory">
         /// Manager factory
         /// </param>
-        internal InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
+        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
@@ -56,6 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
                 var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
                                                     // If the test execution is with a test filter, group them by sources
                                                     testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var executionContext = new TestExecutionContext(
                             testRunCriteria.FrequencyOfRunStatsChangeEvent,
                             testRunCriteria.RunStatsChangeEventTimeout,
-                            inIsolation: false,
+                            inIsolation: runConfiguration.InIsolation,
                             keepAlive: testRunCriteria.KeepAlive,
                             isDataCollectionEnabled: false,
                             areTestCaseLevelEventsRequired: false,

@@ -174,6 +174,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public string TestCaseFilterValue { get; set; }
 
         /// <summary>
+        /// Target Path used by ListFullyQualifiedTests option
+        /// </summary>
+        public string ListTestsTargetPath { get; set; }
+
+        /// <summary>
         /// Specifies the Target Device
         /// </summary>
         public string TargetDevice { get; set; }

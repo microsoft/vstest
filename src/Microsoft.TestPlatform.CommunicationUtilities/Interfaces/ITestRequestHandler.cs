@@ -69,10 +69,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// The discovery complete handler
         /// </summary>
-        /// <param name="totalTests"> The total Tests. </param>
+        /// <param name="discoveryCompleteEventArgs">Discovery Compelete Event Args</param>
         /// <param name="lastChunk"> The last Chunk. </param>
-        /// <param name="isAborted"> The is Aborted. </param>
-        void DiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted);
+        void DiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk);
 
         /// <summary>
         /// Launches a process with a given process info under debugger

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
 
     /// <summary>
@@ -24,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             Debug.Assert((isAborted ? -1 == totalTests : true), "If discovery request is aborted totalTest should be -1.");
 
             this.TotalCount = totalTests;
-            this.IsAborted = isAborted;            
+            this.IsAborted = isAborted;
         }
 
         /// <summary>
@@ -36,5 +37,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Specifies if discovery has been aborted. If true TotalCount is also set to -1.
         /// </summary>
         public bool IsAborted { get; private set; }
+
+        /// <summary>
+        /// Metrics
+        /// </summary>
+        public IDictionary<string, string> Metrics { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -29,28 +30,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     {
         private TestSessionMessageLogger sessionMessageLogger;
         private ITestPlatformEventSource testPlatformEventSource;
-
-        private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
+        private IRequestData requestData;
+        private ITestDiscoveryEventsHandler2 testDiscoveryEventsHandler;
         private DiscoveryCriteria discoveryCriteria;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
-        public DiscoveryManager() : this(TestPlatformEventSource.Instance)
+        public DiscoveryManager(IRequestData requestData) : this(requestData, TestPlatformEventSource.Instance)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
-        /// <param name="testPlatformEventSource">
-        /// The test platform event source.
+        /// <param name="requestData">
+        /// The Request Data for providing discovery services and data.
         /// </param>
-        protected DiscoveryManager(ITestPlatformEventSource testPlatformEventSource)
+        /// <param name="testPlatformEventSource">
+        ///     The test platform event source.
+        /// </param>
+        protected DiscoveryManager(IRequestData requestData, ITestPlatformEventSource testPlatformEventSource)
         {
             this.sessionMessageLogger = TestSessionMessageLogger.Instance;
             this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.requestData = requestData;
         }
 
         /// <summary>
@@ -77,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
-        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
             var discoveryResultCache = new DiscoveryResultCache(
                 discoveryCriteria.FrequencyOfDiscoveredTestsEvent,
@@ -89,7 +94,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 this.discoveryCriteria = discoveryCriteria;
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
                 this.testDiscoveryEventsHandler = eventHandler;
-
                 var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
                 // Validate the sources 
@@ -105,9 +109,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    new DiscovererEnumerator(discoveryResultCache).LoadTests(
+                    new DiscovererEnumerator(this.requestData, discoveryResultCache).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
+                        discoveryCriteria.TestCaseFilter,
                         this.sessionMessageLogger);
                 }
             }
@@ -123,11 +128,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (eventHandler != null)
                 {
-                    if(lastChunk != null)
+                    if (lastChunk != null)
                     {
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                     }
-                    eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
+
+                    // Collecting Discovery State
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, "Completed");
+
+                    // Collecting Total Tests Discovered
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount.ToString());
+
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false);
+                    discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
+
+                    eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
                 }
                 else
                 {
@@ -243,13 +258,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
         }
 
+
         private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
         {
             // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users),
             // else these test cases are not displayed in TestWindow.
             if (!string.IsNullOrEmpty(package))
             {
-                foreach(var tc in testCases)
+                foreach (var tc in testCases)
                 {
                     tc.Source = package;
                 }

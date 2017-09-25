@@ -1,23 +1,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
     [TestClass]
     public class ParallelRunEventsHandlerTests
     {
@@ -31,6 +32,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IDataSerializer> mockDataSerializer;
 
+        private Mock<IRequestData> mockRequestData;
+
         [TestInitialize]
         public void TestInit()
         {
@@ -38,8 +41,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             this.mockParallelProxyExecutionManager = new Mock<IParallelProxyExecutionManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
 
-            this.parallelRunEventsHandler = new ParallelRunEventsHandler(this.mockProxyExecutionManager.Object,
+            this.parallelRunEventsHandler = new ParallelRunEventsHandler(this.mockRequestData.Object, this.mockProxyExecutionManager.Object,
                 this.mockTestRunEventsHandler.Object, this.mockParallelProxyExecutionManager.Object,
                 new ParallelRunDataAggregator(), this.mockDataSerializer.Object);
         }
@@ -176,6 +181,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 It.IsAny<TestRunChangedEventArgs>(), 
                 It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleRunCompleteShouldCollectMetrics()
+        {
+            var mockMetricsCollector = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
+
+            var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
+
+            this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
+                this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
+
+            // Act
+            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+
+            // Verify.
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.RunState, It.IsAny<string>()), Times.Once);
         }
     }
 }

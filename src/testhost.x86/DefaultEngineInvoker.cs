@@ -8,11 +8,14 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Net;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
@@ -37,6 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private const string LogFileArgument = "--diag";
 
         private const string DataCollectionPortArgument = "--datacollectionport";
+
+        private const string TelemetryOptedIn = "--telemetryoptedin";
 
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
@@ -64,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 endpoint = IPAddress.Loopback + ":" + port;
             }
 
-            ConnectionRole connectionRole = ConnectionRole.Client;
+            var connectionRole = ConnectionRole.Client;
             string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
             if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
             {
@@ -104,9 +109,30 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
                 }
 
+                // Checks for Telemetry Opted in or not from Command line Arguments.
+                // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
+                var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
+                var telemetryOptedIn = false;
+                if (!string.IsNullOrWhiteSpace(telemetryStatus))
+                {
+                    if (telemetryStatus.Equals("true", StringComparison.Ordinal))
+                    {
+                        telemetryOptedIn = true;
+                    }
+                }
+
+                var requestData = new RequestData
+                                      {
+                                          MetricsCollection =
+                                              telemetryOptedIn
+                                                  ? (IMetricsCollection)new MetricsCollection()
+                                                  : new NoOpMetricsCollection(),
+                                          IsTelemetryOptedIn = telemetryOptedIn
+                };
+
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
+                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData));
 
                 // Wait for processing to complete.
                 Task.WaitAny(processingTask);

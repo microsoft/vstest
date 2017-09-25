@@ -131,5 +131,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public string RunSettings { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the criteria for filtering test cases.
+        /// </summary>
+        [DataMember]
+        public string TestCaseFilter {get; set;}
     }
 }

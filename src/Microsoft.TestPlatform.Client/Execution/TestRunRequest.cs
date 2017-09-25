@@ -7,17 +7,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+    using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -55,22 +59,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
         private Timer timer;
 
-        internal TestRunRequest(TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager) :
-            this(testRunCriteria, executionManager, JsonDataSerializer.Instance)
+        /// <summary>
+        /// Execution Start Time
+        /// </summary>
+        private DateTime executionStartTime;
+
+        /// <summary>
+        /// Request Data
+        /// </summary>
+        private IRequestData requestData;
+
+        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager) :
+            this(requestData, testRunCriteria, executionManager, JsonDataSerializer.Instance)
         {
         }
 
-        private TestRunRequest(TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer)
+        private TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer)
         {
             Debug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
             Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
+            Debug.Assert(requestData != null, "request Data is null");
 
-            EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
+            }
+
             this.testRunCriteria = testRunCriteria;
             this.ExecutionManager = executionManager;
-
             this.State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
+            this.requestData = requestData;
         }
 
         #region ITestRunRequest
@@ -95,10 +114,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     throw new InvalidOperationException(ClientResources.InvalidStateForExecution);
                 }
 
-                EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
+                this.executionStartTime = DateTime.UtcNow;
 
-                // Waiting for warm up to be over.
-                EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
+                // Collecting Number of sources Sent For Execution
+                var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count<string>() : 0);
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources.ToString());
+
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
+                }
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    // Waiting for warm up to be over.
+                    EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
+                }
 
                 this.State = TestRunState.InProgress;
 
@@ -110,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 try
                 {
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.TestRunCriteria.TestRunSettings);
-                    this.testSessionTimeout  = runConfiguration.TestSessionTimeout;
+                    this.testSessionTimeout = runConfiguration.TestSessionTimeout;
 
                     if (testSessionTimeout > 0)
                     {
@@ -126,8 +157,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Start the stop watch for calculating the test run time taken overall
                     this.runRequestTimeTracker.Start();
+                    this.OnRunStart.SafeInvoke(this, new TestRunStartEventArgs(this.testRunCriteria), "TestRun.TestRunStart");
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
-                    EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
+
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
+                    }
 
                     return processId;
                 }
@@ -263,6 +299,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public event EventHandler<TestRunChangedEventArgs> OnRunStatsChange;
 
         /// <summary>
+        /// Raised when the test run starts.
+        /// </summary>
+        public event EventHandler<TestRunStartEventArgs> OnRunStart;
+
+        /// <summary>
         /// Raised when the test message is received.
         /// </summary>
         public event EventHandler<TestRunMessageEventArgs> TestRunMessage;
@@ -391,6 +432,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Notify the waiting handle that run is complete
                     this.runCompletionEvent.Set();
+
+
+                    var executionTotalTimeTaken = DateTime.UtcNow - this.executionStartTime;
+
+                    // Fill in the time taken to complete the run
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds.ToString());
+
+                    // Fill in the Metrics From Test Host Process
+                    var metrics = runCompleteArgs.Metrics;
+                    if (metrics != null && metrics.Count != 0)
+                    {
+                        foreach (var metric in metrics)
+                        {
+                            this.requestData.MetricsCollection.Add(metric.Key, metric.Value);
+                        }
+                    }
                 }
 
                 EqtTrace.Info("TestRunRequest:TestRunComplete: Completed.");
