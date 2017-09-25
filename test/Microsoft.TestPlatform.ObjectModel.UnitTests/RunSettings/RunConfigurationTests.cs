@@ -135,14 +135,14 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
              @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
-                       <TestSessionTimeout>0</TestSessionTimeout>
+                       <TestSessionTimeout>-1</TestSessionTimeout>
                      </RunConfiguration>
                 </RunSettings>";
 
 
             Assert.That.Throws<SettingsException>(
                     () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
-                    .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '0' specified for 'TestSessionTimeout'.");
+                    .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '-1' specified for 'TestSessionTimeout'.");
         }
 
         [TestMethod]

@@ -190,7 +190,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             // Call StartTestRun with faulty runsettings so that it will throw exception
-            this.executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>0</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
+            this.executionManager.StartTestRun(new List<TestCase>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
 
             // Verify that TestRunComplete get called and error message are getting logged
             mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
@@ -203,7 +203,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             // Call StartTestRun with faulty runsettings so that it will throw exception
-            this.executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>0</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
+            this.executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), null, @"<RunSettings><RunConfiguration><TestSessionTimeout>-1</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
 
             // Verify that TestRunComplete get called and error message are getting logged
             mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);

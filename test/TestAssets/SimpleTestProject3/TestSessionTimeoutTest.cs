@@ -8,19 +8,19 @@ namespace SampleUnitTestProject3
     public class TestSessionTimeoutTest
     {
         [TestMethod]
-        public void TestWhichTakeSomeTime1()
+        public void TestWhichTakeSomeTime11()
         {
             System.Threading.Thread.Sleep(3 * 1000);
         }
 
         [TestMethod]
-        public void TestWhichTakeSomeTime2()
+        public void TestWhichTakeSomeTime12()
         {
             System.Threading.Thread.Sleep(3 * 1000);
         }
 
         [TestMethod]
-        public void TestWhichTakeSomeTime3()
+        public void TestWhichTakeSomeTime13()
         {
             System.Threading.Thread.Sleep(3 * 1000);
         }
