@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void UITestShouldPassIfApartmentStateIsSTA(RunnnerInfo runnerInfo)
+        public void UITestShouldPassIfApartmentStateIsSTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETCORETargetFramework]
-        public void WarningShouldBeShownWhenValueIsSTAForNetCore(RunnnerInfo runnerInfo)
+        public void WarningShouldBeShownWhenValueIsSTAForNetCore(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void UITestShouldFailWhenDefaultApartmentStateIsMTA(RunnnerInfo runnerInfo)
+        public void UITestShouldFailWhenDefaultApartmentStateIsMTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnnerInfo runnerInfo)
+        public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
