@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var runSettingsProvider = new TestableRunSettingsProvider();
             runSettingsProvider.AddDefaultRunSettings();
-            return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, this.mockOutput.Object, this.mockInferHelper.Object);
+            return new RunSpecificTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, this.mockOutput.Object);
         }
 
         public RunSpecificTestsArgumentProcessorTests()

@@ -44,10 +44,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockOutput = new Mock<IOutput>();
-            this.mockInferHelper = new Mock<IInferHelper>();
             this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
             this.mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
+            this.mockInferHelper = new Mock<IInferHelper>();
             SetupMockExtensions();
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.IsDesignMode = true;
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.mockInferHelper.Object);
-            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, this.mockOutput.Object, null);
+            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, this.mockOutput.Object);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }
@@ -120,8 +120,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 CommandLineOptions.Instance,
                 runSettingsProvider,
                 testRequestManager,
-                this.mockOutput.Object,
-                this.mockInferHelper.Object);
+                this.mockOutput.Object
+                );
             return executor;
         }
 

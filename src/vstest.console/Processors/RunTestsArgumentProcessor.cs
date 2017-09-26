@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         CommandLineOptions.Instance,
                         RunSettingsManager.Instance,
                         TestRequestManager.Instance,
-                        ConsoleOutput.Instance, InferHelper.Instance));
+                        ConsoleOutput.Instance));
                 }
 
                 return this.executor;
@@ -111,11 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private ITestRunEventsRegistrar testRunEventsRegistrar;
 
-        /// <summary>
-        /// To determine framework and platform.
-        /// </summary>
-        private IInferHelper inferHelper;
-
         #endregion
 
         #region Constructor
@@ -127,8 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             CommandLineOptions commandLineOptions,
             IRunSettingsProvider runSettingsProvider,
             ITestRequestManager testRequestManager,
-            IOutput output,
-            IInferHelper inferHelper)
+            IOutput output)
         {
             Contract.Requires(commandLineOptions != null);
 
@@ -136,7 +130,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.runSettingsManager = runSettingsProvider;
             this.testRequestManager = testRequestManager;
             this.output = output;
-            this.inferHelper = inferHelper;
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output);
         }
 
@@ -192,7 +185,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
             }
 
-            // InferHelper.UpdateSettingsIfNotSpecified(inferHelper, this.commandLineOptions, this.runSettingsManager);
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             if (EqtTrace.IsVerboseEnabled)

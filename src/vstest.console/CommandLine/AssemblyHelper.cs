@@ -14,12 +14,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
     internal class AssemblyHelper : IAssemblyHelper
     {
-        private static AssemblyHelper _instance;
+        private static AssemblyHelper instance;
 
         /// <summary>
         /// Gets the instance.
         /// </summary>
-        internal static AssemblyHelper Instance => _instance ?? (_instance = new AssemblyHelper());
+        internal static AssemblyHelper Instance => instance ?? (instance = new AssemblyHelper());
 
         /// <inheritdoc />
         public FrameworkName GetFrameWork(string filePath)
@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 using (var assemblyStream = File.Open(filePath, FileMode.Open))
                 {
-                    frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream, frameworkName);
+                    frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream);
                 }
             }
             catch (Exception ex)
@@ -75,9 +75,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             return archType;
         }
-        private static FrameworkName GetFrameworkNameFromAssemblyMetadata(FileStream assemblyStream,
-            FrameworkName frameworkName)
+
+        private static FrameworkName GetFrameworkNameFromAssemblyMetadata(FileStream assemblyStream)
         {
+            FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             var peReader = new PEReader(assemblyStream);
             var metadataReader = peReader.GetMetadataReader();
 
@@ -98,14 +99,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                     }
                 }
             }
-            return frameworkName;
-        }
 
-        private bool IsDotNETAssembly(string filePath)
-        {
-            var extType = Path.GetExtension(filePath);
-            return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
-                                       extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
+            return frameworkName;
         }
 
         private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture)

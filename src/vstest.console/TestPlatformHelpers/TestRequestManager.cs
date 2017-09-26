@@ -70,7 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestPlatformFactory.GetTestPlatform(),
             TestLoggerManager.Instance,
             TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance, InferHelper.Instance)
+            TestPlatformEventSource.Instance,
+            InferHelper.Instance)
         {
         }
 
@@ -414,30 +415,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator)
         {
-            bool required = false;
-            bool isValidFx =
-                InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
-            if (!isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml))
-            {
-                // Not specified/valid in design mode scenario.
-                required = true;
-            }
-
-            return required;
+            bool isValidFx = InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
+            return !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
         }
 
         private bool IsAutoPlatformDetectRequired(XPathNavigator navigator)
         {
-            bool required = false;
-            bool isValidPlatform =
-                InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
-            if (!isValidPlatform || string.IsNullOrWhiteSpace(platformXml))
-            {
-                // Not specified/valid in design mode scenario.
-                required = true;
-            }
-
-            return required;
+            bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
+            return !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
         }
 
         /// <summary>

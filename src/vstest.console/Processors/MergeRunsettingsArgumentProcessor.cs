@@ -84,19 +84,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class MergeRunsettingsArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
-
-        // <summary>
-        /// Gets the command name.
-        /// </summary>
         public override string CommandName => MergeRunsettingsArgumentProcessor.CommandName;
 
         public override bool IsSpecialCommand => true;
 
+        public override bool AllowMultiple => false;
+
         public override bool AlwaysExecute => true;
 
-        /// <summary>
-        /// Gets the priority.
-        /// </summary>
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.MergeRunsettings;
     }
 
@@ -163,14 +158,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (!commandLineOptions.ArchitectureSpecified)
             {
                 var arch = inferHelper.AutoDetectArchitecture(commandLineOptions.Sources?.ToList());
-                this.runSettingsManager?.UpdateRunSettingsNodeInnerXml(PlatformArgumentExecutor.RunSettingsPath,
+                this.runSettingsManager?.UpdateRunSettingsNodeInnerXml(
+                    PlatformArgumentExecutor.RunSettingsPath,
                     arch.Equals(Architecture.Default) ? Constants.DefaultPlatform.ToString() : arch.ToString());
             }
 
             if (!commandLineOptions.FrameworkVersionSpecified)
             {
                 var fx = inferHelper.AutoDetectFramework(commandLineOptions.Sources?.ToList());
-                this.runSettingsManager?.UpdateRunSettingsNodeInnerXml(FrameworkArgumentExecutor.RunSettingsPath,
+                this.runSettingsManager?.UpdateRunSettingsNodeInnerXml(
+                    FrameworkArgumentExecutor.RunSettingsPath,
                     fx == null ? Framework.DefaultFramework.ToString() : fx.ToString());
             }
         }
@@ -178,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Execute.
         /// </summary>
-        /// <returns>
+        /// <returns>MergeRunsettingsExecutor
         /// The <see cref="ArgumentProcessorResult"/>.
         /// </returns>
         public ArgumentProcessorResult Execute()

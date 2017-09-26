@@ -4,6 +4,7 @@
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -232,6 +233,112 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             // Verify.
             Assert.AreEqual(4, actualRequestData.ProtocolConfig.Version);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldUpdateFrameworkAndPlatformIfNotSpecifiedInDesignMode()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()))
+                .Returns(Architecture.ARM);
+            this.mockInferHelper.Setup(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()))
+                .Returns(Framework.FromString(Constants.DotNetFramework46));
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    actualDiscoveryCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()));
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()));
+
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignMode()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                    $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
+                     <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()))
+                .Returns(Architecture.X86);
+            this.mockInferHelper.Setup(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()))
+                .Returns(Framework.FromString(Constants.DotNetFramework451));
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    actualDiscoveryCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()), Times.Never);
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()), Times.Never);
+
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformInCommandLineScenarios()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()))
+                .Returns(Architecture.ARM);
+            this.mockInferHelper.Setup(it => it.AutoDetectFramework(It.IsAny<List<string>>()))
+                .Returns(Framework.FromString(Constants.DotNetFramework46));
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    actualDiscoveryCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()), Times.Never);
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()), Times.Never);
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
         }
 
         [TestMethod]
@@ -679,6 +786,162 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var collectSourceInformation = $"<CollectSourceInformation>{val}</CollectSourceInformation>";
             this.mockTestPlatform.Verify(
                 tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation))));
+        }
+
+        [TestMethod]
+        public void RunTestsShouldShouldUpdateFrameworkAndPlatformIfNotSpecifiedInDesignMode()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()))
+                                .Returns(Architecture.ARM);
+            this.mockInferHelper.Setup(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()))
+                                .Returns(Framework.FromString(Constants.DotNetFramework46));
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()));
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()));
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignMode()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                    $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                         <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
+                         <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()))
+                .Returns(Architecture.X86);
+            this.mockInferHelper.Setup(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()))
+                .Returns(Framework.FromString(Constants.DotNetFramework451));
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()), Times.Never);
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()), Times.Never);
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotUpdateFrameworkAndPlatformInCommandLineScenarios()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = false;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()))
+                .Returns(Architecture.ARM);
+            this.mockInferHelper.Setup(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()))
+                .Returns(Framework.FromString(Constants.DotNetFramework46));
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()), Times.Never);
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()), Times.Never);
+
+            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        public void RunTestsWithTestCasesShouldUpdateFrameworkAndPlatformIfNotSpecifiedInDesignMode()
+        {
+            var actualSources = new List<string>(){"1.dll", "2.dll"};
+            var payload = new TestRunRequestPayload()
+            {
+                TestCases = new List<TestCase>() {
+                    new TestCase(){Source = actualSources[0]},
+                    new TestCase() { Source = actualSources[0]},
+                    new TestCase() { Source = actualSources[1] }
+                },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            ICollection archSources = null, fxSources = null;
+
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockInferHelper.Setup(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>())).Callback<List<string>>( source => archSources= source)
+                .Returns(Architecture.ARM);
+            this.mockInferHelper.Setup(ih => ih.AutoDetectFramework(It.IsAny<List<string>>())).Callback<List<string>>(source => fxSources = source)
+                .Returns(Framework.FromString(Constants.DotNetFramework46));
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockInferHelper.Verify(ih => ih.AutoDetectArchitecture(It.IsAny<List<string>>()));
+            this.mockInferHelper.Verify(ih => ih.AutoDetectFramework(It.IsAny<List<string>>()));
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+            CollectionAssert.AreEqual(actualSources, archSources);
+            CollectionAssert.AreEqual(actualSources, fxSources);
         }
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

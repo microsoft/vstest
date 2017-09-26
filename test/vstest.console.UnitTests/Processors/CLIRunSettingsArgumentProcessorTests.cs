@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
 namespace vstest.console.UnitTests.Processors
 {
     using System;
@@ -19,6 +21,7 @@ namespace vstest.console.UnitTests.Processors
     {
         private TestableRunSettingsProvider settingsProvider;
         private CLIRunSettingsArgumentExecutor executor;
+        private CommandLineOptions commandLineOptions;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
         private const string RunSettingsWithDeploymentDisabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
         private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
@@ -26,8 +29,15 @@ namespace vstest.console.UnitTests.Processors
         [TestInitialize]
         public void Init()
         {
+            this.commandLineOptions = CommandLineOptions.Instance;
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new CLIRunSettingsArgumentExecutor(this.settingsProvider, CommandLineOptions.Instance);
+            this.executor = new CLIRunSettingsArgumentExecutor(this.settingsProvider, this.commandLineOptions);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            this.commandLineOptions.Reset();
         }
 
         [TestMethod]
@@ -202,6 +212,51 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>\r\n    </DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldUpdateCommandLineOptionsFrameworkIfProvided()
+        {
+
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(DefaultRunSettings);
+            settingsProvider.SetActiveRunSettings(runSettings);
+
+            var args = new string[] { $"RunConfiguration.TargetFrameworkVersion={Constants.DotNetFramework46}" };
+            this.executor.Initialize(args);
+
+            Assert.IsTrue(this.commandLineOptions.FrameworkVersionSpecified);
+            Assert.AreEqual(Framework.FromString(Constants.DotNetFramework46), this.commandLineOptions.TargetFrameworkVersion);
+        }
+
+        [TestMethod]
+        public void InitializeShouldUpdateCommandLineOptionsArchitectureIfProvided()
+        {
+
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(DefaultRunSettings);
+            settingsProvider.SetActiveRunSettings(runSettings);
+
+            var args = new string[] { $"RunConfiguration.TargetPlatform={Architecture.ARM.ToString()}" };
+            this.executor.Initialize(args);
+
+            Assert.IsTrue(this.commandLineOptions.ArchitectureSpecified);
+            Assert.AreEqual(Architecture.ARM, this.commandLineOptions.TargetArchitecture);
+        }
+
+        [TestMethod]
+        public void InitializeShouldNotUpdateCommandLineOptionsArchitectureAndFxIfNotProvided()
+        {
+
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(DefaultRunSettings);
+            settingsProvider.SetActiveRunSettings(runSettings);
+
+            var args = new string[] {};
+            this.executor.Initialize(args);
+
+            Assert.IsFalse(this.commandLineOptions.ArchitectureSpecified);
+            Assert.IsFalse(this.commandLineOptions.FrameworkVersionSpecified);
         }
 
         #endregion
