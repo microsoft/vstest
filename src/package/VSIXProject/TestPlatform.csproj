@@ -29,7 +29,10 @@
     <IsProductComponent>true</IsProductComponent>
     <VsixInputFileLocation>$(TestPlatformRoot)artifacts\$(Configuration)\net451\win7-x64</VsixInputFileLocation>
     <OutputPath>$(TestPlatformRoot)artifacts\$(Configuration)\VSIX</OutputPath>
-    <ExtensionInstallationFolder>TestPlatform</ExtensionInstallationFolder>
+    <!--<ExtensionInstallationFolder>TestPlatform</ExtensionInstallationFolder>-->
+
+    <ExtensionInstallationRoot>CommonExtensions</ExtensionInstallationRoot> 
+    <ExtensionInstallationFolder>Microsoft\TestWindow\TestPlatform</ExtensionInstallationFolder> 
 
     <!-- Disable warning that there are no source files. It is intentional. -->
     <NoWarn>$(NoWarn);2008</NoWarn>
