@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Collections.Generic;
+    using vstest.console.UnitTests.Processors;
 
     using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
 
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestInitialize]
         public void Init()
         {
-            this.runSettingsProvider = RunSettingsManager.Instance;
+            this.runSettingsProvider = new TestableRunSettingsProvider();
             this.commandLineOptions = CommandLineOptions.Instance;
             this.mockInferHelper = new Mock<IInferHelper>();
             this.executor = new MergeRunsettingsArgumentExecutor(
