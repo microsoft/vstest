@@ -30,6 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// <summary>
         /// Gets or sets the Metrics
         /// </summary>
-        public IDictionary<string, string> Metrics { get; set; }
+        public IDictionary<string, object> Metrics { get; set; }
     }
 }

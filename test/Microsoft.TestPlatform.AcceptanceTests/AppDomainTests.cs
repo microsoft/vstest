@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void RunTestExecutionWithDisableAppDomain(RunnnerInfo runnerInfo)
+        public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 

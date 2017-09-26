@@ -21,9 +21,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnnerInfo runnnerInfo)
+        public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnnerInfo);
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
@@ -42,9 +42,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnnerInfo runnnerInfo)
+        public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
         {
-            SetTestEnvironment(this.testEnvironment, runnnerInfo);
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();

@@ -60,25 +60,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 
 
         /// <summary>
-        /// Executor should try find "project.json" if empty args given
+        /// Executor should Print Error message and Help contents when no arguments are provided.
         /// </summary>
         [TestMethod]
-        public void ExecutorEmptyArgsCallRunTestsProcessor()
+        public void ExecutorEmptyArgsPrintsErrorAndHelpMessage()
         {
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
 
-            // Since no projectjsons exist in current folder it should fail
-            Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
+            Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-            //// Verify that messages exist
-            //Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print atleast copyright info");
-            //Assert.IsNotNull(mockOutput.Messages.First().Message, "First Printed Message cannot be null or empty");
-
-            //// Just check first 20 characters - don't need to check whole thing as assembly version is variable
-            //Assert.IsTrue(mockOutput.Messages.First().Message.Contains(
-            //    Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.MicrosoftCommandLineTitle.Substring(0, 20)),
-            //    "First Printed message must be Microsoft Copyright");
+            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(CommandLineResources.NoArgumentsProvided)));
         }
 
         /// <summary>

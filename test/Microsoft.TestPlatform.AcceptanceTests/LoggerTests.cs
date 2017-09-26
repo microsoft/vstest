@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void TrxLoggerShouldProperlyOverwriteFile(RunnnerInfo runnerInfo)
+        public void TrxLoggerShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 

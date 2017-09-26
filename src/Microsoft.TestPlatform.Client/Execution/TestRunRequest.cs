@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 // Collecting Number of sources Sent For Execution
                 var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count<string>() : 0);
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources.ToString());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources);
 
                 if (EqtTrace.IsInfoEnabled)
                 {
@@ -437,7 +437,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     var executionTotalTimeTaken = DateTime.UtcNow - this.executionStartTime;
 
                     // Fill in the time taken to complete the run
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds);
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = runCompleteArgs.Metrics;
