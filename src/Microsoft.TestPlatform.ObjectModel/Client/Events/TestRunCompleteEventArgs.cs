@@ -76,6 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Get or Sets the Metrics
         /// </summary>
         [DataMember]
-        public IDictionary<string, string> Metrics { get; set; }
+        public IDictionary<string, object> Metrics { get; set; }
     }    
 }

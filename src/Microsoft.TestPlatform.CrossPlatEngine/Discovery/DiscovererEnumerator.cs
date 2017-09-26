@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
             // Collecting Data Point for TimeTaken to Load Adapters
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, (totalAdapterLoadTIme.TotalSeconds).ToString());
+            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, totalAdapterLoadTIme.TotalSeconds);
 
             // Warning is logged for in the inner function
             if (discovererToSourcesMap == null || !discovererToSourcesMap.Any())
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
 
             // Collecting Total Number of Adapters Discovered in Machine
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count().ToString());
+            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count());
 
             var context = new DiscoveryContext { RunSettings = settings };
             context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     if (this.discoveryResultCache.TotalDiscoveredTests > currentTotalTests)
                     {
                         var totalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
-                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter, discoverer.Metadata.DefaultExecutorUri), totalDiscoveredTests.ToString());
+                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter, discoverer.Metadata.DefaultExecutorUri), totalDiscoveredTests);
                         totalAdaptersUsed++;
                     }
 
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
 
                     // Collecting Data Point for Time Taken to Discover Tests by each Adapter
-                    this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), (totalAdapterRunTime.TotalSeconds).ToString());
+                    this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), totalAdapterRunTime.TotalSeconds);
                     totalTimeTakenByAdapters += totalAdapterRunTime.TotalSeconds;
                 }
                 catch (Exception e)
@@ -187,10 +187,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
 
             // Collecting Total Time Taken by Adapters
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters.ToString());
+            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters);
 
             // Collecting Total Adapters Used to Discover tests
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, totalAdaptersUsed.ToString());
+            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, totalAdaptersUsed);
         }
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)

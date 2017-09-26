@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     var executionEngineTotalTime = DateTime.UtcNow - executionEngineStartTime;
 
                     // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
                     var executionContext = new TestExecutionContext(
