@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private List<ITestRunStatistics> testRunStatsList;
 
-        private ConcurrentDictionary<string, string> metricsAggregator;
+        private ConcurrentDictionary<string, double> metricsAggregator;
 
         private object dataUpdateSyncObject = new object();
 
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             executorUris = new List<string>();
             testRunStatsList = new List<ITestRunStatistics>();
 
-            metricsAggregator = new ConcurrentDictionary<string, string>();
+            metricsAggregator = new ConcurrentDictionary<string, double>();
 
             IsAborted = false;
             IsCanceled = false;
@@ -94,11 +94,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Returns the Aggregated Run Data Metrics
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, string> GetAggregatedRunDataMetrics()
+        public IDictionary<string, double> GetAggregatedRunDataMetrics()
         {
             if (this.metricsAggregator == null || this.metricsAggregator.Count == 0)
             {
-               return new ConcurrentDictionary<string, string>();
+               return new ConcurrentDictionary<string, double>();
             }
 
             var adapterUsedCount = this.metricsAggregator.Count(metrics =>
@@ -108,12 +108,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 metrics.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter));
 
             // Aggregating Total Adapter Used Count
-            this.metricsAggregator.TryAdd(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUsedCount.ToString());
+            this.metricsAggregator.TryAdd(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, adapterUsedCount);
 
             // Aggregating Total Adapters Discovered Count
             this.metricsAggregator.TryAdd(
                 TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution,
-                adaptersDiscoveredCount.ToString());
+                adaptersDiscoveredCount);
 
             return this.metricsAggregator;
         }
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Aggregates Run Data Metrics from each Test Host Process
         /// </summary>
         /// <param name="metrics"></param>
-        public void AggregateRunDataMetrics(IDictionary<string, string> metrics)
+        public void AggregateRunDataMetrics(IDictionary<string, object> metrics)
         {
             if (metrics == null || metrics.Count == 0 || this.metricsAggregator == null)
             {
@@ -175,17 +175,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)))
                 {
-                    var newValue = Double.Parse(metric.Value);
-                    string oldValue;
+                    var newValue = Convert.ToDouble(metric.Value);
+                    Double oldValue;
 
                     if (this.metricsAggregator.TryGetValue(metric.Key, out oldValue))
                     {
-                        this.metricsAggregator[metric.Key] = (newValue + Double.Parse(oldValue)).ToString();
+                        this.metricsAggregator[metric.Key] = newValue + oldValue;
                     }
 
                     else
                     {
-                        this.metricsAggregator.TryAdd(metric.Key, newValue.ToString());
+                        this.metricsAggregator.TryAdd(metric.Key, newValue);
                     }
                 }
             }

@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     this.runDataAggregator.ElapsedTime);
 
                 // Collect Final RunState
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, runDataAggregator.IsAborted ? "Aborted" : runDataAggregator.IsCanceled ? "Canceled" : "Completed");
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.RunState, this.runDataAggregator.IsAborted ? "Aborted" : this.runDataAggregator.IsCanceled ? "Canceled" : "Completed");
 
                 // Collect Aggregated Metrics Data
                 var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();

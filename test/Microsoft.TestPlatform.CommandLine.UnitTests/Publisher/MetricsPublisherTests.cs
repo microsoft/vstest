@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.CommandLine.UnitTests.Publisher
         public void RemoveInvalidCharactersFromPropertiesShouldEmptyMetricIfMetricsIsEmpty()
         {
             var publishMetrics = new MetricsPublisher();
-            var dummyDictionary = new Dictionary<string, string>();
+            var dummyDictionary = new Dictionary<string, object>();
 
             // Act.
             var result = publishMetrics.RemoveInvalidCharactersFromProperties(dummyDictionary);
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.CommandLine.UnitTests.Publisher
         public void RemoveInvalidCharactersFromPropertiesShouldValidMetrics()
         {
             var publishMetrics = new MetricsPublisher();
-            var dummyDictionary = new Dictionary<string, string>();
+            var dummyDictionary = new Dictionary<string, object>();
             dummyDictionary.Add("DummyMessage://", "DummyValue");
             dummyDictionary.Add("Dummy2", "DummyValue2");
 

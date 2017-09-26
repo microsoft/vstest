@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         {
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
-            string value;
+            object value;
             Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value), true);
             Assert.AreEqual(value, "DummyValue");
         }
@@ -32,13 +32,13 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         {
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
-            string value;
+            object value;
             Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value), true);
             Assert.AreEqual(value, "DummyValue");
 
             this.metricsCollection.Add("DummyMessage", "newValue");
 
-            string newValue;
+            object newValue;
             Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out newValue), true);
             Assert.AreEqual(newValue, "newValue");
         }
