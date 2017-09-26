@@ -23,6 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     {
         #region TestRunSpecificData
 
+        private bool abortRequested = false;
+
         private int runCompletedClients = 0;
         private int runStartedClients = 0;
         private int availableTestSources = -1;
@@ -121,6 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public void Abort()
         {
+            abortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
         }
 
@@ -162,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 // So, we need to keep track of total runcomplete calls
                 this.runCompletedClients++;
 
-                if (testRunCompleteArgs.IsCanceled)
+                if (testRunCompleteArgs.IsCanceled || abortRequested)
                 {
                     allRunsCompleted = this.runCompletedClients == this.runStartedClients;
                 }
@@ -215,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // If cancel is triggered for any one run, there is no reason to fetch next source
             // and queue another test run
-            if (!testRunCompleteArgs.IsCanceled)
+            if (!testRunCompleteArgs.IsCanceled && !abortRequested)
             {
                 this.StartTestRunOnConcurrentManager(proxyExecutionManager);
             }
