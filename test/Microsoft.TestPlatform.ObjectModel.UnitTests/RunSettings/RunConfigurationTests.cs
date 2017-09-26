@@ -146,6 +146,21 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         }
 
         [TestMethod]
+        public void RunConfigurationFromXmlShouldNotThrowsSettingsExceptionIfTestSessionTimeoutIsZero()
+        {
+            string settingsXml =
+             @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TestSessionTimeout>0</TestSessionTimeout>
+                     </RunConfiguration>
+                </RunSettings>";
+
+
+            XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+        }
+
+        [TestMethod]
         public void RunConfigurationFromXmlThrowsSettingsExceptionIfExecutionThreadApartmentStateIsInvalid()
         {
             string settingsXml =

@@ -114,24 +114,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        public void TestSessionTimeOutShouldBeInfinityIfProvidedValueIsZeroTests(RunnnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest.TestWhichTakeSomeTime1");
-
-            // set TestSessionTimeOut = 0 sec --> inifinity, means no TestSessionTimeout
-            arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=0");
-            this.InvokeVsTest(arguments);
-
-            this.ValidateSummaryStatus(3,0,0);
-        }
-
-        [CustomDataTestMethod]
         [NETCORETargetFramework]
         public void TestPlatformShouldBeCompatibleWithOldTestHost(RunnerInfo runnerInfo)
         {
