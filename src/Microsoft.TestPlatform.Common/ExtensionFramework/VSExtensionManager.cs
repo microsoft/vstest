@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private const string SettingsManagerTypeName = "Microsoft.VisualStudio.Settings.ExternalSettingsManager";
         private const string SettingsManagerAssemblyName = @"Microsoft.VisualStudio.Settings.15.0";
-        
+
         private IFileHelper fileHelper;
 
         private Assembly extensionManagerAssembly;
@@ -79,9 +79,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             IEnumerable<string> installedExtensions = new List<string>();
 
-            // Navigate up to the IDE folder
+            // Navigate up to the Common7\IDE folder
             // In case of xcopyable vstest.console, this functionality is not supported.
-            var vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent?.Parent?.Parent?.FullName;
+            var vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent?.Parent?.Parent?.Parent?.Parent?.FullName;
             string pathToDevenv = null;
 
             if (!string.IsNullOrEmpty(vsInstallPath))
@@ -198,7 +198,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 return extensionManagerServiceType;
             }
         }
-        
+
         /// <summary>
         /// Used to explicitly load Microsoft.VisualStudio.Settings.15.0.dll
         /// </summary>
