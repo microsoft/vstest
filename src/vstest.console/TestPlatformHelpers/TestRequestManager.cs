@@ -65,13 +65,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #region Constructor
 
-        public TestRequestManager() :
-            this(CommandLineOptions.Instance,
-            TestPlatformFactory.GetTestPlatform(),
-            TestLoggerManager.Instance,
-            TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance,
-            InferHelper.Instance)
+        public TestRequestManager()
+            : this(
+                  CommandLineOptions.Instance,
+                  TestPlatformFactory.GetTestPlatform(),
+                  TestLoggerManager.Instance,
+                  TestRunResultAggregator.Instance,
+                  TestPlatformEventSource.Instance,
+                  InferHelper.Instance)
         {
         }
 
@@ -153,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var requestData = this.GetRequestData(protocolConfig);
             var metricsPublisher = this.telemetryOptedIn ? (IMetricsPublisher)new MetricsPublisher() : new NoOpMetricsPublisher();
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources.ToList(), out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }

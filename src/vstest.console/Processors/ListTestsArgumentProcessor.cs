@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -96,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool AllowMultiple => false;
 
-        public override bool IsAction => true; 
+        public override bool IsAction => true;
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
@@ -137,11 +136,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
-        /// <summary>
-        /// To determine framework and platform.
-        /// </summary>
-        private IInferHelper inferHelper;
-
         #endregion
 
         #region Constructor
@@ -155,24 +149,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ListTestsArgumentExecutor(
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
-            ITestRequestManager testRequestManager) : 
-                this(options, runSettingsProvider, testRequestManager, ConsoleOutput.Instance, InferHelper.Instance)
+            ITestRequestManager testRequestManager) :
+                this(options, runSettingsProvider, testRequestManager, ConsoleOutput.Instance)
         {
         }
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="options">
+        /// The options.
+        /// </param>
         internal ListTestsArgumentExecutor(
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
             ITestRequestManager testRequestManager,
-            IOutput output,
-            IInferHelper inferHelper)
+            IOutput output)
         {
             Contract.Requires(options != null);
 
             this.commandLineOptions = options;
             this.output = output;
             this.testRequestManager = testRequestManager;
-            this.inferHelper = inferHelper;
+
             this.runSettingsManager = runSettingsProvider;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output);
         }
@@ -214,7 +213,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            // InferHelper.UpdateSettingsIfNotSpecified(this.inferHelper, this.commandLineOptions, this.runSettingsManager);
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             var success = this.testRequestManager.DiscoverTests(
