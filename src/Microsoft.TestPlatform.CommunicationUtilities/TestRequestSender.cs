@@ -155,10 +155,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         EqtTrace.Verbose("Received message: {0}", rawMessage);
                     }
 
-                    // Send raw message first to unblock handlers waiting to send message to IDEs
-                    discoveryEventsHandler.HandleRawMessage(rawMessage);
-
                     var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+                    if (!string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+                    {
+                        // Send raw message first to unblock handlers waiting to send message to IDEs
+                        discoveryEventsHandler.HandleRawMessage(rawMessage);
+                    }
+
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
                         var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
@@ -170,9 +174,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                         var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
                         discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+
+                        // This also closes the TestHost if it did not exit normally
+                        // Do not send RawMessage till this is complete else we are not sending correct data
                         discoveryEventsHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
                             discoveryCompletePayload.LastDiscoveredTests);
+
+                        discoveryEventsHandler.HandleRawMessage(rawMessage);
                         isDiscoveryComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
@@ -281,10 +290,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 {
                     var rawMessage = this.TryReceiveRawMessage();
 
-                    // Send raw message first to unblock handlers waiting to send message to IDEs
-                    testRunEventsHandler.HandleRawMessage(rawMessage);
-
                     var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+                    if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
+                    {
+                        // Send raw message first to unblock handlers waiting to send message to IDEs
+                        testRunEventsHandler.HandleRawMessage(rawMessage);
+                    }
+
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
                         var testRunChangedArgs = this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(
@@ -296,11 +309,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         var testRunCompletePayload =
                             this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
+                        // This also closes the TestHost if it did not exit normally
+                        // Do not send RawMessage till this is complete else we are not sending correct data
                         testRunEventsHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
                             testRunCompletePayload.LastRunTests,
                             testRunCompletePayload.RunAttachments,
                             testRunCompletePayload.ExecutorUris);
+
+                        testRunEventsHandler.HandleRawMessage(rawMessage);
                         isTestRunComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
