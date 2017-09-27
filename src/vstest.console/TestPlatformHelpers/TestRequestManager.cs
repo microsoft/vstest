@@ -61,6 +61,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private Task<IMetricsPublisher> metricsPublisher;
 
+        private bool isDisposed;
+
         #region Constructor
 
         public TestRequestManager()
@@ -72,11 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 TestPlatformEventSource.Instance,
                 MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
-        }
-
-        public void Dispose()
-        {
-            this.metricsPublisher.Result.Dispose();
         }
 
         internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, Task<IMetricsPublisher> metricsPublisher)
@@ -287,6 +284,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                if (disposing)
+                {
+                    this.metricsPublisher.Result.Dispose();
+                }
+
+                this.isDisposed = true;
+            }
+        }
 
         private bool UpdateRunSettingsIfRequired(string runsettingsXml, out string updatedRunSettingsXml)
         {
