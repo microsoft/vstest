@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Class used to define the TestRunRequestPayload sent by the Vstest.console translation layers into design mode
@@ -52,20 +51,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads
         public bool DebuggingEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the filter criteria for run with sources to filter test cases.
+        /// Gets or sets the test platform options 
         /// </summary>
         [DataMember]
-        public string TestCaseFilter
-        {
-            get;
-            set;
-        }
-
-        /// <summary> 
-        /// Additional options for test case filter. 
-        /// </summary> 
-        [DataMember]
-        public FilterOptions FilterOptions
+        public TestPlatformOptions TestPlatformOptions
         {
             get;
             set;

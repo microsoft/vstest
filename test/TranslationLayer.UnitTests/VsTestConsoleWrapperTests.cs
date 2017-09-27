@@ -192,19 +192,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void RunTestsWithSourcesAndOptionsUsingACustomHostShouldThrowIfOptionsIsNull()
-        {
-            Assert.That.Throws<ArgumentNullException>(
-                () => this.consoleWrapper.RunTestsWithCustomTestHost(
-                            this.testSources,
-                            "RunSettings",
-                            null,
-                            new Mock<ITestRunEventsHandler>().Object,
-                            new Mock<ITestHostLauncher>().Object)
-                 ).WithMessage("The test platform options cannot be null.");
-        }
-
-        [TestMethod]
         public void RunTestsWithSourcesAndOptionsUsingACustomHostShouldPassOnOptions()
         {
             var options = new TestPlatformOptions() { TestCaseFilter = "PacMan" };

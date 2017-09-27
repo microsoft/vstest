@@ -304,7 +304,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// Evaluate filterExpression with given propertyValueProvider.
         /// </summary>
-        /// <param name="propertyValueProvider"> The property Value Provider. </param>
+        /// <param name="propertyValueProvider"> The property Value Provider.</param>
+        /// <param name="propertyValueRegexMatchOpt">Applies RegEx pattern on the property value</param>
         /// <returns> True if evaluation is successful. </returns>
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {

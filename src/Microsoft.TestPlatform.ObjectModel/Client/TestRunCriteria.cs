@@ -360,7 +360,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 this.testCaseFilter = value;
             }
         }
-        
+
+        /// <summary>
+        /// Gets or sets the filter options
+        /// </summary>
+        /// <remarks>This is only applicable when TestCaseFilter is present.</remarks>
         [DataMember]
         public FilterOptions FilterOptions
         {

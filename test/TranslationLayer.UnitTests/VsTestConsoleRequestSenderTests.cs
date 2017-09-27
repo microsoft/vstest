@@ -12,7 +12,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -918,7 +917,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.IsNull(receivedRequest.TestCaseFilter, "The run request message should include a null test case filter");
+            Assert.IsNull(receivedRequest.TestPlatformOptions, "The run request message should include a null test case filter");
         }
 
         [TestMethod]
@@ -941,7 +940,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.AreEqual(filter, receivedRequest.TestCaseFilter, "The run request message should include test case filter");
+            Assert.AreEqual(filter, receivedRequest.TestPlatformOptions.TestCaseFilter, "The run request message should include test case filter");
         }
 
         [TestMethod]
@@ -1189,7 +1188,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.IsNull(receivedRequest.TestCaseFilter, "The run request message should include a null test case filter");
+            Assert.IsNull(receivedRequest.TestPlatformOptions, "The run request message should include a null test case filter");
         }
 
         [TestMethod]
@@ -1212,7 +1211,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.AreEqual(filter, receivedRequest.TestCaseFilter, "The run request message should include test case filter");
+            Assert.AreEqual(filter, receivedRequest.TestPlatformOptions.TestCaseFilter, "The run request message should include test case filter");
         }
 
         [TestMethod]
