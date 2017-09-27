@@ -28,10 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private static string filterExpressionSeperatorString = @"(\&)|(\|)|(\()|(\))";
 
-
-        internal const string FullyQualifiedNamePropertyName = "FullyQualifiedName";
-        internal const string NormalizedFullyQualifiedNameFilterKeyword = "NFQN";
-
         /// <summary>
         /// Condition, if expression is conditional expression.
         /// </summary>
@@ -52,11 +48,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private bool areJoinedByAnd;
 
-        private string fastFilterPropertyName;
-        private HashSet<string> fastFilter;
-
-        private bool UseFastFilter => fastFilter != null;
-
         #region Constructors
 
         private FilterExpression()
@@ -74,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// True, if filter expression is empty.
         /// </summary>
         internal bool IsEmpty 
-            => (this.left == null && this.right == null && this.condition == null) || this.UseFastFilter;
+            => this.left == null && this.right == null && this.condition == null;
 
         /// <summary>
         /// Create a new filter expression 'And'ing 'this' with 'filter'. 
@@ -159,18 +150,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         internal string[] ValidForProperties(IEnumerable<string> properties, Func<string, TestProperty> propertyProvider)
         {
-            if (this.UseFastFilter)
-            {
-                // If the property name for fast filter is "NFQN", we will check if FQN is supported.
-                var propertyName = fastFilterPropertyName.Equals(FilterExpression.NormalizedFullyQualifiedNameFilterKeyword, StringComparison.OrdinalIgnoreCase)
-                    ? FilterExpression.FullyQualifiedNamePropertyName
-                    : fastFilterPropertyName;
-
-                return properties.Contains(propertyName, StringComparer.OrdinalIgnoreCase)
-                    ? null
-                    : new[] { propertyName };
-            }
-
             string[] invalidProperties = null;
 
             if (null == properties)
@@ -206,11 +185,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
 
         /// <summary>
-        /// Return FilterExpression after parsing the given filter expression.
+        /// Return FilterExpression after parsing the given filter expression, and a FastFilter when possible.
         /// </summary>
-        internal static FilterExpression Parse(string filterString)
+        internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
         {
             ValidateArg.NotNull(filterString, "filterString");
+
+            fastFilter = null;
 
             // below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
             var invalidInput = Regex.Match(filterString, @"\(\s*\)");
@@ -223,12 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
 
-            // We try to build a hash table for an filter expression consists of only a single kind of property with 'equal' operation and '|' operator in parallel.
-            // If by the time we finished parsing the entire expression and `isRunByFullyQualifiedName` is still true, then this hash table will be used instead
-            // for "run by fully qualified name".
-            var canUseFastFilter = true;
-            string filterPropertyName = null;
-            var filterHashSet = new HashSet<string>();
+            var fastFilterBuilder = FastFilter.CreateBuilder();
 
             // This is based on standard parsing of inorder expression using two stacks (operand stack and operator stack)
             // Predence(And) > Predence(Or)
@@ -245,16 +221,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     case "&":
                     case "|":
-                        if (token == "&")
-                        {
-                            canUseFastFilter = false;
-                        }
 
                         Operator currentOperator = Operator.And;
                         if (string.Equals("|", token))
                         {
                             currentOperator = Operator.Or;
                         }
+
+                        fastFilterBuilder.AddOperator(currentOperator);
 
                         // Always put only higher priority operator on stack.
                         //  if lesser prioriy -- pop up the stack and process the operator to maintain operator precedence.
@@ -305,21 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         FilterExpression filter = new FilterExpression(condition);
                         filterStack.Push(filter);
 
-                        if (filterPropertyName == null)
-                        {
-                            filterPropertyName = condition.Name;
-                        }
-
-                        if (canUseFastFilter
-                            && condition.Operation == Operation.Equal 
-                            && condition.Name.Equals(filterPropertyName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            filterHashSet.Add(condition.Value);
-                        }
-                        else
-                        {
-                            canUseFastFilter = false;
-                        }
+                        fastFilterBuilder.AddCondition(condition);
                         break;
                 }
             }
@@ -334,17 +294,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
             }
 
-            if (canUseFastFilter)
+            if (fastFilterBuilder.ContainsValidFilter)
             {
-                var filterExpression = new FilterExpression();
-                filterExpression.fastFilter = filterHashSet;
-                filterExpression.fastFilterPropertyName = filterPropertyName;
-                return filterExpression;
+                fastFilter = fastFilterBuilder.ToFastFilter();
             }
-            else
-            {
-                return filterStack.Pop();
-            }
+            return filterStack.Pop();
         }
 
         /// <summary>
@@ -352,47 +306,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         /// <param name="propertyValueProvider"> The property Value Provider. </param>
         /// <returns> True if evaluation is successful. </returns>
-        internal bool Evaluate(Func<string, Object> propertyValueProvider, Func<string, string> propertyValueRegexMatchOpt)
+        internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
-
-            if (this.UseFastFilter)
-            {
-                Debug.Assert(this.condition == null && this.left == null && this.right == null);
-
-                if (fastFilterPropertyName.Equals(FilterExpression.NormalizedFullyQualifiedNameFilterKeyword, StringComparison.OrdinalIgnoreCase))
-                {
-                    return TryGetSinglePropertyValue(FilterExpression.FullyQualifiedNamePropertyName, propertyValueProvider, out var value)
-                            && this.fastFilter.Contains(MakeNormalizedFQN(value));
-                }
-                else
-                {
-                    if (!TryGetSinglePropertyValue(fastFilterPropertyName, propertyValueProvider, out var value))
-                    {
-                        return false;
-                    }
-
-                    if (propertyValueRegexMatchOpt != null)
-                    {
-                        value = propertyValueRegexMatchOpt(value);
-                        if (value == null)
-                        {
-                            return false;
-                        }
-                    }
-                    return this.fastFilter.Contains(value);
-                }
-            }
-            else
-            {
-                Debug.Assert(propertyValueRegexMatchOpt == null);
-                return EvaluateRecursive(propertyValueProvider);
-            }
-        }
-
-        private bool EvaluateRecursive(Func<string, Object> propertyValueProvider)
-        {
-            Debug.Assert(!this.IsEmpty, "Filter expression is empty.");
 
             bool filterResult = false;
             if (null != this.condition)
@@ -402,8 +318,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             else
             {
                 // & or | operator
-                bool leftResult = this.left.EvaluateRecursive(propertyValueProvider);
-                bool rightResult = this.right.EvaluateRecursive(propertyValueProvider);
+                bool leftResult = this.left.Evaluate(propertyValueProvider);
+                bool rightResult = this.right.Evaluate(propertyValueProvider);
                 if (this.areJoinedByAnd)
                 {
                     filterResult = leftResult && rightResult;
@@ -414,18 +330,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 }
             }
             return filterResult;
-        }
-
-        private static string MakeNormalizedFQN(string value)
-        {
-            var indexOfSpace = value.IndexOf(" ");
-            return indexOfSpace > 0 ? value.Substring(0, value.IndexOf(" ")) : value;
-        }
-
-        private static bool TryGetSinglePropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue)
-        {
-            singleValue = propertyValueProvider(name) as string;
-            return singleValue != null;
         }
     }
 }
