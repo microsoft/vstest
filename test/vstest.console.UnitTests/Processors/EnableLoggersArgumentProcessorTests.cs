@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new EnableLoggerArgumentExecutor(testloggerManager);
 
             executor.Initialize("console;verbosity=minimal");
-            Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/ConsoleLogger/v2"));
+            Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/ConsoleLogger/v1"));
         }
 
         [TestMethod]
