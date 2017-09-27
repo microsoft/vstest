@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using System;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapperAsync"/> to invoke test operations
@@ -139,11 +140,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task RunTestsAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler)
         {
+            await RunTestsAsync(sources, runSettings, null, testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler)
+        {
             var sourceList = sources.ToList();
             this.testPlatformEventSource.TranslationLayerExecutionStart(0, sourceList.Count, 0, runSettings ?? string.Empty);
 
             await this.EnsureInitializedAsync();
-            await this.requestSender.StartTestRunAsync(sourceList, runSettings, testRunEventsHandler);
+            await this.requestSender.StartTestRunAsync(sourceList, runSettings, options, testRunEventsHandler);
         }
 
         /// <inheritdoc/>
@@ -159,11 +166,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
         {
+            await RunTestsWithCustomTestHostAsync(sources, runSettings, null, testRunEventsHandler, customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public async Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
             var sourceList = sources.ToList();
             this.testPlatformEventSource.TranslationLayerExecutionStart(1, sourceList.Count, 0, runSettings ?? string.Empty);
 
             await this.EnsureInitializedAsync();
-            await this.requestSender.StartTestRunWithCustomHostAsync(sourceList, runSettings, testRunEventsHandler, customTestHostLauncher);
+            await this.requestSender.StartTestRunWithCustomHostAsync(sourceList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
         }
 
         /// <inheritdoc/>

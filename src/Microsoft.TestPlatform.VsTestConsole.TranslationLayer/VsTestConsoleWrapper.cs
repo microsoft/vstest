@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -13,7 +14,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using System;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
@@ -142,17 +142,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTests(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler)
         {
-            this.RunTests(sources, runSettings, new TestPlatformOptions(), testRunEventsHandler);
+            this.RunTests(sources, runSettings, null, testRunEventsHandler);
         }
 
         /// <inheritdoc/>
         public void RunTests(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler)
         {
-            if(options == null)
-            {
-                throw new ArgumentNullException(nameof(options), "The test platform options cannot be null.");
-            }
-
             var sourceList = sources.ToList();
             this.testPlatformEventSource.TranslationLayerExecutionStart(0, sourceList.Count, 0, runSettings ?? string.Empty);
 
@@ -173,17 +168,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
         {
-            this.RunTestsWithCustomTestHost(sources, runSettings, new TestPlatformOptions(), testRunEventsHandler, customTestHostLauncher);
+            this.RunTestsWithCustomTestHost(sources, runSettings, null, testRunEventsHandler, customTestHostLauncher);
         }
 
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options), "The test platform options cannot be null.");
-            }
-
             var sourceList = sources.ToList();
             this.testPlatformEventSource.TranslationLayerExecutionStart(1, sourceList.Count, 0, runSettings ?? string.Empty);
 
