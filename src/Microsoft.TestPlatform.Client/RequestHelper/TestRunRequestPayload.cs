@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
     using System.Collections.Generic;
     using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Class used to define the TestRunRequestPayload sent by the Vstest.console translation layers into design mode
@@ -55,6 +56,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// </summary>
         [DataMember]
         public string TestCaseFilter
+        {
+            get;
+            set;
+        }
+
+        /// <summary> 
+        /// Additional options for test case filter. 
+        /// </summary> 
+        [DataMember]
+        public FilterOptions FilterOptions
         {
             get;
             set;

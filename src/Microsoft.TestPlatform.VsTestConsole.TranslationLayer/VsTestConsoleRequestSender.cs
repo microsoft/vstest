@@ -155,17 +155,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestCaseFilter = options?.TestCaseFilter },
+                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestCaseFilter = options?.TestCaseFilter, FilterOptions = options?.FilterOptions },
                 runEventsHandler,
                 null);
         }
 
         /// <inheritdoc/>
-        public async Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler)
+        public async Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
         {
             await this.SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.TestRunAllSourcesWithDefaultHost,
-                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings },
+                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestCaseFilter = options?.TestCaseFilter, FilterOptions = options?.FilterOptions },
                 runEventsHandler,
                 null);
         }
@@ -205,7 +205,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     Sources = sources.ToList(),
                     RunSettings = runSettings,
                     DebuggingEnabled = customHostLauncher.IsDebug,
-                    TestCaseFilter = options?.TestCaseFilter
+                    TestCaseFilter = options?.TestCaseFilter,
+                    FilterOptions = options?.FilterOptions
                 },
                 runEventsHandler,
                 customHostLauncher);
@@ -214,7 +215,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task StartTestRunWithCustomHostAsync(
             IEnumerable<string> sources,
-            string runSettings,
+            string runSettings, 
+            TestPlatformOptions options,
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
@@ -224,7 +226,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     Sources = sources.ToList(),
                     RunSettings = runSettings,
-                    DebuggingEnabled = customHostLauncher.IsDebug
+                    DebuggingEnabled = customHostLauncher.IsDebug,
+                    TestCaseFilter = options?.TestCaseFilter,
+                    FilterOptions = options?.FilterOptions
                 },
                 runEventsHandler,
                 customHostLauncher);
