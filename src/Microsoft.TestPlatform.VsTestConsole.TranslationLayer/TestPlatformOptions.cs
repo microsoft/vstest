@@ -3,6 +3,8 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     /// <summary>
     /// Options to be passed into the Test Platform during Discovery/Execution.
     /// </summary>
@@ -15,5 +17,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// This is only used when running tests with sources.
         /// </remarks>
         public string TestCaseFilter { get; set; }
+
+        /// <summary> 
+        /// Gets or sets the filter options if there are any. 
+        /// </summary> 
+        /// <remarks> 
+        /// This is will be valid only if TestCase filter is present. 
+        /// </remarks> 
+        public FilterOptions FilterOptions { get; set; }
     }
 }
