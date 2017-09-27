@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
 #if NET451
             try
             {
-                this.session = new TelemetrySession(TelemetryService.DefaultSession.SerializeSettings());
+                this.session = TelemetryService.DefaultSession;
                 this.session.IsOptedIn = true;
                 this.session.Start();
             }
