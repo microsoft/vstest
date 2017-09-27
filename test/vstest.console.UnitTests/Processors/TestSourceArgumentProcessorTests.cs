@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             Assert.AreEqual(HelpContentPriority.None, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.TestSource, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 
             Assert.AreEqual(true, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);

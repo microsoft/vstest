@@ -142,11 +142,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             IArgumentProcessor argumentProcessor;
             CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
 
-            if (argumentProcessor == null)
-            {
-                SpecialCommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
-            }
-
             // If an argument processor was not found for the command, then consider it as a test source argument.
             if (argumentProcessor == null)
             {
@@ -236,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new EnableDiagArgumentProcessor(),
                 new CLIRunSettingsArgumentProcessor(),
                 new ResultsDirectoryArgumentProcessor(),
-                new InIsolationArgumentProcessor(), 
+                new InIsolationArgumentProcessor(),
                 new CollectArgumentProcessor(),
                 new EnableCodeCoverageArgumentProcessor(),
                 new DisableAutoFakesArgumentProcessor(),
@@ -244,8 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new EnableBlameArgumentProcessor(),
                 new UseVsixExtensionsArgumentProcessor(),
                 new ListFullyQualifiedTestsArgumentProcessor(),
-                new ListTestsTargetPathArgumentProcessor(),
-                new MergeRunsettingsArgumentProcessor()
+                new ListTestsTargetPathArgumentProcessor()
         };
 
         /// <summary>
@@ -263,21 +257,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                                       ? this.specialCommandToProcessorMap
                                       : this.commandToProcessorMap;
 
-                var processorCapabilities = argumentProcessor.Metadata.Value;
-                string commandName = processorCapabilities.CommandName;
+                string commandName = argumentProcessor.Metadata.Value.CommandName;
                 processorsMap.Add(commandName, argumentProcessor);
 
-                // AlwaysExecute are auto argument processors which are not required xplat names
-                if (!processorCapabilities.AlwaysExecute)
-                {
-                    // Add xplat name for the command name.
-                    commandName = string.Concat("--", commandName.Remove(0, 1));
-                    processorsMap.Add(commandName, argumentProcessor);
-                }
+                // Add xplat name for the command name
+                commandName = string.Concat("--", commandName.Remove(0, 1));
+                processorsMap.Add(commandName, argumentProcessor);
 
-                if (!string.IsNullOrEmpty(processorCapabilities.ShortCommandName))
+                if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
                 {
-                    string shortCommandName = processorCapabilities.ShortCommandName;
+                    string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
                     processorsMap.Add(shortCommandName, argumentProcessor);
 
                     // Add xplat short name for the command name

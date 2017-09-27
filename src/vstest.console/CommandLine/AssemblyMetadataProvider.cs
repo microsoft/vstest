@@ -12,14 +12,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     using System.Text;
     using ObjectModel;
 
-    internal class AssemblyHelper : IAssemblyHelper
+    internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
     {
-        private static AssemblyHelper instance;
+        private static AssemblyMetadataProvider instance;
 
         /// <summary>
         /// Gets the instance.
         /// </summary>
-        internal static AssemblyHelper Instance => instance ?? (instance = new AssemblyHelper());
+        internal static AssemblyMetadataProvider Instance => instance ?? (instance = new AssemblyMetadataProvider());
 
         /// <inheritdoc />
         public FrameworkName GetFrameWork(string filePath)

@@ -15,26 +15,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    internal class InferHelper : IInferHelper
+    internal class InferHelper
     {
-        private IAssemblyHelper assemblyHelper;
+        private IAssemblyMetadataProvider assemblyMetadataProvider;
 
-        private static InferHelper _instance;
-
-        internal InferHelper(IAssemblyHelper assemblyHelper)
+        internal InferHelper(IAssemblyMetadataProvider assemblyMetadataProvider)
         {
-            this.assemblyHelper = assemblyHelper;
+            this.assemblyMetadataProvider = assemblyMetadataProvider;
         }
 
-        private InferHelper():this(AssemblyHelper.Instance)
-        {
-        }
         /// <summary>
-        /// Gets the instance.
+        /// Determines Architecture from sources.
         /// </summary>
-        internal static InferHelper Instance => _instance ?? (_instance = new InferHelper());
-
-        /// <inheritdoc />
         public Architecture AutoDetectArchitecture(List<string> sources)
         {
             Architecture architecture = Constants.DefaultPlatform;
@@ -48,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         Architecture arch;
                         if (IsDotNETAssembly(source))
                         {
-                            arch = assemblyHelper.GetArchitecture(source);
+                            arch = assemblyMetadataProvider.GetArchitecture(source);
                         }
                         else
                         {
@@ -131,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                 FrameworkName fx;
                 if (IsDotNETAssembly(source))
                 {
-                    fx = assemblyHelper.GetFrameWork(source);
+                    fx = assemblyMetadataProvider.GetFrameWork(source);
                 }
                 else
                 {

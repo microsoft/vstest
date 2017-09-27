@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string DotNetFrameWorkStringPrefix = ".NETFramework,Version=";
 
-        public const string DotNetFramework35 = ".NETFramework,Version = v3.5";
+        public const string DotNetFramework35 = ".NETFramework,Version=v3.5";
 
         public const string DotNetFramework40 = ".NETFramework,Version=v4.0";
 

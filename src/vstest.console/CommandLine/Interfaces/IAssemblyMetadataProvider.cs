@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// <summary>
     /// Defines interface for assembly properties.
     /// </summary>
-    internal interface IAssemblyHelper
+    internal interface IAssemblyMetadataProvider
     {
         /// <summary>
         /// Determines FrameworkName from filePath.

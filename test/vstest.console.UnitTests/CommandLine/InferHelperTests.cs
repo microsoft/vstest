@@ -16,19 +16,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     [TestClass]
     public class InferHelperTests
     {
-        private readonly Mock<IAssemblyHelper> mockAssemblyHelper;
-        private IInferHelper inferHelper;
+        private readonly Mock<IAssemblyMetadataProvider> mockAssemblyHelper;
+        private InferHelper inferHelper;
         private readonly Framework defaultFramework = Framework.DefaultFramework;
         private readonly Framework frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
         private readonly Framework frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
         private readonly Framework frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
         private readonly Framework frameworkCore10 = Framework.FromString(".NETCoreApp,Version=1.0");
         private readonly Framework frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1");
-        private readonly Framework frameworkCore20 = Framework.FromString(".NETCoreApp,Version=2.0");
 
         public InferHelperTests()
         {
-            this.mockAssemblyHelper  = new Mock<IAssemblyHelper>();
+            this.mockAssemblyHelper  = new Mock<IAssemblyMetadataProvider>();
             inferHelper = new InferHelper(this.mockAssemblyHelper.Object);
         }
 

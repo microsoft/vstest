@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         public override string CommandName => TestSourceArgumentProcessor.CommandName;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.TestSource;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
         public override bool IsSpecialCommand => true;
     }

@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private static ITestRequestManager testRequestManagerInstance;
 
-        private IInferHelper inferHelper;
+        private InferHelper inferHelper;
 
         private const int runRequestTimeout = 5000;
 
@@ -72,11 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestLoggerManager.Instance,
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
-                  InferHelper.Instance)
+                  new InferHelper(new AssemblyMetadataProvider()))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, IInferHelper inferHelper)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
@@ -238,6 +238,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
+            if (!commandLineOptions.IsDesignMode)
+            {
+                GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
+            }
+
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
                 runCriteria = new TestRunCriteria(
@@ -260,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher);
             }
 
-            var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar, protocolConfig);
+            var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
 
@@ -310,25 +315,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     document.Load(reader);
 
                     var navigator = document.CreateNavigator();
-                    if (this.commandLineOptions.IsDesignMode)
+
+                    // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
+                    bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
+                    bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
+
+                    if (updateFramework)
                     {
-                        // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
-                        bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
-                        bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
+                        InferRunSettingsHelper.UpdateTargetFramework(navigator,
+                            inferHelper.AutoDetectFramework(sources)?.ToString(), overwrite: true);
+                        settingsUpdated = true;
+                    }
 
-                        if (updateFramework)
-                        {
-                            InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                                inferHelper.AutoDetectFramework(sources)?.ToString(), overwrite:true);
-                            settingsUpdated = true;
-                        }
-
-                        if (updatePlatform)
-                        {
-                            InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                                inferHelper.AutoDetectArchitecture(sources).ToString(), overwrite: true);
-                            settingsUpdated = true;
-                        }
+                    if (updatePlatform)
+                    {
+                        InferRunSettingsHelper.UpdateTargetPlatform(navigator,
+                            inferHelper.AutoDetectArchitecture(sources).ToString(), overwrite: true);
+                        settingsUpdated = true;
                     }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.
@@ -359,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
-        private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
+        private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -416,14 +419,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator)
         {
-            bool isValidFx = InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
-            return !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
+            bool required = false;
+            if (commandLineOptions.IsDesignMode)
+            {
+                bool isValidFx =
+                    InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
+                required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
+            }
+            else if (!commandLineOptions.IsDesignMode && !commandLineOptions.FrameworkVersionSpecified)
+            {
+                required = true;
+            }
+
+            return required;
         }
 
         private bool IsAutoPlatformDetectRequired(XPathNavigator navigator)
         {
-            bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
-            return !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
+            bool required = false;
+            if (commandLineOptions.IsDesignMode)
+            {
+                bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
+                required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
+            }
+            else if (!commandLineOptions.IsDesignMode && !commandLineOptions.ArchitectureSpecified)
+            {
+                required = true;
+            }
+
+            return required;
         }
 
         /// <summary>
