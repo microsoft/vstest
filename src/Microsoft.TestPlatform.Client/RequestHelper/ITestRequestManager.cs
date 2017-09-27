@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
 {
+    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -12,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
     /// <summary>
     /// Defines the contract that commandline 
     /// </summary>
-    public interface ITestRequestManager
+    public interface ITestRequestManager : IDisposable
     {
         /// <summary>
         /// Initializes the extensions while probing additional paths
