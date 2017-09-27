@@ -156,12 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     }
 
                     var message = this.dataSerializer.DeserializeMessage(rawMessage);
-
-                    if (!string.Equals(MessageType.DiscoveryComplete, message.MessageType))
-                    {
-                        // Send raw message first to unblock handlers waiting to send message to IDEs
-                        discoveryEventsHandler.HandleRawMessage(rawMessage);
-                    }
+                    discoveryEventsHandler.HandleRawMessage(rawMessage);
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
@@ -180,8 +175,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         discoveryEventsHandler.HandleDiscoveryComplete(
                             discoveryCompleteEventArgs,
                             discoveryCompletePayload.LastDiscoveredTests);
-
-                        discoveryEventsHandler.HandleRawMessage(rawMessage);
                         isDiscoveryComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
@@ -292,11 +285,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
-                    if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
-                    {
-                        // Send raw message first to unblock handlers waiting to send message to IDEs
-                        testRunEventsHandler.HandleRawMessage(rawMessage);
-                    }
+                    // Send raw message first to unblock handlers waiting to send message to IDEs
+                    testRunEventsHandler.HandleRawMessage(rawMessage);
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -316,8 +306,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             testRunCompletePayload.LastRunTests,
                             testRunCompletePayload.RunAttachments,
                             testRunCompletePayload.ExecutorUris);
-
-                        testRunEventsHandler.HandleRawMessage(rawMessage);
                         isTestRunComplete = true;
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
