@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
 {
     using System;
     using System.Runtime.Serialization;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Stores information about test execution context.
@@ -44,7 +45,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             bool areTestCaseLevelEventsRequired,
             bool hasTestRun,
             bool isDebug,
-            string testCaseFilter)
+            string testCaseFilter,
+            FilterOptions filterOptions)
         {
             this.FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
             this.RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
@@ -57,6 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
 
             this.HasTestRun = hasTestRun;
             this.TestCaseFilter = testCaseFilter;
+            this.FilterOptions = filterOptions;
         }
 
         #endregion
@@ -128,6 +131,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
         /// </summary>
         [DataMember]
         public string TestCaseFilter
+        {
+            get;
+            set;
+        }
+
+        /// <summary> 
+        /// Get or set additional options for test case filter. 
+        /// </summary> 
+        [DataMember]
+        public FilterOptions FilterOptions
         {
             get;
             set;

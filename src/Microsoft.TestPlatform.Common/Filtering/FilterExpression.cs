@@ -52,8 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private bool areJoinedByAnd;
 
-        private Regex PropertyValueRegex = new Regex(@"^[^\s\(]+");
-
         private string fastFilterPropertyName;
         private HashSet<string> fastFilter;
 
@@ -354,13 +352,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         /// <param name="propertyValueProvider"> The property Value Provider. </param>
         /// <returns> True if evaluation is successful. </returns>
-        internal bool Evaluate(Func<string, Object> propertyValueProvider)
+        internal bool Evaluate(Func<string, Object> propertyValueProvider, Func<string, string> propertyValueRegexMatchOpt)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
 
             if (this.UseFastFilter)
             {
                 Debug.Assert(this.condition == null && this.left == null && this.right == null);
+
                 if (fastFilterPropertyName.Equals(FilterExpression.NormalizedFullyQualifiedNameFilterKeyword, StringComparison.OrdinalIgnoreCase))
                 {
                     return TryGetSinglePropertyValue(FilterExpression.FullyQualifiedNamePropertyName, propertyValueProvider, out var value)
@@ -373,21 +372,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         return false;
                     }
 
-                    if (PropertyValueRegex != null)
+                    if (propertyValueRegexMatchOpt != null)
                     {
-                        var match = PropertyValueRegex.Match(value);
-                        if (!match.Success)
+                        value = propertyValueRegexMatchOpt(value);
+                        if (value == null)
                         {
                             return false;
                         }
-                        value = match.Value;
                     }
                     return this.fastFilter.Contains(value);
                 }
             }
             else
             {
-                Debug.Assert(this.PropertyValueRegex == null);
+                Debug.Assert(propertyValueRegexMatchOpt == null);
                 return EvaluateRecursive(propertyValueProvider);
             }
         }
@@ -404,8 +402,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             else
             {
                 // & or | operator
-                bool leftResult = this.left.Evaluate(propertyValueProvider);
-                bool rightResult = this.right.Evaluate(propertyValueProvider);
+                bool leftResult = this.left.EvaluateRecursive(propertyValueProvider);
+                bool rightResult = this.right.EvaluateRecursive(propertyValueProvider);
                 if (this.areJoinedByAnd)
                 {
                     filterResult = leftResult && rightResult;

@@ -133,7 +133,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         areTestCaseLevelEventsRequired: false,
                         hasTestRun: true,
                         isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
-                        testCaseFilter: testRunCriteria.TestCaseFilter);
+                        testCaseFilter: testRunCriteria.TestCaseFilter,
+                        filterOptions: testRunCriteria.FilterOptions);
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                     var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });

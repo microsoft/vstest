@@ -5,8 +5,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Class holds information related to filtering criteria.
@@ -16,23 +18,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// FilterExpression corresponding to filter criteria
         /// </summary>
-        private FilterExpression filterExpression;
+        private readonly FilterExpression filterExpression;
+
+        private readonly Regex filterRegex;
 
         /// <summary>
         /// Initializes FilterExpressionWrapper with given filterString.  
         /// </summary>
-        public FilterExpressionWrapper(string filterString)
+        public FilterExpressionWrapper(string filterString, FilterOptions options = null)
         {
             ValidateArg.NotNullOrEmpty(filterString, "filterString");
             
             this.FilterString = filterString;
+            this.FilterOptions = options;            
+
             try
             {
                 this.filterExpression = FilterExpression.Parse(filterString);
+
+                var regexString = options?.FilterRegEx;
+                if (!string.IsNullOrEmpty(regexString))
+                {
+                    filterRegex = new Regex(regexString);
+                }
             }
             catch (FormatException ex)
             {
                 this.ParseError = ex.Message;
+            }
+            catch (ArgumentException)
+            {
+                // Ignore regex parsing error. Filter with no regex matching.
             }
         }
 
@@ -40,6 +56,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// User specified filter criteria.
         /// </summary>
         public string FilterString
+        {
+            get;
+            private set;
+        }
+
+        public FilterOptions FilterOptions
         {
             get;
             private set;
@@ -73,7 +95,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
-            return this.filterExpression != null && this.filterExpression.Evaluate(propertyValueProvider);
+            return this.filterExpression != null && this.filterExpression.Evaluate(propertyValueProvider, MatchPropertyValueWithRegex);
+        }
+
+        public string MatchPropertyValueWithRegex(string value)
+        {
+            if (this.filterRegex == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                var match = this.filterRegex.Match(value);
+                if (match.Success)
+                {
+                    return match.Value;
+                }
+            }
+            catch (RegexMatchTimeoutException)
+            {
+            }
+
+            return null;
         }
     }
 }
