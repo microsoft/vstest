@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public FilterExpressionWrapper(string filterString, FilterOptions options = null)
         {
             ValidateArg.NotNullOrEmpty(filterString, "filterString");
-            
+
             this.FilterString = filterString;
             this.FilterOptions = options;
 

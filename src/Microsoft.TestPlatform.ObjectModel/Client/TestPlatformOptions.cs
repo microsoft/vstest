@@ -3,9 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// Options to be passed into the Test Platform during Discovery/Execution.
     /// </summary>
+    [DataContract]
     public class TestPlatformOptions
     {
         /// <summary>
@@ -14,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <remarks>
         /// This is only used when running tests with sources.
         /// </remarks>
+        [DataMember]
         public string TestCaseFilter { get; set; }
 
         /// <summary>
@@ -22,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <remarks>
         /// This will be valid only if TestCase filter is present.
         /// </remarks>
+        [DataMember]
         public FilterOptions FilterOptions { get; set; }
     }
 }

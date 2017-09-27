@@ -5,15 +5,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     internal sealed class FastFilter
     {
-        private const string FullyQualifiedNamePropertyName = "FullyQualifiedName";
-        private const string NormalizedFullyQualifiedNameFilterKeyword = "NFQN";
 
         private readonly string filterPropertyName;
         private readonly HashSet<string> filterPropertyValues;
@@ -24,16 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         internal FastFilter(string filterPropertyName, HashSet<string> filterPropertyValues, Operation filterOperation, Operator filterOperator)
         {
-            Debug.Assert((filterOperation == Operation.Equal && filterOperator == Operator.Or) || (filterOperation == Operation.NotEqual && filterOperator == Operator.And));
-
             ValidateArg.NotNullOrEmpty(filterPropertyName, nameof(filterPropertyName));
             ValidateArg.NotNull(filterPropertyValues, nameof(filterPropertyValues));
-
-            // temporary hack for NFQN
-            this.filterPropertyName = filterPropertyName.Equals(NormalizedFullyQualifiedNameFilterKeyword, StringComparison.OrdinalIgnoreCase)
-                ? FullyQualifiedNamePropertyName
-                : filterPropertyName;
-
+            
+            this.filterPropertyName = filterPropertyName;
             this.filterPropertyValues = filterPropertyValues;
 
             if (filterOperation == Operation.Equal && (filterOperator == Operator.Or || filterOperator == Operator.None))
@@ -151,8 +142,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     fastFilterOperation = condition.Operation;
                     filterPropertyName = condition.Name;
 
+                    filterHashSet.Add(condition.Value);
+
                     // Don't support `Contains`.
-                    if (fastFilterOperation != Operation.Equal || fastFilterOperation != Operation.NotEqual)
+                    if (fastFilterOperation != Operation.Equal && fastFilterOperation != Operation.NotEqual)
                     {
                         containsValidFilter = false;
                     }
