@@ -169,6 +169,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Exte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventLogUnitTestProject", "test\TestAssets\EventLogUnitTestProject\EventLogUnitTestProject.csproj", "{826CD5AF-44FA-40F6-B731-3980CADED8C0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "V1UnitTestProject", "test\TestAssets\V1UnitTestProject\V1UnitTestProject.csproj", "{1F29087C-30F4-4733-8B8A-9226145E8431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -887,6 +889,18 @@ Global
 		{826CD5AF-44FA-40F6-B731-3980CADED8C0}.Release|x64.Build.0 = Release|Any CPU
 		{826CD5AF-44FA-40F6-B731-3980CADED8C0}.Release|x86.ActiveCfg = Release|Any CPU
 		{826CD5AF-44FA-40F6-B731-3980CADED8C0}.Release|x86.Build.0 = Release|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Debug|x64.Build.0 = Debug|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Debug|x86.Build.0 = Debug|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Release|x64.ActiveCfg = Release|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Release|x64.Build.0 = Release|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Release|x86.ActiveCfg = Release|Any CPU
+		{1F29087C-30F4-4733-8B8A-9226145E8431}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
