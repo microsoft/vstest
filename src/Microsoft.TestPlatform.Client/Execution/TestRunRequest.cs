@@ -532,7 +532,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
                 this.OnRawMessageReceived?.Invoke(this, rawMessage);
-                this.runCompletionEvent?.WaitOne();
             }
             else
             {
