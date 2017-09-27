@@ -3,13 +3,13 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
-    public class RunnnerInfo
+    public class RunnerInfo
     {
-        public RunnnerInfo(string runnerType, string targetFramework): this(runnerType, targetFramework, "")
+        public RunnerInfo(string runnerType, string targetFramework): this(runnerType, targetFramework, "")
         {
         }
 
-        public RunnnerInfo(string runnerType, string targetFramework, string inIsolation)
+        public RunnerInfo(string runnerType, string targetFramework, string inIsolation)
         {
             this.RunnerFramework = runnerType;
             this.TargetFramework = targetFramework;
