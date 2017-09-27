@@ -230,6 +230,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
             }
 
+            // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority) 
+            if(result == 1 && processors.First<IArgumentProcessor>().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
+            {
+                processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+            }
             return result;
         }
 
