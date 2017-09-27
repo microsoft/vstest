@@ -288,7 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsTrue(CommandLineOptions.Instance.ArchitectureSpecified);
             Assert.IsTrue(CommandLineOptions.Instance.FrameworkVersionSpecified);
             Assert.AreEqual(Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
-            Assert.AreEqual(Framework.FromString(Constants.DotNetFramework46), CommandLineOptions.Instance.TargetFrameworkVersion);
+            Assert.AreEqual(Constants.DotNetFramework46, CommandLineOptions.Instance.TargetFrameworkVersion.Name);
         }
 
         [TestMethod]

@@ -89,25 +89,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             return this.Name;
         }
-
-        public override bool Equals(Object obj)
-        {
-            Framework other = obj as Framework;
-            if (other == null)
-            {
-                return false;
-            }
-            bool equal = string.Equals(this.Name, other.Name, StringComparison.OrdinalIgnoreCase);
-            equal = equal && (this.Version == null ? other.Version == null : this.Version.Equals(other.Version));
-            return equal;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Version != null ? Version.GetHashCode() : 0);
-            }
-        }
     }
 }

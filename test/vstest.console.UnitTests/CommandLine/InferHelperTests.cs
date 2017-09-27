@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnEmptyItemInSources()
         {
-            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(new List<string>() { string.Empty }));
+            Assert.AreEqual(defaultFramework.Name, inferHelper.AutoDetectFramework(new List<string>() { string.Empty }).Name);
         }
 
         [TestMethod]
@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
                 .Returns(new FrameworkName(frameworkNet46.Name))
                 .Returns(new FrameworkName(frameworkNet47.Name))
                 .Returns(new FrameworkName(frameworkNet45.Name));
-            Assert.AreEqual(frameworkNet47, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }));
+            Assert.AreEqual(frameworkNet47.Name, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }).Name);
             this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()),Times.Exactly(3));
         }
 
@@ -198,7 +198,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
                 .Returns(new FrameworkName(frameworkCore10.Name))
                 .Returns(new FrameworkName(frameworkCore11.Name))
                 .Returns(new FrameworkName(frameworkCore10.Name));
-            Assert.AreEqual(frameworkCore11, inferHelper.AutoDetectFramework(new List<string>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }));
+            Assert.AreEqual(frameworkCore11.Name, inferHelper.AutoDetectFramework(new List<string>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }).Name);
             this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -206,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.Setup(sh => sh.GetFrameWork(assemblyName))
                 .Returns(new FrameworkName(fx.Name));
-            Assert.AreEqual(fx, inferHelper.AutoDetectFramework(new List<string>() { assemblyName }));
+            Assert.AreEqual(fx.Name, inferHelper.AutoDetectFramework(new List<string>() { assemblyName }).Name);
             if (verify)
             {
                 this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(assemblyName));

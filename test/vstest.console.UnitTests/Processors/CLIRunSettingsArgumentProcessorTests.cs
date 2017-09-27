@@ -226,7 +226,7 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize(args);
 
             Assert.IsTrue(this.commandLineOptions.FrameworkVersionSpecified);
-            Assert.AreEqual(Framework.FromString(Constants.DotNetFramework46), this.commandLineOptions.TargetFrameworkVersion);
+            Assert.AreEqual(Constants.DotNetFramework46, this.commandLineOptions.TargetFrameworkVersion.Name);
         }
 
         [TestMethod]
