@@ -89,6 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private IRunSettingsProvider runSettingsManager;
 
         private const string FriendlyName = "Code Coverage";
+        private const string UriString = "datacollector://Microsoft/CodeCoverage/2.0";
 
         internal EnableCodeCoverageArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
@@ -99,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
-            CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
+            CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager, UriString);
         }
 
         /// <inheritdoc />
