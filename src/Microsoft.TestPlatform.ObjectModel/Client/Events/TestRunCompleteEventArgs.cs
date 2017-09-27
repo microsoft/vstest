@@ -25,8 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="error">Specifies the error encountered during the execution of the test run.</param>
         /// <param name="attachmentSets">Attachment sets associated with the run.</param>
         /// <param name="elapsedTime">Time elapsed in just running tests</param>
-        /// <param name="metrics">Metrics</param>
-        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime, IDictionary<string, string> metrics)
+        public TestRunCompleteEventArgs(ITestRunStatistics stats, bool isCanceled, bool isAborted, Exception error, Collection<AttachmentSet> attachmentSets, TimeSpan elapsedTime)
         {
             this.TestRunStatistics = stats;
             this.IsCanceled = isCanceled;
@@ -34,7 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.Error = error;
             this.AttachmentSets = attachmentSets;
             this.ElapsedTimeInRunningTests = elapsedTime;
-            this.Metrics = metrics;
         }
 
         /// <summary>
@@ -78,6 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Get or Sets the Metrics
         /// </summary>
         [DataMember]
-        public IDictionary<string, string> Metrics { get; set; }
+        public IDictionary<string, object> Metrics { get; set; }
     }    
 }

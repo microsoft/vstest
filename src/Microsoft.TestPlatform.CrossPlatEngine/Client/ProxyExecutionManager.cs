@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     var executionEngineTotalTime = DateTime.UtcNow - executionEngineStartTime;
 
                     // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
                     var executionContext = new TestExecutionContext(
@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
                 // created to replace the current one. This will help if the current execution manager is aborted due to irreparable error
                 // and the test host is lost as well.
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero, null);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 

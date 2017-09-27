@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     this.discoveryStartTime = DateTime.UtcNow;
 
                     // Collecting Data Point Number of sources sent for discovery
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, this.DiscoveryCriteria.Sources.Count());
 
                     // Invoke OnDiscoveryStart event
                     this.OnDiscoveryStart.SafeInvoke(this, new DiscoveryStartEventArgs(this.DiscoveryCriteria), "DiscoveryRequest.DiscoveryStart");
@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                     // Collecting Total Time Taken
                     this.requestData.MetricsCollection.Add(
-                        TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds.ToString());
+                        TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds);
                 }
             }
 

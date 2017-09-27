@@ -73,8 +73,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 }
                 else
                 {
-                    var runnnerInfo = (RunnnerInfo)dataRow.Data[0];
-                    result.DisplayName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testMethod.TestMethodName, runnnerInfo.ToString());
+                    var runnerInfo = (RunnerInfo)dataRow.Data[0];
+                    result.DisplayName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testMethod.TestMethodName, runnerInfo.ToString());
                 }
 
                 results.Add(result);
@@ -100,16 +100,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public NETFullTargetFramework(bool inIsolation = true, bool inProcess = false)
         {
             this.DataRows = new List<DataRowAttribute>();
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)));
 
             if (inIsolation == true)
             {
-                this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation)));
+                this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation)));
             }
 
             if (inProcess == true)
             {
-                this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)));
+                this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)));
             }
         }
 
@@ -133,12 +133,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public NETCORETargetFramework()
         {
             this.DataRows = new List<DataRowAttribute>(6);
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework)));
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework)));
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework)));
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework)));
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)));
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)));
+            this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)));
         }
 
         /// <summary>

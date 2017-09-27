@@ -372,6 +372,39 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null));
         }
 
+        [TestMethod]
+        public void DiscoverTestsShouldCollectMetricsOnHandleDiscoveryComplete()
+        {
+            var dict = new Dictionary<string, object>();
+            dict.Add("DummyMessage", "DummyValue");
+
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            var completePayload = new DiscoveryCompletePayload()
+                                      {
+                                          IsAborted = false,
+                                          LastDiscoveredTests = null,
+                                          TotalTests = 1,
+                                          Metrics = dict
+                                      };
+            this.SetupDeserializeMessage(MessageType.DiscoveryComplete, completePayload);
+            this.SetupFakeCommunicationChannel();
+
+            DiscoveryCompleteEventArgs actualDiscoveryCompleteEventArgs = null;
+            mockHandler.Setup(md => md.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>(
+                    (discoveryCompleteEventArgs, testCase) =>
+                        {
+                            actualDiscoveryCompleteEventArgs = discoveryCompleteEventArgs;
+                        });
+
+            // Act.
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), mockHandler.Object);
+            this.RaiseMessageReceivedEvent();
+
+            // Verify
+            Assert.AreEqual(actualDiscoveryCompleteEventArgs.Metrics, dict);
+        }
+
         #endregion
 
         #region Execution Protocol Tests
@@ -474,7 +507,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue, null),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };
@@ -577,7 +610,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testRunCompletePayload = new TestRunCompletePayload
             {
-                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue, null),
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
                 LastRunTests = new TestRunChangedEventArgs(null, null, null),
                 RunAttachments = new List<AttachmentSet>()
             };

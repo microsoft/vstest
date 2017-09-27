@@ -264,19 +264,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+            testRunCompeleteEventsArgs.Metrics = dict;
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), dict), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
 
             // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
         }
 
@@ -288,7 +296,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
             this.testRunRequest.ExecuteAsync();
 
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), null), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0)), null, null, null);
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);
