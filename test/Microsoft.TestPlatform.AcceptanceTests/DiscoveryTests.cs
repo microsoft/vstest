@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void DiscoverAllTests(RunnnerInfo runnerInfo)
+        public void DiscoverAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void MultipleSourcesDiscoverAllTests(RunnnerInfo runnerInfo)
+        public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void DiscoverFullyQualifiedTests(RunnnerInfo runnerInfo)
+        public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
             try
             {

@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
 {
-    using System;
-
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -18,18 +17,12 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
             this.metricsCollection = new MetricsCollection();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            this.metricsCollection.Clear();
-        }
-
         [TestMethod]
         public void AddShouldAddMetric()
         {
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
-            string value;
+            object value;
             Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value), true);
             Assert.AreEqual(value, "DummyValue");
         }
@@ -39,13 +32,13 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         {
             this.metricsCollection.Add("DummyMessage", "DummyValue");
 
-            string value;
+            object value;
             Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out value), true);
             Assert.AreEqual(value, "DummyValue");
 
             this.metricsCollection.Add("DummyMessage", "newValue");
 
-            string newValue;
+            object newValue;
             Assert.AreEqual(this.metricsCollection.Metrics.TryGetValue("DummyMessage", out newValue), true);
             Assert.AreEqual(newValue, "newValue");
         }
@@ -64,19 +57,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Telemetry
         [TestMethod]
         public void MetricsShouldReturnEmptyDictionaryIfMetricsIsEmpty()
         {
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
-        }
-
-        [TestMethod]
-        public void ClearMetricsShouldClearMetrics()
-        {
-            this.metricsCollection.Add("DummyMessage", "DummyValue");
-            this.metricsCollection.Add("DummyMessage2", "DummyValue");
-
-            Assert.AreEqual(this.metricsCollection.Metrics.Count, 2);
-
-            this.metricsCollection.Clear();
-
             Assert.AreEqual(this.metricsCollection.Metrics.Count, 0);
         }
     }
