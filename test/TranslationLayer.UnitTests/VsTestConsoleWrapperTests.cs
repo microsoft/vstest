@@ -155,15 +155,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void RunTestsWithSourcesAndOptionsShouldThrowIfOptionsIsNull()
+        public void RunTestsWithSourcesAndNullOptionsShouldPassOnNullOptions()
         {
-            Assert.That.Throws<ArgumentNullException>(
-                () => this.consoleWrapper.RunTests(
+            this.consoleWrapper.RunTests(
                             this.testSources,
                             "RunSettings",
                             null,
-                            new Mock<ITestRunEventsHandler>().Object)
-                 ).WithMessage("The test platform options cannot be null.");
+                            new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
