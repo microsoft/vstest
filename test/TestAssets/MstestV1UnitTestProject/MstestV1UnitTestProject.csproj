@@ -8,7 +8,7 @@
   <PropertyGroup>
     <OutputType>library</OutputType>
     <TargetFrameworks>net451</TargetFrameworks>
-    <AssemblyName>V1UnitTestProject</AssemblyName>
+    <AssemblyName>MstestV1UnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -22,7 +22,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="V1UnitTestProjectTestSettings.testsettings">
+    <None Include="MstestV1UnitTestProjectTestSettings.testsettings">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -175,7 +175,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var arguments = PrepareArguments(
-                this.testEnvironment.GetTestAsset("V1UnitTestProject.dll"),
+                this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty,
                 this.FrameworkArgValue,
@@ -183,8 +183,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
             this.InvokeVsTest(arguments);
-            var listOfTests = new string[] {"V1UnitTestProject.UnitTest1.PassingTest", "V1UnitTestProject.UnitTest1.SkippingTest" };
-            var listOfNotDiscoveredTests = new string[] {"V1UnitTestProject.UnitTest1.FailingTest" };
+            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
+            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest" };
             this.ValidateDiscoveredTests(listOfTests);
             this.ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
         }
@@ -204,19 +204,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            string testAssemblyPath = this.testEnvironment.GetTestAsset("V1UnitTestProject.dll");
+            string testAssemblyPath = this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll");
             var arguments = PrepareArguments(
                 testAssemblyPath,
                 this.GetTestAdapterPath(),
                 string.Empty,
                 this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
-            string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "V1UnitTestProjectTestSettings.testsettings");
+            string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
 
             this.InvokeVsTest(arguments);
-            var listOfTests = new string[] {"V1UnitTestProject.UnitTest1.PassingTest" };
-            var listOfNotDiscoveredTests = new string[] {"V1UnitTestProject.UnitTest1.FailingTest", "V1UnitTestProject.UnitTest1.SkippingTest" };
+            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest" };
+            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
             this.ValidateDiscoveredTests(listOfTests);
             this.ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
         }
