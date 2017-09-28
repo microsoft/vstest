@@ -39,12 +39,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 dataRows.AddRange(netcoreappRows[0].DataRows);
             }
 
-            var netDesktopRows = testMethod.GetAttributes<NETDesktopTargetFramework>(false);
-            if (netDesktopRows != null && netDesktopRows.Length > 0 && netDesktopRows[0].DataRows.Count > 0)
-            {
-                dataRows.AddRange(netDesktopRows[0].DataRows);
-            }
-
             if (dataRows.Count == 0)
             {
                 return new TestResult[] { new TestResult() { Outcome = UnitTestOutcome.Failed, TestFailureException = new Exception("No DataRowAttribute specified. Atleast one DataRowAttribute is required with DataTestMethodAttribute.") } };
@@ -139,26 +133,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework)));
             this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)));
             this.DataRows.Add(new DataRowAttribute(new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)));
-        }
-
-        /// <summary>
-        /// Gets or sets the data rows.
-        /// </summary>
-        public List<DataRowAttribute> DataRows { get; set; }
-    }
-
-    /// <summary>
-    /// The attribute defining both runner framework and target framework as net451.
-    /// </summary>
-    public class NETDesktopTargetFramework : Attribute
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NETDesktopTargetFramework"/> class.
-        /// </summary>
-        public NETDesktopTargetFramework()
-        {
-            this.DataRows = new List<DataRowAttribute>(1);
-            this.DataRows.Add(new DataRowAttribute(new RunnnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)));
         }
 
         /// <summary>

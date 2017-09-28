@@ -163,9 +163,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Discover tests using mstest v1 adapter with test case filters.
         /// </summary>
         [CustomDataTestMethod]
-        [NETDesktopTargetFramework]
-        public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnnerInfo runnerInfo)
+        [NETFullTargetFramework]
+        public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnerInfo runnerInfo)
         {
+            if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("Mstest v1 tests not supported with .Netcore runner.");
+                return;
+            }
+
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var arguments = PrepareArguments(
@@ -187,9 +193,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Discover tests using tmi adapter with test case filters.
         /// </summary>
         [CustomDataTestMethod]
-        [NETDesktopTargetFramework]
-        public void DiscoverTmiTestsWithOnlyPropertyValue(RunnnerInfo runnerInfo)
+        [NETFullTargetFramework]
+        public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {
+            if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("Tmi tests not supported with .Netcore runner.");
+                return;
+            }
+
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             string testAssemblyPath = this.testEnvironment.GetTestAsset("V1UnitTestProject.dll");
