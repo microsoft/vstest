@@ -6,6 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Client.Discovery;
 
@@ -177,6 +179,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteRawMessageShouldNotBeSentIfHandleDiscoveryCompleteEventIsNotRaised()
+        {
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, "HelloWorld");
+            bool taskDidNotComplete = false;
+
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            this.discoveryRequest.DiscoverAsync();
+
+            Task.Run(() => eventsHandler.HandleRawMessage(rawMessage), new CancellationTokenSource(100).Token).
+                ContinueWith(t =>
+                {
+                    taskDidNotComplete = true;
+                }).Wait();
+
+
+            Assert.AreEqual(taskDidNotComplete, true, "DiscoveryComplete Raw message should not have been sent");
         }
     }
 }

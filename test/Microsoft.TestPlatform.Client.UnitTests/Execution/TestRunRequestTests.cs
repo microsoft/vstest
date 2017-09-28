@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Client.Execution;
 
@@ -288,6 +289,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             Assert.AreEqual(rawMessage, messageReceived, "RunRequest should just pass the message as is.");
             testRunRequest.OnRawMessageReceived -= handler;
+        }
+
+        [TestMethod]
+        public void HandleExecutionCompleteRawMessageShouldNotBeSentIfHandleExecutionCompleteEventIsNotRaised()
+        {
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, "HelloWorld");
+            bool taskDidNotComplete = false;
+
+            this.testRunRequest.ExecuteAsync();
+            Task.Run(() => testRunRequest.HandleRawMessage(rawMessage), new CancellationTokenSource(100).Token).
+                ContinueWith(t =>
+                {
+                    taskDidNotComplete = true;
+                }).Wait();
+
+            Assert.AreEqual(taskDidNotComplete, true, "ExecutionComplete Raw message should not have been sent");
         }
 
         [TestMethod]
