@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Uri used to uniquely identify the console logger.
         /// </summary>
-        public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v2";
+        public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v1";
 
         /// <summary>
         /// Alternate user friendly string to uniquely identify the console logger.
