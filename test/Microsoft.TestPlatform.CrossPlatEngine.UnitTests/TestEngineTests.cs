@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using System.Reflection;
 
     using Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -422,6 +423,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void GetExtensionManagerShouldReturnANonNullInstance()
         {
             Assert.IsNotNull(this.testEngine.GetExtensionManager());
+        }
+
+        [TestMethod]
+        public void GetExtensionManagerShouldCollectMetrics()
+        {
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <DisableAppDomain>false</DisableAppDomain>
+                        <DesignMode>false</DesignMode>
+                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                        <MaxCpuCount>1</MaxCpuCount>
+                    </RunConfiguration>
+                 </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+
+            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+
+            this.mockMetricsCollection.Verify( mc => mc.Add(TelemetryDataConstants.MaxCPUcount, It.IsAny<object>()), Times.Once);
+            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.TargetDevice, It.IsAny<object>()), Times.Once);
+            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.TargetFramework, It.IsAny<object>()), Times.Once);
+            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.TargetPlatform, It.IsAny<object>()), Times.Once);
+            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
+            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.DataCollectorsEnabled, It.IsAny<object>()), Times.Once);
         }
     }
 }
