@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     {
         #region TestRunSpecificData
 
+        // This variable id to differentiate between implicit (abort requested by testPlatform) and explicit (test host aborted) abort.
         private bool abortRequested = false;
 
         private int runCompletedClients = 0;
@@ -123,6 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public void Abort()
         {
+            // Test platform initiated abort.
             abortRequested = true;
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
         }
@@ -216,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.AddManager(proxyExecutionManager, parallelEventsHandler);
             }
 
-            // If cancel is triggered for any one run, there is no reason to fetch next source
+            // If cancel is triggered for any one run or abort is requested by test platform, there is no reason to fetch next source
             // and queue another test run
             if (!testRunCompleteArgs.IsCanceled && !abortRequested)
             {

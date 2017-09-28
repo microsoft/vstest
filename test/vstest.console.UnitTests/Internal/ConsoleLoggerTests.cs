@@ -507,7 +507,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
         }
 
-
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsAborted()
         {
