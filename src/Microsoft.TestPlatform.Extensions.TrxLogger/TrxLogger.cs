@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <summary>
         /// Uri used to uniquely identify the TRX logger.
         /// </summary>
-        public const string ExtensionUri = "logger://Microsoft/TestPlatform/TrxLogger/v2";
+        public const string ExtensionUri = "logger://Microsoft/TestPlatform/TrxLogger/v1";
 
         /// <summary>
         /// Alternate user friendly string to uniquely identify the console logger.
