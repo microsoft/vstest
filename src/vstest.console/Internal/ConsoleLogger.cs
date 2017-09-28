@@ -428,7 +428,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 string testCountDetails;
 
-                if(e.IsAborted || e.IsCanceled)
+                if (e.IsAborted || e.IsCanceled)
                 {
                     testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, testsPassed, testsFailed, testsSkipped);
                 }
@@ -438,24 +438,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
 
                 Output.Information(false, testCountDetails);
+            }
 
-                if (e.IsCanceled)
-                {
-                    Output.Error(false, CommandLineResources.TestRunCanceled);
-                }
-                else if (e.IsAborted)
-                {
-                    Output.Error(false, CommandLineResources.TestRunAborted);
-                }
-                else if (this.testOutcome == TestOutcome.Failed)
-                {
-                    Output.Error(false, CommandLineResources.TestRunFailed);
-                }
-                else
-                {
-                    Output.Information(false, ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
-                }
+            if (e.IsCanceled)
+            {
+                Output.Error(false, CommandLineResources.TestRunCanceled);
+            }
+            else if (e.IsAborted)
+            {
+                Output.Error(false, CommandLineResources.TestRunAborted);
+            }
+            else if (this.testOutcome == TestOutcome.Failed && this.testsTotal > 0)
+            {
+                Output.Error(false, CommandLineResources.TestRunFailed);
+            }
+            else if(this.testsTotal > 0)
+            {
+                Output.Information(false, ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
+            }
 
+            if (this.testsTotal > 0)
+            {
                 if (!e.ElapsedTimeInRunningTests.Equals(TimeSpan.Zero))
                 {
                     PrintTimeSpan(e.ElapsedTimeInRunningTests);
