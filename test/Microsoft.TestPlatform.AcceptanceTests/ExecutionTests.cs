@@ -108,8 +108,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=7000");
             this.InvokeVsTest(arguments);
 
-            this.StdErrorContains("Test Run Canceled.");
-            this.StdErrorContains("Canceling test run: test run timeout of 7000 milliseconds exceeded.");
+            this.StdErrorContains("Test Run Aborted.");
+            this.StdErrorContains("Aborting test run: test run timeout of 7000 milliseconds exceeded.");
             this.StdOutputDoesNotContains("Total tests: 6");
         }
 

@@ -148,11 +148,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
 
         [TestMethod]
-        public void OnTestSessionTimeoutShouldCallCancel()
+        public void OnTestSessionTimeoutShouldCallAbort()
         {
             this.testRunRequest.ExecuteAsync();
             this.testRunRequest.OnTestSessionTimeout(null);
-            this.executionManager.Verify(o => o.Cancel(), Times.Once);
+            this.executionManager.Verify(o => o.Abort(), Times.Once);
         }
 
         [TestMethod]
@@ -194,12 +194,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
             onTestSessionTimeoutCalled.Reset();
-            executionManager.Setup(o => o.Cancel()).Callback(() => onTestSessionTimeoutCalled.Set());
+            executionManager.Setup(o => o.Abort()).Callback(() => onTestSessionTimeoutCalled.Set());
 
             testRunRequest.ExecuteAsync();
             onTestSessionTimeoutCalled.WaitOne(20 * 1000);
 
-            executionManager.Verify(o => o.Cancel(), Times.Once);
+            executionManager.Verify(o => o.Abort(), Times.Once);
+        }
+
+        /// <summary>
+        /// Test session timeout should be infinity if TestSessionTimeout is 0.
+        /// </summary>
+        [TestMethod]
+        public void OnTestSessionTimeoutShouldNotGetCalledWhenTestSessionTimeoutIsZero()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TestSessionTimeout>0</TestSessionTimeout>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, true, settingsXml);
+            var executionManager = new Mock<IProxyExecutionManager>();
+            var testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object);
+
+            executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).Callback(() => System.Threading.Thread.Sleep(5 * 1000));
+
+            testRunRequest.ExecuteAsync();
+
+            executionManager.Verify(o => o.Abort(), Times.Never);
         }
 
         [TestMethod]
