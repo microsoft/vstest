@@ -121,8 +121,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.currentDiscoveryEventsHandler = null;
 
                 // Dispose concurrent executors
-                // Do not do the cleanuptask in the current thread as we will unncessarily add to discovery time
-                this.lastParallelDiscoveryCleanUpTask = Task.Run(() => this.UpdateParallelLevel(0));
+                // Do this before we send DiscoveryComplete message since that means all current testhost have been closed,
+                // which might not be true if the below task was async
+                this.UpdateParallelLevel(0);
 
                 return true;
             }

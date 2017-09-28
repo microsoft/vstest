@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             /// <summary>
-            /// Handles the TestRunRequest complete event 
+            /// Handles the TestRunRequest complete event
             /// </summary>
             /// <param name="sender"></param>
             /// <param name="e">RunCompletion args</param>
