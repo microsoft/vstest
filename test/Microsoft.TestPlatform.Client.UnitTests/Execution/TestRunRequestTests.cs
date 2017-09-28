@@ -20,6 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using ObjectModel;
     using ObjectModel.Client;
     using ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
     [TestClass]
     public class TestRunRequestTests
@@ -28,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         Mock<IProxyExecutionManager> executionManager;
         TestRunCriteria testRunCriteria;
         private Mock<IRequestData> mockRequestData;
+        private IDataSerializer dataSerializer;
 
         public TestRunRequestTests()
         {
@@ -36,6 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object);
+            this.dataSerializer = JsonDataSerializer.Instance;
         }
 
         [TestMethod]
@@ -245,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         [TestMethod]
         public void HandleRawMessageShouldCallOnRawMessageReceived()
         {
-            string rawMessage = "HelloWorld";
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.TestRunStatsChange, "HelloWorld");
             string messageReceived = null;
 
             // Call should NOT fail even if onrawmessagereceived is not registered.
@@ -271,6 +276,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             this.testRunRequest.ExecuteAsync();
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, "HelloWorld");
+            testRunRequest.HandleRawMessage(rawMessage);
             var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
                 new TestRunStatistics(1, null),
                 false,
@@ -294,7 +301,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var events = new List<string>();
             this.executionManager.Setup(em => em.Close()).Callback(() => events.Add("close"));
             this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, "HelloWorld");
+
             this.testRunRequest.ExecuteAsync();
+            testRunRequest.HandleRawMessage(rawMessage);
 
             this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0)), null, null, null);
 

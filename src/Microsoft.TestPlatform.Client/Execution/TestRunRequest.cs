@@ -23,7 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
     using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -529,7 +528,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
-            if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
+            if (!string.Equals(CommunicationObjectModel.MessageType.ExecutionComplete, message.MessageType))
             {
                 this.OnRawMessageReceived?.Invoke(this, rawMessage);
             }
