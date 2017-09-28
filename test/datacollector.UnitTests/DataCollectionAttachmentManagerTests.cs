@@ -120,6 +120,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
+        public void AddAttachmentsShouldAddFilesCorrespondingToDifferentDataCollectors()
+        {
+            var filename = "filename.txt";
+            var filename1 = "filename1.txt";
+            File.WriteAllText(Path.Combine(TempDirectoryPath, filename), string.Empty);
+            File.WriteAllText(Path.Combine(TempDirectoryPath, filename1), string.Empty);
+
+            this.attachmentManager.Initialize(this.sessionId, TempDirectoryPath, this.messageSink.Object);
+
+            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var friendlyName = "TestDataCollector";
+            var uri = new Uri("datacollector://Company/Product/Version");
+            var uri1 = new Uri("datacollector://Company/Product/Version1");
+
+            EventWaitHandle waitHandle = new AutoResetEvent(false);
+            var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename), false);
+
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
+
+            // Wait for file operations to complete
+            waitHandle.WaitOne(Timeout);
+
+            waitHandle.Reset();
+            dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(TempDirectoryPath, filename1), false);
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri1, friendlyName);
+
+            // Wait for file operations to complete
+            waitHandle.WaitOne(Timeout);
+
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri1].Attachments.Count);
+        }
+
+        [TestMethod]
         public void AddAttachmentShouldAddNewFileTransferAndMoveFileToOutputDirectoryIfDeleteFileIsTrue()
         {
             var filename = "filename1.txt";
