@@ -9,42 +9,38 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.Win32;
 
     [TestClass]
     public class TelemetryTests : AcceptanceTestBase
     {
+        private readonly string resultPath;
         private const string TELEMETRY_OPTEDIN = "VSTEST_TELEMETRY_OPTEDIN";
-        private const string UserRoot = @"HKEY_CURRENT_USER\Software\Microsoft\VisualStudio\Telemetry\Channels";
-        private const string SubKey = @"Software\Microsoft\VisualStudio\Telemetry\Channels";
-        private const string Pathfolder = "VSTelemetryLog";
-        private const string AsiKeyName = "asi";
-        private const string AiasimovKeyName = "aiasimov";
-        private const string AivortexKeyName = "aivortex";
-        private const string FileLoggerName = "fileLogger";
+        private const string LOG_TELEMETRY = "VSTEST_LOGTELEMETRY";
 
         public TelemetryTests()
         {
+            this.resultPath = Path.GetTempPath() + "TelemetryLogs";
+
             // Opt in the Telemetry
             Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, "1");
 
-            // Setting registry keys to not send telemetry at backend.
-            Registry.SetValue(UserRoot, AsiKeyName, 0, RegistryValueKind.DWord);
-            Registry.SetValue(UserRoot, AiasimovKeyName, 0, RegistryValueKind.DWord);
-            Registry.SetValue(UserRoot, AivortexKeyName, 0, RegistryValueKind.DWord);
-
-            // Logging the telemetry in file
-            Registry.SetValue(UserRoot, FileLoggerName, 1, RegistryValueKind.DWord);
+            // Log the telemetry Data to file
+            Environment.SetEnvironmentVariable(LOG_TELEMETRY, "1");
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            // Removing the Keys
-            Registry.CurrentUser.DeleteSubKey(SubKey);
-
             // Opt out the Telemetry
             Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, "0");
+
+            // Unset the environment varaible
+            Environment.SetEnvironmentVariable(LOG_TELEMETRY, "0");
+
+            if (Directory.Exists(this.resultPath))
+            {
+                Directory.Delete(this.resultPath, true);
+            }
         }
 
         [CustomDataTestMethod]
@@ -55,6 +51,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             this.RunTests(runnerInfo.RunnerFramework);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETCORETargetFramework]
+        public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            this.DiscoverTests(runnerInfo.RunnerFramework);
         }
 
         private void RunTests(string runnerFramework)
@@ -71,14 +77,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateOutput();
         }
 
+
+        private void DiscoverTests(string runnerFramework)
+        {
+            if (runnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("Telemetry API is not supported for .NetCore runner");
+                return;
+            }
+
+            var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
+
+            this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            this.ValidateOutput();
+        }
+
         private void ValidateOutput()
         {
             bool isValid = false;
-            string path = System.IO.Path.GetTempPath() + Pathfolder;
 
-            if (Directory.Exists(path))
+            if (Directory.Exists(this.resultPath))
             {
-                var directory = new DirectoryInfo(path);
+                var directory = new DirectoryInfo(this.resultPath);
                 var file = directory.GetFiles().OrderByDescending(f => f.CreationTime).First();
 
                 string[] lines = File.ReadAllLines(file.FullName);
@@ -99,7 +119,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                         && line.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter);
 
                         isValid = isPresent;
-                        continue;
                     }
                     else if (line.Contains(TelemetryDataConstants.TestDiscoveryCompleteEvent))
                     {
@@ -117,7 +136,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                         && line.Contains(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests);
 
                         isValid = isPresent;
-                        continue;
                     }
                 }
             }

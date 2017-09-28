@@ -6,6 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -70,6 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
                 }
 
                 this.session.PostEvent(telemetryEvent);
+                this.LogToFile(eventName, finalMetrics);
             }
             catch (Exception e)
             {
@@ -133,6 +137,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
             }
 
             return finalMetrics;
+        }
+
+        /// <summary>
+        /// Log the telemetry to file.
+        /// For Testing purposes.
+        /// </summary>
+        /// <param name="metrics"></param>
+        private void LogToFile(string eventName, IDictionary<string, object> metrics)
+        {
+            var logEnabled = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY");
+
+            if (!string.IsNullOrEmpty(logEnabled) && logEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                string resultDirectory = Path.GetTempPath() + "TelemetryLogs";
+                string resultFileName = Guid.NewGuid().ToString();
+                string path = Path.Combine(resultDirectory, resultFileName);
+
+                if (!Directory.Exists(resultDirectory))
+                {
+                    Directory.CreateDirectory(resultDirectory);
+                }
+
+                var telemetryData = string.Join(";", metrics.Select(x => x.Key + "=" + x.Value));
+                var finalData = string.Concat(eventName, ";", telemetryData);
+                File.WriteAllText(path, finalData);
+            }
         }
     }
 }
