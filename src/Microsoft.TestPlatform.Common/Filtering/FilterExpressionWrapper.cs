@@ -20,7 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private readonly FilterExpression filterExpression;
 
-        private readonly FastFilter fastFilter;
+        /// <remarks>
+        /// Exposed for testing purpose.
+        /// </remarks>
+        internal readonly FastFilter fastFilter;
 
         private bool UseFilterExpression => this.filterExpression != null;
 
@@ -52,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     var regexString = options?.FilterRegEx;
                     if (!string.IsNullOrEmpty(regexString))
                     {
-                        fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
+                        this.fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
                     }
                 }
 

@@ -5,27 +5,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     internal sealed class FastFilter
     {
+        internal string FilterPropertyName { get; }
 
-        private readonly string filterPropertyName;
-        private readonly HashSet<string> filterPropertyValues;
+        internal ImmutableHashSet<string> FilterPropertyValues { get; }
 
-        private bool IsFilteredOutWhenMatched { get; }
+        internal bool IsFilteredOutWhenMatched { get; }
 
         internal Regex PropertyValueRegex { get; set; }
 
-        internal FastFilter(string filterPropertyName, HashSet<string> filterPropertyValues, Operation filterOperation, Operator filterOperator)
+        internal FastFilter(string filterPropertyName, ImmutableHashSet<string> filterPropertyValues, Operation filterOperation, Operator filterOperator)
         {
             ValidateArg.NotNullOrEmpty(filterPropertyName, nameof(filterPropertyName));
             ValidateArg.NotNull(filterPropertyValues, nameof(filterPropertyValues));
             
-            this.filterPropertyName = filterPropertyName;
-            this.filterPropertyValues = filterPropertyValues;
+            this.FilterPropertyName = filterPropertyName;
+            this.FilterPropertyValues = filterPropertyValues;
 
             if (filterOperation == Operation.Equal && (filterOperator == Operator.Or || filterOperator == Operator.None))
             {
@@ -43,16 +44,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         internal string[] ValidForProperties(IEnumerable<string> properties)
         {
-            return properties.Contains(this.filterPropertyName, StringComparer.OrdinalIgnoreCase)
+            return properties.Contains(this.FilterPropertyName, StringComparer.OrdinalIgnoreCase)
                 ? null
-                : new[] { this.filterPropertyName };
+                : new[] { this.FilterPropertyName };
         }
 
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
 
-            if (!TryGetSinglePropertyValue(this.filterPropertyName, propertyValueProvider, out var value))
+            if (!TryGetSinglePropertyValue(this.FilterPropertyName, propertyValueProvider, out var value))
             {
                 return false;
             }
@@ -70,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 }
             }
 
-            var matched = this.filterPropertyValues.Contains(value);
+            var matched = this.FilterPropertyValues.Contains(value);
             return IsFilteredOutWhenMatched ? !matched : matched;
         }
 
@@ -93,8 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             private bool conditionEncountered = false;
             private Operation fastFilterOperation;
             private string filterPropertyName;
-
-            private HashSet<string> filterHashSet = new HashSet<string>();
+            private ImmutableHashSet<string>.Builder filterHashSetBuilder = ImmutableHashSet.CreateBuilder<string>();
 
             private bool containsValidFilter = true;
 
@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     if (condition.Operation == fastFilterOperation && condition.Name.Equals(filterPropertyName, StringComparison.OrdinalIgnoreCase))
                     {
-                        filterHashSet.Add(condition.Value);
+                        filterHashSetBuilder.Add(condition.Value);
                     }
                     else
                     {
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     fastFilterOperation = condition.Operation;
                     filterPropertyName = condition.Name;
 
-                    filterHashSet.Add(condition.Value);
+                    filterHashSetBuilder.Add(condition.Value);
 
                     // Don't support `Contains`.
                     if (fastFilterOperation != Operation.Equal && fastFilterOperation != Operation.NotEqual)
@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
             internal FastFilter ToFastFilter()
             {
-                return ContainsValidFilter ? new FastFilter(filterPropertyName, filterHashSet, fastFilterOperation, fastFilterOperator) : null;
+                return ContainsValidFilter ? new FastFilter(filterPropertyName, filterHashSetBuilder.ToImmutable(), fastFilterOperation, fastFilterOperator) : null;
             }
         }
     }
