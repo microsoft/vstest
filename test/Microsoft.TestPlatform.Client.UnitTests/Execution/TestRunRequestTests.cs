@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using ObjectModel;
     using ObjectModel.Client;
     using ObjectModel.Engine;
+    using System.Collections.ObjectModel;
 
     [TestClass]
     public class TestRunRequestTests
@@ -311,6 +312,85 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldHandleListAttachments()
+        {
+            bool attachmentsFound = false;
+            this.testRunRequest.OnRunCompletion += (s, e) =>
+             {
+                 attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
+             };
+
+            List<AttachmentSet> attachmentSets = new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") };
+
+            this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
+
+            // Verify.
+            Assert.IsTrue(attachmentsFound);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldHandleCollectionAttachments()
+        {
+            bool attachmentsFound = false;
+            this.testRunRequest.OnRunCompletion += (s, e) =>
+            {
+                attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
+            };
+
+            Collection<AttachmentSet> attachmentSets = new Collection<AttachmentSet>(new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") });
+
+            this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
+
+            // Verify.
+            Assert.IsTrue(attachmentsFound);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldHandleNullAttachments()
+        {
+            bool attachmentsFound = false;
+            this.testRunRequest.OnRunCompletion += (s, e) =>
+            {
+                attachmentsFound = e.AttachmentSets == null;
+            };
+
+            this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
+
+            // Verify.
+            Assert.IsTrue(attachmentsFound);
         }
 
         [TestMethod]
