@@ -21,6 +21,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     [TestClass]
     public class ProxyDiscoveryManagerTests
@@ -52,6 +54,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
 
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestData.Object, 
@@ -299,7 +304,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             // Assert.
-            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), null), Times.Once);
+            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), this.testDiscoveryManager), Times.Once);
         }
 
         [TestMethod]
@@ -322,6 +327,54 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             {
                 TestPluginCache.Instance = null;
             }
+        }
+
+        [TestMethod]
+        public void DiscoverTestsCloseTestHostIfRawMessageIsOfTypeDiscoveryComplete()
+        {
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns( () =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.DiscoveryComplete
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeDiscoveryComplete()
+        {
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.DiscoveryInitialize
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }

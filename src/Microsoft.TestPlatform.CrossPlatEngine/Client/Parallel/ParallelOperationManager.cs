@@ -67,7 +67,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void RemoveManager(T manager)
         {
             this.concurrentManagerHandlerMap.Remove(manager);
-            this.DisposeInstance(manager);
         }
 
         /// <summary>

@@ -21,6 +21,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
     [TestClass]
     public class ProxyExecutionManagerTests
@@ -54,6 +55,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
@@ -315,7 +319,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             TestRunCriteriaWithSources testRunCriteriaPassed = null;
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), null))
+            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), this.testExecutionManager))
                 .Callback(
                     (TestRunCriteriaWithSources criteria, ITestRunEventsHandler sink) =>
                         {
@@ -337,7 +341,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             TestRunCriteriaWithTests testRunCriteriaPassed = null;
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), null))
+            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), this.testExecutionManager))
                 .Callback(
                     (TestRunCriteriaWithTests criteria, ITestRunEventsHandler sink) =>
                     {
@@ -424,6 +428,58 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.Cancel();
 
             this.mockRequestSender.Verify(s => s.SendTestRunCancel(), Times.Never);
+        }
+
+        [TestMethod]
+        public void ExecuteTestsCloseTestHostIfRawMessageIfOfTypeExecutionComplete()
+        {
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.ExecutionComplete
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            // Verify
+            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void ExecuteTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeExecutionComplete()
+        {
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.ExecutionInitialize
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            // Verify
+            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
 
         private void SignalEvent(ManualResetEvent manualResetEvent)

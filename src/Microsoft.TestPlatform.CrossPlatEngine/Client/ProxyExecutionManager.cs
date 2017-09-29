@@ -27,13 +27,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
     /// </summary>
-    internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
+    internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager, ITestRunEventsHandler
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
         private IRequestData requestData;
+        private ITestRunEventsHandler baseTestRunEventsHandler;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -89,6 +90,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns> The process id of the runner executing tests. </returns>
         public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
+            this.baseTestRunEventsHandler = eventHandler;
+
             try
             {
                 var executionEngineStartTime = DateTime.UtcNow;
@@ -136,33 +139,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         testCaseFilter: testRunCriteria.TestCaseFilter);
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
-                    var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
+                    var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message); });
 
                     if (testRunCriteria.HasSpecificSources)
                     {
                         var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, runsettings, executionContext, testPackages);
 
-                        this.RequestSender.StartTestRun(runRequest, eventHandler);
+                        this.RequestSender.StartTestRun(runRequest, this);
                     }
                     else
                     {
                         var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, runsettings, executionContext, testPackages);
 
-                        this.RequestSender.StartTestRun(runRequest, eventHandler);
+                        this.RequestSender.StartTestRun(runRequest, this);
                     }
                 }
             }
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
-                this.LogMessage(TestMessageLevel.Error, exception.Message, eventHandler);
+                this.LogMessage(TestMessageLevel.Error, exception.Message);
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
                 // created to replace the current one. This will help if the current execution manager is aborted due to irreparable error
                 // and the test host is lost as well.
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
-                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+                this.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
             return 0;
@@ -189,17 +192,57 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.SendTestRunAbort();
         }
 
+        /// <inheritdoc/>
+        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+        {
+            this.baseTestRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
+        }
+
+        /// <inheritdoc/>
+        public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+        {
+            this.baseTestRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
+        }
+
+        /// <inheritdoc/>
+        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        {
+            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
+        /// <inheritdoc/>
+        public void HandleRawMessage(string rawMessage)
+        {
+            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+            if(string.Equals(message.MessageType, MessageType.ExecutionComplete))
+            {
+                this.CleanupManager();
+            }
+            this.baseTestRunEventsHandler.HandleRawMessage(rawMessage);
+        }
+
+        public void HandleLogMessage(TestMessageLevel level, string message)
+        {
+            this.baseTestRunEventsHandler.HandleLogMessage(level, message);
+        }
+
         #endregion
 
-        private void LogMessage(TestMessageLevel testMessageLevel, string message, ITestRunEventsHandler eventHandler)
+        private void CleanupManager()
+        {
+            this.Close();
+        }
+
+        private void LogMessage(TestMessageLevel testMessageLevel, string message)
         {
             // Log to vs ide test output
             var testMessagePayload = new TestMessagePayload { MessageLevel = testMessageLevel, Message = message };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            eventHandler.HandleRawMessage(rawMessage);
+            this.HandleRawMessage(rawMessage);
 
             // Log to vstest.console
-            eventHandler.HandleLogMessage(testMessageLevel, message);
+            this.HandleLogMessage(testMessageLevel, message);
         }
 
         private void InitializeExtensions(IEnumerable<string> sources)
