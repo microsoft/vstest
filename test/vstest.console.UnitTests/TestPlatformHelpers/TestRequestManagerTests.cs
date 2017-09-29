@@ -19,9 +19,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -48,6 +50,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
         private ProtocolConfig protocolConfig;
+        private Task<IMetricsPublisher> mockMetricsPublisherTask;
+        private Mock<IMetricsPublisher> mockMetricsPublisher;
 
         private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -69,8 +73,16 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.inferHelper = new InferHelper(this.mockAssemblyMetadataProvider.Object);
             var testRunResultAggregator = new DummyTestRunResultAggregator();
 
-            this.testRequestManager = new TestRequestManager(this.commandLineOptions, this.mockTestPlatform.Object,
-                mockLoggerManager, testRunResultAggregator, mockTestPlatformEventSource.Object, this.inferHelper);
+            this.mockMetricsPublisher = new Mock<IMetricsPublisher>();
+            this.mockMetricsPublisherTask = Task.FromResult(this.mockMetricsPublisher.Object);
+            this.testRequestManager = new TestRequestManager(
+                this.commandLineOptions,
+                this.mockTestPlatform.Object,
+                this.mockLoggerManager,
+                testRunResultAggregator,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
@@ -97,7 +109,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
                 new Mock<ITestPlatformEventSource>().Object,
-                this.inferHelper);
+                this.inferHelper,
+            this.mockMetricsPublisherTask);
 
             Assert.IsTrue(this.mockLoggerEvents.EventsSubscribed());
         }
@@ -113,7 +126,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
                 new Mock<ITestPlatformEventSource>().Object,
-                this.inferHelper);
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
 
             Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
         }
@@ -194,7 +208,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
-                this.inferHelper);
+                this.inferHelper,
+            this.mockMetricsPublisherTask);
 
             var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
 
@@ -243,7 +258,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
-                this.inferHelper);
+                this.inferHelper,
+            this.mockMetricsPublisherTask);
 
             // Act
             this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
@@ -363,7 +379,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         {
             var payload = new DiscoveryRequestPayload()
             {
-                Sources = new List<string>() { "a.dll" },
+                Sources = new List<string>() {"a.dll"},
                 RunSettings =
                     @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -380,18 +396,38 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 .Returns(new FrameworkName(Constants.DotNetFramework46));
             DiscoveryCriteria actualDiscoveryCriteria = null;
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
-                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
-                {
-                    actualDiscoveryCriteria = discoveryCriteria;
-                }).Returns(mockDiscoveryRequest.Object);
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+            var success = this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
 
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldPublishMetrics()
+        {
+            var payload = new DiscoveryRequestPayload()
+                              {
+                                  Sources = new List<string>() { "a", "b" }
+                              };
+            var mockProtocolConfig = new ProtocolConfig { Version = 2 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify.
+            this.mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
         }
 
         [TestMethod]
@@ -562,7 +598,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
-                this.inferHelper);
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
 
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
@@ -665,6 +702,22 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     && (run1Start > run2Stop)
                     && (run2Stop > run2Start));
             }
+        }
+
+        [TestMethod]
+        public void RunTestsShouldPublishMetrics()
+        {
+            var payload = new TestRunRequestPayload()
+                              {
+                                  Sources = new List<string>() { "a", "b" }
+                              };
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+
+            this.mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
         }
 
         [TestMethod]
