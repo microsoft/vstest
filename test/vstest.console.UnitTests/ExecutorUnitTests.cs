@@ -139,11 +139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         public void ExecutorShouldShowRightErrorMessage()
         {
             var activeRunSetting = RunSettingsManager.Instance.ActiveRunSettings;
+            var runSettingsFile = Path.Combine(Path.GetTempPath(), "ExecutorShouldShowRightErrorMessage.runsettings");
 
             try
             {
-                var runSettingsFile = Path.Combine(Path.GetTempPath(), "ExecutorShouldShowRightErrorMessage.runsettings");
-
                 if (File.Exists(runSettingsFile))
                 {
                     File.Delete(runSettingsFile);
@@ -165,11 +164,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                 var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'."));
                 Assert.AreEqual(1, exitCode, "Exit code should be one because it throws exception");
                 Assert.IsTrue(result, "expecting error message : Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'.");
-
-                File.Delete(runSettingsFile);
             }
             finally
             {
+                File.Delete(runSettingsFile);
                 RunSettingsManager.Instance.SetActiveRunSettings(activeRunSetting);
             }
         }
