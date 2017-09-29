@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             this.HandleLogMessage(TestMessageLevel.Error, message);
             this.HandleRawMessage(rawMessage);
-            this.CancelAsync();
+            this.Abort();
         }
 
         /// <summary>
