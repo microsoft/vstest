@@ -240,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            if (!commandLineOptions.IsDesignMode)
+            if (!commandLineOptions.IsDesignMode && string.IsNullOrWhiteSpace(runsettings))
             {
                 GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
             }

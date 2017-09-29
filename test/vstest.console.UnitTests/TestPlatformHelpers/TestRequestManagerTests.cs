@@ -709,7 +709,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         {
             var payload = new TestRunRequestPayload()
                               {
-                                  Sources = new List<string>() { "a", "b" }
+                                  Sources = new List<string>() { "a", "b" },
+                                  RunSettings = DefaultRunsettings
                               };
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
