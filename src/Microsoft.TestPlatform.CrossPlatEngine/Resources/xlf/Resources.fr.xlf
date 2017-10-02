@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-1747068205">
     <header>
@@ -140,8 +140,8 @@
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
-        <target state="new">Aucun test ne correspond au filtre, car il contient une ou plusieurs propriétés non valides ({0}). Spécifiez une expression de filtre contenant des propriétés valides ({1}), puis réessayez.</target>
-        <note></note>
+        <target state="translated">Aucun test ne correspond au filtre, car il contient une ou plusieurs propriétés non valides ({0}). Spécifiez une expression de filtre contenant des propriétés valides ({1}).</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aucun test mis en correspondance avec le filtre, car elle contient une ou plusieurs propriétés qui ne sont pas valide ({0}). Spécifiez l’expression de filtre qui contient des propriétés valides ({1}) et essayez de nouveau.</target>
         </alt-trans>
@@ -174,22 +174,22 @@
       </trans-unit>
       <trans-unit id="CancelationRequested">
         <source>Canceling test run as cancelation requested.</source>
-        <target state="new">Canceling test run as cancelation requested.</target>
+        <target state="translated">Annulation d'une série de tests en raison d'une demande d'annulation.</target>
       </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
-        <target state="new">Failed to launch testhost with error: {0}</target>
-        <note></note>
+        <target state="translated">Échec du lancement de l'hôte de test. Erreur : {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ExecutionThreadApartmentStateNotSupportedForFramework">
         <source>ExecutionThreadApartmentState option not supported for framework: {0}.</source>
-        <target state="new">ExecutionThreadApartmentState option not supported for framework: {0}</target>
-        <note></note>
+        <target state="translated">L'option ExecutionThreadApartmentState n'est pas prise en charge pour le framework : {0}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="OldTestHostIsGettingUsed">
         <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
-        <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>
-        <note></note>
+        <target state="translated">Vous utilisez une ancienne version de Microsoft.NET.Test.Sdk. Passez à une version égale ou supérieure à la version 15.3.0.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

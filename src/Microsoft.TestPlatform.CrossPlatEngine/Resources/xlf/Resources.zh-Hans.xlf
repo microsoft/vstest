@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-1038642004">
     <header>
@@ -140,8 +140,8 @@
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
-        <target state="new">没有与筛选器匹配的测试，因为该筛选器包含一个或多个无效属性 ({0})。请指定包含有效属性 ({1}) 的筛选器表达式，然后重试。</target>
-        <note></note>
+        <target state="translated">没有与筛选器匹配的测试，因为该筛选器包含一个或多个无效属性 ({0})。请指定包含有效属性 ({1}) 的筛选器表达式。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">没有测试匹配筛选器，因为它包含一个或多个属性无效 ({0})。指定筛选器表达式，其中包含有效的属性 ({1})，然后重试。</target>
         </alt-trans>
@@ -174,22 +174,22 @@
       </trans-unit>
       <trans-unit id="CancelationRequested">
         <source>Canceling test run as cancelation requested.</source>
-        <target state="new">Canceling test run as cancelation requested.</target>
+        <target state="translated">根据取消请求取消测试运行。</target>
       </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
-        <target state="new">Failed to launch testhost with error: {0}</target>
-        <note></note>
+        <target state="translated">未能启动测试主机，错误为 {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ExecutionThreadApartmentStateNotSupportedForFramework">
         <source>ExecutionThreadApartmentState option not supported for framework: {0}.</source>
-        <target state="new">ExecutionThreadApartmentState option not supported for framework: {0}</target>
-        <note></note>
+        <target state="translated">框架 {0} 不支持 ExecutionThreadApartmentState 选项。</target>
+        <note />
       </trans-unit>
       <trans-unit id="OldTestHostIsGettingUsed">
         <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
-        <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>
-        <note></note>
+        <target state="translated">你使用的是旧版 Microsoft.NET.Test.Sdk。请迁移到 15.3.0 及更高版本。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
