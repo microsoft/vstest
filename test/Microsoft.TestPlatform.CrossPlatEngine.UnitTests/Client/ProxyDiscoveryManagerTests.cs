@@ -316,7 +316,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 // Act.
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<string>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<double>()), Times.Once);
             }
             finally
             {

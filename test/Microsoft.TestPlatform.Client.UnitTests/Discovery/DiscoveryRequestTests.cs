@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         public void HandleDiscoveryCompleteShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
 
             // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
         }
     }

@@ -33,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -90,18 +91,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.testPlatformEventSource.VsTestConsoleStart();
 
+            this.PrintSplashScreen();
+
             int exitCode = 0;
 
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
             if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
             {
-                args = args ?? new string[0];
+                this.Output.Error(true, CommandLineResources.NoArgumentsProvided);
+                args = new string[] { HelpArgumentProcessor.CommandName };
                 exitCode = 1;
-
-                // Do not add help processor as we will go and try to check for project.json files in current dir
             }
-
-            this.PrintSplashScreen();
 
             // Flatten arguments and process response files.
             string[] flattenedArguments;
@@ -139,6 +139,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.testPlatformEventSource.VsTestConsoleStop();
 
+            this.testPlatformEventSource.MetricsDisposeStart();
+
+            // Disposing Metrics Publisher when VsTestConsole ends
+            TestRequestManager.Instance.Dispose();
+
+            this.testPlatformEventSource.MetricsDisposeStop();
             return exitCode;
         }
 

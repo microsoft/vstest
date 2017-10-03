@@ -275,6 +275,22 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
         }
 
+        /// <summary>
+        /// Validate that the discovered tests list doesn't contain specified tests.
+        /// </summary>
+        /// <param name="testsList">List of tests expected not to be discovered.</param>
+        public void ValidateTestsNotDiscovered(params string[] testsList)
+        {
+            foreach (var test in testsList)
+            {
+                var flag = this.standardTestOutput.Contains(test)
+                           || this.standardTestOutput.Contains(GetTestMethodName(test));
+                Assert.IsFalse(flag, $"Test {test} should not appear in discovered tests list." +
+                                    $"{System.Environment.NewLine}Std Output: {this.standardTestOutput}" +
+                                    $"{System.Environment.NewLine}Std Error: { this.standardTestError}");
+            }
+        }
+
         public void ValidateFullyQualifiedDiscoveredTests(string filePath, params string[] discoveredTestsList)
         {
             var fileOutput = File.ReadAllLines(filePath);

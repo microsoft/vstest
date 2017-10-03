@@ -41,6 +41,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Metrics
         /// </summary>
-        public IDictionary<string, string> Metrics { get; set; }
+        public IDictionary<string, object> Metrics { get; set; }
     }
 }

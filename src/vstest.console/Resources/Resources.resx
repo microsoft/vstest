@@ -663,4 +663,8 @@
   <data name="UseVsixExtensionsDeprecation" xml:space="preserve">
     <value>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</value>
   </data>
+  <data name="DisableAutoFakesUsage" xml:space="preserve">
+    <value>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+     Example: /DisableAutoFakes:true</value>
+  </data>
 </root>

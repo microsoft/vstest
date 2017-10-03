@@ -476,6 +476,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   --DisableAutoFakes|/DisableAutoFakes:<true/false>
+        ///      Example: /DisableAutoFakes:true
+        /// </summary>
+        public static string DisableAutoFakesUsage
+        {
+            get
+            {
+                return ResourceManager.GetString("DisableAutoFakesUsage", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --Blame|/Blame 
         ///      Enable Blame mode for diagnosis of faulty test case
         /// </summary>

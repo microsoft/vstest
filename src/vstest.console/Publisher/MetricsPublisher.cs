@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
 #if NET451
             try
             {
-                this.session = new TelemetrySession(TelemetryService.DefaultSession.SerializeSettings());
+                this.session = TelemetryService.DefaultSession;
                 this.session.IsOptedIn = true;
                 this.session.Start();
             }
@@ -40,12 +40,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
 #endif
         }
 
-            /// <summary>
-            /// Publishes the metrics
-            /// </summary>
-            /// <param name="eventName"></param>
-            /// <param name="metrics"></param>
-            public void PublishMetrics(string eventName, IDictionary<string, string> metrics)
+        /// <summary>
+        /// Publishes the metrics
+        /// </summary>
+        /// <param name="eventName"></param>
+        /// <param name="metrics"></param>
+        public void PublishMetrics(string eventName, IDictionary<string, object> metrics)
         {
 #if NET451
             if (metrics == null || metrics.Count == 0)
@@ -110,14 +110,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         /// <returns>
         /// Removes the invalid keys from the Keys
         /// </returns>
-        internal IDictionary<string, string> RemoveInvalidCharactersFromProperties(IDictionary<string, string> metrics)
+        internal IDictionary<string, object> RemoveInvalidCharactersFromProperties(IDictionary<string, object> metrics)
         {
             if (metrics == null)
             {
-                return new Dictionary<string, string>();
+                return new Dictionary<string, object>();
             }
 
-            var finalMetrics = new Dictionary<string, string>();
+            var finalMetrics = new Dictionary<string, object>();
             foreach (var metric in metrics)
             {
                 if (metric.Key.Contains(":"))
