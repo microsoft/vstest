@@ -12,22 +12,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
     /// </summary>
     public class NoOpMetricsCollection : IMetricsCollection
     {
-        public void Add(string message, string value)
+        /// <summary>
+        /// Will do NO-OP
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="value"></param>
+        public void Add(string message, object value)
         {
             // No operation
         }
 
-        public void Clear()
-        {
-            // No Operation
-        }
-
-        public IDictionary<string, string> Metrics
-        {
-            get
-            {
-                return new Dictionary<string, string>();
-            }
-        }
+        /// <summary>
+        /// Will return empty list
+        /// </summary>
+        public IDictionary<string, object> Metrics => new Dictionary<string, object>();
     }
 }

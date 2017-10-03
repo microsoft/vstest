@@ -63,6 +63,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default setup test host manager as shared (desktop)
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(
+                    m => m.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<TestRunnerConnectionInfo>()))
+                .Returns(new TestProcessStartInfo());
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
                 .Callback(
                     () =>
@@ -310,7 +316,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 // Act.
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<string>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<double>()), Times.Once);
             }
             finally
             {

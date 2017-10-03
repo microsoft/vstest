@@ -24,11 +24,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected string FrameworkArgValue => DeriveFrameworkArgValue(this.testEnvironment);
 
-        protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnnerInfo runnnerInfo)
+        protected static void SetTestEnvironment(IntegrationTestEnvironment testEnvironment, RunnerInfo runnerInfo)
         {
-            testEnvironment.RunnerFramework = runnnerInfo.RunnerFramework;
-            testEnvironment.TargetFramework = runnnerInfo.TargetFramework;
-            testEnvironment.InIsolationValue = runnnerInfo.InIsolationValue;
+            testEnvironment.RunnerFramework = runnerInfo.RunnerFramework;
+            testEnvironment.TargetFramework = runnerInfo.TargetFramework;
+            testEnvironment.InIsolationValue = runnerInfo.InIsolationValue;
         }
 
         protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)

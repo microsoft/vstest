@@ -15,17 +15,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         /// <param name="metric">Metric Message</param>
         /// <param name="value">Value associated with Metric</param>
-        void Add(string metric, string value);
+        void Add(string metric, object value);
 
         /// <summary>
         /// Get Metrics
         /// </summary>
         /// <value>Returns the Telemetry Data Points</value>
-        IDictionary<string, string> Metrics { get; }
-
-        /// <summary>
-        /// Clear the Metrics
-        /// </summary>
-        void Clear();
+        IDictionary<string, object> Metrics { get; }
     }
 }
