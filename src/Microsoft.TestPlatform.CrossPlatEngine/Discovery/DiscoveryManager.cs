@@ -31,9 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private TestSessionMessageLogger sessionMessageLogger;
         private ITestPlatformEventSource testPlatformEventSource;
         private IRequestData requestData;
-
         private ITestDiscoveryEventsHandler2 testDiscoveryEventsHandler;
-
         private DiscoveryCriteria discoveryCriteria;
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
         /// <param name="requestData">
-        ///     The Request Data
+        /// The Request Data for providing discovery services and data.
         /// </param>
         /// <param name="testPlatformEventSource">
         ///     The test platform event source.
@@ -139,9 +137,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.DiscoveryState, "Completed");
 
                     // Collecting Total Tests Discovered
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
 
-                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false, this.requestData.MetricsCollection.Metrics);
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false);
+                    discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
 
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
                 }

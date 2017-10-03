@@ -9,9 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -32,20 +30,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
         /// </summary>
-        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager)
-            : this(
-                testHostManager,
-                new TestHostManagerFactory(new RequestData { MetricsCollection = new MetricsCollection() }))
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InProcessProxyexecutionManager"/> class.
-        /// </summary>
+        /// <param name="testHostManager">
+        /// The test Host Manager.
+        /// </param>
         /// <param name="testHostManagerFactory">
         /// Manager factory
         /// </param>
-        internal InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
+        public InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
@@ -108,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller.
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero, null);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
