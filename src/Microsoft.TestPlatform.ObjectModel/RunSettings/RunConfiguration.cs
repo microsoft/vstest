@@ -187,7 +187,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set
             {
                 this.testSessionTimeout = value;
-                this.TestSessionTimeoutSet = true;
             }
         }
 
@@ -387,15 +386,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Gets a value indicating batch size is set
         /// </summary>
         public bool BatchSizeSet
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets a value indicating testSessionTimeout is set
-        /// </summary>
-        public bool TestSessionTimeoutSet
         {
             get;
             private set;
@@ -636,7 +626,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                             string testSessionTimeout = reader.ReadElementContentAsString();
                             long sessionTimeout;
-                            if (!long.TryParse(testSessionTimeout, out sessionTimeout) || sessionTimeout <= 0)
+                            if (!long.TryParse(testSessionTimeout, out sessionTimeout) || sessionTimeout < 0)
                             {
                                 throw new SettingsException(
                                     string.Format(
