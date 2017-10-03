@@ -154,30 +154,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
 
-        #region ParallelOperationManager Methods
-
-        /// <summary>
-        /// Closes the instance of the IProxyDiscoveryManager Instance
-        /// </summary>
-        /// <param name="managerInstance"></param>
-        protected override void DisposeInstance(IProxyDiscoveryManager managerInstance)
-        {
-            if (managerInstance != null)
-            {
-                try
-                {
-                    managerInstance.Close();
-                }
-                catch (Exception ex)
-                {
-                    // ignore any exceptions
-                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to dispose discovery manager. Exception: " + ex);
-                }
-            }
-        }
-
-        #endregion
-
         private void DiscoverTestsPrivate(ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             this.currentDiscoveryEventsHandler = discoveryEventsHandler;

@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 foreach (var managerInstance in this.GetConcurrentManagerInstances())
                 {
-                    this.DisposeInstance(managerInstance);
+                    this.RemoveManager(managerInstance);
                 }
             }
 
@@ -253,12 +253,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             return hasNext;
         }
-
-        #region AbstractMethods
-
-        protected abstract void DisposeInstance(T managerInstance);
-
-        #endregion
     }
 }
 

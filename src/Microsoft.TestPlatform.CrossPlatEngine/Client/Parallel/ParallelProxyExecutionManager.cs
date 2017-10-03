@@ -225,26 +225,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
 
-        #region ParallelOperationManager Methods
-
-        protected override void DisposeInstance(IProxyExecutionManager managerInstance)
-        {
-            if (managerInstance != null)
-            {
-                try
-                {
-                    managerInstance.Close();
-                }
-                catch (Exception ex)
-                {
-                    // ignore any exceptions
-                    EqtTrace.Error("ParallelProxyExecutionManager: Failed to dispose execution manager. Exception: " + ex);
-                }
-            }
-        }
-
-        #endregion
-
         private int StartTestRunPrivate(ITestRunEventsHandler runEventsHandler)
         {
             this.currentRunEventsHandler = runEventsHandler;

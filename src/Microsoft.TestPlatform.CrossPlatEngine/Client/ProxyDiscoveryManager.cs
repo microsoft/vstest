@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
             if(string.Equals(message.MessageType, MessageType.DiscoveryComplete))
             {
-                this.CleanupManager();
+                this.Close();
             }
 
             this.baseTestDiscoveryEventsHandler.HandleRawMessage(rawMessage);
@@ -171,11 +171,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         #endregion
-
-        private void CleanupManager()
-        {
-            this.Close();
-        }
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {

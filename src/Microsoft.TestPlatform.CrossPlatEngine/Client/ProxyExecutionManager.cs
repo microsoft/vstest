@@ -217,8 +217,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if(string.Equals(message.MessageType, MessageType.ExecutionComplete))
             {
-                this.CleanupManager();
+                this.Close();
             }
+
             this.baseTestRunEventsHandler.HandleRawMessage(rawMessage);
         }
 
@@ -228,11 +229,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         #endregion
-
-        private void CleanupManager()
-        {
-            this.Close();
-        }
 
         private void LogMessage(TestMessageLevel testMessageLevel, string message)
         {
