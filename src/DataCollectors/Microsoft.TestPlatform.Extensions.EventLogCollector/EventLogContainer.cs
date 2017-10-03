@@ -232,7 +232,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         string.Format(
                             CultureInfo.InvariantCulture,
                             Resource.EventsLostError,
-                            this.eventLog.Log), exception);
+                            this.eventLog.Log,
+                            exception), exception);
                 }
             }
         }
