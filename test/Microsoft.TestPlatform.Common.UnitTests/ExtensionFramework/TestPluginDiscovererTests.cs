@@ -9,11 +9,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.Reflection;
     using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -96,6 +98,21 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.AreEqual(1, testExtensions.Keys.Where(k => k.Contains("csv")).Count());
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        }
+
+        [TestMethod]
+        public void GetTestExtensionsInformationShouldReturnDataCollectorExtensionsAndIgnoresInvalidDataCollectors()
+        {
+            var pathToExtensions = new List<string> { typeof(TestPluginDiscovererTests).GetTypeInfo().Assembly.Location };
+
+            // The below should not throw an exception.
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<DataCollectorConfig, DataCollector>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+
+            var pluginInformation = new DataCollectorConfig(typeof(ValidDataCollector));
+
+            Assert.AreEqual(2, testExtensions.Keys.Count);
+            Assert.AreEqual(1, testExtensions.Keys.Where(k => k.Equals("datacollector://foo/bar")).Count());
+            Assert.AreEqual(1, testExtensions.Keys.Where(k => k.Equals("datacollector://foo/bar1")).Count());
         }
 
         [TestMethod]
@@ -308,6 +325,46 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             }
         }
 
+        #endregion
+
+        #region  DataCollectors
+
+        public class InvalidDataCollector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// The a data collector inheriting from another data collector.
+        /// </summary>
+        [DataCollectorFriendlyName("Foo1")]
+        [DataCollectorTypeUri("datacollector://foo/bar1")]
+        public class ADataCollectorInheritingFromAnotherDataCollector : InvalidDataCollector
+        {
+        }
+
+        [DataCollectorFriendlyName("Foo")]
+        [DataCollectorTypeUri("datacollector://foo/bar")]
+        public class ValidDataCollector : DataCollector
+        {
+            public override void Initialize(
+                XmlElement configurationElement,
+                DataCollectionEvents events,
+                DataCollectionSink dataSink,
+                DataCollectionLogger logger,
+                DataCollectionEnvironmentContext environmentContext)
+            {
+
+            }
+        }
         #endregion
 
         internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
