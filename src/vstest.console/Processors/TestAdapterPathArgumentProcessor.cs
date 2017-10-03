@@ -161,6 +161,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             try
             {
+                // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
+                // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
                 // Remove leading and trailing ' " ' chars...
                 argument = argument.Trim().Trim(new char[] { '\"' });
                 customAdaptersPath = Path.GetFullPath(argument);
