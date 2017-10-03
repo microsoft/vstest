@@ -1501,7 +1501,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;..
+        ///   Looks up a localized string similar to Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;..
         /// </summary>
         public static string SuggestTestAdapterPathIfNoTestsIsFound
         {

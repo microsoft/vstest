@@ -520,7 +520,7 @@
     <value>Standard Output Messages:</value>
   </data>
   <data name="SuggestTestAdapterPathIfNoTestsIsFound" xml:space="preserve">
-    <value>Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</value>
+    <value>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</value>
   </data>
   <data name="SupportedFileTypesIndicator" xml:space="preserve">
     <value>        Supported File Types:</value>

@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Settings file does not conform with to required format..
+        ///   Looks up a localized string similar to Settings file provided does not conform to required format..
         /// </summary>
         public static string MalformedRunSettingsFile{
             get {

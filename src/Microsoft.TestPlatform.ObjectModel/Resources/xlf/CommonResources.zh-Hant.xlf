@@ -48,7 +48,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>
       <trans-unit id="MalformedRunSettingsFile">
-        <source>Settings file does not conform with to required format.</source>
+        <source>Settings file provided does not conform to required format.</source>
         <target state="new">Settings file does not conform with to required format.</target>
         <note></note>
       </trans-unit>
