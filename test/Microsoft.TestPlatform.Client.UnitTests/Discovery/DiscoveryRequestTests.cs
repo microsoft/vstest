@@ -6,6 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Client.Discovery;
 
@@ -17,6 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
     [TestClass]
     public class DiscoveryRequestTests
@@ -25,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         Mock<IProxyDiscoveryManager> discoveryManager;
         DiscoveryCriteria discoveryCriteria;
         private Mock<IRequestData> mockRequestData;
+        private IDataSerializer dataSerializer;
 
         public DiscoveryRequestTests()
         {
@@ -33,6 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object);
+            this.dataSerializer = JsonDataSerializer.Instance;
         }
 
         [TestMethod]
@@ -110,7 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         [TestMethod]
         public void HandleDiscoveryCompleteShouldCloseDiscoveryManager()
         {
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, "HelloWorld");
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            eventsHandler.HandleRawMessage(rawMessage);
 
             eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
             this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
@@ -123,7 +132,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.discoveryManager.Setup(dm => dm.Close()).Callback(() => events.Add("close"));
             this.discoveryRequest.OnDiscoveryComplete += (s, e) => events.Add("complete");
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, "HelloWorld");
 
+            eventsHandler.HandleRawMessage(rawMessage);
             eventsHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(1, false), Enumerable.Empty<TestCase>());
 
             Assert.AreEqual(2, events.Count);
@@ -157,16 +168,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, "HelloWorld");
             var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
             discoveryCompleteEventArgs.Metrics = dict;
-
+            eventsHandler.HandleRawMessage(rawMessage);
             // Act
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
 
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteRawMessageShouldNotBeSentIfHandleDiscoveryCompleteEventIsNotRaised()
+        {
+            string rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, "HelloWorld");
+            bool taskDidNotComplete = false;
+
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            this.discoveryRequest.DiscoverAsync();
+
+            Task.Run(() => eventsHandler.HandleRawMessage(rawMessage), new CancellationTokenSource(100).Token).
+                ContinueWith(t =>
+                {
+                    taskDidNotComplete = true;
+                }).Wait();
+
+
+            Assert.AreEqual(taskDidNotComplete, true, "DiscoveryComplete Raw message should not have been sent");
         }
     }
 }

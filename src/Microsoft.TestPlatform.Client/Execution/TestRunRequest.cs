@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -51,6 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private Stopwatch runRequestTimeTracker;
 
         private IDataSerializer dataSerializer;
+
+        private Task testRunCompleteRawMessage;
 
         /// <summary>
         /// Time out for run provided by client.
@@ -434,6 +437,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // Notify the waiting handle that run is complete
                     this.runCompletionEvent.Set();
 
+                    //Send RunExecution Complete Raw Message
+                    this.testRunCompleteRawMessage.Wait();
 
                     var executionTotalTimeTaken = DateTime.UtcNow - this.executionStartTime;
 
@@ -522,7 +527,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <param name="rawMessage"></param>
         public void HandleRawMessage(string rawMessage)
         {
-            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+            if (!string.Equals(CommunicationObjectModel.MessageType.ExecutionComplete, message.MessageType))
+            {
+                this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            }
+            else
+            {
+                this.testRunCompleteRawMessage = Task.Run(() => SendRawMessageAsync(rawMessage));
+            }
         }
 
         /// <summary>
@@ -567,6 +581,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             }
 
             EqtTrace.Info("TestRunRequest.Dispose: Completed.");
+        }
+
+        private void SendRawMessageAsync(string rawMessage)
+        {
+            this.runCompletionEvent?.WaitOne();
+            this.OnRawMessageReceived?.Invoke(this, rawMessage);
         }
     }
 }

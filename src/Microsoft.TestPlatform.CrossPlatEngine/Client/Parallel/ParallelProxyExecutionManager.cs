@@ -38,8 +38,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private bool hasSpecificTestsRun = false;
 
-        private Task lastParallelRunCleanUpTask = null;
-
         private ITestRunEventsHandler currentRunEventsHandler;
 
         private ParallelRunDataAggregator currentRunDataAggregator;
@@ -193,11 +191,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.currentRunEventsHandler = null;
 
                 // Dispose concurrent executors
-                // Do not do the cleanuptask in the current thread as we will unncessarily add to execution time
-                this.lastParallelRunCleanUpTask = Task.Run(() =>
-                {
-                    this.UpdateParallelLevel(0);
-                });
+                // Do this before we send ExecutionComplete message since that means all current testhost have been closed,
+                // which might not be true if the below task was async
+                this.UpdateParallelLevel(0);
 
                 return true;
             }
@@ -253,31 +249,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private int StartTestRunPrivate(ITestRunEventsHandler runEventsHandler)
         {
             this.currentRunEventsHandler = runEventsHandler;
-
-            // Cleanup Task for cleaning up the parallel executors except for the default one
-            // We do not do this in Sync so that this task does not add up to execution time
-            if (this.lastParallelRunCleanUpTask != null)
-            {
-                try
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("ProxyParallelExecutionManager: Wait for last cleanup to complete.");
-                    }
-
-                    this.lastParallelRunCleanUpTask.Wait();
-                }
-                catch (Exception ex)
-                {
-                    // if there is an exception disposing off concurrent executors ignore it
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("ProxyParallelExecutionManager: Exception while invoking an action on ProxyExecutionManager: {0}", ex);
-                    }
-                }
-
-                this.lastParallelRunCleanUpTask = null;
-            }
 
             // Reset the runcomplete data
             this.runCompletedClients = 0;

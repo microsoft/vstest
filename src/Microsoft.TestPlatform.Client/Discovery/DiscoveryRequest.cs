@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -14,6 +15,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     /// <summary>
     /// The discovery request.
@@ -26,11 +30,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="requestData">The Request Data instance providing services and data for discovery</param>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
-        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
+        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager) : this(requestData, criteria, discoveryManager, JsonDataSerializer.Instance)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
+        /// </summary>
+        /// <param name="requestData">The Request Data instance providing services and data for discovery</param>
+        /// <param name="criteria">Discovery criterion.</param>
+        /// <param name="discoveryManager">Discovery manager instance.</param>
+        private DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager, IDataSerializer dataSerializer)
         {
             this.requestData = requestData;
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
+            this.dataSerializer = dataSerializer;
         }
 
         /// <summary>
@@ -249,6 +264,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     if (this.discoveryCompleted != null)
                     {
                         this.discoveryCompleted.Set();
+
+                        //Send the Discovery Complete Raw Message
+                        this.discoveryCompleteTask.Wait();
+
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Notified the discovery complete event.");
@@ -355,7 +374,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="rawMessage">Raw message.</param>
         public void HandleRawMessage(string rawMessage)
         {
-            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+            if (!string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+            {
+                this.OnRawMessageReceived?.Invoke(this, rawMessage);
+            }
+            else
+            {
+                this.discoveryCompleteTask = Task.Run(() => SendRawMessageAsync(rawMessage));
+            }
         }
 
         #endregion
@@ -406,6 +434,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
         #endregion
 
+        private void SendRawMessageAsync(string rawMessage)
+        {
+            this.discoveryCompleted?.WaitOne();
+            this.OnRawMessageReceived?.Invoke(this, rawMessage);
+        }
+
         #region privates fields
 
         /// <summary>
@@ -437,6 +471,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// Request Data
         /// </summary>
         private IRequestData requestData;
+
+        private IDataSerializer dataSerializer;
+
+        private Task discoveryCompleteTask;
 
         #endregion
     }
