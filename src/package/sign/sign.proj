@@ -88,6 +88,9 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.WebTestFramework.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.DataCollectionAgentObject.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAdapter.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.HostAdapters.ASPNETAgent.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)VsWebSite.Interop.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent32.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)QTAgent32_35.exe" />
