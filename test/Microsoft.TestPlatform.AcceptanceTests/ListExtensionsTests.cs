@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: false, inProcess: true)]
-        public void ListDiscoverersShouldShowInboxDiscoverers(RunnnerInfo runnerInfo)
+        public void ListDiscoverersShouldShowInboxDiscoverers(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: false, inProcess: true)]
-        public void ListLoggersShouldShowInboxLoggers(RunnnerInfo runnerInfo)
+        public void ListLoggersShouldShowInboxLoggers(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: false, inProcess: true)]
-        public void ListSettingsProvidersShouldShowInboxSettingsProviders(RunnnerInfo runnerInfo)
+        public void ListSettingsProvidersShouldShowInboxSettingsProviders(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
