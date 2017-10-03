@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: false, inProcess: true)]
-        public void ListExecutorsShouldShowInboxExecutors(RunnnerInfo runnerInfo)
+        public void ListExecutorsShouldShowInboxExecutors(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
