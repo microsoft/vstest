@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     public class RunSpecificTestsArgumentProcessorTests
     {
         private const string NoDiscoveredTestsWarning = @"No test is available in DummyTest.dll. Make sure that installed test discoverers & executors, platform & framework version settings are appropriate and try again.";
-        private const string TestAdapterPathSuggestion = @"Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:<pathToCustomAdapters>.";
+        private const string TestAdapterPathSuggestion = @"Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:<pathToCustomAdapters>.";
         private readonly Mock<IFileHelper> mockFileHelper;
         private readonly Mock<IOutput> mockOutput;
         private string dummyTestFilePath = "DummyTest.dll";
