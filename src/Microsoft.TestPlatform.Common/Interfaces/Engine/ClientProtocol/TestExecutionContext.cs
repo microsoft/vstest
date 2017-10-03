@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
         /// <param name="hasTestRun">True if ExecutionContext is associated with Test run, false otherwise.</param>
         /// <param name="isDebug">True if ExecutionContext needs debugger, false otherwise.</param>
         /// <param name="testCaseFilter">Filter criteria string for filtering tests.</param>
+        /// <param name="filterOptions">Additional options for test case filter.</param>
         public TestExecutionContext(
             long frequencyOfRunStatsChangeEvent,
             TimeSpan runStatsChangeEventTimeout,

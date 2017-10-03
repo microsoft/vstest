@@ -55,10 +55,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
 
-            if (!TryGetSinglePropertyValue(this.FilterPropertyName, propertyValueProvider, out var value))
+            if (!(propertyValueProvider(this.FilterPropertyName) is string value))
             {
                 return false;
             }
+
             if (PropertyValueRegex != null)
             {
                 if (PropertyValueRegexReplacement == null)
@@ -83,12 +84,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             return IsFilteredOutWhenMatched ? !matched : matched;
         }
 
-        private static bool TryGetSinglePropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue)
-        {
-            singleValue = propertyValueProvider(name) as string;
-            return singleValue != null;
-        }
-
         internal static Builder CreateBuilder()
         {
             return new Builder();
@@ -110,19 +105,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
             internal void AddOperator(Operator @operator)
             {
-                if (!containsValidFilter || !(@operator == Operator.And || @operator == Operator.Or))
+                if (containsValidFilter && (@operator == Operator.And || @operator == Operator.Or))
                 {
-                    return;
-                }
-
-                if (operatorEncountered)
-                {
-                    containsValidFilter = fastFilterOperator == @operator;
+                    if (operatorEncountered)
+                    {
+                        containsValidFilter = fastFilterOperator == @operator;
+                    }
+                    else
+                    {
+                        operatorEncountered = true;
+                        fastFilterOperator = @operator;
+                    }
                 }
                 else
                 {
-                    operatorEncountered = true;
-                    fastFilterOperator = @operator;                    
+                    containsValidFilter = false;
                 }
             }
 

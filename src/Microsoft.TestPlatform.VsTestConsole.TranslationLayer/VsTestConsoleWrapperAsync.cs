@@ -14,7 +14,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using System;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapperAsync"/> to invoke test operations

@@ -106,6 +106,27 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
+        public void FastFilterWithMultipleEqualsClauseAndParentheses()
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1|(FullyQualifiedName=Test2|FullyQualifiedName=Test3)");
+            var fastFilter = filterExpressionWrapper.fastFilter;
+
+            var expectedFilterValues = new HashSet<string>() { "Test1", "Test2", "Test3" };
+
+            Assert.IsTrue(fastFilter != null);
+            Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
+            Assert.IsFalse(fastFilter.IsFilteredOutWhenMatched);
+            Assert.IsTrue(expectedFilterValues.SetEquals(fastFilter.FilterPropertyValues));
+
+            filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
+
+            Assert.IsTrue(fastFilter.Evaluate((s) => "Test1"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "Test2"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "Test3"));
+            Assert.IsFalse(fastFilter.Evaluate((s) => "Test4"));
+        }
+
+        [TestMethod]
         public void FastFilterWithMultipleEqualsClauseAndRegex()
         {
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1|FullyQualifiedName=Test2|FullyQualifiedName=Test3", new FilterOptions() { FilterRegEx = @"^[^\s\(]+" });
@@ -220,6 +241,15 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             Assert.IsFalse(fastFilter.Evaluate((s) => "Test3  (123)"));
             Assert.IsTrue(fastFilter.Evaluate((s) => "Test4"));
             Assert.IsTrue(fastFilter.Evaluate((s) => "Test4 (123)"));
+        }
+
+        [TestMethod]
+        public void FastFilterWithWithRegexParseErrorShouldNotCreateFastFilter()
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test", new FilterOptions() { FilterRegEx = @"^[^\s\(]+\1" });
+
+            Assert.AreEqual(null, filterExpressionWrapper.fastFilter);
+            Assert.IsFalse(string.IsNullOrEmpty(filterExpressionWrapper.ParseError));
         }
     }
 }

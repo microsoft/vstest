@@ -142,7 +142,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTests(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler)
         {
-            this.RunTests(sources, runSettings, null, testRunEventsHandler);
+            this.RunTests(sources, runSettings, options: null, testRunEventsHandler: testRunEventsHandler);
         }
 
         /// <inheritdoc/>
@@ -168,7 +168,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
         {
-            this.RunTestsWithCustomTestHost(sources, runSettings, null, testRunEventsHandler, customTestHostLauncher);
+            this.RunTestsWithCustomTestHost(sources, runSettings, options: null, testRunEventsHandler: testRunEventsHandler, customTestHostLauncher: customTestHostLauncher);
         }
 
         /// <inheritdoc/>
