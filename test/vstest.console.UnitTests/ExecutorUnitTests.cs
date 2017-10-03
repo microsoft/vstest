@@ -121,7 +121,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         }
 
         [TestMethod]
-
         public void ExecuteShouldExitWithErrorOnInvalidArgumentCombination()
         {
             // Create temp file for testsource dll to pass FileUtil.Exits()
@@ -146,9 +145,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
 
             var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(
-                string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, args[0].Substring(1))));
+            string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, args[0].Substring(1))));
             Assert.AreEqual(1, errorMessageCount, "Response File Exception should display error.");
             Assert.AreEqual(1, exitCode, "Response File Exception execution should exit with error.");
+        }
+
+        [TestMethod]
+        public void ExecutorShouldShowRightErrorMessage()
+        {
+            var activeRunSetting = RunSettingsManager.Instance.ActiveRunSettings;
+            var runSettingsFile = Path.Combine(Path.GetTempPath(), "ExecutorShouldShowRightErrorMessage.runsettings");
+
+            try
+            {
+                if (File.Exists(runSettingsFile))
+                {
+                    File.Delete(runSettingsFile);
+                }
+
+                var fileContents = @"<RunSettings>
+                                    <RunConfiguration>
+                                        <TargetPlatform>Invalid</TargetPlatform>
+                                    </RunConfiguration>
+                                </RunSettings>";
+
+                File.WriteAllText(runSettingsFile, fileContents);
+
+                string[] args = { "/settings:" + runSettingsFile };
+                var mockOutput = new MockOutput();
+
+                var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
+
+                var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'."));
+                Assert.AreEqual(1, exitCode, "Exit code should be one because it throws exception");
+                Assert.IsTrue(result, "expecting error message : Invalid setting 'RunConfiguration'. Invalid value 'Invalid' specified for 'TargetPlatform'.");
+            }
+            finally
+            {
+                File.Delete(runSettingsFile);
+                RunSettingsManager.Instance.SetActiveRunSettings(activeRunSetting);
+            }
         }
 
         private class MockOutput : IOutput

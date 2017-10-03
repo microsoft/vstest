@@ -213,6 +213,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunShouldNotProcessAllSourcesOnExecutionAborted()
+        {
+            var executionManagerMock = new Mock<IProxyExecutionManager>();
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, () => executionManagerMock.Object, 1);
+            this.createdMockManagers.Add(executionManagerMock);
+            this.SetupMockManagers(this.processedSources, isCanceled: false, isAborted: false);
+            SetupHandleTestRunComplete(this.executionCompleted);
+
+            parallelExecutionManager.Abort();
+            Task.Run(() => { parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object); });
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            Assert.AreEqual(1, this.processedSources.Count, "Abort should stop all sources execution.");
+        }
+
+        [TestMethod]
         public void StartTestRunShouldProcessAllSourcesOnExecutionAbortsForAnySource()
         {
             var executionManagerMock = new Mock<IProxyExecutionManager>();
