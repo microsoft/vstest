@@ -80,15 +80,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.UseVsixExtensionsValueRequired, argument));
+                throw new CommandLineException(CommandLineResources.DisableAutoFakesUsage);
             }
 
             bool value;
             if (!bool.TryParse(argument, out value))
             {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidUseVsixExtensionsCommand, argument));
+                throw new CommandLineException(CommandLineResources.DisableAutoFakesUsage);
             }
 
             this.commandLineOptions.DisableAutoFakes = value;
