@@ -11,6 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
     using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 #if NET451
     using Microsoft.VisualStudio.Telemetry;
@@ -73,7 +75,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
                 }
 
                 this.session.PostEvent(telemetryEvent);
-                this.LogToFile(eventName, finalMetrics);
+
+                // Log to Text File
+                var logEnabled = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY");
+                if (!string.IsNullOrEmpty(logEnabled) && logEnabled.Equals("1", StringComparison.Ordinal))
+                {
+                    this.LogToFile(eventName, finalMetrics, new FileHelper());
+                }
             }
             catch (Exception e)
             {
@@ -143,26 +151,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         /// Log the telemetry to file.
         /// For Testing purposes.
         /// </summary>
-        /// <param name="metrics"></param>
-        private void LogToFile(string eventName, IDictionary<string, object> metrics)
+        /// <param name="eventName">
+        /// The event Name.
+        /// </param>
+        /// <param name="metrics">
+        /// Metrics
+        /// </param>
+        /// <param name="fileHelper">
+        /// The file Helper.
+        /// </param>
+        internal void LogToFile(string eventName, IDictionary<string, object> metrics, IFileHelper fileHelper)
         {
-            var logEnabled = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY");
+            string resultDirectory = Path.GetTempPath() + "TelemetryLogs";
+            string resultFileName = Guid.NewGuid().ToString();
+            string path = Path.Combine(resultDirectory, resultFileName);
 
-            if (!string.IsNullOrEmpty(logEnabled) && logEnabled.Equals("1", StringComparison.Ordinal))
+            if (!fileHelper.DirectoryExists(resultDirectory))
             {
-                string resultDirectory = Path.GetTempPath() + "TelemetryLogs";
-                string resultFileName = Guid.NewGuid().ToString();
-                string path = Path.Combine(resultDirectory, resultFileName);
-
-                if (!Directory.Exists(resultDirectory))
-                {
-                    Directory.CreateDirectory(resultDirectory);
-                }
-
-                var telemetryData = string.Join(";", metrics.Select(x => x.Key + "=" + x.Value));
-                var finalData = string.Concat(eventName, ";", telemetryData);
-                File.WriteAllText(path, finalData);
+                fileHelper.CreateDirectory(resultDirectory);
             }
+
+            var telemetryData = string.Join(";", metrics.Select(x => x.Key + "=" + x.Value));
+            var finalData = string.Concat(eventName, ";", telemetryData);
+
+            fileHelper.WriteAllTextToFile(path, finalData);
         }
     }
 }

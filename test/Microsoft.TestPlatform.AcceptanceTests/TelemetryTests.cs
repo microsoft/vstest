@@ -14,12 +14,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class TelemetryTests : AcceptanceTestBase
     {
         private readonly string resultPath;
+        private string CurrentOptInStatus;
         private const string TELEMETRY_OPTEDIN = "VSTEST_TELEMETRY_OPTEDIN";
         private const string LOG_TELEMETRY = "VSTEST_LOGTELEMETRY";
 
         public TelemetryTests()
         {
             this.resultPath = Path.GetTempPath() + "TelemetryLogs";
+
+            // Get Current Opt In Status
+            CurrentOptInStatus = Environment.GetEnvironmentVariable(TELEMETRY_OPTEDIN);
 
             // Opt in the Telemetry
             Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, "1");
@@ -33,6 +37,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             // Opt out the Telemetry
             Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, "0");
+
+            // Set Current Opt in Status
+            Environment.SetEnvironmentVariable(TELEMETRY_OPTEDIN, CurrentOptInStatus);
 
             // Unset the environment varaible
             Environment.SetEnvironmentVariable(LOG_TELEMETRY, "0");
