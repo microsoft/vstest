@@ -442,10 +442,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
 
-            this.mockMetricsCollection.Verify( mc => mc.Add(TelemetryDataConstants.MaxCPUcount, It.IsAny<object>()), Times.Once);
-            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.TargetDevice, It.IsAny<object>()), Times.Once);
-            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.TargetFramework, It.IsAny<object>()), Times.Once);
-            this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.TargetPlatform, It.IsAny<object>()), Times.Once);
             this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
             this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.DataCollectorsEnabled, It.IsAny<object>()), Times.Once);
         }

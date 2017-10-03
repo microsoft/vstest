@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             // Collecting IsParallel Enabled
             requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringDiscovery, parallelLevel > 1 ? "True" : "False");
 
-            if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false, requestData))
+            if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
                 var newRequestData = this.GetRequestData(isTelemetryOptedIn);
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled, requestData))
+            if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
                 var isTelemetryOptedIn = requestData.IsTelemetryOptedIn;
                 var newRequestData = this.GetRequestData(isTelemetryOptedIn);
@@ -227,34 +227,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return parallelLevelToUse;
         }
 
-        private bool ShouldRunInNoIsolation(string runsettings, bool isParallelEnabled, bool isDataCollectorEnabled, IRequestData requestData)
+        private bool ShouldRunInNoIsolation(string runsettings, bool isParallelEnabled, bool isDataCollectorEnabled)
         {
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
-
-            // Collecting Target Framework.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFrameworkVersion);
-
-            // Collecting Target Platform.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform);
-
-            // Collecting Max Cpu count.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.MaxCPUcount, runConfiguration.MaxCpuCount);
-
-            // Collecting Target Device. Here, it will be updated run settings so, target device will be under runconfiguration only.
-            var targetDevice = runConfiguration.TargetDevice;
-            if (string.IsNullOrEmpty(targetDevice))
-            {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Local Machine");
-            }
-            else if (targetDevice.Equals("Device", StringComparison.Ordinal) || targetDevice.Contains("Emulator"))
-            {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, targetDevice);
-            }
-            else
-            {
-                // For IOT scenarios
-                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Other");
-            }
 
             if (runConfiguration.InIsolation)
             {

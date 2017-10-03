@@ -146,9 +146,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             bool success = false;
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryPayload.RunSettings);
-            var batchSize = runConfiguration.BatchSize;
-
             var runsettings = discoveryPayload.RunSettings;
             var requestData = this.GetRequestData(protocolConfig);
             if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
@@ -156,8 +153,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            // Collecting TestPlatform Version
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+            var batchSize = runConfiguration.BatchSize;
+
+            // Collect Metrics
+            this.CollectMetrics(requestData, runConfiguration);
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
@@ -221,9 +221,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunRequestPayload.RunSettings);
-            var batchSize = runConfiguration.BatchSize;
-
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
             var requestData = this.GetRequestData(protocolConfig);
@@ -232,8 +229,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            // Collecting TestPlatform Version
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+            var batchSize = runConfiguration.BatchSize;
+
+            this.CollectMetrics(requestData, runConfiguration);
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
@@ -413,6 +412,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
+        /// Collect Metrics
+        /// </summary>
+        /// <param name="requestData">Request Data for common Discovery/Execution Services</param>
+        /// <param name="runConfiguration">RunConfiguration</param>
+        private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
+        {
+            // Collecting Target Framework.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFrameworkVersion);
+
+            // Collecting Target Platform.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform);
+
+            // Collecting Max Cpu count.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.MaxCPUcount, runConfiguration.MaxCpuCount);
+
+            // Collecting Target Device. Here, it will be updated run settings so, target device will be under runconfiguration only.
+            var targetDevice = runConfiguration.TargetDevice;
+            if (string.IsNullOrEmpty(targetDevice))
+            {
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Local Machine");
+            }
+            else if (targetDevice.Equals("Device", StringComparison.Ordinal) || targetDevice.Contains("Emulator"))
+            {
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, targetDevice);
+            }
+            else
+            {
+                // For IOT scenarios
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Other");
+            }
+
+            // Collecting TestPlatform Version
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+        }
+
+        /// <summary>
         /// Checks whether Telemetry opted in or not. 
         /// By Default opting out
         /// </summary>
@@ -426,7 +461,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <summary>
         /// Gets Request Data
         /// </summary>
-        /// <param name="protocolConfig"></param>
+        /// <param name="protocolConfig">Protocol Config</param>
         /// <returns></returns>
         private IRequestData GetRequestData(ProtocolConfig protocolConfig)
         {
