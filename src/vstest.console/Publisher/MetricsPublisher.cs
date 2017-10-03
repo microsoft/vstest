@@ -61,6 +61,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TelemetrySession: Sending the telemetry data to the server.");
+                EqtTrace.Verbose("Telemetry Data");
+
+                foreach (var metric in metrics)
+                {
+                    EqtTrace.Verbose("Telemetry Key: {0} and Value: {1}", metric.Key, metric.Value);
+                }
             }
 
             try

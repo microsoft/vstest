@@ -81,7 +81,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
 
             this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            this.ValidateOutput();
+            this.ValidateOutput("Execution");
         }
 
 
@@ -96,10 +96,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
 
             this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            this.ValidateOutput();
+            this.ValidateOutput("Discovery");
         }
 
-        private void ValidateOutput()
+        private void ValidateOutput(string command)
         {
             bool isValid = false;
 
@@ -109,40 +109,44 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 var file = directory.GetFiles().OrderByDescending(f => f.CreationTime).First();
 
                 string[] lines = File.ReadAllLines(file.FullName);
+
                 foreach (var line in lines)
                 {
-                    if (line.Contains(TelemetryDataConstants.TestExecutionCompleteEvent))
+                    if (line.Contains(TelemetryDataConstants.TestExecutionCompleteEvent) && command.Equals("Execution", StringComparison.Ordinal))
                     {
-                        var isPresent = line.Contains(TelemetryDataConstants.DataCollectorsEnabled)
+                        var isPresent = line.Contains(TelemetryDataConstants.DataCollectorsEnabled + '=' + "False")
                                         && line.Contains(
                                             TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution)
                                         && line.Contains(TelemetryDataConstants.NumberOfAdapterUsedToRunTests)
-                                        && line.Contains(TelemetryDataConstants.ParallelEnabledDuringExecution)
-                                        && line.Contains(TelemetryDataConstants.NumberOfSourcesSentForRun)
-                                        && line.Contains(TelemetryDataConstants.RunState)
+                                        && line.Contains(TelemetryDataConstants.ParallelEnabledDuringExecution + '=' + "False")
+                                        && line.Contains(TelemetryDataConstants.NumberOfSourcesSentForRun + '=' + "1")
+                                        && line.Contains(TelemetryDataConstants.RunState + '=' + "Completed")
                                         && line.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec)
-                                        && line.Contains(TelemetryDataConstants.TotalTestsRun)
+                                        && line.Contains(TelemetryDataConstants.TotalTestsRun + '=' + "3")
                                         && line.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)
                                         && line.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter);
 
                         isValid = isPresent;
+                        break;
                     }
-                    else if (line.Contains(TelemetryDataConstants.TestDiscoveryCompleteEvent))
+
+                    else if (line.Contains(TelemetryDataConstants.TestDiscoveryCompleteEvent) && command.Equals("Discovery", StringComparison.Ordinal))
                     {
-                        var isPresent = line.Contains(TelemetryDataConstants.TotalTestsDiscovered)
-                                        && line.Contains(TelemetryDataConstants.ParallelEnabledDuringDiscovery)
+                        var isPresent = line.Contains(TelemetryDataConstants.TotalTestsDiscovered + '=' + "3")
+                                        && line.Contains(TelemetryDataConstants.ParallelEnabledDuringDiscovery + '=' + "False")
                                         && line.Contains(TelemetryDataConstants.TimeTakenInSecForDiscovery)
                                         && line.Contains(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec)
                                         && line.Contains(TelemetryDataConstants.TimeTakenInSecByAllAdapters)
                                         && line.Contains(TelemetryDataConstants.TotalTestsByAdapter)
                                         && line.Contains(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter)
-                                        && line.Contains(TelemetryDataConstants.DiscoveryState)
-                                        && line.Contains(TelemetryDataConstants.NumberOfSourcesSentForDiscovery)
+                                        && line.Contains(TelemetryDataConstants.DiscoveryState + "=" + "Completed")
+                                        && line.Contains(TelemetryDataConstants.NumberOfSourcesSentForDiscovery + '=' + "1")
                                         && line.Contains(
                                             TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery)
                                         && line.Contains(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests);
 
                         isValid = isPresent;
+                        break;
                     }
                 }
             }
