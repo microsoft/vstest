@@ -131,6 +131,33 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
+        public void FastFilterWithMultipleEqualsClauseAndRegexReplacement()
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=TestClass.Test1|FullyQualifiedName=TestClass.Test2|FullyQualifiedName=TestClass.Test3", new FilterOptions() { FilterRegEx = @"\s*\([^\)]*\)", FilterRegExReplacement = "" });
+            var fastFilter = filterExpressionWrapper.fastFilter;
+
+            var expectedFilterValues = new HashSet<string>() { "TestClass.Test1", "TestClass.Test2", "TestClass.Test3" };
+
+            Assert.IsTrue(fastFilter != null);
+            Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
+            Assert.IsFalse(fastFilter.IsFilteredOutWhenMatched);
+            Assert.IsTrue(expectedFilterValues.SetEquals(fastFilter.FilterPropertyValues));
+
+            filterExpressionWrapper.ValidForProperties(new List<string>() { "FullyQualifiedName" }, null);
+
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1).Test1"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass().Test1()"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1, 2).Test2"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass.Test3 (abcd1234)"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1).Test1(123)"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1, 2).Test2(x:1, y:2, z:3)"));
+            Assert.IsTrue(fastFilter.Evaluate((s) => "TestClass(1, 2,3).Test3(1)  (123)"));
+            Assert.IsFalse(fastFilter.Evaluate((s) => "TestClass1.Test1"));
+            Assert.IsFalse(fastFilter.Evaluate((s) => "TestClass1(1).Test1"));
+            Assert.IsFalse(fastFilter.Evaluate((s) => "TestClass((1, 2, 3)).Test1"));
+        }
+
+        [TestMethod]
         public void FastFilterWithSingleNotEqualsClause()
         {
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName!=Test1");

@@ -19,17 +19,29 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         [DataMember]
         public string FilterRegEx { get; set; }
 
+        /// <summary> 
+        /// Gets or sets the optional regular expression replacement string. When this property is set, <see cref="System.Text.RegularExpressions.Regex.Replace"/> 
+        /// will be called upon property value instead of <see cref="System.Text.RegularExpressions.Regex.Match"/> before matching. 
+        /// </summary> 
+        [DataMember]
+        public string FilterRegExReplacement { get; set; }
+
         /// <inheritdoc/>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "FilterOptions:"));
-            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   FilterRegEx={0}", this.FilterRegEx ?? string.Empty));
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture,
+                "   FilterRegEx={0}   FilterRegExReplacement={1}", 
+                this.FilterRegEx ?? string.Empty,
+                this.FilterRegExReplacement ?? string.Empty));
             return sb.ToString();
         }
 
         protected bool Equals(FilterOptions other) => 
-            other != null && string.Equals(this.FilterRegEx, other.FilterRegEx);
+            other != null && 
+            string.Equals(this.FilterRegEx, other.FilterRegEx) && 
+            string.Equals(this.FilterRegExReplacement, other.FilterRegExReplacement);
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as FilterOptions);
@@ -37,7 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return this.FilterRegEx.GetHashCode();
+            unchecked
+            {
+                var hashCode = this.FilterRegEx.GetHashCode();
+                return (hashCode * 397) ^ (this.FilterRegExReplacement != null ? this.FilterRegExReplacement.GetHashCode() : 0);
+            }
         }
     }
 }

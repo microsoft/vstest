@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         internal Regex PropertyValueRegex { get; set; }
 
+        internal string PropertyValueRegexReplacement { get; set; }
+
         internal FastFilter(string filterPropertyName, ImmutableHashSet<string> filterPropertyValues, Operation filterOperation, Operator filterOperator)
         {
             ValidateArg.NotNullOrEmpty(filterPropertyName, nameof(filterPropertyName));
@@ -57,17 +59,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 return false;
             }
-
             if (PropertyValueRegex != null)
             {
-                var match = PropertyValueRegex.Match(value);
-                if (match.Success)
+                if (PropertyValueRegexReplacement == null)
                 {
-                    value = match.Value;
+                    var match = PropertyValueRegex.Match(value);
+                    if (match.Success)
+                    {
+                        value = match.Value;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
-                    return false;
+                    value = PropertyValueRegex.Replace(value, PropertyValueRegexReplacement);
                 }
             }
 

@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using System.Diagnostics;
 
     /// <summary>
     /// Class holds information related to filtering criteria.
@@ -55,7 +56,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     var regexString = options?.FilterRegEx;
                     if (!string.IsNullOrEmpty(regexString))
                     {
+                        Debug.Assert(options.FilterRegExReplacement != null ? options.FilterRegEx != null : true);
                         this.fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
+                        this.fastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
                     }
                 }
 
