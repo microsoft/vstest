@@ -481,6 +481,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria, this.protocolConfig.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.AtLeast(2));
+
+            // Asserting that 'StartTestRun" should have been completed, & invoked only once
+            this.mockDataSerializer.Verify(ds => ds.DeserializePayload<TestRunCompletePayload>(completeMessage), Times.Exactly(1));
             mockHandler.Verify(mh => mh.HandleLogMessage(payload.MessageLevel, payload.Message), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.AtLeastOnce);
         }
