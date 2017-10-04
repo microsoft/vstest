@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -55,33 +56,67 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
 
-            if (!(propertyValueProvider(this.FilterPropertyName) is string value))
+            if (!TryGetPropertyValue(this.FilterPropertyName, propertyValueProvider, out var singleValue, out var multiValues))
             {
-                return false;
+                // No value corresponding to given name, treat it as unmatched.
+                return IsFilteredOutWhenMatched;
             }
 
-            if (PropertyValueRegex != null)
+            bool matched;
+            if (singleValue != null)
             {
-                if (PropertyValueRegexReplacement == null)
-                {
-                    var match = PropertyValueRegex.Match(value);
-                    if (match.Success)
-                    {
-                        value = match.Value;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    value = PropertyValueRegex.Replace(value, PropertyValueRegexReplacement);
-                }
+                var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
+                matched = value != null && this.FilterPropertyValues.Contains(value);
+            }
+            else
+            {
+                matched = (PropertyValueRegex == null ? multiValues : multiValues.Select(value => ApplyRegex(value)))
+                    .Any(result => result != null && this.FilterPropertyValues.Contains(result));
             }
 
-            var matched = this.FilterPropertyValues.Contains(value);
             return IsFilteredOutWhenMatched ? !matched : matched;
+        }
+
+        /// <summary>
+        /// Apply regex matching or replacement to given value.
+        /// </summary>
+        /// <returns>For matching, returns the result of matching, null if no match found. For replacement, returns the result of replacement.</returns>
+        private string ApplyRegex(string value)
+        {
+            Debug.Assert(PropertyValueRegex != null);
+
+            string result = null;
+            if (PropertyValueRegexReplacement == null)
+            {
+                var match = PropertyValueRegex.Match(value);
+                if (match.Success)
+                {
+                    result = match.Value;
+                }
+            }
+            else
+            {
+                result = PropertyValueRegex.Replace(value, PropertyValueRegexReplacement);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns property value for Property using propertValueProvider.
+        /// </summary>
+        private static bool TryGetPropertyValue(string name, Func<string, Object> propertyValueProvider, out string singleValue, out string[] multiValues)
+        {
+            var propertyValue = propertyValueProvider(name);
+            if (null != propertyValue)
+            {
+                singleValue = propertyValue as string;
+                multiValues = singleValue == null ? propertyValue as string[] : null;
+                return true;
+            }
+
+            singleValue = null;
+            multiValues = null;
+            return false;
         }
 
         internal static Builder CreateBuilder()

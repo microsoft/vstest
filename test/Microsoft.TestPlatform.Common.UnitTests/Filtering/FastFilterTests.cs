@@ -152,6 +152,29 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
+        public void FastFilterWithMultipleEqualsClauseForMultiplePropertyValues()
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper("Category=UnitTest|Category=PerfTest", null);
+            var fastFilter = filterExpressionWrapper.fastFilter;
+
+            var expectedFilterValues = new HashSet<string>() { "UnitTest", "PerfTest"};
+
+            Assert.IsTrue(fastFilter != null);
+            Assert.AreEqual("Category", fastFilter.FilterPropertyName);
+            Assert.IsFalse(fastFilter.IsFilteredOutWhenMatched);
+            Assert.IsTrue(expectedFilterValues.SetEquals(fastFilter.FilterPropertyValues));
+
+            filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null);
+
+            Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "UnitTest" }));
+            Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "PerfTest" }));
+            Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "UnitTest", "PerfTest" }));
+            Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "UnitTest", "IntegrationTest" }));
+            Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "IntegrationTest" }));
+            Assert.IsFalse(fastFilter.Evaluate((s) => null));
+        }
+
+        [TestMethod]
         public void FastFilterWithMultipleEqualsClauseAndRegexReplacement()
         {
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=TestClass.Test1|FullyQualifiedName=TestClass.Test2|FullyQualifiedName=TestClass.Test3", new FilterOptions() { FilterRegEx = @"\s*\([^\)]*\)", FilterRegExReplacement = "" });
@@ -241,6 +264,29 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             Assert.IsFalse(fastFilter.Evaluate((s) => "Test3  (123)"));
             Assert.IsTrue(fastFilter.Evaluate((s) => "Test4"));
             Assert.IsTrue(fastFilter.Evaluate((s) => "Test4 (123)"));
+        }
+
+        [TestMethod]
+        public void FastFilterWithMultipleNotEqualsClauseForMultiplePropertyValues()
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper("Category!=UnitTest&Category!=PerfTest", null);
+            var fastFilter = filterExpressionWrapper.fastFilter;
+
+            var expectedFilterValues = new HashSet<string>() { "UnitTest", "PerfTest" };
+
+            Assert.IsTrue(fastFilter != null);
+            Assert.AreEqual("Category", fastFilter.FilterPropertyName);
+            Assert.IsTrue(fastFilter.IsFilteredOutWhenMatched);
+            Assert.IsTrue(expectedFilterValues.SetEquals(fastFilter.FilterPropertyValues));
+
+            filterExpressionWrapper.ValidForProperties(new List<string>() { "Category" }, null);
+
+            Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "UnitTest" }));
+            Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "PerfTest" }));
+            Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "UnitTest", "PerfTest" }));
+            Assert.IsFalse(fastFilter.Evaluate((s) => new[] { "UnitTest", "IntegrationTest" }));
+            Assert.IsTrue(fastFilter.Evaluate((s) => new[] { "IntegrationTest" }));
+            Assert.IsTrue(fastFilter.Evaluate((s) => null));
         }
 
         [TestMethod]
