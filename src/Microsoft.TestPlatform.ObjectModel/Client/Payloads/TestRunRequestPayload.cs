@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
@@ -51,10 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         public bool DebuggingEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the filter criteria for run with sources to filter test cases.
+        /// Gets or sets the test platform options 
         /// </summary>
         [DataMember]
-        public string TestCaseFilter
+        public TestPlatformOptions TestPlatformOptions
         {
             get;
             set;

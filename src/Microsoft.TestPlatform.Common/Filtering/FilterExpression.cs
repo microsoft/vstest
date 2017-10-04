@@ -26,32 +26,38 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// Seperator string to seperate various tokens in input string.
         /// </summary>
-        private static string filterExpressionSeperatorString = @"(\&)|(\|)|(\()|(\))";
+        private const string filterExpressionSeperatorString = @"(\&)|(\|)|(\()|(\))";
 
         /// <summary>
         /// Condition, if expression is conditional expression.
         /// </summary>
-        private Condition condition;
+        private readonly Condition condition;
 
         /// <summary>
         /// Left operand, when expression is logical expression.
         /// </summary>
-        private FilterExpression left;
+        private readonly FilterExpression left;
 
         /// <summary>
         /// Right operand, when expression is logical expression.
         /// </summary>
-        private FilterExpression right;
+        private readonly FilterExpression right;
 
         /// <summary>
         /// If logical expression is using logical And ('&') operator.
         /// </summary>
-        private bool areJoinedByAnd;
+        private readonly bool areJoinedByAnd;
 
         #region Constructors
 
-        internal FilterExpression()
+        private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
         {
+            ValidateArg.NotNull(left, "left");
+            ValidateArg.NotNull(right, "right");
+
+            this.left = left;
+            this.right = right;
+            this.areJoinedByAnd = areJoinedByAnd;
         }
 
         private FilterExpression(Condition condition)
@@ -59,46 +65,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             ValidateArg.NotNull(condition, "condition");
             this.condition = condition;
         }
-        #endregion
-
-
-        /// <summary>
-        /// True, if filter expression is empty.
-        /// </summary>
-        internal bool IsEmpty
-        {
-            get
-            {
-                return
-                    (this.left == null) &&
-                    (this.right == null) &&
-                    (this.condition == null);
-            }
-        }
-
-
+        #endregion        
 
         /// <summary>
         /// Create a new filter expression 'And'ing 'this' with 'filter'. 
         /// </summary>
         private FilterExpression And(FilterExpression filter)
         {
-            if (this.IsEmpty)
-            {
-                return filter;
-            }
-
-            if (filter.IsEmpty)
-            {
-                return this;
-            }
-
-            var result = new FilterExpression();
-
-            result.left = this;
-            result.right = filter;
-            result.areJoinedByAnd = true;
-            return result;
+            return new FilterExpression(this, filter, true);
         }
 
         /// <summary>
@@ -106,11 +80,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private FilterExpression Or(FilterExpression filter)
         {
-            var result = this.And(filter);
-            result.areJoinedByAnd = false;
-            return result;
+            return new FilterExpression(this, filter, false);
         }
-
 
         /// <summary>
         /// Process the given operator from the filterStack. 
@@ -153,8 +124,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
         }
 
-
-
         /// <summary>
         /// True, if filter is valid for given set of properties.
         /// When False, invalidProperties would contain properties making filter invalid.
@@ -166,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             if (null == properties)
             {
                 // if null, initialize to empty list so that invalid properties can be found.
-                properties = new List<string>();
+                properties = Enumerable.Empty<string>();
             }
 
             bool valid = false;
@@ -194,11 +163,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             return invalidProperties;
         }
 
-
         /// <summary>
-        /// Return FilterExpression after parsing the given filter expression.        
+        /// Return FilterExpression after parsing the given filter expression, and a FastFilter when possible.
         /// </summary>
-        internal static FilterExpression Parse(string filterString)
+        internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
         {
             ValidateArg.NotNull(filterString, "filterString");
 
@@ -212,6 +180,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             var tokens = Regex.Split(filterString, filterExpressionSeperatorString);
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
+
+            var fastFilterBuilder = FastFilter.CreateBuilder();
 
             // This is based on standard parsing of inorder expression using two stacks (operand stack and operator stack)
             // Predence(And) > Predence(Or)
@@ -228,11 +198,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     case "&":
                     case "|":
+
                         Operator currentOperator = Operator.And;
                         if (string.Equals("|", token))
                         {
                             currentOperator = Operator.Or;
                         }
+
+                        fastFilterBuilder.AddOperator(currentOperator);
 
                         // Always put only higher priority operator on stack.
                         //  if lesser prioriy -- pop up the stack and process the operator to maintain operator precedence.
@@ -282,6 +255,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         Condition condition = Condition.Parse(token);
                         FilterExpression filter = new FilterExpression(condition);
                         filterStack.Push(filter);
+
+                        fastFilterBuilder.AddCondition(condition);
                         break;
                 }
             }
@@ -295,6 +270,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
             }
+            
+            fastFilter = fastFilterBuilder.ToFastFilter();
 
             return filterStack.Pop();
         }
@@ -302,13 +279,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// Evaluate filterExpression with given propertyValueProvider.
         /// </summary>
-        /// <param name="propertyValueProvider"> The property Value Provider. </param>
+        /// <param name="propertyValueProvider"> The property Value Provider.</param>
         /// <returns> True if evaluation is successful. </returns>
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
 
-            Debug.Assert(!this.IsEmpty, "Filter expression is empty.");
             bool filterResult = false;
             if (null != this.condition)
             {
