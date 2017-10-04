@@ -10,9 +10,9 @@
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.
 {0}</source>
-        <target state="new">Multiple extensions with different file versions found. Selected extensions with version:
+        <target state="translated">Es wurden mehrere Versionen derselben Erweiterung gefunden. Die höchste Version wird ausgewählt.
 {0}</target>
-        <note></note>
+        <note />
       </trans-unit>
     </body>
   </file>
