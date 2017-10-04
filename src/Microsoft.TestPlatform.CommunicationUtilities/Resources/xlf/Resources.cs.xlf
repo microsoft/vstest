@@ -68,8 +68,8 @@
       </trans-unit>
       <trans-unit id="VersionCheckTimedout">
         <source>Failed to negotiate protocol. Wait for response timed out.</source>
-        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
-        <note></note>
+        <target state="translated">Nepovedlo se vyjednat protokol. Při čekání na odpověď vypršel časový limit.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
