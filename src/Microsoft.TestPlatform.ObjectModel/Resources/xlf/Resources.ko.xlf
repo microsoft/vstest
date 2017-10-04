@@ -589,13 +589,13 @@
       </trans-unit>
       <trans-unit id="FailedToCreateDiaSession">
         <source>Failed to Create msdia Session COM HResult '{0}'.</source>
-        <target state="new">Failed to Create msdia Session COM HResult '{0}'.</target>
-        <note></note>
+        <target state="translated">msdia 세션 COM HResult ‘{0}’을(를) 만들지 못했습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="FailedToLoadMsDia">
         <source>Failed to load msdia</source>
-        <target state="new">Failed to load msdia</target>
-        <note></note>
+        <target state="translated">msdia 로드 실패</target>
+        <note />
       </trans-unit>
     </body>
   </file>
