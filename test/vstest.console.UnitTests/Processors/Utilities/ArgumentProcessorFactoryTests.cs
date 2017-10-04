@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             var allProcessors = typeof(ArgumentProcessorFactory).GetTypeInfo()
                                     .Assembly.GetTypes()
-                                    .Where(t => !t.Name.Equals("IArgumentProcessor") && typeof(IArgumentProcessor).IsAssignableFrom(t));
+                                    .Where(t => !t.GetTypeInfo().IsAbstract && !t.Name.Equals("IArgumentProcessor") && typeof(IArgumentProcessor).IsAssignableFrom(t));
 
             foreach (var processor in allProcessors)
             {
