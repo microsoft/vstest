@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Act and Assert.
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize(fileName),
-                "Settings file provided do not confirm to required format.");
+                "Settings file provided does not conform to required format.");
         }
 
         [TestMethod]

@@ -26,8 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IEnumerator<string> sourceEnumerator;
         
-        private Task lastParallelDiscoveryCleanUpTask = null;
-
         private ITestDiscoveryEventsHandler2 currentDiscoveryEventsHandler;
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
@@ -121,8 +119,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.currentDiscoveryEventsHandler = null;
 
                 // Dispose concurrent executors
-                // Do this before we send DiscoveryComplete message since that means all current testhost have been closed,
-                // which might not be true if the below task was async
                 this.UpdateParallelLevel(0);
 
                 return true;
@@ -158,58 +154,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
 
-        #region ParallelOperationManager Methods
-
-        /// <summary>
-        /// Closes the instance of the IProxyDiscoveryManager Instance
-        /// </summary>
-        /// <param name="managerInstance"></param>
-        protected override void DisposeInstance(IProxyDiscoveryManager managerInstance)
-        {
-            if (managerInstance != null)
-            {
-                try
-                {
-                    managerInstance.Close();
-                }
-                catch (Exception ex)
-                {
-                    // ignore any exceptions
-                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to dispose discovery manager. Exception: " + ex);
-                }
-            }
-        }
-
-        #endregion
-
         private void DiscoverTestsPrivate(ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             this.currentDiscoveryEventsHandler = discoveryEventsHandler;
-
-            // Cleanup Task for cleaning up the parallel executors except for the default one
-            // We do not do this in Sync so that this task does not add up to discovery time
-            if (this.lastParallelDiscoveryCleanUpTask != null)
-            {
-                try
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("ProxyParallelDiscoveryManager: Wait for last cleanup to complete.");
-                    }
-
-                    this.lastParallelDiscoveryCleanUpTask.Wait();
-                }
-                catch (Exception ex)
-                {
-                    // if there is an exception disposing off concurrent hosts ignore it
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("ParallelProxyDiscoveryManager: Exception while invoking an action on DiscoveryManager: {0}", ex);
-                    }
-                }
-
-                this.lastParallelDiscoveryCleanUpTask = null;
-            }
 
             // Reset the discoverycomplete data
             this.discoveryCompletedClients = 0;

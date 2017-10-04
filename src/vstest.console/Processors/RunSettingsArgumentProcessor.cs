@@ -138,7 +138,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             catch (XmlException exception)
             {
-                throw new CommandLineException(CommandLineResources.MalformedRunSettingsFile + " " + exception.Message, exception);
+                throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
+                        exception);
             }
             catch (SettingsException exception)
             {
@@ -203,7 +205,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
                 catch (XPathException e)
                 {
-                    throw new SettingsException(CommandLineResources.MalformedRunSettingsFile + " " + e.Message, e);
+                    throw new SettingsException(
+                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, e.Message),
+                        e);
                 }
             }
 
