@@ -240,7 +240,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = testRunRequestPayload.TestCaseFilter;
+                runCriteria.TestCaseFilter = testRunRequestPayload.TestPlatformOptions?.TestCaseFilter;
+                runCriteria.FilterOptions = testRunRequestPayload.TestPlatformOptions?.FilterOptions;
             }
             else
             {

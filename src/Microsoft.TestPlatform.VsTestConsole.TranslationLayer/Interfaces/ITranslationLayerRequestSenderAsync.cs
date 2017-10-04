@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <summary>
         /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRun(IEnumerable{string}, string, TestPlatformOptions, ITestRunEventsHandler)"/>.
         /// </summary>
-        Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler);
+        Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
         /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRun(IEnumerable{TestCase}, string, ITestRunEventsHandler)"/>.
@@ -50,7 +50,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <summary>
         /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRunWithCustomHost(IEnumerable{string}, string, TestPlatformOptions, ITestRunEventsHandler, ITestHostLauncher)"/>.
         /// </summary>
-        Task StartTestRunWithCustomHostAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
+        Task StartTestRunWithCustomHostAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.StartTestRunWithCustomHost(IEnumerable{TestCase}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
