@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
         <source>Aborting test run: test run timeout of {0} milliseconds exceeded.</source>
-        <target state="new">Canceling test run as it crossed testSessionTimeout: {0} milliseconds.</target>
+        <target state="new">正在取消測試回合: 已超過 {0} 毫秒的測試回合逾時。</target>
         <note></note>
       </trans-unit>
     </body>
