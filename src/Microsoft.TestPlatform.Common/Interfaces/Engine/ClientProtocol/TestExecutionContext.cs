@@ -137,9 +137,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             set;
         }
 
-        /// <summary> 
-        /// Get or set additional options for test case filter. 
-        /// </summary> 
+
+        /// <summary>
+        /// Gets or sets additional options for filtering.
+        /// </summary>
         [DataMember]
         public FilterOptions FilterOptions
         {

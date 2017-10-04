@@ -112,8 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
-            Debug.Assert(this.filterExpression != null || this.fastFilter != null);
-            return UseFastFilter ? this.fastFilter.ValidForProperties(supportedProperties) : this.filterExpression.ValidForProperties(supportedProperties, propertyProvider);
+            return UseFastFilter ? this.fastFilter.ValidForProperties(supportedProperties) : this.filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
         }
 
         /// <summary>
@@ -122,9 +121,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            
+            if (UseFastFilter)
+            {
+                return this.fastFilter.Evaluate(propertyValueProvider);
+            }
 
-            Debug.Assert(this.filterExpression != null || this.fastFilter != null);
-            return UseFastFilter ? this.fastFilter.Evaluate(propertyValueProvider) : this.filterExpression.Evaluate(propertyValueProvider);
+            return this.filterExpression == null ? false : this.filterExpression.Evaluate(propertyValueProvider);
         }
     }
 }
