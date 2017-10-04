@@ -417,7 +417,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
             string testCaseFilterValue = "TestFilter";
-            payload.TestCaseFilter = testCaseFilterValue;
+            payload.TestPlatformOptions = new TestPlatformOptions { TestCaseFilter = testCaseFilterValue };
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
                 TestLoggerManager.Instance,
