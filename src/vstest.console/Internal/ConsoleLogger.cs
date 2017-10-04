@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Level of verbosity
         /// </summary>
-        private Verbosity verbosityLevel = Verbosity.Minimal;
+        private Verbosity verbosityLevel = Verbosity.Normal;
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
