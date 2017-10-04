@@ -94,8 +94,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             try
             {
-                var executionEngineStartTime = DateTime.UtcNow;
-
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
@@ -119,12 +117,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
 
                     this.InitializeExtensions(testPackages);
-
-                    // Collecting Time Taken to Start Discovery Engine
-                    var executionEngineTotalTime = DateTime.UtcNow - executionEngineStartTime;
-
-                    // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
                     var executionContext = new TestExecutionContext(

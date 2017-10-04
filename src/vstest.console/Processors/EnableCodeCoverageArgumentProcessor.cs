@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -87,12 +87,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     {
         private IRunSettingsProvider runSettingsManager;
+        private CommandLineOptions commandLineOptions;
 
         private const string FriendlyName = "Code Coverage";
 
-        internal EnableCodeCoverageArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             this.runSettingsManager = runSettingsManager;
+            this.commandLineOptions = options;
         }
 
         /// <inheritdoc />
@@ -100,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
             CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
+            this.commandLineOptions.EnableCodeCoverage = true;
         }
 
         /// <inheritdoc />

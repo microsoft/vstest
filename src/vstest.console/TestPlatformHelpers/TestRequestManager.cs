@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -202,6 +203,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
 
+            // Collect Commands
+            this.CollectCommands(requestData);
+
             // Posts the Discovery Complete event.
             this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
 
@@ -256,6 +260,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar, protocolConfig);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
+
+            this.CollectCommands(requestData);
 
             // Post the run complete event
             this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
@@ -421,6 +427,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
             return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Collect Command Line switches for Telemetry purposes
+        /// </summary>
+        /// <param name="requestData"></param>
+        private void CollectCommands(IRequestData requestData)
+        {
+            var commandsUsed = new List<string>();
+
+            var parallel = this.commandLineOptions.Parallel;
+            if (parallel)
+            {
+                commandsUsed.Add("/Parallel");
+            }
+
+            var platform = this.commandLineOptions.ArchitectureSpecified;
+            if (platform)
+            {
+                commandsUsed.Add("/Platform");
+            }
+
+            var enableCodeCoverage = this.commandLineOptions.EnableCodeCoverage;
+            if (enableCodeCoverage)
+            {
+                commandsUsed.Add("/EnableCodeCoverage");
+            }
+
+            var inIsolation = this.commandLineOptions.InIsolation;
+            if (inIsolation)
+            {
+                commandsUsed.Add("/InIsolation");
+            }
+
+            var useVsixExtensions = this.commandLineOptions.UseVsixExtensions;
+            if (useVsixExtensions)
+            {
+                commandsUsed.Add("/UseVsixExtensions");
+            }
+
+            var frameworkVersionSpecified = this.commandLineOptions.FrameworkVersionSpecified;
+            if (frameworkVersionSpecified)
+            {
+                commandsUsed.Add("/Framework");
+            }
+
+            var settings = this.commandLineOptions.SettingsFile;
+            if (!string.IsNullOrEmpty(settings) && string.Equals(Path.GetExtension(settings), ".runsettings", StringComparison.OrdinalIgnoreCase))
+            {
+                commandsUsed.Add("/settings//.RunSettings");
+            }
+            else if (!string.IsNullOrEmpty(settings))
+            {
+                commandsUsed.Add("/settings//.TestSettings");
+            }
+
+            requestData.MetricsCollection.Add(TelemetryDataConstants.CommandLineSwitches, string.Join(",", commandsUsed.ToArray()));
+
+            // Collecting TargetOS
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
         }
 
         /// <summary>

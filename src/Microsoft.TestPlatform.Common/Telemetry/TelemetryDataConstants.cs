@@ -31,6 +31,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TargetDevice = "VS.TestRun.TargetDevice";
 
+        public static string TargetFramework = "VS.TestRun.TargetFramework";
+
+        public static string TargetPlatform = "VS.TestRun.TargetPlatform";
+
+        public static string MaxCPUcount = "VS.TestRun.MaxCPUcount";
+
+        public static string TestPlatformVersion = "VS.TestRun.TestPlatformVersion";
+
+        public static string TargetOS = "VS.TestRun.TargetOS";
+
+        public static string LoggerUsed = "VS.TestRun.LoggersUsed";
+
+        public static string AdaptersVersion = "VS.TestRun.AdaptersVersion";
+
+        public static string CommandLineSwitches = "VS.TestRun.CommandLineSwitches";
+
         // Adapter name will get appended. eg:- VS.TestRun.TotalTestsRanByAdapter.executor//cppunittestexecutor/v1
         // In case of parallel it will be sum of all tests ran by an adapter in different execution process
         public static string TotalTestsRanByAdapter = "VS.TestRun.TotalTestsRanByAdapter";
@@ -43,9 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string NumberOfAdapterDiscoveredDuringExecution = "VS.TestRun.AdaptersDiscoveredCount";
 
         public static string NumberOfAdapterUsedToRunTests = "VS.TestRun.AdaptersUsedCount";
-
-        // In case of parallel, it will be maximum of all time taken by different execution engine.
-        public static string TimeTakenToStartExecutionEngineExe = "VS.TestRun.ExecutionEngineStartTime";
 
         // It will be the sum of the times taken by all adapter to run tests.
         // In case of parallel it can be more than total time taken to complete run request.
@@ -60,8 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string TimeTakenInSecForDiscovery = "VS.TestDiscovery.TotalTimeTakenInSec";
 
         public static string TimeTakenToLoadAdaptersInSec = "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec";
-
-        public static string TimeTakenInSecToStartDiscoveryEngine = "VS.TestDiscovery.TimeTakenInSecToStartDiscoveryEngine";
 
         // It will be the sum of the times taken by all adapter to discover tests.
         public static string TimeTakenInSecByAllAdapters = "VS.TestDiscovery.TimeTakenInSecByAllAdapters";

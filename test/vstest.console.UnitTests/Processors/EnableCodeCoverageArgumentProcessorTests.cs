@@ -3,6 +3,7 @@
 
 namespace vstest.console.UnitTests.Processors
 {
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -17,7 +18,7 @@ namespace vstest.console.UnitTests.Processors
         public EnableCodeCoverageArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new EnableCodeCoverageArgumentExecutor(this.settingsProvider);
+            this.executor = new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, this.settingsProvider);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 

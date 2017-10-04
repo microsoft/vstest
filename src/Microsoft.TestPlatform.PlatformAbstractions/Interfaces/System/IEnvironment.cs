@@ -19,6 +19,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         PlatformOperatingSystem OperatingSystem { get; }
 
         /// <summary>
+        /// Operating System Version
+        /// </summary>
+        string OperatingSystemVersion { get; }
+
+        /// <summary>
         /// Exits the current process as per Operating System
         /// </summary>
         /// <param name="exitcode">Exit code set by user</param>

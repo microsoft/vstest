@@ -29,6 +29,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private ProxyDataCollectionManager proxyDataCollectionManager;
         private Mock<IDataCollectionLauncher> mockDataCollectionLauncher;
         private Mock<IProcessHelper> mockProcessHelper;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         [TestInitialize]
         public void Initialize()
@@ -36,7 +38,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.mockDataCollectionRequestSender = new Mock<IDataCollectionRequestSender>();
             this.mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
         }
 
         [TestMethod]
@@ -91,7 +96,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void BeforeTestRunStartShouldPassRunSettingsWithExtensionsFolderUpdatedAsTestAdapterPath()
         {
             string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
 
             BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
             this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);

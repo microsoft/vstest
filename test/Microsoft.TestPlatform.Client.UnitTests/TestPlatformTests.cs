@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             // Action
-            var discoveryRequest = tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), discoveryCriteria);
+            var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
 
             // Verify
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));

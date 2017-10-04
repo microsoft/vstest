@@ -96,18 +96,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                var discoveryEngineStartTime = DateTime.UtcNow;
-
                 this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
-
-                    // Collecting Time Taken to Start Discovery Engine
-                    var discoveryEngineTotalTime = DateTime.UtcNow - discoveryEngineStartTime;
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds);
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
