@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</source>
-        <target state="new">The active Test Run was aborted because the host process exited unexpectedly while executing test </target>
-        <note></note>
+        <target state="translated">以下のテストの実行中にホスト プロセスが予期せず終了したため、アクティブなテスト実行が中止されました:</target>
+        <note />
       </trans-unit>
     </body>
   </file>

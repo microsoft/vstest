@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             if (!string.IsNullOrEmpty(this.TestExecutionContext.TestCaseFilter))
             {
-                runContext.FilterExpressionWrapper = new FilterExpressionWrapper(this.TestExecutionContext.TestCaseFilter);
+                runContext.FilterExpressionWrapper = new FilterExpressionWrapper(this.TestExecutionContext.TestCaseFilter, this.TestExecutionContext.FilterOptions);
             }
             else
             {

@@ -235,30 +235,39 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 return null;
             }
 
-            using (var stringReader = new StringReader(runSettingsXml))
+            try
             {
-                var reader = XmlReader.Create(stringReader, ReaderSettings);
-
-                // read to the fist child
-                XmlReaderUtilities.ReadToRootNode(reader);
-                reader.ReadToNextElement();
-
-                // Read till we reach DC element or reach EOF
-                while (!string.Equals(reader.Name, Constants.DataCollectionRunSettingsName)
-                       &&
-                       !reader.EOF)
+                using (var stringReader = new StringReader(runSettingsXml))
                 {
-                    reader.SkipToNextElement();
-                }
+                    var reader = XmlReader.Create(stringReader, ReaderSettings);
 
-                // If reached EOF => DC element not there
-                if (reader.EOF)
-                {
-                    return null;
-                }
+                    // read to the fist child
+                    XmlReaderUtilities.ReadToRootNode(reader);
+                    reader.ReadToNextElement();
 
-                // Reached here => DC element present. 
-                return DataCollectionRunSettings.FromXml(reader);
+                    // Read till we reach DC element or reach EOF
+                    while (!string.Equals(reader.Name, Constants.DataCollectionRunSettingsName)
+                           &&
+                           !reader.EOF)
+                    {
+                        reader.SkipToNextElement();
+                    }
+
+                    // If reached EOF => DC element not there
+                    if (reader.EOF)
+                    {
+                        return null;
+                    }
+
+                    // Reached here => DC element present. 
+                    return DataCollectionRunSettings.FromXml(reader);
+                }
+            }
+            catch (XmlException ex)
+            {
+                throw new SettingsException(
+                    string.Format(CultureInfo.CurrentCulture, "{0} {1}", Resources.CommonResources.MalformedRunSettingsFile, ex.Message),
+                    ex);
             }
         }
 
@@ -332,27 +341,36 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
             if (!string.IsNullOrWhiteSpace(settingsXml))
             {
-                using (var stringReader = new StringReader(settingsXml))
+                try
                 {
-                    XmlReader reader = XmlReader.Create(stringReader, ReaderSettings);
-
-                    // read to the fist child
-                    XmlReaderUtilities.ReadToRootNode(reader);
-                    reader.ReadToNextElement();
-
-                    // Read till we reach nodeName element or reach EOF
-                    while (!string.Equals(reader.Name, nodeName, StringComparison.OrdinalIgnoreCase)
-                            &&
-                            !reader.EOF)
+                    using (var stringReader = new StringReader(settingsXml))
                     {
-                        reader.SkipToNextElement();
-                    }
+                        XmlReader reader = XmlReader.Create(stringReader, ReaderSettings);
 
-                    if (!reader.EOF)
-                    {
-                        // read nodeName element.
-                        return nodeParser(reader);
+                        // read to the fist child
+                        XmlReaderUtilities.ReadToRootNode(reader);
+                        reader.ReadToNextElement();
+
+                        // Read till we reach nodeName element or reach EOF
+                        while (!string.Equals(reader.Name, nodeName, StringComparison.OrdinalIgnoreCase)
+                                &&
+                                !reader.EOF)
+                        {
+                            reader.SkipToNextElement();
+                        }
+
+                        if (!reader.EOF)
+                        {
+                            // read nodeName element.
+                            return nodeParser(reader);
+                        }
                     }
+                }
+                catch (XmlException ex)
+                {
+                    throw new SettingsException(
+                    string.Format(CultureInfo.CurrentCulture, "{0} {1}", Resources.CommonResources.MalformedRunSettingsFile, ex.Message),
+                        ex);
                 }
             }
 

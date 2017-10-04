@@ -476,6 +476,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   --DisableAutoFakes|/DisableAutoFakes:<true/false>
+        ///      Example: /DisableAutoFakes:true
+        /// </summary>
+        public static string DisableAutoFakesUsage
+        {
+            get
+            {
+                return ResourceManager.GetString("DisableAutoFakesUsage", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --Blame|/Blame 
         ///      Enable Blame mode for diagnosis of faulty test case
         /// </summary>
@@ -958,17 +970,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("LoggerUriInvalid", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Settings file provided do not confirm to required format. .
-        /// </summary>
-        public static string MalformedRunSettingsFile
-        {
-            get
-            {
-                return ResourceManager.GetString("MalformedRunSettingsFile", resourceCulture);
             }
         }
 
@@ -1500,7 +1501,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;..
+        ///   Looks up a localized string similar to Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;..
         /// </summary>
         public static string SuggestTestAdapterPathIfNoTestsIsFound
         {

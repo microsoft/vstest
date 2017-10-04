@@ -163,11 +163,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             {
                 this.DoActionOnAllManagers(action, false);
             }
-
-            protected override void DisposeInstance(SampleConcurrentClass clientInstance)
-            {
-                clientInstance.IsDisposeCalled = true;
-            }
         }
 
         private class SampleConcurrentClass
