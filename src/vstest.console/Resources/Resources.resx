@@ -382,9 +382,6 @@
   <data name="LoggerUriInvalid" xml:space="preserve">
     <value>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</value>
   </data>
-  <data name="MalformedRunSettingsFile" xml:space="preserve">
-    <value>Settings file provided do not confirm to required format. </value>
-  </data>
   <data name="MicrosoftCommandLineTitle" xml:space="preserve">
     <value>Microsoft (R) Test Execution Command Line Tool Version {0}</value>
   </data>
@@ -523,7 +520,7 @@
     <value>Standard Output Messages:</value>
   </data>
   <data name="SuggestTestAdapterPathIfNoTestsIsFound" xml:space="preserve">
-    <value>Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</value>
+    <value>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</value>
   </data>
   <data name="SupportedFileTypesIndicator" xml:space="preserve">
     <value>        Supported File Types:</value>
@@ -665,5 +662,9 @@
   </data>
   <data name="UseVsixExtensionsDeprecation" xml:space="preserve">
     <value>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</value>
+  </data>
+  <data name="DisableAutoFakesUsage" xml:space="preserve">
+    <value>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+     Example: /DisableAutoFakes:true</value>
   </data>
 </root>

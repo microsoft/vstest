@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -27,8 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private IEnumerator<string> sourceEnumerator;
         
-        private Task lastParallelDiscoveryCleanUpTask = null;
-
         private ITestDiscoveryEventsHandler2 currentDiscoveryEventsHandler;
 
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
@@ -122,8 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.currentDiscoveryEventsHandler = null;
 
                 // Dispose concurrent executors
-                // Do not do the cleanuptask in the current thread as we will unncessarily add to discovery time
-                this.lastParallelDiscoveryCleanUpTask = Task.Run(() => this.UpdateParallelLevel(0));
+                this.UpdateParallelLevel(0);
 
                 return true;
             }
@@ -158,58 +154,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #endregion
 
-        #region ParallelOperationManager Methods
-
-        /// <summary>
-        /// Closes the instance of the IProxyDiscoveryManager Instance
-        /// </summary>
-        /// <param name="managerInstance"></param>
-        protected override void DisposeInstance(IProxyDiscoveryManager managerInstance)
-        {
-            if (managerInstance != null)
-            {
-                try
-                {
-                    managerInstance.Close();
-                }
-                catch (Exception ex)
-                {
-                    // ignore any exceptions
-                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to dispose discovery manager. Exception: " + ex);
-                }
-            }
-        }
-
-        #endregion
-
         private void DiscoverTestsPrivate(ITestDiscoveryEventsHandler2 discoveryEventsHandler)
         {
             this.currentDiscoveryEventsHandler = discoveryEventsHandler;
-
-            // Cleanup Task for cleaning up the parallel executors except for the default one
-            // We do not do this in Sync so that this task does not add up to discovery time
-            if (this.lastParallelDiscoveryCleanUpTask != null)
-            {
-                try
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("ProxyParallelDiscoveryManager: Wait for last cleanup to complete.");
-                    }
-
-                    this.lastParallelDiscoveryCleanUpTask.Wait();
-                }
-                catch (Exception ex)
-                {
-                    // if there is an exception disposing off concurrent hosts ignore it
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("ParallelProxyDiscoveryManager: Exception while invoking an action on DiscoveryManager: {0}", ex);
-                    }
-                }
-
-                this.lastParallelDiscoveryCleanUpTask = null;
-            }
 
             // Reset the discoverycomplete data
             this.discoveryCompletedClients = 0;
@@ -273,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Total tests must be zero here since parallel discovery events handler adds the count
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
-                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+                        var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                         this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },

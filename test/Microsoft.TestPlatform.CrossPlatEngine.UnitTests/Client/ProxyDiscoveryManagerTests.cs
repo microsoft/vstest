@@ -3,14 +3,14 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -23,6 +23,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     [TestClass]
     public class ProxyDiscoveryManagerTests
@@ -39,6 +41,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IRequestData> mockRequestData;
 
+        private Mock<IMetricsCollection> mockMetricsCollection;
+
+        private ITestRequestSender testRequestSender;
+        private Mock<ICommunicationManager> mockCommunicationManager;
+
+        ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -50,7 +59,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
 
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestData.Object, 
@@ -62,6 +75,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default setup test host manager as shared (desktop)
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(
+                    m => m.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<TestRunnerConnectionInfo>()))
+                .Returns(new TestProcessStartInfo());
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
                 .Callback(
                     () =>
@@ -292,7 +311,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             // Assert.
-            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), null), Times.Once);
+            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), this.testDiscoveryManager), Times.Once);
         }
 
         [TestMethod]
@@ -309,12 +328,146 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 // Act.
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<string>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<double>()), Times.Once);
             }
             finally
             {
                 TestPluginCache.Instance = null;
             }
+        }
+
+        [TestMethod]
+        public void DiscoverTestsCloseTestHostIfRawMessageIsOfTypeDiscoveryComplete()
+        {
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns( () =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.DiscoveryComplete
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotCloseTestHostIfRawMessageIsNotOfTypeDiscoveryComplete()
+        {
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.DiscoveryInitialize
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            this.mockTestHostManager.Verify(mthm => mthm.CleanTestHostAsync(It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void DiscoveryManagerShouldPassOnHandleDiscoveredTests()
+        {
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            var testCases = new List<TestCase>() { new TestCase("x.y.z", new Uri("x://y"), "x.dll") };
+            var rawMessage = "OnDiscoveredTests";
+            var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
+            this.SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize(rawMessage, message);
+
+            var completePayload = new DiscoveryCompletePayload()
+            {
+                IsAborted = false,
+                LastDiscoveredTests = null,
+                TotalTests = 1
+            };
+            var completeMessage = new Message() { MessageType = MessageType.DiscoveryComplete, Payload = null };
+            mockTestDiscoveryEventsHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
+                () =>
+                {
+                    this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.IsAny<string>())).Returns(completeMessage);
+                    this.mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(completeMessage)).Returns(completePayload);
+                });
+
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.AtLeastOnce);
+        }
+
+        [TestMethod]
+        public void DiscoveryManagerShouldPassOnHandleLogMessage()
+        {
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            {
+                var message = new Message
+                {
+                    MessageType = MessageType.TestMessage
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once);
+        }
+
+        private void SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize(string rawMessage, Message message)
+        {
+            TestHostConnectionInfo connectionInfo;
+            connectionInfo = new TestHostConnectionInfo
+            {
+                Endpoint = IPAddress.Loopback + ":0",
+                Role = ConnectionRole.Client,
+                Transport = Transport.Sockets
+            };
+            this.mockCommunicationManager = new Mock<ICommunicationManager>();
+            this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, connectionInfo, this.mockDataSerializer.Object, this.protocolConfig);
+            this.mockCommunicationManager.Setup(mc => mc.HostServer(It.IsAny<IPEndPoint>())).Returns(new IPEndPoint(IPAddress.Loopback, 0));
+            this.mockCommunicationManager.Setup(mc => mc.WaitForClientConnection(It.IsAny<int>())).Returns(true);
+            this.testRequestSender.InitializeCommunication();
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(rawMessage));
+            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+
+            this.testDiscoveryManager = new ProxyDiscoveryManager(
+                                            this.mockRequestData.Object,
+                                            this.testRequestSender,
+                                            this.mockTestHostManager.Object,
+                                            this.mockDataSerializer.Object,
+                                            this.testableClientConnectionTimeout);
+
+            this.CheckAndSetProtocolVersion();
+        }
+
+        private void CheckAndSetProtocolVersion()
+        {
+            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolConfig.Version };
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(this.protocolConfig.Version);
+            this.testRequestSender.CheckVersionWithTestHost();
         }
     }
 }

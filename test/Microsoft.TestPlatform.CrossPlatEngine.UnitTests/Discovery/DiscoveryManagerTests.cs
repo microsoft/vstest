@@ -10,7 +10,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -29,12 +28,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     {
         private DiscoveryManager discoveryManager;
         private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         [TestInitialize]
         public void TestInit()
         {
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
             this.discoveryManager = new DiscoveryManager(this.mockRequestData.Object);
         }
 
@@ -194,7 +195,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void DiscoverTestsShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
@@ -217,7 +218,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.DiscoveryState, It.IsAny<string>()), Times.Once);
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsDiscovered, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsDiscovered, It.IsAny<object>()), Times.Once);
         }
 
         #endregion

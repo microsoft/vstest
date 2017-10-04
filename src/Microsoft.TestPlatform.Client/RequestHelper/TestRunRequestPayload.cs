@@ -49,5 +49,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// </summary>
         [DataMember]
         public bool DebuggingEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the filter criteria for run with sources to filter test cases.
+        /// </summary>
+        [DataMember]
+        public string TestCaseFilter
+        {
+            get;
+            set;
+        }
     }
 }

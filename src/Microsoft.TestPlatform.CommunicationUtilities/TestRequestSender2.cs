@@ -208,8 +208,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 var discoveryCompletePayload =
                                     this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
 
-                                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted, discoveryCompletePayload.Metrics);
-
+                                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                                discoveryCompleteEventsArgs.Metrics = discoveryCompletePayload.Metrics;
                                 discoveryEventsHandler.HandleDiscoveryComplete(
                                     discoveryCompleteEventsArgs,
                                     discoveryCompletePayload.LastDiscoveredTests);
@@ -410,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
 
             // notify test run abort to vstest console wrapper.
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero, null);
+            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
             var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -445,7 +445,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             eventHandler.HandleRawMessage(rawMessage);
 
             // Complete discovery
-            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+            var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
             eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
         }

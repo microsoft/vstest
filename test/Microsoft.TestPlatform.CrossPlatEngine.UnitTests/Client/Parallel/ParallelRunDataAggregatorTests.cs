@@ -256,17 +256,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TotalTestsRanByAdapter, "2");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TotalTestsRanByAdapter, 2);
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsRanByAdapter, out value), true);
-            Assert.AreEqual(value, "4");
+            Assert.AreEqual(value, 4);
         }
 
         [TestMethod]
@@ -274,17 +274,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, .02091);
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, out value), true);
-            Assert.AreEqual(value, (.04182).ToString());
+            Assert.AreEqual(value, .04182);
         }
 
         [TestMethod]
@@ -292,17 +292,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, .02091);
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, out value), true);
-            Assert.AreEqual(value, (.04182).ToString());
+            Assert.AreEqual(value, .04182);
         }
 
         [TestMethod]
@@ -310,7 +310,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add(TelemetryDataConstants.RunState, "Completed");
 
             aggregator.AggregateRunDataMetrics(dict);
@@ -318,7 +318,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.RunState, out value), false);
         }
 
@@ -327,7 +327,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateRunDataMetrics(dict);
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
@@ -353,17 +353,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TotalTestsRanByAdapter, "2");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TotalTestsRanByAdapter, 2);
 
             aggregator.AggregateRunDataMetrics(dict);
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value), true);
-            Assert.AreEqual(value, "1");
+            Assert.AreEqual(value, 1);
         }
 
         [TestMethod]
@@ -371,30 +371,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelRunDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV1", ".02091");
-            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV2", ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV1", .02091);
+            dict.Add(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter + "executor:MSTestV2", .02091);
 
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out value), true);
-            Assert.AreEqual(value, "2");
+            Assert.AreEqual(value, 2);
         }
 
         [TestMethod]
         public void GetRunDataMetricsShouldNotAddTotalAdaptersUsedIfMetricsIsEmpty()
         {
             var aggregator = new ParallelRunDataAggregator();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, out value), false);
         }
 
@@ -402,13 +402,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         public void GetRunDataMetricsShouldNotAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
         {
             var aggregator = new ParallelRunDataAggregator();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateRunDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedRunDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, out value), false);
         }
     }

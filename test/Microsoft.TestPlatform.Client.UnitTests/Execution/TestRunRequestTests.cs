@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
     using Client.Execution;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -21,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using ObjectModel;
     using ObjectModel.Client;
     using ObjectModel.Engine;
+    using System.Collections.ObjectModel;
 
     [TestClass]
     public class TestRunRequestTests
@@ -149,11 +149,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
 
         [TestMethod]
-        public void OnTestSessionTimeoutShouldCallCancel()
+        public void OnTestSessionTimeoutShouldCallAbort()
         {
             this.testRunRequest.ExecuteAsync();
             this.testRunRequest.OnTestSessionTimeout(null);
-            this.executionManager.Verify(o => o.Cancel(), Times.Once);
+            this.executionManager.Verify(o => o.Abort(), Times.Once);
         }
 
         [TestMethod]
@@ -195,12 +195,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
             onTestSessionTimeoutCalled.Reset();
-            executionManager.Setup(o => o.Cancel()).Callback(() => onTestSessionTimeoutCalled.Set());
+            executionManager.Setup(o => o.Abort()).Callback(() => onTestSessionTimeoutCalled.Set());
 
             testRunRequest.ExecuteAsync();
             onTestSessionTimeoutCalled.WaitOne(20 * 1000);
 
-            executionManager.Verify(o => o.Cancel(), Times.Once);
+            executionManager.Verify(o => o.Abort(), Times.Once);
+        }
+
+        /// <summary>
+        /// Test session timeout should be infinity if TestSessionTimeout is 0.
+        /// </summary>
+        [TestMethod]
+        public void OnTestSessionTimeoutShouldNotGetCalledWhenTestSessionTimeoutIsZero()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TestSessionTimeout>0</TestSessionTimeout>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, true, settingsXml);
+            var executionManager = new Mock<IProxyExecutionManager>();
+            var testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object);
+
+            executionManager.Setup(o => o.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).Callback(() => System.Threading.Thread.Sleep(5 * 1000));
+
+            testRunRequest.ExecuteAsync();
+
+            executionManager.Verify(o => o.Abort(), Times.Never);
         }
 
         [TestMethod]
@@ -265,20 +290,107 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void HandleTestRunCompleteShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
 
             this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+            testRunCompeleteEventsArgs.Metrics = dict;
 
             // Act
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), dict), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
 
             // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForRun, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldHandleListAttachments()
+        {
+            bool attachmentsFound = false;
+            this.testRunRequest.OnRunCompletion += (s, e) =>
+             {
+                 attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
+             };
+
+            List<AttachmentSet> attachmentSets = new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") };
+
+            this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
+
+            // Verify.
+            Assert.IsTrue(attachmentsFound);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldHandleCollectionAttachments()
+        {
+            bool attachmentsFound = false;
+            this.testRunRequest.OnRunCompletion += (s, e) =>
+            {
+                attachmentsFound = e.AttachmentSets != null && e.AttachmentSets.Count == 1;
+            };
+
+            Collection<AttachmentSet> attachmentSets = new Collection<AttachmentSet>(new List<AttachmentSet> { new AttachmentSet(new Uri("datacollector://attachment"), "datacollectorAttachment") });
+
+            this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, attachmentSets, null);
+
+            // Verify.
+            Assert.IsTrue(attachmentsFound);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldHandleNullAttachments()
+        {
+            bool attachmentsFound = false;
+            this.testRunRequest.OnRunCompletion += (s, e) =>
+            {
+                attachmentsFound = e.AttachmentSets == null;
+            };
+
+            this.testRunRequest.ExecuteAsync();
+            var testRunCompeleteEventsArgs = new TestRunCompleteEventArgs(
+                new TestRunStatistics(1, null),
+                false,
+                false,
+                null,
+                null,
+                TimeSpan.FromSeconds(0));
+
+            // Act
+            this.testRunRequest.HandleTestRunComplete(testRunCompeleteEventsArgs, null, null, null);
+
+            // Verify.
+            Assert.IsTrue(attachmentsFound);
         }
 
         [TestMethod]
@@ -289,7 +401,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
             this.testRunRequest.ExecuteAsync();
 
-            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0), null), null, null, null);
+            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0)), null, null, null);
 
             Assert.AreEqual(2, events.Count);
             Assert.AreEqual("close", events[0]);

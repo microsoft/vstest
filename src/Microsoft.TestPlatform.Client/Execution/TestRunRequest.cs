@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Linq;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -119,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 // Collecting Number of sources Sent For Execution
                 var numberOfSources = (uint)(testRunCriteria.Sources != null ? testRunCriteria.Sources.Count<string>() : 0);
-                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources.ToString());
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForRun, numberOfSources);
 
                 if (EqtTrace.IsInfoEnabled)
                 {
@@ -189,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             this.HandleLogMessage(TestMessageLevel.Error, message);
             this.HandleRawMessage(rawMessage);
-            this.CancelAsync();
+            this.Abort();
         }
 
         /// <summary>
@@ -408,8 +407,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            runContextAttachments as Collection<AttachmentSet>,
-                            this.runRequestTimeTracker.Elapsed, null);
+                            // This is required as TMI adapter is sending attachments as List which cannot be typecasted to Collection.
+                            runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
+                            this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
                     // by either engines - as both calculate at different points
@@ -438,7 +438,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     var executionTotalTimeTaken = DateTime.UtcNow - this.executionStartTime;
 
                     // Fill in the time taken to complete the run
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds);
 
                     // Fill in the Metrics From Test Host Process
                     var metrics = runCompleteArgs.Metrics;
@@ -558,7 +558,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (disposing)
                     {
                         this.runCompletionEvent?.Dispose();
-                        this.requestData.MetricsCollection.Clear();
                     }
 
                     // Indicate that object has been disposed
