@@ -70,7 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             areTestCaseLevelEventsRequired: false,
                             hasTestRun: true,
                             isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
-                            testCaseFilter: testRunCriteria.TestCaseFilter);
+                            testCaseFilter: testRunCriteria.TestCaseFilter,
+                            filterOptions: testRunCriteria.FilterOptions);
 
                 // Initialize extension before execution
                 this.InitializeExtensions(testPackages);
