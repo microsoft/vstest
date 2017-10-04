@@ -58,8 +58,8 @@
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="new">名为“{0}”的设置部分重复。忽略重复的设置。</target>
-        <note></note>
+        <target state="translated">名为“{0}”的运行设置部分重复。请忽略重复的设置。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">重复的名为"{0} 找到运行的设置部分。 忽略重复设置。</target>
         </alt-trans>
@@ -211,8 +211,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
         <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
-        <target state="new">数据收集器“{0}”未能提供初始化信息。错误: {1}</target>
-        <note></note>
+        <target state="translated">数据收集器“{0}”未能提供初始化信息。错误: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
         <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
@@ -251,13 +251,13 @@
       </trans-unit>
       <trans-unit id="FailedToFindInstalledUnitTestExtensions">
         <source>Failed to find the list of installed unit test extensions. Reason: {0}</source>
-        <target state="new">Failed to find the list of installed unit test extensions. Reason: {0}</target>
-        <note></note>
+        <target state="translated">找不到已安装的单元测试扩展列表。原因: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VSInstallationNotFound">
         <source>This option works only with vstest.console.exe installed as part of Visual Studio.</source>
-        <target state="new">Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</target>
-        <note></note>
+        <target state="translated">此选项仅适用于作为 Visual Studio 一部分安装的 vstest.console.exe。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
