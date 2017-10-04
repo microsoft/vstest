@@ -39,9 +39,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
-        <source>Canceling test run: test run timeout of {0} milliseconds exceeded.</source>
-        <target state="translated">Cancelando a execução de teste: o tempo limite da execução de teste de {0} milissegundos foi excedido.</target>
-        <note />
+        <source>Aborting test run: test run timeout of {0} milliseconds exceeded.</source>
+        <target state="new">Cancelando a execução de teste: o tempo limite da execução de teste de {0} milissegundos foi excedido.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

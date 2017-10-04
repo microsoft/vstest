@@ -39,9 +39,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
-        <source>Canceling test run: test run timeout of {0} milliseconds exceeded.</source>
-        <target state="translated">테스트 실행 취소 중: 테스트 실행 시간 제한 {0}밀리초가 초과되었습니다.</target>
-        <note />
+        <source>Aborting test run: test run timeout of {0} milliseconds exceeded.</source>
+        <target state="new">테스트 실행 취소 중: 테스트 실행 시간 제한 {0}밀리초가 초과되었습니다.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

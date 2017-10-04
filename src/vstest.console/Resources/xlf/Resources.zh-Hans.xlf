@@ -1546,6 +1546,13 @@
         <target state="translated">/UseVsixExtensions 即将被弃用。请改为使用 /TestAdapterPath。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesUsage">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+     Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+     Example: /DisableAutoFakes:true</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
