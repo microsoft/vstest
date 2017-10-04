@@ -12,7 +12,8 @@ namespace EventLogUnitTestProject
     [TestClass]
     public class UnitTest1
     {
-        [TestMethod]
+        // Making this TestMethod TestInitialize because we always wants this function to execute at first
+        [TestInitialize]
         public void TestMethod1()
         {
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 110);
@@ -29,7 +30,8 @@ namespace EventLogUnitTestProject
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 223);
         }
 
-        [TestMethod]
+        // Making this TestMethod TestCleanup because we always wants this function to execute at last
+        [TestCleanup]
         public void TestMethod3()
         {
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 330);
