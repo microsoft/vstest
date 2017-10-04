@@ -83,7 +83,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest("/listLoggers");
 
             this.StdOutputContains("logger://Microsoft/TestPlatform/Extensions/Blame/v1");
-            this.StdOutputContains("logger://Microsoft/TestPlatform/TrxLogger/v2");
+            this.StdOutputContains("logger://Microsoft/TestPlatform/TrxLogger/v1");
         }
 
         [CustomDataTestMethod]
