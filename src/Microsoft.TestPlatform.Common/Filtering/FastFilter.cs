@@ -109,8 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             var propertyValue = propertyValueProvider(name);
             if (null != propertyValue)
             {
-                singleValue = propertyValue as string;
-                multiValues = singleValue == null ? propertyValue as string[] : null;
+                multiValues = propertyValue as string[];
+                singleValue = multiValues == null? propertyValue.ToString() : null;
                 return true;
             }
 
