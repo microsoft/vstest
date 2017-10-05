@@ -75,6 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockMetricsPublisherTask = Task.FromResult(this.mockMetricsPublisher.Object);
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
+            this.mockAssemblyMetadataProvider.Setup(x => x.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
             this.inferHelper = new InferHelper(this.mockAssemblyMetadataProvider.Object);
         }
 
