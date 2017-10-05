@@ -84,6 +84,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             do
             {
                 var message = this.communicationManager.ReceiveMessage();
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestRequestHandler.ProcessRequests: received message: {0}", message);
+                }
 
                 switch (message.MessageType)
                 {
