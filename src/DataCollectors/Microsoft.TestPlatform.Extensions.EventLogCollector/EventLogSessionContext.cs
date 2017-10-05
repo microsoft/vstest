@@ -58,8 +58,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             foreach (KeyValuePair<string, IEventLogContainer> kvp in this.eventLogContainerMap)
             {
-                kvp.Value.OnEventLogEntryWritten(kvp.Value.EventLog, null);
-
                 this.EventLogContainerStartIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count);
             }
         }
