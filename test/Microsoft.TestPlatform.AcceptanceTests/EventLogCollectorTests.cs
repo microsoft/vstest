@@ -20,6 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         }
 
+        [Ignore]
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
