@@ -135,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
-#endregion
+        #endregion
 
         #region Constructor
 
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
         }
 
-#endregion
+        #endregion
 
         #region IArgumentProcessor
 
@@ -255,10 +255,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // for command line keep alive is always false.
                 bool keepAlive = false;
 
-                GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref this.effectiveRunSettings);
-
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
-                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestCaseFilter = this.commandLineOptions.TestCaseFilterValue };
+                var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue }};
                 result &= this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
             }
             else

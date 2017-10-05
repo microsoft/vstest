@@ -33,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -138,6 +139,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.testPlatformEventSource.VsTestConsoleStop();
 
+            this.testPlatformEventSource.MetricsDisposeStart();
+
+            // Disposing Metrics Publisher when VsTestConsole ends
+            TestRequestManager.Instance.Dispose();
+
+            this.testPlatformEventSource.MetricsDisposeStop();
             return exitCode;
         }
 
@@ -216,7 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    if (ex is CommandLineException || ex is TestPlatformException)
+                    if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                     {
                         this.Output.Error(false, ex.Message);
                         result = 1;
@@ -309,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             catch (Exception ex)
             {
-                if (ex is CommandLineException || ex is TestPlatformException)
+                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                 {
                     EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
                     this.Output.Error(false, ex.Message);

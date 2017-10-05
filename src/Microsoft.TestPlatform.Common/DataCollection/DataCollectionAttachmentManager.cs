@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Use to cancel attachment transfers if test run is cancelled.
         /// </summary>
         private CancellationTokenSource cancellationTokenSource;
-        
+
         /// <summary>
         /// File helper instance.
         /// </summary>
@@ -166,9 +166,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             if (!this.AttachmentSets.ContainsKey(fileTransferInfo.Context))
             {
                 var uriAttachmentSetMap = new Dictionary<Uri, AttachmentSet>();
-                uriAttachmentSetMap.Add(uri, new AttachmentSet(uri, friendlyName));
                 this.AttachmentSets.Add(fileTransferInfo.Context, uriAttachmentSetMap);
                 this.attachmentTasks.Add(fileTransferInfo.Context, new List<Task>());
+            }
+
+            if (!this.AttachmentSets[fileTransferInfo.Context].ContainsKey(uri))
+            {
+                this.AttachmentSets[fileTransferInfo.Context].Add(uri, new AttachmentSet(uri, friendlyName));
             }
 
             this.AddNewFileTransfer(fileTransferInfo, sendFileCompletedCallback, uri, friendlyName);
@@ -308,8 +312,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     {
                         if (t.Exception == null)
                         {
-                            // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
-                            var attachmentUri = new UriBuilder() { Scheme = "file", Host="", Path = localFilePath }.Uri;
+                        // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
+                        var attachmentUri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
                             this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(attachmentUri, fileTransferInfo.Description));
                         }
 

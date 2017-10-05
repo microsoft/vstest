@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             this.HandleLogMessage(TestMessageLevel.Error, message);
             this.HandleRawMessage(rawMessage);
-            this.CancelAsync();
+            this.Abort();
         }
 
         /// <summary>
@@ -407,7 +407,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            runContextAttachments as Collection<AttachmentSet>,
+                            // This is required as TMI adapter is sending attachments as List which cannot be typecasted to Collection.
+                            runContextAttachments != null ? new Collection<AttachmentSet>(runContextAttachments.ToList()) : null,
                             this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 

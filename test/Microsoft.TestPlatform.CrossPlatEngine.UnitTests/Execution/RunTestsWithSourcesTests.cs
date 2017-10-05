@@ -53,7 +53,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                             areTestCaseLevelEventsRequired: false,
                                             hasTestRun: false,
                                             isDebug: false,
-                                            testCaseFilter: null);
+                                            testCaseFilter: null,
+                                            filterOptions: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
             this.mockRequestData = new Mock<IRequestData>();

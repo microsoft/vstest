@@ -5,8 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using System.Diagnostics;
 
     /// <summary>
     /// Class holds information related to filtering criteria.
@@ -16,30 +19,80 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <summary>
         /// FilterExpression corresponding to filter criteria
         /// </summary>
-        private FilterExpression filterExpression;
-        
+        private readonly FilterExpression filterExpression;
+
+        /// <remarks>
+        /// Exposed for testing purpose.
+        /// </remarks>
+        internal readonly FastFilter fastFilter;
+
+        private bool UseFastFilter => this.fastFilter != null;
+
         /// <summary>
-        /// Initializes FilterExpressionWrapper with given filterString.  
+        /// Initializes FilterExpressionWrapper with given filterString and options.  
         /// </summary>
-        public FilterExpressionWrapper(string filterString)
+        public FilterExpressionWrapper(string filterString, FilterOptions options)
         {
             ValidateArg.NotNullOrEmpty(filterString, "filterString");
 
             this.FilterString = filterString;
+            this.FilterOptions = options;
+
             try
             {
-                this.filterExpression = FilterExpression.Parse(filterString);
+                // We prefer fast filter when it's available.
+                this.filterExpression = FilterExpression.Parse(filterString, out this.fastFilter);
+
+                if (UseFastFilter)
+                {
+                    this.filterExpression = null;
+
+                    // Property value regex is only supported for fast filter, 
+                    // so we ignore it if no fast filter is constructed.
+
+                    // TODO: surface an error message to suer.
+                    var regexString = options?.FilterRegEx;
+                    if (!string.IsNullOrEmpty(regexString))
+                    {
+                        Debug.Assert(options.FilterRegExReplacement != null ? options.FilterRegEx != null : true);
+                        this.fastFilter.PropertyValueRegex = new Regex(regexString, RegexOptions.Compiled);
+                        this.fastFilter.PropertyValueRegexReplacement = options.FilterRegExReplacement;
+                    }
+                }
+
             }
             catch (FormatException ex)
             {
                 this.ParseError = ex.Message;
             }
+            catch (ArgumentException ex)
+            {
+                this.fastFilter = null;
+                this.ParseError = ex.Message;
+            }
         }
-        
+
+        /// <summary>
+        /// Initializes FilterExpressionWrapper with given filterString.  
+        /// </summary>
+        public FilterExpressionWrapper(string filterString)
+            : this(filterString, null)
+        {
+        }
+
         /// <summary>
         /// User specified filter criteria.
         /// </summary>
         public string FilterString
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// User specified additional filter options.
+        /// </summary>
+        public FilterOptions FilterOptions
         {
             get;
             private set;
@@ -59,26 +112,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
         {
-            string[] invalidProperties = null;
-            if (null != this.filterExpression)
-            {
-                invalidProperties = this.filterExpression.ValidForProperties(supportedProperties, propertyProvider);
-            }
-            return invalidProperties;
+            return UseFastFilter ? this.fastFilter.ValidForProperties(supportedProperties) : this.filterExpression?.ValidForProperties(supportedProperties, propertyProvider);
         }
-        
+
         /// <summary>
         /// Evaluate filterExpression with given propertyValueProvider.
         /// </summary>
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
             ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
-            if (null == this.filterExpression)
+            
+            if (UseFastFilter)
             {
-                return false;
+                return this.fastFilter.Evaluate(propertyValueProvider);
             }
-            return this.filterExpression.Evaluate(propertyValueProvider);
-        }
 
+            return this.filterExpression == null ? false : this.filterExpression.Evaluate(propertyValueProvider);
+        }
     }
 }

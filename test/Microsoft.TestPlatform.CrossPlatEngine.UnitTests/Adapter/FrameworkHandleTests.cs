@@ -98,7 +98,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
                           areTestCaseLevelEventsRequired: false,
                           hasTestRun: false,
                           isDebug: false,
-                          testCaseFilter: string.Empty);
+                          testCaseFilter: string.Empty,
+                          filterOptions: null);
             return tec;
         }
     }
