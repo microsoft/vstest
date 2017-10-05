@@ -7,12 +7,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Collections.Generic;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -32,10 +29,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private TestableTestRunCache testableTestRunCache;
         private TestExecutionContext testExecutionContext;
         private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
-
         private TestableRunTestsWithTests runTestsInstance;
-
-        private IRequestData requestData;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         private const string RunTestsWithSourcesTestsExecutorUri = "executor://RunTestWithSourcesDiscoverer/";
 
@@ -43,7 +39,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void TestInit()
         {
             this.testableTestRunCache = new TestableTestRunCache();
-            this.requestData = new RequestData(new NoOpMetricsCollection());
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
             this.testExecutionContext = new TestExecutionContext(
                                 frequencyOfRunStatsChangeEvent: 100,
                                 runStatsChangeEventTimeout: TimeSpan.MaxValue,
@@ -53,7 +51,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                 areTestCaseLevelEventsRequired: false,
                                 hasTestRun: false,
                                 isDebug: false,
-                                testCaseFilter: null);
+                                testCaseFilter: null,
+                                filterOptions: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         }
 
@@ -72,7 +71,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
-                this.requestData);
+                this.mockRequestData.Object);
 
             var map = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
@@ -100,7 +99,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
-                this.requestData);
+                this.mockRequestData.Object);
 
             var map = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
@@ -134,7 +133,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 this.mockTestRunEventsHandler.Object,
                 executorUriVsTestList,
-                this.requestData);
+                this.mockRequestData.Object);
             
             var testExecutor = new RunTestsWithSourcesTests.RunTestWithSourcesExecutor();
             var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));

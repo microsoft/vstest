@@ -23,6 +23,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class TestAdapterPathArgumentProcessorTests
     {
+        RunSettings currentActiveSetting;
+
+        [TestInitialize]
+        public void TestInit()
+        {
+            currentActiveSetting = RunSettingsManager.Instance.ActiveRunSettings;
+        }
+
+        [TestCleanup]
+        public void TestClean()
+        {
+            RunSettingsManager.Instance.SetActiveRunSettings(currentActiveSetting);
+        }
+
+
         [TestMethod]
         public void GetMetadataShouldReturnTestAdapterPathArgumentProcessorCapabilities()
         {
@@ -158,22 +173,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldUpdateTestAdapterPathsInRunSettings()
-        {
-            RunSettingsManager.Instance.AddDefaultRunSettings();
-
-            var mockOutput = new Mock<IOutput>();
-            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, new FileHelper());
-
-            var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).GetTypeInfo().Assembly.Location;
-            var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
-
-            executor.Initialize(currentFolder);
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-            Assert.AreEqual(currentFolder, runConfiguration.TestAdaptersPaths);
-        }
-
-        [TestMethod]
         public void InitializeShouldMergeTestAdapterPathsInRunSettings()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
@@ -241,6 +240,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             }
 
             Assert.IsTrue(isExceptionThrown);
+        }
+
+        [TestMethod]
+        public void InitializeShouldTrimTrailingAndLeadingDoubleQuotes()
+        {
+            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(runSettingsXml);
+            RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+            var mockFileHelper = new Mock<IFileHelper>();
+            var mockOutput = new Mock<IOutput>();
+
+            mockFileHelper.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
+            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
+
+            executor.Initialize("\"c:\\users\"");
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual("d:\\users;c:\\users", runConfiguration.TestAdaptersPaths);
+
         }
 
         #endregion

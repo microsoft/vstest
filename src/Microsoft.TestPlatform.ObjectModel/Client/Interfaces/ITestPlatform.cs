@@ -26,17 +26,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Creates a discovery request
         /// </summary>
+        /// <param name="requestData">Providing common services and data for Discovery</param>
         /// <param name="discoveryCriteria">Specifies the discovery parameters</param>
-        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>DiscoveryRequest object</returns>
-        IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig);
+        IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria);
 
         /// <summary>
         /// Creates a test run request.
         /// </summary>
+        /// <param name="requestData">Providing common services and data for Execution</param>
         /// <param name="testRunCriteria">Specifies the test run criteria</param>
-        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>RunRequest object</returns>
-        ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria, ProtocolConfig protocolConfig);
+        ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria);
     }
 }

@@ -14,7 +14,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
@@ -45,6 +44,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private Mock<IRequestData> mockRequestData;
 
+        private Mock<IMetricsCollection> mockMetricsCollection;
+
         private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
         private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
 
@@ -60,13 +61,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                           areTestCaseLevelEventsRequired: false,
                           hasTestRun: false,
                           isDebug: false,
-                          testCaseFilter: string.Empty);
+                          testCaseFilter: string.Empty,
+                          filterOptions: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
 
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
             this.runTestsInstance = new TestableBaseRunTests(
                 null,
@@ -614,7 +617,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             TestRunCompleteEventArgs receivedRunCompleteArgs = null;
             var mockMetricsCollector = new Mock<IMetricsCollection>();
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
 
             // Setup mocks.
@@ -650,7 +653,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldCollectMetrics()
         {
             var mockMetricsCollector = new Mock<IMetricsCollection>();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add("DummyMessage", "DummyValue");
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -676,13 +679,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.RunTests();
 
             // Verify.
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsRun, It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsRun, It.IsAny<object>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.RunState, It.IsAny<string>()), Times.Once);
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, It.IsAny<string>()), Times.Once);
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, It.IsAny<string>()), Times.Once);
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, It.IsAny<string>()), Times.Once);
-            mockMetricsCollector.Verify(rd => rd.Add(string.Concat(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, ".", new Uri(BadBaseRunTestsExecutorUri)), It.IsAny<string>()), Times.Once);
-            mockMetricsCollector.Verify(rd => rd.Add(string.Concat(TelemetryDataConstants.TotalTestsRanByAdapter, ".", new Uri(BadBaseRunTestsExecutorUri)), It.IsAny<string>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, It.IsAny<object>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution, It.IsAny<object>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, It.IsAny<object>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(string.Concat(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter, ".", new Uri(BadBaseRunTestsExecutorUri)), It.IsAny<object>()), Times.Once);
+            mockMetricsCollector.Verify(rd => rd.Add(string.Concat(TelemetryDataConstants.TotalTestsRanByAdapter, ".", new Uri(BadBaseRunTestsExecutorUri)), It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]

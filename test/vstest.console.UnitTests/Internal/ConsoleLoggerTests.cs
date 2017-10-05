@@ -438,7 +438,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 1, 0, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
@@ -452,7 +452,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
@@ -466,9 +466,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, true, false, null, null, new TimeSpan(1, 0, 0, 0), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, true, false, null, null, new TimeSpan(1, 0, 0, 0)));
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsCanceledWithoutRunningAnyTest()
+        {
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, true, false, null, null, new TimeSpan(1, 0, 0, 0)));
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
         }
 
@@ -480,7 +488,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, true, false, null, null, new TimeSpan(1, 0, 0, 0), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, true, false, null, null, new TimeSpan(1, 0, 0, 0)));
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
@@ -494,7 +502,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, true, null, null, new TimeSpan(1, 0, 0, 0), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, true, null, null, new TimeSpan(1, 0, 0, 0)));
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
@@ -508,9 +516,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, true, null, null, new TimeSpan(1, 0, 0, 0), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, true, null, null, new TimeSpan(1, 0, 0, 0)));
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsAbortedWithoutRunningAnyTest()
+        {
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, true, null, null, new TimeSpan(1, 0, 0, 0)));
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
         }
 
@@ -522,10 +538,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise events on mock object
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0), null));
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 1, 0, 0), null));
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 1, 0), null));
-            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 0, 1), null));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 1, 0, 0)));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 1, 0)));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 0, 1)));
 
             // Verify PrintTimeSpan with different formats
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Days), OutputLevel.Information), Times.Once());
@@ -594,7 +610,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             attachmentSet.Attachments.Add(uriDataAttachment1);
             var attachmentSetList = new List<AttachmentSet>();
             attachmentSetList.Add(attachmentSet);
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0), null);
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
             this.testRunRequest.Raise(m => m.OnRunCompletion += null, testRunCompleteEventArgs);
@@ -684,7 +700,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Raise a test run complete message to flush out any pending messages in queue
             this.testRunRequest.Raise(
                 m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0), metrics: null));
+                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0)));
         }
 
         private List<ObjectModel.TestResult> GetTestResultsObject()

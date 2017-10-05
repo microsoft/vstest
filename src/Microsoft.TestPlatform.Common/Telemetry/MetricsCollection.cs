@@ -5,20 +5,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 {
     using System.Collections.Generic;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     /// <inheritdoc />
     /// <summary>
     /// This Class will collect Metrics.
     /// </summary>
     public class MetricsCollection : IMetricsCollection
     {
-        private Dictionary<string, string> metricDictionary;
+        private Dictionary<string, object> metricDictionary;
 
         /// <summary>
         /// The Metrics Collection
         /// </summary>
         public MetricsCollection()
         {
-            this.metricDictionary = new Dictionary<string, string>();
+            this.metricDictionary = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -26,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// </summary>
         /// <param name="metric"></param>
         /// <param name="value"></param>
-        public void Add(string metric, string value)
+        public void Add(string metric, object value)
         {
             this.metricDictionary[metric] = value;
         }
@@ -34,13 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         /// <summary>
         /// Returns the Metrics
         /// </summary>
-        public IDictionary<string, string> Metrics
-        {
-            get
-            {
-                return this.metricDictionary;
-            }
-        }
+        public IDictionary<string, object> Metrics => this.metricDictionary;
 
         /// <summary>
         /// Clears the Metrics

@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
@@ -82,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             if (!string.IsNullOrEmpty(this.TestExecutionContext.TestCaseFilter))
             {
-                runContext.FilterExpressionWrapper = new FilterExpressionWrapper(this.TestExecutionContext.TestCaseFilter);
+                runContext.FilterExpressionWrapper = new FilterExpressionWrapper(this.TestExecutionContext.TestCaseFilter, this.TestExecutionContext.FilterOptions);
             }
             else
             {

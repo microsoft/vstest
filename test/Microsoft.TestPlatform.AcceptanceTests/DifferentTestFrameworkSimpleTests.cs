@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void ChutzpahRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void ChutzpahRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -22,7 +22,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testJSFileAbsolutePath,
                 this.GetTestAdapterPath(UnitTestFramework.Chutzpah),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -30,7 +29,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void CPPRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void CPPRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x86");
@@ -38,15 +37,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void CPPRunAllTestExecutionPlatformx64(RunnnerInfo runnerInfo)
+        public void CPPRunAllTestExecutionPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CppRunAllTests(runnerInfo.RunnerFramework, "x64");
         }
-		
+
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void WebTestRunAllTests(RunnnerInfo runnerInfo)
+        public void WebTestRunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             WebTestRunAllTests(runnerInfo.RunnerFramework);
@@ -54,7 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void CodedWebTestRunAllTests(RunnnerInfo runnerInfo)
+        public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             CodedWebTestRunAllTests(runnerInfo.RunnerFramework);
@@ -62,7 +61,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void NUnitRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -70,7 +69,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -79,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void XUnitRunAllTestExecution(RunnnerInfo runnerInfo)
+        public void XUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             string testAssemblyPath = null;
@@ -98,7 +96,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -122,14 +119,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 assemblyAbsolutePath,
                 string.Empty,
                 string.Empty,
-                this.FrameworkArgValue,
                 this.testEnvironment.InIsolationValue);
 
-            arguments = string.Concat(arguments, $" /platform:{platform}");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }
-		
+
         private void WebTestRunAllTests(string runnerFramework)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
@@ -144,8 +139,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty,
-                this.FrameworkArgValue);
+                string.Empty);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -165,9 +159,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty,
-                this.FrameworkArgValue);
-                
+                string.Empty);
+
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
         }

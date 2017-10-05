@@ -10,12 +10,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,6 +30,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
         private DiscoveryResultCache discoveryResultCache;
         private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         [TestInitialize]
         public void TestInit()
@@ -37,7 +38,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
             this.mockRequestData = new Mock<IRequestData>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
             this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object);
 
             TestDiscoveryExtensionManager.Destroy();
@@ -270,7 +272,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             try
             {
                 var mockMetricsCollector = new Mock<IMetricsCollection>();
-                var dict = new Dictionary<string, string>();
+                var dict = new Dictionary<string, object>();
                 dict.Add("DummyMessage", "DummyValue");
 
                 TestPluginCacheTests.SetupMockExtensions(
@@ -296,12 +298,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
 
                 // Verify.
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, It.IsAny<string>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, It.IsAny<string>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, It.IsAny<string>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, It.IsAny<string>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsByAdapter + ".discoverer://dlldiscoverer/", It.IsAny<string>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + ".discoverer://dlldiscoverer/", It.IsAny<string>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsByAdapter + ".discoverer://dlldiscoverer/", It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + ".discoverer://dlldiscoverer/", It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, It.IsAny<object>()), Times.Once);
             }
             finally
             {

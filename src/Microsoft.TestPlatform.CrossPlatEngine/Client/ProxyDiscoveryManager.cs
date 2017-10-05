@@ -5,13 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -25,20 +23,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
     /// </summary>
-    public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager
+    public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager, ITestDiscoveryEventsHandler2
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
         private IRequestData requestData;
+        private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
 
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
-        /// <param name="requestData">Request Data</param>
+        /// <param name="requestData">The Request Data for providing discovery services and data.</param>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
@@ -67,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
             int clientConnectionTimeout)
-            : base(requestSender, testHostManager, clientConnectionTimeout)
+            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
@@ -94,6 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
                 var discoveryEngineStartTime = DateTime.UtcNow;
@@ -107,9 +107,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     // Collecting Time Taken to Start Discovery Engine
                     var discoveryEngineTotalTime = DateTime.UtcNow - discoveryEngineStartTime;
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds.ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds);
 
-                    this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+                    this.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
             }
             catch (Exception exception)
@@ -119,18 +119,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Log to vs ide test output
                 var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
                 var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-                eventHandler.HandleRawMessage(rawMessage);
+                this.HandleRawMessage(rawMessage);
 
                 // Log to vstest.console
                 // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
                 // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
                 // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
                 // and the test host is lost as well.
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                this.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
-                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true, null);
+                var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
-                eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
+                this.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }
         }
 
@@ -141,9 +141,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc/>
-        public override void Close()
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            base.Close();
+            this.baseTestDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, lastChunk);
+        }
+
+        /// <inheritdoc/>
+        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+        {
+            this.baseTestDiscoveryEventsHandler.HandleDiscoveredTests(discoveredTestCases);
+        }
+
+        /// <inheritdoc/>
+        public void HandleRawMessage(string rawMessage)
+        {
+            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+            if(string.Equals(message.MessageType, MessageType.DiscoveryComplete))
+            {
+                this.Close();
+            }
+
+            this.baseTestDiscoveryEventsHandler.HandleRawMessage(rawMessage);
+        }
+
+        /// <inheritdoc/>
+        public void HandleLogMessage(TestMessageLevel level, string message)
+        {
+            this.baseTestDiscoveryEventsHandler.HandleLogMessage(level, message);
         }
 
         #endregion

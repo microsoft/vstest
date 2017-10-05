@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void RunMultipleTestAssemblies(RunnnerInfo runnerInfo)
+        public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void RunMultipleTestAssembliesWithoutTestAdapterPath(RunnnerInfo runnerInfo)
+        public void RunMultipleTestAssembliesWithoutTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -47,13 +47,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunMultipleTestAssembliesInParallel(RunnnerInfo runnerInfo)
+        public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
             string testhostProcessName = string.Empty;
@@ -95,32 +95,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void TestSessionTimeOutTests(RunnnerInfo runnerInfo)
+        public void TestSessionTimeOutTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
 
             // set TestSessionTimeOut = 7 sec
             arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=7000");
             this.InvokeVsTest(arguments);
 
-            this.StdErrorContains("Test Run Canceled.");
-            this.StdErrorContains("Canceling test run: test run timeout of 7000 milliseconds exceeded.");
+            this.StdErrorContains("Test Run Aborted.");
+            this.StdErrorContains("Aborting test run: test run timeout of 7000 milliseconds exceeded.");
             this.StdOutputDoesNotContains("Total tests: 6");
         }
 
         [CustomDataTestMethod]
         [NETCORETargetFramework]
-        public void TestPlatformShouldBeCompatibleWithOldTestHost(RunnnerInfo runnerInfo)
+        public void TestPlatformShouldBeCompatibleWithOldTestHost(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SampleProjectWithOldTestHost.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);
 
@@ -130,13 +130,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void WorkingDirectoryIsSourceDirectory(RunnnerInfo runnerInfo)
+        public void WorkingDirectoryIsSourceDirectory(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /tests:WorkingDirectoryTest");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -145,13 +145,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(RunnnerInfo runnerInfo)
+        public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase)
-                && runnerInfo.TargetFramework.StartsWith("netcoreapp"))
+            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
             {
+                // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
                 Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
                 return;
             }
@@ -159,9 +159,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var diagLogFilePath = Path.Combine(Path.GetTempPath(), $"std_error_log_{Guid.NewGuid()}.txt");
             File.Delete(diagLogFilePath);
 
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
@@ -185,7 +184,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(RunnnerInfo runnerInfo)
+        public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -194,7 +193,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 

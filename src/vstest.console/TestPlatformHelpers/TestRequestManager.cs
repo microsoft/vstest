@@ -7,16 +7,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Xml;
+    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -42,7 +48,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private static ITestRequestManager testRequestManagerInstance;
 
+        private InferHelper inferHelper;
+
         private const int runRequestTimeout = 5000;
+
+        private bool telemetryOptedIn;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -54,24 +64,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private object syncobject = new object();
 
+        private Task<IMetricsPublisher> metricsPublisher;
+
+        private bool isDisposed;
+
         #region Constructor
 
-        public TestRequestManager() :
-            this(CommandLineOptions.Instance,
-            TestPlatformFactory.GetTestPlatform(),
-            TestLoggerManager.Instance,
-            TestRunResultAggregator.Instance,
-            TestPlatformEventSource.Instance)
+        public TestRequestManager()
+            : this(
+                  CommandLineOptions.Instance,
+                  TestPlatformFactory.GetTestPlatform(),
+                  TestLoggerManager.Instance,
+                  TestRunResultAggregator.Instance,
+                  TestPlatformEventSource.Instance,
+                  new InferHelper(new AssemblyMetadataProvider()),
+                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
             this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.inferHelper = inferHelper;
+            this.metricsPublisher = metricsPublisher;
+            this.telemetryOptedIn = IsTelemetryOptedIn();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -137,7 +157,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var batchSize = runConfiguration.BatchSize;
 
             var runsettings = discoveryPayload.RunSettings;
-            if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
+
+            var requestData = this.GetRequestData(protocolConfig);
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -146,45 +168,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
             criteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
 
-            using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria, protocolConfig))
+            try
             {
-                try
+                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria))
                 {
-                    this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
-                    discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
-
-                    this.testPlatformEventSource.DiscoveryRequestStart();
-
-                    discoveryRequest.DiscoverAsync();
-                    discoveryRequest.WaitForCompletion();
-
-                    success = true;
-                }
-                catch (Exception ex)
-                {
-                    if (ex is TestPlatformException ||
-                        ex is SettingsException ||
-                        ex is InvalidOperationException)
+                    try
                     {
-#if TODO
-                        Utilities.RaiseTestRunError(testLoggerManager, null, ex);
-#endif
-                        success = false;
+                        this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
+                        discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
+
+                        this.testPlatformEventSource.DiscoveryRequestStart();
+
+                        discoveryRequest.DiscoverAsync();
+                        discoveryRequest.WaitForCompletion();
+
+                        success = true;
                     }
-                    else
+
+                    finally
                     {
-                        throw;
+                        this.testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
+                        discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
                     }
-                }
-                finally
-                {
-                    this.testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
-                    discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
                 }
             }
-
+            catch (Exception ex)
+            {
+                if (ex is TestPlatformException ||
+                    ex is SettingsException ||
+                    ex is InvalidOperationException)
+                {
+                    LoggerUtilities.RaiseTestRunError(testLoggerManager, null, ex);
+                    success = false;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
+
+            // Posts the Discovery Complete event.
+            this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+
             return success;
         }
 
@@ -205,9 +233,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
-            if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
+            var requestData = this.GetRequestData(protocolConfig);
+            // Get sources to auto detect fx and arch for both run selected or run all scenario.
+            var sources = GetSources(testRunRequestPayload);
+
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
+            }
+
+            if (!commandLineOptions.IsDesignMode && string.IsNullOrWhiteSpace(runsettings))
+            {
+                GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
             }
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
@@ -219,7 +256,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
+                runCriteria.TestCaseFilter = testRunRequestPayload.TestPlatformOptions?.TestCaseFilter;
+                runCriteria.FilterOptions = testRunRequestPayload.TestPlatformOptions?.FilterOptions;
             }
             else
             {
@@ -232,9 +270,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher);
             }
 
-            var success = this.RunTests(runCriteria, testRunEventsRegistrar, protocolConfig);
+            var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
+
+            // Post the run complete event
+            this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+
             return success;
         }
 
@@ -262,10 +304,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #endregion
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, out string updatedRunSettingsXml)
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                if (disposing)
+                {
+                    this.metricsPublisher.Result.Dispose();
+                }
+
+                this.isDisposed = true;
+            }
+        }
+
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml,List<string> sources, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
+
 
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
@@ -277,6 +342,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     document.Load(reader);
 
                     var navigator = document.CreateNavigator();
+
+                    // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
+                    bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
+                    bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
+
+                    if (updateFramework)
+                    {
+                        InferRunSettingsHelper.UpdateTargetFramework(navigator,
+                            inferHelper.AutoDetectFramework(sources)?.ToString(), overwrite: true);
+                        settingsUpdated = true;
+                    }
+
+                    if (updatePlatform)
+                    {
+                        InferRunSettingsHelper.UpdateTargetPlatform(navigator,
+                            inferHelper.AutoDetectArchitecture(sources).ToString(), overwrite: true);
+                        settingsUpdated = true;
+                    }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
@@ -295,7 +378,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if(InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
-                        InferRunSettingsHelper.UpdateTargetDeviceInformation(navigator, deviceXml);
+                        InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
                         settingsUpdated = true;
                     }
 
@@ -306,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
-        private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
+        private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -315,50 +398,135 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             lock (syncobject)
             {
                 bool success = true;
-                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria, protocolConfig))
+
+                try
                 {
-                    this.currentTestRunRequest = testRunRequest;
-                    this.runRequestCreatedEventHandle.Set();
-                    try
+                    using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria))
                     {
-                        this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
-                        this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
-                        testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
+                        this.currentTestRunRequest = testRunRequest;
+                        this.runRequestCreatedEventHandle.Set();
 
-                        this.testPlatformEventSource.ExecutionRequestStart();
-
-                        testRunRequest.ExecuteAsync();
-
-                        // Wait for the run completion event
-                        testRunRequest.WaitForCompletion();
-                    }
-                    catch (Exception ex)
-                    {
-                        EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
-                        if (ex is TestPlatformException ||
-                            ex is SettingsException ||
-                            ex is InvalidOperationException)
+                        try
                         {
-                            LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
-                            success = false;
+                            this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
+                            this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
+                            testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
+
+                            this.testPlatformEventSource.ExecutionRequestStart();
+
+                            testRunRequest.ExecuteAsync();
+
+                            // Wait for the run completion event
+                            testRunRequest.WaitForCompletion();
                         }
-                        else
+                        finally
                         {
-                            throw;
+                            this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
+                            this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
+                            testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
                         }
                     }
-                    finally
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
+                    if (ex is TestPlatformException ||
+                        ex is SettingsException ||
+                        ex is InvalidOperationException)
                     {
-                        this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
-                        this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
-                        testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
+                        LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
+                        success = false;
+                    }
+                    else
+                    {
+                        throw;
                     }
                 }
 
                 this.currentTestRunRequest = null;
-
                 return success;
             }
+        }
+
+        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator)
+        {
+            bool required = false;
+            if (commandLineOptions.IsDesignMode)
+            {
+                bool isValidFx =
+                    InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
+                required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
+            }
+            else if (!commandLineOptions.IsDesignMode && !commandLineOptions.FrameworkVersionSpecified)
+            {
+                required = true;
+            }
+
+            return required;
+        }
+
+        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator)
+        {
+            bool required = false;
+            if (commandLineOptions.IsDesignMode)
+            {
+                bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
+                required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
+            }
+            else if (!commandLineOptions.IsDesignMode && !commandLineOptions.ArchitectureSpecified)
+            {
+                required = true;
+            }
+
+            return required;
+        }
+
+        /// <summary>
+        /// Checks whether Telemetry opted in or not. 
+        /// By Default opting out
+        /// </summary>
+        /// <returns>Returns Telemetry Opted out or not</returns>
+        private static bool IsTelemetryOptedIn()
+        {
+            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
+            return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Gets Request Data
+        /// </summary>
+        /// <param name="protocolConfig"></param>
+        /// <returns></returns>
+        private IRequestData GetRequestData(ProtocolConfig protocolConfig)
+        {
+            return new RequestData
+                       {
+                           ProtocolConfig = protocolConfig,
+                           MetricsCollection =
+                               this.telemetryOptedIn
+                                   ? (IMetricsCollection)new MetricsCollection()
+                                   : new NoOpMetricsCollection(),
+                           IsTelemetryOptedIn = this.telemetryOptedIn
+                       };
+        }
+
+        private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
+        {
+            List<string> sources = new List<string>();
+            if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Count > 0)
+            {
+                sources = testRunRequestPayload.Sources;
+            }
+            else if (testRunRequestPayload.TestCases != null && testRunRequestPayload.TestCases.Count > 0)
+            {
+                ISet<string> sourcesSet = new HashSet<string>();
+                foreach (var testCase in testRunRequestPayload.TestCases)
+                {
+                    sourcesSet.Add(testCase.Source);
+                }
+                sources = sourcesSet.ToList();
+            }
+            return sources;
         }
     }
 }

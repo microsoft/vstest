@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using System.Linq;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -24,14 +23,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
         /// </summary>
-        /// <param name="requestData">The Request Data instance providing common services and data for discovery</param>
+        /// <param name="requestData">The Request Data instance providing services and data for discovery</param>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
         internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
         {
+            this.requestData = requestData;
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
-            this.requestData = requestData;
         }
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     this.discoveryStartTime = DateTime.UtcNow;
 
                     // Collecting Data Point Number of sources sent for discovery
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
+                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, this.DiscoveryCriteria.Sources.Count());
 
                     // Invoke OnDiscoveryStart event
                     this.OnDiscoveryStart.SafeInvoke(this, new DiscoveryStartEventArgs(this.DiscoveryCriteria), "DiscoveryRequest.DiscoveryStart");
@@ -278,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                     // Collecting Total Time Taken
                     this.requestData.MetricsCollection.Add(
-                        TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds.ToString());
+                        TelemetryDataConstants.TimeTakenInSecForDiscovery, discoveryFinalTimeTaken.TotalSeconds);
                 }
             }
 
@@ -390,7 +389,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         if (this.discoveryCompleted != null)
                         {
                             this.discoveryCompleted.Dispose();
-                            this.requestData.MetricsCollection.Clear();
                         }
                     }
 

@@ -157,8 +157,8 @@
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find '{0}' host. Make sure that '{0}' is installed on the machine and is available in PATH environment variable.</source>
-        <target state="new">{0} bulunamadı. Makinede dotnet’in yüklü olduğundan emin olun.</target>
-        <note></note>
+        <target state="translated">'{0}' konağı bulunamadı. '{0}' konağının makinede yüklü olduğundan ve PATH ortam değişkeninde bulunduğundan emin olun.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

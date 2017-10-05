@@ -172,5 +172,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// Mark the completion of translation layer execution request.
         /// </summary>
         void TranslationLayerExecutionStop();
+
+        /// <summary>
+        /// Mark the start of Metrics Dispose.
+        /// </summary>
+        void MetricsDisposeStart();
+
+        /// <summary>
+        /// Mark the completion of Metrics Dispose.
+        /// </summary>
+        void MetricsDisposeStop();
     }
 }

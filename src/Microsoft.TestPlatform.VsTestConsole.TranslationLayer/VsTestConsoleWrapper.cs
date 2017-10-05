@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -141,11 +142,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTests(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler)
         {
+            this.RunTests(sources, runSettings, options: null, testRunEventsHandler: testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public void RunTests(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler)
+        {
             var sourceList = sources.ToList();
             this.testPlatformEventSource.TranslationLayerExecutionStart(0, sourceList.Count, 0, runSettings ?? string.Empty);
 
             this.EnsureInitialized();
-            this.requestSender.StartTestRun(sourceList, runSettings, testRunEventsHandler);
+            this.requestSender.StartTestRun(sourceList, runSettings, options, testRunEventsHandler);
         }
 
         /// <inheritdoc/>
@@ -161,11 +168,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
         {
+            this.RunTestsWithCustomTestHost(sources, runSettings, options: null, testRunEventsHandler: testRunEventsHandler, customTestHostLauncher: customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
             var sourceList = sources.ToList();
             this.testPlatformEventSource.TranslationLayerExecutionStart(1, sourceList.Count, 0, runSettings ?? string.Empty);
 
             this.EnsureInitialized();
-            this.requestSender.StartTestRunWithCustomHost(sourceList, runSettings, testRunEventsHandler, customTestHostLauncher);
+            this.requestSender.StartTestRunWithCustomHost(sourceList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
         }
 
         /// <inheritdoc/>

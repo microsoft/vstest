@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void DiscoverAllTests(RunnnerInfo runnerInfo)
+        public void DiscoverAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void MultipleSourcesDiscoverAllTests(RunnnerInfo runnerInfo)
+        public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -47,12 +47,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
         [NETCORETargetFramework]
-        public void DiscoverFullyQualifiedTests(RunnnerInfo runnerInfo)
+        public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
             try
             {
                 AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-                this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty, this.FrameworkArgValue);
+                this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty);
                 var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
                 this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
             }

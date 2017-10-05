@@ -12,8 +12,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -36,10 +34,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private TestableTestRunCache testableTestRunCache;
         private TestExecutionContext testExecutionContext;
         private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
-
         private TestableRunTestsWithSources runTestsInstance;
-
-        private IRequestData requestData;
+        private Mock<IRequestData> mockRequestData;
+        private Mock<IMetricsCollection> mockMetricsCollection;
 
         internal const string RunTestsWithSourcesTestsExecutorUri = "executor://RunTestWithSourcesDiscoverer/";
 
@@ -56,9 +53,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                             areTestCaseLevelEventsRequired: false,
                                             hasTestRun: false,
                                             isDebug: false,
-                                            testCaseFilter: null);
+                                            testCaseFilter: null,
+                                            filterOptions: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
-            this.requestData = new RequestData(new NoOpMetricsCollection());
+            this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockRequestData = new Mock<IRequestData>();
+            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
             TestPluginCacheTests.SetupMockExtensions(
                 new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },
@@ -92,7 +92,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 this.mockTestRunEventsHandler.Object,
                 executorUriVsSourceList,
-                this.requestData);
+                this.mockRequestData.Object);
             
             this.runTestsInstance.CallBeforeRaisingTestRunComplete(false);
 
@@ -115,7 +115,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
-                this.requestData);
+                this.mockRequestData.Object);
 
             var executorUris = this.runTestsInstance.CallGetExecutorUriExtensionMap(new Mock<IFrameworkHandle>().Object, new RunContext());
 
@@ -138,7 +138,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
-                this.requestData);
+                this.mockRequestData.Object);
 
             var executorUris = this.runTestsInstance.CallGetExecutorUriExtensionMap(
                 new Mock<IFrameworkHandle>().Object, new RunContext());
@@ -166,7 +166,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 this.mockTestRunEventsHandler.Object,
                 executorUriVsSourceList,
-                this.requestData);
+                this.mockRequestData.Object);
 
             var testExecutor = new RunTestWithSourcesExecutor();
             var extension = new LazyExtension<ITestExecutor, ITestExecutorCapabilities>(testExecutor, new TestExecutorMetadata("e://d/"));
@@ -194,7 +194,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
-                this.requestData);
+                this.mockRequestData.Object);
 
             bool isExecutorCalled = false;
             RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) => { isExecutorCalled = true; };

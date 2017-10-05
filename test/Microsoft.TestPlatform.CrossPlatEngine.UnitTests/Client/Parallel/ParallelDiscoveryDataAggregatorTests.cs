@@ -59,17 +59,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TotalTestsDiscovered, "2");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TotalTestsDiscovered, 2);
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TotalTestsDiscovered, out value), true);
-            Assert.AreEqual(value, "4");
+            Assert.AreEqual(value, 4);
         }
 
         [TestMethod]
@@ -77,17 +77,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, .02091);
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, out value), true);
-            Assert.AreEqual(value, (.04182).ToString());
+            Assert.AreEqual(value, .04182);
         }
 
         [TestMethod]
@@ -95,17 +95,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, .02091);
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenInSecByAllAdapters, out value), true);
-            Assert.AreEqual(value, (.04182).ToString());
+            Assert.AreEqual(value, .04182);
         }
 
         [TestMethod]
@@ -113,17 +113,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, .02091);
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, out value), true);
-            Assert.AreEqual(value, (.04182).ToString());
+            Assert.AreEqual(value, .04182);
         }
 
         [TestMethod]
@@ -131,7 +131,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
             dict.Add(TelemetryDataConstants.DiscoveryState, "Completed");
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
@@ -139,7 +139,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.DiscoveryState, out value), false);
         }
 
@@ -148,7 +148,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
@@ -161,7 +161,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateDiscoveryDataMetrics(null);
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
@@ -174,17 +174,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TotalTestsByAdapter, "2");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TotalTestsByAdapter, 2);
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value), true);
-            Assert.AreEqual(value, "1");
+            Assert.AreEqual(value, 1);
         }
 
         [TestMethod]
@@ -192,30 +192,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
 
-            var dict = new Dictionary<string, string>();
-            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV1", ".02091");
-            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV2", ".02091");
+            var dict = new Dictionary<string, object>();
+            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV1", .02091);
+            dict.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + "executor:MSTestV2", .02091);
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out value), true);
-            Assert.AreEqual(value, "2");
+            Assert.AreEqual(value, 2);
         }
 
         [TestMethod]
         public void GetDiscoveryDataMetricsShouldNotAddTotalAdaptersUsedIfMetricsIsEmpty()
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, out value), false);
         }
 
@@ -223,13 +223,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
         public void GetDiscoveryDataMetricsShouldNotAddNumberOfAdapterDiscoveredIfMetricsIsEmpty()
         {
             var aggregator = new ParallelDiscoveryDataAggregator();
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, object>();
 
             aggregator.AggregateDiscoveryDataMetrics(dict);
 
             var runMetrics = aggregator.GetAggregatedDiscoveryDataMetrics();
 
-            string value;
+            double value;
             Assert.AreEqual(runMetrics.TryGetValue(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, out value), false);
         }
     }

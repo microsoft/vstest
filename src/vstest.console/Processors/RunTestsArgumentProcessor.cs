@@ -196,9 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // for Windows Store apps it should be false, as Windows Store apps executor should terminate after finishing the test execution.
             var keepAlive = false;
 
-            GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runSettings);
-
-            var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive };
+            var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive, TestPlatformOptions= new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue } };
             var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
             if (EqtTrace.IsInfoEnabled)
@@ -229,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             /// <summary>
-            /// Handles the TestRunRequest complete event 
+            /// Handles the TestRunRequest complete event
             /// </summary>
             /// <param name="sender"></param>
             /// <param name="e">RunCompletion args</param>
