@@ -17,13 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // Total time taken to complete one test run request
         public static string TimeTakenInSecForRun = "VS.TestRun.TimeTakenInSec";
 
-        public static string PeakWorkingSetForRun = "VS.TestRun.PeakWorkingSet";
-
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
-
-        public static string ListOfDataCollectors = "VS.TestRun.ListOfDataCollectors";
-
-        public static string IsAppContainerMode = "VS.TestRun.IsAppContainerMode";
 
         public static string RunState = "VS.TestRun.RunState";
 
@@ -42,8 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string TargetOS = "VS.TestRun.TargetOS";
 
         public static string LoggerUsed = "VS.TestRun.LoggersUsed";
-
-        public static string AdaptersVersion = "VS.TestRun.AdaptersVersion";
 
         public static string CommandLineSwitches = "VS.TestRun.CommandLineSwitches";
 

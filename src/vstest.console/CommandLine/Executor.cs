@@ -30,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -237,6 +237,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
             }
 
+            // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority) 
+            if(result == 1 && processors.First<IArgumentProcessor>().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
+            {
+                processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+            }
             return result;
         }
 
@@ -352,10 +357,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private void PrintSplashScreen()
         {
-            var assembly = typeof(Executor).GetTypeInfo().Assembly;
             string assemblyVersion = string.Empty;
+            assemblyVersion = Product.Version;
 
-            assemblyVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
 
