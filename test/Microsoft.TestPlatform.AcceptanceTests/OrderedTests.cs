@@ -29,7 +29,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 orderedTestFileAbsolutePath,
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);
@@ -37,7 +36,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidatePassedTests("PassingTest2");
             this.ValidateFailedTests("FailingTest1");
             this.ValidateSkippedTests("FailingTest2");
-            this.ValidateSummaryStatus(2, 1, 0);
+            this.ValidateSummaryStatus(2, 1, 1);
         }
 
     }
