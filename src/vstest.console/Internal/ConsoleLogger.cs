@@ -69,7 +69,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Level of verbosity
         /// </summary>
+#if NET451
         private Verbosity verbosityLevel = Verbosity.Normal;
+#else
+        // Keep default verbosity for x-plat command line as minimal
+        private Verbosity verbosityLevel = Verbosity.Minimal;
+#endif
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;

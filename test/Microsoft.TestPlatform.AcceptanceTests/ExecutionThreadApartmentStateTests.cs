@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:UITestMethod");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);

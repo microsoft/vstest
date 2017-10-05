@@ -106,7 +106,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             parameters.Add("verbosity", "random");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
+#if NET451
             Assert.AreEqual(ConsoleLogger.Verbosity.Normal, this.consoleLogger.VerbosityLevel);
+#else
+            Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, this.consoleLogger.VerbosityLevel);
+#endif
         }
 
         [TestMethod]
