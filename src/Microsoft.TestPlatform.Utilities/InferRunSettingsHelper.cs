@@ -3,16 +3,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Xml;
-    using System.Xml.XPath;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+    using System.Xml;
+    using System.Xml.XPath;
     using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
     /// <summary>
@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
         private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
+        private const string multiTargettingForwardLink = @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409";
 
         // To make things compatible for older runsettings
         private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
@@ -409,6 +410,92 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 };
 
             return XmlUtilities.IsValidNodeXmlValue(frameworkXml, validator);
+        }
+
+        /// <summary>
+        /// Returns true if source settings are incomaptible with target settings.
+        /// </summary>
+        private static bool IsSettingIncompatible(Architecture sourcePlatform,
+            Architecture targetPlatform,
+            Framework sourceFramework,
+            Framework targetFramework)
+        {
+            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
+        }
+
+
+        /// <summary>
+        /// Returns true if source Platform is incompatible with target platform.
+        /// </summary>
+        private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
+        {
+            Debug.Assert(targetPlatform != Architecture.AnyCPU, "TargetPlatform is AnyCPU.");
+            Debug.Assert(targetPlatform != Architecture.Default, "TargetPlatform is Default.");
+
+            if (sourcePlatform == Architecture.Default ||
+                sourcePlatform == Architecture.AnyCPU)
+            {
+                return false;
+            }
+
+            return sourcePlatform != targetPlatform;
+        }
+
+        /// <summary>
+        /// Returns true if source FrameworkVersion is incompatible with target FrameworkVersion.
+        /// </summary>
+        private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
+        {
+            Debug.Assert(!targetFramework.Equals(Framework.DefaultFramework), "TargetFramework is None.");
+            if (sourceFramework.Equals(Framework.DefaultFramework))
+            {
+                return false;
+            }
+            return !sourceFramework.Equals(targetFramework);
+        }
+
+
+        /// <summary>
+        /// Returns the sources matching the specified platform and framework settings.
+        /// For incompatible sources, warning is added to incompatibleSettingWarning.
+        /// </summary>
+        public static IEnumerable<String> FilterCompatibleSources(Architecture choosenPlatform,
+            Framework framework,
+            IDictionary<String,Architecture> sourcePlatforms,
+            IDictionary<String, Framework> sourceFrameworks,
+            out String incompatibleSettingWarning)
+        {
+            incompatibleSettingWarning = null;
+            List<String> compatibleSources = new List<String>();
+            StringBuilder warnings = new StringBuilder();
+            warnings.AppendLine("");
+            bool incompatiblityFound = false;
+            foreach (var source in sourcePlatforms.Keys)
+            {
+                Architecture actualPlatform = sourcePlatforms[source];
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, choosenPlatform, sourceFrameworks[source], framework);
+                if (isSettingIncompatible)
+                {
+                    string incompatiblityMessage;
+
+                    // Add message for incompatible sources.
+                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, source, sourceFrameworks[source].Version, actualPlatform);
+
+                    warnings.AppendLine(incompatiblityMessage);
+                    incompatiblityFound = true;
+                }
+                else
+                {
+                    compatibleSources.Add(source);
+                }
+            }
+
+            if (incompatiblityFound)
+            {
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, framework, choosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+            }
+
+            return compatibleSources;
         }
     }
 }

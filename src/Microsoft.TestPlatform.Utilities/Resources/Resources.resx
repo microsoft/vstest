@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DisplayChosenSettings" xml:space="preserve">
+    <value>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</value>
+  </data>
   <data name="InvalidRunSettingsXml" xml:space="preserve">
     <value>Run settings XML does not contain "RunSettings" node.</value>
   </data>
@@ -131,6 +134,9 @@
   </data>
   <data name="RunSettingsParseError" xml:space="preserve">
     <value>An error occurred while loading the settings.  Error: {0}.</value>
+  </data>
+  <data name="SourceIncompatible" xml:space="preserve">
+    <value>{0} is built for Framework {1} and Platform {2}.</value>
   </data>
   <data name="SystemArchitectureIncompatibleWithTargetPlatform" xml:space="preserve">
     <value>Incompatible Target platform settings '{0}' with system architecture '{1}'.</value>

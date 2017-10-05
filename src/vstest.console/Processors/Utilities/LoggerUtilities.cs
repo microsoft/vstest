@@ -22,14 +22,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
 
             TestRunMessageEventArgs errorMessage = new TestRunMessageEventArgs(TestMessageLevel.Error, exception.Message);
-            loggerManager.SendTestRunError(errorMessage);
+            loggerManager.SendTestRunMessage(errorMessage);
 
             // Send inner exception only when its message is different to avoid duplicate.
             if (exception is TestPlatformException && exception.InnerException != null && string.Compare(exception.Message, exception.InnerException.Message, StringComparison.CurrentCultureIgnoreCase) != 0)
             {
                 errorMessage = new TestRunMessageEventArgs(TestMessageLevel.Error, exception.InnerException.Message);
-                loggerManager.SendTestRunError(errorMessage);
+                loggerManager.SendTestRunMessage(errorMessage);
             }
+        }
+
+        internal static void RaiseTestRunWarning(TestLoggerManager loggerManager, TestRunResultAggregator testRunResultAggregator, string warningMessage)
+        {
+            // testRunResultAggregator can be null, if error is being raised in discovery context.
+            if (null != testRunResultAggregator)
+            {
+                testRunResultAggregator.MarkTestRunFailed();
+            }
+
+            TestRunMessageEventArgs errorMessage = new TestRunMessageEventArgs(TestMessageLevel.Warning, warningMessage);
+            loggerManager.SendTestRunMessage(errorMessage);
         }
 
         /// <summary>

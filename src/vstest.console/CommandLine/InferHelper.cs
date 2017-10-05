@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Architecture from sources.
         /// </summary>
-        public Architecture AutoDetectArchitecture(List<string> sources)
+        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms)
         {
             Architecture architecture = Constants.DefaultPlatform;
             try
@@ -57,15 +57,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         if (finalArch == null)
                         {
                             finalArch = arch;
+                            sourcePlatforms.Add(source, (Architecture)arch);
                             continue;
                         }
 
                         if (!finalArch.Equals(arch))
                         {
-                            // TODO Log to console and client.
+                            sourcePlatforms.Add(source, (Architecture)arch);
                             finalArch = Constants.DefaultPlatform;
                             EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
-                            break;
                         }
                     }
 
@@ -83,14 +83,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         }
 
         /// <inheritdoc />
-        public Framework AutoDetectFramework(List<string> sources)
+        public Framework AutoDetectFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
         {
             Framework framework = Framework.DefaultFramework;
             try
             {
                 if (sources != null && sources.Count > 0)
                 {
-                    var finalFx = DetermineFrameworkName(sources, out var conflictInFxIdentifier);
+                    var finalFx = DetermineFrameworkName(sources, sourceFrameworkVersions, out var conflictInFxIdentifier);
                     framework = Framework.FromString(finalFx.FullName);
                     if (conflictInFxIdentifier && EqtTrace.IsInfoEnabled)
                     {
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
             return framework;
         }
 
-        private FrameworkName DetermineFrameworkName(IEnumerable<string> sources, out bool conflictInFxIdentifier)
+        private FrameworkName DetermineFrameworkName(IEnumerable<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out bool conflictInFxIdentifier)
         {
             FrameworkName finalFx = null;
             conflictInFxIdentifier = false;
@@ -148,6 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                 if (finalFx == null)
                 {
                     finalFx = fx;
+                    sourceFrameworkVersions.Add(source, Framework.FromString(fx.FullName));
                     continue;
                 }
 
@@ -163,8 +164,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                 {
                     conflictInFxIdentifier = true;
                     finalFx = new FrameworkName(Framework.DefaultFramework.Name);
-                    break;
                 }
+                sourceFrameworkVersions.Add(source, Framework.FromString(fx.FullName));
             }
             return finalFx;
         }

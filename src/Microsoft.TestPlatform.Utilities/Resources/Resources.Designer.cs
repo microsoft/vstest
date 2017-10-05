@@ -123,5 +123,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Resources {
                 return ResourceManager.GetString("UnExpectedSettingsFile", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings..
+        /// </summary>
+        public static string DisplayChosenSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("DisplayChosenSettings", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is built for Framework {1} and Platform {2}..
+        /// </summary>
+        public static string SourceIncompatible
+        {
+            get
+            {
+                return ResourceManager.GetString("SourceIncompatible", resourceCulture);
+            }
+        }
     }
 }

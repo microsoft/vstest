@@ -424,7 +424,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="e">
         /// The e.
         /// </param>
-        public void SendTestRunError(TestRunMessageEventArgs e)
+        public void SendTestRunMessage(TestRunMessageEventArgs e)
         {
             this.TestRunMessageHandler(null, e);
         }
@@ -449,6 +449,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
                         this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
                         this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
+                        
                     }
 
                     if (this.discoveryRequest != null)

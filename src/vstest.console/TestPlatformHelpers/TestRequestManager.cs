@@ -157,11 +157,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var batchSize = runConfiguration.BatchSize;
 
             var runsettings = discoveryPayload.RunSettings;
+            IEnumerable<string> compatiableSources = Enumerable.Empty<string>();
 
             var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings, out compatiableSources))
             {
                 runsettings = updatedRunsettings;
+            }
+
+            if(compatiableSources.Count() == 0)
+            {
+                return true;
             }
 
             // create discovery request
@@ -236,10 +242,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var requestData = this.GetRequestData(protocolConfig);
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
+            IEnumerable<string> compatiableSources = Enumerable.Empty<string>();
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings, out compatiableSources))
             {
                 runsettings = updatedRunsettings;
+            }
+
+            if(compatiableSources.Count() == 0)
+            {
+                return true;
             }
 
             if (!commandLineOptions.IsDesignMode && string.IsNullOrWhiteSpace(runsettings))
@@ -325,11 +337,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml,List<string> sources, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml, out IEnumerable<string> compatiableSources)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
-
+            IDictionary<string, Architecture> sourcePlatforms = new Dictionary<string, Architecture>();
+            IDictionary<string, Framework> sourceFrameworks = new Dictionary<string, Framework>();
+            compatiableSources = sources;
 
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
@@ -346,18 +360,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
 
-                    if (updateFramework)
+                    if (updateFramework || updatePlatform)
                     {
+                        var frameworkChoosen = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
                         InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                            inferHelper.AutoDetectFramework(sources)?.ToString(), overwrite: true);
+                            frameworkChoosen?.ToString(), overwrite: true);
                         settingsUpdated = true;
-                    }
 
-                    if (updatePlatform)
-                    {
-                        InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                            inferHelper.AutoDetectArchitecture(sources).ToString(), overwrite: true);
-                        settingsUpdated = true;
+                        var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+                        if(updatePlatform)
+                        {
+                            InferRunSettingsHelper.UpdateTargetPlatform(navigator,
+                            inferedPlatform.ToString(), overwrite: true);
+                        }
+
+                        string incompatiableSettingWarning = string.Empty;
+                        var platformChoosen = updatePlatform ? inferedPlatform : commandLineOptions.TargetArchitecture;
+                        compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(platformChoosen, frameworkChoosen, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+
+                        if(!string.IsNullOrEmpty(incompatiableSettingWarning) && EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info(incompatiableSettingWarning);
+                            LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
+                        }
+
+                        if(compatiableSources.Count()==0)
+                        {
+                            var exceptionMessage = string.Format(Resources.Resources.NoMatchingSourcesFound, frameworkChoosen, platformChoosen);
+                            LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, new TestPlatformException(exceptionMessage));
+                        }
+
                     }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.

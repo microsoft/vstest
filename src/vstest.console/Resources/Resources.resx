@@ -667,4 +667,7 @@
     <value>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
      Example: /DisableAutoFakes:true</value>
   </data>
+  <data name="NoMatchingSourcesFound" xml:space="preserve">
+    <value>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</value>
+  </data>
 </root>
