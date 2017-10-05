@@ -17,19 +17,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // Total time taken to complete one test run request
         public static string TimeTakenInSecForRun = "VS.TestRun.TimeTakenInSec";
 
-        public static string PeakWorkingSetForRun = "VS.TestRun.PeakWorkingSet";
-
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
-
-        public static string ListOfDataCollectors = "VS.TestRun.ListOfDataCollectors";
-
-        public static string IsAppContainerMode = "VS.TestRun.IsAppContainerMode";
 
         public static string RunState = "VS.TestRun.RunState";
 
         public static string NumberOfSourcesSentForRun = "VS.TestRun.NumberOfSources";
 
         public static string TargetDevice = "VS.TestRun.TargetDevice";
+
+        public static string TargetFramework = "VS.TestRun.TargetFramework";
+
+        public static string TargetPlatform = "VS.TestRun.TargetPlatform";
+
+        public static string MaxCPUcount = "VS.TestRun.MaxCPUcount";
+
+        public static string TestPlatformVersion = "VS.TestRun.TestPlatformVersion";
 
         // Adapter name will get appended. eg:- VS.TestRun.TotalTestsRanByAdapter.executor//cppunittestexecutor/v1
         // In case of parallel it will be sum of all tests ran by an adapter in different execution process
