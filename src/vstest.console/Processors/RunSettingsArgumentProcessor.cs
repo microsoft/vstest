@@ -125,7 +125,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             try
             {
                 IXPathNavigable document = this.GetRunSettingsDocument(argument);
+
                 this.runSettingsManager.UpdateRunSettings(document.CreateNavigator().OuterXml);
+
+                // To determine whether to infer framework and platform.
+                ExtractFrameworkAndPlatform();
 
                 //Add default runsettings values if not exists in given runsettings file.
                 this.runSettingsManager.AddDefaultRunSettings();
@@ -134,11 +138,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             catch (XmlException exception)
             {
-                throw new CommandLineException(CommandLineResources.MalformedRunSettingsFile + " " + exception.Message, exception);
+                throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
+                        exception);
             }
             catch (SettingsException exception)
             {
                 throw new CommandLineException(exception.Message, exception);
+            }
+        }
+
+        private void ExtractFrameworkAndPlatform()
+        {
+            var framworkStr = this.runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
+            Framework framework = Framework.FromString(framworkStr);
+            if (framework != null)
+            {
+                this.commandLineOptions.TargetFrameworkVersion = framework;
+            }
+
+            var platformStr = this.runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
+            if (Enum.TryParse<Architecture>(platformStr, true, out var architecture))
+            {
+                this.commandLineOptions.TargetArchitecture = architecture;
             }
         }
 
@@ -183,7 +205,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
                 catch (XPathException e)
                 {
-                    throw new SettingsException(CommandLineResources.MalformedRunSettingsFile + " " + e.Message, e);
+                    throw new SettingsException(
+                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, e.Message),
+                        e);
                 }
             }
 

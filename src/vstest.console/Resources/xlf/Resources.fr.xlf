@@ -416,11 +416,11 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="new">/InIsolation
+        <target state="translated">--InIsolation|/InIsolation
       Exécute les tests dans un processus isolé. Le processus vstest.console.exe 
       est moins susceptible de s'arrêter en cas d'erreur durant les tests, mais ces derniers 
       risquent de s'exécuter plus lentement.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       Exécute les tests dans un processus isolé. Processus de vstest.console.exe moins susceptible d’être arrêté sur une erreur dans les tests, mais les tests peuvent s’exécuter plus lentement.</target>
@@ -748,11 +748,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">--Framework|/Framework:&lt;version du framework&gt;
+        <target state="translated">--Framework|/Framework:&lt;version du framework&gt;
       Version cible du .Net Framework à utiliser pour l'exécution des tests. 
-      Les valeurs valides sont : ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0", etc.
+      Les valeurs valides sont : ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0", etc.
       Les autres valeurs prises en charge sont Framework35, Framework40, Framework45 et FrameworkCore10.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework : &lt; Version .NET Framework &gt;
       Ciblez .net version de Framework à utiliser pour l’exécution du test. 
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
-        <target state="new">L'argument /Framework nécessite la version cible du .Net Framework pour la série de tests. Exemple : /Framework:".NETFramework,Version=v4.6"</target>
-        <note></note>
+        <target state="translated">L'argument /Framework nécessite la version cible du .Net Framework pour la série de tests. Exemple : /Framework:".NETFramework,Version=v4.5.1"</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">L’argument /Framework requiert la cible .net Framework version pour la série de tests.   Exemple : /Framework : ». NETFramework, Version = v4.6 »</target>
         </alt-trans>
@@ -772,8 +772,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">Version du .Net Framework non valide : {0}. Indiquez le nom complet de TargetFramework. Les autres versions du .Net Framework prises en charge sont Framework35, Framework40 et Framework45.</target>
-        <note></note>
+        <target state="translated">Version non valide du .Net Framework : {0}. Indiquez le nom complet de TargetFramework. Les autres versions du .Net Framework prises en charge sont Framework35, Framework40, Framework45 et FrameworkCore10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Non valide .net version du Framework : {0}. Veuillez donner le nom complet de la TargetFramework. Autre prise en charge de .net Framework versions sont Framework35, Framework40 et Framework45.</target>
         </alt-trans>
@@ -910,15 +910,6 @@
           <target state-qualifier="mt-suggestion">L’argument {0} n’est pas attendu dans la commande 'EnableCodeCoverage'. Spécifiez la commande sans l’argument (exemple : vstest.console.exe myTests.dll /EnableCodeCoverage), puis réessayez.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
-      </trans-unit>
-      <trans-unit id="MalformedRunSettingsFile">
-        <source>Settings file provided do not confirm to required format. </source>
-        <target state="translated">Le fichier de paramètres fourni n'est pas conforme au format nécessaire. </target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Fichier de paramètres fourni ne confirmez pas au format requis.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="NoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
@@ -1496,57 +1487,57 @@
       </trans-unit>
       <trans-unit id="DbgTrcMessagesBanner">
         <source>Debug Traces Messages:</source>
-        <target state="new">Debug Traces Messages:</target>
-        <note></note>
+        <target state="translated">Déboguer les messages de traces :</target>
+        <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
         <source>--Blame|/Blame
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="new">--Blame|/Blame
-      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame
+      Exécute le test en mode blame (responsabilité). Cette option permet d'isoler le test problématique qui est à l'origine d'un incident sur l'hôte de test. Elle crée dans le répertoire actif un fichier de sortie nommé "Sequence.xml", qui capture l'ordre d'exécution du test avant l'incident.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
-        <target state="new">Test Run Aborted.</target>
-        <note></note>
+        <target state="translated">Série de tests abandonnée.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
-        <target state="new">Test Run Canceled.</target>
-        <note></note>
+        <target state="translated">Série de tests annulée.</target>
+        <note />
       </trans-unit>
       <trans-unit id="OpenResponseFileError">
         <source>Error opening response file '{0}'</source>
-        <target state="new">Error opening response file '{0}'</target>
-        <note></note>
+        <target state="translated">Erreur au moment de l'ouverture du fichier réponse '{0}'</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResponseFileArgumentHelp">
         <source>@&lt;file&gt;
       Read response file for more options.</source>
-        <target state="new">@&lt;file&gt;
-      Read response file for more options.</target>
-        <note></note>
+        <target state="translated">@&lt;fichier&gt;
+      Consultez le fichier réponse pour plus d'options.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
-        <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
-        <note></note>
+        <target state="translated">Nombre total de tests : inconnu. Réussi(s) : {0}. Non réussi(s) : {1}. Ignoré(s) : {2}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
-        <target state="new">{0} {1}</target>
-        <note></note>
+        <target state="translated">{0} {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
-        <source>Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
+        <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
         <target state="new">Additionally, you can point to location of test executors and discoverers by specifying &amp;apos;/TestAdapterPath&amp;apos; command. Example  /TestAdapterPath:&amp;lt;pathToCustomAdapters&amp;gt;.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
         <source>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</source>
-        <target state="new">/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</target>
-        <note></note>
+        <target state="translated">/UseVsixExtensions est progressivement déprécié. Utilisez /TestAdapterPath à la place.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DisableAutoFakesUsage">
         <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;

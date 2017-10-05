@@ -140,8 +140,8 @@
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
-        <target state="new">Нет удовлетворяющих фильтру тестов, так как фильтр содержит одно или несколько недопустимых свойств ({0}). Укажите выражение фильтра, содержащее допустимые свойства ({1}), и повторите попытку.</target>
-        <note></note>
+        <target state="translated">Соответствующих фильтру тестов нет, так как фильтр содержит одно недопустимое свойство или несколько ({0}). Укажите выражение фильтра, содержащее допустимые свойства ({1}).</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тесты не соответствует фильтр, так как оно содержит одно или несколько свойств, которые не являются допустимым ({0}). Укажите выражение для фильтра содержит допустимые свойства ({1}) и повторите попытку.</target>
         </alt-trans>
@@ -174,22 +174,22 @@
       </trans-unit>
       <trans-unit id="CancelationRequested">
         <source>Canceling test run as cancelation requested.</source>
-        <target state="new">Canceling test run as cancelation requested.</target>
+        <target state="translated">Тестовый запуск отменяется по запросу.</target>
       </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
-        <target state="new">Failed to launch testhost with error: {0}</target>
-        <note></note>
+        <target state="translated">Не удалось запустить хост для тестов с ошибкой: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ExecutionThreadApartmentStateNotSupportedForFramework">
         <source>ExecutionThreadApartmentState option not supported for framework: {0}.</source>
-        <target state="new">ExecutionThreadApartmentState option not supported for framework: {0}</target>
-        <note></note>
+        <target state="translated">Параметр ExecutionThreadApartmentState не поддерживается для платформы: {0}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="OldTestHostIsGettingUsed">
         <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
-        <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>
-        <note></note>
+        <target state="translated">Вы используете более старую версию Microsoft.NET.Test.Sdk. Перейдите на версию 15.3.0 или более позднюю.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

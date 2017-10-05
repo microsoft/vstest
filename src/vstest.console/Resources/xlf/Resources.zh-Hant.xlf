@@ -416,11 +416,11 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="new">/InIsolation
-      在獨立的處理序中執行測試。這樣會降低 vstest.console.exe 
-      處理序在測試中錯誤處於停止狀態的可能性，但是測試 
-      的執行速度可能會比較慢。</target>
-        <note></note>
+        <target state="translated">--InIsolation|/InIsolation
+      在隔離的處理序中執行測試。這樣會降低 vstest.console.exe 
+      處理序在測試中發生錯誤而停止的可能性，但是測試 
+      可能會執行得較慢。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       在独立进程中运行测试。这使得 vstest.console.exe 进程不太可能被停止的错误在测试中，但是测试运行速度将减慢。</target>
@@ -748,11 +748,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework 版本&gt;
-      要用於測試執行的目標 .Net Framework 版本。
-      有效值為 ".NETFramework,Version=v4.6"、".NETCoreApp,Version=v1.0" 等
+        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
+      要用於測試執行的目標 .Net Framework 版本。 
+      有效值為 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等
       其他支援的值為 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
       目标.Net Framework 版本以用于测试执行。
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
-        <target state="new">/Framework 引數需要測試回合的目標 .NET Framework 版本。範例:  /Framework:".NETFramework,Version=v4.6"</target>
-        <note></note>
+        <target state="translated">/Framework 引數需要測試回合的目標 .NET Framework 版本。   範例: /Framework:".NETFramework,Version=v4.5.1"</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework 参数要求目标.Net Framework 版本的测试运行。  例如︰ /Framework:"。NETFramework、 版本 = v4.6"</target>
         </alt-trans>
@@ -772,8 +772,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">.NET Framework 版本無效: {0}。請指定 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40 和 Framework45。</target>
-        <note></note>
+        <target state="translated">.NET Framework 版本無效: {0}。請指定 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">无效的.Net Framework 版本︰ {0}。 请给 TargetFramework 的全名。其他受支持的.Net Framework 版本是 Framework35、 Framework40 和 Framework45。</target>
         </alt-trans>
@@ -910,15 +910,6 @@
           <target state-qualifier="mt-suggestion">参数 {0} 不应在 EnableCodeCoverage 命令。指定不带参数的命令 (示例︰ vstest.console.exe myTests.dll /EnableCodeCoverage)，然后重试。</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
-      </trans-unit>
-      <trans-unit id="MalformedRunSettingsFile">
-        <source>Settings file provided do not confirm to required format. </source>
-        <target state="translated">提供的設定檔不符合必要的格式。</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">设置文件提供所需的格式为未确认。</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="NoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
@@ -1496,57 +1487,57 @@
       </trans-unit>
       <trans-unit id="DbgTrcMessagesBanner">
         <source>Debug Traces Messages:</source>
-        <target state="new">Debug Traces Messages:</target>
-        <note></note>
+        <target state="translated">偵錯追蹤訊息:</target>
+        <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
         <source>--Blame|/Blame
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="new">--Blame|/Blame
-      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame
+      在 Blame 模式中執行測試。此選項有助於隔離造成測試主機損毀的問題測試。其會在目前的目錄中建立 "Sequence.xml" 這樣的輸出檔案，以擷取損毀前執行測試的順序。</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
-        <target state="new">Test Run Aborted.</target>
-        <note></note>
+        <target state="translated">測試回合已中止。</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
-        <target state="new">Test Run Canceled.</target>
-        <note></note>
+        <target state="translated">測試回合已取消。</target>
+        <note />
       </trans-unit>
       <trans-unit id="OpenResponseFileError">
         <source>Error opening response file '{0}'</source>
-        <target state="new">Error opening response file '{0}'</target>
-        <note></note>
+        <target state="translated">開啟回應檔案 '{0}' 時發生錯誤</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResponseFileArgumentHelp">
         <source>@&lt;file&gt;
       Read response file for more options.</source>
-        <target state="new">@&lt;file&gt;
-      Read response file for more options.</target>
-        <note></note>
+        <target state="translated">@&lt;檔案&gt;
+      讀取回應檔以取得更多選項。</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
-        <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
-        <note></note>
+        <target state="translated">測試總數: 未知。已通過: {0}。失敗: {1}。已跳過: {2}。</target>
+        <note />
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
-        <target state="new">{0} {1}</target>
-        <note></note>
+        <target state="translated">{0} {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
-        <source>Additionally, path to test adapters can specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
+        <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
         <target state="new">Additionally, you can point to location of test executors and discoverers by specifying &amp;apos;/TestAdapterPath&amp;apos; command. Example  /TestAdapterPath:&amp;lt;pathToCustomAdapters&amp;gt;.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
         <source>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</source>
-        <target state="new">/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</target>
-        <note></note>
+        <target state="translated">/UseVsixExtensions 即將淘汰。請改用 /TestAdapterPath。</target>
+        <note />
       </trans-unit>
       <trans-unit id="DisableAutoFakesUsage">
         <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
