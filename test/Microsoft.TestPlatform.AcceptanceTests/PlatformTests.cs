@@ -77,7 +77,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue,
                 this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, platformArg);
 
