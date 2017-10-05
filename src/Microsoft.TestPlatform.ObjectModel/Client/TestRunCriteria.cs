@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     {
         private string testCaseFilter;
+        private FilterOptions filterOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
@@ -357,6 +358,29 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 }
 
                 this.testCaseFilter = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the filter options
+        /// </summary>
+        /// <remarks>This is only applicable when TestCaseFilter is present.</remarks>
+        [DataMember]
+        public FilterOptions FilterOptions
+        {
+            get
+            {
+                return this.filterOptions;
+            }
+
+            set
+            {
+                if (value != null && !this.HasSpecificSources)
+                {
+                    throw new InvalidOperationException(Resources.NoTestCaseFilterForSpecificTests);
+                }
+
+                this.filterOptions = value;
             }
         }
 
