@@ -12,6 +12,18 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
     public class FrameworkTests
     {
         [TestMethod]
+        public void FrameworkFromStringShouldReturnNullForNull()
+        {
+            Assert.IsNull(Framework.FromString(null));
+        }
+
+        [TestMethod]
+        public void FrameworkFromStringShouldReturnNullForEmptyString()
+        {
+            Assert.IsNull(Framework.FromString(string.Empty));
+        }
+
+        [TestMethod]
         public void FrameworkFromStringShouldTrimSpacesAroundFrameworkString()
         {
             var fx = Framework.FromString("  Framework35");

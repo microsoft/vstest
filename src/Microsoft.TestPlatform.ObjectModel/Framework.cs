@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using System;
     using System.Runtime.Versioning;
 
     /// <summary>
@@ -42,6 +43,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>A framework object</returns>
         public static Framework FromString(string frameworkString)
         {
+            if (string.IsNullOrWhiteSpace(frameworkString))
+            {
+                return null;
+            }
+
             FrameworkName frameworkName;
             try
             {
@@ -53,19 +59,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 switch (frameworkString.Trim())
                 {
                     case "Framework35":
-                        frameworkName = new FrameworkName(".NETFramework,Version=v3.5");
+                        frameworkName = new FrameworkName(Constants.DotNetFramework35);
                         break;
                     case "Framework40":
-                        frameworkName = new FrameworkName(".NETFramework,Version=v4.0");
+                        frameworkName = new FrameworkName(Constants.DotNetFramework40);
                         break;
                     case "Framework45":
-                        frameworkName = new FrameworkName(".NETFramework,Version=v4.5");
+                        frameworkName = new FrameworkName(Constants.DotNetFramework45);
                         break;
                     case "FrameworkCore10":
-                        frameworkName = new FrameworkName(".NETCoreApp,Version=1.0");
+                        frameworkName = new FrameworkName(Constants.DotNetFrameworkCore10);
                         break;
                     case "FrameworkUap10":
-                        frameworkName = new FrameworkName("Uap,Version=10.0");
+                        frameworkName = new FrameworkName(Constants.DotNetFrameworkUap10);
                         break;
                     default:
                         return null;
@@ -74,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return new Framework() { Name = frameworkName.FullName, Version = frameworkName.Version.ToString() };
         }
-        
+
         /// <summary>
         /// Returns full name of the framework.
         /// </summary>
