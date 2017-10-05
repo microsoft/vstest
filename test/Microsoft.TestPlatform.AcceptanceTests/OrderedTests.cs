@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void OlderOrderedTestsShouldPassWhenAllTestsArePassingTests(RunnerInfo runnerInfo)
+        public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var orderedTestFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "MstestV1UnitTestProject", "AllPassing.orderedtest");
+            var orderedTestFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "MstestV1UnitTestProject", "MixedTests.orderedtest");
             var arguments = PrepareArguments(
                 orderedTestFileAbsolutePath,
                 this.GetTestAdapterPath(),
@@ -35,35 +35,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             this.ValidatePassedTests("PassingTest1");
             this.ValidatePassedTests("PassingTest2");
-            this.ValidateSummaryStatus(2, 0, 0);
-        }
-
-        /// <summary>
-        /// Ordered Tests created using earlier versions of Visual Studio(i.e. before VS2017) should work fine.
-        /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        public void OlderOrderedTestsShouldFailWhenAllTestsAreFailingTests(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
-            {
-                Assert.Inconclusive(" Ordered tests are not supported with .Netcore runner.");
-                return;
-            }
-
-            var orderedTestFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "MstestV1UnitTestProject", "AllFailing.orderedtest");
-            var arguments = PrepareArguments(
-                orderedTestFileAbsolutePath,
-                this.GetTestAdapterPath(),
-                string.Empty,
-                this.FrameworkArgValue,
-                runnerInfo.InIsolationValue);
-
-            this.InvokeVsTest(arguments);
             this.ValidateFailedTests("FailingTest1");
             this.ValidateSkippedTests("FailingTest2");
-            this.ValidateSummaryStatus(0, 1, 1);
+            this.ValidateSummaryStatus(2, 1, 0);
         }
 
     }

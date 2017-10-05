@@ -27,7 +27,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Update="AllPassing.orderedtest">
+    <None Update="MixedTests.orderedtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="AllFailing.orderedtest">
