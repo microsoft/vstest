@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, " /testcasefilter:UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=STA");
+            arguments = string.Concat(arguments, " /testcasefilter:UITestMethod");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
         }
@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, " /testcasefilter:UITestMethod");
+            arguments = string.Concat(arguments, " /testcasefilter:UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=MTA");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
         }
