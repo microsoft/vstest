@@ -34,7 +34,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
-                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);

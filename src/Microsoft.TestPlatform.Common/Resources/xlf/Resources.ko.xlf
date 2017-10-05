@@ -58,8 +58,8 @@
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="new">중복되는 실행 설정 섹션 '{0}'이(가) 있습니다. 중복 설정을 무시합니다.</target>
-        <note></note>
+        <target state="translated">중복 실행 설정 섹션 ‘{0}’이(가) 있습니다. 중복 설정을 무시합니다.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">이름이 ' {0} '이 (가) 발견 실행된 설정 섹션을 중복.  복제 설정을 무시합니다.</target>
         </alt-trans>
@@ -211,8 +211,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
         <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
-        <target state="new">데이터 수집기 ‘{0}’에서 초기화 정보를 제공하지 못했습니다. 오류: {1}</target>
-        <note></note>
+        <target state="translated">데이터 수집기 ‘{0}’에서 초기화 정보를 제공하지 못했습니다. 오류: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
         <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
@@ -251,13 +251,13 @@
       </trans-unit>
       <trans-unit id="FailedToFindInstalledUnitTestExtensions">
         <source>Failed to find the list of installed unit test extensions. Reason: {0}</source>
-        <target state="new">Failed to find the list of installed unit test extensions. Reason: {0}</target>
-        <note></note>
+        <target state="translated">설치된 단위 테스트 확장 목록을 찾지 못했습니다. 이유: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VSInstallationNotFound">
         <source>This option works only with vstest.console.exe installed as part of Visual Studio.</source>
-        <target state="new">Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</target>
-        <note></note>
+        <target state="translated">이 옵션은 Visual Studio의 일부로 설치된 vstest.console.exe에서만 실행됩니다.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

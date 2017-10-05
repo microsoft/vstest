@@ -19,6 +19,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
     public class Program
     {
+        public const string DefaultRunSettings = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
         public static int Main(string[] args)
         {
             if (args == null || args.Length < 1)
@@ -89,6 +90,12 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
             Console.WriteLine("-------------------------------------------------------");
 
+            testresults = RunAllTestsWithTestCaseFilter(consoleWrapper, new List<string>() { testAssembly });
+
+            Console.WriteLine("Run All Test Count: " + testresults?.Count());
+            Console.WriteLine("Run All Test Result: " + testresults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testresults?.FirstOrDefault()?.Outcome);
+            Console.WriteLine("-------------------------------------------------------");
+
             return 0;
         }
 
@@ -96,7 +103,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
         {
             var waitHandle = new AutoResetEvent(false);
             var handler = new DiscoveryEventHandler(waitHandle);
-            consoleWrapper.DiscoverTests(sources, null, handler);
+            consoleWrapper.DiscoverTests(sources, DefaultRunSettings, handler);
 
             waitHandle.WaitOne();
 
@@ -107,7 +114,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
         {
             var waitHandle = new AutoResetEvent(false);
             var handler = new RunEventHandler(waitHandle);
-            consoleWrapper.RunTests(testCases, null, handler);
+            consoleWrapper.RunTests(testCases, DefaultRunSettings, handler);
 
             waitHandle.WaitOne();
             return handler.TestResults;
@@ -117,7 +124,17 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
         {
             var waitHandle = new AutoResetEvent(false);
             var handler = new RunEventHandler(waitHandle);
-            consoleWrapper.RunTests(sources, null, handler);
+            consoleWrapper.RunTests(sources, DefaultRunSettings, handler);
+
+            waitHandle.WaitOne();
+            return handler.TestResults;
+        }
+
+        static IEnumerable<TestResult> RunAllTestsWithTestCaseFilter(IVsTestConsoleWrapper consoleWrapper, IEnumerable<string> sources)
+        {
+            var waitHandle = new AutoResetEvent(false);
+            var handler = new RunEventHandler(waitHandle);
+            consoleWrapper.RunTests(sources, DefaultRunSettings, new TestPlatformOptions() { TestCaseFilter= "FullyQualifiedName=UnitTestProject.UnitTest.PassingTest" }, handler);
 
             waitHandle.WaitOne();
             return handler.TestResults;
@@ -128,7 +145,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
             var runCompleteSignal = new AutoResetEvent(false);
             var processExitedSignal = new AutoResetEvent(false);
             var handler = new RunEventHandler(runCompleteSignal);
-            consoleWrapper.RunTestsWithCustomTestHost(list, String.Empty, handler, new CustomTestHostLauncher(() => processExitedSignal.Set()));
+            consoleWrapper.RunTestsWithCustomTestHost(list, DefaultRunSettings, handler, new CustomTestHostLauncher(() => processExitedSignal.Set()));
 
             // Test host exited signal comes after the run complete
             processExitedSignal.WaitOne();

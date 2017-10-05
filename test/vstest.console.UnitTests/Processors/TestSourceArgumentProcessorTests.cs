@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void CapabilitiesShouldReturnAppropriateProperties()
         {
             TestSourceArgumentProcessorCapabilities capabilities = new TestSourceArgumentProcessorCapabilities();
-            Assert.AreEqual("TestSource", capabilities.CommandName);
+            Assert.AreEqual("/TestSource", capabilities.CommandName);
             Assert.IsNull(capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.None, capabilities.HelpPriority);

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -232,14 +233,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             var testPlugins = this.GetValuesFromDictionary(testPluginInfo);
             foreach (var plugin in testPlugins)
             {
-                var testExtension = new LazyExtension<IExtension, IMetadata>(plugin, typeof(TMetadata));
                 if (!string.IsNullOrEmpty(plugin.IdentifierData))
                 {
+                    var testExtension = new LazyExtension<IExtension, IMetadata>(plugin, typeof(TMetadata));
                     filteredExtensions.Add(testExtension);
                 }
 
-                unfilteredExtensions.Add(
-                    new LazyExtension<IExtension, Dictionary<string, object>>(plugin, new Dictionary<string, object>()));
+                unfilteredExtensions.Add(new LazyExtension<IExtension, Dictionary<string, object>>(plugin, new Dictionary<string, object>()));
             }
 
             unfiltered = unfilteredExtensions;
