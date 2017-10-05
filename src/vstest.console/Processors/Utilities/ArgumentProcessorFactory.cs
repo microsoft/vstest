@@ -238,6 +238,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new ResponseFileArgumentProcessor(),
                 new EnableBlameArgumentProcessor(),
                 new UseVsixExtensionsArgumentProcessor(),
+                new ListDiscoverersArgumentProcessor(),
+                new ListExecutorsArgumentProcessor(),
+                new ListLoggersArgumentProcessor(),
+                new ListSettingsProvidersArgumentProcessor(),
                 new ListFullyQualifiedTestsArgumentProcessor(),
                 new ListTestsTargetPathArgumentProcessor()
         };

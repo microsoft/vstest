@@ -153,9 +153,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             bool success = false;
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryPayload.RunSettings);
-            var batchSize = runConfiguration.BatchSize;
-
             var runsettings = discoveryPayload.RunSettings;
             IEnumerable<string> compatiableSources = Enumerable.Empty<string>();
 
@@ -167,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if(compatiableSources.Count() == 0)
             {
-                return true;
+                return false;
             }
 
             // create discovery request
@@ -234,9 +231,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunRequestPayload.RunSettings);
-            var batchSize = runConfiguration.BatchSize;
-
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
             var requestData = this.GetRequestData(protocolConfig);
@@ -251,7 +245,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if(compatiableSources.Count() == 0)
             {
-                return true;
+                return false;
             }
 
             if (!commandLineOptions.IsDesignMode && string.IsNullOrWhiteSpace(runsettings))
@@ -268,7 +262,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
-                runCriteria.TestCaseFilter = testRunRequestPayload.TestCaseFilter;
+                runCriteria.TestCaseFilter = testRunRequestPayload.TestPlatformOptions?.TestCaseFilter;
+                runCriteria.FilterOptions = testRunRequestPayload.TestPlatformOptions?.FilterOptions;
             }
             else
             {
@@ -345,6 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             IDictionary<string, Framework> sourceFrameworks = new Dictionary<string, Framework>();
             compatiableSources = sources;
 
+
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
                 // TargetFramework is full CLR. Set DesignMode based on current context.
@@ -389,7 +385,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                             var exceptionMessage = string.Format(Resources.Resources.NoMatchingSourcesFound, frameworkChoosen, platformChoosen);
                             LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, new TestPlatformException(exceptionMessage));
                         }
-
                     }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.
@@ -513,6 +508,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
+        /// Collect Metrics
+        /// </summary>
+        /// <param name="requestData">Request Data for common Discovery/Execution Services</param>
+        /// <param name="runConfiguration">RunConfiguration</param>
+        private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
+        {
+            // Collecting Target Framework.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFrameworkVersion);
+
+            // Collecting Target Platform.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform);
+
+            // Collecting Max Cpu count.
+            requestData.MetricsCollection.Add(TelemetryDataConstants.MaxCPUcount, runConfiguration.MaxCpuCount);
+
+            // Collecting Target Device. Here, it will be updated run settings so, target device will be under runconfiguration only.
+            var targetDevice = runConfiguration.TargetDevice;
+            if (string.IsNullOrEmpty(targetDevice))
+            {
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Local Machine");
+            }
+            else if (targetDevice.Equals("Device", StringComparison.Ordinal) || targetDevice.Contains("Emulator"))
+            {
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, targetDevice);
+            }
+            else
+            {
+                // For IOT scenarios
+                requestData.MetricsCollection.Add(TelemetryDataConstants.TargetDevice, "Other");
+            }
+
+            // Collecting TestPlatform Version
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+        }
+
+        /// <summary>
         /// Checks whether Telemetry opted in or not. 
         /// By Default opting out
         /// </summary>
@@ -526,7 +557,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <summary>
         /// Gets Request Data
         /// </summary>
-        /// <param name="protocolConfig"></param>
+        /// <param name="protocolConfig">Protocol Config</param>
         /// <returns></returns>
         private IRequestData GetRequestData(ProtocolConfig protocolConfig)
         {
