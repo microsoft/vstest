@@ -102,21 +102,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void BuildCommadMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
         {
-            var specialCommands = GetArgumentProcessors(specialCommandFilter: true)
-                                    .Select(a => a.Metadata.Value.CommandName)
-                                    .ToList();
+            var specialCommands = GetArgumentProcessors(specialCommandFilter: true);
 
-            List<string> xplatspecialCommands = new List<string>();
+            List<string> xplatspecialCommandNames = new List<string>();
+            List<string> specialCommandNames = new List<string>();
 
             // for each command add there xplat version
-            foreach (string name in specialCommands)
+            foreach (var specialCommand in specialCommands)
             {
-                xplatspecialCommands.Add(string.Concat("--", name.Remove(0, 1)));
+                specialCommandNames.Add(specialCommand.Metadata.Value.CommandName);
+                if (!specialCommand.Metadata.Value.AlwaysExecute)
+                {
+                    xplatspecialCommandNames.Add(string.Concat("--", specialCommand.Metadata.Value.CommandName.Remove(0, 1)));
+                }
             }
             var factory = ArgumentProcessorFactory.Create();
 
             CollectionAssert.AreEquivalent(
-                specialCommands.Concat(xplatspecialCommands).ToList(),
+                specialCommandNames.Concat(xplatspecialCommandNames).ToList(),
                 factory.SpecialCommandToProcessorMap.Keys.ToList());
         }
 
