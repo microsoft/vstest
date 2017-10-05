@@ -29,8 +29,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void CreateEventLogContainerStartIndexMapShouldCreateStartIndexMap()
         {
+            System.Diagnostics.Debugger.Launch();
             this.eventLogSessionContext = new EventLogSessionContext(this.eventLogContainersMap);
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["LogName"] == 1);
+            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["LogName"] == 2);
         }
 
         [TestMethod]

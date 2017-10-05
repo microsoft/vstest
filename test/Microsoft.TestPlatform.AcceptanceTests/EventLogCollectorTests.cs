@@ -20,8 +20,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         }
 
-        // Ignoring because this tests is failing consistently in PR build.
-        [Ignore]
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
