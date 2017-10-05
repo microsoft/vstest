@@ -655,7 +655,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
         private List<ObjectModel.TestResult> GetTestResultsObject()
         {
-            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+            var testcase = new TestCase("ClassName.TestName", new Uri("some://uri"), "TestSource");
+            testcase.DisplayName = "TestName";
             var testresult = new ObjectModel.TestResult(testcase);
             testresult.Outcome = TestOutcome.Passed;
 
