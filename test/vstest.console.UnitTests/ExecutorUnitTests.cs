@@ -74,6 +74,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         }
 
         /// <summary>
+        /// Executor should Print Error message and Help contents when no arguments are provided.
+        /// </summary>
+        [TestMethod]
+        public void ExecutorWithInvalidArgsShouldPrintErrorMessage()
+        {
+            var mockOutput = new MockOutput();
+            string badArg = "/badArgument";
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(badArg);
+
+            Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
+
+            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.TestSourceFileNotFound, badArg))));
+        }
+
+        /// <summary>
         /// Executor should set default runsettings value even there is no processor
         /// </summary>
         [TestMethod]
