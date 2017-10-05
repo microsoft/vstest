@@ -149,9 +149,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase)
-                && runnerInfo.TargetFramework.StartsWith("netcoreapp"))
+            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
             {
+                // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
                 Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
                 return;
             }
@@ -159,8 +159,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var diagLogFilePath = Path.Combine(Path.GetTempPath(), $"std_error_log_{Guid.NewGuid()}.txt");
             File.Delete(diagLogFilePath);
 
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
