@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// The command name.
         /// </summary>
-        public const string CommandName = "TestSource";
+        public const string CommandName = "/TestSource";
 
         #endregion
 
