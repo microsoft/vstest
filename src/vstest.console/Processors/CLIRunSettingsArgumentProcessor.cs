@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new CLIRunSettingsArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new CLIRunSettingsArgumentExecutor(RunSettingsManager.Instance, CommandLineOptions.Instance));
                 }
 
                 return this.executor;
@@ -88,10 +88,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class CLIRunSettingsArgumentExecutor : IArgumentsExecutor
     {
         private IRunSettingsProvider runSettingsManager;
+        private CommandLineOptions commandLineOptions;
 
-        internal CLIRunSettingsArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        internal CLIRunSettingsArgumentExecutor(IRunSettingsProvider runSettingsManager, CommandLineOptions commandLineOptions)
         {
             this.runSettingsManager = runSettingsManager;
+            this.commandLineOptions = commandLineOptions;
         }
 
         public void Initialize(string argument)
@@ -151,7 +153,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     continue;
                 }
 
+                // To determine whether to infer framework and platform.
+                UpdateFrameworkAndPlatform(key, value);
+
                 runSettingsProvider.UpdateRunSettingsNode(key, value);
+            }
+        }
+
+        private void UpdateFrameworkAndPlatform(string key, string value)
+        {
+            if (key.Equals(FrameworkArgumentExecutor.RunSettingsPath))
+            {
+                Framework framework = Framework.FromString(value);
+                if (framework != null)
+                {
+                    this.commandLineOptions.TargetFrameworkVersion = framework;
+                }
+            }
+
+            if (key.Equals(PlatformArgumentExecutor.RunSettingsPath))
+            {
+                bool success = Enum.TryParse<Architecture>(value, true, out var architecture);
+                if (success)
+                {
+                    this.commandLineOptions.TargetArchitecture = architecture;
+                }
             }
         }
     }

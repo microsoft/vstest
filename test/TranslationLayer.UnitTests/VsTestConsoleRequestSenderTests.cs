@@ -12,7 +12,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -781,7 +780,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
 
-            await this.requestSenderAsync.StartTestRunAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -891,7 +890,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
-            await this.requestSenderAsync.StartTestRunAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(new List<string>() { "1.dll" }, null, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -918,7 +917,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.IsNull(receivedRequest.TestCaseFilter, "The run request message should include a null test case filter");
+            Assert.IsNull(receivedRequest.TestPlatformOptions, "The run request message should include a null test case filter");
         }
 
         [TestMethod]
@@ -941,7 +940,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.AreEqual(filter, receivedRequest.TestCaseFilter, "The run request message should include test case filter");
+            Assert.AreEqual(filter, receivedRequest.TestPlatformOptions.TestCaseFilter, "The run request message should include test case filter");
         }
 
         [TestMethod]
@@ -1063,7 +1062,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
-            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
+            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1164,7 +1163,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>(), this.protocolVersion)).
                 Callback(() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
 
-            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
+            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(new List<string>() { "1.dll" }, null, null, mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1189,7 +1188,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.IsNull(receivedRequest.TestCaseFilter, "The run request message should include a null test case filter");
+            Assert.IsNull(receivedRequest.TestPlatformOptions, "The run request message should include a null test case filter");
         }
 
         [TestMethod]
@@ -1212,7 +1211,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // Assert.
             Assert.IsNotNull(receivedRequest);
             CollectionAssert.AreEqual(sources, receivedRequest.Sources);
-            Assert.AreEqual(filter, receivedRequest.TestCaseFilter, "The run request message should include test case filter");
+            Assert.AreEqual(filter, receivedRequest.TestPlatformOptions.TestCaseFilter, "The run request message should include test case filter");
         }
 
         [TestMethod]
@@ -1801,7 +1800,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 });
 
             await this.requestSenderAsync.InitializeCommunicationAsync(this.WaitTimeout);
-            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(sources, null, mockHandler.Object, mockLauncher.Object);
+            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(sources, null, null, mockHandler.Object, mockLauncher.Object);
 
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
         }
@@ -1833,7 +1832,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload, this.protocolVersion)).Throws(exception);
 
-            await this.requestSenderAsync.StartTestRunAsync(sources, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(sources, null, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
@@ -1896,7 +1895,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     Assert.IsTrue(c.IsCancellationRequested);
                 }).Returns(Task.FromResult((Message)null));
 
-            await this.requestSenderAsync.StartTestRunAsync(sources, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(sources, null, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
