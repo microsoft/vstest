@@ -21,8 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         // Ignoring because this tests is failing consistently in PR build.
-        [Ignore]
-        [CustomDataTestMethod]
+        // [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
         {
