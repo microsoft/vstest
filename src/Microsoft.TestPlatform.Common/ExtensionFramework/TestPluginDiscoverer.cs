@@ -254,6 +254,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
                 var pluginInfo = (TPluginInfo)rawPluginInfo;
 
+                if (pluginInfo == null || pluginInfo.IdentifierData == null)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error(
+                        "TryGetTestExtensionFromType: Either PluginInformation is null or PluginInformation doesn't contain IdentifierData for type {0}.", type.FullName);
+                    }
+
+                    return;
+                }
+
                 if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
                 {
                     EqtTrace.Error(

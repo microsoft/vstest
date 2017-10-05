@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     /// </summary>
     internal static class RunSettingsProviderExtensions
     {
-        public const string EmptyRunSettings = @"<RunSettings></RunSettings>";
+        public const string EmptyRunSettings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
 
         public static void UpdateRunSettings(this IRunSettingsProvider runSettingsProvider, string runsettingsXml)
         {

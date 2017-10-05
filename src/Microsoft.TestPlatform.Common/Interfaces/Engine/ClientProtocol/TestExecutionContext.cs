@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
 {
     using System;
     using System.Runtime.Serialization;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Stores information about test execution context.
@@ -35,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
         /// <param name="hasTestRun">True if ExecutionContext is associated with Test run, false otherwise.</param>
         /// <param name="isDebug">True if ExecutionContext needs debugger, false otherwise.</param>
         /// <param name="testCaseFilter">Filter criteria string for filtering tests.</param>
+        /// <param name="filterOptions">Additional options for test case filter.</param>
         public TestExecutionContext(
             long frequencyOfRunStatsChangeEvent,
             TimeSpan runStatsChangeEventTimeout,
@@ -44,7 +46,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
             bool areTestCaseLevelEventsRequired,
             bool hasTestRun,
             bool isDebug,
-            string testCaseFilter)
+            string testCaseFilter,
+            FilterOptions filterOptions)
         {
             this.FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
             this.RunStatsChangeEventTimeout = runStatsChangeEventTimeout;
@@ -57,6 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
 
             this.HasTestRun = hasTestRun;
             this.TestCaseFilter = testCaseFilter;
+            this.FilterOptions = filterOptions;
         }
 
         #endregion
@@ -128,6 +132,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol
         /// </summary>
         [DataMember]
         public string TestCaseFilter
+        {
+            get;
+            set;
+        }
+
+
+        /// <summary>
+        /// Gets or sets additional options for filtering.
+        /// </summary>
+        [DataMember]
+        public FilterOptions FilterOptions
         {
             get;
             set;

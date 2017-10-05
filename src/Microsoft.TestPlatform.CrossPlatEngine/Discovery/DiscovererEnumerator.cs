@@ -219,7 +219,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="sources"> The sources. </param>
         /// <param name="logger"> The logger instance. </param>
         /// <returns> The map between an extension type and a source. </returns>
-        internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> GetDiscovererToSourcesMap(string extensionAssembly, IEnumerable<string> sources, IMessageLogger logger)
+        internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> GetDiscovererToSourcesMap(
+            string extensionAssembly,
+            IEnumerable<string> sources,
+            IMessageLogger logger)
         {
             var allDiscoverers = GetDiscoverers(extensionAssembly, throwOnError: true);
 
@@ -234,8 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return null;
             }
 
-            var result =
-                new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
+            var result = new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
             var sourcesForWhichNoDiscovererIsAvailable = new List<string>(sources);
 
             foreach (var discoverer in allDiscoverers)
