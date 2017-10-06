@@ -174,8 +174,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
             this.InvokeVsTest(arguments);
-            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
-            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest" };
+            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest1", "MstestV1UnitTestProject.UnitTest1.PassingTest2",
+                "MstestV1UnitTestProject.UnitTest1.FailingTest2", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
+            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest1" };
             this.ValidateDiscoveredTests(listOfTests);
             this.ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
         }
@@ -205,8 +206,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
 
             this.InvokeVsTest(arguments);
-            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest" };
-            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
+            var listOfTests = new string[] {"MstestV1UnitTestProject.UnitTest1.PassingTest1", "MstestV1UnitTestProject.UnitTest1.PassingTest2" };
+            var listOfNotDiscoveredTests = new string[] {"MstestV1UnitTestProject.UnitTest1.FailingTest1", "MstestV1UnitTestProject.UnitTest1.FailingTest2", "MstestV1UnitTestProject.UnitTest1.SkippingTest" };
             this.ValidateDiscoveredTests(listOfTests);
             this.ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
         }
