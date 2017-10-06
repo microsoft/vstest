@@ -47,6 +47,8 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.EventLog.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorder.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\VSTestVideoRecorder.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TestTools.DataCollection.SystemInfo.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\V1\Microsoft.VisualStudio.TraceCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.GenericTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.OrderedTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.CodedWebTestAdapter.dll" />
