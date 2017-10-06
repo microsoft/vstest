@@ -47,6 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                             //TODO what to do for js, appx and others? Using default for now.
                             arch = Constants.DefaultPlatform;
                         }
+                        sourcePlatforms[source]=(Architecture)arch;
 
                         if (Architecture.AnyCPU.Equals(arch))
                         {
@@ -57,13 +58,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         if (finalArch == null)
                         {
                             finalArch = arch;
-                            sourcePlatforms.Add(source, (Architecture)arch);
                             continue;
                         }
 
                         if (!finalArch.Equals(arch))
                         {
-                            sourcePlatforms.Add(source, (Architecture)arch);
                             finalArch = Constants.DefaultPlatform;
                             EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
                         }
@@ -144,11 +143,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         fx = new FrameworkName(Framework.DefaultFramework.Name);
                     }
                 }
+                sourceFrameworkVersions[source] = Framework.FromString(fx.FullName);
 
                 if (finalFx == null)
                 {
                     finalFx = fx;
-                    sourceFrameworkVersions.Add(source, Framework.FromString(fx.FullName));
                     continue;
                 }
 
@@ -165,7 +164,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                     conflictInFxIdentifier = true;
                     finalFx = new FrameworkName(Framework.DefaultFramework.Name);
                 }
-                sourceFrameworkVersions.Add(source, Framework.FromString(fx.FullName));
             }
             return finalFx;
         }

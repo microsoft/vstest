@@ -92,6 +92,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 .Returns(this.mockRunRequest.Object);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.X86);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+                .Returns(new FrameworkName(Constants.DotNetFramework40));
         }
 
         [TestCleanup]

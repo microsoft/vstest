@@ -459,7 +459,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
         /// </summary>
         public static IEnumerable<String> FilterCompatibleSources(Architecture choosenPlatform,
-            Framework framework,
+            Framework choosenFramework,
             IDictionary<String,Architecture> sourcePlatforms,
             IDictionary<String, Framework> sourceFrameworks,
             out String incompatibleSettingWarning)
@@ -472,13 +472,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             foreach (var source in sourcePlatforms.Keys)
             {
                 Architecture actualPlatform = sourcePlatforms[source];
-                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, choosenPlatform, sourceFrameworks[source], framework);
+                Framework actualFramework = sourceFrameworks[source];
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, choosenPlatform, actualFramework, choosenFramework);
                 if (isSettingIncompatible)
                 {
                     string incompatiblityMessage;
                     var onlyFileName = Path.GetFileName(source);
                     // Add message for incompatible sources.
-                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, onlyFileName, sourceFrameworks[source].Version, actualPlatform);
+                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
 
                     warnings.AppendLine(incompatiblityMessage);
                     incompatiblityFound = true;
@@ -491,7 +492,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (incompatiblityFound)
             {
-                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, framework, choosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, choosenFramework, choosenPlatform, warnings.ToString(), multiTargettingForwardLink);
             }
 
             return compatibleSources;

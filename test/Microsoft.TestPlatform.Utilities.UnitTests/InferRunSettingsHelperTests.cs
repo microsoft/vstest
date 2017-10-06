@@ -14,10 +14,27 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using MSTest.TestFramework.AssertExtensions;
     using System.IO;
+    using System.Collections.Generic;
+    using System.Linq;
+    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
+    using System.Globalization;
+    using System.Text;
 
     [TestClass]
     public class InferRunSettingsHelperTests
     {
+        private IDictionary<string, Architecture> sourceArchitectures;
+        private IDictionary<string, Framework> sourceFrameworks;
+        private readonly Framework frameworkNet45 = Framework.FromString(".NETFramework,Version=4.5");
+        private readonly Framework frameworkNet46 = Framework.FromString(".NETFramework,Version=4.6");
+        private readonly Framework frameworkNet47 = Framework.FromString(".NETFramework,Version=4.7");
+
+        public InferRunSettingsHelperTests()
+        {
+            sourceArchitectures = new Dictionary<string, Architecture>();
+            sourceFrameworks = new Dictionary<string, Framework>();
+        }
+
         [TestMethod]
         public void UpdateRunSettingsShouldThrowIfRunSettingsNodeDoesNotExist()
         {
@@ -396,7 +413,76 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(".NETCoreApp,Version=v1.0", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/TargetFrameworkVersion"));
         }
 
+        [TestMethod]
+        public void FilterCompatiableSourcesShouldIdentifyIncomaptiableSourcesAndConstructWarningMessage()
+        {
+            #region Arrange
+            sourceArchitectures["AnyCPU1net46.dll"] = Architecture.AnyCPU;
+            sourceArchitectures["x64net47.exe"] = Architecture.X64;
+            sourceArchitectures["x86net45.dll"] = Architecture.X86;
+
+            sourceFrameworks["AnyCPU1net46.dll"] = frameworkNet46;
+            sourceFrameworks["x64net47.exe"] = frameworkNet47;
+            sourceFrameworks["x86net45.dll"] = frameworkNet45;
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("");
+            sb.AppendLine(GetSourceIncompatibleMessage("AnyCPU1net46.dll"));
+            sb.AppendLine(GetSourceIncompatibleMessage("x64net47.exe"));
+            sb.AppendLine(GetSourceIncompatibleMessage("x86net45.dll"));
+
+            var expected = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+            #endregion
+
+            string warningMessage = string.Empty;
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet47, sourceArchitectures, sourceFrameworks, out warningMessage);
+
+            // None of the DLLs passed are compatiable to the choosen settings
+            Assert.AreEqual(0, compatibleSources.Count());
+            Assert.AreEqual(expected, warningMessage);
+        }
+
+        [TestMethod]
+        public void FilterCompatiableSourcesShouldIdentifyCompatiableSources()
+        {
+            sourceArchitectures["x64net45.exe"] = Architecture.X64;
+            sourceArchitectures["x86net45.dll"] = Architecture.X86;
+
+            sourceFrameworks["x64net45.exe"] = frameworkNet45;
+            sourceFrameworks["x86net45.dll"] = frameworkNet45;
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("");
+            sb.AppendLine(GetSourceIncompatibleMessage("x64net45.exe"));
+
+            var expected = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+
+            string warningMessage = string.Empty;
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
+
+            // only "x86net45.dll" is the compatiable source
+            Assert.AreEqual(1, compatibleSources.Count());
+            Assert.AreEqual(expected, warningMessage);
+        }
+
+        [TestMethod]
+        public void FilterCompatiableSourcesShouldRetrunnullAsWarningMessageIfNoConflict()
+        {
+            sourceArchitectures["x64net45.exe"] = Architecture.X64;
+            sourceFrameworks["x64net45.exe"] = frameworkNet45;
+
+            string warningMessage = string.Empty;
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Architecture.X64, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
+
+            Assert.IsNull(warningMessage);
+        }
+
         #region private methods
+
+        private string GetSourceIncompatibleMessage(string source)
+        {
+            return string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, source, sourceFrameworks[source].Version, sourceArchitectures[source]);
+        }
 
         private XPathNavigator GetNavigator(string settingsXml)
         {
