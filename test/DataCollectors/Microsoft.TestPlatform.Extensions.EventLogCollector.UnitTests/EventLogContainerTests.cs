@@ -59,6 +59,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         }
 
         [TestMethod]
+        [Ignore]
         public void OnEventLogEntryWrittenShouldAddLogs()
         {
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);
