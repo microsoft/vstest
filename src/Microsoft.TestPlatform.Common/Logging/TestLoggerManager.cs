@@ -449,7 +449,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
                         this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
                         this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
-                        
                     }
 
                     if (this.discoveryRequest != null)

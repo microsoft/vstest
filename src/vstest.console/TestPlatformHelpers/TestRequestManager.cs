@@ -355,9 +355,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (updateFramework || updatePlatform)
                     {
-                        var frameworkChoosen = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+                        var frameworkChosen = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
                         InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                            frameworkChoosen?.ToString(), overwrite: true);
+                            frameworkChosen?.ToString(), overwrite: true);
                         settingsUpdated = true;
 
                         var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
@@ -368,8 +368,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         }
 
                         string incompatiableSettingWarning = string.Empty;
-                        var platformChoosen = updatePlatform ? inferedPlatform : commandLineOptions.TargetArchitecture;
-                        var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(platformChoosen, frameworkChoosen, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+                        var platformChosen = updatePlatform ? inferedPlatform : commandLineOptions.TargetArchitecture;
+                        var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(platformChosen, frameworkChosen, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
                         if(!string.IsNullOrEmpty(incompatiableSettingWarning))
                         {

@@ -437,7 +437,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string warningMessage = string.Empty;
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet47, sourceArchitectures, sourceFrameworks, out warningMessage);
 
-            // None of the DLLs passed are compatiable to the choosen settings
+            // None of the DLLs passed are compatiable to the chosen settings
             Assert.AreEqual(0, compatibleSources.Count());
             Assert.AreEqual(expected, warningMessage);
         }

@@ -458,8 +458,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
         /// </summary>
-        public static IEnumerable<String> FilterCompatibleSources(Architecture choosenPlatform,
-            Framework choosenFramework,
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform,
+            Framework chosenFramework,
             IDictionary<String,Architecture> sourcePlatforms,
             IDictionary<String, Framework> sourceFrameworks,
             out String incompatibleSettingWarning)
@@ -473,7 +473,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 Architecture actualPlatform = sourcePlatforms[source];
                 Framework actualFramework = sourceFrameworks[source];
-                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, choosenPlatform, actualFramework, choosenFramework);
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
                 if (isSettingIncompatible)
                 {
                     string incompatiblityMessage;
@@ -492,7 +492,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (incompatiblityFound)
             {
-                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, choosenFramework, choosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
             }
 
             return compatibleSources;
