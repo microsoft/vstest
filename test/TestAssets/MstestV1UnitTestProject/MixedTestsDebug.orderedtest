@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<OrderedTest name="AllPassing" storage="AllPassing.orderedtest" id="93ccc912-6e00-43fa-bf06-557da1684587" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestLinks>
+	<TestLink id="05d8fe14-597a-7f95-c021-a020669296f1" name="PassingTest1" storage="bin\debug\net451\MstestV1UnitTestProject.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="4e29cabf-6b42-433d-43ac-55a67fe11ab2" name="PassingTest2" storage="bin\debug\net451\MstestV1UnitTestProject.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+	<TestLink id="26da5e66-905a-30e9-2bd8-754df1300777" name="FailingTest1" storage="bin\debug\net451\MstestV1UnitTestProject.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <TestLink id="080755a1-efc5-3620-f352-0c0c9d220cf3" name="FailingTest2" storage="bin\debug\net451\MstestV1UnitTestProject.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </TestLinks>
+</OrderedTest>
