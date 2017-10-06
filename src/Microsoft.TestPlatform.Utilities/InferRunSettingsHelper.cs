@@ -446,7 +446,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
         {
-            Debug.Assert(!targetFramework.Equals(Framework.DefaultFramework), "TargetFramework is None.");
             if (sourceFramework.Equals(Framework.DefaultFramework))
             {
                 return false;
@@ -477,9 +476,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 if (isSettingIncompatible)
                 {
                     string incompatiblityMessage;
-
+                    var onlyFileName = Path.GetFileName(source);
                     // Add message for incompatible sources.
-                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, source, sourceFrameworks[source].Version, actualPlatform);
+                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, onlyFileName, sourceFrameworks[source].Version, actualPlatform);
 
                     warnings.AppendLine(incompatiblityMessage);
                     incompatiblityFound = true;

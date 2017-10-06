@@ -154,18 +154,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             bool success = false;
 
             var runsettings = discoveryPayload.RunSettings;
-            IEnumerable<string> compatiableSources = Enumerable.Empty<string>();
 
             var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings, out compatiableSources))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
 
-            if(compatiableSources.Count() == 0)
-            {
-                return false;
-            }
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+            var batchSize = runConfiguration.BatchSize;
+
+            // Collect Metrics
+            this.CollectMetrics(requestData, runConfiguration);
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
@@ -236,17 +236,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var requestData = this.GetRequestData(protocolConfig);
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
-            IEnumerable<string> compatiableSources = Enumerable.Empty<string>();
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings, out compatiableSources))
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
 
-            if(compatiableSources.Count() == 0)
-            {
-                return false;
-            }
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+            var batchSize = runConfiguration.BatchSize;
+
+            this.CollectMetrics(requestData, runConfiguration);
 
             if (!commandLineOptions.IsDesignMode && string.IsNullOrWhiteSpace(runsettings))
             {
@@ -332,14 +331,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml, out IEnumerable<string> compatiableSources)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
             IDictionary<string, Architecture> sourcePlatforms = new Dictionary<string, Architecture>();
             IDictionary<string, Framework> sourceFrameworks = new Dictionary<string, Framework>();
-            compatiableSources = sources;
-
 
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
@@ -372,18 +369,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                         string incompatiableSettingWarning = string.Empty;
                         var platformChoosen = updatePlatform ? inferedPlatform : commandLineOptions.TargetArchitecture;
-                        compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(platformChoosen, frameworkChoosen, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+                        var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(platformChoosen, frameworkChoosen, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
-                        if(!string.IsNullOrEmpty(incompatiableSettingWarning) && EqtTrace.IsInfoEnabled)
+                        if(!string.IsNullOrEmpty(incompatiableSettingWarning))
                         {
                             EqtTrace.Info(incompatiableSettingWarning);
                             LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
                         }
 
-                        if(compatiableSources.Count()==0)
+                        if (EqtTrace.IsInfoEnabled)
                         {
-                            var exceptionMessage = string.Format(Resources.Resources.NoMatchingSourcesFound, frameworkChoosen, platformChoosen);
-                            LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, new TestPlatformException(exceptionMessage));
+                            EqtTrace.Info("Compatiable sources list : ");
+                            EqtTrace.Info(string.Join("\n", compatiableSources.ToArray()));
                         }
                     }
 

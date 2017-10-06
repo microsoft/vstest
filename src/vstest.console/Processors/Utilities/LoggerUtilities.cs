@@ -40,8 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 testRunResultAggregator.MarkTestRunFailed();
             }
 
-            TestRunMessageEventArgs errorMessage = new TestRunMessageEventArgs(TestMessageLevel.Warning, warningMessage);
-            loggerManager.SendTestRunMessage(errorMessage);
+            TestRunMessageEventArgs testRunMessage = new TestRunMessageEventArgs(TestMessageLevel.Warning, warningMessage);
+            loggerManager.SendTestRunMessage(testRunMessage);
         }
 
         /// <summary>
