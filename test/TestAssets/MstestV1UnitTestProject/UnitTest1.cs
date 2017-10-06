@@ -17,9 +17,15 @@ namespace MstestV1UnitTestProject
         /// </summary>
         [Priority(2)]
         [TestMethod]
-        public void PassingTest()
+        public void PassingTest1()
         {
             Assert.AreEqual(2, 2);
+        }
+
+        [TestMethod]
+        public void PassingTest2()
+        {
+            Assert.AreEqual(3, 3);
         }
 
         /// <summary>
@@ -28,9 +34,15 @@ namespace MstestV1UnitTestProject
         [TestCategory("CategoryA")]
         [Priority(3)]
         [TestMethod]
-        public void FailingTest()
+        public void FailingTest1()
         {
             Assert.AreEqual(2, 3);
+        }
+
+        [TestMethod]
+        public void FailingTest2()
+        {
+            Assert.AreEqual(2, 4);
         }
 
         /// <summary>
