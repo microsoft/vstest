@@ -355,21 +355,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (updateFramework || updatePlatform)
                     {
-                        var frameworkChosen = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
-                        InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                            frameworkChosen?.ToString(), overwrite: true);
-                        settingsUpdated = true;
+                        var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+                        var chosenFramework = inferedFramework;
+                        if(updateFramework)
+                        {
+                            InferRunSettingsHelper.UpdateTargetFramework(navigator,
+                            inferedFramework?.ToString(), overwrite: true);
+                            settingsUpdated = true;
+                        }
+                        else
+                        {
+                            chosenFramework = commandLineOptions.TargetFrameworkVersion;
+                        }
 
                         var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
-                        if(updatePlatform)
+                        var chosenPlatform = inferedPlatform;
+                        if (updatePlatform)
                         {
                             InferRunSettingsHelper.UpdateTargetPlatform(navigator,
                             inferedPlatform.ToString(), overwrite: true);
                         }
+                        else
+                        {
+                            chosenPlatform = commandLineOptions.TargetArchitecture;
+                        }
 
                         string incompatiableSettingWarning = string.Empty;
-                        var platformChosen = updatePlatform ? inferedPlatform : commandLineOptions.TargetArchitecture;
-                        var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(platformChosen, frameworkChosen, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+
+                        var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
                         if(!string.IsNullOrEmpty(incompatiableSettingWarning))
                         {

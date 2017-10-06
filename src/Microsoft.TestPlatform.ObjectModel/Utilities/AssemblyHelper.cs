@@ -322,7 +322,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             try
             {
                 RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runContext.RunSettings.SettingsXml);
-                if (null != runConfiguration && (string.Equals(runConfiguration.TargetFrameworkVersion.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
+                if (null != runConfiguration && (Enum.Equals(runConfiguration.TargetFrameworkVersion, FrameworkVersion.Framework40) ||
+                    string.Equals(runConfiguration.TargetFrameworkVersion.ToString(), Constants.DotNetFramework40, StringComparison.OrdinalIgnoreCase)))
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
