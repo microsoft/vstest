@@ -353,48 +353,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
 
-                    if (updateFramework || updatePlatform)
+                    var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+                    var chosenFramework = inferedFramework;
+                    if(updateFramework)
                     {
-                        var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
-                        var chosenFramework = inferedFramework;
-                        if(updateFramework)
-                        {
-                            InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                            inferedFramework?.ToString(), overwrite: true);
-                            settingsUpdated = true;
-                        }
-                        else
-                        {
-                            chosenFramework = commandLineOptions.TargetFrameworkVersion;
-                        }
+                        InferRunSettingsHelper.UpdateTargetFramework(navigator,
+                        inferedFramework?.ToString(), overwrite: true);
+                        settingsUpdated = true;
+                    }
+                    else
+                    {
+                        chosenFramework = commandLineOptions.TargetFrameworkVersion;
+                    }
 
-                        var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
-                        var chosenPlatform = inferedPlatform;
-                        if (updatePlatform)
-                        {
-                            InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                            inferedPlatform.ToString(), overwrite: true);
-                        }
-                        else
-                        {
-                            chosenPlatform = commandLineOptions.TargetArchitecture;
-                        }
+                    var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+                    var chosenPlatform = inferedPlatform;
+                    if (updatePlatform)
+                    {
+                        InferRunSettingsHelper.UpdateTargetPlatform(navigator,
+                        inferedPlatform.ToString(), overwrite: true);
+                    }
+                    else
+                    {
+                        chosenPlatform = commandLineOptions.TargetArchitecture;
+                    }
 
-                        string incompatiableSettingWarning = string.Empty;
+                    string incompatiableSettingWarning = string.Empty;
 
-                        var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+                    var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
-                        if(!string.IsNullOrEmpty(incompatiableSettingWarning))
-                        {
-                            EqtTrace.Info(incompatiableSettingWarning);
-                            LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
-                        }
+                    if(!string.IsNullOrEmpty(incompatiableSettingWarning))
+                    {
+                        EqtTrace.Info(incompatiableSettingWarning);
+                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
+                    }
 
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("Compatiable sources list : ");
-                            EqtTrace.Info(string.Join("\n", compatiableSources.ToArray()));
-                        }
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("Compatiable sources list : ");
+                        EqtTrace.Info(string.Join("\n", compatiableSources.ToArray()));
                     }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.
