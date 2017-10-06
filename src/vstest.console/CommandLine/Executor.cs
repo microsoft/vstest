@@ -235,7 +235,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                         this.Output.Error(false, ex.Message);
                         result = 1;
                         this.showHelp = false;
-
                     }
                     else
                     {

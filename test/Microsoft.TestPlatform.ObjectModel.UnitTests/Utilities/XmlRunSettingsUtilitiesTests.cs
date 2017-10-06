@@ -4,7 +4,10 @@
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Xml;
+    using System.Xml.XPath;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -404,6 +407,70 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
             Assert.AreEqual(friendlyNameList.Count, 2, "There should be two friendly name");
             CollectionAssert.AreEqual(friendlyNameList, new List<string> { "DummyDataCollector1", "DummyDataCollector2" });
+        }
+
+        [TestMethod]
+        public void ContainsDataCollectorWithFriendlyNameShouldReturnTrueIfDataCollectorWithGivenFriendlyNameExist()
+        {
+            var settingsXml = @"<RunSettings>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
+
+            IXPathNavigable runSettingsDocument;
+            using (var stream = new StringReader(settingsXml))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+#if NET451
+                runSettingsDocument = document;
+#else
+                runSettingsDocument = document.ToXPathNavigable();
+#endif
+            }
+
+            var runSettingsNavigator = runSettingsDocument.CreateNavigator();
+
+            Assert.IsTrue(XmlRunSettingsUtilities.ContainsDataCollectorWithFriendlyName(runSettingsNavigator, "DummyDataCollector1"));
+        }
+
+        [TestMethod]
+        public void ContainsDataCollectorWithFriendlyNameShouldReturnFalseIfDataCollectorWithGivenFriendlyNameNotExist()
+        {
+            var settingsXml = @"<RunSettings>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
+
+            IXPathNavigable runSettingsDocument;
+            using (var stream = new StringReader(settingsXml))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+#if NET451
+                runSettingsDocument = document;
+#else
+                runSettingsDocument = document.ToXPathNavigable();
+#endif
+            }
+
+            var runSettingsNavigator = runSettingsDocument.CreateNavigator();
+
+            Assert.IsFalse(XmlRunSettingsUtilities.ContainsDataCollectorWithFriendlyName(runSettingsNavigator, "DummyDataCollector3"));
         }
 
         private string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
