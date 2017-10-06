@@ -30,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -357,10 +357,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private void PrintSplashScreen()
         {
-            var assembly = typeof(Executor).GetTypeInfo().Assembly;
             string assemblyVersion = string.Empty;
+            assemblyVersion = Product.Version;
 
-            assemblyVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
 
