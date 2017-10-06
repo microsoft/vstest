@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public bool DebuggingEnabled { get; set; }
 
         /// <summary>
-        /// Gets or sets the test platform options 
+        /// Gets or sets the testplatform options
         /// </summary>
         [DataMember]
         public TestPlatformOptions TestPlatformOptions

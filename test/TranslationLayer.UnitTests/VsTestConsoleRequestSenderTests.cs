@@ -329,7 +329,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.InitializeCommunication();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var payload = new DiscoveryCompletePayload() { TotalTests = 0, LastDiscoveredTests = null, IsAborted = false };
             var discoveryComplete = new Message()
@@ -339,9 +339,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
 
-            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(0, null, false), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Never, "DiscoveredTests must not be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
@@ -351,7 +351,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var payload = new DiscoveryCompletePayload() { TotalTests = 0, LastDiscoveredTests = null, IsAborted = false };
             var discoveryComplete = new Message()
@@ -361,9 +361,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
 
-            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(0, null, false), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Never, "DiscoveredTests must not be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
@@ -373,7 +373,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.InitializeCommunication();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             var testCaseList = new List<TestCase>() { testCase };
@@ -394,9 +394,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
                 () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
-            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(1, null, false), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Once, "DiscoveredTests must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
@@ -406,7 +406,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             var testCaseList = new List<TestCase>() { testCase };
@@ -427,9 +427,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
                 () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
-            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(1, null, false), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Once, "DiscoveredTests must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
@@ -439,7 +439,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.InitializeCommunication();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
@@ -460,7 +460,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                         this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((discoveryComplete)));
                     });
 
-            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedTestCases);
             Assert.AreEqual(1, receivedTestCases.Count);
@@ -477,7 +477,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
@@ -498,7 +498,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                         this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((discoveryComplete)));
                     });
 
-            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedTestCases);
             Assert.AreEqual(1, receivedTestCases.Count);
@@ -515,7 +515,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.InitializeCommunication();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
@@ -527,14 +527,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
-            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
                 .Callback(
-                    (long totalTests, IEnumerable<TestCase> tests, bool isAborted) =>
+                    (DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) =>
                     {
                         receivedTestCases = tests?.ToList();
                     });
 
-            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedTestCases);
             Assert.AreEqual(1, receivedTestCases.Count);
@@ -551,7 +551,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             testCase.Traits.Add(new Trait("a", "b"));
@@ -563,14 +563,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
-            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
                 .Callback(
-                    (long totalTests, IEnumerable<TestCase> tests, bool isAborted) =>
+                    (DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> tests) =>
                     {
                         receivedTestCases = tests?.ToList();
                     });
 
-            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedTestCases);
             Assert.AreEqual(1, receivedTestCases.Count);
@@ -587,7 +587,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.InitializeCommunication();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             var testCaseList = new List<TestCase>() { testCase };
@@ -605,9 +605,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
-            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(1, null, false), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Once, "DiscoveredTests must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Once, "TestMessage event must be called");
         }
@@ -617,7 +617,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             await this.InitializeCommunicationAsync();
 
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             var testCaseList = new List<TestCase>() { testCase };
@@ -635,9 +635,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
-            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(new List<string>() { "1.dll" }, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(1, null, false), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()), Times.Once, "DiscoveredTests must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Once, "TestMessage event must be called");
         }
@@ -645,14 +645,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldAbortOnExceptionInSendMessage()
         {
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var sources = new List<string> { "1.dll" };
             var payload = new DiscoveryRequestPayload { Sources = sources, RunSettings = null };
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, payload)).Throws(new IOException());
 
-            this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
         }
@@ -660,14 +660,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public async Task DiscoverTestsAsyncShouldAbortOnExceptionInSendMessage()
         {
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var sources = new List<string> { "1.dll" };
             var payload = new DiscoveryRequestPayload { Sources = sources, RunSettings = null };
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, payload)).Throws(new IOException());
 
-            await this.requestSenderAsync.DiscoverTestsAsync(sources, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(sources, null, new TestPlatformOptions(), mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
         }
@@ -675,7 +675,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldAbortWhenProcessExited()
         {
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var sources = new List<string> { "1.dll" };
             var payload = new DiscoveryRequestPayload { Sources = sources, RunSettings = null };
             var manualEvent = new ManualResetEvent(false);
@@ -692,9 +692,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     Assert.IsTrue(c.IsCancellationRequested);
                 }).Returns(Task.FromResult((Message)null));
 
-            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true)).Callback(() => manualEvent.Set());
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete( It.IsAny<DiscoveryCompleteEventArgs>(), null)).Callback(() => manualEvent.Set());
 
-            this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
+            this.requestSender.DiscoverTests(sources, null, new TestPlatformOptions(), mockHandler.Object);
 
             manualEvent.WaitOne();
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
@@ -704,7 +704,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public async Task DiscoverTestsAsyncShouldAbortWhenProcessExited()
         {
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var sources = new List<string> { "1.dll" };
             var payload = new DiscoveryRequestPayload { Sources = sources, RunSettings = null };
 
@@ -720,7 +720,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     Assert.IsTrue(c.IsCancellationRequested);
                 }).Returns(Task.FromResult((Message)null));
 
-            await this.requestSenderAsync.DiscoverTestsAsync(sources, null, mockHandler.Object);
+            await this.requestSenderAsync.DiscoverTestsAsync(sources, null, new TestPlatformOptions(), mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
@@ -1233,7 +1233,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
 
-            this.requestSender.StartTestRun(new List<TestCase>(), null, mockHandler.Object);
+            this.requestSender.StartTestRun(new List<TestCase>(), null, new TestPlatformOptions(), mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1260,7 +1260,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
 
-            await this.requestSenderAsync.StartTestRunAsync(new List<TestCase>(), null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(new List<TestCase>(), null, new TestPlatformOptions(), mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1314,7 +1314,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
-            this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
+            this.requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1368,7 +1368,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
-            await this.requestSenderAsync.StartTestRunAsync(testCaseList, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1420,7 +1420,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                         receivedChangeEventArgs = stats;
                     });
 
-            this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
+            this.requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedChangeEventArgs);
             Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Count() > 0);
@@ -1476,7 +1476,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                         receivedChangeEventArgs = stats;
                     });
 
-            await this.requestSenderAsync.StartTestRunAsync(testCaseList, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedChangeEventArgs);
             Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Count() > 0);
@@ -1533,7 +1533,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                         this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                     });
 
-            this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
+            this.requestSender.StartTestRun(testCaseList, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedChangeEventArgs);
             Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
@@ -1590,7 +1590,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                         this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                     });
 
-            await this.requestSenderAsync.StartTestRunAsync(testCaseList, null, mockHandler.Object);
+            await this.requestSenderAsync.StartTestRunAsync(testCaseList, null, new TestPlatformOptions(), mockHandler.Object);
 
             Assert.IsNotNull(receivedChangeEventArgs);
             Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
@@ -1655,7 +1655,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
-            this.requestSender.StartTestRunWithCustomHost(testCaseList, null, mockHandler.Object, mockLauncher.Object);
+            this.requestSender.StartTestRunWithCustomHost(testCaseList, null, new TestPlatformOptions(), mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
@@ -1717,7 +1717,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
-            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(testCaseList, null, mockHandler.Object, mockLauncher.Object);
+            await this.requestSenderAsync.StartTestRunWithCustomHostAsync(testCaseList, null, new TestPlatformOptions(), mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");

@@ -28,5 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </remarks>
         [DataMember]
         public FilterOptions FilterOptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Telemetry Opted in status
+        /// </summary>
+        [DataMember]
+        public bool TelemetryOptedIn { get; set; }
     }
 }

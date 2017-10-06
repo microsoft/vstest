@@ -15,10 +15,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -78,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
                   new InferHelper(new AssemblyMetadataProvider()),
-                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
+                  MetricsPublisherFactory.GetMetricsPublisher(false, CommandLineOptions.Instance.IsDesignMode))
         {
         }
 
@@ -91,7 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testPlatformEventSource = testPlatformEventSource;
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
-            this.telemetryOptedIn = IsTelemetryOptedIn();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -152,8 +150,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
             bool success = false;
-
             var runsettings = discoveryPayload.RunSettings;
+
+            if (discoveryPayload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.TelemetryOptedIn;
+            }
 
             var requestData = this.GetRequestData(protocolConfig);
             if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
@@ -233,7 +235,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
+
+            if (testRunRequestPayload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.TelemetryOptedIn;
+            }
+
             var requestData = this.GetRequestData(protocolConfig);
+
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
@@ -520,17 +529,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // Collecting TestPlatform Version
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
-        }
-
-        /// <summary>
-        /// Checks whether Telemetry opted in or not. 
-        /// By Default opting out
-        /// </summary>
-        /// <returns>Returns Telemetry Opted out or not</returns>
-        private static bool IsTelemetryOptedIn()
-        {
-            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
-            return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
         }
 
         /// <summary>
