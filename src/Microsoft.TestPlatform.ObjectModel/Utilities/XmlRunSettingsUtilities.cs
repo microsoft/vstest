@@ -86,6 +86,45 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             return false;
         }
 
+        /// <summary>
+        /// Check data collector exist with friendly name
+        /// </summary>
+        /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
+        /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
+        /// <returns> True if there is a datacollector configured. </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
+        public static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
+        {
+            if (runSettingDocument == null)
+            {
+                throw new ArgumentNullException(nameof(runSettingDocument));
+            }
+
+            if (dataCollectorFriendlyName == null)
+            {
+                throw new ArgumentNullException(nameof(dataCollectorFriendlyName));
+            }
+
+            var navigator = runSettingDocument.CreateNavigator();
+            var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+
+            foreach (XPathNavigator dataCollectorNavigator in nodes)
+            {
+                var uri = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
+                if (string.Equals(dataCollectorFriendlyName, uri, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Get the list of friendly name of all data collector present in runsettings.
+        /// </summary>
+        /// <param name="runsettingsXml">runsettings xml string</param>
+        /// <returns>List of friendly name</returns>
         public static IList<string> GetDataCollectorsFriendlyName(string runsettingsXml)
         {
             var friendlyNameList = new List<string>();

@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -114,9 +114,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     argument));
             }
 
-            if(TestPlatform.Utilities.InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
+            if(InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
             {
-                throw new SettingsException("--Collect|/Collect argument is not supported with TestSettings file");
+                throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
             AddDataCollectorToRunSettings(argument, this.runSettingsManager);
         }
@@ -203,6 +203,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+        }
+
+        internal static void AddDataCollectorFriendlyName(string friendlyName)
+        {
+            EnabledDataCollectors.Add(friendlyName.ToLower());
         }
     }
 }

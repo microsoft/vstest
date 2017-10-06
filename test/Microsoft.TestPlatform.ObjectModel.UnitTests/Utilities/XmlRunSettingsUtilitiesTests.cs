@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -384,6 +385,26 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         }
 
         #endregion
+
+        [TestMethod]
+        public void GetDataCollectorsFriendlyNameShouldReturnListOfFriendlyName()
+        {
+            var settingsXml = @"<RunSettings>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
+
+            var friendlyNameList = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingsXml).ToList<string>();
+
+            Assert.AreEqual(friendlyNameList.Count, 2, "There should be two friendly name");
+            CollectionAssert.AreEqual(friendlyNameList, new List<string> { "DummyDataCollector1", "DummyDataCollector2" });
+        }
 
         private string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
         {

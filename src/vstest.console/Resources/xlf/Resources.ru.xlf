@@ -1546,6 +1546,16 @@
      Example: /DisableAutoFakes:true</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="CollectWithTestSettingErrorMessage">
+        <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
+        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunsettingsWithDCErrorMessage">
+        <source>DataCollector with friendlyName="{0}" in runsettings in not supported if test run is configured using testsettings.</source>
+        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

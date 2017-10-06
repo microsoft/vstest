@@ -1668,6 +1668,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   DataCollector with friendlyName=&quot;{0}&quot; in runsettings in not supported if test run is configured using testsettings..
+        /// </summary>
+        public static string RunsettingsWithDCErrorMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("RunsettingsWithDCErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   --Collect|/Collect:&quot;{0}&quot; is not supported if test run is configured using testsettings..
+        /// </summary>
+        public static string CollectWithTestSettingErrorMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("CollectWithTestSettingErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Test Run Failed..
         /// </summary>
         public static string TestRunFailed

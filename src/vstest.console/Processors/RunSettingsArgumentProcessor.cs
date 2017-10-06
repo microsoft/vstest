@@ -137,35 +137,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 this.commandLineOptions.SettingsFile = argument;
 
+                // runsettings with data collector and testsettings is not supported.
                 string settingXml = this.runSettingsManager.ActiveRunSettings.SettingsXml;
                 if (InferRunSettingsHelper.IsTestSettingsEnabled(settingXml) && XmlRunSettingsUtilities.IsDataCollectionEnabled(settingXml))
                 {
-                    bool throwException = false;
                     var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingXml);
+                    StringBuilder sb = new StringBuilder();
 
-                    if (this.commandLineOptions.EnableCodeCoverage)
+                    foreach (var fn in dataCollectorsFriendlyNames)
                     {
-                        if (dataCollectorsFriendlyNames.Count >= 2)
-                        {
-                            throwException = true;
-                            dataCollectorsFriendlyNames.Remove("Code Coverage");
-                        }
-                    }
-                    else
-                    {
-                        throwException = true;
+                        sb.AppendFormat(CommandLineResources.RunsettingsWithDCErrorMessage, fn);
+                        sb.Append(Environment.NewLine);
                     }
 
-                    if (throwException)
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        foreach (var fn in dataCollectorsFriendlyNames)
-                        {
-                            sb.AppendFormat("{0} in runsettings in not supported if test run is configured using testsettings", fn);
-                        }
-
-                        throw new SettingsException(sb.ToString());
-                    }
+                    throw new SettingsException(sb.ToString());
                 }
             }
             catch (XmlException exception)
@@ -227,20 +212,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
                 runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
-            }
-
-            if (this.commandLineOptions.EnableCodeCoverage == true)
-            {
-                try
-                {
-                    CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(runSettingsDocument);
-                }
-                catch (XPathException e)
-                {
-                    throw new SettingsException(
-                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, e.Message),
-                        e);
-                }
             }
 
             return runSettingsDocument;
