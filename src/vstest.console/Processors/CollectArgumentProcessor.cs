@@ -114,6 +114,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     argument));
             }
 
+            if(TestPlatform.Utilities.InferRunSettingsHelper.IsTestSettingsEnabled(this.runSettingsManager.ActiveRunSettings.SettingsXml))
+            {
+                throw new SettingsException("--Collect|/Collect argument is not supported with TestSettings file");
+            }
             AddDataCollectorToRunSettings(argument, this.runSettingsManager);
         }
 

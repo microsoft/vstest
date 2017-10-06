@@ -135,16 +135,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.runSettingsManager.AddDefaultRunSettings();
 
                 this.commandLineOptions.SettingsFile = argument;
+
+                string settingXml = this.runSettingsManager.ActiveRunSettings.SettingsXml;
+                if (InferRunSettingsHelper.IsTestSettingsEnabled(settingXml))
+                {
+                    if(XmlRunSettingsUtilities.IsDataCollectionEnabled(settingXml))
+                    {
+                        throw new SettingsException(String.Format("Provided runsettings file({0}) has data collector entry with TestSettings file in it. This is not a supported scenario.", argument));
+                    }
+                }
             }
             catch (XmlException exception)
             {
-                throw new CommandLineException(
+                throw new SettingsException(
                         string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
                         exception);
             }
             catch (SettingsException exception)
             {
-                throw new CommandLineException(exception.Message, exception);
+                throw new SettingsException(exception.Message, exception);
             }
         }
 

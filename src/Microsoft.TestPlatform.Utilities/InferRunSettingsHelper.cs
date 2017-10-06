@@ -239,6 +239,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return false;
         }
 
+        public static bool IsTestSettingsEnabled(string runsettingsXml)
+        {
+            if (!string.IsNullOrWhiteSpace(runsettingsXml))
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    // Move navigator to MSTest node
+                    if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+                        !runSettingsNavigator.MoveToChild("MSTest", string.Empty))
+                    {
+                        EqtTrace.Info("InferRunSettingsHelper.IsTestSettingsEnabled: Unable to navigate to RunSettings/MSTest. Current node: " + runSettingsNavigator.LocalName);
+                        return false;
+                    }
+
+                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+                    if(node != null && !string.IsNullOrEmpty(node.InnerXml))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Adds node under RunConfiguration setting. Noop if node is already present.
         /// </summary>
