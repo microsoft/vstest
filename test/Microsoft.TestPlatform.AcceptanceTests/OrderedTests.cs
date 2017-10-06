@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System;
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,7 +25,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            var orderedTestFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "MstestV1UnitTestProject", "MixedTests.orderedtest");
+            var orderedTestFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "MstestV1UnitTestProject");
+
+            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
+            {
+                orderedTestFileAbsolutePath = Path.Combine(orderedTestFileAbsolutePath, "MixedTestsRelease.orderedtest");
+            }
+            else
+            {
+                orderedTestFileAbsolutePath = Path.Combine(orderedTestFileAbsolutePath, "MixedTestsDebug.orderedtest");
+            }
+
             var arguments = PrepareArguments(
                 orderedTestFileAbsolutePath,
                 this.GetTestAdapterPath(),
