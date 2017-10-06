@@ -114,6 +114,14 @@
       <VSIXSubPath>Extensions\V1</VSIXSubPath>
     </VsixSourceItem>
 
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\V1\x86\*.*" Exclude="$(VsixInputFileLocation)\Extensions\V1\*.pdb">
+      <VSIXSubPath>Extensions\V1\x86</VSIXSubPath>
+    </VsixSourceItem>
+
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\V1\x64\*.*" Exclude="$(VsixInputFileLocation)\Extensions\V1\*.pdb">
+      <VSIXSubPath>Extensions\V1\x64</VSIXSubPath>
+    </VsixSourceItem>
+
     <!-- Test host dependencies -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\x64\*.*">
       <VSIXSubPath>x64</VSIXSubPath>
