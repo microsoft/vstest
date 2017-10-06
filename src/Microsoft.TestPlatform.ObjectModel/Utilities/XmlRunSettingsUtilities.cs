@@ -86,6 +86,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             return false;
         }
 
+        public static IList<string> GetDataCollectorsFriendlyName(string runsettingsXml)
+        {
+            var friendlyNameList = new List<string>();
+            if (!string.IsNullOrWhiteSpace(runsettingsXml))
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+
+                    var runSettingsNavigator = document.CreateNavigator();
+                    var nodes = runSettingsNavigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+
+                    foreach (XPathNavigator dataCollectorNavigator in nodes)
+                    {
+                        var friendlyName = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
+                        friendlyNameList.Add(friendlyName);
+                    }
+                }
+            }
+
+            return friendlyNameList;
+        }
+
         /// <summary>
         /// Inserts a data collector settings in the file
         /// </summary>

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Text;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -137,11 +138,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.commandLineOptions.SettingsFile = argument;
 
                 string settingXml = this.runSettingsManager.ActiveRunSettings.SettingsXml;
-                if (InferRunSettingsHelper.IsTestSettingsEnabled(settingXml))
+                if (InferRunSettingsHelper.IsTestSettingsEnabled(settingXml) && XmlRunSettingsUtilities.IsDataCollectionEnabled(settingXml))
                 {
-                    if(XmlRunSettingsUtilities.IsDataCollectionEnabled(settingXml))
+                    bool throwException = false;
+                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingXml);
+
+                    if (this.commandLineOptions.EnableCodeCoverage)
                     {
-                        throw new SettingsException(String.Format("Provided runsettings file({0}) has data collector entry with TestSettings file in it. This is not a supported scenario.", argument));
+                        if (dataCollectorsFriendlyNames.Count >= 2)
+                        {
+                            throwException = true;
+                            dataCollectorsFriendlyNames.Remove("Code Coverage");
+                        }
+                    }
+                    else
+                    {
+                        throwException = true;
+                    }
+
+                    if (throwException)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        foreach (var fn in dataCollectorsFriendlyNames)
+                        {
+                            sb.AppendFormat("{0} in runsettings in not supported if test run is configured using testsettings", fn);
+                        }
+
+                        throw new SettingsException(sb.ToString());
                     }
                 }
             }

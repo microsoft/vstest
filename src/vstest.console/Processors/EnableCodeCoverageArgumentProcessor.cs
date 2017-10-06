@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Diag;
 
         //public override string HelpContentResourceName => CommandLineResources.EnableCodeCoverageArgumentProcessorHelp;
 
@@ -87,19 +87,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class EnableCodeCoverageArgumentExecutor : IArgumentExecutor
     {
         private IRunSettingsProvider runSettingsManager;
+        private CommandLineOptions commandLineOptions;
 
         private const string FriendlyName = "Code Coverage";
 
-        internal EnableCodeCoverageArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
+            this.commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
 
         /// <inheritdoc />
         public void Initialize(string argument)
         {
+            commandLineOptions.EnableCodeCoverage = true;
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
-            CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
+            //CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
         }
 
         /// <inheritdoc />
