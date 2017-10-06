@@ -45,10 +45,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 kvp.Value.OnEventLogEntryWritten(kvp.Value.EventLog, null);
 
-                lock (kvp.Value.EventLogEntries)
-                {
-                    this.EventLogContainerEndIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count - 1);
-                }
+                this.EventLogContainerEndIndexMap.Add(kvp.Key, kvp.Value.EventLogEntries.Count - 1);
             }
         }
 
