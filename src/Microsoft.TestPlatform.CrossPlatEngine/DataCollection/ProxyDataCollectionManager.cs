@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
             this.connectionTimeout = 5 * 1000;
-            this.CollectEnabledDataCollectors();
+            this.LogEnabledDataCollectors();
         }
 
         /// <summary>
@@ -296,9 +296,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// Collect Enabled Data Collectors
+        /// Log Enabled Data Collectors
         /// </summary>
-        private void CollectEnabledDataCollectors()
+        private void LogEnabledDataCollectors()
         {
             var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.settingsXml);
 

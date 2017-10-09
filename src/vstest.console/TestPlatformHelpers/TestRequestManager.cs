@@ -15,10 +15,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -168,6 +167,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Collect Metrics
             this.CollectMetrics(requestData, runConfiguration);
 
+            // Collect Commands
+            this.LogCommandsTelemetryPoints(requestData);
+
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
             criteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
@@ -210,12 +212,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     throw;
                 }
             }
-            
+
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
-
-            // Collect Commands
-            this.CollectCommands(requestData);
 
             // Posts the Discovery Complete event.
             this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
@@ -249,7 +248,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
+            // Collect Metrics
             this.CollectMetrics(requestData, runConfiguration);
+
+            // Collect Commands
+            this.LogCommandsTelemetryPoints(requestData);
 
             if (!commandLineOptions.IsDesignMode)
             {
@@ -284,8 +287,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             this.testPlatformEventSource.ExecutionRequestStop();
-
-            this.CollectCommands(requestData);
 
             // Post the run complete event
             this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
@@ -339,7 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml,List<string> sources, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -389,7 +390,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
-                    if(InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
+                    if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
                         InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
                         settingsUpdated = true;
@@ -528,6 +529,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // Collecting TestPlatform Version
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+
+            // Collecting TargetOS
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
         }
 
         /// <summary>
@@ -542,11 +546,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
-        /// Collect Command Line switches for Telemetry purposes
+        /// Log Command Line switches for Telemetry purposes
         /// </summary>
-        /// <param name="requestData"></param>
-        private void CollectCommands(IRequestData requestData)
+        /// <param name="requestData">Request Data providing common discovery/execution services.</param>
+        private void LogCommandsTelemetryPoints(IRequestData requestData)
         {
+            if (!requestData.IsTelemetryOptedIn)
+            {
+                return;
+            }
+
             var commandsUsed = new List<string>();
 
             var parallel = this.commandLineOptions.Parallel;
@@ -586,19 +595,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             var settings = this.commandLineOptions.SettingsFile;
-            if (!string.IsNullOrEmpty(settings) && string.Equals(Path.GetExtension(settings), ".runsettings", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(settings))
             {
-                commandsUsed.Add("/settings//.RunSettings");
-            }
-            else if (!string.IsNullOrEmpty(settings))
-            {
-                commandsUsed.Add("/settings//.TestSettings");
+                var extension = Path.GetExtension(settings);
+                if (string.Equals(extension, ".runsettings", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.RunSettings");
+                }
+                else if (string.Equals(extension, ".testsettings", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.TestSettings");
+                }
+                else if (string.Equals(extension, ".vsmdi", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.vsmdi");
+                }
+                else if (string.Equals(extension, ".testrunConfig", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.testrunConfig");
+                }
             }
 
             requestData.MetricsCollection.Add(TelemetryDataConstants.CommandLineSwitches, string.Join(",", commandsUsed.ToArray()));
-
-            // Collecting TargetOS
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
         }
 
         /// <summary>
@@ -609,14 +627,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private IRequestData GetRequestData(ProtocolConfig protocolConfig)
         {
             return new RequestData
-                       {
-                           ProtocolConfig = protocolConfig,
-                           MetricsCollection =
+            {
+                ProtocolConfig = protocolConfig,
+                MetricsCollection =
                                this.telemetryOptedIn
                                    ? (IMetricsCollection)new MetricsCollection()
                                    : new NoOpMetricsCollection(),
-                           IsTelemetryOptedIn = this.telemetryOptedIn
-                       };
+                IsTelemetryOptedIn = this.telemetryOptedIn
+            };
         }
 
         private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)
