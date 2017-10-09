@@ -20,8 +20,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         }
 
-        // Ignoring because this tests is failing consistently in PR build.
-        [Ignore]
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
@@ -142,7 +140,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(this.VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
             Assert.IsTrue(this.VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
 
-            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent1));
+            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
         }
 
         private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)

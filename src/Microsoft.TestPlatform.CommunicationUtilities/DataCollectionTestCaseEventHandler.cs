@@ -80,6 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         var testCaseStartEventArgs = this.dataSerializer.DeserializePayload<TestCaseStartEventArgs>(message);
                         this.dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
+                        this.communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
 
                         if (EqtTrace.IsInfoEnabled)
                         {
