@@ -32,7 +32,8 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
 </source>
-        <target state="new">Testovací běh použije knihovny DLL sestavené pro rozhraní {0} a platformu {1}. Tyto knihovny DLL nebudou součástí běhu: {2} Další podrobnosti o správě těchto nastavení najdete na adrese {3}.</target>
+        <target state="translated">Testovací běh použije knihovny DLL sestavené pro rozhraní {0} a platformu {1}. Tyto knihovny DLL nebudou součástí běhu: {2}Další podrobnosti o správě těchto nastavení najdete na adrese {3}.
+</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Spuštění testu použije DLL(s) vybudované framework {0} a platformu {1}. Po DLL(s) nebudou součástí run: {2} {3} podrobnosti přejít na správu těchto nastavení.</target>
