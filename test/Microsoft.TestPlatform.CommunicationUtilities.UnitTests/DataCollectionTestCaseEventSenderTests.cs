@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
 
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.ReceiveMessage(), Times.Once);
         }
 
         [TestMethod]
