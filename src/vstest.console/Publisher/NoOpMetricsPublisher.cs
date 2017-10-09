@@ -3,12 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
 {
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// This class will be initialized if Telemetry is opted out.
