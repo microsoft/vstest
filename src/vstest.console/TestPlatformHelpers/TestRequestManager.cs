@@ -357,8 +357,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var chosenFramework = inferedFramework;
                     if(updateFramework)
                     {
-                        InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                        inferedFramework?.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetFramework(navigator, inferedFramework?.ToString(), overwrite: true);
                         settingsUpdated = true;
                     }
                     else
@@ -370,8 +369,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var chosenPlatform = inferedPlatform;
                     if (updatePlatform)
                     {
-                        InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                        inferedPlatform.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetPlatform(navigator, inferedPlatform.ToString(), overwrite: true);
                     }
                     else
                     {
@@ -380,7 +378,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     string incompatiableSettingWarning = string.Empty;
 
-                    var compatiableSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
                     if(!string.IsNullOrEmpty(incompatiableSettingWarning))
                     {
@@ -391,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     if (EqtTrace.IsInfoEnabled)
                     {
                         EqtTrace.Info("Compatiable sources list : ");
-                        EqtTrace.Info(string.Join("\n", compatiableSources.ToArray()));
+                        EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
                     }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.

@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
     using Microsoft.TestPlatform.Utilities.Tests;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -426,12 +427,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             sourceFrameworks["x86net45.dll"] = frameworkNet45;
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("");
+            sb.AppendLine();
             sb.AppendLine(GetSourceIncompatibleMessage("AnyCPU1net46.dll"));
             sb.AppendLine(GetSourceIncompatibleMessage("x64net47.exe"));
             sb.AppendLine(GetSourceIncompatibleMessage("x86net45.dll"));
 
-            var expected = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+            var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet47, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
             #endregion
 
             string warningMessage = string.Empty;
@@ -452,10 +453,10 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             sourceFrameworks["x86net45.dll"] = frameworkNet45;
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("");
+            sb.AppendLine();
             sb.AppendLine(GetSourceIncompatibleMessage("x64net45.exe"));
 
-            var expected = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
+            var expected = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, frameworkNet45, Constants.DefaultPlatform, sb.ToString(), @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409");
 
             string warningMessage = string.Empty;
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
@@ -463,6 +464,20 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             // only "x86net45.dll" is the compatiable source
             Assert.AreEqual(1, compatibleSources.Count());
             Assert.AreEqual(expected, warningMessage);
+        }
+
+        [TestMethod]
+        public void FilterCompatiableSourcesShouldNotComposeWarningIfSettingsAreCorrect()
+        {
+            sourceArchitectures["x86net45.dll"] = Architecture.X86;
+            sourceFrameworks["x86net45.dll"] = frameworkNet45;
+
+            string warningMessage = string.Empty;
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
+
+            // only "x86net45.dll" is the compatiable source
+            Assert.AreEqual(1, compatibleSources.Count());
+            Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
         }
 
         [TestMethod]
@@ -481,7 +496,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
         private string GetSourceIncompatibleMessage(string source)
         {
-            return string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, source, sourceFrameworks[source].Version, sourceArchitectures[source]);
+            return string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, source, sourceFrameworks[source].Version, sourceArchitectures[source]);
         }
 
         private XPathNavigator GetNavigator(string settingsXml)

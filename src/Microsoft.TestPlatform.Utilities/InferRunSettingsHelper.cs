@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -413,6 +414,46 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
+        /// Returns the sources matching the specified platform and framework settings.
+        /// For incompatible sources, warning is added to incompatibleSettingWarning.
+        /// </summary>
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+        {
+            incompatibleSettingWarning = string.Empty;
+            List<String> compatibleSources = new List<String>();
+            StringBuilder warnings = new StringBuilder();
+            warnings.AppendLine();
+            bool incompatiblityFound = false;
+            foreach (var source in sourcePlatforms.Keys)
+            {
+                Architecture actualPlatform = sourcePlatforms[source];
+                Framework actualFramework = sourceFrameworks[source];
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
+                if (isSettingIncompatible)
+                {
+                    string incompatiblityMessage;
+                    var onlyFileName = Path.GetFileName(source);
+                    // Add message for incompatible sources.
+                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
+
+                    warnings.AppendLine(incompatiblityMessage);
+                    incompatiblityFound = true;
+                }
+                else
+                {
+                    compatibleSources.Add(source);
+                }
+            }
+
+            if (incompatiblityFound)
+            {
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+            }
+
+            return compatibleSources;
+        }
+
+        /// <summary>
         /// Returns true if source settings are incomaptible with target settings.
         /// </summary>
         private static bool IsSettingIncompatible(Architecture sourcePlatform,
@@ -443,56 +484,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
         {
-            if (sourceFramework.Equals(Framework.DefaultFramework))
+            if (sourceFramework.Version.Equals(Framework.DefaultFramework.Version))
             {
                 return false;
             }
-            return !sourceFramework.Equals(targetFramework);
-        }
-
-
-        /// <summary>
-        /// Returns the sources matching the specified platform and framework settings.
-        /// For incompatible sources, warning is added to incompatibleSettingWarning.
-        /// </summary>
-        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform,
-            Framework chosenFramework,
-            IDictionary<String,Architecture> sourcePlatforms,
-            IDictionary<String, Framework> sourceFrameworks,
-            out String incompatibleSettingWarning)
-        {
-            incompatibleSettingWarning = null;
-            List<String> compatibleSources = new List<String>();
-            StringBuilder warnings = new StringBuilder();
-            warnings.AppendLine("");
-            bool incompatiblityFound = false;
-            foreach (var source in sourcePlatforms.Keys)
-            {
-                Architecture actualPlatform = sourcePlatforms[source];
-                Framework actualFramework = sourceFrameworks[source];
-                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
-                if (isSettingIncompatible)
-                {
-                    string incompatiblityMessage;
-                    var onlyFileName = Path.GetFileName(source);
-                    // Add message for incompatible sources.
-                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
-
-                    warnings.AppendLine(incompatiblityMessage);
-                    incompatiblityFound = true;
-                }
-                else
-                {
-                    compatibleSources.Add(source);
-                }
-            }
-
-            if (incompatiblityFound)
-            {
-                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, UtilitiesResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
-            }
-
-            return compatibleSources;
+            return !sourceFramework.Version.Equals(targetFramework.Version);
         }
     }
 }
