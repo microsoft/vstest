@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using System.Text;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -209,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     throw;
                 }
             }
-            
+
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
             this.testPlatformEventSource.DiscoveryRequestStop();
 
@@ -234,12 +236,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
             var requestData = this.GetRequestData(protocolConfig);
+
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
             if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
+            }
+
+            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            {
+                bool throwException = false;
+                if (this.commandLineOptions.EnableCodeCoverage)
+                {
+                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
+                    if (dataCollectorsFriendlyNames.Count >= 2)
+                    {
+                        throwException = true;
+                    }
+
+                }
+                else if (XmlRunSettingsUtilities.IsDataCollectionEnabled(runsettings))
+                {
+                    throwException = true;
+                }
+
+                if(throwException)
+                {
+                    throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
+                }
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
@@ -333,7 +359,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml,List<string> sources, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -383,7 +409,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
-                    if(InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
+                    if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
                         InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
                         settingsUpdated = true;
@@ -543,14 +569,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private IRequestData GetRequestData(ProtocolConfig protocolConfig)
         {
             return new RequestData
-                       {
-                           ProtocolConfig = protocolConfig,
-                           MetricsCollection =
+            {
+                ProtocolConfig = protocolConfig,
+                MetricsCollection =
                                this.telemetryOptedIn
                                    ? (IMetricsCollection)new MetricsCollection()
                                    : new NoOpMetricsCollection(),
-                           IsTelemetryOptedIn = this.telemetryOptedIn
-                       };
+                IsTelemetryOptedIn = this.telemetryOptedIn
+            };
         }
 
         private List<String> GetSources(TestRunRequestPayload testRunRequestPayload)

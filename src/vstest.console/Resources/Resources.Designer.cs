@@ -1668,6 +1668,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}..
+        /// </summary>
+        public static string RunsettingsWithDCErrorMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("RunsettingsWithDCErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   --Collect|/Collect:&quot;{0}&quot; is not supported if test run is configured using testsettings..
+        /// </summary>
+        public static string CollectWithTestSettingErrorMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("CollectWithTestSettingErrorMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Test Run Failed..
         /// </summary>
         public static string TestRunFailed
