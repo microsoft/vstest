@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public void CreateEventLogContainerStartIndexMapShouldCreateStartIndexMap()
         {
             this.eventLogSessionContext = new EventLogSessionContext(this.eventLogContainersMap);
-            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["LogName"] == 1);
+            Assert.IsTrue(this.eventLogSessionContext.EventLogContainerStartIndexMap["LogName"] == 2);
         }
 
         [TestMethod]
