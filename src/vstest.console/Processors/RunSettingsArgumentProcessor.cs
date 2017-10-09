@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Text;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -138,13 +139,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             catch (XmlException exception)
             {
-                throw new CommandLineException(
+                throw new SettingsException(
                         string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
                         exception);
-            }
-            catch (SettingsException exception)
-            {
-                throw new CommandLineException(exception.Message, exception);
             }
         }
 
@@ -195,20 +192,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
                 runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
-            }
-
-            if (this.commandLineOptions.EnableCodeCoverage == true)
-            {
-                try
-                {
-                    CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(runSettingsDocument);
-                }
-                catch (XPathException e)
-                {
-                    throw new SettingsException(
-                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, e.Message),
-                        e);
-                }
             }
 
             return runSettingsDocument;

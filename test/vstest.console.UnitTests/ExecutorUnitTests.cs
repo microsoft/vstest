@@ -73,9 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(CommandLineResources.NoArgumentsProvided)));
         }
 
-        /// <summary>
-        /// Executor should Print Error message and Help contents when no arguments are provided.
-        /// </summary>
         [TestMethod]
         public void ExecutorWithInvalidArgsShouldPrintErrorMessage()
         {

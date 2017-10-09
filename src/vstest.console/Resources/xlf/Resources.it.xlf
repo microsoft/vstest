@@ -1545,6 +1545,16 @@
      Esempio: /DisableAutoFakes:true</target>
         <note />
       </trans-unit>
+      <trans-unit id="CollectWithTestSettingErrorMessage">
+        <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
+        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunsettingsWithDCErrorMessage">
+        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
