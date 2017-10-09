@@ -185,6 +185,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// </summary>
         public const string DataCollectionTestEndResult = "DataCollection.TestEndResult";
 
+        /// <summary>
+        /// Ack Event message type send to datacollector process before test case execution starts.
+        /// </summary>
+        public const string DataCollectionTestStartAck = "DataCollection.TestStartAck";
+
         #endregion
     }
 }

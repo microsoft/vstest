@@ -256,8 +256,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             this.CollectMetrics(requestData, runConfiguration);
 
-            if (!commandLineOptions.IsDesignMode && string.IsNullOrWhiteSpace(runsettings))
+            if (!commandLineOptions.IsDesignMode)
             {
+                // Generate fakes settings only for command line scenarios. In case of
+                // Editors/IDEs, this responsibility is with the caller.
                 GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runsettings);
             }
 
