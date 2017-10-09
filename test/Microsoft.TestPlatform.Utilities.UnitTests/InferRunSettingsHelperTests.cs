@@ -481,7 +481,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
-        public void FilterCompatiableSourcesShouldRetrunnullAsWarningMessageIfNoConflict()
+        public void FilterCompatiableSourcesShouldRetrunWarningMessageIfNoConflict()
         {
             sourceArchitectures["x64net45.exe"] = Architecture.X64;
             sourceFrameworks["x64net45.exe"] = frameworkNet45;
@@ -489,7 +489,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string warningMessage = string.Empty;
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Architecture.X64, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
-            Assert.IsNull(warningMessage);
+            Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
         }
 
         #region private methods

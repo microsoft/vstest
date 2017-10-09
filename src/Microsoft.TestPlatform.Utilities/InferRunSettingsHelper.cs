@@ -484,11 +484,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
         {
-            if (sourceFramework.Version.Equals(Framework.DefaultFramework.Version) && sourceFramework.Name.Equals(Framework.DefaultFramework.Name))
+            if (sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
-            return !sourceFramework.Version.Equals(targetFramework.Version) && !sourceFramework.Name.Equals(targetFramework.Name);
+            return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
