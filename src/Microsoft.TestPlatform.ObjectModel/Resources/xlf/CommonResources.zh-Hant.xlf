@@ -30,9 +30,10 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run will use DLL(s) built for framework {0} and platform {1}.Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
+        <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
 </source>
-        <target state="new">測試回合將使用替架構 {0} 與平台 {1} 所建置的 DLL。下列 DLL 將不包含在測試回合中: {2} 如需如何管理這些設定的詳細資料，請前往 {3}。</target>
+        <target state="translated">測試回合將使用替架構 {0} 與平台 {1} 所建置的 DLL。下列 DLL 將不包含在測試回合中: {2}如需如何管理這些設定的詳細資料，請前往 {3}。
+</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">测试运行将使用 DLL(s) 框架 {0} 和 {1} 的平台的构建。按照 DLL(s) 将不能运行的过程︰ {2} 转到详细 {3} 上管理这些设置。</target>

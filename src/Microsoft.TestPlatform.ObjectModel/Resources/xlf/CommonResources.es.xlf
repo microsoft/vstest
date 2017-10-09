@@ -30,9 +30,10 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run will use DLL(s) built for framework {0} and platform {1}.Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
+        <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
 </source>
-        <target state="new">La serie de pruebas usará archivos DLL compilados para el marco {0} y la plataforma {1}. Los siguientes archivos DLL no formarán parte de la ejecución: {2} Vaya a {3} para obtener más información sobre cómo administrar esta configuración.</target>
+        <target state="translated">La serie de pruebas usará archivos DLL compilados para el marco {0} y la plataforma {1}. Los siguientes archivos DLL no formarán parte de la ejecución: {2}Vaya a {3} para obtener más información sobre cómo administrar esta configuración.
+</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ejecución de prueba utilizará archivos DLL construido para framework {0} y plataforma {1}. Siguiendo los archivos DLL no formarán parte de la ejecución: {2} vaya a {3} para obtener más información acerca de cómo administrar esta configuración.</target>
