@@ -95,6 +95,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 .Returns(this.mockRunRequest.Object);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.X86);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+                .Returns(new FrameworkName(Constants.DotNetFramework40));
         }
 
         [TestCleanup]
@@ -378,7 +380,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformInCommandLineScenariosIfSpecified()
+        public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformInCommandLineScenariosIfSpecifiedButInferred()
         {
             var payload = new DiscoveryRequestPayload()
             {
@@ -409,8 +411,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.DiscoverTests(payload,
                 new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
@@ -946,7 +948,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void RunTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignMode()
+        public void RunTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignModeButInferred()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -976,8 +978,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
@@ -1020,7 +1022,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void RunTestsShouldNotpdateFrameworkAndPlatformInCommandLineScenariosIfSpecified()
+        public void RunTestsShouldNotpdateFrameworkAndPlatformInCommandLineScenariosIfSpecifiedButInferred()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -1050,8 +1052,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));

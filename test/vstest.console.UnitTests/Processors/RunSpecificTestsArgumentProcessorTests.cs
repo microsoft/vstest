@@ -5,8 +5,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
-    using CommandLineUtilities;
     using System.Threading.Tasks;
+    using System.Runtime.Versioning;
+
+    using CommandLineUtilities;
     using CoreUtilities.Tracing.Interfaces;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
@@ -54,6 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
             this.inferHelper = new InferHelper(this.mockAssemblyMetadataProvider.Object);
             this.mockAssemblyMetadataProvider.Setup(x => x.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
+            this.mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
             this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
             this.mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             this.mockMetricsPublisher = new Mock<IMetricsPublisher>();
