@@ -429,9 +429,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
         {
-            Debug.Assert(targetPlatform != Architecture.AnyCPU, "TargetPlatform is AnyCPU.");
-            Debug.Assert(targetPlatform != Architecture.Default, "TargetPlatform is Default.");
-
             if (sourcePlatform == Architecture.Default ||
                 sourcePlatform == Architecture.AnyCPU)
             {
