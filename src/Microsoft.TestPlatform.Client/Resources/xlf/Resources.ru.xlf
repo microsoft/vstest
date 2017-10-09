@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
         <source>Aborting test run: test run timeout of {0} milliseconds exceeded.</source>
-        <target state="new">Отменяется тестовый запуск: истекло время ожидания тестового запуска ({0} мс).</target>
-        <note></note>
+        <target state="translated">Тестовый запуск отменяется: превышено допустимое время ожидания в {0} мс.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
