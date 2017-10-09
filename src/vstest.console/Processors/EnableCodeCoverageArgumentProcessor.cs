@@ -13,8 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// The argument processor for enabling data collectors.
@@ -59,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -96,6 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #region private variables
 
         private IRunSettingsProvider runSettingsManager;
+        private CommandLineOptions commandLineOptions;
 
         private const string FriendlyName = "Code Coverage";
 
@@ -112,14 +111,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #endregion
 
-        internal EnableCodeCoverageArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        internal EnableCodeCoverageArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
+            this.commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
 
         /// <inheritdoc />
         public void Initialize(string argument)
         {
+            this.commandLineOptions.EnableCodeCoverage = true;
+
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
             CollectArgumentExecutor.AddDataCollectorFriendlyName(FriendlyName);
             try
@@ -167,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             var runSettingsNavigator = runSettingsDocument.CreateNavigator();
 
-            if (XmlRunSettingsUtilities.ContainsDataCollectorWithFriendlyName(runSettingsNavigator, FriendlyName))
+            if (ContainsDataCollectorWithFriendlyName(runSettingsNavigator, FriendlyName))
             {
                 // runsettings already has Code coverage data collector, just enable it.
                 CollectArgumentExecutor.AddDataCollectorToRunSettings(FriendlyName, this.runSettingsManager);
@@ -224,6 +226,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             xmlText = string.Format(CultureInfo.InvariantCulture, xmlText, string.Empty);
             return xmlText;
+        }
+
+        /// <summary>
+        /// Check data collector exist with friendly name
+        /// </summary>
+        /// <param name="runSettingDocument"> XPathNavigable representation of a runsettings file </param>
+        /// <param name="dataCollectorFriendlyName"> The data Collector friendly name. </param>
+        /// <returns> True if there is a datacollector configured. </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1054:UriParametersShouldNotBeStrings", MessageId = "1#")]
+        private static bool ContainsDataCollectorWithFriendlyName(IXPathNavigable runSettingDocument, string dataCollectorFriendlyName)
+        {
+            if (runSettingDocument == null)
+            {
+                throw new ArgumentNullException(nameof(runSettingDocument));
+            }
+
+            if (dataCollectorFriendlyName == null)
+            {
+                throw new ArgumentNullException(nameof(dataCollectorFriendlyName));
+            }
+
+            var navigator = runSettingDocument.CreateNavigator();
+            var nodes = navigator.Select("/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+
+            foreach (XPathNavigator dataCollectorNavigator in nodes)
+            {
+                var fn = dataCollectorNavigator.GetAttribute("friendlyName", string.Empty);
+                if (string.Equals(dataCollectorFriendlyName, fn, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

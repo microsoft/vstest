@@ -19,7 +19,7 @@ namespace vstest.console.UnitTests.Processors
         public EnableCodeCoverageArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new EnableCodeCoverageArgumentExecutor(this.settingsProvider);
+            this.executor = new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, this.settingsProvider);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
@@ -56,6 +56,21 @@ namespace vstest.console.UnitTests.Processors
         #endregion
 
         #region EnableCodeCoverageArgumentExecutor tests
+
+        [TestMethod]
+        public void InitializeShouldSetEnableCodeCoverageOfCommandLineOption()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            CommandLineOptions.Instance.EnableCodeCoverage = false;
+
+            this.executor.Initialize(string.Empty);
+
+            Assert.IsTrue(CommandLineOptions.Instance.EnableCodeCoverage, "/EnableCoverage should set CommandLineOption.EnableCodeCoverage to true");
+        }
 
         [TestMethod]
         public void InitializeShouldCreateEntryForCodeCoverageInRunSettingsIfNotAlreadyPresent()

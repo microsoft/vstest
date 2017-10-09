@@ -136,32 +136,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.runSettingsManager.AddDefaultRunSettings();
 
                 this.commandLineOptions.SettingsFile = argument;
-
-                // runsettings with data collector and testsettings is not supported.
-                string settingXml = this.runSettingsManager.ActiveRunSettings.SettingsXml;
-                if (InferRunSettingsHelper.IsTestSettingsEnabled(settingXml) && XmlRunSettingsUtilities.IsDataCollectionEnabled(settingXml))
-                {
-                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(settingXml);
-                    StringBuilder sb = new StringBuilder();
-
-                    foreach (var fn in dataCollectorsFriendlyNames)
-                    {
-                        sb.AppendFormat(CommandLineResources.RunsettingsWithDCErrorMessage, fn);
-                        sb.Append(Environment.NewLine);
-                    }
-
-                    throw new SettingsException(sb.ToString());
-                }
             }
             catch (XmlException exception)
             {
                 throw new SettingsException(
                         string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
                         exception);
-            }
-            catch (SettingsException exception)
-            {
-                throw new SettingsException(exception.Message, exception);
             }
         }
 

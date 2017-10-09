@@ -239,6 +239,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return false;
         }
 
+        /// <summary>
+        /// Check if testsettings in configured using runsettings.
+        /// </summary>
+        /// <param name="runsettingsXml">xml string of runsetting</param>
+        /// <returns></returns>
         public static bool IsTestSettingsEnabled(string runsettingsXml)
         {
             if (!string.IsNullOrWhiteSpace(runsettingsXml))

@@ -134,52 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldThrowExceptionIfRunsettingsHasDatatCollectorAndTestSettings()
-        {
-            // Arrange.
-            var fileName = "C:\\temp\\r.runsettings";
-            var settingsXml = @"<RunSettings>
-                                    <MSTest>
-                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
-                                        <ForcedLegacyMode>true</ForcedLegacyMode>
-                                    </MSTest>
-                                    <DataCollectionRunSettings>
-                                        <DataCollectors>
-                                            <DataCollector friendlyName=""DummyDataCollector1"">
-                                            </DataCollector>
-                                            <DataCollector friendlyName=""DummyDataCollector2"">
-                                            </DataCollector>
-                                        </DataCollectors>
-                                    </DataCollectionRunSettings>
-                                </RunSettings>";
-
-            var executor = new TestableRunSettingsArgumentExecutor(
-                CommandLineOptions.Instance,
-                this.settingsProvider,
-                settingsXml);
-
-            // Setup mocks.
-            var mockFileHelper = new Mock<IFileHelper>();
-            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-
-            executor.FileHelper = mockFileHelper.Object;
-            bool exceptionThrown = false;
-
-            try
-            {
-                executor.Initialize(fileName);
-            }
-            catch (SettingsException ex)
-            {
-                exceptionThrown = true;
-                Assert.AreEqual("DataCollector with friendlyName=\"DummyDataCollector1\" in runsettings in not supported if test run is configured using testsettings." + Environment.NewLine +
-                    "DataCollector with friendlyName=\"DummyDataCollector2\" in runsettings in not supported if test run is configured using testsettings." + Environment.NewLine, ex.Message);
-            }
-
-            Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
-        }
-
-        [TestMethod]
         public void InitializeShouldSetActiveRunSettings()
         {
             // Arrange.
