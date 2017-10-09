@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
     }
 
-    
+
     internal class CollectArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override string CommandName => CollectArgumentProcessor.CommandName;
@@ -123,15 +123,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        internal static void EnableDataCollectorUsingFriendlyName(string argument, DataCollectionRunSettings dataCollectionRunSettings)
+        internal static void EnableDataCollectorUsingFriendlyName(string friendlyName, DataCollectionRunSettings dataCollectionRunSettings, string uri = null)
         {
             DataCollectorSettings dataCollectorSettings = null;
 
-            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
+            if (!DoesDataCollectorSettingsExist(friendlyName, dataCollectionRunSettings, out dataCollectorSettings))
             {
                 dataCollectorSettings = new DataCollectorSettings();
-                dataCollectorSettings.FriendlyName = argument;
+                dataCollectorSettings.FriendlyName = friendlyName;
                 dataCollectorSettings.IsEnabled = true;
+                if (!string.IsNullOrWhiteSpace(uri))
+                {
+                    dataCollectorSettings.Uri = new Uri(uri);
+                }
+
                 dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
             }
             else
@@ -172,9 +177,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return false;
         }
 
-        internal static void AddDataCollectorToRunSettings(string argument, IRunSettingsProvider runSettingsManager)
+        internal static void AddDataCollectorToRunSettings(string friendlyName, IRunSettingsProvider runSettingsManager, string uri = null)
         {
-            EnabledDataCollectors.Add(argument.ToLower());
+            EnabledDataCollectors.Add(friendlyName.ToLower());
 
             var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
             if (settings == null)
@@ -196,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Add data collectors if not already present, enable if already present.
-            EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
+            EnableDataCollectorUsingFriendlyName(friendlyName, dataCollectionRunSettings, uri);
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }
