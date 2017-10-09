@@ -1,10 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Runtime.Versioning;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
-using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+
 
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
@@ -29,6 +26,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using System.Runtime.Versioning;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     using Moq;
 
@@ -1102,10 +1105,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         [TestMethod]
         public void RunTestShouldThrowExceptionIfRunSettingWithDCHasTestSettingsInIt()
         {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll" },
-                RunSettings = @"<RunSettings>
+            var settingXml = @"<RunSettings>
                                     <MSTest>
                                         <SettingsFile>C:\temp.testsettings</SettingsFile>
                                         <ForcedLegacyMode>true</ForcedLegacyMode>
@@ -1118,7 +1118,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                                             </DataCollector>
                                         </DataCollectors>
                                     </DataCollectionRunSettings>
-                                </RunSettings>"
+                                </RunSettings>";
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings = settingXml
             };
 
             this.commandLineOptions.EnableCodeCoverage = false;
@@ -1131,8 +1136,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             catch (SettingsException ex)
             {
                 exceptionThrown = true;
-                Assert.AreEqual("DataCollector with friendlyName=\"DummyDataCollector1\" in runsettings in not supported if test run is configured using testsettings." + Environment.NewLine +
-                    "DataCollector with friendlyName=\"DummyDataCollector2\" in runsettings in not supported if test run is configured using testsettings." + Environment.NewLine, ex.Message);
+                Assert.IsTrue(ex.Message.Contains(@"<SettingsFile>C:\temp.testsettings</SettingsFile>"), ex.Message);
             }
 
             Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
@@ -1141,23 +1145,25 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         [TestMethod]
         public void RunTestShouldThrowExceptionIfRunSettingWithDCHasTestSettingsAndEnableCodeCoverageTrue()
         {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll" },
-                RunSettings = @"<RunSettings>
+            var settingXml = @"<RunSettings>
                                     <MSTest>
                                         <SettingsFile>C:\temp.testsettings</SettingsFile>
                                         <ForcedLegacyMode>true</ForcedLegacyMode>
                                     </MSTest>
                                     <DataCollectionRunSettings>
                                         <DataCollectors>
-                                            <DataCollector friendlyName=""Code Coverage"">
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
                                             </DataCollector>
                                             <DataCollector friendlyName=""DummyDataCollector2"">
                                             </DataCollector>
                                         </DataCollectors>
                                     </DataCollectionRunSettings>
-                                </RunSettings>"
+                                </RunSettings>";
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings = settingXml
             };
 
             this.commandLineOptions.EnableCodeCoverage = true;
@@ -1170,7 +1176,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             catch (SettingsException ex)
             {
                 exceptionThrown = true;
-                Assert.AreEqual("DataCollector with friendlyName=\"DummyDataCollector2\" in runsettings in not supported if test run is configured using testsettings." + Environment.NewLine, ex.Message);
+                Assert.IsTrue(ex.Message.Contains(@"<SettingsFile>C:\temp.testsettings</SettingsFile>"), ex.Message);
             }
 
             Assert.IsTrue(exceptionThrown, "Initialize should throw exception");

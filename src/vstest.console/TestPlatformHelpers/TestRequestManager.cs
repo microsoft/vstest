@@ -247,36 +247,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
             {
+                bool throwException = false;
                 if (this.commandLineOptions.EnableCodeCoverage)
                 {
                     var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
                     if (dataCollectorsFriendlyNames.Count >= 2)
                     {
-                        dataCollectorsFriendlyNames.Remove("Code Coverage");
-                        StringBuilder sb = new StringBuilder();
-
-                        foreach (var fn in dataCollectorsFriendlyNames)
-                        {
-                            sb.AppendFormat(Resources.RunsettingsWithDCErrorMessage, fn);
-                            sb.Append(Environment.NewLine);
-                        }
-
-                        throw new SettingsException(sb.ToString());
+                        throwException = true;
                     }
 
                 }
                 else if (XmlRunSettingsUtilities.IsDataCollectionEnabled(runsettings))
                 {
-                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
-                    StringBuilder sb = new StringBuilder();
+                    throwException = true;
+                }
 
-                    foreach (var fn in dataCollectorsFriendlyNames)
-                    {
-                        sb.AppendFormat(Resources.RunsettingsWithDCErrorMessage, fn);
-                        sb.Append(Environment.NewLine);
-                    }
-
-                    throw new SettingsException(sb.ToString());
+                if(throwException)
+                {
+                    throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
                 }
             }
 

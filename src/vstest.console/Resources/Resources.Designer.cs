@@ -1668,7 +1668,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   DataCollector with friendlyName=&quot;{0}&quot; in runsettings in not supported if test run is configured using testsettings..
+        ///   Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}..
         /// </summary>
         public static string RunsettingsWithDCErrorMessage
         {
