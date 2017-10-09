@@ -116,7 +116,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var fileName = "C:\\temp\\r.runsettings";
             var settingsXml = "<BadRunSettings></BadRunSettings>";
 
-            CommandLineOptions.Instance.EnableCodeCoverage = true;
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
                 this.settingsProvider,
@@ -129,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.FileHelper = mockFileHelper.Object;
 
             // Act and Assert.
-            ExceptionUtilities.ThrowsException<CommandLineException>(
+            ExceptionUtilities.ThrowsException<SettingsException>(
                 () => executor.Initialize(fileName),
                 "Settings file provided does not conform to required format.");
         }
@@ -238,31 +237,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, $"<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>\r\n    <TargetFrameworkVersion>{Framework.FromString(FrameworkVersion.Framework45.ToString()).Name}</TargetFrameworkVersion>\r\n    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>");
         }
 
-        [TestMethod]
-        public void InitializeShouldSetActiveRunSettingsWithCodeCoverageData()
-        {
-            // Arrange.
-            var fileName = "C:\\temp\\r.runsettings";
-            var settingsXml = "<RunSettings></RunSettings>";
-
-            CommandLineOptions.Instance.EnableCodeCoverage = true;
-            var executor = new TestableRunSettingsArgumentExecutor(
-                CommandLineOptions.Instance,
-                this.settingsProvider,
-                settingsXml);
-
-            // Setup mocks.
-            var mockFileHelper = new Mock<IFileHelper>();
-            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-            executor.FileHelper = mockFileHelper.Object;
-
-            // Act.
-            executor.Initialize(fileName);
-
-            // Assert.
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            StringAssert.Contains(this.settingsProvider.ActiveRunSettings.SettingsXml, $"<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector uri=\"datacollector://microsoft/CodeCoverage/2.0\" assemblyQualifiedName=\"Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=15.0.0.0 , Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" friendlyName=\"Code Coverage\">\r\n        <Configuration>\r\n          <CodeCoverage>\r\n            <ModulePaths>\r\n              <Exclude>\r\n                <ModulePath>.*CPPUnitTestFramework.*</ModulePath>\r\n                <ModulePath>.*vstest.console.*</ModulePath>\r\n                <ModulePath>.*microsoft.intellitrace.*</ModulePath>\r\n                <ModulePath>.*vstest.executionengine.*</ModulePath>\r\n                <ModulePath>.*vstest.discoveryengine.*</ModulePath>\r\n                <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>\r\n                <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>\r\n                <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>\r\n                <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>\r\n                <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>\r\n                <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>\r\n                <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>\r\n                <ModulePath>.*qtagent32.*</ModulePath>\r\n                <ModulePath>.*msvcr.*dll$</ModulePath>\r\n                <ModulePath>.*msvcp.*dll$</ModulePath>\r\n                <ModulePath>.*clr.dll$</ModulePath>\r\n                <ModulePath>.*clr.ni.dll$</ModulePath>\r\n                <ModulePath>.*clrjit.dll$</ModulePath>\r\n                <ModulePath>.*clrjit.ni.dll$</ModulePath>\r\n                <ModulePath>.*mscoree.dll$</ModulePath>\r\n                <ModulePath>.*mscoreei.dll$</ModulePath>\r\n                <ModulePath>.*mscoreei.ni.dll$</ModulePath>\r\n                <ModulePath>.*mscorlib.dll$</ModulePath>\r\n                <ModulePath>.*mscorlib.ni.dll$</ModulePath>\r\n              </Exclude>\r\n            </ModulePaths>\r\n            <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>\r\n            <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>\r\n            <CollectFromChildProcesses>True</CollectFromChildProcesses>\r\n            <CollectAspDotNet>false</CollectAspDotNet>\r\n            <SymbolSearchPaths />\r\n            <Functions>\r\n              <Exclude>\r\n                <Function>^std::.*</Function>\r\n                <Function>^ATL::.*</Function>\r\n                <Function>.*::__GetTestMethodInfo.*</Function>\r\n                <Function>.*__CxxPureMSILEntry.*</Function>\r\n                <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>\r\n                <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>\r\n                <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>\r\n                <Function>^__.*</Function>\r\n                <Function>.*::__.*</Function>\r\n              </Exclude>\r\n            </Functions>\r\n            <Attributes>\r\n              <Exclude>\r\n                <Attribute>^System.Diagnostics.DebuggerHiddenAttribute$</Attribute>\r\n                <Attribute>^System.Diagnostics.DebuggerNonUserCodeAttribute$</Attribute>\r\n                <Attribute>^System.Runtime.CompilerServices.CompilerGeneratedAttribute$</Attribute>\r\n                <Attribute>^System.CodeDom.Compiler.GeneratedCodeAttribute$</Attribute>\r\n                <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>\r\n              </Exclude>\r\n            </Attributes>\r\n            <Sources>\r\n              <Exclude>\r\n                <Source>.*\\\\atlmfc\\\\.*</Source>\r\n                <Source>.*\\\\vctools\\\\.*</Source>\r\n                <Source>.*\\\\public\\\\sdk\\\\.*</Source>\r\n                <Source>.*\\\\externalapis\\\\.*</Source>\r\n                <Source>.*\\\\microsoft sdks\\\\.*</Source>\r\n                <Source>.*\\\\vc\\\\include\\\\.*</Source>\r\n                <Source>.*\\\\msclr\\\\.*</Source>\r\n                <Source>.*\\\\ucrt\\\\.*</Source>\r\n              </Exclude>\r\n            </Sources>\r\n            <CompanyNames />\r\n            <PublicKeyTokens />\r\n          </CodeCoverage>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>{Constants.DefaultResultsDirectory}</ResultsDirectory>\r\n    <TargetPlatform>{Constants.DefaultPlatform}</TargetPlatform>\r\n    <TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>");
-        }
 
         [TestMethod]
         public void InitializeShouldUpdateCommandLineOptionsArchitectureAndFxIfProvided()

@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.IO;
     using System.Reflection;
     using System.Threading.Tasks;
+    using System.Runtime.Versioning;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -61,6 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             SetupMockExtensions();
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.X86);
+            this.mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
         }
 
         [TestMethod]

@@ -1,10 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Runtime.Versioning;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
-using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+
 
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
@@ -29,6 +26,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using System.Runtime.Versioning;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     using Moq;
 
@@ -92,6 +95,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 .Returns(this.mockRunRequest.Object);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.X86);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+                .Returns(new FrameworkName(Constants.DotNetFramework40));
         }
 
         [TestCleanup]
@@ -375,11 +380,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformInCommandLineScenariosIfSpecified()
+        public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformInCommandLineScenariosIfSpecifiedButInferred()
         {
             var payload = new DiscoveryRequestPayload()
             {
-                Sources = new List<string>() {"a.dll"},
+                Sources = new List<string>() { "a.dll" },
                 RunSettings =
                     @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -406,8 +411,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.DiscoverTests(payload,
                 new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
@@ -417,9 +422,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void DiscoverTestsShouldPublishMetrics()
         {
             var payload = new DiscoveryRequestPayload()
-                              {
-                                  Sources = new List<string>() { "a", "b" }
-                              };
+            {
+                Sources = new List<string>() { "a", "b" }
+            };
             var mockProtocolConfig = new ProtocolConfig { Version = 2 };
             var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
 
@@ -708,10 +713,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void RunTestsShouldPublishMetrics()
         {
             var payload = new TestRunRequestPayload()
-                              {
-                                  Sources = new List<string>() { "a", "b" },
-                                  RunSettings = DefaultRunsettings
-                              };
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = DefaultRunsettings
+            };
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
@@ -943,7 +948,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void RunTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignMode()
+        public void RunTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignModeButInferred()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -973,8 +978,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
@@ -1017,7 +1022,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void RunTestsShouldNotpdateFrameworkAndPlatformInCommandLineScenariosIfSpecified()
+        public void RunTestsShouldNotpdateFrameworkAndPlatformInCommandLineScenariosIfSpecifiedButInferred()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -1047,8 +1052,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
-            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
@@ -1057,7 +1062,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         [TestMethod]
         public void RunTestsWithTestCasesShouldUpdateFrameworkAndPlatformIfNotSpecifiedInDesignMode()
         {
-            var actualSources = new List<string>(){"1.dll", "2.dll"};
+            var actualSources = new List<string>() { "1.dll", "2.dll" };
             var payload = new TestRunRequestPayload()
             {
                 TestCases = new List<TestCase>() {
@@ -1076,7 +1081,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             List<string> archSources = new List<string>(), fxSources = new List<string>();
 
             this.commandLineOptions.IsDesignMode = true;
-            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>())).Callback<string>( source => archSources.Add(source))
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>())).Callback<string>(source => archSources.Add(source))
                 .Returns(Architecture.ARM);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Callback<string>(source => fxSources.Add(source))
                 .Returns(new FrameworkName(Constants.DotNetFramework46));
@@ -1098,6 +1103,111 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             CollectionAssert.AreEqual(actualSources, archSources);
             CollectionAssert.AreEqual(actualSources, fxSources);
         }
+
+        [TestMethod]
+        public void RunTestShouldThrowExceptionIfRunSettingWithDCHasTestSettingsInIt()
+        {
+            var settingXml = @"<RunSettings>
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings = settingXml
+            };
+
+            this.commandLineOptions.EnableCodeCoverage = false;
+            bool exceptionThrown = false;
+
+            try
+            {
+                this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            }
+            catch (SettingsException ex)
+            {
+                exceptionThrown = true;
+                Assert.IsTrue(ex.Message.Contains(@"<SettingsFile>C:\temp.testsettings</SettingsFile>"), ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
+        }
+
+        [TestMethod]
+        public void RunTestShouldThrowExceptionIfRunSettingWithDCHasTestSettingsAndEnableCodeCoverageTrue()
+        {
+            var settingXml = @"<RunSettings>
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""DummyDataCollector1"">
+                                            </DataCollector>
+                                            <DataCollector friendlyName=""DummyDataCollector2"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>";
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings = settingXml
+            };
+
+            this.commandLineOptions.EnableCodeCoverage = true;
+            bool exceptionThrown = false;
+
+            try
+            {
+                this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            }
+            catch (SettingsException ex)
+            {
+                exceptionThrown = true;
+                Assert.IsTrue(ex.Message.Contains(@"<SettingsFile>C:\temp.testsettings</SettingsFile>"), ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
+        }
+
+        [TestMethod]
+        public void RunTestShouldNotThrowExceptionIfRunSettingHasCodeCoverageDCAndTestSettingsInItWithEnableCoverageTrue()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings = @"<RunSettings>
+                                    <MSTest>
+                                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <DataCollectionRunSettings>
+                                        <DataCollectors>
+                                            <DataCollector friendlyName=""Code Coverage"">
+                                            </DataCollector>
+                                        </DataCollectors>
+                                    </DataCollectionRunSettings>
+                                </RunSettings>"
+            };
+
+            this.commandLineOptions.EnableCodeCoverage = true;
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+        }
+
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
         {
