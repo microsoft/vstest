@@ -221,9 +221,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             Assert.AreEqual(frameworkNet47.Name, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, sourceFrameworks).Name);
 
             Assert.AreEqual(3, sourceFrameworks.Count);
-            Assert.AreEqual(frameworkNet46, sourceFrameworks["net46.dll"]);
-            Assert.AreEqual(frameworkNet47, sourceFrameworks["net47.exe"]);
-            Assert.AreEqual(frameworkNet45, sourceFrameworks["net45.dll"]);
+            Assert.AreEqual(frameworkNet46.Version, sourceFrameworks["net46.dll"].Version);
+            Assert.AreEqual(frameworkNet47.Version, sourceFrameworks["net47.exe"].Version);
+            Assert.AreEqual(frameworkNet45.Version, sourceFrameworks["net45.dll"].Version);
             this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
         }
 
