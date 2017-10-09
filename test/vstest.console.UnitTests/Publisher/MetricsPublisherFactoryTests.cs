@@ -10,14 +10,6 @@ namespace vstest.console.UnitTests.Publisher
     public class MetricsPublisherFactoryTests
     {
         [TestMethod]
-        public void GetMetricsPublisherShouldReturnMetricsPublisherIfTelemetryOptedInAndNotInDesignMode()
-        {
-            var result = MetricsPublisherFactory.GetMetricsPublisher(true, false);
-
-            Assert.IsTrue(result.Result is MetricsPublisher);
-        }
-
-        [TestMethod]
         public void GetMetricsPublisherShouldReturnNoOpMetricsPublisherIfTelemetryOptedOutAndNotInDesignMode()
         {
             var result = MetricsPublisherFactory.GetMetricsPublisher(false, false);
