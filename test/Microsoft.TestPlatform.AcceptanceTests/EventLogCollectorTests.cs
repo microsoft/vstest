@@ -136,18 +136,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             eventIdsDics.Add(new[] { "330", "331", "332" }, false);
 
             // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
-            Console.WriteLine("File1");
-            Console.WriteLine(fileContent1);
-
-            Console.WriteLine("File2");
-            Console.WriteLine(fileContent2);
-
-            Console.WriteLine("File3");
-            Console.WriteLine(fileContent3);
-
-            Console.WriteLine("File4");
-            Console.WriteLine(fileContent4);
-
             Assert.IsTrue(this.VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
             Assert.IsTrue(this.VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
             Assert.IsTrue(this.VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
