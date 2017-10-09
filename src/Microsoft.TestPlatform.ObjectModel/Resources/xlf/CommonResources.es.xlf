@@ -30,9 +30,10 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
-        <target state="translated">La serie de pruebas usará archivos DLL compilados para el marco {0} y la plataforma {1}. Los siguientes archivos DLL no formarán parte de la ejecución: {2} Vaya a {3} para obtener más información sobre cómo administrar esta configuración.</target>
-        <note />
+        <source>Test run will use DLL(s) built for framework {0} and platform {1}.Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
+</source>
+        <target state="new">La serie de pruebas usará archivos DLL compilados para el marco {0} y la plataforma {1}. Los siguientes archivos DLL no formarán parte de la ejecución: {2} Vaya a {3} para obtener más información sobre cómo administrar esta configuración.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ejecución de prueba utilizará archivos DLL construido para framework {0} y plataforma {1}. Siguiendo los archivos DLL no formarán parte de la ejecución: {2} vaya a {3} para obtener más información acerca de cómo administrar esta configuración.</target>
         </alt-trans>
@@ -51,6 +52,11 @@
         <source>Settings file provided does not conform to required format.</source>
         <target state="translated">El archivo de configuración proporcionado no tiene el formato requerido.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="SourceIncompatible">
+        <source>{0} is built for Framework {1} and Platform {2}.</source>
+        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>
