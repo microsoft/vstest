@@ -1845,16 +1845,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("DataCollectorFriendlyNameInvalid", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run.  Platform: {0}   .Net Framework: {1}.  Go to http://go.microsoft.com/?link for more details on managing these settings..
-        /// </summary>
-        public static string NoMatchingSourcesFound
-        {
-            get
-            {
-                return ResourceManager.GetString("NoMatchingSourcesFound", resourceCulture);
-            }
-        }
     }
 }
