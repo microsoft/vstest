@@ -92,10 +92,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendTestCaseStartShouldSendMessageThroughCommunicationManager()
         {
+            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestStartAck });
             var testcaseStartEventArgs = new TestCaseStartEventArgs(this.testCase);
             this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
 
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.ReceiveMessage(), Times.Once);
         }
 
         [TestMethod]
