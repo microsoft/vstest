@@ -667,4 +667,10 @@
     <value>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
      Example: /DisableAutoFakes:true</value>
   </data>
+  <data name="CollectWithTestSettingErrorMessage" xml:space="preserve">
+    <value>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</value>
+  </data>
+  <data name="RunsettingsWithDCErrorMessage" xml:space="preserve">
+    <value>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</value>
+  </data>
 </root>

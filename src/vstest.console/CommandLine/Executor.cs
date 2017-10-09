@@ -49,6 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     internal class Executor
     {
         private ITestPlatformEventSource testPlatformEventSource;
+        private bool showHelp;
 
         #region Constructor
 
@@ -63,6 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.Output = output;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.showHelp = true;
         }
 
         #endregion
@@ -223,10 +225,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
+                    if (ex is CommandLineException || ex is TestPlatformException)
                     {
                         this.Output.Error(false, ex.Message);
                         result = 1;
+                    }
+                    else if(ex is SettingsException)
+                    {
+                        this.Output.Error(false, ex.Message);
+                        result = 1;
+                        this.showHelp = false;
                     }
                     else
                     {
@@ -238,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority) 
-            if(result == 1 && processors.First<IArgumentProcessor>().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
+            if(result == 1 && this.showHelp && processors.First<IArgumentProcessor>().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
             {
                 processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
             }

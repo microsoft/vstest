@@ -491,6 +491,31 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
         }
+        
+        [TestMethod]
+        public void IsTestSettingsEnabledShouldReturnTrueIfRunsettingsHasTestSettings()
+        {
+            string runsettingsString = @"<RunSettings>
+                                        <MSTest>
+                                            <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                        </MSTest>
+                                    </RunSettings>";
+
+            Assert.IsTrue(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
+        }
+
+        [TestMethod]
+        public void IsTestSettingsEnabledShouldReturnFalseIfRunsettingsDoesnotHaveTestSettings()
+        {
+            string runsettingsString = @"<RunSettings>
+                                        <MSTest>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                        </MSTest>
+                                    </RunSettings>";
+
+            Assert.IsFalse(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
+        }
 
         #region private methods
 
