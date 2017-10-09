@@ -18,11 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         /// <returns>Returns Instance of Metrics Publisher</returns>
         public static async Task<IMetricsPublisher> GetMetricsPublisher(bool isTelemetryOptedIn, bool isDesignMode)
         {
-            if (isTelemetryOptedIn && !isDesignMode)
-            {
-                return await Task.Run(() => new MetricsPublisher());
-            }
-
             return await Task.Run(() => new NoOpMetricsPublisher());
         }
     }
