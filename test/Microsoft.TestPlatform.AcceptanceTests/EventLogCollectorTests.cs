@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -27,7 +28,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
 
             this.InvokeVsTest(arguments);
@@ -48,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
 
             this.InvokeVsTest(arguments);
@@ -129,17 +130,40 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var fileContent3 = File.ReadAllText(resultFiles[2]);
             var fileContent4 = File.ReadAllText(resultFiles[3]);
 
-            Assert.IsTrue(this.VerifyOrder(fileContent1, new[] { "110", "111", "112" }));
-            Assert.IsTrue(this.VerifyOrder(fileContent2, new[] { "220", "221", "222", "223" }));
-            Assert.IsTrue(this.VerifyOrder(fileContent3, new[] { "330", "331", "332" }));
-            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }));
+            var eventIdsDics = new Dictionary<string[], bool>();
+            eventIdsDics.Add(new[] { "110", "111", "112" }, false);
+            eventIdsDics.Add(new[] { "220", "221", "222", "223" }, false);
+            eventIdsDics.Add(new[] { "330", "331", "332" }, false);
+
+            // Since there is no guaranty that test will run in a particular order, we will check file for all available list of ids
+            Assert.IsTrue(this.VerifyOrder2(fileContent1, eventIdsDics), string.Format("Event log file content: {0}", fileContent1));
+            Assert.IsTrue(this.VerifyOrder2(fileContent2, eventIdsDics), string.Format("Event log file content: {0}", fileContent2));
+            Assert.IsTrue(this.VerifyOrder2(fileContent3, eventIdsDics), string.Format("Event log file content: {0}", fileContent3));
+
+            Assert.IsTrue(this.VerifyOrder(fileContent4, new[] { "110", "111", "112", "220", "221", "222", "223", "330", "331", "332" }), string.Format("Event log file content: {0}", fileContent4));
+        }
+
+        private bool VerifyOrder2(string content, Dictionary<string[], bool> eventIdsDics)
+        {
+            foreach (var eventIds in eventIdsDics)
+            {
+                if (eventIds.Value == false)
+                {
+                    if (VerifyOrder(content, eventIds.Key))
+                    {
+                        eventIdsDics[eventIds.Key] = true;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private bool VerifyOrder(string content, string[] eventIds)
         {
-            int currentIndex = 0;
             for (int i = 0; i < eventIds.Length; i++)
             {
+                int currentIndex = 0;
                 currentIndex = content.IndexOf(eventIds[i], currentIndex);
                 if (currentIndex == -1)
                 {

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Text;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -125,7 +126,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             try
             {
                 IXPathNavigable document = this.GetRunSettingsDocument(argument);
+
                 this.runSettingsManager.UpdateRunSettings(document.CreateNavigator().OuterXml);
+
+                // To determine whether to infer framework and platform.
+                ExtractFrameworkAndPlatform();
 
                 //Add default runsettings values if not exists in given runsettings file.
                 this.runSettingsManager.AddDefaultRunSettings();
@@ -134,13 +139,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             catch (XmlException exception)
             {
-                throw new CommandLineException(
+                throw new SettingsException(
                         string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, exception.Message),
                         exception);
             }
-            catch (SettingsException exception)
+        }
+
+        private void ExtractFrameworkAndPlatform()
+        {
+            var framworkStr = this.runSettingsManager.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath);
+            Framework framework = Framework.FromString(framworkStr);
+            if (framework != null)
             {
-                throw new CommandLineException(exception.Message, exception);
+                this.commandLineOptions.TargetFrameworkVersion = framework;
+            }
+
+            var platformStr = this.runSettingsManager.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath);
+            if (Enum.TryParse<Architecture>(platformStr, true, out var architecture))
+            {
+                this.commandLineOptions.TargetArchitecture = architecture;
             }
         }
 
@@ -175,20 +192,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
                 runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
-            }
-
-            if (this.commandLineOptions.EnableCodeCoverage == true)
-            {
-                try
-                {
-                    CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(runSettingsDocument);
-                }
-                catch (XPathException e)
-                {
-                    throw new SettingsException(
-                        string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, e.Message),
-                        e);
-                }
             }
 
             return runSettingsDocument;

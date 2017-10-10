@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -95,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool AllowMultiple => false;
 
-        public override bool IsAction => true; 
+        public override bool IsAction => true;
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
@@ -149,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ListTestsArgumentExecutor(
             CommandLineOptions options,
             IRunSettingsProvider runSettingsProvider,
-            ITestRequestManager testRequestManager) : 
+            ITestRequestManager testRequestManager) :
                 this(options, runSettingsProvider, testRequestManager, ConsoleOutput.Instance)
         {
         }

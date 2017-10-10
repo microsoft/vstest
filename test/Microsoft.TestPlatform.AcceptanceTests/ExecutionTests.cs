@@ -53,7 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
             string testhostProcessName = string.Empty;
@@ -101,7 +101,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
 
             // set TestSessionTimeOut = 7 sec
@@ -120,7 +120,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SampleProjectWithOldTestHost.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);
 
@@ -136,7 +136,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /tests:WorkingDirectoryTest");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -149,9 +149,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase)
-                && runnerInfo.TargetFramework.StartsWith("netcoreapp"))
+            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
             {
+                // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
                 Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
                 return;
             }
@@ -159,9 +159,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var diagLogFilePath = Path.Combine(Path.GetTempPath(), $"std_error_log_{Guid.NewGuid()}.txt");
             File.Delete(diagLogFilePath);
 
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
@@ -194,7 +193,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
@@ -202,6 +201,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
             FileAssert.Contains(diagLogFilePath, errorFirstLine);
             File.Delete(diagLogFilePath);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void IncompatiableSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings.SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProject2.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 1);
+
+            // When both x64 & x86 DLL is passed x64 dll will be ignored.
+            this.StdOutputContains(expectedWarningContains);
         }
     }
 }

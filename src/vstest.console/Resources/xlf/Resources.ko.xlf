@@ -415,11 +415,11 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="new">/InIsolation
+        <target state="translated">--InIsolation|/InIsolation
       격리 모드에서 테스트를 실행합니다. 이렇게 하면 테스트에서 오류가 발생해도 
       vstest.console.exe가 중지될 가능성이 작아지지만 테스트 실행 속도가 
       느려질 수 있습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       격리 된 프로세스에서 테스트를 실행 합니다. 이렇게 하면 vstest.console.exe 프로세스 테스트에서는 오류로 중지 될 가능성이 적은 있지만 테스트 다소 느려질 수 있습니다.</target>
@@ -747,11 +747,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">--Framework|/Framework:&lt;프레임워크 버전&gt;
+        <target state="translated">--Framework|/Framework:&lt;프레임워크 버전&gt;
       테스트 실행에 사용할 대상 .NET Framework 버전입니다. 
-      올바른 값은 ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" 등입니다.
+      유효한 값은 “.NETFramework,Version=v4.5.1”, “.NETCoreApp,Version=v1.0” 등입니다.
       지원되는 기타 값은 Framework35, Framework40, Framework45 및 FrameworkCore10입니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-프레임 워크 | / 프레임 워크: &lt; 프레임 워크 버전 &gt;
       대상.Net Framework 버전 테스트 실행에 사용할 수 있습니다. 
@@ -762,8 +762,8 @@
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
-        <target state="new">/Framework 인수에는 테스트 실행의 대상 .NET Framework 버전이 필요합니다. 예: /Framework:".NETFramework,Version=v4.6"</target>
-        <note></note>
+        <target state="translated">/Framework 인수에는 테스트 실행의 대상 .NET Framework 버전이 필요합니다. 예: /Framework:“.NETFramework,Version=v4.5.1”</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework 인수가 필요 대상.Net Framework 버전 테스트 실행에 대 한.   예: /Framework: ". NETFramework, 버전 v4.6 = "</target>
         </alt-trans>
@@ -771,8 +771,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">.Net Framework 버전 {0}이(가) 잘못되었습니다. TargetFramework의 전체 경로를 지정하세요. 지원되는 다른 .Net Framework 버전은 Framework35, Framework40 및 Framework45입니다.</target>
-        <note></note>
+        <target state="translated">.Net Framework 버전 {0}이(가) 잘못되었습니다. TargetFramework의 전체 경로를 지정하세요. 지원되는 다른 .Net Framework 버전은 Framework35, Framework40, Framework45 및 FrameworkCore10입니다.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">잘못 된.Net Framework 버전: {0}. fullname은 TargetFramework의 이름을 입력 하십시오. 지원 되는 다른.Net Framework 버전은 Framework35, Framework40 및 Framework45.</target>
         </alt-trans>
@@ -1486,63 +1486,73 @@
       </trans-unit>
       <trans-unit id="DbgTrcMessagesBanner">
         <source>Debug Traces Messages:</source>
-        <target state="new">Debug Traces Messages:</target>
-        <note></note>
+        <target state="translated">디버그 추적 메시지:</target>
+        <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
         <source>--Blame|/Blame
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="new">--Blame|/Blame
-      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame
+      테스트를 원인 모드로 실행합니다. 이 옵션은 테스트 호스트 작동을 중단시키는 문제 있는 테스트를 격리하는 데 유용합니다. 이 경우 현재 디렉터리에 “Sequence.xml”라는 출력 파일을 만들며, 이 파일에는 작동 중단 이전 테스트 실행 순서가 캡처되어 있습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
-        <target state="new">Test Run Aborted.</target>
-        <note></note>
+        <target state="translated">테스트 실행이 중단되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
-        <target state="new">Test Run Canceled.</target>
-        <note></note>
+        <target state="translated">테스트 실행이 취소되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="OpenResponseFileError">
         <source>Error opening response file '{0}'</source>
-        <target state="new">Error opening response file '{0}'</target>
-        <note></note>
+        <target state="translated">지시 파일 ‘{0}’을(를) 여는 중 오류가 발생했습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResponseFileArgumentHelp">
         <source>@&lt;file&gt;
       Read response file for more options.</source>
-        <target state="new">@&lt;file&gt;
-      Read response file for more options.</target>
-        <note></note>
+        <target state="translated">@&lt;파일&gt;
+      지시 파일을 읽어 자세한 옵션을 확인합니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
-        <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
-        <note></note>
+        <target state="translated">총 테스트 : 알 수 없음. 통과: {0}. 실패: {1}. 건너뜀: {2}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
-        <target state="new">{0} {1}</target>
-        <note></note>
+        <target state="translated">{0} {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
         <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
-        <target state="new">Additionally, you can point to location of test executors and discoverers by specifying &amp;apos;/TestAdapterPath&amp;apos; command. Example  /TestAdapterPath:&amp;lt;pathToCustomAdapters&amp;gt;.</target>
-        <note></note>
+        <target state="translated">/TestAdapterPath 명령을 사용하여 테스트 어댑터 경로도 지정할 수 있습니다. 예: /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</target>
+        <note />
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
         <source>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</source>
-        <target state="new">/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</target>
-        <note></note>
+        <target state="translated">/UseVsixExtensions는 더 이상 사용되지 않습니다. 대신 /TestAdapterPath를 사용하세요.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DisableAutoFakesUsage">
         <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
      Example: /DisableAutoFakes:true</source>
-        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
-     Example: /DisableAutoFakes:true</target>
+        <target state="translated">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+     예: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CollectWithTestSettingErrorMessage">
+        <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
+        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunsettingsWithDCErrorMessage">
+        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
         <note></note>
       </trans-unit>
     </body>

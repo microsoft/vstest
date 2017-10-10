@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>

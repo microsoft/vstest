@@ -231,13 +231,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new EnableDiagArgumentProcessor(),
                 new CLIRunSettingsArgumentProcessor(),
                 new ResultsDirectoryArgumentProcessor(),
-                new InIsolationArgumentProcessor(), 
+                new InIsolationArgumentProcessor(),
                 new CollectArgumentProcessor(),
                 new EnableCodeCoverageArgumentProcessor(),
                 new DisableAutoFakesArgumentProcessor(),
                 new ResponseFileArgumentProcessor(),
                 new EnableBlameArgumentProcessor(),
                 new UseVsixExtensionsArgumentProcessor(),
+                new ListDiscoverersArgumentProcessor(),
+                new ListExecutorsArgumentProcessor(),
+                new ListLoggersArgumentProcessor(),
+                new ListSettingsProvidersArgumentProcessor(),
                 new ListFullyQualifiedTestsArgumentProcessor(),
                 new ListTestsTargetPathArgumentProcessor()
         };

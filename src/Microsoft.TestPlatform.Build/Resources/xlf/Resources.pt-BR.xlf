@@ -22,18 +22,18 @@
     <body>
       <trans-unit id="BuildCompleted">
         <source>Build completed.</source>
-        <target state="new">Build completed.</target>
-        <note></note>
+        <target state="translated">Build concluído.</target>
+        <note />
       </trans-unit>
       <trans-unit id="BuildStarted">
         <source>Build started, please wait...</source>
-        <target state="new">Build started, please wait...</target>
-        <note></note>
+        <target state="translated">Build iniciada, aguarde...</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunningSummary">
         <source>Test run for {0}({1})</source>
-        <target state="new">Test run for {0}({1})</target>
-        <note></note>
+        <target state="translated">Execução de teste para {0}({1})</target>
+        <note />
       </trans-unit>
     </body>
   </file>

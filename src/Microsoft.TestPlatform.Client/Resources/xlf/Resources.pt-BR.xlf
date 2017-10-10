@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
         <source>Aborting test run: test run timeout of {0} milliseconds exceeded.</source>
-        <target state="new">Canceling test run as it crossed testSessionTimeout: {0} milliseconds.</target>
-        <note></note>
+        <target state="translated">Anulando a execução de teste: o tempo limite da execução de teste de {0} milissegundos foi excedido.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
