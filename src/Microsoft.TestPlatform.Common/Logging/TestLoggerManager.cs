@@ -164,8 +164,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="requestData">Request Data for Providing Common Services/Data for Discovery and Execution</param>
         public void InitializeLoggers(IRequestData requestData)
         {
-            var loggersUsed = new List<string>();
-
             foreach (var logger in this.loggersInfoList)
             {
                 string loggerIdentifier = logger.loggerIdentifier;
@@ -175,7 +173,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 try
                 {
                     this.AddLoggerByUri(loggerIdentifier, parameters);
-                    loggersUsed.Add(loggerIdentifier);
                 }
                 catch (InvalidLoggerException)
                 {
@@ -183,7 +180,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     if (testLoggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
                     {
                         this.AddLoggerByUri(loggerUri, parameters);
-                        loggersUsed.Add(loggerUri);
                     }
                     else
                     {
@@ -196,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 }
             }
 
-            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join(",", loggersUsed.ToArray()));
+            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join(",", this.initializedLoggers.ToArray()));
         }
 
         /// <summary>

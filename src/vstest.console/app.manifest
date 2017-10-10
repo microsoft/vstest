@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Adding same as used in TPv1 Refer: /src/vset/Agile/TestPlatform/RocksteadyCLI/app.manifest -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <!-- The assemblyIdentity node is needed to fix a binding problem on Win2003 (PS72518) -->
   <assemblyIdentity version="1.0.0.0" name="MyApplication.app"/>
@@ -16,4 +17,11 @@
       <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}"/>
     </application>
   </compatibility>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+    <security>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"></requestedExecutionLevel>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
 </assembly>

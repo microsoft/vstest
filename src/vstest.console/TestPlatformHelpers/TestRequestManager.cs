@@ -164,11 +164,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            // Collect Metrics
-            this.CollectMetrics(requestData, runConfiguration);
+            if (this.telemetryOptedIn)
+            {
+                // Collect Metrics
+                this.CollectMetrics(requestData, runConfiguration);
 
-            // Collect Commands
-            this.LogCommandsTelemetryPoints(requestData);
+                // Collect Commands
+                this.LogCommandsTelemetryPoints(requestData);
+            }
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
@@ -248,11 +251,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            // Collect Metrics
-            this.CollectMetrics(requestData, runConfiguration);
+            if (this.telemetryOptedIn)
+            {
+                // Collect Metrics
+                this.CollectMetrics(requestData, runConfiguration);
 
-            // Collect Commands
-            this.LogCommandsTelemetryPoints(requestData);
+                // Collect Commands
+                this.LogCommandsTelemetryPoints(requestData);
+            }
 
             if (!commandLineOptions.IsDesignMode)
             {
@@ -551,11 +557,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="requestData">Request Data providing common discovery/execution services.</param>
         private void LogCommandsTelemetryPoints(IRequestData requestData)
         {
-            if (!requestData.IsTelemetryOptedIn)
-            {
-                return;
-            }
-
             var commandsUsed = new List<string>();
 
             var parallel = this.commandLineOptions.Parallel;

@@ -300,6 +300,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         private void LogEnabledDataCollectors()
         {
+            if (!this.requestData.IsTelemetryOptedIn)
+            {
+                return;
+            }
+
             var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.settingsXml);
 
             if (dataCollectionSettings == null || !dataCollectionSettings.IsCollectionEnabled)

@@ -7,8 +7,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.IO;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -19,8 +22,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System.IO;
-    using System.Reflection;
 
     [TestClass]
     public class ProxyDataCollectionManagerTests
@@ -171,6 +172,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, mockRunEventsHandler.Object);
 
             mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
+        }
+
+
+        [TestMethod]
+        public void ProxyDataCollectionShouldLogEnabledDataCollectors()
+        {
+            string settings = @"<RunSettings>
+              <DataCollectionRunSettings>
+                <DataCollectors>
+                    <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"">
+                </DataCollector>
+              </DataCollectors>
+             </DataCollectionRunSettings>
+           </RunSettings>";
+
+            this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
+
+            var proxyExecutionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, settings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+
+            var resultString = "{ FriendlyName = Code Coverage, Uri = datacollector://microsoft/CodeCoverage/2.0 }";
+            this.mockMetricsCollection.Verify(rd => rd.Add(TelemetryDataConstants.DataCollectorsEnabled, resultString), Times.Once);
         }
     }
 }
