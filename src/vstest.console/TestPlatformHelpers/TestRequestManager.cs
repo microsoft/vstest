@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using System.Text;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -240,12 +242,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
             var requestData = this.GetRequestData(protocolConfig);
+
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
             if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
+            }
+
+            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            {
+                bool throwException = false;
+                if (this.commandLineOptions.EnableCodeCoverage)
+                {
+                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
+                    if (dataCollectorsFriendlyNames.Count >= 2)
+                    {
+                        throwException = true;
+                    }
+
+                }
+                else if (XmlRunSettingsUtilities.IsDataCollectionEnabled(runsettings))
+                {
+                    throwException = true;
+                }
+
+                if(throwException)
+                {
+                    throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
+                }
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
@@ -350,7 +376,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
-
+            IDictionary<string, Architecture> sourcePlatforms = new Dictionary<string, Architecture>();
+            IDictionary<string, Framework> sourceFrameworks = new Dictionary<string, Framework>();
 
             if (!string.IsNullOrEmpty(runsettingsXml))
             {
@@ -363,22 +390,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var navigator = document.CreateNavigator();
 
-                    // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
-                    bool updateFramework = IsAutoFrameworkDetectRequired(navigator);
-                    bool updatePlatform = IsAutoPlatformDetectRequired(navigator);
+                    var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+                    Framework chosenFramework;
+                    var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+                    Architecture chosenPlatform;
 
-                    if (updateFramework)
+                    // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
+                    bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
+                    bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
+
+                    if(updateFramework)
                     {
-                        InferRunSettingsHelper.UpdateTargetFramework(navigator,
-                            inferHelper.AutoDetectFramework(sources)?.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetFramework(navigator, inferedFramework?.ToString(), overwrite: true);
+                        chosenFramework = inferedFramework;
                         settingsUpdated = true;
                     }
 
                     if (updatePlatform)
                     {
-                        InferRunSettingsHelper.UpdateTargetPlatform(navigator,
-                            inferHelper.AutoDetectArchitecture(sources).ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetPlatform(navigator, inferedPlatform.ToString(), overwrite: true);
+                        chosenPlatform = inferedPlatform;
                         settingsUpdated = true;
+                    }
+
+                    string incompatiableSettingWarning = string.Empty;
+
+                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
+
+                    if(!string.IsNullOrEmpty(incompatiableSettingWarning))
+                    {
+                        EqtTrace.Info(incompatiableSettingWarning);
+                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
+                    }
+
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("Compatiable sources list : ");
+                        EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
                     }
 
                     // If user is already setting DesignMode via runsettings or CLI args; we skip.
@@ -468,34 +516,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator)
+        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator, out Framework chosenFramework)
         {
-            bool required = false;
+            bool required = true;
+            chosenFramework = null;
             if (commandLineOptions.IsDesignMode)
             {
                 bool isValidFx =
                     InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
                 required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
+                if(!required)
+                {
+                    chosenFramework = Framework.FromString(frameworkFromrunsettingsXml);
+                }
             }
-            else if (!commandLineOptions.IsDesignMode && !commandLineOptions.FrameworkVersionSpecified)
+            else if (!commandLineOptions.IsDesignMode && commandLineOptions.FrameworkVersionSpecified)
             {
-                required = true;
+                required = false;
+                chosenFramework = commandLineOptions.TargetFrameworkVersion;
             }
 
             return required;
         }
 
-        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator)
+        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator, out Architecture chosenPlatform)
         {
-            bool required = false;
+            bool required = true;
+            chosenPlatform = Architecture.Default;
             if (commandLineOptions.IsDesignMode)
             {
                 bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
                 required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
+                if(!required)
+                {
+                    chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml);
+                }
             }
-            else if (!commandLineOptions.IsDesignMode && !commandLineOptions.ArchitectureSpecified)
+            else if (!commandLineOptions.IsDesignMode && commandLineOptions.ArchitectureSpecified)
             {
-                required = true;
+                required = false;
+                chosenPlatform = commandLineOptions.TargetArchitecture;
             }
 
             return required;

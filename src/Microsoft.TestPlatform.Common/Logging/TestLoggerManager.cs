@@ -428,7 +428,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="e">
         /// The e.
         /// </param>
-        public void SendTestRunError(TestRunMessageEventArgs e)
+        public void SendTestRunMessage(TestRunMessageEventArgs e)
         {
             this.TestRunMessageHandler(null, e);
         }
