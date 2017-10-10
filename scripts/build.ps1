@@ -354,6 +354,7 @@ function Create-VsixPackage
     $packageDir = Get-FullCLRPackageDirectory
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
+	$legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1046721\contentFiles\any\any"
@@ -378,6 +379,11 @@ function Create-VsixPackage
         New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
     }
     Copy-Item -Recurse $comComponentsDirectoryTIA\* $testImpactComComponentsDir -Force
+
+	if (-not (Test-Path $legacyTestImpactComComponentsDir)) {
+        New-Item $legacyTestImpactComComponentsDir -Type Directory -Force | Out-Null
+    }
+    Copy-Item -Recurse $comComponentsDirectoryTIA\* $legacyTestImpactComComponentsDir -Force
     
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force

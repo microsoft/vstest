@@ -122,6 +122,13 @@
       <VSIXSubPath>Extensions\V1\x64</VSIXSubPath>
     </VsixSourceItem>
 
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\V1\TestImpact\ComComponents\x64\*.*">
+      <VSIXSubPath>Extensions\V1\TestImpact\ComComponents\x64</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\V1\TestImpact\ComComponents\x86\*.*">
+      <VSIXSubPath>Extensions\V1\TestImpact\ComComponents\x86</VSIXSubPath>
+    </VsixSourceItem>
+
     <!-- Test host dependencies -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\x64\*.*">
       <VSIXSubPath>x64</VSIXSubPath>
