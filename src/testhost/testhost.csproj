@@ -8,6 +8,7 @@
     <AssemblyName>testhost</AssemblyName>
     <TargetFrameworks>netstandard1.4;netcoreapp1.0;net451</TargetFrameworks>
     <OutputType Condition="'$(TargetFramework)' != 'netstandard1.4'">Exe</OutputType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>

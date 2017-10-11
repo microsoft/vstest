@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
 
                 // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers();
+                TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 this.AddExtensionAssembliesFromSource(testRunCriteria);
 
                 // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers();
+                TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
