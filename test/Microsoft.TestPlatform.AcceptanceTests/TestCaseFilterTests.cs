@@ -46,6 +46,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
+        public void RunSelectedTestsWithCategoryTraitInLower(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=categorya\"");
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(0, 1, 0);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
         public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

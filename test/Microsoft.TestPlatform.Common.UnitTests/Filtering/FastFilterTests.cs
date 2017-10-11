@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1");
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1" };
+            var expectedFilterValues = new HashSet<string>() { "test1" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -90,7 +90,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1|FullyQualifiedName=Test2|FullyQualifiedName=Test3");
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1", "Test2", "Test3" };
+            var expectedFilterValues = new HashSet<string>() { "test1", "test2", "test3" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1|(FullyQualifiedName=Test2|FullyQualifiedName=Test3)");
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1", "Test2", "Test3" };
+            var expectedFilterValues = new HashSet<string>() { "test1", "test2", "test3" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -132,7 +132,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=Test1|FullyQualifiedName=Test2|FullyQualifiedName=Test3", new FilterOptions() { FilterRegEx = @"^[^\s\(]+" });
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1", "Test2", "Test3" };
+            var expectedFilterValues = new HashSet<string>() { "test1", "test2", "test3" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -157,7 +157,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("Category=UnitTest|Category=PerfTest", null);
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "UnitTest", "PerfTest"};
+            var expectedFilterValues = new HashSet<string>() { "unittest", "perftest"};
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("Category", fastFilter.FilterPropertyName);
@@ -180,7 +180,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName=TestClass.Test1|FullyQualifiedName=TestClass.Test2|FullyQualifiedName=TestClass.Test3", new FilterOptions() { FilterRegEx = @"\s*\([^\)]*\)", FilterRegExReplacement = "" });
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "TestClass.Test1", "TestClass.Test2", "TestClass.Test3" };
+            var expectedFilterValues = new HashSet<string>() { "testclass.test1", "testclass.test2", "testclass.test3" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -207,7 +207,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName!=Test1");
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1" };
+            var expectedFilterValues = new HashSet<string>() { "test1" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -226,7 +226,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName!=Test1&FullyQualifiedName!=Test2&FullyQualifiedName!=Test3");
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1", "Test2", "Test3" };
+            var expectedFilterValues = new HashSet<string>() { "test1", "test2", "test3" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -247,7 +247,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName!=Test1&FullyQualifiedName!=Test2&FullyQualifiedName!=Test3", new FilterOptions() { FilterRegEx = @"^[^\s\(]+" });
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "Test1", "Test2", "Test3" };
+            var expectedFilterValues = new HashSet<string>() { "test1", "test2", "test3" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("FullyQualifiedName", fastFilter.FilterPropertyName);
@@ -272,7 +272,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var filterExpressionWrapper = new FilterExpressionWrapper("Category!=UnitTest&Category!=PerfTest", null);
             var fastFilter = filterExpressionWrapper.fastFilter;
 
-            var expectedFilterValues = new HashSet<string>() { "UnitTest", "PerfTest" };
+            var expectedFilterValues = new HashSet<string>() { "unittest", "perftest" };
 
             Assert.IsTrue(fastFilter != null);
             Assert.AreEqual("Category", fastFilter.FilterPropertyName);
