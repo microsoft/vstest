@@ -48,11 +48,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 {
                     process.Exited += (sender, args) =>
                     {
-                        // Call WaitForExit again to ensure all streams are flushed
+                        // Call WaitForExit without again to ensure all streams are flushed,
+                        // Add timeout to avoid indefinite waiting on child process exist.
                         var p = sender as Process;
                         try
                         {
-                            p.WaitForExit();
+                            p.WaitForExit(500);
                         }
                         catch (InvalidOperationException)
                         {
