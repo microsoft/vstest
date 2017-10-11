@@ -356,11 +356,11 @@ function Create-VsixPackage
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1046721\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1050541\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy QtAgent Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-1046721\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-1050541\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Legacy data collectors Related depedencies
