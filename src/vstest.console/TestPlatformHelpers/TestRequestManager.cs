@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
@@ -79,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
                   new InferHelper(new AssemblyMetadataProvider()),
-                  MetricsPublisherFactory.GetMetricsPublisher(false, CommandLineOptions.Instance.IsDesignMode))
+                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
         }
 
@@ -168,8 +169,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            // Collect Metrics
-            this.CollectMetrics(requestData, runConfiguration);
+            if (this.telemetryOptedIn)
+            {
+                // Collect Metrics
+                this.CollectMetrics(requestData, runConfiguration);
+
+                // Collect Commands
+                this.LogCommandsTelemetryPoints(requestData);
+            }
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
@@ -279,7 +286,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            this.CollectMetrics(requestData, runConfiguration);
+            if (this.telemetryOptedIn)
+            {
+                // Collect Metrics
+                this.CollectMetrics(requestData, runConfiguration);
+
+                // Collect Commands
+                this.LogCommandsTelemetryPoints(requestData);
+            }
 
             if (!commandLineOptions.IsDesignMode)
             {
@@ -590,9 +604,93 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // Collecting TestPlatform Version
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+
+            // Collecting TargetOS
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
         }
 
         /// <summary>
+        /// Checks whether Telemetry opted in or not. 
+        /// By Default opting out
+        /// </summary>
+        /// <returns>Returns Telemetry Opted out or not</returns>
+        private static bool IsTelemetryOptedIn()
+        {
+            var telemetryStatus = Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN");
+            return !string.IsNullOrEmpty(telemetryStatus) && telemetryStatus.Equals("1", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Log Command Line switches for Telemetry purposes
+        /// </summary>
+        /// <param name="requestData">Request Data providing common discovery/execution services.</param>
+        private void LogCommandsTelemetryPoints(IRequestData requestData)
+        {
+            var commandsUsed = new List<string>();
+
+            var parallel = this.commandLineOptions.Parallel;
+            if (parallel)
+            {
+                commandsUsed.Add("/Parallel");
+            }
+
+            var platform = this.commandLineOptions.ArchitectureSpecified;
+            if (platform)
+            {
+                commandsUsed.Add("/Platform");
+            }
+
+            var enableCodeCoverage = this.commandLineOptions.EnableCodeCoverage;
+            if (enableCodeCoverage)
+            {
+                commandsUsed.Add("/EnableCodeCoverage");
+            }
+
+            var inIsolation = this.commandLineOptions.InIsolation;
+            if (inIsolation)
+            {
+                commandsUsed.Add("/InIsolation");
+            }
+
+            var useVsixExtensions = this.commandLineOptions.UseVsixExtensions;
+            if (useVsixExtensions)
+            {
+                commandsUsed.Add("/UseVsixExtensions");
+            }
+
+            var frameworkVersionSpecified = this.commandLineOptions.FrameworkVersionSpecified;
+            if (frameworkVersionSpecified)
+            {
+                commandsUsed.Add("/Framework");
+            }
+
+            var settings = this.commandLineOptions.SettingsFile;
+            if (!string.IsNullOrEmpty(settings))
+            {
+                var extension = Path.GetExtension(settings);
+                if (string.Equals(extension, ".runsettings", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.RunSettings");
+                }
+                else if (string.Equals(extension, ".testsettings", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.TestSettings");
+                }
+                else if (string.Equals(extension, ".vsmdi", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.vsmdi");
+                }
+                else if (string.Equals(extension, ".testrunConfig", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.testrunConfig");
+                }
+            }
+
+            requestData.MetricsCollection.Add(TelemetryDataConstants.CommandLineSwitches, string.Join(",", commandsUsed.ToArray()));
+        }
+
+        /// <summary>
+>>>>>>> master
         /// Gets Request Data
         /// </summary>
         /// <param name="protocolConfig">Protocol Config</param>

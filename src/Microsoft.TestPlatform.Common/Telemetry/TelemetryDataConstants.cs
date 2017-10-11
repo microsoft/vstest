@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         public static string ParallelEnabledDuringExecution = "VS.TestRun.ParallelEnabled";
 
         // Total number of tests ran under one test request
-        public static string TotalTestsRun = "VS.TestRun.TotalTestsRun";
+        public static string TotalTestsRun = "VS.TestRun.TotalTests";
 
         // Total time taken to complete one test run request
         public static string TimeTakenInSecForRun = "VS.TestRun.TimeTakenInSec";
@@ -33,28 +33,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TestPlatformVersion = "VS.TestRun.TestPlatformVersion";
 
-        // Adapter name will get appended. eg:- VS.TestRun.TotalTestsRanByAdapter.executor//cppunittestexecutor/v1
-        // In case of parallel it will be sum of all tests ran by an adapter in different execution process
-        public static string TotalTestsRanByAdapter = "VS.TestRun.TotalTestsRanByAdapter";
+        public static string TargetOS = "VS.TestRun.TargetOS";
 
-        // Adapter name will get appended. eg:- VS.TestRun.TimeTakenToRunTestsByAnAdapter.executor//cppunittestexecutor/v1
+        public static string LoggerUsed = "VS.TestRun.LoggersUsed";
+
+        public static string CommandLineSwitches = "VS.TestRun.CommandLineSwitches";
+
+        // Adapter name will get appended. eg:- VS.TestRun.TotalTestsRun.executor//cppunittestexecutor/v1
+        // In case of parallel it will be sum of all tests ran by an adapter in different execution process
+        public static string TotalTestsRanByAdapter = "VS.TestRun.TotalTestsRun";
+
+        // Adapter name will get appended. eg:- VS.TestRun.TimeTakenToRun.executor//cppunittestexecutor/v1
         // In case of parallel it will be sum of all time taken by an adapter to run tests in different execution process
-        public static string TimeTakenToRunTestsByAnAdapter = "VS.TestRun.TimeTakenToRunTestsByAnAdapter";
+        public static string TimeTakenToRunTestsByAnAdapter = "VS.TestRun.TimeTakenToRun";
 
         // Total number of adapter discovered on the machine.
         public static string NumberOfAdapterDiscoveredDuringExecution = "VS.TestRun.AdaptersDiscoveredCount";
 
         public static string NumberOfAdapterUsedToRunTests = "VS.TestRun.AdaptersUsedCount";
 
-        // In case of parallel, it will be maximum of all time taken by different execution engine.
-        public static string TimeTakenToStartExecutionEngineExe = "VS.TestRun.ExecutionEngineStartTime";
-
         // It will be the sum of the times taken by all adapter to run tests.
         // In case of parallel it can be more than total time taken to complete run request.
-        public static string TimeTakenByAllAdaptersInSec = "VS.TestRun.TimeTakenByAllAdaptersInSec";
+        public static string TimeTakenByAllAdaptersInSec = "VS.TestRun.TimeTakenByAllAdapters";
 
         // *********************Discovery****************************
-        public static string TotalTestsDiscovered = "VS.TestDiscovery.TotalTestsDiscovered";
+        public static string TotalTestsDiscovered = "VS.TestDiscovery.TotalTests";
 
         public static string ParallelEnabledDuringDiscovery = "VS.TestDiscovery.ParallelEnabled";
 
@@ -63,16 +66,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TimeTakenToLoadAdaptersInSec = "VS.TestDiscovery.TimeTakenToLoadAdaptersInSec";
 
-        public static string TimeTakenInSecToStartDiscoveryEngine = "VS.TestDiscovery.TimeTakenInSecToStartDiscoveryEngine";
-
         // It will be the sum of the times taken by all adapter to discover tests.
         public static string TimeTakenInSecByAllAdapters = "VS.TestDiscovery.TimeTakenInSecByAllAdapters";
 
-        // Adapter name will get appended. eg:- VS.TestDiscovery.TimeTaken.executor//cppunittestexecutor/v1
-        public static string TimeTakenToDiscoverTestsByAnAdapter = "VS.TestDiscovery.TimeTaken";
+        // Adapter name will get appended. eg:- VS.TestDiscovery.TimeTakenAdapter.executor//cppunittestexecutor/v1
+        public static string TimeTakenToDiscoverTestsByAnAdapter = "VS.TestDiscovery.TimeTakenAdapter";
 
-        // Adapter name will get appended. eg:- VS.TestDiscovery.TotalTests.executor//cppunittestexecutor/v1
-        public static string TotalTestsByAdapter = "VS.TestDiscovery.TotalTests";
+        // Adapter name will get appended. eg:- VS.TestDiscovery.TotalTestsDiscovered.executor//cppunittestexecutor/v1
+        public static string TotalTestsByAdapter = "VS.TestDiscovery.TotalTestsDiscovered";
 
         public static string DiscoveryState = "VS.TestDiscovery.DiscoveryState";
 
