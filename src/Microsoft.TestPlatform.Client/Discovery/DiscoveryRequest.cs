@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -391,7 +390,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     {
                         if (discoveryCompletePayload.Metrics == null)
                         {
-                            discoveryCompletePayload.Metrics = new ConcurrentDictionary<string, object>();
+                            discoveryCompletePayload.Metrics = new Dictionary<string, object>();
                         }
 
                         foreach (var kvp in this.requestData.MetricsCollection.Metrics)

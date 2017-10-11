@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -537,12 +536,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         if (testRunCompletePayload.TestRunCompleteArgs?.Metrics == null)
                         {
-                            testRunCompletePayload.TestRunCompleteArgs.Metrics = new ConcurrentDictionary<string, object>();
+                            testRunCompletePayload.TestRunCompleteArgs.Metrics = new Dictionary<string, object>();
                         }
 
                         foreach (var kvp in this.requestData.MetricsCollection.Metrics)
                         {
-                            testRunCompletePayload.TestRunCompleteArgs?.Metrics?.Add(kvp.Key, kvp.Value);
+                            testRunCompletePayload.TestRunCompleteArgs.Metrics.Add(kvp.Key, kvp.Value);
                         }
                     }
 
