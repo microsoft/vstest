@@ -128,7 +128,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             await this.EnsureInitializedAsync();
 
             // Converts ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
-            var discoveryCompleteEventsHandler2 = new DiscoveryEventsHandler(discoveryEventsHandler);
+            var discoveryCompleteEventsHandler2 = new DiscoveryEventsHandleConverter(discoveryEventsHandler);
             await this.requestSender.DiscoverTestsAsync(sources, discoverySettings, options: null, discoveryEventsHandler: discoveryCompleteEventsHandler2);
         }
 

@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.EnsureInitialized();
 
             // Converts ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
-            var discoveryCompleteEventsHandler2 = new DiscoveryEventsHandler(discoveryEventsHandler);
+            var discoveryCompleteEventsHandler2 = new DiscoveryEventsHandleConverter(discoveryEventsHandler);
             this.requestSender.DiscoverTests(sources, discoverySettings, options: null, discoveryEventsHandler: discoveryCompleteEventsHandler2);
         }
 
