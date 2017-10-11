@@ -226,7 +226,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     options,
                     It.IsAny<ITestRunEventsHandler>(),
                     It.IsAny<ITestHostLauncher>()),
-                Times.Once);
+                    Times.Once);
         }
 
         [TestMethod]

@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            if (this.telemetryOptedIn)
+            if (requestData.IsTelemetryOptedIn)
             {
                 // Collect Metrics
                 this.CollectMetrics(requestData, runConfiguration);
@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     throwException = true;
                 }
 
-                if(throwException)
+                if (throwException)
                 {
                     throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
                 }
@@ -286,7 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            if (this.telemetryOptedIn)
+            if (requestData.IsTelemetryOptedIn)
             {
                 // Collect Metrics
                 this.CollectMetrics(requestData, runConfiguration);
@@ -408,7 +408,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
-                    if(updateFramework)
+                    if (updateFramework)
                     {
                         InferRunSettingsHelper.UpdateTargetFramework(navigator, inferedFramework?.ToString(), overwrite: true);
                         chosenFramework = inferedFramework;
@@ -426,7 +426,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
-                    if(!string.IsNullOrEmpty(incompatiableSettingWarning))
+                    if (!string.IsNullOrEmpty(incompatiableSettingWarning))
                     {
                         EqtTrace.Info(incompatiableSettingWarning);
                         LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
@@ -534,7 +534,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 bool isValidFx =
                     InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
                 required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
-                if(!required)
+                if (!required)
                 {
                     chosenFramework = Framework.FromString(frameworkFromrunsettingsXml);
                 }
@@ -556,7 +556,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
                 required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
-                if(!required)
+                if (!required)
                 {
                     chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml);
                 }
@@ -690,7 +690,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
->>>>>>> master
         /// Gets Request Data
         /// </summary>
         /// <param name="protocolConfig">Protocol Config</param>
@@ -701,10 +700,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 ProtocolConfig = protocolConfig,
                 MetricsCollection =
-                               this.telemetryOptedIn
+                               this.telemetryOptedIn || IsTelemetryOptedIn()
                                    ? (IMetricsCollection)new MetricsCollection()
                                    : new NoOpMetricsCollection(),
-                IsTelemetryOptedIn = this.telemetryOptedIn
+                IsTelemetryOptedIn = this.telemetryOptedIn || IsTelemetryOptedIn()
             };
         }
 
