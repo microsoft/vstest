@@ -37,11 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private List<string> pathToExtensions;
 
         /// <summary>
-        /// Specifies whether we should load only well known extensions or not. Default is "load all".
-        /// </summary>
-        private bool loadOnlyWellKnownExtensions;
-
-        /// <summary>
         /// Assembly resolver used to resolve the additional extensions
         /// </summary>
         private AssemblyResolver assemblyResolver;
@@ -71,7 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
             this.pathToExtensions = null;
-            this.loadOnlyWellKnownExtensions = false;
             this.lockForExtensionsUpdate = new object();
             this.fileHelper = fileHelper;
             this.TestExtensions = null;
@@ -108,17 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             get
             {
                 return this.pathToExtensions;
-            }
-        }
-
-        /// <summary>
-        /// Specific whether only well known extensions should be loaded or not
-        /// </summary>
-        public bool LoadOnlyWellKnownExtensions
-        {
-            get
-            {
-                return this.loadOnlyWellKnownExtensions;
             }
         }
 
@@ -240,30 +223,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             lock (this.lockForExtensionsUpdate)
             {
-                EqtTrace.Verbose(
-                    "TestPluginCache: Updating loadOnlyWellKnownExtensions from {0} to {1}.",
-                    this.loadOnlyWellKnownExtensions,
-                    shouldLoadOnlyWellKnownExtensions);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "TestPluginCache: Updating loadOnlyWellKnownExtensions from {0} to {1}.",
+                        this.loadOnlyWellKnownExtensions,
+                        shouldLoadOnlyWellKnownExtensions);
+                }
 
-                this.loadOnlyWellKnownExtensions = shouldLoadOnlyWellKnownExtensions;
-
-                List<string> extensions = additionalExtensionsPath?.ToList();
+                var extensions = additionalExtensionsPath?.ToList();
                 if (extensions == null || extensions.Count == 0)
                 {
                     return;
                 }
 
-                string extensionString;
                 if (this.pathToExtensions != null
-                    && extensions.Count == this.pathToExtensions.Count()
+                    && extensions.Count == this.pathToExtensions.Count
                     && extensions.All(e => this.pathToExtensions.Contains(e)))
                 {
-                    extensionString = this.pathToExtensions != null
-                                          ? string.Join(",", this.pathToExtensions.ToArray())
-                                          : null;
-                    EqtTrace.Verbose(
-                        "TestPluginCache: Ignoring the new extensions update as there is no change. Current extensions are '{0}'.",
-                        extensionString);
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        var extensionString = string.Join(",", this.pathToExtensions);
+                        EqtTrace.Verbose(
+                            "TestPluginCache: Ignoring the new extensions update as there is no change. Current extensions are '{0}'.",
+                            extensionString);
+                    }
 
                     return;
                 }
@@ -271,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // Don't do a strict check for existence of the extension path. The extension paths may or may
                 // not exist on the disk. In case of .net core, the paths are relative to the nuget packages
                 // directory. The path to nuget directory is automatically setup for CLR to resolve.
-                // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
+                // Test platform tries to load every extension by assembly name. If it is not resolved, we don't throw
                 // an error.
                 if (this.pathToExtensions != null)
                 {
@@ -288,17 +272,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    var directories =
-                        this.pathToExtensions.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
-
-                    var directoryString = directories != null ? string.Join(",", directories.ToArray()) : null;
+                    var directories = this.pathToExtensions.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
+                    var directoryString = string.Join(",", directories);
                     EqtTrace.Verbose(
                         "TestPluginCache: Using directories for assembly resolution '{0}'.",
                         directoryString);
 
-                    extensionString = this.pathToExtensions != null
-                                          ? string.Join(",", this.pathToExtensions.ToArray())
-                                          : null;
+                    var extensionString = string.Join(",", this.pathToExtensions.ToArray());
                     EqtTrace.Verbose("TestPluginCache: Updated the available extensions to '{0}'.", extensionString);
                 }
             }

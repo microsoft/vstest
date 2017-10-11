@@ -250,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.RequestSender.InitializeExecution(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+                this.RequestSender.InitializeExecution(platformExtensions, false);
             }
         }
     }
