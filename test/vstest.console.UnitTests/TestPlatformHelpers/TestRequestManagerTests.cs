@@ -1501,6 +1501,46 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        [DataRow("x86")]
+        [DataRow("X86")]
+        [DataRow("ARM")]
+        [DataRow("aRm")]
+        public void RunTestsShouldNotUpdatePlatformIfSpecifiedInDesignModeButInferred(string targetPlatform)
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                         <TargetPlatform>{targetPlatform}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
+                .Returns(Architecture.X86);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+                .Returns(new FrameworkName(Constants.DotNetFramework451));
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(targetPlatform));
+        }
+
+        [TestMethod]
         public void RunTestsShouldUpdateFrameworkAndPlatformInCommandLineScenarios()
         {
             var payload = new TestRunRequestPayload()

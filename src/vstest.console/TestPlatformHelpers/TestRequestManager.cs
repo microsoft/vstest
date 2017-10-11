@@ -558,7 +558,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
                 if (!required)
                 {
-                    chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml);
+                    chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml, true);
                 }
             }
             else if (!commandLineOptions.IsDesignMode && commandLineOptions.ArchitectureSpecified)
