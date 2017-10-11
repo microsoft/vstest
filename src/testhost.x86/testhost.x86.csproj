@@ -10,6 +10,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
     <OutputType Condition="'$(TargetFramework)' != 'netstandard1.4'">Exe</OutputType>
+    <ApplicationManifest>\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
