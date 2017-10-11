@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -22,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
     using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -74,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
         }
 
-        private TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer)
+        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer)
         {
             Debug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
             Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
@@ -522,6 +524,42 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <param name="rawMessage"></param>
         public void HandleRawMessage(string rawMessage)
         {
+            if (this.requestData.IsTelemetryOptedIn)
+            {
+                var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+                if (string.Equals(message.MessageType, MessageType.ExecutionComplete))
+                {
+                    var testRunCompletePayload =
+                        this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+
+                    if (testRunCompletePayload != null)
+                    {
+                        if (testRunCompletePayload.TestRunCompleteArgs?.Metrics == null)
+                        {
+                            testRunCompletePayload.TestRunCompleteArgs.Metrics = new ConcurrentDictionary<string, object>();
+                        }
+
+                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        {
+                            testRunCompletePayload.TestRunCompleteArgs?.Metrics?.Add(kvp.Key, kvp.Value);
+                        }
+                    }
+
+                    int version = 2;
+
+                    if (message is VersionedMessage)
+                    {
+                        version = ((VersionedMessage)message).Version;
+                    }
+
+                    rawMessage = this.dataSerializer.SerializePayload(
+                        MessageType.ExecutionComplete,
+                        testRunCompletePayload,
+                        version);
+                }
+            }
+
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
         }
 
