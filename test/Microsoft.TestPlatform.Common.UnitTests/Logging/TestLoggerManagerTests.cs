@@ -9,6 +9,7 @@ namespace TestPlatform.Common.UnitTests.Logging
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -373,6 +374,23 @@ namespace TestPlatform.Common.UnitTests.Logging
                     {
                         TestLoggerManager.Instance.RegisterTestRunEvents(null);
                     });
+        }
+
+        [TestMethod]
+        public void LoggerInitialzeShouldCollectLoggersForTelemetry()
+        {
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+            TestLoggerManager.Instance.AddLogger(new Uri(this.loggerUri), new Dictionary<string, string>());
+
+            // Act.
+            TestLoggerManager.Instance.InitializeLoggers(mockRequestData.Object);
+
+            // Verify
+            mockMetricsCollection.Verify(
+                rd => rd.Add(TelemetryDataConstants.LoggerUsed, new Uri(this.loggerUri)));
         }
 
         /// <summary>

@@ -114,8 +114,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 {
                     if (line.Contains(TelemetryDataConstants.TestExecutionCompleteEvent) && command.Equals("Execution", StringComparison.Ordinal))
                     {
-                        var isPresent = line.Contains(TelemetryDataConstants.DataCollectorsEnabled + '=' + "False")
-                                        && line.Contains(
+                        var isPresent = line.Contains(
                                             TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution)
                                         && line.Contains(TelemetryDataConstants.NumberOfAdapterUsedToRunTests)
                                         && line.Contains(TelemetryDataConstants.ParallelEnabledDuringExecution + '=' + "False")

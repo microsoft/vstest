@@ -102,7 +102,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
 
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
-            var proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
+            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize();
