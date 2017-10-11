@@ -199,6 +199,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         }
 
         [TestMethod]
+        public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagereIfrunsettingsHasTestSettingsInIt()
+        {
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <TargetPlatform>x86</TargetPlatform>
+                        <DisableAppDomain>false</DisableAppDomain>
+                        <DesignMode>false</DesignMode>
+                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    </RunConfiguration>
+                    <MSTest>
+                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                    </MSTest>
+                 </RunSettings>";
+
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+
+            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, discoveryCriteria);
+            Assert.IsNotNull(discoveryManager);
+            Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
+        }
+
+        [TestMethod]
         public void GetDiscoveryManagerShouldReturnsInProcessProxyDiscoveryManager()
         {
             string settingXml =
@@ -208,7 +231,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
-                    </RunConfiguration >
+                    </RunConfiguration>
                  </RunSettings>";
 
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
@@ -387,6 +410,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                             </InProcDataCollector>
                         </InProcDataCollectors>
                     </InProcDataCollectionRunSettings>
+                 </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+
+            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+
+            Assert.IsNotNull(executionManager);
+            Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
+        }
+
+        [TestMethod]
+        public void GetExecutionManagerShouldNotReturnInProcessProxyexecutionManagerIfrunsettingsHasTestSettingsInIt()
+        {
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <DisableAppDomain>false</DisableAppDomain>
+                        <DesignMode>false</DesignMode>
+                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                        <MaxCpuCount>1</MaxCpuCount>
+                    </RunConfiguration >
+                    <MSTest>
+                        <SettingsFile>C:\temp.testsettings</SettingsFile>
+                    </MSTest>
                  </RunSettings>";
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);

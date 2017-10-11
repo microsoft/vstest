@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// Cross Platform test engine entry point for the client.
@@ -234,6 +235,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 {
                     EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in isolation");
                 }
+                return false;
+            }
+
+            // Run tests in isolation if run is authored using testsettings.
+            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            {
                 return false;
             }
 
