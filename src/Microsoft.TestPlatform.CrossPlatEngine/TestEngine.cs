@@ -108,9 +108,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            // Collecting IsDataCollector Enabled
-            requestData.MetricsCollection.Add(TelemetryDataConstants.DataCollectorsEnabled, isDataCollectorEnabled.ToString());
-
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
@@ -134,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager.GetTestHostConnectionInfo());
 
-                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
+                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings))
                                                 : new ProxyExecutionManager(requestData, requestSender, hostManager);
             };
 
