@@ -354,7 +354,7 @@ function Create-VsixPackage
     $packageDir = Get-FullCLRPackageDirectory
     $extensionsPackageDir = Join-Path $packageDir "Extensions"
     $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
-	$legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
+    $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1050541\contentFiles\any\any"
