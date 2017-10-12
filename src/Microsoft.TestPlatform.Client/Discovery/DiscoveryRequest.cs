@@ -390,12 +390,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     {
                         if (discoveryCompletePayload.Metrics == null)
                         {
-                            discoveryCompletePayload.Metrics = new Dictionary<string, object>();
+                            discoveryCompletePayload.Metrics = this.requestData.MetricsCollection.Metrics;
                         }
-
-                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        else
                         {
-                            discoveryCompletePayload.Metrics.Add(kvp.Key, kvp.Value);
+                            foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                            {
+                                discoveryCompletePayload.Metrics.Add(kvp.Key, kvp.Value);
+                            }
                         }
 
                         var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - this.discoveryStartTime;
@@ -404,17 +406,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
                     }
 
-                    int version = 2;
-
                     if (message is VersionedMessage)
                     {
-                        version = ((VersionedMessage)message).Version;
-                    }
+                        var version = ((VersionedMessage)message).Version;
 
-                    rawMessage = this.dataSerializer.SerializePayload(
-                        MessageType.DiscoveryComplete,
-                        discoveryCompletePayload,
-                        version);
+                        rawMessage = this.dataSerializer.SerializePayload(
+                            MessageType.DiscoveryComplete,
+                            discoveryCompletePayload,
+                            version);
+                    }
+                    else
+                    {
+                        rawMessage = this.dataSerializer.SerializePayload(
+                            MessageType.DiscoveryComplete,
+                            discoveryCompletePayload);
+                    }
                 }
             }
 

@@ -536,12 +536,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         if (testRunCompletePayload.TestRunCompleteArgs?.Metrics == null)
                         {
-                            testRunCompletePayload.TestRunCompleteArgs.Metrics = new Dictionary<string, object>();
+                            testRunCompletePayload.TestRunCompleteArgs.Metrics =
+                                this.requestData.MetricsCollection.Metrics;
                         }
-
-                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        else
                         {
-                            testRunCompletePayload.TestRunCompleteArgs.Metrics.Add(kvp.Key, kvp.Value);
+                            foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                            {
+                                testRunCompletePayload.TestRunCompleteArgs.Metrics.Add(kvp.Key, kvp.Value);
+                            }
                         }
 
                         var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - this.executionStartTime;
@@ -550,17 +553,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
                     }
 
-                    int version = 2;
-
                     if (message is VersionedMessage)
                     {
-                        version = ((VersionedMessage)message).Version;
-                    }
+                        var version = ((VersionedMessage)message).Version;
 
-                    rawMessage = this.dataSerializer.SerializePayload(
-                        MessageType.ExecutionComplete,
-                        testRunCompletePayload,
-                        version);
+                        rawMessage = this.dataSerializer.SerializePayload(
+                            MessageType.ExecutionComplete,
+                            testRunCompletePayload,
+                            version);
+                    }
+                    else
+                    {
+                        rawMessage = this.dataSerializer.SerializePayload(
+                            MessageType.ExecutionComplete,
+                            testRunCompletePayload);
+                    }
                 }
             }
 
