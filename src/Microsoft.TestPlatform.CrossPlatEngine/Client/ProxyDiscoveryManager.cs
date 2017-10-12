@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.RequestSender.InitializeDiscovery(platformExtensions, false);
+                this.RequestSender.InitializeDiscovery(platformExtensions);
             }
         }
     }

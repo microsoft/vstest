@@ -93,7 +93,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -168,7 +168,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -187,7 +187,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions, false), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Once);
             }
             finally
             {
@@ -206,7 +206,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }, false), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
             }
             finally
             {
@@ -282,7 +282,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Once);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
 
         [TestMethod]

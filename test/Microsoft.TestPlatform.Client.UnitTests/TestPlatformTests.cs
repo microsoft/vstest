@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var additionalExtensions = new List<string> { "e1.dll", "e2.dll" };
 
-            tp.UpdateExtensions(additionalExtensions, loadOnlyWellKnownExtensions: true);
+            tp.UpdateExtensions(additionalExtensions, skipExtensionFilters: true);
 
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
         }

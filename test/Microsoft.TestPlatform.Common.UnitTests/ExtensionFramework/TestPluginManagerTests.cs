@@ -45,7 +45,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var instance = TestPluginManager.CreateTestExtension<ITestDiscoverer>(typeof(DummyTestDiscoverer));
 
             Assert.IsNotNull(instance);
-            Assert.IsTrue(instance is ITestDiscoverer);
         }
 
         [TestMethod]
@@ -110,7 +109,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                 out testExtensions);
 
             Assert.IsNotNull(testExtensions);
-            Assert.IsTrue(testExtensions.Count() > 0);
+            Assert.IsTrue(testExtensions.Any());
 
             Assert.AreEqual(1, discoveryCount);
         }

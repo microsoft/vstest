@@ -163,11 +163,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// The update extensions.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        /// <param name="loadOnlyWellKnownExtensions"> The load only well known extensions. </param>
-        public void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        /// <param name="skipExtensionFilters">Skips filtering by name (if true).</param>
+        public void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
             this.TestEngine.GetExtensionManager()
-                   .UseAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+                   .UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
         }
 
         /// <summary>

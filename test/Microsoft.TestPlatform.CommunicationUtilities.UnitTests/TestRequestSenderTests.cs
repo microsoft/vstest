@@ -162,7 +162,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var paths = new List<string>() { "Hello", "World" };
             this.CheckAndSetProtocolVersion();
-            this.testRequestSender.InitializeDiscovery(paths, false);
+            this.testRequestSender.InitializeDiscovery(paths);
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.DiscoveryInitialize, paths, this.protocolConfig.Version), Times.Once);
         }
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void InitializeExecutionShouldSendCommunicationMessageWithCorrectParameters()
         {
             var paths = new List<string>() { "Hello", "World" };
-            this.testRequestSender.InitializeExecution(paths, true);
+            this.testRequestSender.InitializeExecution(paths);
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.ExecutionInitialize, paths, this.protocolConfig.Version), Times.Once);
         }

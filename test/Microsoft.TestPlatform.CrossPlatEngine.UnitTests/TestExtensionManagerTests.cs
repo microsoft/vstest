@@ -35,7 +35,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testExtensionManager.UseAdditionalExtensions(extensions, true);
 
-            Assert.IsTrue(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToExtensions.ToList());
         }
 

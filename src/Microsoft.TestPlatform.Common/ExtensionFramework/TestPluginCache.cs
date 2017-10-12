@@ -149,7 +149,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
 
-                // Combine all the possible extensions - both default and additional
+                // Combine all the possible extensions - both default and additional. We don't attempt filtering on
+                // DefaultExtensionPaths
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToExtensions != null)
                 {
@@ -183,15 +184,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 this.LogExtensions();
             }
 #if NET451
-                catch (ThreadAbortException)
+            catch (ThreadAbortException)
+            {
+                // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
+                // being aborted as it is a legitimate exception to receive.
+                if (EqtTrace.IsVerboseEnabled)
                 {
-                    // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
-                    // being aborted as it is a legitimate exception to receive.
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
-                    }
+                    EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
                 }
+            }
 #endif
             catch (Exception e)
             {
@@ -219,13 +220,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Use the parameter path to extensions
         /// </summary>
-        public void UpdateExtensions(IEnumerable<string> additionalExtensionsPath, bool shouldLoadOnlyWellKnownExtensions)
+        /// <param name="additionalExtensionsPath">List of extension paths</param>
+        /// <param name="skipExtensionFilters">Skip extension name filtering (if true)</param>
+        public void UpdateExtensions(IEnumerable<string> additionalExtensionsPath, bool skipExtensionFilters)
         {
             lock (this.lockForExtensionsUpdate)
             {
                 var extensions = additionalExtensionsPath?.ToList();
                 if (extensions == null || extensions.Count == 0)
                 {
+                    return;
+                }
+
+                if (skipExtensionFilters)
+                {
+                    // Add the extensions to unfilter list. These extensions will never be filtered
+                    // based on file name (e.g. *.testadapter.dll etc.).
+                    this.DefaultExtensionPaths = extensions;
                     return;
                 }
 
@@ -256,8 +267,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 extensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-                // Use the new paths and set the extensions discovered to false so that the next time 
-                // any one tries to get the additional extensions, we rediscover. 
+                // Use the new paths and set the extensions discovered to false so that the next time
+                // any one tries to get the additional extensions, we rediscover.
                 this.pathToExtensions = extensions;
 
                 this.TestExtensions?.InvalidateCache();

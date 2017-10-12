@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.ExtensionsInitialize:
                             {
                                 var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
-                                testRequestManager.InitializeExtensions(extensionPaths);
+                                testRequestManager.InitializeExtensions(extensionPaths, skipFiltering: false);
                                 break;
                             }
 

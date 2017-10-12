@@ -58,22 +58,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
         }
 
-        [TestMethod]
-        public void LoadOnlyWellKnownExtensionsShouldBeFalseByDefault()
-        {
-            Assert.IsFalse(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
-        }
-
         #endregion
 
         #region UpdateAdditionalExtensions tests
-
-        [TestMethod]
-        public void UpdateAdditionalExtensionsShouldUpdateLoadOnlyWellKnownExtensions()
-        {
-            TestPluginCache.Instance.UpdateExtensions(null, true);
-            Assert.IsTrue(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
-        }
 
         [TestMethod]
         public void UpdateAdditionalExtensionsShouldNotThrowIfExtenionPathIsNull()
@@ -93,7 +80,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void UpdateAdditionalExtensionsShouldUpdateAdditionalExtensions()
         {
             var additionalExtensions = new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location };
-            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
+            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, false);
             var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
 
             Assert.IsNotNull(updatedExtensions);
@@ -108,7 +95,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                                                typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location,
                                                typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location
                                            };
-            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
+            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, false);
             var updatedExtensions = TestPluginCache.Instance.PathToExtensions.ToList();
 
             Assert.IsNotNull(updatedExtensions);
@@ -120,8 +107,19 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void UpdateAdditionalExtensionsShouldUpdatePathsThatDoNotExist()
         {
             var additionalExtensions = new List<string> { "foo.dll" };
-            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
+            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, false);
             var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
+
+            Assert.IsNotNull(updatedExtensions);
+            Assert.AreEqual(1, updatedExtensions.Count());
+        }
+
+        [TestMethod]
+        public void UpdateAdditionalExtensionsShouldUpdateDefaultExtensionsWhenSkipFilteringIsTrue()
+        {
+            var additionalExtensions = new List<string> { "foo.dll" };
+            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
+            var updatedExtensions = TestPluginCache.Instance.DefaultExtensionPaths;
 
             Assert.IsNotNull(updatedExtensions);
             Assert.AreEqual(1, updatedExtensions.Count());
@@ -384,7 +382,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             TestDiscoveryExtensionManager.Destroy();
             TestExecutorExtensionManager.Destroy();
             SettingsProviderExtensionManager.Destroy();
-            this.UpdateExtensions(extensionsPath, true);
+            this.UpdateExtensions(extensionsPath, skipExtensionFilters: false);
         }
 
         public TestableTestPluginCache(IFileHelper fileHelper) : this(fileHelper, new List<string>())

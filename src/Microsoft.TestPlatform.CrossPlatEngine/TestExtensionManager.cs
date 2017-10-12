@@ -13,14 +13,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     /// </summary>
     public class TestExtensionManager : ITestExtensionManager
     {
+        /// <inheritdoc />
         public void ClearExtensions()
         {
             TestPluginCache.Instance.ClearExtensions();
         }
 
-        public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        /// <inheritdoc />
+        public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
-            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters: false);
         }
     }
 }
