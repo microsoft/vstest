@@ -58,9 +58,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.dataCollectionContext);
         }
 
-        [Ignore]
         [TestMethod]
-        // Ignoring because this tests is failing consistently in PR build.
+        [Ignore]
         public void OnEventLogEntryWrittenShouldAddLogs()
         {
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);

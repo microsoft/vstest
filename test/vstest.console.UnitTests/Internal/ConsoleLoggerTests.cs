@@ -101,13 +101,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
-        public void InitializeWithParametersShouldDefaultToMinimalVerbosityLevelForInvalidVerbosity()
+        public void InitializeWithParametersShouldDefaultToNormalVerbosityLevelForInvalidVerbosity()
         {
             var parameters = new Dictionary<string, string>();
             parameters.Add("verbosity", "random");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
+#if NET451
+            Assert.AreEqual(ConsoleLogger.Verbosity.Normal, this.consoleLogger.VerbosityLevel);
+#else
             Assert.AreEqual(ConsoleLogger.Verbosity.Minimal, this.consoleLogger.VerbosityLevel);
+#endif
         }
 
         [TestMethod]
@@ -705,7 +709,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
         private List<ObjectModel.TestResult> GetTestResultsObject()
         {
-            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+            var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource");
+            testcase.DisplayName = "TestName";
+
             var testresult = new ObjectModel.TestResult(testcase);
             testresult.Outcome = TestOutcome.Passed;
 

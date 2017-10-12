@@ -27,9 +27,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions);
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.DiscoverTests(IEnumerable{string}, string, ITestDiscoveryEventsHandler)"/>.
+        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.DiscoverTests(IEnumerable{string}, string, ITestDiscoveryEventsHandler)"/>
         /// </summary>
         Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, ITestDiscoveryEventsHandler discoveryEventsHandler);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.DiscoverTests(IEnumerable{string}, string, TestPlatformOptions, ITestDiscoveryEventsHandler2)"/>
+        /// </summary>
+        Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler);
 
         /// <summary>
         /// See <see cref="IVsTestConsoleWrapper.CancelDiscovery"/>.
@@ -42,9 +47,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task RunTestsAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTests(IEnumerable{string}, string, TestPlatformOptions, ITestRunEventsHandler)"/>.
+        /// </summary>
+        Task RunTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler);
+
+        /// <summary>
         /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTests(IEnumerable{TestCase}, string, ITestRunEventsHandler)"/>.
         /// </summary>
         Task RunTestsAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTests(IEnumerable{TestCase}, string, TestPlatformOptions, ITestRunEventsHandler)"/>.
+        /// </summary>
+        Task RunTestsAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
         /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTestsWithCustomTestHost(IEnumerable{string}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
@@ -52,9 +67,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTestsWithCustomTestHost(IEnumerable{string}, string, TestPlatformOptions, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// </summary>
+        Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
         /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTestsWithCustomTestHost(IEnumerable{TestCase}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
         /// </summary>
         Task RunTestsWithCustomTestHostAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.RunTestsWithCustomTestHost(IEnumerable{TestCase}, string, TestPlatformOptions, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// </summary>
+        Task RunTestsWithCustomTestHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// See <see cref="IVsTestConsoleWrapper.CancelTestRun"/>.

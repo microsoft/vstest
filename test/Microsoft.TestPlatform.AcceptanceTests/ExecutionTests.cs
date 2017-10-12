@@ -202,5 +202,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             FileAssert.Contains(diagLogFilePath, errorFirstLine);
             File.Delete(diagLogFilePath);
         }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void IncompatiableSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings.SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProject2.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 1);
+
+            // When both x64 & x86 DLL is passed x64 dll will be ignored.
+            this.StdOutputContains(expectedWarningContains);
+        }
     }
 }

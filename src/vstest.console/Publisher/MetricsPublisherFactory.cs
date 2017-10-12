@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
 {
+    using System;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -18,12 +19,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher
         /// <returns>Returns Instance of Metrics Publisher</returns>
         public static async Task<IMetricsPublisher> GetMetricsPublisher(bool isTelemetryOptedIn, bool isDesignMode)
         {
-            if (isTelemetryOptedIn && !isDesignMode)
+            var logEnabled = Environment.GetEnvironmentVariable("VSTEST_LOGTELEMETRY");
+            bool logTelemery = !string.IsNullOrEmpty(logEnabled) && logEnabled.Equals("1", StringComparison.Ordinal);
+
+            if (isTelemetryOptedIn && !isDesignMode && logTelemery)
             {
-                return await Task.Run(() => new MetricsPublisher());
+                return await Task.FromResult<IMetricsPublisher>(new TextFileTelemetryPublisher());
             }
 
-            return await Task.Run(() => new NoOpMetricsPublisher());
+            return await Task.FromResult<IMetricsPublisher>(new NoOpMetricsPublisher());
         }
     }
 }

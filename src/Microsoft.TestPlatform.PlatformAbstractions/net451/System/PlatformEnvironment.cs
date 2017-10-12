@@ -42,6 +42,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc />
+        public string OperatingSystemVersion
+        {
+            get
+            {
+                return System.Environment.OSVersion.ToString();
+            }
+        }
+
+        /// <inheritdoc />
         public void Exit(int exitcode)
         {
             Environment.Exit(exitcode);

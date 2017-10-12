@@ -69,7 +69,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Level of verbosity
         /// </summary>
+#if NET451
+        private Verbosity verbosityLevel = Verbosity.Normal;
+#else
+        // Keep default verbosity for x-plat command line as minimal
         private Verbosity verbosityLevel = Verbosity.Minimal;
+#endif
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
@@ -357,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             this.testsTotal++;
 
             string name = null;
-            name = !string.IsNullOrEmpty(e.Result.DisplayName) ? e.Result.DisplayName : e.Result.TestCase.FullyQualifiedName;
+            name = !string.IsNullOrEmpty(e.Result.DisplayName) ? e.Result.DisplayName : e.Result.TestCase.DisplayName;
 
             if (e.Result.Outcome == TestOutcome.Skipped)
             {

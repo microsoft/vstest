@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Runtime.Versioning;
 
     using Common.Logging;
 
@@ -77,6 +78,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockMetricsPublisherTask = Task.FromResult(this.mockMetricsPublisher.Object);
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.mockAssemblyMetadataProvider = new Mock<IAssemblyMetadataProvider>();
+            this.mockAssemblyMetadataProvider.Setup(x => x.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
+            this.mockAssemblyMetadataProvider.Setup(x => x.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework40));
             this.inferHelper = new InferHelper(this.mockAssemblyMetadataProvider.Object);
         }
 
@@ -107,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ListFullyQualifiedTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/ListFullyQualifiedTests", capabilities.CommandName);
-            
+
             Assert.AreEqual(true, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
 

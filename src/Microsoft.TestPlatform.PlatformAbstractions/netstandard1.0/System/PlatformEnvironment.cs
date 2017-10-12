@@ -28,6 +28,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc />
+        public string OperatingSystemVersion
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <inheritdoc />
         public void Exit(int exitcode)
         {
             throw new NotImplementedException();

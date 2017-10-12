@@ -374,23 +374,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void StartTestRunShouldCollectMetrics()
-        {
-            var mockMetricsCollector = new Mock<IMetricsCollection>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
-
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-            var runCriteria = new Mock<TestRunCriteria>(
-                new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
-                10);
-
-            this.testExecutionManager.StartTestRun(runCriteria.Object, null);
-
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, It.IsAny<object>()), Times.Once);
-        }
-
-        [TestMethod]
         public void CloseShouldSignalToServerSessionEndIfTestHostWasLaunched()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);

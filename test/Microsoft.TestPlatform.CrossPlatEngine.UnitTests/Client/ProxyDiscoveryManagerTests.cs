@@ -315,28 +315,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldCollectMetrics()
-        {
-            TestPluginCache.Instance = null;
-            try
-            {
-                var mockMetricsCollector = new Mock<IMetricsCollection>();
-                this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
-
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-                // Act.
-                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
-
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<double>()), Times.Once);
-            }
-            finally
-            {
-                TestPluginCache.Instance = null;
-            }
-        }
-
-        [TestMethod]
         public void DiscoverTestsCloseTestHostIfRawMessageIsOfTypeDiscoveryComplete()
         {
             Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
