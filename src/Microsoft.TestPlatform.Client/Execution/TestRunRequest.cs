@@ -543,6 +543,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         {
                             testRunCompletePayload.TestRunCompleteArgs.Metrics.Add(kvp.Key, kvp.Value);
                         }
+
+                        var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - this.executionStartTime;
+
+                        // Fill in the time taken to complete the run
+                        testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
                     }
 
                     int version = 2;
