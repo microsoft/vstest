@@ -19,7 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// Initializes the extensions while probing additional paths
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to Additional extensions</param>
-        void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions);
+        /// <param name="skipExtensionFilters">Skip extension filtering by name (if true)</param>
+        void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters);
 
         /// <summary>
         /// Resets Vstest.console.exe Options

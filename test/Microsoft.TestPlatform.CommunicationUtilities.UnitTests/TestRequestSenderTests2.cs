@@ -199,7 +199,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeCommunicationChannel();
 
-            this.testRequestSender.InitializeDiscovery(this.pathToAdditionalExtensions, false);
+            this.testRequestSender.InitializeDiscovery(this.pathToAdditionalExtensions);
 
             this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.DiscoveryInitialize, this.pathToAdditionalExtensions, 1), Times.Once);
             this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
@@ -210,7 +210,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeChannelWithVersionNegotiation(DUMMYNEGOTIATEDPROTOCOLVERSION);
 
-            this.testRequestSender.InitializeDiscovery(this.pathToAdditionalExtensions, false);
+            this.testRequestSender.InitializeDiscovery(this.pathToAdditionalExtensions);
 
             this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.DiscoveryInitialize, this.pathToAdditionalExtensions, DUMMYNEGOTIATEDPROTOCOLVERSION), Times.Once);
         }
@@ -414,7 +414,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeCommunicationChannel();
 
-            this.testRequestSender.InitializeExecution(this.pathToAdditionalExtensions, true);
+            this.testRequestSender.InitializeExecution(this.pathToAdditionalExtensions);
 
             this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.ExecutionInitialize, this.pathToAdditionalExtensions, 1), Times.Once);
             this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
@@ -425,7 +425,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeChannelWithVersionNegotiation(DUMMYNEGOTIATEDPROTOCOLVERSION);
 
-            this.testRequestSender.InitializeExecution(this.pathToAdditionalExtensions, true);
+            this.testRequestSender.InitializeExecution(this.pathToAdditionalExtensions);
 
             this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.ExecutionInitialize, this.pathToAdditionalExtensions, DUMMYNEGOTIATEDPROTOCOLVERSION), Times.Once);
         }
