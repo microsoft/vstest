@@ -314,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             this.testRunRequest.HandleRawMessage(string.Empty);
 
-            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<TestRunCompletePayload>(), It.IsAny<int>()), Times.Once);
+            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<TestRunCompletePayload>()), Times.Once);
             this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
             Assert.IsTrue(onDiscoveryCompleteInvoked);
         }

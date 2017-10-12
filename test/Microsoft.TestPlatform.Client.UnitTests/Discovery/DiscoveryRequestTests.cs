@@ -206,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 
             this.discoveryRequest.HandleRawMessage(string.Empty);
 
-            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<DiscoveryCompletePayload>(), It.IsAny<int>()), Times.Once);
+            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<DiscoveryCompletePayload>()), Times.Once);
             this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
             Assert.IsTrue(onDiscoveryCompleteInvoked);
         }
