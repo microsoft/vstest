@@ -4,7 +4,6 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;

@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// The test plugin cache.
@@ -353,23 +354,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             var resolutionPaths = new List<string>();
 
-            var extensionDirectories = this.filterableExtensionPaths.Concat(this.unfilterableExtensionPaths).Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct().ToList();
+            // Add the extension directories for assembly resolution
+            var extensionDirectories = this.GetExtensionPaths(string.Empty).Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct().ToList();
             if (extensionDirectories.Any())
             {
                 resolutionPaths.AddRange(extensionDirectories);
             }
 
-            extensionDirectories = this.defaultExtensionPaths.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct().ToList();
-            if (extensionDirectories.Any())
-            {
-                resolutionPaths.AddRange(extensionDirectories);
-            }
-
+            // Keep current directory for resolution
             var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
-
             if (!resolutionPaths.Contains(currentDirectory))
             {
                 resolutionPaths.Add(currentDirectory);
+            }
+
+            // If running in Visual Studio context, add well known directories for resolution
+            var installContext = new InstallationContext(new FileHelper());
+            if (installContext.TryGetVisualStudioDirectory(out string vsInstallPath))
+            {
+                resolutionPaths.AddRange(installContext.GetVisualStudioCommonLocations(vsInstallPath));
             }
 
             return resolutionPaths;

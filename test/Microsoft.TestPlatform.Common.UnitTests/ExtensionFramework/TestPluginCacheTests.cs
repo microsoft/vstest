@@ -103,7 +103,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var updatedExtensions = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
             Assert.IsNotNull(updatedExtensions);
-            Assert.AreEqual(1, updatedExtensions.Count());
+            Assert.AreEqual(1, updatedExtensions.Count);
         }
 
         [TestMethod]
