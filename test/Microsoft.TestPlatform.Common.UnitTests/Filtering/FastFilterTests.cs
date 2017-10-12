@@ -204,7 +204,20 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         [TestMethod]
         public void FastFilterWithSingleNotEqualsClause()
         {
-            var filterExpressionWrapper = new FilterExpressionWrapper("FullyQualifiedName!=Test1");
+            var filterString = "FullyQualifiedName!=Test1";
+            CheckFastFailureWithNotEqualClause(filterString);
+        }
+
+        [TestMethod]
+        public void FastFilterWithNotEqualsClauseAndDifferentCase()
+        {
+            var filterString = "FullyQualifiedName!=Test1&FullyQualifiedName!=test1";
+            CheckFastFailureWithNotEqualClause(filterString);
+        }
+
+        private void CheckFastFailureWithNotEqualClause(string filterString)
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper(filterString);
             var fastFilter = filterExpressionWrapper.fastFilter;
 
             var expectedFilterValues = new HashSet<string>() { "test1" };
