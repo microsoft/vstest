@@ -95,6 +95,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             var connTimeout = this.connectionTimeout;
 
+            var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
+            if(string.IsNullOrEmpty(userSpecifiedTimeout))
+            {
+                connTimeout = int.Parse(userSpecifiedTimeout) * 1000;
+            }
+            
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
