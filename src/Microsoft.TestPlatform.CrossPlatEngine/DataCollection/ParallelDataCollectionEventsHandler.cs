@@ -82,6 +82,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     this.runDataAggregator.RunContextAttachments,
                     this.runDataAggregator.ElapsedTime);
 
+                // Add Metrics from Data Collector
+                completedArgs.Metrics = this.runDataAggregator.GetAggregatedRunDataMetrics();
+
                 HandleParallelTestRunComplete(completedArgs);
             }
         }
