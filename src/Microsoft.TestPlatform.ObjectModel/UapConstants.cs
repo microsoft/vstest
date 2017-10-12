@@ -11,11 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The UWP PackageName after it is deployed.
         /// </summary>
-        public const string UapPackageFullName = "PackageFullName";
+        public static readonly string UapPackageFullName = "PackageFullName";
 
         /// <summary>
         /// The UWP Package ID after it is deployed.
         /// </summary>
-        public const string UapAppUserModeId = "AppUserModeId";
+        public static readonly string UapAppUserModeId = "AppUserModeId";
     }
 }
