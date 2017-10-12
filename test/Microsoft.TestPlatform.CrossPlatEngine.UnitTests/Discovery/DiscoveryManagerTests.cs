@@ -53,7 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-            TestPluginCache.Instance = new TestableTestPluginCache(mockFileHelper.Object);
+            TestPluginCache.Instance = new TestableTestPluginCache();
 
             this.discoveryManager.Initialize(
                 new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
