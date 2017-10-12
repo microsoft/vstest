@@ -223,14 +223,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             lock (this.lockForExtensionsUpdate)
             {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "TestPluginCache: Updating loadOnlyWellKnownExtensions from {0} to {1}.",
-                        this.loadOnlyWellKnownExtensions,
-                        shouldLoadOnlyWellKnownExtensions);
-                }
-
                 var extensions = additionalExtensionsPath?.ToList();
                 if (extensions == null || extensions.Count == 0)
                 {
@@ -314,29 +306,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         }
 
         /// <summary>
-        ///  Checks if a directory exists
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
-        internal virtual bool DoesDirectoryExist(string path)
-        {
-            return this.fileHelper.DirectoryExists(path);
-        }
-
-        /// <summary>
-        /// Gets files in a directory.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="endsWithPattern"></param>
-        /// <returns></returns>
-        /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
-        internal virtual string[] GetFilesInDirectory(string path, string endsWithPattern)
-        {
-            return this.fileHelper.EnumerateFiles(path, SearchOption.TopDirectoryOnly, endsWithPattern).ToArray();
-        }
-
-        /// <summary>
         /// Get the files which match the regex pattern
         /// </summary>
         /// <param name="extensions">
@@ -368,7 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <returns>
         /// The <see cref="Dictionary"/>.
         /// </returns>
-        internal virtual Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
+        internal Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
         {
             // Check if extensions from this assembly have already been discovered.
             var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(this.TestExtensions.GetTestExtensionCache<TPluginInfo>(), extensionAssembly);
@@ -469,7 +438,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             var discoverer = new TestPluginDiscoverer();
 
-            return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths, this.loadOnlyWellKnownExtensions);
+            return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths);
         }
 
         private void SetupAssemblyResolver(string extensionAssembly)
