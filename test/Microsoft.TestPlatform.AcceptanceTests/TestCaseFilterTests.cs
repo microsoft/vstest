@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
-        public void RunSelectedTestsWithCategoryTrait(RunnerInfo runnerInfo)
+        public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetTestAdapterPath(),
                 string.Empty,
                 runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=CategoryA\"");
+            arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=Categorya\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
         }
