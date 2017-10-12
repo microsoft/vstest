@@ -111,7 +111,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsNotNull(testExtensions);
             Assert.IsTrue(testExtensions.Any());
 
-            Assert.AreEqual(1, discoveryCount);
+            Assert.AreEqual(2, discoveryCount);
         }
 
         [TestMethod]
