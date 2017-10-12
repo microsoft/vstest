@@ -396,7 +396,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         {
                             foreach (var kvp in this.requestData.MetricsCollection.Metrics)
                             {
-                                discoveryCompletePayload.Metrics.Add(kvp.Key, kvp.Value);
+                                discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
                             }
                         }
 

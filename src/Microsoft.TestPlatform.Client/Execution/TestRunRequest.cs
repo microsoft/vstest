@@ -536,14 +536,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         if (testRunCompletePayload.TestRunCompleteArgs?.Metrics == null)
                         {
-                            testRunCompletePayload.TestRunCompleteArgs.Metrics =
-                                this.requestData.MetricsCollection.Metrics;
+                            testRunCompletePayload.TestRunCompleteArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                         }
                         else
                         {
                             foreach (var kvp in this.requestData.MetricsCollection.Metrics)
                             {
-                                testRunCompletePayload.TestRunCompleteArgs.Metrics.Add(kvp.Key, kvp.Value);
+                                testRunCompletePayload.TestRunCompleteArgs.Metrics[kvp.Key] = kvp.Value;
                             }
                         }
 
