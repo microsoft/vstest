@@ -442,10 +442,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             contents = null;
             try
             {
-                using (FileStream file = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-                {
-                    contents = (new StreamReader(file)).ReadToEnd();
-                }
+                contents = File.ReadAllText(fileName);
             }
             catch (Exception e)
             {
