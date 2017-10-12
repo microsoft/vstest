@@ -82,14 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
                 // Collect Aggregated Metrics Data
                 var aggregatedRunDataMetrics = runDataAggregator.GetAggregatedRunDataMetrics();
-                if(aggregatedRunDataMetrics != null && aggregatedRunDataMetrics.Count != 0)
-                {
-                    foreach (var aggregatedRunDataMetric in aggregatedRunDataMetrics)
-                    {
-                        this.requestData.MetricsCollection.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
-                    }
-                }
 
+                completedArgs.Metrics = aggregatedRunDataMetrics;
                 HandleParallelTestRunComplete(completedArgs);
             }
         }

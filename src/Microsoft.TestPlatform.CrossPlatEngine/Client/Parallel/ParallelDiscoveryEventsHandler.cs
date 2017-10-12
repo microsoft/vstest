@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             this(requestData, proxyDiscoveryManager, actualDiscoveryEventsHandler, parallelProxyDiscoveryManager, discoveryDataAggregator, JsonDataSerializer.Instance)
         {
         }
-        
+
         internal ParallelDiscoveryEventsHandler(IRequestData requestData,
             IProxyDiscoveryManager proxyDiscoveryManager,
             ITestDiscoveryEventsHandler2 actualDiscoveryEventsHandler,
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 ConvertToRawMessageAndSend(MessageType.TestCasesFound, lastChunk);
                 this.HandleDiscoveredTests(lastChunk);
             }
-            
+
             // Aggregate for final discoverycomplete 
             discoveryDataAggregator.Aggregate(totalTests, isAborted);
 
@@ -100,19 +100,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
                 // Collect Aggregated Metrics Data
                 var aggregatedDiscoveryDataMetrics = discoveryDataAggregator.GetAggregatedDiscoveryDataMetrics();
-                if (aggregatedDiscoveryDataMetrics != null && aggregatedDiscoveryDataMetrics.Count != 0)
-                {
-                    foreach (var aggregatedRunDataMetric in aggregatedDiscoveryDataMetrics)
-                    {
-                        this.requestData.MetricsCollection.Add(aggregatedRunDataMetric.Key, aggregatedRunDataMetric.Value);
-                    }
-                }
+                testDiscoveryCompletePayload.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // we have to send raw messages as we block the discoverycomplete actual raw messages
                 this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
                 var finalDiscoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(this.discoveryDataAggregator.TotalTests,
                     this.discoveryDataAggregator.IsAborted);
+                finalDiscoveryCompleteEventArgs.Metrics = aggregatedDiscoveryDataMetrics;
 
                 // send actual test discoverycomplete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(finalDiscoveryCompleteEventArgs, null);
@@ -133,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.actualDiscoveryEventsHandler.HandleRawMessage(rawMessage);
             }
         }
-        
+
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
