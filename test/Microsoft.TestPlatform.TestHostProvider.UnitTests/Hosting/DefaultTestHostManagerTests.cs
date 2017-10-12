@@ -252,7 +252,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Verify
             List<string> expectedList = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
             CollectionAssert.AreEqual(expectedList, resultExtensions);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Warning, "Multiple versions of same extension found. Selecting the highest version.\n  ext1.TestAdapter : 2.2\n  ext2.TestAdapter : 5.5"), Times.Once);
+            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Warning, "Multiple versions of same extension found. Selecting the highest version.\r\n  ext1.TestAdapter : 2.2\n  ext2.TestAdapter : 5.5"), Times.Once);
         }
 
         [TestMethod]
@@ -277,7 +277,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             // Verify
             CollectionAssert.AreEqual(extensionsList2, resultExtensions);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Warning, "Multiple versions of same extension found. Selecting the highest version.\n  ext1.TestAdapter : 2.2"), Times.Once);
+            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Warning, "Multiple versions of same extension found. Selecting the highest version.\r\n  ext1.TestAdapter : 2.2"), Times.Once);
         }
 
         [TestMethod]

@@ -286,7 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 .Callback(callback)
                 .Returns(extensions);
 
-            var testableTestPluginCache = new TestableTestPluginCache(mockFileHelper.Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
 
             // Setup the testable instance.
             TestPluginCache.Instance = testableTestPluginCache;
@@ -322,9 +322,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     public class TestableTestPluginCache : TestPluginCache
     {
-        public TestableTestPluginCache(IFileHelper fileHelper) : base(fileHelper)
-        {
-        }
     }
 
     #endregion

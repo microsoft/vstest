@@ -20,10 +20,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public TestExtensionManagerTests()
         {
             this.testExtensionManager = new TestExtensionManager();
+
+            // Reset the singleton
+            TestPluginCache.Instance = null;
         }
 
         [TestCleanup]
-        public void CleanUp()
+        public void TestCleanup()
         {
             TestPluginCache.Instance = null;
         }
@@ -35,7 +38,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testExtensionManager.UseAdditionalExtensions(extensions, true);
 
-            CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToExtensions.ToList());
+            CollectionAssert.AreEquivalent(extensions, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
         }
 
         [TestMethod]
@@ -46,7 +49,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testExtensionManager.ClearExtensions();
 
-            Assert.AreEqual(0, TestPluginCache.Instance.PathToExtensions.Count());
+            Assert.AreEqual(0, TestPluginCache.Instance.GetExtensionPaths(string.Empty).Count);
         }
     }
 }

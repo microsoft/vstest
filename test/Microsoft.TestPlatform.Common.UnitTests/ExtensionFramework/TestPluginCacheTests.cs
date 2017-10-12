@@ -31,9 +31,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             // Reset the singleton.
             TestPluginCache.Instance = null;
             this.mockFileHelper = new Mock<IFileHelper>();
-            this.testablePluginCache = new TestableTestPluginCache(
-                this.mockFileHelper.Object,
-                new List<string>() { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
+            this.testablePluginCache = new TestableTestPluginCache(new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
 
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         }
@@ -52,28 +50,22 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsNull(TestPluginCache.Instance.TestExtensions);
         }
 
-        [TestMethod]
-        public void PathToAdditionalExtensionsShouldBeNullByDefault()
-        {
-            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
-        }
-
         #endregion
 
         #region UpdateAdditionalExtensions tests
 
         [TestMethod]
-        public void UpdateAdditionalExtensionsShouldNotThrowIfExtenionPathIsNull()
+        public void UpdateAdditionalExtensionsShouldNotThrowIfExtensionPathIsNull()
         {
             TestPluginCache.Instance.UpdateExtensions(null, true);
-            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
+            Assert.IsFalse(TestPluginCache.Instance.GetExtensionPaths(string.Empty).Any());
         }
 
         [TestMethod]
         public void UpdateAdditionalExtensionsShouldNotThrowIfExtensionPathIsEmpty()
         {
             TestPluginCache.Instance.UpdateExtensions(new List<string>(), true);
-            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
+            Assert.IsFalse(TestPluginCache.Instance.GetExtensionPaths(string.Empty).Any());
         }
 
         [TestMethod]
@@ -81,7 +73,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             var additionalExtensions = new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, false);
-            var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
+            var updatedExtensions = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
             Assert.IsNotNull(updatedExtensions);
             CollectionAssert.AreEqual(additionalExtensions, updatedExtensions.ToList());
@@ -96,7 +88,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                                                typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location
                                            };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, false);
-            var updatedExtensions = TestPluginCache.Instance.PathToExtensions.ToList();
+            var updatedExtensions = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
             Assert.IsNotNull(updatedExtensions);
             Assert.AreEqual(1, updatedExtensions.Count);
@@ -108,21 +100,22 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             var additionalExtensions = new List<string> { "foo.dll" };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, false);
-            var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
+            var updatedExtensions = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
             Assert.IsNotNull(updatedExtensions);
             Assert.AreEqual(1, updatedExtensions.Count());
         }
 
         [TestMethod]
-        public void UpdateAdditionalExtensionsShouldUpdateDefaultExtensionsWhenSkipFilteringIsTrue()
+        public void UpdateAdditionalExtensionsShouldUpdateUnfilteredExtensionsListWhenSkipFilteringIsTrue()
         {
             var additionalExtensions = new List<string> { "foo.dll" };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
-            var updatedExtensions = TestPluginCache.Instance.DefaultExtensionPaths;
+            var updatedExtensions = TestPluginCache.Instance.GetExtensionPaths("testadapter.dll");
 
+            // Since the extension is unfiltered, above filter criteria doesn't filter it
             Assert.IsNotNull(updatedExtensions);
-            Assert.AreEqual(1, updatedExtensions.Count());
+            Assert.AreEqual(1, updatedExtensions.Count);
         }
 
         [Ignore]
@@ -142,7 +135,53 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             TestPluginCache.Instance.ClearExtensions();
 
-            Assert.AreEqual(0, TestPluginCache.Instance.PathToExtensions.Count());
+            Assert.AreEqual(0, TestPluginCache.Instance.GetExtensionPaths(string.Empty).Count);
+        }
+
+        #endregion
+
+        #region GetExtensionPaths
+
+        [TestMethod]
+        public void GetExtensionPathsShouldConsolidateAllExtensions()
+        {
+            var expectedExtensions = new[] { "filter.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
+            expectedExtensions.Add("default.dll");
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] {"default.dll"};
+
+            var extensions = TestPluginCache.Instance.GetExtensionPaths("filter.dll");
+
+            CollectionAssert.AreEquivalent(expectedExtensions, extensions);
+        }
+
+        [TestMethod]
+        public void GetExtensionPathsShouldFilterFilterableExtensions()
+        {
+            var expectedExtensions = new[] { "filter.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
+            expectedExtensions.Add("default.dll");
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] {"default.dll"};
+
+            var extensions = TestPluginCache.Instance.GetExtensionPaths("filter.dll");
+
+            CollectionAssert.AreEquivalent(expectedExtensions, extensions);
+        }
+
+        [TestMethod]
+        public void GetExtensionPathsShouldNotFilterIfEndsWithPatternIsNullOrEmpty()
+        {
+            var expectedExtensions = new[] { "filter.dll", "other.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
+            expectedExtensions.Add("default.dll");
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] {"default.dll"};
+
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
+
+            CollectionAssert.AreEquivalent(expectedExtensions, extensions);
         }
 
         #endregion
@@ -171,7 +210,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             // Setup mocks.
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-            var testableTestPluginCache = new TestableTestPluginCache(mockFileHelper.Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
 
             TestPluginCache.Instance = testableTestPluginCache;
 
@@ -324,7 +363,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public static TestableTestPluginCache SetupMockAdditionalPathExtensions(string[] extensions)
         {
             var mockFileHelper = new Mock<IFileHelper>();
-            var testPluginCache = new TestableTestPluginCache(mockFileHelper.Object);
+            var testPluginCache = new TestableTestPluginCache();
 
             TestPluginCache.Instance = testPluginCache;
 
@@ -356,7 +395,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
 
-            var testableTestPluginCache = new TestableTestPluginCache(mockFileHelper.Object, extensions.ToList());
+            var testableTestPluginCache = new TestableTestPluginCache(extensions.ToList());
             testableTestPluginCache.Action = callback;
 
             // Setup the testable instance.
@@ -377,7 +416,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     public class TestableTestPluginCache : TestPluginCache
     {
         public Action Action;
-        public TestableTestPluginCache(IFileHelper fileHelper, List<string> extensionsPath) : base(fileHelper)
+        public TestableTestPluginCache(List<string> extensionsPath)
         {
             TestDiscoveryExtensionManager.Destroy();
             TestExecutorExtensionManager.Destroy();
@@ -385,17 +424,17 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             this.UpdateExtensions(extensionsPath, skipExtensionFilters: false);
         }
 
-        public TestableTestPluginCache(IFileHelper fileHelper) : this(fileHelper, new List<string>())
+        public TestableTestPluginCache() : this(new List<string>())
         {
         }
 
-        internal override List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        protected override List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
         {
             this.Action?.Invoke();
             return extensions;
         }
     }
 
-    #endregion 
+    #endregion
 }
 

@@ -223,10 +223,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             try
             {
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-                var expectedResult = new List<string>();
-                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
-                expectedResult.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 

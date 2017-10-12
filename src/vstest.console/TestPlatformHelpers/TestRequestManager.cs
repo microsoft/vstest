@@ -124,6 +124,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <inheritdoc />
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
+            // It is possible for an Editor/IDE to keep running the runner in design mode for long duration.
+            // We clear the extensions cache to ensure the extensions don't get reused across discovery/run
+            // requests.
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
             this.testPlatform.ClearExtensions();
             this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
