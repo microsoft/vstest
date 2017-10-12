@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <inheritdoc />
         public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
-            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters: false);
+            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
         }
     }
 }

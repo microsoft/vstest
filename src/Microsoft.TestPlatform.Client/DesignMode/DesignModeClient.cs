@@ -149,8 +149,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.ExtensionsInitialize:
                             {
+                                // Do not filter the Editor/IDE provided extensions by name
                                 var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
-                                testRequestManager.InitializeExtensions(extensionPaths, skipFiltering: false);
+                                testRequestManager.InitializeExtensions(extensionPaths, skipExtensionFilters: true);
                                 break;
                             }
 
