@@ -93,7 +93,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testPlatformEventSource = testPlatformEventSource;
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
-            this.telemetryOptedIn = IsTelemetryOptedIn();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -151,8 +150,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
             bool success = false;
-
             var runsettings = discoveryPayload.RunSettings;
+
+            if (discoveryPayload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.CollectMetrics;
+            }
 
             var requestData = this.GetRequestData(protocolConfig);
             if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
@@ -163,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            if (this.telemetryOptedIn)
+            if (requestData.IsTelemetryOptedIn)
             {
                 // Collect Metrics
                 this.CollectMetrics(requestData, runConfiguration);
@@ -238,6 +241,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
+
+            if (testRunRequestPayload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.CollectMetrics;
+            }
+
             var requestData = this.GetRequestData(protocolConfig);
 
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
@@ -265,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     throwException = true;
                 }
 
-                if(throwException)
+                if (throwException)
                 {
                     throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
                 }
@@ -274,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            if (this.telemetryOptedIn)
+            if (requestData.IsTelemetryOptedIn)
             {
                 // Collect Metrics
                 this.CollectMetrics(requestData, runConfiguration);
@@ -396,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
-                    if(updateFramework)
+                    if (updateFramework)
                     {
                         InferRunSettingsHelper.UpdateTargetFramework(navigator, inferedFramework?.ToString(), overwrite: true);
                         chosenFramework = inferedFramework;
@@ -414,7 +423,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
 
-                    if(!string.IsNullOrEmpty(incompatiableSettingWarning))
+                    if (!string.IsNullOrEmpty(incompatiableSettingWarning))
                     {
                         EqtTrace.Info(incompatiableSettingWarning);
                         LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
@@ -522,7 +531,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 bool isValidFx =
                     InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
                 required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
-                if(!required)
+                if (!required)
                 {
                     chosenFramework = Framework.FromString(frameworkFromrunsettingsXml);
                 }
@@ -544,7 +553,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
                 required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
-                if(!required)
+                if (!required)
                 {
                     chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml, true);
                 }
@@ -688,10 +697,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 ProtocolConfig = protocolConfig,
                 MetricsCollection =
-                               this.telemetryOptedIn
+                               this.telemetryOptedIn || IsTelemetryOptedIn()
                                    ? (IMetricsCollection)new MetricsCollection()
                                    : new NoOpMetricsCollection(),
-                IsTelemetryOptedIn = this.telemetryOptedIn
+                IsTelemetryOptedIn = this.telemetryOptedIn || IsTelemetryOptedIn()
             };
         }
 

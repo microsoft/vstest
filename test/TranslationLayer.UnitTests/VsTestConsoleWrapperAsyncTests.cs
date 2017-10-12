@@ -131,9 +131,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public async Task DiscoverTestsAsyncShouldSucceed()
         {
-            await this.consoleWrapper.DiscoverTestsAsync(this.testSources, null, new Mock<ITestDiscoveryEventsHandler>().Object);
+            await this.consoleWrapper.DiscoverTestsAsync(this.testSources, null, new TestPlatformOptions(), new Mock<ITestDiscoveryEventsHandler2>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(this.testSources, null, It.IsAny<ITestDiscoveryEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(this.testSources, null, It.IsAny<TestPlatformOptions>(), It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DiscoverTestsAsyncShouldPassTestDiscoveryHandler2IfTestDiscoveryHandler1IsInput()
+        {
+            await this.consoleWrapper.DiscoverTestsAsync(this.testSources, null, new TestPlatformOptions(), new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(this.testSources, null, It.IsAny<TestPlatformOptions>(), It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DiscoverTestsAndNullOptionsAsyncShouldSucceedOnNullOptions()
+        {
+            await this.consoleWrapper.DiscoverTestsAsync(this.testSources, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(this.testSources, null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task DiscoverTestsAndOptionsAsyncShouldSucceedOnOptions()
+        {
+            var options = new TestPlatformOptions();
+            await this.consoleWrapper.DiscoverTestsAsync(this.testSources, null, options, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(this.testSources, null, options, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Once);
         }
 
         [TestMethod]
@@ -141,8 +166,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(-1));
 
-            Assert.ThrowsExceptionAsync<TransationLayerException>(async () => await this.consoleWrapper.DiscoverTestsAsync(new List<string> { "Hello", "World" }, null, new Mock<ITestDiscoveryEventsHandler>().Object));
-            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), It.IsAny<ITestDiscoveryEventsHandler>()), Times.Never);
+            Assert.ThrowsExceptionAsync<TransationLayerException>(async () => await this.consoleWrapper.DiscoverTestsAsync(new List<string> { "Hello", "World" }, null, new TestPlatformOptions(), new Mock<ITestDiscoveryEventsHandler2>().Object));
+            this.mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), It.IsAny<TestPlatformOptions>(), It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
         }
 
         [TestMethod]
@@ -151,6 +176,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             await this.consoleWrapper.RunTestsAsync(this.testSources, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
             this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testSources, "RunSettings", null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        }
+
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSourcesAndNullOptionsShouldSucceedOnNullOptions()
+        {
+            await this.consoleWrapper.RunTestsAsync(this.testSources, "RunSettings", null, new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testSources, "RunSettings", null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        }
+
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSourcesAndOptionsShouldSucceedOnOptions()
+        {
+            var options = new TestPlatformOptions();
+            await this.consoleWrapper.RunTestsAsync(this.testSources, "RunSettings", options, new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testSources, "RunSettings", options, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -166,11 +210,57 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
+        public async Task RunTestsAsyncWithSourcesAndOptionsUsingCustomHostShouldSucceedOnNullOptions()
+        {
+            await this.consoleWrapper.RunTestsWithCustomTestHostAsync(
+                this.testSources,
+                "RunSettings",
+                null,
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHostAsync(this.testSources, "RunSettings", null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSourcesOnOptionsUsingCustomHostShouldSucceedOnOptions()
+        {
+            var options = new TestPlatformOptions();
+
+            await this.consoleWrapper.RunTestsWithCustomTestHostAsync(
+                this.testSources,
+                "RunSettings",
+                options,
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHostAsync(this.testSources, "RunSettings", options, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
         public async Task RunTestsAsyncWithSelectedTestsShouldSucceed()
         {
             await this.consoleWrapper.RunTestsAsync(this.testCases, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testCases, "RunSettings", It.IsAny<ITestRunEventsHandler>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSelectedTestsAndOptionsShouldSucceedOnNullOptions()
+        {
+            await this.consoleWrapper.RunTestsAsync(this.testCases, "RunSettings", null, new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testCases, "RunSettings", null, It.IsAny<ITestRunEventsHandler>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSelectedTestsAndOptionsShouldSucceedOnOptions()
+        {
+            var options = new TestPlatformOptions();
+
+            await this.consoleWrapper.RunTestsAsync(this.testCases, "RunSettings", options, new Mock<ITestRunEventsHandler>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunAsync(this.testCases, "RunSettings", options, It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -182,7 +272,34 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 new Mock<ITestRunEventsHandler>().Object,
                 new Mock<ITestHostLauncher>().Object);
 
-            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHostAsync(this.testCases, "RunSettings", It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHostAsync(this.testCases, "RunSettings", It.IsAny<TestPlatformOptions>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSelectedTestsAndOptionsUsingCustomLauncherShouldSucceedOnNullOptions()
+        {
+            await this.consoleWrapper.RunTestsWithCustomTestHostAsync(
+                this.testCases,
+                "RunSettings",
+                null,
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHostAsync(this.testCases, "RunSettings", null, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task RunTestsAsyncWithSelectedTestsAndOptionsUsingCustomLauncherShouldSucceedOnOptions()
+        {
+            var options = new TestPlatformOptions();
+            await this.consoleWrapper.RunTestsWithCustomTestHostAsync(
+                this.testCases,
+                "RunSettings",
+                options,
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
+
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHostAsync(this.testCases, "RunSettings", options, It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
         }
 
         [TestMethod]
