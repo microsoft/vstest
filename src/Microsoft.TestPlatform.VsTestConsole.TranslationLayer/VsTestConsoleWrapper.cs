@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -129,7 +128,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.testPlatformEventSource.TranslationLayerDiscoveryStart();
             this.EnsureInitialized();
-            this.requestSender.DiscoverTests(sources, discoverySettings, discoveryEventsHandler);
+
+            // Converts ITestDiscoveryEventsHandler to ITestDiscoveryEventsHandler2
+            var discoveryCompleteEventsHandler2 = new DiscoveryEventsHandleConverter(discoveryEventsHandler);
+            this.requestSender.DiscoverTests(sources, discoverySettings, options: null, discoveryEventsHandler: discoveryCompleteEventsHandler2);
+        }
+
+        /// <inheritdoc/>
+        public void DiscoverTests(IEnumerable<string> sources, string discoverySettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 discoveryEventsHandler)
+        {
+            this.testPlatformEventSource.TranslationLayerDiscoveryStart();
+            this.EnsureInitialized();
+            this.requestSender.DiscoverTests(sources, discoverySettings, options, discoveryEventsHandler);
         }
 
         /// <inheritdoc/>
@@ -162,7 +172,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStart(0, 0, testCaseList.Count, runSettings ?? string.Empty);
 
             this.EnsureInitialized();
-            this.requestSender.StartTestRun(testCaseList, runSettings, testRunEventsHandler);
+            this.requestSender.StartTestRun(testCaseList, runSettings, options: null, runEventsHandler: testRunEventsHandler);
+        }
+
+        /// <inheritdoc/>
+        public void RunTests(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler)
+        {
+            var testCaseList = testCases.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(0, 0, testCaseList.Count, runSettings ?? string.Empty);
+
+            this.EnsureInitialized();
+            this.requestSender.StartTestRun(testCaseList, runSettings, options, testRunEventsHandler);
         }
 
         /// <inheritdoc/>
@@ -188,7 +208,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerExecutionStart(1, 0, testCaseList.Count, runSettings ?? string.Empty);
 
             this.EnsureInitialized();
-            this.requestSender.StartTestRunWithCustomHost(testCaseList, runSettings, testRunEventsHandler, customTestHostLauncher);
+            this.requestSender.StartTestRunWithCustomHost(testCaseList, runSettings, options: null, runEventsHandler: testRunEventsHandler, customTestHostLauncher: customTestHostLauncher);
+        }
+
+        /// <inheritdoc/>
+        public void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher)
+        {
+            var testCaseList = testCases.ToList();
+            this.testPlatformEventSource.TranslationLayerExecutionStart(1, 0, testCaseList.Count, runSettings ?? string.Empty);
+
+            this.EnsureInitialized();
+            this.requestSender.StartTestRunWithCustomHost(testCaseList, runSettings, options, testRunEventsHandler, customTestHostLauncher);
         }
 
         /// <inheritdoc/>
