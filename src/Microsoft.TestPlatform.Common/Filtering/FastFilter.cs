@@ -169,8 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     if (condition.Operation == fastFilterOperation && condition.Name.Equals(filterPropertyName, StringComparison.OrdinalIgnoreCase))
                     {
-                        var value = condition.Value?.ToLowerInvariant();
-                        filterHashSetBuilder.Add(value);
+                        filterHashSetBuilder.Add(condition.Value?.ToLowerInvariant());
                     }
                     else
                     {
@@ -182,8 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     conditionEncountered = true;
                     fastFilterOperation = condition.Operation;
                     filterPropertyName = condition.Name;
-                    var value = condition.Value?.ToLowerInvariant();
-                    filterHashSetBuilder.Add(value);
+                    filterHashSetBuilder.Add(condition.Value?.ToLowerInvariant());
 
                     // Don't support `Contains`.
                     if (fastFilterOperation != Operation.Equal && fastFilterOperation != Operation.NotEqual)
