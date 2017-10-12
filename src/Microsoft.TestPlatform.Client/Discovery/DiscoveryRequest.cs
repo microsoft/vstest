@@ -9,6 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -20,6 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     /// </summary>
     public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHandler2
     {
+        private IDataSerializer dataSerializer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
         /// </summary>
@@ -27,16 +32,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
         internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
+            : this(requestData, criteria, discoveryManager, JsonDataSerializer.Instance)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
+        /// </summary>
+        /// <param name="requestData">The Request Data instance providing services and data for discovery</param>
+        /// <param name="criteria">Discovery criterion.</param>
+        /// <param name="discoveryManager">Discovery manager instance.</param>
+        /// <param name="dataSerializer">Data Serializer</param>
+        internal DiscoveryRequest(
+            IRequestData requestData,
+            DiscoveryCriteria criteria,
+            IProxyDiscoveryManager discoveryManager,
+            IDataSerializer dataSerializer)
         {
             this.requestData = requestData;
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
+            this.dataSerializer = dataSerializer;
         }
 
         /// <summary>
         /// Start the discovery request
         /// </summary>
-        void IDiscoveryRequest.DiscoverAsync()
+        public void DiscoverAsync()
         {
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -82,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Aborts the test discovery.
         /// </summary>
-        void IDiscoveryRequest.Abort()
+        public void Abort()
         {
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -355,6 +377,53 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="rawMessage">Raw message.</param>
         public void HandleRawMessage(string rawMessage)
         {
+            if (this.requestData.IsTelemetryOptedIn)
+            {
+                var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+                if (string.Equals(message.MessageType, MessageType.DiscoveryComplete))
+                {
+                    var discoveryCompletePayload =
+                        this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+
+                    if (discoveryCompletePayload != null)
+                    {
+                        if (discoveryCompletePayload.Metrics == null)
+                        {
+                            discoveryCompletePayload.Metrics = this.requestData.MetricsCollection.Metrics;
+                        }
+                        else
+                        {
+                            foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                            {
+                                discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
+                            }
+                        }
+
+                        var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - this.discoveryStartTime;
+
+                        // Collecting Total Time Taken
+                        discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
+                    }
+
+                    if (message is VersionedMessage)
+                    {
+                        var version = ((VersionedMessage)message).Version;
+
+                        rawMessage = this.dataSerializer.SerializePayload(
+                            MessageType.DiscoveryComplete,
+                            discoveryCompletePayload,
+                            version);
+                    }
+                    else
+                    {
+                        rawMessage = this.dataSerializer.SerializePayload(
+                            MessageType.DiscoveryComplete,
+                            discoveryCompletePayload);
+                    }
+                }
+            }
+
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
         }
 
@@ -409,6 +478,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         #region privates fields
 
         /// <summary>
+        /// Request Data
+        /// </summary>
+        internal IRequestData requestData;
+
+        /// <summary>
         /// If this request has been disposed.
         /// </summary>
         private bool disposed = false;
@@ -432,11 +506,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// Discovery Start Time
         /// </summary>
         private DateTime discoveryStartTime;
-
-        /// <summary>
-        /// Request Data
-        /// </summary>
-        private IRequestData requestData;
 
         #endregion
     }
