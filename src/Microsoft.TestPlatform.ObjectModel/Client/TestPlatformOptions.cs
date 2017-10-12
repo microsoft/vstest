@@ -30,9 +30,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public FilterOptions FilterOptions { get; set; }
 
         /// <summary>
-        /// Gets or sets the Telemetry Opted in status
+        ///  Gets or sets whether Metrics should be collected or not.
         /// </summary>
         [DataMember]
-        public bool TelemetryOptedIn { get; set; }
+        public bool CollectMetrics { get; set; }
     }
 }

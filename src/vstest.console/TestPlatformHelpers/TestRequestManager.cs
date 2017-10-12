@@ -157,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (discoveryPayload.TestPlatformOptions != null)
             {
-                this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.TelemetryOptedIn;
+                this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.CollectMetrics;
             }
 
             var requestData = this.GetRequestData(protocolConfig);
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             if (testRunRequestPayload.TestPlatformOptions != null)
             {
-                this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.TelemetryOptedIn;
+                this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.CollectMetrics;
             }
 
             var requestData = this.GetRequestData(protocolConfig);
