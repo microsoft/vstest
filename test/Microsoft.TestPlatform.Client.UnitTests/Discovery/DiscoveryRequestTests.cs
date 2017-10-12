@@ -10,6 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     using Client.Discovery;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -21,10 +24,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     [TestClass]
     public class DiscoveryRequestTests
     {
-        IDiscoveryRequest discoveryRequest;
+        DiscoveryRequest discoveryRequest;
         Mock<IProxyDiscoveryManager> discoveryManager;
         DiscoveryCriteria discoveryCriteria;
         private Mock<IRequestData> mockRequestData;
+        private Mock<IDataSerializer> mockDataSerializer;
 
         public DiscoveryRequestTests()
         {
@@ -32,7 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
-            this.discoveryRequest = new DiscoveryRequest(mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object);
+            this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.discoveryRequest = new DiscoveryRequest(this.mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object, this.mockDataSerializer.Object);
         }
 
         [TestMethod]
@@ -167,6 +172,43 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecForDiscovery, It.IsAny<double>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add("DummyMessage", "DummyValue"), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldHandleRawMessage()
+        {
+            bool onDiscoveryCompleteInvoked = false;
+            this.discoveryRequest.OnRawMessageReceived += (object sender, string e) =>
+                {
+                    onDiscoveryCompleteInvoked = true;
+                };
+
+            this.discoveryRequest.HandleRawMessage(string.Empty);
+
+            Assert.IsTrue(onDiscoveryCompleteInvoked);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldAddVSTestDataPointsIfTelemetryOptedIn()
+        {
+            bool onDiscoveryCompleteInvoked = true;
+            this.mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
+            this.discoveryRequest.OnRawMessageReceived += (object sender, string e) =>
+                {
+                    onDiscoveryCompleteInvoked = true;
+                };
+
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+                .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });
+
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
+                .Returns(new DiscoveryCompletePayload());
+
+            this.discoveryRequest.HandleRawMessage(string.Empty);
+
+            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<DiscoveryCompletePayload>()), Times.Once);
+            this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
+            Assert.IsTrue(onDiscoveryCompleteInvoked);
         }
     }
 }

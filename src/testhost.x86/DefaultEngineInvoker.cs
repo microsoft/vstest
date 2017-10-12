@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -29,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// The timeout for the client to connect to the server.
         /// Increasing Timeout to allow client to connect, not always the client can connect within 5 seconds
         /// </summary>
-        private const int ClientListenTimeOut = 30 * 1000;
+        private const int ClientListenTimeOut = Timeout.Infinite;
 
         private const string EndpointArgument = "--endpoint";
 
