@@ -20,8 +20,8 @@ namespace vstest.console.UnitTests.Processors
         private Mock<ITestRequestManager> testRequestManager;
         private Mock<IVSExtensionManager> extensionManager;
         private Mock<IOutput> output;
-        private UseVsixExtensionsArgumentExecutor executor;                  
-        
+        private UseVsixExtensionsArgumentExecutor executor;
+
         public UseVsixExtensionsArgumentProcessorTests()
         {
             this.testRequestManager = new Mock<ITestRequestManager>();
@@ -65,7 +65,7 @@ namespace vstest.console.UnitTests.Processors
         #endregion
 
         #region UseVsixExtensionsArgumentExecutor tests
-        
+
         [TestMethod]
         public void InitializeShouldThrowExceptionIfArgumentIsNull()
         {
@@ -92,7 +92,7 @@ namespace vstest.console.UnitTests.Processors
 
             this.output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
             this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Once);
-            this.testRequestManager.Verify(trm => trm.InitializeExtensions(extensions), Times.Once);
+            this.testRequestManager.Verify(trm => trm.InitializeExtensions(extensions, true), Times.Once);
         }
 
         [TestMethod]
@@ -102,7 +102,7 @@ namespace vstest.console.UnitTests.Processors
 
             this.output.Verify(o => o.WriteLine(DeprecationMessage, OutputLevel.Warning), Times.Once);
             this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Never);
-            this.testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
+            this.testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>(), true), Times.Never);
         }
 
         #endregion

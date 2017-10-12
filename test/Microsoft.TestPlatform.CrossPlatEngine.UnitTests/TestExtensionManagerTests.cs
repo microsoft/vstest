@@ -4,7 +4,6 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -20,10 +19,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public TestExtensionManagerTests()
         {
             this.testExtensionManager = new TestExtensionManager();
+
+            // Reset the singleton
+            TestPluginCache.Instance = null;
         }
 
         [TestCleanup]
-        public void CleanUp()
+        public void TestCleanup()
         {
             TestPluginCache.Instance = null;
         }
@@ -35,19 +37,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testExtensionManager.UseAdditionalExtensions(extensions, true);
 
-            Assert.IsTrue(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
-            CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToExtensions.ToList());
+            CollectionAssert.AreEquivalent(extensions, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
         }
 
         [TestMethod]
         public void ClearExtensionsShouldClearExtensionsInCache()
         {
             var extensions = new List<string> { @"Foo.dll" };
-            this.testExtensionManager.UseAdditionalExtensions(extensions, true);
+            this.testExtensionManager.UseAdditionalExtensions(extensions, false);
 
             this.testExtensionManager.ClearExtensions();
 
-            Assert.AreEqual(0, TestPluginCache.Instance.PathToExtensions.Count());
+            Assert.AreEqual(0, TestPluginCache.Instance.GetExtensionPaths(string.Empty).Count);
         }
     }
 }
