@@ -42,7 +42,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void ClearExtensionsShouldClearExtensionsInCache()
         {
             var extensions = new List<string> { @"Foo.dll" };
-            this.testExtensionManager.UseAdditionalExtensions(extensions, true);
+            this.testExtensionManager.UseAdditionalExtensions(extensions, false);
 
             this.testExtensionManager.ClearExtensions();
 
