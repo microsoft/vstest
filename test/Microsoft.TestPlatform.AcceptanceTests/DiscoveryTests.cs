@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DiscoveryTests : AcceptanceTestBase
     {
-        private string dummyFilePath = Path.Combine(Path.GetTempPath(), $"{System.Guid.NewGuid()}.txt");
+        private readonly string dummyFilePath = Path.Combine(Path.GetTempPath(), $"{System.Guid.NewGuid()}.txt");
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
@@ -19,8 +19,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
+
+            var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
             this.ValidateDiscoveredTests(listOfTests);
+            this.ExitCodeEquals(0);
         }
 
         [CustomDataTestMethod]
@@ -29,11 +31,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            var listOfTests = new string[] {
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+            var listOfTests = new[] {
                 "SampleUnitTestProject.UnitTest1.PassingTest",
                 "SampleUnitTestProject.UnitTest1.FailingTest",
                 "SampleUnitTestProject.UnitTest1.SkippingTest",
@@ -41,20 +40,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 "SampleUnitTestProject.UnitTest1.FailingTest2",
                 "SampleUnitTestProject.UnitTest1.SkippingTest2"
             };
+
+            this.InvokeVsTestForDiscovery(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+
             this.ValidateDiscoveredTests(listOfTests);
+            this.ExitCodeEquals(0);
         }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
         public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
         {
             try
             {
                 AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+                var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
+
                 this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty);
-                var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
+
                 this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
+                this.ExitCodeEquals(0);
             }
             finally
             {
