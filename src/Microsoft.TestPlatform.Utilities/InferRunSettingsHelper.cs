@@ -227,6 +227,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             AddNodeIfNotPresent<string>(runSettingsNavigator, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
         }
 
+        /// <summary>
+        /// Updates the <c>RunConfiguration.ResultsDirectory</c> value for a run settings. if the value is already set, behavior depends on overwrite.
+        /// </summary>
+        /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
+        /// <param name="resultsDirectory">Value to set</param>
+        /// <param name="overwrite">Overwrite option.</param>
+        public static void UpdateResultsDirectory(XPathNavigator runSettingsNavigator, string resultsDirectory, bool overwrite = false)
+        {
+            AddNodeIfNotPresent<string>(runSettingsNavigator, ResultsDirectoryNodePath, ResultsDirectoryNodeName, resultsDirectory, overwrite);
+        }
+
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
         {
             ValidateArg.NotNull(runSettingsNavigator, "runSettingsNavigator");
