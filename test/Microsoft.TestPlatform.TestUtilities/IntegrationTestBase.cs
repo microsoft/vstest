@@ -27,6 +27,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
+        private int runnerExitCode = -1;
 
         private string arguments = string.Empty;
 
@@ -87,7 +88,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
-            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError);
+            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
             this.FormatStandardOutCome();
         }
 
@@ -122,7 +123,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'" 
+        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'"
         /// is appended to the arguments.
         /// </summary>
         /// <param name="testAssembly">A test assembly.</param>
@@ -201,6 +202,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void StdOutputDoesNotContains(string substring)
         {
             Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
+        }
+
+        public void ExitCodeEquals(int exitCode)
+        {
+            Assert.AreEqual(exitCode, this.runnerExitCode, $"ExitCode - [{this.runnerExitCode}] doesn't match expected '{exitCode}'.");
         }
 
         /// <summary>
@@ -290,7 +296,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var fileOutput = File.ReadAllLines(filePath);
             Assert.IsTrue(fileOutput.Length == 3);
-            
+
             foreach (var test in discoveredTestsList)
             {
                 var flag = fileOutput.Contains(test)
@@ -390,7 +396,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private void Execute(string args, out string stdOut, out string stdError)
+        private void Execute(string args, out string stdOut, out string stdError, out int exitCode)
         {
             if (this.IsNetCoreRunner())
             {
@@ -439,7 +445,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
-                Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
+                exitCode = vstestconsole.ExitCode;
+                Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", exitCode);
             }
         }
 
