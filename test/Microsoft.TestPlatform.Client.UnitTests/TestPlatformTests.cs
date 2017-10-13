@@ -96,6 +96,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
+        public void CreateTestRunRequestShouldThrowExceptionIfNoTestHostproviderFound()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>.NETPortable,Version=v4.5</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, null);
+            bool exceptionThrown = false;
+
+            try
+            {
+                tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            }
+            catch(TestPlatformException ex)
+            {
+                exceptionThrown = true;
+                Assert.AreEqual("No suitable testHostProvider found for framework '.NETPortable,Version=v4.5'", ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "TestPlatformException should get thrown");
+        }
+
+        [TestMethod]
         public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunAll()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
@@ -229,6 +257,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestPlatform();
 
             Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(this.mockRequestData.Object, null));
+        }
+
+
+        [TestMethod]
+        public void CreateDiscoveryRequestShouldThrowExceptionIfNoTestHostproviderFound()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>.NETPortable,Version=v4.5</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { @"x:dummy\foo.dll" }, 1, settingsXml);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, null);
+            bool exceptionThrown = false;
+
+            try
+            {
+                tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+            }
+            catch (TestPlatformException ex)
+            {
+                exceptionThrown = true;
+                Assert.AreEqual("No suitable testHostProvider found for framework '.NETPortable,Version=v4.5'", ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "TestPlatformException should get thrown");
         }
 
         /// <summary>

@@ -102,6 +102,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+            if (testHostManager == null)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
+                var framework = config.TargetFrameworkVersion;
+
+                EqtTrace.Error("TestPlatform.CreateDiscoveryRequest: No suitable testHostProvider found for framework '{0}'", framework);
+                throw new TestPlatformException(String.Format("No suitable testHostProvider found for framework '{0}'", framework));
+            }
+
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
@@ -138,6 +147,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+            if(testHostManager == null)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
+                var framework = config.TargetFrameworkVersion;
+
+                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for framework '{0}'", framework);
+                throw new TestPlatformException(String.Format("No suitable testHostProvider found for framework '{0}'", framework));
+            }
+
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
             if (testRunCriteria.TestHostLauncher != null)
