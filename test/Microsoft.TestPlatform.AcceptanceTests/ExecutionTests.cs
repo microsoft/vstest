@@ -219,11 +219,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProject2.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest2");
 
             this.InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ExitCodeEquals(1); // there are failing tests
+            this.ValidateSummaryStatus(1, 0, 0);
+            this.ExitCodeEquals(0);
 
             // When both x64 & x86 DLL is passed x64 dll will be ignored.
             this.StdOutputContains(expectedWarningContains);
