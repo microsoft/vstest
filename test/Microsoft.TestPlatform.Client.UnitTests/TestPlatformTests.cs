@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var additionalExtensions = new List<string> { "e1.dll", "e2.dll" };
 
-            tp.UpdateExtensions(additionalExtensions, loadOnlyWellKnownExtensions: true);
+            tp.UpdateExtensions(additionalExtensions, skipExtensionFilters: true);
 
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
         }
@@ -150,11 +150,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
         [TestMethod]
-        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunSelected()
+        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesignModeIsFalseForRunSelected()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
         [TestMethod]
@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
             this.hostManager.Verify(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         /// Logger extensions should be updated when design mode is false.
         /// </summary>
         [TestMethod]
-        public void CreateDiscoveryRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalse()
+        public void CreateDiscoveryRequestShouldUpdateLoggerExtensionWhenDesignModeIsFalse()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -320,7 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
 
             // Verify
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
         private class TestableTestPlatform : TestPlatform

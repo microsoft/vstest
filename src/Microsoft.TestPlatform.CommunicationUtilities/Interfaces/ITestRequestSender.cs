@@ -41,15 +41,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Initializes the Discovery
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
-        /// <param name="loadOnlyWellKnownExtensions">Load only well only extensions</param>
-        void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
+        void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions);
 
         /// <summary>
         /// Initializes the Execution
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
-        /// <param name="loadOnlyWellKnownExtensions">Load only well only extensions</param>
-        void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
+        void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions);
 
         /// <summary>
         /// Discovers the tests
