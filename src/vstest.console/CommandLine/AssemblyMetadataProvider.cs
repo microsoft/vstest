@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("GetArchitecture: determined atchitecture:{0} info for assembly: {1}", archType,
+                EqtTrace.Info("GetArchitecture: determined architecture:{0} info for assembly: {1}", archType,
                     assemblyPath);
             }
 
