@@ -16,10 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         internal static void RaiseTestRunError(TestLoggerManager loggerManager, TestRunResultAggregator testRunResultAggregator, Exception exception)
         {
             // testRunResultAggregator can be null, if error is being raised in discovery context.
-            if (null != testRunResultAggregator)
-            {
-                testRunResultAggregator.MarkTestRunFailed();
-            }
+            testRunResultAggregator?.MarkTestRunFailed();
 
             TestRunMessageEventArgs errorMessage = new TestRunMessageEventArgs(TestMessageLevel.Error, exception.Message);
             loggerManager.SendTestRunMessage(errorMessage);
@@ -34,12 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
         internal static void RaiseTestRunWarning(TestLoggerManager loggerManager, TestRunResultAggregator testRunResultAggregator, string warningMessage)
         {
-            // testRunResultAggregator can be null, if error is being raised in discovery context.
-            if (null != testRunResultAggregator)
-            {
-                testRunResultAggregator.MarkTestRunFailed();
-            }
-
             TestRunMessageEventArgs testRunMessage = new TestRunMessageEventArgs(TestMessageLevel.Warning, warningMessage);
             loggerManager.SendTestRunMessage(testRunMessage);
         }
@@ -49,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         /// </summary>
         /// <param name="argument">Logger argument</param>
         /// <param name="loggerIdentifier">Receives logger Uri or friendly name.</param>
-        /// <param name="paramters">Receives parse name value pairs.</param>
+        /// <param name="parameters">Receives parse name value pairs.</param>
         /// <returns>True is successful, false otherwise.</returns>
         public static bool TryParseLoggerArgument(string argument, out string loggerIdentifier, out Dictionary<string, string> parameters)
         {

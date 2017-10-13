@@ -415,7 +415,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
-        public void FilterCompatiableSourcesShouldIdentifyIncomaptiableSourcesAndConstructWarningMessage()
+        public void FilterCompatibleSourcesShouldIdentifyIncomaptiableSourcesAndConstructWarningMessage()
         {
             #region Arrange
             sourceArchitectures["AnyCPU1net46.dll"] = Architecture.AnyCPU;
@@ -438,13 +438,13 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string warningMessage = string.Empty;
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet47, sourceArchitectures, sourceFrameworks, out warningMessage);
 
-            // None of the DLLs passed are compatiable to the chosen settings
+            // None of the DLLs passed are compatible to the chosen settings
             Assert.AreEqual(0, compatibleSources.Count());
             Assert.AreEqual(expected, warningMessage);
         }
 
         [TestMethod]
-        public void FilterCompatiableSourcesShouldIdentifyCompatiableSources()
+        public void FilterCompatibleSourcesShouldIdentifyCompatibleSources()
         {
             sourceArchitectures["x64net45.exe"] = Architecture.X64;
             sourceArchitectures["x86net45.dll"] = Architecture.X86;
@@ -461,13 +461,13 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string warningMessage = string.Empty;
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
-            // only "x86net45.dll" is the compatiable source
+            // only "x86net45.dll" is the compatible source
             Assert.AreEqual(1, compatibleSources.Count());
             Assert.AreEqual(expected, warningMessage);
         }
 
         [TestMethod]
-        public void FilterCompatiableSourcesShouldNotComposeWarningIfSettingsAreCorrect()
+        public void FilterCompatibleSourcesShouldNotComposeWarningIfSettingsAreCorrect()
         {
             sourceArchitectures["x86net45.dll"] = Architecture.X86;
             sourceFrameworks["x86net45.dll"] = frameworkNet45;
@@ -475,13 +475,13 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string warningMessage = string.Empty;
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Constants.DefaultPlatform, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
-            // only "x86net45.dll" is the compatiable source
+            // only "x86net45.dll" is the compatible source
             Assert.AreEqual(1, compatibleSources.Count());
             Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
         }
 
         [TestMethod]
-        public void FilterCompatiableSourcesShouldRetrunWarningMessageIfNoConflict()
+        public void FilterCompatibleSourcesShouldRetrunWarningMessageIfNoConflict()
         {
             sourceArchitectures["x64net45.exe"] = Architecture.X64;
             sourceFrameworks["x64net45.exe"] = frameworkNet45;
