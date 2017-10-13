@@ -121,15 +121,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #region ITestRequestManager
 
-        /// <summary>
-        /// Initializes the extensions while probing additional paths.
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions">Paths to Additional extensions</param>
-        public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
+        /// <inheritdoc />
+        public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
+            // It is possible for an Editor/IDE to keep running the runner in design mode for long duration.
+            // We clear the extensions cache to ensure the extensions don't get reused across discovery/run
+            // requests.
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
             this.testPlatform.ClearExtensions();
-            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, false);
+            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 

@@ -67,17 +67,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets information about each of the test extensions available.
         /// </summary>
         /// <param name="extensionPaths">
-        /// The path to the extensions.
-        /// </param>
-        /// <param name="loadOnlyWellKnownExtensions">
-        /// Should load only well known extensions or all.
+        ///     The path to the extensions.
         /// </param>
         /// <returns>
-        /// The <see cref="Dictionary"/>` of assembly qualified name and testplugin information.
+        /// A dictionary of assembly qualified name and testplugin information.
         /// </returns>
-        public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(
-            IEnumerable<string> extensionPaths,
-            bool loadOnlyWellKnownExtensions) where TPluginInfo : TestPluginInformation
+        public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
         {
             Debug.Assert(extensionPaths != null);
 
@@ -89,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 this.AddKnownExtensions(ref extensionPaths);
             }
 
-            this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);
+            this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
 
             return pluginInfos;
         }
@@ -125,9 +120,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="files">
         /// List of dll's to check for test extension availability
         /// </param>
-        /// <param name="loadOnlyWellKnownExtensions">
-        /// Should load only well known extensions or all.
-        /// </param>
         /// <param name="pluginInfos">
         /// Test plugins collection to add to.
         /// </param>
@@ -135,18 +127,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We would like to continue discovering all plugins even if some dll in Extensions folder is not able to be load properly")]
         private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
             string[] files,
-            bool loadOnlyWellKnownExtensions,
             Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
         {
             Debug.Assert(files != null, "null files");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-
-            // TODO: Do not see why loadOnlyWellKnowExtensions is still needed.
-            // AssemblyName executingAssemblyName = null;
-            // if (loadOnlyWellKnownExtensions)
-            // {
-            //    executingAssemblyName = new AssemblyName(typeof(TestPluginDiscoverer).GetTypeInfo().Assembly.FullName);
-            // }
 
             // Scan each of the files for data extensions.
             foreach (var file in files)
@@ -160,17 +144,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     {
                         this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
                     }
-
-                    // Check whether this assembly is known or not.
-                    // if (loadOnlyWellKnownExtensions && assembly != null)
-                    // {
-                    //    var extensionAssemblyName = new AssemblyName(assembly.FullName);
-                    //    if (!AssemblyUtilities.PublicKeyTokenMatches(extensionAssemblyName, executingAssemblyName))
-                    //    {
-                    //        EqtTrace.Warning("TestPluginDiscoverer: Ignoring extensions in assembly {0} as it is not a known assembly.", assembly.FullName);
-                    //        continue;
-                    //    }
-                    // }
                 }
                 catch (Exception e)
                 {

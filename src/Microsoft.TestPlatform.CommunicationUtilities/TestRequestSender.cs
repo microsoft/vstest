@@ -125,13 +125,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc/>
-        public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions)
         {
             this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: this.protocolVersion);
         }
 
         /// <inheritdoc/>
-        public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions)
         {
             this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: this.protocolVersion);
         }
