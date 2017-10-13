@@ -5,8 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-
     /// <summary>
     /// Orchestrates extensions for this engine.
     /// </summary>
@@ -15,7 +13,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Update the extensions data
         /// </summary>
-        void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
+        /// <param name="pathToAdditionalExtensions">List of extension paths</param>
+        /// <param name="skipExtensionFilters">Skips filtering of extensions (if true)</param>
+        void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters);
 
         /// <summary>
         /// Clear the extensions data

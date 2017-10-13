@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     /// <summary>
     /// Argument Executor for the "--ListFullyQualifiedTests|/ListFullyQualifiedTests" command line argument.
-    /// </summary>  
+    /// </summary>
     internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
     {
         #region Constants
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.testRequestManager = testRequestManager;
 
             this.runSettingsManager = runSettingsProvider;
-            this.testCasefilter = new TestCaseFilter();            
+            this.testCasefilter = new TestCaseFilter();
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(output, this.testCasefilter, discoveredTests, this.commandLineOptions);
         }
 
@@ -213,10 +213,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml; 
+            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             var success = this.testRequestManager.DiscoverTests(
-                new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
+                new DiscoveryRequestPayload { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
                 this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
             if (string.IsNullOrEmpty(this.commandLineOptions.ListTestsTargetPath))
@@ -224,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // This string does not need to go to Resources. Reason - only internal consumption
                 throw new CommandLineException("Target Path should be specified for listing FQDN tests!");
             }
-            
+
             File.WriteAllLines(this.commandLineOptions.ListTestsTargetPath, this.discoveredTests);
             return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
         }
@@ -262,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     throw new TestPlatformException("DiscoveredTestsEventArgs cannot be null.");
                 }
-                
+
                 // Initialising the test case filter here because the filter value is read late.
                 this.testCasefilter.Initialize(this.options.TestCaseFilterValue);
                 var discoveredTests = args.DiscoveredTestCases.ToList();
@@ -453,7 +453,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     return propertyValueArray;
                 }
                 return null;
-            }            
+            }
         }
-    }    
+    }
 }

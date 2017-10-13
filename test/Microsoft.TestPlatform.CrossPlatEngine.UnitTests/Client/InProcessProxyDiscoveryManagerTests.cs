@@ -59,29 +59,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
+        public void DiscoverTestsShouldUpdateTestPluginCacheWithExtensionsReturnByTestHost()
         {
             var manualResetEvent = new ManualResetEvent(false);
-
             this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
                 () => manualResetEvent.Set());
 
             this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\DiscoveryDummy.dll" });
-
-            List<string> expectedResult = new List<string>();
-            if (TestPluginCache.Instance.PathToExtensions != null)
-            {
-                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
-            }
-
+            var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
             expectedResult.Add("C:\\DiscoveryDummy.dll");
-
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
+
             this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, null);
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize");
-
-            Assert.IsFalse(expectedResult.Except(TestPluginCache.Instance.PathToExtensions).Any());
+            CollectionAssert.AreEquivalent(expectedResult, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
         }
 
         [TestMethod]
