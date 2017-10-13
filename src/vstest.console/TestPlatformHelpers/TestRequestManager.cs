@@ -422,19 +422,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
-                    string incompatiableSettingWarning = string.Empty;
+                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
 
-                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
-
-                    if (!string.IsNullOrEmpty(incompatiableSettingWarning))
+                    if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
-                        EqtTrace.Info(incompatiableSettingWarning);
-                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
+                        EqtTrace.Info(incompatibleSettingWarning);
+                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatibleSettingWarning);
                     }
 
                     if (EqtTrace.IsInfoEnabled)
                     {
-                        EqtTrace.Info("Compatiable sources list : ");
+                        EqtTrace.Info("Compatible sources list : ");
                         EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
                     }
 
