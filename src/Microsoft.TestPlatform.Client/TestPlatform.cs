@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -24,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
     /// <summary>
     /// Implementation for TestPlatform
@@ -107,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var framework = config.TargetFrameworkVersion;
 
                 EqtTrace.Error("TestPlatform.CreateDiscoveryRequest: No suitable testHostProvider found for framework '{0}'", framework);
-                throw new TestPlatformException(String.Format("No suitable testHostProvider found for framework '{0}'", framework));
+                throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
             }
 
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
@@ -151,8 +153,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
                 var framework = config.TargetFrameworkVersion;
 
-                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for framework '{0}'", framework);
-                throw new TestPlatformException(String.Format("No suitable testHostProvider found for framework '{0}'", framework));
+                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", testRunCriteria.TestRunSettings);
+                throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
             }
 
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);

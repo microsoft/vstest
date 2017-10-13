@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             catch(TestPlatformException ex)
             {
                 exceptionThrown = true;
-                Assert.AreEqual("No suitable testHostProvider found for framework '.NETPortable,Version=v4.5'", ex.Message);
+                Assert.AreEqual("No suitable test runtime provider found for this run.", ex.Message);
             }
 
             Assert.IsTrue(exceptionThrown, "TestPlatformException should get thrown");
@@ -282,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             catch (TestPlatformException ex)
             {
                 exceptionThrown = true;
-                Assert.AreEqual("No suitable testHostProvider found for framework '.NETPortable,Version=v4.5'", ex.Message);
+                Assert.AreEqual("No suitable test runtime provider found for this run.", ex.Message);
             }
 
             Assert.IsTrue(exceptionThrown, "TestPlatformException should get thrown");
