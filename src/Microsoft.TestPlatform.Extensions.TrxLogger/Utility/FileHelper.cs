@@ -57,6 +57,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             AdditionalInvalidFileNameChars.Add('(', null);
             AdditionalInvalidFileNameChars.Add(')', null);
             AdditionalInvalidFileNameChars.Add('^', null);
+
+            // Replace white space with underscore from folder/file name to make it command line friendly
+            // Related issues https://github.com/Microsoft/vstest/issues/244 & https://devdiv.visualstudio.com/DevDiv/_workitems?id=507982&_a=edit
+            AdditionalInvalidFileNameChars.Add(' ', null);
         }
 
         #endregion
