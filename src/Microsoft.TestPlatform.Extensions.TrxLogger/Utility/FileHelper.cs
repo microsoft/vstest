@@ -52,7 +52,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             // Needed becuase when kicking off qtsetup.bat cmd.exe is used.  '@' is a special character
             // for cmd so must be removed from the path to the bat file
-            AdditionalInvalidFileNameChars = new Dictionary<char, object>(4);
+            AdditionalInvalidFileNameChars = new Dictionary<char, object>(5);
             AdditionalInvalidFileNameChars.Add('@', null);
             AdditionalInvalidFileNameChars.Add('(', null);
             AdditionalInvalidFileNameChars.Add(')', null);
