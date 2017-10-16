@@ -486,8 +486,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </summary>
         private void SetDefaultTrxFilePath()
         {
-            // [RunDeploymentRootDirectory] Replace white space with underscore from trx file name to make it command line friendly
-            var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory.Replace(' ', '_') + ".trx";
+            var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
             this.trxFilePath = FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 

@@ -52,11 +52,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             // Needed becuase when kicking off qtsetup.bat cmd.exe is used.  '@' is a special character
             // for cmd so must be removed from the path to the bat file
-            AdditionalInvalidFileNameChars = new Dictionary<char, object>(4);
+            AdditionalInvalidFileNameChars = new Dictionary<char, object>(5);
             AdditionalInvalidFileNameChars.Add('@', null);
             AdditionalInvalidFileNameChars.Add('(', null);
             AdditionalInvalidFileNameChars.Add(')', null);
             AdditionalInvalidFileNameChars.Add('^', null);
+
+            // Replace white space with underscore from folder/file name to make it command line friendly
+            // Related issues https://github.com/Microsoft/vstest/issues/244 & https://devdiv.visualstudio.com/DevDiv/_workitems?id=507982&_a=edit
+            AdditionalInvalidFileNameChars.Add(' ', null);
         }
 
         #endregion
