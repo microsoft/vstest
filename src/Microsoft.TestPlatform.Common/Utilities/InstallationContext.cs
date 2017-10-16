@@ -50,6 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 Path.Combine(visualStudioDirectory, PrivateAssembliesDirName),
                 Path.Combine(visualStudioDirectory, PublicAssembliesDirName),
                 Path.Combine(visualStudioDirectory, "CommonExtensions", "Microsoft", "TestWindow"),
+                Path.Combine(visualStudioDirectory, "CommonExtensions", "Microsoft", "TeamFoundation", "Team Explorer"),
                 visualStudioDirectory
             };
         }
