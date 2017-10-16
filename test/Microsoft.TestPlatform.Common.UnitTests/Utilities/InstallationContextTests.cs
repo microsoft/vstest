@@ -57,6 +57,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Utilities
                 @"C:\temp\PrivateAssemblies",
                 @"C:\temp\PublicAssemblies",
                 @"C:\temp\CommonExtensions\Microsoft\TestWindow",
+                @"C:\temp\CommonExtensions\Microsoft\TeamFoundation\Team Explorer",
                 @"C:\temp"
             };
             var commonLocations = this.installationContext.GetVisualStudioCommonLocations(@"C:\temp");
