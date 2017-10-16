@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         try
                         {
-                            this.testCaseEventMonitorTask.Wait(this.cancellationTokenSource.Token);
+                            this.testCaseEventMonitorTask?.Wait(this.cancellationTokenSource.Token);
                             this.dataCollectionTestCaseEventHandler.Close();
                         }
                         catch (Exception ex)
