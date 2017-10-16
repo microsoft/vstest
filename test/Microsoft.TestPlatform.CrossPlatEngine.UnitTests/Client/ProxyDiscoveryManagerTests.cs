@@ -66,7 +66,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
 
             this.testDiscoveryManager = new ProxyDiscoveryManager(
-                                            this.mockRequestData.Object, 
+                                            this.mockRequestData.Object,
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
                                             this.mockDataSerializer.Object,
@@ -100,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -220,7 +220,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.InitializeDiscovery(extensions, true), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(extensions), Times.Once);
             }
             finally
             {
@@ -240,7 +240,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
-                this.mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }, true), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
             }
             finally
             {
@@ -257,10 +257,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             try
             {
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-                var expectedResult = new List<string>();
-                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
-                expectedResult.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
@@ -312,28 +309,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Assert.
             this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), this.testDiscoveryManager), Times.Once);
-        }
-
-        [TestMethod]
-        public void DiscoverTestsShouldCollectMetrics()
-        {
-            TestPluginCache.Instance = null;
-            try
-            {
-                var mockMetricsCollector = new Mock<IMetricsCollection>();
-                this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
-
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-                // Act.
-                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
-
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, It.IsAny<double>()), Times.Once);
-            }
-            finally
-            {
-                TestPluginCache.Instance = null;
-            }
         }
 
         [TestMethod]

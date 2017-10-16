@@ -93,7 +93,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -168,7 +168,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
         [TestMethod]
@@ -187,7 +187,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions, false), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Once);
             }
             finally
             {
@@ -206,7 +206,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }, false), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }), Times.Once);
             }
             finally
             {
@@ -223,10 +223,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             try
             {
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-                var expectedResult = new List<string>();
-                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
-                expectedResult.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
@@ -282,7 +279,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Once);
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>()), Times.Once);
         }
 
         [TestMethod]
@@ -371,23 +368,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(
                 runCriteria.Object.TestRunSettings,
                 testRunCriteriaPassed.RunSettings);
-        }
-
-        [TestMethod]
-        public void StartTestRunShouldCollectMetrics()
-        {
-            var mockMetricsCollector = new Mock<IMetricsCollection>();
-            this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
-
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-            var runCriteria = new Mock<TestRunCriteria>(
-                new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
-                10);
-
-            this.testExecutionManager.StartTestRun(runCriteria.Object, null);
-
-            mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]

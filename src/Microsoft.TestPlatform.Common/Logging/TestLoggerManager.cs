@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
     using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -160,7 +161,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Initializes all the loggers passed by user
         /// </summary>
-        public void InitializeLoggers()
+        /// <param name="requestData">Request Data for Providing Common Services/Data for Discovery and Execution</param>
+        public void InitializeLoggers(IRequestData requestData)
         {
             foreach (var logger in this.loggersInfoList)
             {
@@ -189,6 +191,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     }
                 }
             }
+
+            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join(",", this.initializedLoggers.ToArray()));
         }
 
         /// <summary>
@@ -424,7 +428,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <param name="e">
         /// The e.
         /// </param>
-        public void SendTestRunError(TestRunMessageEventArgs e)
+        public void SendTestRunMessage(TestRunMessageEventArgs e)
         {
             this.TestRunMessageHandler(null, e);
         }

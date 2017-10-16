@@ -3,16 +3,17 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Xml;
-    using System.Xml.XPath;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
+    using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+    using System.Xml;
+    using System.Xml.XPath;
     using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
     /// <summary>
@@ -36,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
         private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
+        private const string multiTargettingForwardLink = @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409";
 
         // To make things compatible for older runsettings
         private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
@@ -240,6 +242,42 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
+        /// Check if testsettings in configured using runsettings.
+        /// </summary>
+        /// <param name="runsettingsXml">xml string of runsetting</param>
+        /// <returns></returns>
+        public static bool IsTestSettingsEnabled(string runsettingsXml)
+        {
+            if (!string.IsNullOrWhiteSpace(runsettingsXml))
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    // Move navigator to MSTest node
+                    if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+                        !runSettingsNavigator.MoveToChild("MSTest", string.Empty))
+                    {
+                        EqtTrace.Info("InferRunSettingsHelper.IsTestSettingsEnabled: Unable to navigate to RunSettings/MSTest. Current node: " + runSettingsNavigator.LocalName);
+                        return false;
+                    }
+
+                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+                    if(node != null && !string.IsNullOrEmpty(node.InnerXml))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Adds node under RunConfiguration setting. Noop if node is already present.
         /// </summary>
         private static void AddNodeIfNotPresent<T>(XPathNavigator runSettingsNavigator, string nodePath, string nodeName, T nodeValue, bool overwrite = false)
@@ -409,6 +447,84 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 };
 
             return XmlUtilities.IsValidNodeXmlValue(frameworkXml, validator);
+        }
+
+        /// <summary>
+        /// Returns the sources matching the specified platform and framework settings.
+        /// For incompatible sources, warning is added to incompatibleSettingWarning.
+        /// </summary>
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+        {
+            incompatibleSettingWarning = string.Empty;
+            List<String> compatibleSources = new List<String>();
+            StringBuilder warnings = new StringBuilder();
+            warnings.AppendLine();
+            bool incompatiblityFound = false;
+            foreach (var source in sourcePlatforms.Keys)
+            {
+                Architecture actualPlatform = sourcePlatforms[source];
+                Framework actualFramework = sourceFrameworks[source];
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
+                if (isSettingIncompatible)
+                {
+                    string incompatiblityMessage;
+                    var onlyFileName = Path.GetFileName(source);
+                    // Add message for incompatible sources.
+                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
+
+                    warnings.AppendLine(incompatiblityMessage);
+                    incompatiblityFound = true;
+                }
+                else
+                {
+                    compatibleSources.Add(source);
+                }
+            }
+
+            if (incompatiblityFound)
+            {
+                incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
+            }
+
+            return compatibleSources;
+        }
+
+        /// <summary>
+        /// Returns true if source settings are incomaptible with target settings.
+        /// </summary>
+        private static bool IsSettingIncompatible(Architecture sourcePlatform,
+            Architecture targetPlatform,
+            Framework sourceFramework,
+            Framework targetFramework)
+        {
+            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
+        }
+
+
+        /// <summary>
+        /// Returns true if source Platform is incompatible with target platform.
+        /// </summary>
+        private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
+        {
+            if (sourcePlatform == Architecture.Default ||
+                sourcePlatform == Architecture.AnyCPU)
+            {
+                return false;
+            }
+
+            return sourcePlatform != targetPlatform;
+        }
+
+        /// <summary>
+        /// Returns true if source FrameworkVersion is incompatible with target FrameworkVersion.
+        /// </summary>
+        private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
+        {
+            if (sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

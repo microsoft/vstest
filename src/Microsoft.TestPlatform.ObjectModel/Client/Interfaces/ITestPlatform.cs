@@ -12,11 +12,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Update the extensions to be used by the test service
         /// </summary>
         /// <param name="pathToAdditionalExtensions">
-        /// Specifies the path to unit test extensions. 
-        /// If no additional extension is available, then specify null or empty list.
+        ///     Specifies the path to unit test extensions. 
+        ///     If no additional extension is available, then specify null or empty list.
         /// </param>
-        /// <param name="loadOnlyWellKnownExtensions">Specifies whether only well known extensions should be loaded.</param>
-        void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
+        /// <param name="skipExtensionFilters"></param>
+        void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters);
 
         /// <summary>
         /// Clear the extensions

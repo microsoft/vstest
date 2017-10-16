@@ -223,8 +223,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                      ITestRunEventsRegistrar testRunEventsRegistrar,
                      ProtocolConfig config) =>
                     {
-                        allTasksComplete.Set();
                         receivedTestRunPayload = trp;
+                        allTasksComplete.Set();
                     });
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)

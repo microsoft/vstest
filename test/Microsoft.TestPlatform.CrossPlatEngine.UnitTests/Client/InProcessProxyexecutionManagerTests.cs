@@ -57,17 +57,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
         {
             this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\dummy.dll" });
-            List<string> expectedResult = new List<string>();
-            if (TestPluginCache.Instance.PathToExtensions != null)
-            {
-                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
-            }
+            var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
             expectedResult.Add("C:\\dummy.dll");
 
             var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            Assert.IsFalse(expectedResult.Except(TestPluginCache.Instance.PathToExtensions).Any());
+            CollectionAssert.AreEquivalent(expectedResult, TestPluginCache.Instance.GetExtensionPaths(string.Empty));
         }
 
         [TestMethod]

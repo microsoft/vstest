@@ -30,8 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -49,6 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     internal class Executor
     {
         private ITestPlatformEventSource testPlatformEventSource;
+        private bool showHelp;
 
         #region Constructor
 
@@ -63,6 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.Output = output;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.showHelp = true;
         }
 
         #endregion
@@ -223,10 +225,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
+                    if (ex is CommandLineException || ex is TestPlatformException)
                     {
                         this.Output.Error(false, ex.Message);
                         result = 1;
+                    }
+                    else if (ex is SettingsException)
+                    {
+                        this.Output.Error(false, ex.Message);
+                        result = 1;
+                        this.showHelp = false;
                     }
                     else
                     {
@@ -237,6 +245,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
             }
 
+            // If some argument was invalid, add help argument processor in beginning(i.e. at highest priority) 
+            if (result == 1 && this.showHelp && processors.First<IArgumentProcessor>().Metadata.Value.CommandName != HelpArgumentProcessor.CommandName)
+            {
+                processors.Insert(0, processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+            }
             return result;
         }
 
@@ -352,10 +365,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private void PrintSplashScreen()
         {
-            var assembly = typeof(Executor).GetTypeInfo().Assembly;
             string assemblyVersion = string.Empty;
+            assemblyVersion = Product.Version;
 
-            assemblyVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
 
@@ -369,7 +381,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="arguments">Arguments provided to perform execution with.</param>
         /// <param name="flattenedArguments">Array of flattened arguments.</param>
         /// <returns>0 if successful and 1 otherwise.</returns>
-        /// <see href="https://github.com/dotnet/roslyn/blob/bcdcafc2d407635bc7de205d63d0182e81ef9faa/src/Compilers/Core/Portable/CommandLine/CommonCommandLineParser.cs#L297"/>
         private int FlattenArguments(IEnumerable<string> arguments, out string[] flattenedArguments)
         {
             List<string> outputArguments = new List<string>();
@@ -381,8 +392,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 {
                     // response file:
                     string path = arg.Substring(1).TrimEnd(null);
-                    result |= ParseResponseFile(path, out var responseFileArguments);
-                    outputArguments.AddRange(responseFileArguments.Reverse());
+                    var hadError = this.ReadArgumentsAndSanitize(path, out var responseFileArgs, out var nestedArgs);
+
+                    if (hadError)
+                    {
+                        result |= 1;
+                    }
+                    else
+                    {
+                        this.Output.WriteLine(string.Format("vstest.console.exe {0}", responseFileArgs), OutputLevel.Information);
+                        outputArguments.AddRange(nestedArgs);
+                    }
                 }
                 else
                 {
@@ -395,56 +415,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         }
 
         /// <summary>
-        /// Parse a response file into a set of arguments. Errors opening the response file are output as errors.
+        /// Read and sanitize the arguments.
         /// </summary>
-        /// <param name="fullPath">Full path to the response file.</param>
-        /// <param name="responseFileArguments">Enumeration of the response file arguments.</param>
+        /// <param name="fileName">File provided by user.</param>
+        /// <param name="args">argument in the file as string.</param>
+        /// <param name="arguments">Modified argument after sanitizing the contents of the file.</param>
         /// <returns>0 if successful and 1 otherwise.</returns>
-        /// <see href="https://github.com/dotnet/roslyn/blob/bcdcafc2d407635bc7de205d63d0182e81ef9faa/src/Compilers/Core/Portable/CommandLine/CommonCommandLineParser.cs#L517"/>
-        private int ParseResponseFile(string fullPath, out IEnumerable<string> responseFileArguments)
+        public bool ReadArgumentsAndSanitize(string fileName, out string args, out string[] arguments)
         {
-            int result = 0;
-            List<string> lines = new List<string>();
-            try
+            arguments = null;
+            if (GetContentUsingFile(fileName, out args))
             {
-                using (var reader = new StreamReader(
-                    new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read),
-                                   detectEncodingFromByteOrderMarks: true))
-                {
-                    string str;
-                    while ((str = reader.ReadLine()) != null)
-                    {
-                        lines.Add(str);
-                    }
-                }
-
-                responseFileArguments = ParseResponseLines(lines);
-            }
-            catch (Exception)
-            {
-                this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fullPath));
-                responseFileArguments = new string[0];
-                result = 1;
+                return true;
             }
 
-            return result;
+            if (string.IsNullOrEmpty(args))
+            {
+                return false;
+            }
+
+            return CommandLineUtilities.SplitCommandLineIntoArguments(args, out arguments);
         }
 
-        /// <summary>
-        /// Take a string of lines from a response file, remove comments,
-        /// and split into a set of command line arguments.
-        /// </summary>
-        /// <see href="https://github.com/dotnet/roslyn/blob/bcdcafc2d407635bc7de205d63d0182e81ef9faa/src/Compilers/Core/Portable/CommandLine/CommonCommandLineParser.cs#L545"/>
-        private static IEnumerable<string> ParseResponseLines(IEnumerable<string> lines)
+        private bool GetContentUsingFile(string fileName, out string contents)
         {
-            List<string> arguments = new List<string>();
-
-            foreach (string line in lines)
+            contents = null;
+            try
             {
-                arguments.AddRange(CommandLineUtilities.SplitCommandLineIntoArguments(line, removeHashComments: true));
+                contents = File.ReadAllText(fileName);
+            }
+            catch (Exception e)
+            {
+                EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", 1);
+                EqtTrace.Error(string.Format(CultureInfo.InvariantCulture, "Error: Can't open command line argument file '{0}' : '{1}'", fileName, e.Message));
+                this.Output.Error(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fileName));
+                return true;
             }
 
-            return arguments;
+            return false;
         }
 
         #endregion

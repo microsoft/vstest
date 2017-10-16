@@ -8,6 +8,7 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -80,9 +81,37 @@ namespace vstest.console.UnitTests.Processors
         }
 
         [TestMethod]
+        public void InitializeShouldThrowExceptionWhenTestSettingsIsEnabled()
+        {
+            string runsettingsString = @"<RunSettings>
+                                        <MSTest>
+                                            <SettingsFile>C:\temp.testsettings</SettingsFile>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                        </MSTest>
+                                    </RunSettings>";
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            bool exceptionThrown = false;
+
+            try
+            {
+                this.executor.Initialize("MyDataCollector");
+            }
+            catch (SettingsException ex)
+            {
+                exceptionThrown = true;
+                Assert.AreEqual("--Collect|/Collect:\"MyDataCollector\" is not supported if test run is configured using testsettings.", ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "Initialize should throw exception");
+        }
+
+        [TestMethod]
         public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,"");
+            var runsettingsString = string.Format(DefaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);

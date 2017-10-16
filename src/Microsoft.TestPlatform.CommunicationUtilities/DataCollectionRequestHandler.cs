@@ -351,7 +351,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                     if (extensionAssemblies.Count > 0)
                     {
-                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, true);
+                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                     }
                 }
             }

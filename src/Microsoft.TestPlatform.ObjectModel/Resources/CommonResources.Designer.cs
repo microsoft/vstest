@@ -96,5 +96,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("NoMatchingSourcesFound", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is built for Framework {1} and Platform {2}..
+        /// </summary>
+        public static string SourceIncompatible
+        {
+            get
+            {
+                return ResourceManager.GetString("SourceIncompatible", resourceCulture);
+            }
+        }
     }
 }

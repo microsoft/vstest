@@ -21,10 +21,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+
             this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+
             this.ValidateSummaryStatus(2, 2, 2);
+            this.ExitCodeEquals(1); // failing tests
         }
 
         [CustomDataTestMethod]
@@ -41,7 +43,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
             this.InvokeVsTestForExecution(assemblyPaths, string.Empty, string.Empty, this.FrameworkArgValue);
+
             this.ValidateSummaryStatus(2, 2, 1);
+            this.ExitCodeEquals(1); // failing tests
         }
 
         [CustomDataTestMethod]
@@ -83,13 +87,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testhostProcessName);
 
             this.InvokeVsTest(arguments);
-            cts.Cancel();
 
+            cts.Cancel();
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result,
                 $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
             this.ValidateSummaryStatus(2, 2, 2);
+            this.ExitCodeEquals(1); // failing tests
         }
 
         [CustomDataTestMethod]
@@ -108,6 +113,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=7000");
             this.InvokeVsTest(arguments);
 
+            this.ExitCodeEquals(1);
             this.StdErrorContains("Test Run Aborted.");
             this.StdErrorContains("Aborting test run: test run timeout of 7000 milliseconds exceeded.");
             this.StdOutputDoesNotContains("Total tests: 6");
@@ -125,6 +131,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 0, 0);
+            this.ExitCodeEquals(0);
         }
 
         [CustomDataTestMethod]
@@ -134,12 +141,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /tests:WorkingDirectoryTest");
+
             this.InvokeVsTest(arguments);
+
             this.ValidateSummaryStatus(1, 0, 0);
+            this.ExitCodeEquals(0);
         }
 
         [CustomDataTestMethod]
@@ -165,17 +174,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
-            var errorMessage = string.Empty;
 
+            var errorMessage = "Process is terminated due to StackOverflowException.";
             if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
             {
                 errorMessage = "Process is terminating due to StackOverflowException.";
             }
-            else
-            {
-                errorMessage = "Process is terminated due to StackOverflowException.";
-            }
 
+            this.ExitCodeEquals(1);
             FileAssert.Contains(diagLogFilePath, errorMessage);
             this.StdErrorContains(errorMessage);
             File.Delete(diagLogFilePath);
@@ -198,9 +204,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
+
             var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
             FileAssert.Contains(diagLogFilePath, errorFirstLine);
             File.Delete(diagLogFilePath);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings.SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProject2.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest2");
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 0, 0);
+            this.ExitCodeEquals(0);
+
+            // When both x64 & x86 DLL is passed x64 dll will be ignored.
+            this.StdOutputContains(expectedWarningContains);
         }
     }
 }
