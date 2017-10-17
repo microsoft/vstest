@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
             string dataCollectorFileName = null;
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
+            var dataCollectorDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
             var currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
 
             if (EqtTrace.IsVerboseEnabled)
@@ -70,14 +70,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
             }
 
-            var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
+            var dataCollectorAssemblyPath = Path.Combine(dataCollectorDirectory, DataCollectorProcessName);
 
             dataCollectorFileName = Path.GetFileNameWithoutExtension(dataCollectorAssemblyPath);
 
             var args = "exec";
 
             // Probe for runtimeconfig and deps file for the test source
-            var runtimeConfigPath = Path.Combine(currentWorkingDirectory, string.Concat(dataCollectorFileName, ".runtimeconfig.json"));
+            var runtimeConfigPath = Path.Combine(dataCollectorDirectory, string.Concat(dataCollectorFileName, ".runtimeconfig.json"));
 
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
 
             // Use the deps.json for test source
-            var depsFilePath = Path.Combine(currentWorkingDirectory, string.Concat(dataCollectorFileName, ".deps.json"));
+            var depsFilePath = Path.Combine(dataCollectorDirectory, string.Concat(dataCollectorFileName, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
                 var argsToAdd = " --depsfile " + depsFilePath.AddDoubleQuote();
@@ -117,8 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var cliArgs = string.Join(" ", commandLineArguments);
             var argumentsString = string.Format("{0} \"{1}\" {2} ", args, dataCollectorAssemblyPath, cliArgs);
-
-            var dataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
+            var dataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
             this.DataCollectorProcessId = this.processHelper.GetProcessId(dataCollectorProcess);
             return this.DataCollectorProcessId;
         }
