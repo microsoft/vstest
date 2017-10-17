@@ -713,6 +713,61 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldUpdateResultsDirectoryIfNotAlreadySet()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    actualDiscoveryCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains("ResultsDirectory"), actualDiscoveryCriteria.RunSettings);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotUpdateResultsDirectoryIfAlreadySet()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                        <ResultsDirectory>c:\\temp</ResultsDirectory>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    actualDiscoveryCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(@"<ResultsDirectory>c:\\temp</ResultsDirectory>"), actualDiscoveryCriteria.RunSettings);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldNotUpdateFrameworkAndPlatformIfSpecifiedInDesignMode()
         {
             var payload = new DiscoveryRequestPayload()
@@ -925,6 +980,61 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Task.WaitAll(cancelTask, runTask);
 
             Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+        }
+
+        [TestMethod]
+        public void RunTestsShouldUpdateResultsDirectoryIfNotAlreadySet()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains("ResultsDirectory"), actualTestRunCriteria.TestRunSettings);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotUpdateResultsDirectoryIfAlreadySet()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                        <ResultsDirectory>c:\\temp</ResultsDirectory>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(@"<ResultsDirectory>c:\\temp</ResultsDirectory>"), actualTestRunCriteria.TestRunSettings);
         }
 
         [TestMethod]
