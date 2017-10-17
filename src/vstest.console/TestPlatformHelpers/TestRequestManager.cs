@@ -451,6 +451,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
+                    // We will set default resultDirectory in runsetting if user has not provided.
+                    // We are doing so because in case of datacollector(for netcore) default resultDirectory is (location of datacollector.dll)\ResultsDirectory.
+                    if (!runConfiguration.ResultsDirectorySet)
+                    {
+                        InferRunSettingsHelper.UpdateResultsDirectory(navigator, runConfiguration.ResultsDirectory);
+                        settingsUpdated = true;
+                    }
+
                     if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
                         InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);

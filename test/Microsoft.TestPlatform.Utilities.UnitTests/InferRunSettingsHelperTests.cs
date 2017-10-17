@@ -382,6 +382,17 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
+        public void UpdateResultsDirectoryShouldAddResultDirectory()
+        {
+            var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateResultsDirectory(navigator, "C:\\temp");
+
+            Assert.AreEqual("C:\\temp", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/ResultsDirectory"));
+        }
+
+        [TestMethod]
         public void UpdateTargetFrameworkShouldNotModifyXmlIfNodeIsAlreadyPresentForOverwriteFalse()
         {
             var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.5</TargetFrameworkVersion></RunConfiguration></RunSettings>";
