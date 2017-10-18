@@ -423,6 +423,39 @@ function Create-VsixPackage
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Upload-NugetPackage([string] $nugetExe, [string] $nuspecFile, [string] $packageOutputDir, [string] $additionalArgs )
+{
+    Write-Verbose "$nugetExe pack $nuspecFile -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
+    & $nugetExe pack $nuspecFile -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20 $additionalArgs
+}
+
+function Create-PortableNugetPackage
+{
+    $timer = Start-Timer
+
+    Write-Log "Create-PortableNugetPackage: Started."
+    $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+    $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
+
+    if (-not (Test-Path $packageOutputDir)) {
+        New-Item $packageOutputDir -type directory -Force
+    }
+
+    $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
+
+    $nuspecFile = "Microsoft.TestPlatform.Portable.nuspec"
+    Copy-Item $tpNuspecDir\$nuspecFile $stagingDir -Force
+    Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
+    Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force       
+
+    # Call nuget pack on these components.
+    $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
+
+    Upload-NugetPackage $nugetExe $stagingDir\$nuspecFile $packageOutputDir $additionalArgs
+
+    Write-Log "Create-PortableNugetPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
 function Create-NugetPackages
 {
     $timer = Start-Timer
@@ -430,11 +463,15 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
-    New-Item $packageOutputDir -type directory -Force
+
+    if (-not (Test-Path $packageOutputDir)) {
+        New-Item $packageOutputDir -type directory -Force
+    }
+
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec", "Microsoft.TestPlatform.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec", "Microsoft.TestPlatform.nuspec")
     $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
@@ -462,8 +499,7 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20 $additionalArgs
+        Upload-NugetPackage $nugetExe $stagingDir\$file $packageOutputDir $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -706,6 +742,7 @@ Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
+Create-PortableNugetPackage
 Create-VsixPackage
 Create-NugetPackages
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
