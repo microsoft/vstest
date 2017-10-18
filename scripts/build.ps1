@@ -380,7 +380,7 @@ function Create-VsixPackage
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force        
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
