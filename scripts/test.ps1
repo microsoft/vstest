@@ -76,11 +76,11 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 $TPT_TargetFrameworkFullCLR = "net451"
 $TPT_TargetFrameworkCore = "netcoreapp1.0"
-$TPT_TargetFramework20Core = "netcoreapp2.0"
+$TPT_TargetFrameworkCore20 = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR, $TPT_TargetFrameworkCore20)
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("_none_");
@@ -202,7 +202,7 @@ function Invoke-Test
                 $testFrameWork = ".NETCoreApp,Version=v1.0"
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
-                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFramework20Core $targetRuntime) $vstestConsoleFileName
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore20 $targetRuntime) $vstestConsoleFileName
             } else {
 
                 $testFrameWork = ".NETFramework,Version=v4.5.1"

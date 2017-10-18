@@ -52,18 +52,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 // AssemblyName won't load the assembly into current domain.
-                archType  = MapToArchitecture(new AssemblyName(assemblyPath).ProcessorArchitecture);
+                var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
+                archType = MapToArchitecture(assemblyName.ProcessorArchitecture);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("AssemblyMetadataProvider:GetArchitecture() Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
+                }
+
                 // AssemblyName will thorw Exception if assembly contains native code or no manifest.
                 try
                 {
                     archType = GetArchitectureForSource(assemblyPath);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    EqtTrace.Error("Failed to determine Assembly Architecture: {0}", ex);
+                    EqtTrace.Info("Failed to determine Assembly Architecture with exception: {0}", e);
                 }
             }
 
