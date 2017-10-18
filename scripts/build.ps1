@@ -375,11 +375,11 @@ function Create-VsixPackage
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
     # Copy Event Log Datacollector to Extensions folder.
-     # Copy over the logger assemblies to the Extensions folder.
-     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
-     $extensions_Dir = "Extensions"
-     $fullCLRExtensionsDir = Join-Path $packageDir $extensions_Dir
-     $coreCLRExtensionsDir = Join-Path $coreCLR20PackageDir $extensions_Dir
+    # Copy over the logger assemblies to the Extensions folder.
+    $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
+    $extensions_Dir = "Extensions"
+    $fullCLRExtensionsDir = Join-Path $packageDir $extensions_Dir
+    $coreCLRExtensionsDir = Join-Path $coreCLR20PackageDir $extensions_Dir
     $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
     $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $fullCLRExtensionsDir -Force
