@@ -190,22 +190,19 @@ function Invoke-Test
             }
 
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
-            $testAdapterPath = Get-TestAdapterPath
-            $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
             if (-not [System.String]::IsNullOrEmpty($TPT_TestFilter))
             {
                 $testFilter = "/testCaseFilter:`"$TPT_TestFilter`""
             }
 
-            if($fx -eq $TPT_TargetFrameworkCore)
+            if($fx -eq $TPT_TargetFrameworkCore -or $fx -eq $TPT_TargetFrameworkCore20)
             {
-                $testFrameWork = ".NETCoreApp,Version=v1.0"
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkCore20 $targetRuntime) $vstestConsoleFileName
-            } else {
-
-                $testFrameWork = ".NETFramework,Version=v4.5.1"
+            }
+            else
+            {
                 $vstestConsoleFileName = "vstest.console.exe"
                 $targetRunTime = $Script:TPT_TargetRuntime
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
@@ -235,12 +232,12 @@ function Invoke-Test
                 Set-TestEnvironment
                 if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
-                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
+                    $output = & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
                 } else {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
+                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
                 }
 
                 Reset-TestEnvironment
@@ -284,12 +281,12 @@ function Invoke-Test
 
                     if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
-                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"
-                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger $testFilter
+                        Write-Verbose "$vstestConsolePath $testContainer /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"
+                        & $vstestConsolePath $testContainer /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger $testFilter
                     } else {
 
-                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"
-                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger $testFilter
+                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /logger:`"trx;LogFileName=$trxLogFileName`" $ConsoleLogger $testFilter"
+                        & $dotNetPath $vstestConsolePath $testContainer /logger:"trx;LogFileName=$trxLogFileName" $ConsoleLogger $testFilter
                     }
 
                     Reset-TestEnvironment
@@ -310,13 +307,6 @@ function Invoke-Test
 function Get-PackageDirectory($framework, $targetRuntime)
 {
     return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($framework)\$($targetRuntime)")
-}
-
-function Get-TestAdapterPath
-{
-    [xml]$dependencyProps = Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props
-
-    return "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\$($dependencyProps.Project.PropertyGroup.MSTestAdapterVersion)\build\_common"
 }
 
 function Start-Timer
