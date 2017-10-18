@@ -57,6 +57,10 @@
       <Version>15.5.0-preview-1050541</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Internal.Intellitrace">
+      <Version>15.5.0-preview-20171018-01</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">
       <Version>14.0.0</Version>
       <PrivateAssets>All</PrivateAssets>
