@@ -303,7 +303,7 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force        
+    Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
     
     # Copy Event Log Datacollector to Extensions folder.
     $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
@@ -704,11 +704,11 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-# Install-DotNetCli
-# Restore-Package
-# Update-LocalizedResources
-# Invoke-Build
-# Publish-Package
+Install-DotNetCli
+Restore-Package
+Update-LocalizedResources
+Invoke-Build
+Publish-Package
 Create-VsixPackage
 Create-NugetPackages
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
