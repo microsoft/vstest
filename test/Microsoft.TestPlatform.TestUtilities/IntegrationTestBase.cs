@@ -133,7 +133,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
-           // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
+            // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
             this.InvokeVsTest(arguments);
         }
 
@@ -357,7 +357,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns>
         /// Full path to test runner
         /// </returns>
-        public string GetConsoleRunnerPath()
+        public virtual string GetConsoleRunnerPath()
         {
             string consoleRunnerPath = string.Empty;
 
@@ -376,6 +376,17 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
             return consoleRunnerPath;
+        }
+
+        protected virtual string SetVSTestConsoleDLLPathInArgs(string args)
+        {
+            var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+            vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
+            args = string.Concat(
+                vstestConsoleDll,
+                " ",
+                args);
+            return args;
         }
 
         /// <summary>
@@ -400,12 +411,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             if (this.IsNetCoreRunner())
             {
-                var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
-                vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
-                args = string.Concat(
-                    vstestConsoleDll,
-                    " ",
-                    args);
+                args = this.SetVSTestConsoleDLLPathInArgs(args);
             }
 
             this.arguments = args;

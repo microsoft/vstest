@@ -17,16 +17,22 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestEnvironment
     {
+        public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
+        public static string buildConfiguration =
+#if DEBUG
+            "Debug";
+#else
+            "Release";
+#endif
+
         private static Dictionary<string, string> dependencyVersions;
 
-        private readonly string testPlatformRootDirectory;
         private readonly bool runningInCli;
         private string targetRuntime;
 
         public IntegrationTestEnvironment()
         {
             // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
-            this.testPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
             this.TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
             this.TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
 
@@ -37,26 +43,26 @@ namespace Microsoft.TestPlatform.TestUtilities
                 this.TargetFramework = "net451";
             }
 
-            if (string.IsNullOrEmpty(this.testPlatformRootDirectory))
+            if (string.IsNullOrEmpty(TestPlatformRootDirectory))
             {
                 // Running in VS/IDE. Use artifacts directory as root.
                 this.runningInCli = false;
 
                 // Get root directory from test assembly output directory
-                this.testPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
-                this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"test\TestAssets");
+                TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
+                this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
             }
             else
             {
                 // Running in command line/CI
                 this.runningInCli = true;
-                this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"test\TestAssets");
+                this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
             }
 
             // There is an assumption that integration tests will always run from a source enlistment.
             // Need to remove this assumption when we move to a CDP.
-            this.PackageDirectory = Path.Combine(this.testPlatformRootDirectory, @"packages");
-            this.ToolsDirectory = Path.Combine(this.testPlatformRootDirectory, @"tools");
+            this.PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
+            this.ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
             this.RunnerFramework = "net451";
         }
 
@@ -67,11 +73,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             get
             {
-#if DEBUG
-                return "Debug";
-#else
-                return "Release";
-#endif
+                return buildConfiguration;
             }
         }
 
@@ -81,7 +83,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 if (dependencyVersions == null)
                 {
-                    dependencyVersions = GetDependencies(this.testPlatformRootDirectory);
+                    dependencyVersions = GetDependencies(TestPlatformRootDirectory);
                 }
 
                 return dependencyVersions;
@@ -108,18 +110,18 @@ namespace Microsoft.TestPlatform.TestUtilities
                 if (this.runningInCli)
                 {
                     value = Path.Combine(
-                        this.testPlatformRootDirectory,
+                        TestPlatformRootDirectory,
                         "artifacts",
-                        this.BuildConfiguration,
+                        BuildConfiguration,
                         this.RunnerFramework,
                         this.TargetRuntime);
                 }
                 else
                 {
                     value = Path.Combine(
-                    this.testPlatformRootDirectory,
+                    TestPlatformRootDirectory,
                     @"src\package\package\bin",
-                    this.BuildConfiguration,
+                    BuildConfiguration,
                     this.RunnerFramework,
                     this.TargetRuntime);
                 }
@@ -240,7 +242,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 this.TestAssetsPath,
                 simpleAssetName,
                 "bin",
-                this.BuildConfiguration,
+                BuildConfiguration,
                 targetFramework,
                 assetName);
 
