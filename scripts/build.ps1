@@ -84,6 +84,8 @@ $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } el
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 
+$language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
+
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
@@ -380,7 +382,6 @@ function Publish-PackageInternal($packagename, $framework, $output)
 
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
 {
-    $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 	foreach($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
@@ -393,7 +394,6 @@ function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
 
 function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
 {
-    $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 	foreach($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
