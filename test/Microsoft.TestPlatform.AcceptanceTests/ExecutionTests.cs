@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using global::TestPlatform.TestUtilities;
 
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -158,7 +159,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
+            if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
             {
                 // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
                 Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");

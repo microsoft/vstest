@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.5.0",
+    [System.String] $Version = "15.6.0",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -312,7 +312,7 @@ function Publish-Package
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
-    
+
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
@@ -335,6 +335,16 @@ function Publish-Package
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
+    # Copy IntelliTrace components.
+    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\15.5.0-preview-20171018-01\tools"
+    $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
+
+    if (-not (Test-Path $intellitraceTargetDirectory)) {
+        New-Item $intellitraceTargetDirectory -Type Directory -Force | Out-Null
+    }
+
+    Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
+    
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -370,8 +380,7 @@ function Create-VsixPackage
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
-    
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force    
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
@@ -420,11 +429,15 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
-    New-Item $packageOutputDir -type directory -Force
+
+    if (-not (Test-Path $packageOutputDir)) {
+        New-Item $packageOutputDir -type directory -Force
+    }
+
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec", "Microsoft.TestPlatform.nuspec", "Microsoft.TestPlatform.Portable.nuspec")
     $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
