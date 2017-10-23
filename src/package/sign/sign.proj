@@ -148,6 +148,7 @@
 
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
@@ -183,6 +184,7 @@
 
       <!-- Localized resources -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\%(ResxLang.Identity)\*.*" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
