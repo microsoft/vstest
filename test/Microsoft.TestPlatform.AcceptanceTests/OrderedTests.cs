@@ -5,6 +5,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
+
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -27,7 +29,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var orderedTestFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "MstestV1UnitTestProject");
 
-            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
+            if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
             {
                 orderedTestFileAbsolutePath = Path.Combine(orderedTestFileAbsolutePath, "MixedTestsRelease.orderedtest");
             }
