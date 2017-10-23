@@ -7,25 +7,20 @@ namespace Microsoft.TestPlatform.PerformanceTests
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-
+    using System.Runtime.CompilerServices;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using TestUtilities;
 
     [TestClass]
-    public class AssemblyMetadataProviderTests
+    public class AssemblyMetadataProviderTests : IntegrationTestBase
     {
-        private const string AssetPathFormat = @"{0}\test\TestAssets\{1}\bin\Debug\{2}\{1}.dll";
-        private const string PerfAssertMessageFormat = "Perf test failed. Expected Elapsed Time: {0} ms, Actual Elapsed Time: {1} ms";
-        private static readonly string VstestRepoRootDir;
+        private const int ExpectedTimeForFindingArchForDotNetAssembly = 10; // In milliseconds.
+        private const string PerfAssertMessageFormat = "Expected Elapsed Time: {0} ms, Actual Elapsed Time: {1} ms";
 
         private IAssemblyMetadataProvider assemblyMetadataProvider;
-
-        static AssemblyMetadataProviderTests()
-        {
-            VstestRepoRootDir = new DirectoryInfo(typeof(AssemblyMetadataProviderTests).GetTypeInfo().Assembly.Location).Parent?.Parent?.Parent?.Parent?.Parent?.Parent?.FullName;
-        }
 
         public AssemblyMetadataProviderTests()
         {
@@ -38,7 +33,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
         {
-            this.TestDonetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: 30);
+            this.TestDonetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -47,7 +42,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
         {
-            this.TestDonetAssemblyArch("SimpleTestProject2", framework, Architecture.X86, expectedElapsedTime: 30);
+            this.TestDonetAssemblyArch("SimpleTestProject2", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -56,7 +51,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForAnyCPUAssembly(string framework)
         {
-            this.TestDonetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: 30);
+            this.TestDonetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -64,16 +59,18 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("x64")]
         public void GetArchitectureForNativeDll(string platform)
         {
+            var expectedElapsedTime = 5;
             var platformPath = platform.Equals("x64") ? platform : string.Empty;
-            var assemblyPath = $@"{VstestRepoRootDir}\packages\microsoft.testplatform.testasset.nativecpp\2.0.0\"
+            var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\"
                 + $@"contentFiles\any\any\{platformPath}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+            this.LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
 
             Assert.AreEqual(Enum.Parse(typeof(Architecture), platform, ignoreCase: true), arch);
-            Console.WriteLine($"Platform:{platform}, Elapsed time:{stopWatch.ElapsedMilliseconds} ms");
-            Assert.IsTrue(stopWatch.ElapsedMilliseconds < 30, string.Format(PerfAssertMessageFormat, 30, stopWatch.ElapsedMilliseconds));
+            Console.WriteLine("Platform:{0}, {1}", platform, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+            Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         [TestMethod]
@@ -82,13 +79,17 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetFrameWorkForDotNetAssembly(string framework)
         {
-            var assemblyPath = string.Format(AssetPathFormat, VstestRepoRootDir, "SimpleTestProject3", framework);
+            var expectedElapsedTime = 5;
+            var assemblyPath = this.testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
+            this.LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var actualFx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
 
             if (framework.Equals("net451"))
             {
+                // Reason is unknown for why full framework it is taking more time. Need to investigate.
+                expectedElapsedTime = 100;
                 Assert.AreEqual(actualFx.FullName, Constants.DotNetFramework451);
             }
             else if (framework.Equals("netcoreapp1.0"))
@@ -100,35 +101,43 @@ namespace Microsoft.TestPlatform.PerformanceTests
                 Assert.AreEqual(actualFx.FullName, ".NETCoreApp,Version=v2.0");
             }
 
-            Console.WriteLine($"Framework:{framework}, Elapsed time:{stopWatch.ElapsedMilliseconds} ms");
-            Assert.IsTrue(stopWatch.ElapsedMilliseconds < 130, string.Format(PerfAssertMessageFormat, 130, stopWatch.ElapsedMilliseconds));
+            Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+            Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         [TestMethod]
         public void GetFrameWorkForNativeDll()
         {
-                var assemblyPath =
-                    $@"{VstestRepoRootDir}\packages\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-                var stopWatch = Stopwatch.StartNew();
-                var fx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
-                stopWatch.Stop();
-                Assert.AreEqual(Framework.DefaultFramework.Name, fx.FullName);
+            var expectedElapsedTime = 5;
+            var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+            this.LoadAssemblyIntoMemory(assemblyPath);
+            var stopWatch = Stopwatch.StartNew();
+            var fx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
+            stopWatch.Stop();
+            Assert.AreEqual(Framework.DefaultFramework.Name, fx.FullName);
 
-                Console.WriteLine($"Elapsed time:{stopWatch.ElapsedMilliseconds} ms");
-                Assert.IsTrue(stopWatch.ElapsedMilliseconds < 30, string.Format(PerfAssertMessageFormat, 30, stopWatch.ElapsedMilliseconds));
+            Console.WriteLine(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds);
+            Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         private void TestDonetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
         {
-            var assemblyPath = string.Format(AssetPathFormat, VstestRepoRootDir, projectName, framework);
+            var assemblyPath = this.testEnvironment.GetTestAsset(projectName + ".dll", framework);
+            this.LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
             var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
             Assert.AreEqual(expectedArch, arch, $"Expected: {expectedArch} Actual: {arch}");
-            Console.WriteLine($"Framework:{framework}, Elapsed time:{stopWatch.ElapsedMilliseconds} ms");
+            Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
             Assert.IsTrue(
                 stopWatch.ElapsedMilliseconds < expectedElapsedTime,
                 string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+        }
+
+        private void LoadAssemblyIntoMemory(string assemblyPath)
+        {
+            // Load the file into RAM in ahead to avoid perf number(expectedElapsedTime) dependence on disk read time.
+            File.ReadAllBytes(assemblyPath);
         }
     }
 }

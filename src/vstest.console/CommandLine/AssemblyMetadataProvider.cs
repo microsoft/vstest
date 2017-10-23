@@ -57,19 +57,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
             catch (Exception ex)
             {
+                // AssemblyName will thorw Exception if assembly contains native code or no manifest.
+
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("AssemblyMetadataProvider:GetArchitecture() Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
+                    EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture() Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
                 }
 
-                // AssemblyName will thorw Exception if assembly contains native code or no manifest.
                 try
                 {
                     archType = GetArchitectureForSource(assemblyPath);
                 }
                 catch (Exception e)
                 {
-                    EqtTrace.Info("Failed to determine Assembly Architecture with exception: {0}", e);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("Failed to determine Assembly Architecture with exception: {0}", e);
+                    }
                 }
             }
 
