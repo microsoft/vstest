@@ -133,6 +133,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
+            
             // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
             this.InvokeVsTest(arguments);
         }

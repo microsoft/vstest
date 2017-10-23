@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [ClassInitialize]
         public static void ClassInit(TestContext testContext)
         {
-            var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.buildConfiguration, "packages");
+            var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
             var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg").ToList();
             portablePackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage[0]));
             ZipFile.ExtractToDirectory(nugetPackage[0], portablePackageFolder);

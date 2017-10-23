@@ -18,12 +18,6 @@ namespace Microsoft.TestPlatform.TestUtilities
     public class IntegrationTestEnvironment
     {
         public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
-        public static string buildConfiguration =
-#if DEBUG
-            "Debug";
-#else
-            "Release";
-#endif
 
         private static Dictionary<string, string> dependencyVersions;
 
@@ -69,11 +63,15 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <summary>
         /// Gets the build configuration for the test run.
         /// </summary>
-        public string BuildConfiguration
+        public static string BuildConfiguration
         {
             get
             {
-                return buildConfiguration;
+#if DEBUG
+                return "Debug";
+#else
+                return "Release";
+#endif
             }
         }
 

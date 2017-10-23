@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.IO;
     using System.Xml;
 
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -45,7 +46,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
                 "bin",
-                this.testEnvironment.BuildConfiguration,
+                IntegrationTestEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
@@ -69,7 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
                 "bin",
-                this.testEnvironment.BuildConfiguration,
+                IntegrationTestEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), null, runnerInfo.InIsolationValue);
