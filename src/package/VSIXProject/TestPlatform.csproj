@@ -95,6 +95,48 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\*.*" Exclude="$(VsixInputFileLocation)\Extensions\*.pdb">
       <VSIXSubPath>Extensions</VSIXSubPath>
     </VsixSourceItem>
+
+    <!-- Localized Extensions resources -->
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\cs\*.dll">
+      <VSIXSubPath>Extensions\cs</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\de\*.dll">
+      <VSIXSubPath>Extensions\de</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\es\*.dll">
+      <VSIXSubPath>Extensions\es</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\fr\*.dll">
+      <VSIXSubPath>Extensions\fr</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\it\*.dll">
+      <VSIXSubPath>Extensions\it</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\ja\*.dll">
+      <VSIXSubPath>Extensions\ja</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\ko\*.dll">
+      <VSIXSubPath>Extensions\ko</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\pl\*.dll">
+      <VSIXSubPath>Extensions\pl</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\pt-BR\*.dll">
+      <VSIXSubPath>Extensions\pt-BR</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\ru\*.dll">
+      <VSIXSubPath>Extensions\ru</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\tr\*.dll">
+      <VSIXSubPath>Extensions\tr</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\zh-Hans\*.dll">
+      <VSIXSubPath>Extensions\zh-Hans</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\zh-Hant\*.dll">
+      <VSIXSubPath>Extensions\zh-Hant</VSIXSubPath>
+    </VsixSourceItem>
+
     <VsixSourceItem Include="$(VsixInputFileLocation)\CoreCon\*.*">
       <VSIXSubPath>CoreCon</VSIXSubPath>
     </VsixSourceItem>
