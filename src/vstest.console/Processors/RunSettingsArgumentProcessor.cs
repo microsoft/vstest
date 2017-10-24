@@ -166,11 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         protected virtual XmlReader GetReaderForFile(string runSettingsFile)
         {
-            using (var fileStream = File.OpenRead(runSettingsFile))
-            {
-                var stream = new StreamReader(fileStream, Encoding.UTF8);
-                return XmlReader.Create(runSettingsFile, XmlRunSettingsUtilities.ReaderSettings);
-            }
+            return XmlReader.Create(new StringReader(File.ReadAllText(runSettingsFile, Encoding.UTF8)), XmlRunSettingsUtilities.ReaderSettings);
         }
 
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
