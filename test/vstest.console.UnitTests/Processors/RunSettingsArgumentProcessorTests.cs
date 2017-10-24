@@ -293,37 +293,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldNotThrowExceptionIfRunSettingsHasJapaneseCharacter()
-        {
-            var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldNotThrowExceptionIfRunSettingsHasJapaneseCharacter.runsettings");
-            var settingsXml = @"<RunSettings><RunConfiguration><ResultsDirectory>C:\新しいフォルダー</ResultsDirectory></RunConfiguration></RunSettings>";
-
-            if (File.Exists(runsettingsFile))
-            {
-                File.Delete(runsettingsFile);
-            }
-
-            File.WriteAllText(runsettingsFile, settingsXml);
-
-            var executor = new TestableRunSettingsArgumentExecutor(
-                CommandLineOptions.Instance,
-                this.settingsProvider,
-                null);
-
-            executor.Initialize(runsettingsFile);
-            File.Delete(runsettingsFile);
-        }
-
-        [TestMethod]
         public void InitializeShouldPreserveActualJapaneseString()
         {
             var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldPreserveActualJapaneseString.runsettings");
             var settingsXml = @"<RunSettings><RunConfiguration><ResultsDirectory>C:\新しいフォルダー</ResultsDirectory></RunConfiguration></RunSettings>";
-
-            if (File.Exists(runsettingsFile))
-            {
-                File.Delete(runsettingsFile);
-            }
 
             File.WriteAllText(runsettingsFile, settingsXml, Encoding.UTF8);
 
