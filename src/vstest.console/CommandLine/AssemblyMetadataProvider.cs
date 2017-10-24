@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
+                EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
             }
 
             return frameworkName;
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture() Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
+                    EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
                 }
 
                 try
@@ -72,14 +72,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 {
                     if (EqtTrace.IsInfoEnabled)
                     {
-                        EqtTrace.Info("Failed to determine Assembly Architecture with exception: {0}", e);
+                        EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
                     }
                 }
             }
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("GetArchitecture: determined architecture:{0} info for assembly: {1}", archType,
+                EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
                     assemblyPath);
             }
 

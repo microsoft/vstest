@@ -12,7 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
-    <ProjectReference Include="..\..\src\vstest.console\vstest.console.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>

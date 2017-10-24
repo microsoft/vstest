@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.PerformanceTests
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 {
     using System;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using TestUtilities;
 
     [TestClass]
     public class AssemblyMetadataProviderTests : IntegrationTestBase
@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
         {
-            this.TestDonetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            this.TestDotnetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
         {
-            this.TestDonetAssemblyArch("SimpleTestProject2", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            this.TestDotnetAssemblyArch("SimpleTestProject2", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForAnyCPUAssembly(string framework)
         {
-            this.TestDonetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            this.TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
             Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
-        private void TestDonetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
+        private void TestDotnetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
         {
             var assemblyPath = this.testEnvironment.GetTestAsset(projectName + ".dll", framework);
             this.LoadAssemblyIntoMemory(assemblyPath);
