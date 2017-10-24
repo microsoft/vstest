@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// be accessed in a multi-threaded context.
         /// </summary>
         private Dictionary<string, Assembly> resolvedAssemblies;
-
+        
         /// <summary>
         /// Specifies whether the resolver is disposed or not
         /// </summary>
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             if (this.searchDirectories == null || this.searchDirectories.Count == 0)
             {
                 return null;
-            }
+            }            
 
             EqtTrace.Info("AssemblyResolver: {0}: Resolving assembly.", args.Name);
 
@@ -175,9 +175,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         }
                     }
                 }
-            }
 
-            return null;
+                this.resolvedAssemblies[args.Name] = null;
+
+                return null;
+            }
         }
 
         /// <summary>
