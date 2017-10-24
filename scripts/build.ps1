@@ -84,6 +84,8 @@ $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } el
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 
+$language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
+
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
@@ -295,6 +297,12 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 
+    # Move trx logger resource dlls
+    if($TPB_LocalizedBuild) {
+        Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
+        Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
+    }
+
     # Copy Blame Datacollector to Extensions folder.
     $TPB_TargetFrameworkStandard = "netstandard1.5"
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
@@ -304,7 +312,13 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
-    
+
+    # Copy blame data collector resource dlls
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $blameDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
+        Copy-Loc-Files $blameDataCollectorNetStandard $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
+    }
+
     # Copy Event Log Datacollector to Extensions folder.
     $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
     $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework
@@ -312,7 +326,13 @@ function Publish-Package
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
-    
+
+    # Copy EventLogCollector resource dlls
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $eventLogDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
+        Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
+    }
+
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
@@ -321,6 +341,12 @@ function Publish-Package
         
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
+    }
+
+    # Move TestHostRuntimeProvider resource dlls
+    if($TPB_LocalizedBuild) {
+        Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
+        Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
@@ -335,6 +361,16 @@ function Publish-Package
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
+    # Copy IntelliTrace components.
+    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\15.5.0-preview-20171018-01\tools"
+    $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
+
+    if (-not (Test-Path $intellitraceTargetDirectory)) {
+        New-Item $intellitraceTargetDirectory -Type Directory -Force | Out-Null
+    }
+
+    Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
+    
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -342,6 +378,30 @@ function Publish-PackageInternal($packagename, $framework, $output)
 {
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+}
+
+function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
+{
+	foreach($lang in $language) {
+        $dllToCopy = Join-Path $sourceDir\$lang $dllName
+        $destinationFolder = Join-Path $destinationDir $lang
+        if (-not (Test-Path $destinationFolder)) {
+            New-Item $destinationFolder -Type Directory -Force | Out-Null
+        }
+        Copy-Item $dllToCopy $destinationFolder -Force
+	}
+}
+
+function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
+{
+	foreach($lang in $language) {
+        $dllToCopy = Join-Path $sourceDir\$lang $dllName
+        $destinationFolder = Join-Path $destinationDir $lang
+        if (-not (Test-Path $destinationFolder)) {
+            New-Item $destinationFolder -Type Directory -Force | Out-Null
+        }
+        Move-Item $dllToCopy $destinationFolder -Force
+	}
 }
 
 function Create-VsixPackage
@@ -370,8 +430,7 @@ function Create-VsixPackage
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
-    
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force    
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
     $comComponentsDirectoryTIA = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
@@ -420,11 +479,15 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
-    New-Item $packageOutputDir -type directory -Force
+
+    if (-not (Test-Path $packageOutputDir)) {
+        New-Item $packageOutputDir -type directory -Force
+    }
+
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec", "Microsoft.TestPlatform.nuspec", "Microsoft.TestPlatform.Portable.nuspec")
     $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
