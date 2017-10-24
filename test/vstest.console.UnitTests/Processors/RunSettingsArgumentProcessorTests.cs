@@ -214,6 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        [Ignore("Data Collectors not working with dotnet vstest/dotnet test Issue: https://devdiv.visualstudio.com/DevDiv/VS.in%20Agile%20Testing%20IDE/_queries/edit/491724/?triage=true")]
         public void InitializeShouldSetActiveRunSettingsForTestSettingsFiles()
         {
             // Arrange.
