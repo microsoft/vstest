@@ -4,28 +4,15 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
+    <PlatformTarget>ARM</PlatformTarget>
   </PropertyGroup>
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
-  
   <PropertyGroup>
-    <AssemblyName>SimpleTestProject2</AssemblyName>
+    <AssemblyName>SimpleTestProjectARM</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net451</TargetFrameworks>
     <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
-  <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' ">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451'">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

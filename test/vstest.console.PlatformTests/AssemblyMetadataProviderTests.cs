@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -42,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         [DataRow("netcoreapp2.0")]
         public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
         {
-            this.TestDotnetAssemblyArch("SimpleTestProject2", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+            this.TestDotnetAssemblyArch("SimpleTestProjectx86", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
@@ -52,6 +50,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
         public void GetArchitectureShouldReturnCorrentArchForAnyCPUAssembly(string framework)
         {
             this.TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
+        }
+
+        [TestMethod]
+        [DataRow("net451")]
+        [DataRow("netcoreapp1.0")]
+        [DataRow("netcoreapp2.0")]
+        public void GetArchitectureShouldReturnCorrentArchForARMAssembly(string framework)
+        {
+            this.TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
         }
 
         [TestMethod]
