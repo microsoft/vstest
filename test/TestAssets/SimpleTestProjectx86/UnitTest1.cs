@@ -10,5 +10,13 @@ namespace SimpleTestProjectx86
     [TestClass]
     public class UnitTest1
     {
+        /// <summary>
+        /// The passing test.
+        /// </summary>
+        [TestMethod]
+        public void PassingTestx86()
+        {
+            Assert.AreEqual(2, 2);
+        }
     }
 }
