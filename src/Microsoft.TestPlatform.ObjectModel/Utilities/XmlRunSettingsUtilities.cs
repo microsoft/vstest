@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </returns>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public static IXPathNavigable CreateDefaultRunSettings()
+        public static XmlDocument CreateDefaultRunSettings()
         {
             // Create a new default xml doc that looks like this:
             // <?xml version="1.0" encoding="utf-8"?>
@@ -209,15 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             var dataCollectorsNode = doc.CreateElement(Constants.DataCollectorsSettingName);
             dataCollectionRunSettingsNode.AppendChild(dataCollectorsNode);
 
-            var ret = doc as IXPathNavigable;
-            if (ret == null)
-            {
-#if !NET451
-                return doc.ToXPathNavigable();
-#endif
-            }
-
-            return ret;
+            return doc;
         }
 
         /// <summary>
