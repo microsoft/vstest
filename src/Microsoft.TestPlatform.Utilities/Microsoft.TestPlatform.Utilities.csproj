@@ -20,6 +20,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
+    <PackageReference Include="System.Xml.XPath.XmlDocument">
+      <Version>4.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>

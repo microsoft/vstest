@@ -209,11 +209,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             var dataCollectorsNode = doc.CreateElement(Constants.DataCollectorsSettingName);
             dataCollectionRunSettingsNode.AppendChild(dataCollectorsNode);
 
-#if NET451
-            return doc;
-#else
-            return doc.ToXPathNavigable();
+            var ret = doc as IXPathNavigable;
+            if (ret == null)
+            {
+#if !NET451
+                return doc.ToXPathNavigable();
 #endif
+            }
+
+            return ret;
         }
 
         /// <summary>
