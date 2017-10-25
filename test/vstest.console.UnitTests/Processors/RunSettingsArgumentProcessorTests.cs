@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using vstest.console.UnitTests.Processors;
 
     using Moq;
+    using System.Text;
 
     [TestClass]
     public class RunSettingsArgumentProcessorTests
@@ -290,6 +291,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsFalse(CommandLineOptions.Instance.FrameworkVersionSpecified);
         }
 
+        [TestMethod]
+        public void InitializeShouldPreserveActualJapaneseString()
+        {
+            var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldPreserveActualJapaneseString.runsettings");
+            var settingsXml = @"<RunSettings><RunConfiguration><ResultsDirectory>C:\新しいフォルダー</ResultsDirectory></RunConfiguration></RunSettings>";
+
+            File.WriteAllText(runsettingsFile, settingsXml, Encoding.UTF8);
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                this.settingsProvider,
+                null);
+
+            executor.Initialize(runsettingsFile);
+            Assert.IsTrue(this.settingsProvider.ActiveRunSettings.SettingsXml.Contains(@"C:\新しいフォルダー"));
+            File.Delete(runsettingsFile);
+        }
+
         #endregion
 
         #region Testable Implementations
@@ -312,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 if (this.runSettingsString == null)
                 {
-                    return null;
+                    return base.GetReaderForFile(runSettingsFile);
                 }
 
                 var reader = new StringReader(this.runSettingsString);

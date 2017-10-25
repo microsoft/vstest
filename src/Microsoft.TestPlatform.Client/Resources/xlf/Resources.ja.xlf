@@ -43,6 +43,11 @@
         <target state="translated">テストの実行を中止しています: テスト実行のタイムアウト {0} ミリ秒を超過しました。</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

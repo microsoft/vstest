@@ -43,6 +43,11 @@
         <target state="translated">正在中止測試回合: 超過了測試回合逾時 ({0} 毫秒)。</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

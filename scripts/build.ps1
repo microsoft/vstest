@@ -84,6 +84,8 @@ $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } el
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 
+$language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
+
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
@@ -295,6 +297,12 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 
+    # Move trx logger resource dlls
+    if($TPB_LocalizedBuild) {
+        Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
+        Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
+    }
+
     # Copy Blame Datacollector to Extensions folder.
     $TPB_TargetFrameworkStandard = "netstandard1.5"
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
@@ -304,7 +312,13 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
-    
+
+    # Copy blame data collector resource dlls
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $blameDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
+        Copy-Loc-Files $blameDataCollectorNetStandard $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
+    }
+
     # Copy Event Log Datacollector to Extensions folder.
     $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
     $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework
@@ -312,7 +326,13 @@ function Publish-Package
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
-    
+
+    # Copy EventLogCollector resource dlls
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $eventLogDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
+        Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
+    }
+
     # If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
@@ -321,6 +341,12 @@ function Publish-Package
         
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
+    }
+
+    # Move TestHostRuntimeProvider resource dlls
+    if($TPB_LocalizedBuild) {
+        Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
+        Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
@@ -344,6 +370,30 @@ function Publish-PackageInternal($packagename, $framework, $output)
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 }
 
+function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
+{
+	foreach($lang in $language) {
+        $dllToCopy = Join-Path $sourceDir\$lang $dllName
+        $destinationFolder = Join-Path $destinationDir $lang
+        if (-not (Test-Path $destinationFolder)) {
+            New-Item $destinationFolder -Type Directory -Force | Out-Null
+        }
+        Copy-Item $dllToCopy $destinationFolder -Force
+	}
+}
+
+function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
+{
+	foreach($lang in $language) {
+        $dllToCopy = Join-Path $sourceDir\$lang $dllName
+        $destinationFolder = Join-Path $destinationDir $lang
+        if (-not (Test-Path $destinationFolder)) {
+            New-Item $destinationFolder -Type Directory -Force | Out-Null
+        }
+        Move-Item $dllToCopy $destinationFolder -Force
+	}
+}
+
 function Create-VsixPackage
 {
     Write-Log "Create-VsixPackage: Started."
@@ -357,15 +407,15 @@ function Create-VsixPackage
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1055876\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-1086294\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy QtAgent Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-1050541\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools\15.5.0-preview-1086294\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy Legacy data collectors Related depedencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\15.5.0-preview-1050541\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\15.5.0-preview-1086294\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over

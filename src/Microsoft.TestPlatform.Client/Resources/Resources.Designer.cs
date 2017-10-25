@@ -88,5 +88,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
                 return ResourceManager.GetString("TestSessionTimeoutMessage", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No suitable test runtime provider found for this run..
+        /// </summary>
+        internal static string NoTestHostProviderFound
+        {
+            get
+            {
+                return ResourceManager.GetString("NoTestHostProviderFound", resourceCulture);
+            }
+        }
     }
 }

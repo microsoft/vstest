@@ -43,6 +43,11 @@
         <target state="translated">Interruzione dell'esecuzione dei test: è stato superato il timeout dell'esecuzione dei test, pari a {0} millisecondi.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
