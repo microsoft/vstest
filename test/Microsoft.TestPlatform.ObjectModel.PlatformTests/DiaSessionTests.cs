@@ -125,7 +125,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
         private void ValidateLineNumbers(int min, int max)
         {
             // Release builds optimize code, hence min line numbers are different.
-            if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+            if (this.testEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
             {
                 Assert.AreEqual(min, max, "Incorrect min line number");
             }
@@ -150,7 +150,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
         private void ValidateMinLineNumber(int expected, int actual)
         {
             // Release builds optimize code, hence min line numbers are different.
-            if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+            if (this.testEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
             {
                 Assert.AreEqual(expected + 1, actual, "Incorrect min line number");
             }
