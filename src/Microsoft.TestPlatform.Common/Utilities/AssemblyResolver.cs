@@ -123,6 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         EqtTrace.Info("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
                     }
 
+                    this.resolvedAssemblies[args.Name] = null;
                     return null;
                 }
 
