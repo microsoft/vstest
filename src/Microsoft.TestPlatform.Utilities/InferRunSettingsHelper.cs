@@ -129,10 +129,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Updates the run settings XML with the specified values.
         /// </summary>
-        /// <param name="runSettingsDocument">XmlDocument of runsettings xml. </param>
-        /// <param name="architecture">The architecture. </param>
-        /// <param name="framework">The framework. </param>
-        /// <param name="resultsDirectory">The results directory. </param>
+        /// <param name="runSettingsDocument"> The XmlDocument of the XML. </param>
+        /// <param name="architecture"> The architecture. </param>
+        /// <param name="framework"> The framework. </param>
+        /// <param name="resultsDirectory"> The results directory. </param>
         public static void UpdateRunSettingsWithUserProvidedSwitches(XmlDocument runSettingsDocument, Architecture architecture, Framework framework, string resultsDirectory)
         {
             var runSettingsNavigator = runSettingsDocument.CreateNavigator();
@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Updates the <c>RunConfiguration.DesignMode</c> value for a run settings. Doesn't do anything if the value is already set.
         /// </summary>
-        /// <param name="runSettingsDocument">XmlDocument for runsettings xml</param>
+        /// <param name="runSettingsDocument">Document for runsettings xml</param>
         /// <param name="designModeValue">Value to set</param>
         public static void UpdateDesignMode(XmlDocument runSettingsDocument, bool designModeValue)
         {
@@ -188,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Updates the <c>RunConfiguration.CollectSourceInformation</c> value for a run settings. Doesn't do anything if the value is already set.
         /// </summary>
-        /// <param name="runSettingsDocument">XmlDocument for runsettings xml</param>
+        /// <param name="runSettingsDocument">Navigator for runsettings xml</param>
         /// <param name="collectSourceInformationValue">Value to set</param>
         public static void UpdateCollectSourceInformation(XmlDocument runSettingsDocument, bool collectSourceInformationValue)
         {
@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Updates the <c>RunConfiguration.TargetPlatform</c> value for a run settings. if the value is already set, behavior depends on overwrite.
         /// </summary>
-        /// <param name="runSettingsDocument">XmlDocument for runsettings xml</param>
+        /// <param name="runSettingsDocument">Navigator for runsettings xml</param>
         /// <param name="platform">Value to set</param>
         /// <param name="overwrite">Overwrite option.</param>
         public static void UpdateTargetPlatform(XmlDocument runSettingsDocument, string platform, bool overwrite = false)
