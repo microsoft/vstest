@@ -78,5 +78,17 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             throw new NotImplementedException();
         }
+
+        /// <inheritdoc/>
+        public string GetNativeDllDirectory()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public PlatformArchitecture GetCurrentProcessArchitecture()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

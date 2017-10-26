@@ -77,5 +77,29 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             return -1;
         }
+
+        /// <inheritdoc/>
+        public PlatformArchitecture GetCurrentProcessArchitecture()
+        {
+            // On ARM machines you cannot run x64/x86 process, so OS is ARM, we can safely say current process is ARM
+            if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE").Contains("ARM"))
+            {
+                return PlatformArchitecture.ARM;
+            }
+
+            if (IntPtr.Size == 8)
+            {
+                return PlatformArchitecture.X64;
+            }
+
+            return PlatformArchitecture.X86;
+        }
+
+        /// <inheritdoc/>
+        public string GetNativeDllDirectory()
+        {
+            // For UWP the native dll's are to kept in same directory
+            return this.GetCurrentProcessLocation();
+        }
     }
 }
