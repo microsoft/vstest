@@ -15,6 +15,11 @@
         <target state="new">Canceling test run as it crossed testSessionTimeout: {0} milliseconds.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="new">No suitable test runtime provider found for this run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

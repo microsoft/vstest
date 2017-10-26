@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
+                EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
             }
 
             return frameworkName;
@@ -52,24 +52,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 // AssemblyName won't load the assembly into current domain.
-                archType  = MapToArchitecture(new AssemblyName(assemblyPath).ProcessorArchitecture);
+                var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
+                archType = MapToArchitecture(assemblyName.ProcessorArchitecture);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // AssemblyName will thorw Exception if assembly contains native code or no manifest.
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
+                }
+
                 try
                 {
                     archType = GetArchitectureForSource(assemblyPath);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    EqtTrace.Error("Failed to determine Assembly Architecture: {0}", ex);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
+                    }
                 }
             }
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("GetArchitecture: determined architecture:{0} info for assembly: {1}", archType,
+                EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
                     assemblyPath);
             }
 

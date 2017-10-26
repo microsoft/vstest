@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -20,10 +21,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
     /// <summary>
     /// Implementation for TestPlatform
@@ -101,6 +104,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
+
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
@@ -137,6 +142,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
+
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
             if (testRunCriteria.TestHostLauncher != null)
@@ -175,6 +182,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         public void ClearExtensions()
         {
             this.TestEngine.GetExtensionManager().ClearExtensions();
+        }
+
+        private void ThrowExceptionIfTestHostManagerIsNull(ITestRuntimeProvider testHostManager, string settingXml)
+        {
+            if (testHostManager == null)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(settingXml);
+                var framework = config.TargetFrameworkVersion;
+
+                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
+                throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
+            }
         }
 
         /// <summary>
