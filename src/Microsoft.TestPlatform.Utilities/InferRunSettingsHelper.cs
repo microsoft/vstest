@@ -285,7 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
             var root = xmlDocument.DocumentElement;
 
-            if (root.SelectSingleNode(string.Format("//{0}/{1}", RunSettingsNodeName, RunConfigurationNodeName)) == null)
+            if (root.SelectSingleNode(RunConfigurationNodePath) == null)
             {
                 EqtTrace.Error("InferRunSettingsHelper.UpdateNodeIfNotPresent: Unable to navigate to RunConfiguration. Current node: " + xmlDocument.LocalName);
                 return;
