@@ -177,6 +177,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     }
                 }
 
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly.", args.Name);
+                }
+
                 this.resolvedAssemblies[args.Name] = null;
                 return null;
             }
