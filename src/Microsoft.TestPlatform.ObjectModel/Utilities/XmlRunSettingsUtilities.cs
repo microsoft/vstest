@@ -209,15 +209,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             var dataCollectorsNode = doc.CreateElement(Constants.DataCollectorsSettingName);
             dataCollectionRunSettingsNode.AppendChild(dataCollectorsNode);
 
+#if NET451
+            return doc;
+#else
+            // Xmldocument doesn't inherit from XmlDocument for netcoreapp2.0
             var ret = doc as IXPathNavigable;
             if (ret == null)
             {
-#if !NET451
                 return doc.ToXPathNavigable();
-#endif
             }
 
             return ret;
+#endif
         }
 
         /// <summary>
