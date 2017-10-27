@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ITestMessageEventHandler runEventsHandler)
         {
             var areTestCaseLevelEventsRequired = false;
-            IDictionary<string, string> environmentVariables = null;
+            IDictionary<string, string> environmentVariables = new Dictionary<string, string>();
 
             var dataCollectionEventsPort = 0;
             this.InvokeDataCollectionServiceAction(
