@@ -556,9 +556,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         public static IDiaDataSource GetDiaSourceObject()
         {
-            var currentDirectory = new ProcessHelper().GetNativeDllDirectory();
+            var nativeDllDirectory = new ProcessHelper().GetNativeDllDirectory();
 
-            IntPtr modHandle = LoadLibraryEx(Path.Combine(currentDirectory, "msdia140.dll"), IntPtr.Zero, 0);
+            IntPtr modHandle = LoadLibraryEx(Path.Combine(nativeDllDirectory, "msdia140.dll"), IntPtr.Zero, 0);
 
             if (modHandle == IntPtr.Zero)
             {

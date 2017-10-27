@@ -42,9 +42,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         string GetTestEngineDirectory();
 
         /// <summary>
-        /// Gets the location of msdia140.dll, depending on current process architecture..
+        /// Gets the location of native dll's, depending on current process architecture..
         /// </summary>
-        /// <returns>Location of msdia140.dll</returns>
+        /// <returns>Location of native dll's</returns>
         string GetNativeDllDirectory();
 
         /// <summary>
