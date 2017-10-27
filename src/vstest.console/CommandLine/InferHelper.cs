@@ -44,7 +44,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         }
                         else
                         {
-                            //TODO what to do for js, appx and others? Using AnyCPU for now.
+                            // Set AnyCPU for non dotnet test sources (js, py and other). Otherwise warning will
+                            // show up if there is mismatch with user provided platform.
                             arch = Architecture.AnyCPU;
                         }
                         sourcePlatforms[source]=(Architecture)arch;
