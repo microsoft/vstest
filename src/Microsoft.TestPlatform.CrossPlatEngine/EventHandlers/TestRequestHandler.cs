@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
     /// </summary>
-    public class TestRequestHandler : IDisposable, ITestRequestHandler
+    public class TestRequestHandler3 : IDisposable, ITestRequestHandler
     {
         private ICommunicationManager communicationManager;
 
@@ -41,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies runner is using version 1
         private int protocolVersion = 1;
 
-        public TestRequestHandler(TestHostConnectionInfo connectionInfo)
+        public TestRequestHandler3(TestHostConnectionInfo connectionInfo)
             : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance)
         {
         }
 
-        internal TestRequestHandler(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
+        internal TestRequestHandler3(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
             this.transport = new SocketTransport(communicationManager, connectionInfo);

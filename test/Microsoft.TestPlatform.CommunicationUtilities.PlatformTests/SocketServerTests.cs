@@ -18,8 +18,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
     public class SocketServerTests : SocketTestsBase, IDisposable
     {
         private readonly TcpClient tcpClient;
-
-        private readonly ICommunicationServer socketServer;
+        private readonly string defaultConnection = IPAddress.Loopback.ToString() + ":0";
+        private readonly ICommunicationEndPoint socketServer;
 
         public SocketServerTests()
         {
@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public async Task SocketServerStartShouldHostServer()
         {
-            var connectionInfo = this.socketServer.Start();
+            var connectionInfo = this.socketServer.Start(this.defaultConnection);
 
             Assert.IsFalse(string.IsNullOrEmpty(connectionInfo));
             await this.ConnectToServer(int.Parse(connectionInfo));
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketServerStopShouldStopListening()
         {
-            var connectionInfo = this.socketServer.Start();
+            var connectionInfo = this.socketServer.Start(this.defaultConnection);
 
             this.socketServer.Stop();
 
@@ -74,7 +74,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void SocketServerStopShouldCloseClient()
         {
             ManualResetEvent waitEvent = new ManualResetEvent(false);
-            this.socketServer.ClientDisconnected += (s, e) => { waitEvent.Set(); };
+            this.socketServer.Disconnected += (s, e) => { waitEvent.Set(); };
             this.SetupChannel(out ConnectedEventArgs clientConnected);
 
             this.socketServer.Stop();
@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             DisconnectedEventArgs disconnected = null;
             ManualResetEvent waitEvent = new ManualResetEvent(false);
-            this.socketServer.ClientDisconnected += (s, e) =>
+            this.socketServer.Disconnected += (s, e) =>
             {
                 disconnected = e;
                 waitEvent.Set();
@@ -107,7 +107,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             ManualResetEvent waitEvent = new ManualResetEvent(false);
             var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
-            this.socketServer.ClientDisconnected += (s, e) => { waitEvent.Set(); };
+            this.socketServer.Disconnected += (s, e) => { waitEvent.Set(); };
 
             this.socketServer.Stop();
 
@@ -120,7 +120,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             DisconnectedEventArgs clientDisconnected = null;
             ManualResetEvent waitEvent = new ManualResetEvent(false);
-            this.socketServer.ClientDisconnected += (sender, eventArgs) =>
+            this.socketServer.Disconnected += (sender, eventArgs) =>
             {
                 clientDisconnected = eventArgs;
                 waitEvent.Set();
@@ -144,14 +144,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             ICommunicationChannel channel = null;
             ConnectedEventArgs clientConnectedEvent = null;
             ManualResetEvent waitEvent = new ManualResetEvent(false);
-            this.socketServer.ClientConnected += (sender, eventArgs) =>
+            this.socketServer.Connected += (sender, eventArgs) =>
             {
                 clientConnectedEvent = eventArgs;
                 channel = eventArgs.Channel;
                 waitEvent.Set();
             };
 
-            var connectionInfo = this.socketServer.Start();
+            var connectionInfo = this.socketServer.Start(this.defaultConnection);
             this.ConnectToServer(int.Parse(connectionInfo)).GetAwaiter().GetResult();
             waitEvent.WaitOne();
 

@@ -113,7 +113,7 @@ function invoke_test()
     local dotnet=$(_get_dotnet_path)
     local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel
+    find ./test -path $PROJECT_NAME_PATTERNS | xargs --verbose $dotnet $vstest --parallel
 }
 
 #

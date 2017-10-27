@@ -121,11 +121,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             ICommunicationManager communicationManager,
             IMessageSink messageSink)
         {
+            ValidateArg.NotNull(communicationManager, nameof(communicationManager));
+            ValidateArg.NotNull(messageSink, nameof(messageSink));
             if (Instance == null)
             {
-                ValidateArg.NotNull(communicationManager, nameof(communicationManager));
-                ValidateArg.NotNull(messageSink, nameof(messageSink));
-
                 lock (SyncObject)
                 {
                     if (Instance == null)

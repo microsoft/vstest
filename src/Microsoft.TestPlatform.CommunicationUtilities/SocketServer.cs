@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// <summary>
     /// Communication server implementation over sockets.
     /// </summary>
-    public class SocketServer : ICommunicationServer
+    public class SocketServer : ICommunicationEndPoint
     {
         private readonly CancellationTokenSource cancellation;
 
@@ -53,21 +53,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public event EventHandler<ConnectedEventArgs> ClientConnected;
+        public event EventHandler<ConnectedEventArgs> Connected;
 
         /// <inheritdoc />
-        public event EventHandler<DisconnectedEventArgs> ClientDisconnected;
+        public event EventHandler<DisconnectedEventArgs> Disconnected;
 
-        /// <inheritdoc />
-        public string Start()
+        public string Start(string endpoint)
         {
-            var endpoint = new IPEndPoint(IPAddress.Loopback, 0);
-            this.tcpListener = new TcpListener(endpoint);
+            this.tcpListener = new TcpListener(endpoint.GetIPEndPoint());
 
             this.tcpListener.Start();
 
-            var connectionInfo = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port.ToString();
-            EqtTrace.Info("SocketServer: Listening on port : {0}", connectionInfo);
+            var connectionInfo = ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
+            EqtTrace.Info("SocketServer: Listening on end point : {0}", connectionInfo);
 
             // Serves a single client at the moment. An error in connection, or message loop just
             // terminates the entire server.
@@ -90,10 +88,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.tcpClient = client;
             this.tcpClient.Client.NoDelay = true;
 
-            if (this.ClientConnected != null)
+            if (this.Connected != null)
             {
                 this.channel = this.channelFactory(this.tcpClient.GetStream());
-                this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
+                this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
                 Task.Run(() => this.tcpClient.MessageLoopAsync(this.channel, error => this.Stop(error), this.cancellation.Token)).ConfigureAwait(false);
@@ -121,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Dispose();
                 this.cancellation.Dispose();
 
-                this.ClientDisconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
+                this.Disconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
             }
         }
     }
