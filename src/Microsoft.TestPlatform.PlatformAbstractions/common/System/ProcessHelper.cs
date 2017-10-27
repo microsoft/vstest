@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// </summary>
     public partial class ProcessHelper : IProcessHelper
     {
+        private static readonly string ARM = "arm";
+
         /// <inheritdoc/>
         public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack)
         {
@@ -166,12 +168,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public PlatformArchitecture GetCurrentProcessArchitecture()
         {
-            // On ARM machines you cannot run x64/x86 process, so OS is ARM, we can safely say current process is ARM
-            if (Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE").Contains("ARM"))
-            {
-                return PlatformArchitecture.ARM;
-            }
-
             if (IntPtr.Size == 8)
             {
                 return PlatformArchitecture.X64;
@@ -183,7 +179,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public string GetNativeDllDirectory()
         {
-            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString());
+            var isArm = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE").Contains("ARM");
+            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString(), isArm ? ARM : string.Empty);
         }
     }
 }
