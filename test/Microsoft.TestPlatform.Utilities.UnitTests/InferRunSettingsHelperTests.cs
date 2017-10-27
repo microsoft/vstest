@@ -233,29 +233,6 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                         XmlRunSettingsUtilities.OSArchitecture.ToString()));
         }
 
-        [DataTestMethod]
-        [DataRow("DesignMode")]
-        [DataRow("CollectSourceInformation")]
-        [Ignore]
-        public void UpdateRunSettingsShouldNotModifyXmlIfxmlDocumentIsNotAtRootNode(string settingName)
-        {
-            var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settings);
-
-            switch (settingName.ToUpperInvariant())
-            {
-                case "DESIGNMODE":
-                    InferRunSettingsHelper.UpdateDesignMode(xmlDocument, true);
-                    break;
-
-                case "COLLECTSOURCEINFORMATION":
-                    InferRunSettingsHelper.UpdateCollectSourceInformation(xmlDocument, true);
-                    break;
-            };
-
-            Assert.IsTrue(xmlDocument.InnerXml.IndexOf(settingName, StringComparison.OrdinalIgnoreCase) < 0);
-        }
-
         [TestMethod]
         public void UpdateDesignModeOrCsiShouldNotModifyXmlIfNodeIsAlreadyPresent()
         {
