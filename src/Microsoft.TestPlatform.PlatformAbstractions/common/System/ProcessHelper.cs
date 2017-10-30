@@ -182,10 +182,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             var osArchitecture = new PlatformEnvironment().Architecture;
             if (osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64)
             {
-                return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString(), ARM);
+                return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower(), ARM);
             }
 
-            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString());
+            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower());
         }
     }
 }
