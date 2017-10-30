@@ -288,7 +288,7 @@ function publish_package()
             local testhost=$packageDir/TestHost
             mkdir -p $testhost
             cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x64/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
         fi
         
         # Copy over the logger assemblies to the Extensions folder.
@@ -361,7 +361,8 @@ function create_package()
         log "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
     fi
 
-    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec" "TestPlatform.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
+    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
+        "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
     projectFiles=("Microsoft.TestPlatform.CLI.csproj" "Microsoft.TestPlatform.Build.csproj")
     binDir="$TP_ROOT_DIR/bin/packages"
 
@@ -418,8 +419,9 @@ else
     invoke_build
 fi
 
-log "Build complete. Elapsed $(( SECONDS - start ))s."
-
 if [[ $? -ne 0 ]]; then
+    log "Build failed. Elapsed $(( SECONDS - start ))s."
     exit 1
 fi
+
+log "Build complete. Elapsed $(( SECONDS - start ))s."
