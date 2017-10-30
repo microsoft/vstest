@@ -190,6 +190,10 @@ function Invoke-Build
     & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
+    }
+
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -251,6 +255,10 @@ function Publish-Package
     $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
+
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
+    }
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
@@ -378,6 +386,10 @@ function Publish-PackageInternal($packagename, $framework, $output)
 {
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
+    }
 }
 
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
