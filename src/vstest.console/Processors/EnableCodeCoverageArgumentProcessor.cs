@@ -160,11 +160,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 var document = new XmlDocument();
                 document.Load(reader);
-#if NET451
+
+#if !NETCOREAPP1_0
                 runSettingsDocument = document;
 #else
                 runSettingsDocument = document.ToXPathNavigable();
-#endif
+#endif 
             }
 
             var runSettingsNavigator = runSettingsDocument.CreateNavigator();

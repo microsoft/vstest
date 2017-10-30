@@ -182,11 +182,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     var settingsDocument = new XmlDocument();
                     settingsDocument.Load(reader);
                     ClientUtilities.FixRelativePathsInRunSettings(settingsDocument, runSettingsFile);
-#if NET451
+
+#if !NETCOREAPP1_0
                     runSettingsDocument = settingsDocument;
 #else
                     runSettingsDocument = settingsDocument.ToXPathNavigable();
-#endif
+#endif                    
                 }
             }
             else
