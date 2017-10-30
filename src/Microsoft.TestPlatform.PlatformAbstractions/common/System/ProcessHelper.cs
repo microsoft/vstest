@@ -179,8 +179,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public string GetNativeDllDirectory()
         {
-            var isArm = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE").Contains("ARM");
-            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString(), isArm ? ARM : string.Empty);
+            var osArchitecture = new PlatformEnvironment().Architecture;
+            if (osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64)
+            {
+                return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower(), ARM);
+            }
+
+            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower());
         }
     }
 }
