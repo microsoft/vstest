@@ -172,9 +172,7 @@ function Restore-Package
     & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -190,18 +188,14 @@ function Invoke-Build
     & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 
     Write-Log ".. .. Build: Source: $TPB_TestAssets_Solution"
     Write-Verbose "$dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild"
     & $dotnetExe build $TPB_TestAssets_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -256,9 +250,7 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
@@ -266,9 +258,7 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullCLRPackageDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force -recurse
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
@@ -387,9 +377,7 @@ function Publish-PackageInternal($packagename, $framework, $output)
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 }
 
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
@@ -565,9 +553,7 @@ function Update-LocalizedResources
     Write-Verbose "& $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true"
     & $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize -p:LocalizeResources=true
 
-    if ($lastExitCode -ne 0) {
-        Set-ScriptFailed
-    }
+    Set-ScriptFailed-OnError
 
     Write-Log ".. Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -616,8 +602,12 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
     return $timer.Elapsed
 }
 
-function Set-ScriptFailed
+function Set-ScriptFailed-OnError
 {
+    if ($lastExitCode -eq 0) {
+        return
+    }
+
     if ($FailFast -eq $true) {
         Write-Error "Build failed. Stopping as fail fast is set."
     }
