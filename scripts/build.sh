@@ -96,7 +96,8 @@ TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
-TPB_HasMono=$(command -v mono > /dev/null && echo true || echo false)
+#TPB_HasMono=$(command -v mono > /dev/null && echo true || echo false)
+TPB_HasMono=true
 
 #
 # Logging
@@ -199,6 +200,7 @@ function invoke_build()
     log ".. .. Build: Source: $TPB_Solution"
     
     if $TPB_HasMono; then
+        export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
         if [ -z "$PROJECT_NAME_PATTERNS" ]
         then
             $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
@@ -407,10 +409,10 @@ log "Test platform environment variables: "
 log "Test platform build variables: "
 (set | grep ^TPB_)
 
-if $TPB_HasMono; then
-    # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$(dirname $(which mono))/../lib/mono/4.5/
-fi
+#if $TPB_HasMono; then
+    ## Workaround for https://github.com/dotnet/sdk/issues/335
+    #export FrameworkPathOverride=$(dirname $(which mono))/../lib/mono/4.5/
+#fi
 
 if [ -z "$PROJECT_NAME_PATTERNS" ]
 then

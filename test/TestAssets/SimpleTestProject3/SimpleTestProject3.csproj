@@ -22,6 +22,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <Reference Include="System.Runtime" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
