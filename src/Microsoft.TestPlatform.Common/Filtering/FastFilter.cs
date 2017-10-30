@@ -150,6 +150,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     {
                         operatorEncountered = true;
                         fastFilterOperator = @operator;
+                        if ((fastFilterOperation == Operation.NotEqual && fastFilterOperator == Operator.Or)
+                            || (fastFilterOperation == Operation.Equal && fastFilterOperator == Operator.And))
+                        {
+                            containsValidFilter = false;
+                        }
                     }
                 }
                 else
