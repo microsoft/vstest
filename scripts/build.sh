@@ -80,8 +80,8 @@ TP_SRC_DIR="$TP_ROOT_DIR/src"
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="LATEST"
-DOTNET_RUNTIME_VERSION="LATEST"
+DOTNET_CLI_VERSION="2.1.0-preview1-007372"
+#DOTNET_RUNTIME_VERSION="LATEST"
 
 #
 # Build configuration
