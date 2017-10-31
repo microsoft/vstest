@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <summary>
         /// Initialize the TestPlatform with Paths to extensions like adapters, loggers and any other extensions
         /// </summary>
-        /// <param name="pathToAdditionalExtensions">Folder Paths to where extension DLLs are present</param>
+        /// <param name="pathToAdditionalExtensions">Full Paths to where extension DLLs are present</param>
         void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions);
 
         /// <summary>

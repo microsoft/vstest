@@ -6,6 +6,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
 
     using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 
     public class AcceptanceTestBase : IntegrationTestBase
     {
@@ -62,7 +64,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         protected string GetTargetFramworkForRunsettings()
         {
             var targetFramework = string.Empty;
-            if(this.testEnvironment.TargetFramework == DesktopTargetFramework)
+            if (this.testEnvironment.TargetFramework == DesktopTargetFramework)
             {
                 targetFramework = "Framework45";
             }
@@ -94,6 +96,35 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             return testHostProcessName;
+        }
+
+        protected IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        {
+            var vsConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
+            vsConsoleWrapper.StartSession();
+
+            return vsConsoleWrapper;
+        }
+
+        public string GetDefaultRunSettings()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+            return runSettingsXml;
+        }
+
+        public string GetRunSettingsWithParallel()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <MaxCpuCount>2</MaxCpuCount>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+            return runSettingsXml;
         }
     }
 }
