@@ -109,8 +109,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 var document = new XmlDocument();
                 document.Load(reader);
 
-                InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(document, architecture, framework, defaultResultsDirectory);
-                return document.OuterXml;
+                var navigator = document.CreateNavigator();
+
+                InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, architecture, framework, defaultResultsDirectory);
+                return navigator.OuterXml;
             }
         }
 

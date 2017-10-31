@@ -212,14 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 #if NET451
             return doc;
 #else
-            // Xmldocument doesn't inherit from XmlDocument for netcoreapp2.0
-            var ret = doc as IXPathNavigable;
-            if (ret == null)
-            {
-                return doc.ToXPathNavigable();
-            }
-
-            return ret;
+            return doc.ToXPathNavigable();
 #endif
         }
 

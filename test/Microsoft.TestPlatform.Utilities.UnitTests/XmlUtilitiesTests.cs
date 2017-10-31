@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         #region GetNodeXml tests
 
         [TestMethod]
-        public void GetNodeXmlShouldThrowIfxmlDocumentIsNull()
+        public void GetNodeXmlShouldThrowIfNavigatorIsNull()
         {
             Assert.ThrowsException<NullReferenceException>(() => XmlUtilities.GetNodeXml(null, @"/RunSettings/RunConfiguration"));
         }
@@ -26,36 +26,36 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         public void GetNodeXmlShouldThrowIfXPathIsNull()
         {
             var settingsXml = @"<RunSettings></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), null));
+            Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(navigator, null));
         }
 
         [TestMethod]
         public void GetNodeXmlShouldThrowIfXPathIsInvalid()
         {
             var settingsXml = @"<RunSettings></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"Rs\r"));
+            Assert.ThrowsException<XPathException>(() => XmlUtilities.GetNodeXml(navigator, @"Rs\r"));
         }
 
         [TestMethod]
         public void GetNodeXmlShouldReturnNullIfNodeDoesNotExist()
         {
             var settingsXml = @"<RunSettings></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            Assert.IsNull(XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RunConfiguration"));
+            Assert.IsNull(XmlUtilities.GetNodeXml(navigator, @"/RunSettings/RunConfiguration"));
         }
 
         [TestMethod]
         public void GetNodeXmlShouldReturnNodeValue()
         {
             var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            Assert.AreEqual("abc", XmlUtilities.GetNodeXml(xmlDocument.CreateNavigator(), @"/RunSettings/RC"));
+            Assert.AreEqual("abc", XmlUtilities.GetNodeXml(navigator, @"/RunSettings/RC"));
         }
 
         #endregion
@@ -99,57 +99,65 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         #endregion
 
         #region AppendOrModifyChild tests
-
+        
         [TestMethod]
         public void AppendOrModifyChildShouldModifyExistingNode()
         {
             var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", "ab");
+            navigator.MoveToChild("RunSettings", string.Empty);
 
-            var rcxmlDocument = xmlDocument.SelectSingleNode(@"/RunSettings/RC");
-            Assert.IsNotNull(rcxmlDocument);
-            Assert.AreEqual("ab", rcxmlDocument.InnerXml);
+            XmlUtilities.AppendOrModifyChild(navigator, @"/RunSettings/RC", "RC", "ab");
+
+            var rcNavigator = navigator.SelectSingleNode(@"/RunSettings/RC");
+            Assert.IsNotNull(rcNavigator);
+            Assert.AreEqual("ab", rcNavigator.InnerXml);
         }
 
         [TestMethod]
         public void AppendOrModifyChildShouldAppendANewNode()
         {
             var settingsXml = @"<RunSettings></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", "abc");
+            navigator.MoveToChild("RunSettings", string.Empty);
 
-            var rcxmlDocument = xmlDocument.SelectSingleNode(@"/RunSettings/RC");
-            Assert.IsNotNull(rcxmlDocument);
-            Assert.AreEqual("abc", rcxmlDocument.InnerXml);
+            XmlUtilities.AppendOrModifyChild(navigator, @"/RunSettings/RC", "RC", "abc");
+
+            var rcNavigator = navigator.SelectSingleNode(@"/RunSettings/RC");
+            Assert.IsNotNull(rcNavigator);
+            Assert.AreEqual("abc", rcNavigator.InnerXml);
         }
 
         [TestMethod]
         public void AppendOrModifyChildShouldNotModifyExistingXmlIfInnerXmlPassedInIsNull()
         {
             var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", null);
+            navigator.MoveToChild("RunSettings", string.Empty);
 
-            var rcxmlDocument = xmlDocument.SelectSingleNode(@"/RunSettings/RC");
-            Assert.IsNotNull(rcxmlDocument);
-            Assert.AreEqual("abc", rcxmlDocument.InnerXml);
+            XmlUtilities.AppendOrModifyChild(navigator, @"/RunSettings/RC", "RC", null);
+
+            var rcNavigator = navigator.SelectSingleNode(@"/RunSettings/RC");
+            Assert.IsNotNull(rcNavigator);
+            Assert.AreEqual("abc", rcNavigator.InnerXml);
         }
 
         [TestMethod]
         public void AppendOrModifyChildShouldCreateAnEmptyNewNodeIfInnerXmlPassedInIsNull()
         {
             var settingsXml = @"<RunSettings></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", null);
+            navigator.MoveToChild("RunSettings", string.Empty);
 
-            var rcxmlDocument = xmlDocument.SelectSingleNode(@"/RunSettings/RC");
-            Assert.IsNotNull(rcxmlDocument);
-            Assert.AreEqual(string.Empty, rcxmlDocument.InnerXml);
+            XmlUtilities.AppendOrModifyChild(navigator, @"/RunSettings/RC", "RC", null);
+
+            var rcNavigator = navigator.SelectSingleNode(@"/RunSettings/RC");
+            Assert.IsNotNull(rcNavigator);
+            Assert.AreEqual(string.Empty, rcNavigator.InnerXml);
         }
 
         #endregion
@@ -160,35 +168,38 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         public void RemoveChildNodeShouldNotModifyExistingXmlIfNodeDoesnotExist()
         {
             var settingsXml = @"<RunSettings></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
+            var navigator = this.GetNavigator(settingsXml);
 
-            XmlUtilities.RemoveChildNode(xmlDocument.CreateNavigator(), @"/RunSettings/RC", "RC");
+            navigator.MoveToChild("RunSettings", string.Empty);
 
-            Assert.AreEqual(settingsXml, xmlDocument.OuterXml);
+            XmlUtilities.RemoveChildNode(navigator, @"/RunSettings/RC", "RC");
+
+            Assert.AreEqual(settingsXml, navigator.OuterXml);
         }
 
         [TestMethod]
         public void RemoveChildNodeShouldRemoveXmlIfExist()
         {
             var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
-            var xmlDocument = this.GetXmlDocument(settingsXml);
-            var navigator = xmlDocument.CreateNavigator();
+            var navigator = this.GetNavigator(settingsXml);
+
             navigator.MoveToChild("RunSettings", string.Empty);
+
             XmlUtilities.RemoveChildNode(navigator, @"/RunSettings/RC", "RC");
 
-            Assert.AreEqual(@"<RunSettings></RunSettings>", xmlDocument.OuterXml);
+            Assert.AreEqual(@"<RunSettings></RunSettings>", navigator.OuterXml);
         }
 
         #endregion
 
         #region private methods
 
-        private XmlDocument GetXmlDocument(string settingsXml)
+        private XPathNavigator GetNavigator(string settingsXml)
         {
             var doc = new XmlDocument();
             doc.LoadXml(settingsXml);
 
-            return doc;
+            return doc.CreateNavigator();
         }
 
         #endregion
