@@ -54,6 +54,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var fastFilter = filterExpressionWrapper.fastFilter;
 
             Assert.IsTrue(fastFilter == null);
+            Assert.IsTrue(string.IsNullOrEmpty(filterExpressionWrapper.ParseError));
         }
 
         [TestMethod]
@@ -63,6 +64,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             var fastFilter = filterExpressionWrapper.fastFilter;
 
             Assert.IsTrue(fastFilter == null);
+            Assert.IsTrue(string.IsNullOrEmpty(filterExpressionWrapper.ParseError));
         }
 
         [TestMethod]
