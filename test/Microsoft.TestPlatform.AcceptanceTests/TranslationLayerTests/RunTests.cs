@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -12,6 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class RunTests : AcceptanceTestBase
@@ -125,7 +127,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Assert
             Assert.AreEqual(1, runEventHandler.TestResults.Count);
             Assert.AreEqual(TestOutcome.Passed, runEventHandler.TestResults.FirstOrDefault().Outcome);
-            Assert.AreEqual(22, runEventHandler.TestResults.FirstOrDefault().TestCase.LineNumber);
+
+            // Release builds optimize code, hence min line numbers are different.
+            if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.AreEqual(23, runEventHandler.TestResults.FirstOrDefault().TestCase.LineNumber);
+            }
+            else
+            {
+                Assert.AreEqual(22, runEventHandler.TestResults.FirstOrDefault().TestCase.LineNumber);
+            }
         }
 
         [TestMethod]
