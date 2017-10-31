@@ -44,8 +44,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         }
                         else
                         {
-                            //TODO what to do for js, appx and others? Using default for now.
-                            arch = Constants.DefaultPlatform;
+                            // Set AnyCPU for non dotnet test sources (js, py and other). Otherwise warning will
+                            // show up if there is mismatch with user provided platform.
+                            arch = Architecture.AnyCPU;
                         }
                         sourcePlatforms[source]=(Architecture)arch;
 
@@ -78,10 +79,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
             {
                 EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, architecture);
             }
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Determined platform for all sources: {0}", architecture);
+            }
+
             return architecture;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines Framework from sources.
+        /// </summary>
         public Framework AutoDetectFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
         {
             Framework framework = Framework.DefaultFramework;
@@ -107,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Determined framework: {0}", framework);
+                EqtTrace.Info("Determined framework for all sources: {0}", framework);
             }
 
             return framework;
