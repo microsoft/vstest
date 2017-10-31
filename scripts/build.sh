@@ -24,6 +24,14 @@ CI_BUILD=false
 VERBOSE=false
 PROJECT_NAME_PATTERNS=
 
+#
+# Source build repo api
+# See https://github.com/dotnet/source-build/blob/dev/release/2.0/Documentation/RepoApi.md
+#
+DOTNETBUILDFROMSOURCE=false
+DOTNETCORESDKDIR=
+DOTNETBUILDTOOLSDIR=
+
 while [ $# -gt 0 ]; do
     lowerI="$(echo ${1:-} | awk '{print tolower($0)}')"
     case $lowerI in
@@ -33,24 +41,42 @@ while [ $# -gt 0 ]; do
             ;;
         -c)
             CONFIGURATION=$2
+            shift
             ;;
         -r)
             TARGET_RUNTIME=$2
+            shift
             ;;
         -v)
             VERSION=$2
+            shift
             ;;
         -vs)
             VERSION_SUFFIX=$2
+            shift
             ;;
         -noloc)
             DISABLE_LOCALIZED_BUILD=$2
+            shift
             ;;
         -ci)
             CI_BUILD=$2
+            shift
             ;;
         -p)
             PROJECT_NAME_PATTERNS=$2
+            shift
+            ;;
+        -dotnetbuildfromsource)
+            DOTNETBUILDFROMSOURCE=true
+            ;;
+        -dotnetcoresdkdir)
+            DOTNETCORESDKDIR=$2
+            shift
+            ;;
+        -dotnetbuildtoolsdir)
+            DOTNETBUILDTOOLSDIR=$2
+            shift
             ;;
         -verbose)
             VERBOSE=true
@@ -67,11 +93,13 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
-TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"
+TP_DOTNET_DIR="${DOTNETCORESDKDIR:-${TP_TOOLS_DIR}/dotnet}"
+TP_PACKAGES_DIR="${NUGET_PACKAGES:-${TP_ROOT_DIR}/packages}"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
 TP_PACKAGE_NUSPEC_DIR="$TP_ROOT_DIR/src/package/nuspec"
 TP_SRC_DIR="$TP_ROOT_DIR/src"
+TP_USE_REPO_API=$DOTNETBUILDFROMSOURCE
 
 #
 # Dotnet configuration
@@ -137,33 +165,42 @@ function usage()
 #
 function install_cli()
 {
-    local failed=false
-    local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
-    local remote_path="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
+    if [[ $TP_USE_REPO_API ]]; then
+        # Skip download of dotnet toolset if REPO API is enabled
+        local failed=false
+        local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
+        local remote_path="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
 
-    log "Installing dotnet cli..."
-    local start=$SECONDS
+        log "Installing dotnet cli..."
+        local start=$SECONDS
 
-    # Install the latest version of dotnet-cli
-    curl --retry 10 -sSL --create-dirs -o $install_script $remote_path || failed=true
-    if [ "$failed" = true ]; then
-        error "Failed to download dotnet-install.sh script."
+        # Install the latest version of dotnet-cli
+        curl --retry 10 -sSL --create-dirs -o $install_script $remote_path || failed=true
+        if [ "$failed" = true ]; then
+            error "Failed to download dotnet-install.sh script."
+            return 1
+        fi
+        chmod u+x $install_script
+
+        log "install_cli: Get the latest dotnet cli toolset..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
+
+        # Get netcoreapp1.1 shared components
+        log "install_cli: Get the shared netcoreapp1.0 runtime..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
+        log "install_cli: Get the shared netcoreapp1.1 runtime..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
+        log "install_cli: Get the shared netcoreapp2.0 runtime..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
+        #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
+        #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
+    fi
+
+    local dotnet_path=$(_get_dotnet_path)
+    if [[ ! -e $dotnet_path ]]; then
+        log "dotnet not found at $dotnet_path. Did the dotnet cli installation succeed?"
         return 1
     fi
-    chmod u+x $install_script
-
-    log "install_cli: Get the latest dotnet cli toolset..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
-
-    # Get netcoreapp1.1 shared components
-    log "install_cli: Get the shared netcoreapp1.0 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
-    log "install_cli: Get the shared netcoreapp1.1 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
-    log "install_cli: Get the shared netcoreapp2.0 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
-    #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-    #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
 
     log "install_cli: Complete. Elapsed $(( SECONDS - start ))s."
     return 0
@@ -196,6 +233,7 @@ function invoke_build()
     local start=$SECONDS
     log ".. .. Build: Source: $TPB_Solution"
     
+    # Workaround for https://github.com/dotnet/sdk/issues/335
     export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
@@ -316,11 +354,6 @@ function create_package()
     packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
     mkdir -p $packageOutputDir
 
-    DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
-    if [[ ! -e $DOTNET_PATH ]]; then
-        log "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
-    fi
-
     nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
         "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
     projectFiles=("Microsoft.TestPlatform.CLI.csproj" "Microsoft.TestPlatform.Build.csproj")
@@ -342,9 +375,9 @@ function create_package()
 
 
     for i in ${projectFiles[@]}; do
-        log "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
-        && $DOTNET_PATH restore $stagingDir/${i} \
-        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
+        log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
+        && $dotnet restore $stagingDir/${i} \
+        && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
     done
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."
@@ -355,7 +388,7 @@ function create_package()
 #
 _get_dotnet_path()
 {
-    echo "$TP_TOOLS_DIR/dotnet/dotnet"
+    echo "$TP_DOTNET_DIR/dotnet"
 }
 
 # Execute build
