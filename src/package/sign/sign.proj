@@ -299,6 +299,11 @@
         <Authenticode>Microsoft</Authenticode>
         <StrongName>StrongName</StrongName>
       </TestHostCoreAssembliesToSign>
+
+      <IntellitraceAssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </IntellitraceAssembliesToSign>
     </ItemGroup>
 
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
