@@ -537,9 +537,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
             {
+                dataCollectorInfo.SetTestExecutionEnvironmentVariables();
                 try
                 {
-                    dataCollectorInfo.SetTestExecutionEnvironmentVariables();
                     this.AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);
                 }
                 catch (Exception ex)

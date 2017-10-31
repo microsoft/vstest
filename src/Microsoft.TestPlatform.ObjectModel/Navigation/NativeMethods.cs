@@ -556,11 +556,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         public static IDiaDataSource GetDiaSourceObject()
         {
-            var nativeDllDirectory = new ProcessHelper().GetNativeDllDirectory();
+            var currentDirectory = new ProcessHelper().GetCurrentProcessLocation();
 
-            IntPtr modHandle = LoadLibraryEx(Path.Combine(nativeDllDirectory, "msdia140.dll"), IntPtr.Zero, 0);
+            IntPtr modHandle = IntPtr.Zero;
+            if (IntPtr.Size == 8)
+            {
+                modHandle = LoadLibraryEx(Path.Combine(currentDirectory, "x64\\msdia140.dll"), IntPtr.Zero, 0);
+            }
+            else
+            {
+                modHandle = LoadLibraryEx(Path.Combine(currentDirectory, "x86\\msdia140.dll"), IntPtr.Zero, 0);
+            }
 
-            if (modHandle == IntPtr.Zero)
+            if(modHandle == IntPtr.Zero)
             {
                 throw new COMException(string.Format(Resources.Resources.FailedToLoadMsDia));
             }

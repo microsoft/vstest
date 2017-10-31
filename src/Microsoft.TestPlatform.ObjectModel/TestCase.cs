@@ -18,12 +18,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     [DataContract]
     public sealed class TestCase : TestObject
     {
+#if TODO
         /// <summary>
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
-        private Object localExtensionData;
-
+        private Object m_localExtensionData;
+#endif
         private Guid defaultId = Guid.Empty;
         private Guid id;
         private string displayName;
@@ -69,15 +70,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Properties
 
+#if TODO
         /// <summary>
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
         public Object LocalExtensionData
         {
-            get { return localExtensionData; }
-            set { localExtensionData = value; }
+            get { return m_localExtensionData; }
+            set { m_localExtensionData = value; }
         }
+#endif
 
         /// <summary>
         /// Gets or sets the id of the test case.

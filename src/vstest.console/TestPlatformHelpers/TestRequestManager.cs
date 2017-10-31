@@ -410,14 +410,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (updateFramework)
                     {
-                        InferRunSettingsHelper.UpdateTargetFramework(document, inferedFramework?.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetFramework(navigator, inferedFramework?.ToString(), overwrite: true);
                         chosenFramework = inferedFramework;
                         settingsUpdated = true;
                     }
 
                     if (updatePlatform)
                     {
-                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferedPlatform.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetPlatform(navigator, inferedPlatform.ToString(), overwrite: true);
                         chosenPlatform = inferedPlatform;
                         settingsUpdated = true;
                     }
@@ -441,19 +441,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (!runConfiguration.DesignModeSet)
                     {
-                        InferRunSettingsHelper.UpdateDesignMode(document, this.commandLineOptions.IsDesignMode);
+                        InferRunSettingsHelper.UpdateDesignMode(navigator, this.commandLineOptions.IsDesignMode);
                         settingsUpdated = true;
                     }
 
                     if (!runConfiguration.CollectSourceInformationSet)
                     {
-                        InferRunSettingsHelper.UpdateCollectSourceInformation(document, this.commandLineOptions.ShouldCollectSourceInformation);
+                        InferRunSettingsHelper.UpdateCollectSourceInformation(navigator, this.commandLineOptions.ShouldCollectSourceInformation);
                         settingsUpdated = true;
                     }
 
                     if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
-                        InferRunSettingsHelper.UpdateTargetDevice(document, deviceXml);
+                        InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
                         settingsUpdated = true;
                     }
 

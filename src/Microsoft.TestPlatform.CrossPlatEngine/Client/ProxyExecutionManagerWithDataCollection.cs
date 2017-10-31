@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
-        /// <param name="requestSender">
+        /// <param name="testRequestSender">
         /// Test request sender instance.
         /// </param>
         /// <param name="testHostManager">
@@ -44,7 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
-            this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
         }
 
         /// <summary>

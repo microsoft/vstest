@@ -53,14 +53,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(testGuid, testCase.Id);
         }
 
-        [TestMethod]
-        public void TestCaseLocalExtensionDataIsPubliclySettableGettableProperty()
-        {
-            var dummyData = "foo";
-            this.testCase.LocalExtensionData = dummyData;
-            Assert.AreEqual("foo", this.testCase.LocalExtensionData);
-        }
-
         #region GetSetPropertyValue Tests
 
         [TestMethod]
