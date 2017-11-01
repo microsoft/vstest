@@ -47,6 +47,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IRequestData> mockRequestData;
 
+        private Mock<IDataSerializer> mockDataSerializer;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -61,7 +63,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
-
+            this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockTestHostManager.Setup(
                     m => m.GetTestHostProcessStartInfo(
                         It.IsAny<IEnumerable<string>>(),
@@ -140,24 +142,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var connectionInfo = new TestHostConnectionInfo
                                       {
                                           Endpoint = IPAddress.Loopback + ":0",
-                                          Role = ConnectionRole.Client,
+                                          Role = ConnectionRole.Host,
                                           Transport = Transport.Sockets
                                       };
             ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
             var mockCommunicationServer = new Mock<ICommunicationEndPoint>();
-            mockCommunicationServer.Setup(mc => mc.Start(IPAddress.Loopback.ToString()+":0")).Returns(IPAddress.Loopback.ToString() + ":123");
+
+            mockCommunicationServer.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(IPAddress.Loopback + ":123").Callback(
+                () => { mockCommunicationServer.Raise(s=>s.Connected += null, mockCommunicationServer.Object, new ConnectedEventArgs(this.mockChannel.Object)); });
+
             //mockCommunicationServer.Setup(mc => mc.rai).Returns(true);
-            mockCommunicationServer.Raise(mc => mc.Connected += null, new ConnectedEventArgs(this.mockChannel.Object));
-            var mockDataSerializer = new Mock<IDataSerializer>();
+
+
             var testRequestSender = new TestRequestSender(mockCommunicationServer.Object, connectionInfo, mockDataSerializer.Object, protocolConfig, CLIENTPROCESSEXITWAIT);
 
-            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolConfig.Version };
+            //var message = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolConfig.Version };
             // mockCommunicationServer.Setup(mc => mc.ReceiveMessage()).Returns(message);
-            this.mockChannel.Raise(
-    c => c.MessageReceived += null,
-    this.mockChannel.Object,
-    message);
-            mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(protocolConfig.Version);
+    //        this.mockChannel.Raise(
+    //c => c.MessageReceived += null,
+    //this.mockChannel.Object,
+    //message);
+            //mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(protocolConfig.Version);
+            this.SetupChannelMessage(MessageType.VersionCheck, MessageType.VersionCheck, protocolConfig.Version);
 
             this.mockTestHostManager.Setup(thm => thm.GetTestHostConnectionInfo()).Returns(connectionInfo);
 
@@ -174,33 +180,41 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var connectionInfo = new TestHostConnectionInfo
                                      {
-                                         Endpoint = IPAddress.Loopback + ":0",
+                                         Endpoint = IPAddress.Loopback + ":124",
                                          Role = ConnectionRole.Host,
                                          Transport = Transport.Sockets
                                      };
             ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
             var mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
-            mockCommunicationEndpoint.Setup(mc => mc.Start(IPAddress.Loopback.ToString() + ":0"));
-            mockCommunicationEndpoint.Raise(mc => mc.Connected += null, new ConnectedEventArgs(this.mockChannel.Object));
+            mockCommunicationEndpoint.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(connectionInfo.Endpoint).Callback(() =>
+            {
+                mockCommunicationEndpoint.Raise(
+                    s => s.Connected += null,
+                    mockCommunicationEndpoint.Object,
+                    new ConnectedEventArgs(this.mockChannel.Object));
+            });
+            //mockCommunicationEndpoint.Setup(mc => mc.Start(IPAddress.Loopback.ToString() + ":0"));
+            //mockCommunicationEndpoint.Raise(mc => mc.Connected += null, new ConnectedEventArgs(this.mockChannel.Object));
             //mockCommunicationEndpoint.Setup(mc => mc.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            var mockDataSerializer = new Mock<IDataSerializer>();
+            this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.SetupChannelMessage(MessageType.VersionCheck, MessageType.VersionCheck, protocolConfig.Version);
             var testRequestSender = new TestRequestSender(mockCommunicationEndpoint.Object, connectionInfo, mockDataSerializer.Object, new ProtocolConfig { Version = 2 }, CLIENTPROCESSEXITWAIT);
 
             this.mockTestHostManager.Setup(thm => thm.GetTestHostConnectionInfo()).Returns(connectionInfo);
-            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolConfig.Version };
+            //var message = new Message() { MessageType = MessageType.VersionCheck, Payload = protocolConfig.Version };
 
-            this.mockChannel.Raise(
-                c => c.MessageReceived += null,
-                this.mockChannel.Object,
-                message);
-            //mockCommunicationEndpoint.Setup(mc => mc.ReceiveMessage()).Returns(message);
-            mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(protocolConfig.Version);
+            //this.mockChannel.Raise(
+            //    c => c.MessageReceived += null,
+            //    this.mockChannel.Object,
+            //    message);
+            ////mockCommunicationEndpoint.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            //mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(protocolConfig.Version);
 
             var localTestOperationManager = new TestableProxyOperationManager(this.mockRequestData.Object, testRequestSender, this.mockTestHostManager.Object, this.connectionTimeout);
 
             localTestOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
 
-            //mockCommunicationEndpoint.Verify(s => s.SetupClientAsync(It.IsAny<IPEndPoint>()), Times.Once);
+            mockCommunicationEndpoint.Verify(s => s.Start(It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -440,6 +454,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             errorCallback(process, string.Empty);
                             exitCallback(process);
                         }).Returns(Process.GetCurrentProcess());
+        }
+
+        private void SetupChannelMessage<TPayload>(string messageType, string returnMessageType, TPayload returnPayload)
+        {
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(s => s.Contains(messageType))))
+                            .Callback(() => this.mockChannel.Raise(c => c.MessageReceived += null, this.mockChannel.Object, new MessageReceivedEventArgs { Data = messageType }));
+
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
+            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.Is<string>(s => s.Equals(messageType))))
+                .Returns(new Message { MessageType = returnMessageType });
+            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType))))
+            .Returns(returnPayload);
         }
 
         private class TestableProxyOperationManager : ProxyOperationManager

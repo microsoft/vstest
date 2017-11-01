@@ -391,8 +391,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var rawMessage = "OnDiscoveredTests";
             var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
             this.SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize(rawMessage, message);
-            this.SetupChannelMessage(MessageType.StartDiscovery, Enumerable.Empty<string>());
-            this.SetupChannelMessage(MessageType.TestCasesFound, testCases);
+            this.SetupChannelMessage(MessageType.StartDiscovery, MessageType.TestCasesFound, testCases);
 
             var completePayload = new DiscoveryCompletePayload()
             {
@@ -445,16 +444,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 Role = ConnectionRole.Client,
                 Transport = Transport.Sockets
             };
-#if OLD
-            this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, connectionInfo, this.mockDataSerializer.Object, this.protocolConfig);
-            this.mockCommunicationManager.Setup(mc => mc.HostServer(It.IsAny<IPEndPoint>())).Returns(new IPEndPoint(IPAddress.Loopback, 0));
-            this.mockCommunicationManager.Setup(mc => mc.WaitForClientConnection(It.IsAny<int>())).Returns(true);
-            this.testRequestSender.InitializeCommunication();
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(rawMessage));
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
-#else
+
             this.mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.testRequestSender = new TestRequestSender(this.mockCommunicationEndpoint.Object, connectionInfo, this.mockDataSerializer.Object, this.protocolConfig, CLIENTPROCESSEXITWAIT);
@@ -465,35 +455,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                         this.mockCommunicationEndpoint.Object,
                         new ConnectedEventArgs(this.mockChannel.Object));
                 });
-            this.SetupChannelMessage(MessageType.VersionCheck, this.protocolConfig.Version);
-            //this.SetupRaiseMessageReceivedOnCheckVersion();
-            //this.mockCommunicationEndpoint.Setup(mc => mc.WaitForClientConnection(It.IsAny<int>())).Returns(true);
+            this.SetupChannelMessage(MessageType.VersionCheck, MessageType.VersionCheck, this.protocolConfig.Version);
             this.testRequestSender.InitializeCommunication();
-#endif
+
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestData.Object,
                                             this.testRequestSender,
                                             this.mockTestHostManager.Object,
                                             this.mockDataSerializer.Object,
                                             this.testableClientConnectionTimeout);
-
-            //this.CheckAndSetProtocolVersion();
-            //this.mockChannel.Reset();
         }
 
-        private void CheckAndSetProtocolVersion()
-        {
-            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolConfig.Version };
-
-            this.mockChannel.Raise(
-               c => c.MessageReceived += null,
-               this.mockChannel.Object,
-               message);
-            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(this.protocolConfig.Version);
-            this.testRequestSender.CheckVersionWithTestHost();
-        }
-
-        private void SetupChannelMessage<TPayload>(string messageType, TPayload payload)
+        private void SetupChannelMessage<TPayload>(string messageType, string returnMessageType, TPayload returnPayload)
         {
             this.mockChannel.Setup(mc => mc.Send(It.Is<string>(s => s.Contains(messageType))))
                             .Callback(() => this.mockChannel.Raise(c => c.MessageReceived += null,  this.mockChannel.Object, new MessageReceivedEventArgs { Data = messageType }));
@@ -501,9 +474,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
             this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
             this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.Is<string>(s => s.Equals(messageType))))
-                .Returns(new Message { MessageType = messageType });
-            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType))))
-                .Returns(payload);
+                .Returns(new Message { MessageType = returnMessageType });
+                this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType))))
+                .Returns(returnPayload);
         }
     }
 }

@@ -75,22 +75,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnServerConnected(Task connectAsyncTask)
         {
-            if (connectAsyncTask.IsFaulted)
-            {
-                throw connectAsyncTask.Exception;
-            }
-
-            this.channel = this.channelFactory(this.tcpClient.GetStream());
+            // if (connectAsyncTask.IsFaulted)
+            // {
+            //    throw connectAsyncTask.Exception;
+            // }
             if (this.Connected != null)
             {
-                this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
+                if (connectAsyncTask.IsFaulted)
+                {
+                    this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: ServerConnected");
+                }
+                else
+                {
+                    this.channel = this.channelFactory(this.tcpClient.GetStream());
+                    this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
 
-                // Start the message loop
-                Task.Run(() => this.tcpClient.MessageLoopAsync(
-                        this.channel,
-                        this.Stop,
-                        this.cancellation.Token))
-                    .ConfigureAwait(false);
+                    // Start the message loop
+                    Task.Run(() => this.tcpClient.MessageLoopAsync(
+                            this.channel,
+                            this.Stop,
+                            this.cancellation.Token))
+                        .ConfigureAwait(false);
+                }
             }
         }
 

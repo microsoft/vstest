@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // this.transport = new SocketTransport(communicationEndpoint, connectionInfo);
         }
 
-        protected TestRequestSender(
+        internal TestRequestSender(
                 TestHostConnectionInfo connectionInfo,
                 IDataSerializer serializer,
                 ProtocolConfig protocolConfig,

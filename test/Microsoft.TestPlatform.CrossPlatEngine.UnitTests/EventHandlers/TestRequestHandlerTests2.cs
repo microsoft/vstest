@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+using System.Net.Sockets;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System.IO;
@@ -30,6 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly JsonDataSerializer dataSerializer;
         private readonly ITestRequestHandler requestHandler;
         private readonly TestHostConnectionInfo testHostConnectionInfo;
+        private readonly JobQueue<Action> jobQueue;
 
         public TestRequestHandlerTests2()
         {
@@ -38,9 +43,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.dataSerializer = JsonDataSerializer.Instance;
             this.testHostConnectionInfo = new TestHostConnectionInfo
             {
-                Endpoint = IPAddress.Any + ":0",
+                Endpoint = IPAddress.Loopback + ":123",
                 Role = ConnectionRole.Host
             };
+
+            this.jobQueue = new JobQueue<Action>(
+                action => { action(); },
+                "TestHostOperationQueue",
+                500,
+                25000000,
+                true,
+                message => EqtTrace.Error(message));
 
             // Setup mock discovery and execution managers
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
@@ -52,7 +65,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.requestHandler = new TestableTestRequestHandler(
                 this.testHostConnectionInfo,
                 this.mockCommunicationClient.Object,
-                JsonDataSerializer.Instance);
+                JsonDataSerializer.Instance,
+                jobQueue);
         }
 
         [TestMethod]
@@ -66,9 +80,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         [TestMethod]
         public void InitializeCommunicationShouldThrowIfServerIsNotAccessible()
         {
-            var rh = new TestableTestRequestHandler(this.testHostConnectionInfo, new SocketClient(), this.dataSerializer);
+            var connectionInfo = new TestHostConnectionInfo
+            {
+                Endpoint = IPAddress.Any + ":123",
+                Role = ConnectionRole.Host
+            };
 
-            Assert.ThrowsException<IOException>(() => { rh.InitializeCommunication(); rh.WaitForRequestSenderConnection(1000); });
+            var rh = new TestableTestRequestHandler(connectionInfo, new SocketClient(), this.dataSerializer, this.jobQueue);
+
+            Assert.ThrowsException<SocketException>(() => { rh.InitializeCommunication(); this.requestHandler.WaitForRequestSenderConnection(5 * 1000); });
         }
 
         [TestMethod]
@@ -144,6 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
 
             this.mockDiscoveryManager.Verify(d => d.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
             this.SendSessionEnd();
@@ -191,6 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
 
             this.mockExecutionManager.Verify(e => e.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
             this.SendSessionEnd();
@@ -276,8 +298,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class TestableTestRequestHandler : TestRequestHandler
     {
-        public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndPoint communicationClient, IDataSerializer dataSerializer)
-            : base(testHostConnectionInfo, communicationClient, dataSerializer)
+        public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndPoint communicationClient, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
+            : base(testHostConnectionInfo, communicationClient, dataSerializer, jobQueue)
         {
         }
     }

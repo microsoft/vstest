@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer)
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
         {
             this.communicationEndPoint = communicationEndpoint;
             this.connectionInfo = connectionInfo;
@@ -56,6 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
+            this.jobQueue = jobQueue;
         }
 
         protected TestRequestHandler(TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
@@ -71,26 +72,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.communicationEndPoint = new SocketServer();
             }
             else
-
             {
                 this.communicationEndPoint = new SocketClient();
             }
+
+            this.jobQueue = new JobQueue<Action>(
+                (action) => { action(); },
+                "TestHostOperationQueue",
+                500,
+                25000000,
+                true,
+                (message) => EqtTrace.Error(message));
         }
 
         /// <inheritdoc />
         public void InitializeCommunication()
         {
-            // System.Diagnostics.Debugger.Launch();
             this.communicationEndPoint.Connected += (sender, connectedArgs) =>
             {
-                this.jobQueue = new JobQueue<Action>(
-                    (action) => { action(); },
-                    "TestHostOperationQueue",
-                    500,
-                    25000000,
-                    true,
-                    (message) => EqtTrace.Error(message));
-
+                if (!connectedArgs.Connected)
+                {
+                    throw connectedArgs.Fault;
+                }
                 this.channel = connectedArgs.Channel;
                 this.channel.MessageReceived += this.OnMessageReceived;
                 requestSenderConnected.Set();
@@ -235,6 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
+                        //jobQueue.Flush();
                         break;
                     }
 
@@ -259,6 +263,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
+                        //jobQueue.Flush();
                         break;
                     }
 
