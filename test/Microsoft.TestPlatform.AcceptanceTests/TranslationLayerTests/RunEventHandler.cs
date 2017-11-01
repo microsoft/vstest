@@ -9,9 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    /// <summary>
-    /// The run event handler.
-    /// </summary>
+    /// <inheritdoc />
     public class RunEventHandler : ITestRunEventsHandler
     {
         public List<TestResult> TestResults { get; private set; }

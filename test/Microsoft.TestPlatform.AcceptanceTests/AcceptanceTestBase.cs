@@ -98,6 +98,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return testHostProcessName;
         }
 
+        /// <summary>
+        /// Returns the VsTestConsole Wrapper.
+        /// </summary>
+        /// <returns></returns>
         protected IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
             var vsConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
@@ -106,22 +110,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return vsConsoleWrapper;
         }
 
+        /// <summary>
+        /// Default RunSettings
+        /// </summary>
+        /// <returns></returns>
         public string GetDefaultRunSettings()
         {
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
                                     <RunSettings>     
                                         <RunConfiguration>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-            return runSettingsXml;
-        }
-
-        public string GetRunSettingsWithParallel()
-        {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
-                                        <RunConfiguration>
-                                        <MaxCpuCount>2</MaxCpuCount>
                                         </RunConfiguration>
                                     </RunSettings>";
             return runSettingsXml;

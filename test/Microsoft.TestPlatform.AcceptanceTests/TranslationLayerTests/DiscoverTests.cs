@@ -5,142 +5,106 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
     using System.Collections.Generic;
 
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class DiscoverTests : AcceptanceTestBase
     {
-        [TestMethod]
-        public void DiscoverTestsUsingDiscoveryEventHandler1()
+        private List<string> testAssemblies;
+        private IVsTestConsoleWrapper vstestConsoleWrapper;
+        private DiscoveryEventHandler discoveryEventHandler;
+        private DiscoveryEventHandler2 discoveryEventHandler2;
+
+        public DiscoverTests()
         {
-            var sources = new List<string>
+            this.testAssemblies = new List<string>
                               {
                                   this.GetAssetFullPath("SimpleTestProject.dll"),
                                   this.GetAssetFullPath("SimpleTestProject2.dll")
                               };
-            var vsConsoleWrapper = this.GetVsTestConsoleWrapper();
-            var discoveryEventHandler = new DiscoveryEventHandler();
 
-            vsConsoleWrapper.DiscoverTests(sources, this.GetDefaultRunSettings(), discoveryEventHandler);
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.discoveryEventHandler = new DiscoveryEventHandler();
+            this.discoveryEventHandler2 = new DiscoveryEventHandler2();
+        }
+
+        [TestMethod]
+        public void DiscoverTestsUsingDiscoveryEventHandler1()
+        {
+            this.vstestConsoleWrapper.DiscoverTests(this.testAssemblies, this.GetDefaultRunSettings(), this.discoveryEventHandler);
 
             // Assert.
-            Assert.AreEqual(6, discoveryEventHandler.DiscoveredTestCases.Count);
+            Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
         }
 
         [TestMethod]
         public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut()
         {
-            var sources = new List<string>
-                              {
-                                  this.GetAssetFullPath("SimpleTestProject.dll"),
-                                  this.GetAssetFullPath("SimpleTestProject2.dll")
-                              };
-            var vsConsoleWrapper = this.GetVsTestConsoleWrapper();
-            var discoveryEventHandler2 = new DiscoveryEventHandler2();
-
-            vsConsoleWrapper.DiscoverTests(
-                sources,
+            this.vstestConsoleWrapper.DiscoverTests(
+                this.testAssemblies,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = false },
-                discoveryEventHandler2);
+                this.discoveryEventHandler2);
 
             // Assert.
-            Assert.AreEqual(6, discoveryEventHandler2.DiscoveredTestCases.Count);
+            Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
         }
 
         [TestMethod]
         public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn()
         {
-            var sources = new List<string>
-                              {
-                                  this.GetAssetFullPath("SimpleTestProject.dll"),
-                                  this.GetAssetFullPath("SimpleTestProject2.dll")
-                              };
-
-            var vsConsoleWrapper = this.GetVsTestConsoleWrapper();
-            var discoveryEventHandler2 = new DiscoveryEventHandler2();
-
-            vsConsoleWrapper.DiscoverTests(sources, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, discoveryEventHandler2);
+            this.vstestConsoleWrapper.DiscoverTests(this.testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
 
             // Assert.
-            Assert.AreEqual(6, discoveryEventHandler2.DiscoveredTestCases.Count);
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecByAllAdapters));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForDiscovery));
-            Assert.IsTrue(discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.DiscoveryState));
-        }
-    }
-
-    public class DiscoveryEventHandler : ITestDiscoveryEventsHandler
-    {
-        public List<TestCase> DiscoveredTestCases { get; private set; }
-
-        public DiscoveryEventHandler()
-        {
-            this.DiscoveredTestCases = new List<TestCase>();
+            Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
+            Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TargetDevice));
+            Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests));
+            Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecByAllAdapters));
+            Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForDiscovery));
+            Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.DiscoveryState));
         }
 
-        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
+        [TestMethod]
+        public void DiscoverTestsUsingEventHandler2AndBatchSize()
         {
-            // No Op
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <BatchSize>3</BatchSize>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+
+            this.vstestConsoleWrapper.DiscoverTests(
+                this.testAssemblies,
+                runSettingsXml,
+                new TestPlatformOptions { CollectMetrics = false },
+                this.discoveryEventHandler2);
+
+            // Assert.
+            Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
         }
 
-        public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
-        {
-            if (lastChunk != null)
-            {
-                this.DiscoveredTestCases.AddRange(lastChunk);
-            }
-        }
 
-        public void HandleLogMessage(TestMessageLevel level, string message)
+        [TestMethod]
+        public void DiscoverTestsUsingEventHandler1AndBatchSize()
         {
-             // No Op
-        }
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <BatchSize>3</BatchSize>
+                                        </RunConfiguration>
+                                    </RunSettings>";
 
-        public void HandleRawMessage(string rawMessage)
-        {
-            // No op
-        }
-    }
+            this.vstestConsoleWrapper.DiscoverTests(
+                this.testAssemblies,
+                runSettingsXml,
+                this.discoveryEventHandler);
 
-    public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
-    {
-        public List<TestCase> DiscoveredTestCases { get; private set; }
-        public IDictionary<string, object> Metrics { get; private set; }
-
-        public DiscoveryEventHandler2()
-        {
-            this.DiscoveredTestCases = new List<TestCase>();
-        }
-
-        public void HandleRawMessage(string rawMessage)
-        {
-           // No Op
-        }
-
-        public void HandleLogMessage(TestMessageLevel level, string message)
-        {
-            // No Op
-        }
-
-        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
-        {
-            if (lastChunk != null)
-            {
-                this.DiscoveredTestCases.AddRange(lastChunk);
-                this.Metrics = discoveryCompleteEventArgs.Metrics;
-            }
-        }
-
-        public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
-        {
-            // No Op
+            // Assert.
+            Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
         }
     }
 }
