@@ -18,6 +18,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private DiscoveryEventHandler discoveryEventHandler;
         private DiscoveryEventHandler2 discoveryEventHandler2;
 
+        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <BatchSize>3</BatchSize>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+
         public DiscoverTests()
         {
             this.testAssemblies = new List<string>
@@ -70,16 +77,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         public void DiscoverTestsUsingEventHandler2AndBatchSize()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
-                                        <RunConfiguration>
-                                        <BatchSize>3</BatchSize>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-
             this.vstestConsoleWrapper.DiscoverTests(
                 this.testAssemblies,
-                runSettingsXml,
+                this.runSettingsXml,
                 new TestPlatformOptions { CollectMetrics = false },
                 this.discoveryEventHandler2);
 
@@ -91,16 +91,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         public void DiscoverTestsUsingEventHandler1AndBatchSize()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
-                                        <RunConfiguration>
-                                        <BatchSize>3</BatchSize>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-
             this.vstestConsoleWrapper.DiscoverTests(
                 this.testAssemblies,
-                runSettingsXml,
+                this.runSettingsXml,
                 this.discoveryEventHandler);
 
             // Assert.
