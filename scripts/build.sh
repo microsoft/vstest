@@ -28,9 +28,9 @@ PROJECT_NAME_PATTERNS=
 # Source build repo api
 # See https://github.com/dotnet/source-build/blob/dev/release/2.0/Documentation/RepoApi.md
 #
-DOTNETBUILDFROMSOURCE=false
-DOTNETCORESDKDIR=
-DOTNETBUILDTOOLSDIR=
+DOTNET_BUILD_FROM_SOURCE=false
+DOTNET_CORE_SDK_DIR=
+DOTNET_BUILD_TOOLS_DIR=
 
 while [ $# -gt 0 ]; do
     lowerI="$(echo ${1:-} | awk '{print tolower($0)}')"
@@ -68,14 +68,14 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         -dotnetbuildfromsource)
-            DOTNETBUILDFROMSOURCE=true
+            DOTNET_BUILD_FROM_SOURCE=true
             ;;
         -dotnetcoresdkdir)
-            DOTNETCORESDKDIR=$2
+            DOTNET_CORE_SDK_DIR=$2
             shift
             ;;
         -dotnetbuildtoolsdir)
-            DOTNETBUILDTOOLSDIR=$2
+            DOTNET_BUILD_TOOLS_DIR=$2
             shift
             ;;
         -verbose)
@@ -93,13 +93,13 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
-TP_DOTNET_DIR="${DOTNETCORESDKDIR:-${TP_TOOLS_DIR}/dotnet}"
+TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet}"
 TP_PACKAGES_DIR="${NUGET_PACKAGES:-${TP_ROOT_DIR}/packages}"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
 TP_PACKAGE_NUSPEC_DIR="$TP_ROOT_DIR/src/package/nuspec"
 TP_SRC_DIR="$TP_ROOT_DIR/src"
-TP_USE_REPO_API=$DOTNETBUILDFROMSOURCE
+TP_USE_REPO_API=$DOTNET_BUILD_FROM_SOURCE
 
 #
 # Dotnet configuration
@@ -165,7 +165,7 @@ function usage()
 #
 function install_cli()
 {
-    if [[ $TP_USE_REPO_API ]]; then
+    if [[ ! $TP_USE_REPO_API ]]; then
         # Skip download of dotnet toolset if REPO API is enabled
         local failed=false
         local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
