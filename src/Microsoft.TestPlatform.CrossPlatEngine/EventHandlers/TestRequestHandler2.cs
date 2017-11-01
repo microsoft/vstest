@@ -92,6 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 if (!connectedArgs.Connected)
                 {
+                    requestSenderConnected.Set();
                     throw connectedArgs.Fault;
                 }
                 this.channel = connectedArgs.Channel;

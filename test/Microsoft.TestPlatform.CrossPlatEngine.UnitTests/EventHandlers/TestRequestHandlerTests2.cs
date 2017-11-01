@@ -82,13 +82,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var connectionInfo = new TestHostConnectionInfo
             {
-                Endpoint = IPAddress.Any + ":123",
+                Endpoint = IPAddress.Loopback + ":123",
                 Role = ConnectionRole.Host
             };
+            var socketClient = new SocketClient();
+            socketClient.Connected += (sender, connectedEventArgs) =>
+            {
+                Assert.IsFalse(connectedEventArgs.Connected);
+                Assert.AreEqual(typeof(SocketException), connectedEventArgs.Fault.InnerException.GetType());
+            };
+            var rh = new TestableTestRequestHandler(connectionInfo, socketClient, this.dataSerializer, this.jobQueue);
 
-            var rh = new TestableTestRequestHandler(connectionInfo, new SocketClient(), this.dataSerializer, this.jobQueue);
-
-            Assert.ThrowsException<SocketException>(() => { rh.InitializeCommunication(); this.requestHandler.WaitForRequestSenderConnection(5 * 1000); });
+            rh.InitializeCommunication();
+            this.requestHandler.WaitForRequestSenderConnection(1000);
         }
 
         [TestMethod]
@@ -208,7 +214,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var message = this.dataSerializer.SerializePayload(MessageType.ExecutionInitialize, new[] { "testadapter.dll" });
             this.SetupChannel();
 
-            //this.ProcessRequestsAsync();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
