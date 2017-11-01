@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -270,6 +271,60 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
 
             File.Delete(testsettingsFile);
+        }
+
+        [TestMethod]
+        public void RunTestsWithX64Source()
+        {
+            var sources = new List<string>
+                              {
+                                  this.GetAssetFullPath("SimpleTestProject3.dll")
+                              };
+
+            this.vstestConsoleWrapper.RunTests(
+                sources,
+                this.GetDefaultRunSettings(),
+                new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
+                this.runEventHandler);
+
+            // Assert
+            Assert.AreEqual(1, this.runEventHandler.TestResults.Count);
+            Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+        }
+
+        [TestMethod]
+        public void RunTestsWithNetCoreProject()
+        {
+            var sources = new List<string>
+                              {
+                                  this.testEnvironment.GetTestAsset("SimpleTestProject.dll", "netcoreapp1.0"),
+                                  this.testEnvironment.GetTestAsset("SimpleTestProject2.dll", "netcoreapp2.0")
+                              };
+
+            this.vstestConsoleWrapper.RunTests(
+                sources,
+                this.GetDefaultRunSettings(),
+                this.runEventHandler);
+
+            // Assert
+            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        }
+
+        [TestMethod]
+        public void RunTestsWithCustomTestHostLaunch()
+        {
+            var customTestHostLauncher = new CustomTestHostLauncher();
+            this.vstestConsoleWrapper.RunTestsWithCustomTestHost(this.testAssemblies, this.GetDefaultRunSettings(), this.runEventHandler, customTestHostLauncher);
+
+            // Assert
+            Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
+            Assert.IsTrue(customTestHostLauncher.ProcessId != -1);
+            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
+            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
+            Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
     }
 }

@@ -16,6 +16,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public IDictionary<string, object> Metrics { get; private set; }
 
+        public string LogMessage { get; private set; }
+
+        public TestMessageLevel TestMessageLevel { get; private set; }
+
         public RunEventHandler()
         {
             this.TestResults = new List<TestResult>();
@@ -23,7 +27,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            // No op
+            this.LogMessage = message;
+            this.TestMessageLevel = level;
         }
 
         public void HandleTestRunComplete(
