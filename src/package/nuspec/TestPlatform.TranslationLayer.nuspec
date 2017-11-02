@@ -8,7 +8,7 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>C# SDK for the test platform protocol. This SDK can be used in IDE or Editors to use test platform for discovery and execution of tests.</description>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <licenseUrl>https://www.visualstudio.com/microsoft-visual-studio-test-platform</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>

@@ -7,7 +7,7 @@
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <licenseUrl>https://www.visualstudio.com/microsoft-visual-studio-test-platform</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <description>The MSbuild targets and properties for building the .Net core test projects.</description>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
