@@ -99,5 +99,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
                 return ResourceManager.GetString("NoTestHostProviderFound", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Aborting test run as abortion requested..
+        /// </summary>
+        internal static string AbortRequested
+        {
+            get
+            {
+                return ResourceManager.GetString("AbortRequested", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Canceling test run as cancelation requested..
+        /// </summary>
+        internal static string CancelationRequested
+        {
+            get
+            {
+                return ResourceManager.GetString("CancelationRequested", resourceCulture);
+            }
+        }
     }
 }

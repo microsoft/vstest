@@ -9,20 +9,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
-
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
-    using CommunicationObjectModel = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -183,12 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancelation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
             }
 
-            string message = String.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
-            var testMessagePayload = new CommunicationObjectModel.TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
-            var rawMessage = this.dataSerializer.SerializePayload(CommunicationObjectModel.MessageType.TestMessage, testMessagePayload);
-
-            this.HandleLogMessage(TestMessageLevel.Error, message);
-            this.HandleRawMessage(rawMessage);
+            this.LogMessage(String.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout), TestMessageLevel.Error);
             this.Abort();
         }
 
@@ -231,12 +223,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public void CancelAsync()
         {
             EqtTrace.Verbose("TestRunRequest.CancelAsync: Canceling.");
+            this.LogMessage(ClientResources.CancelationRequested, TestMessageLevel.Informational);
 
             lock (this.syncObject)
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("testRunRequest");
+                    EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest aboject has already been disposed.");
                 }
 
                 if (this.State != TestRunState.InProgress)
@@ -259,12 +252,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public void Abort()
         {
             EqtTrace.Verbose("TestRunRequest.Abort: Aborting.");
+            this.LogMessage(ClientResources.AbortRequested, TestMessageLevel.Informational);
 
             lock (this.syncObject)
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("testRunRequest");
+                    EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest aboject has already been disposed");
                 }
 
                 if (this.State != TestRunState.InProgress)
@@ -615,6 +609,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             }
 
             EqtTrace.Info("TestRunRequest.Dispose: Completed.");
+        }
+
+
+        private void LogMessage(string message, TestMessageLevel messageLevel)
+        {
+            var testMessagePayload = new TestMessagePayload { MessageLevel = messageLevel, Message = message };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+
+            this.HandleLogMessage(messageLevel, message);
+            this.HandleRawMessage(rawMessage);
         }
     }
 }

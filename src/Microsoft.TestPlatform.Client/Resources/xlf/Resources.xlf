@@ -20,6 +20,16 @@
         <target state="new">No suitable test runtime provider found for this run.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="AbortRequested">
+        <source>Aborting test run as abortion requested.</source>
+        <target state="new">Aborting test run as abortion requested.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CancelationRequested">
+        <source>Canceling test run as cancelation requested.</source>
+        <target state="new">Canceling test run as cancelation requested.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
