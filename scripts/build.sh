@@ -28,7 +28,7 @@ PROJECT_NAME_PATTERNS=
 # Source build repo api
 # See https://github.com/dotnet/source-build/blob/dev/release/2.0/Documentation/RepoApi.md
 #
-DOTNET_BUILD_FROM_SOURCE=false
+DOTNET_BUILD_FROM_SOURCE=0
 DOTNET_CORE_SDK_DIR=
 DOTNET_BUILD_TOOLS_DIR=
 
@@ -68,7 +68,7 @@ while [ $# -gt 0 ]; do
             shift
             ;;
         -dotnetbuildfromsource)
-            DOTNET_BUILD_FROM_SOURCE=true
+            DOTNET_BUILD_FROM_SOURCE=1
             ;;
         -dotnetcoresdkdir)
             DOTNET_CORE_SDK_DIR=$2
@@ -165,7 +165,7 @@ function usage()
 #
 function install_cli()
 {
-    if [[ ! $TP_USE_REPO_API ]]; then
+    if [[ $TP_USE_REPO_API = 0 ]]; then
         # Skip download of dotnet toolset if REPO API is enabled
         local failed=false
         local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
