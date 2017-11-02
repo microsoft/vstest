@@ -3,6 +3,9 @@
 
 using System;
 using System.Net.Sockets;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
@@ -226,31 +229,262 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         [TestMethod]
         public void ProcessRequestsExecutionStartShouldStartExecutionWithGivenSources()
         {
+            var asm = new Dictionary<string, IEnumerable<string>>();
+            asm["mstestv2"] = new[] {"test1.dll", "test2.dll"};
+            var testRunCriteriaWithSources = new TestRunCriteriaWithSources(asm, "runsettings", null, null);
+            var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithSources, testRunCriteriaWithSources);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            mockExecutionManager.Verify(e =>
+                e.StartTestRun(
+                    It.Is<Dictionary<string, IEnumerable<string>>>(d => d.ContainsKey("mstestv2")), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                    It.IsAny<ITestRunEventsHandler>()));
+            this.SendSessionEnd();
         }
 
-        // ProcessRequestsExecutionStartShouldStartExecutionWithGivenTests
-        // ProcessRequestsExecutionCancelShouldCancelTestRun
+        [TestMethod]
+        public void ProcessRequestsExecutionStartShouldStartExecutionWithGivenTests()
+        {
+            var t1 = new TestCase("N.C.M1", new Uri("executor://mstest/v2"), "test1.dll");
+            var t2 = new TestCase("N.C.M2", new Uri("executor://mstest/v2"), "test1.dll");
+            var testCases = new [] { t1, t2 };
+            var testRunCriteriaWithTests = new TestRunCriteriaWithTests(testCases, "runsettings", null, null);
+            var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithTests, testRunCriteriaWithTests);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            mockExecutionManager.Verify(e =>
+                e.StartTestRun(
+                    It.Is<IEnumerable<TestCase>>(tcs =>
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M1")) &&
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M2"))), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                    It.IsAny<ITestRunEventsHandler>()));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsExecutionCancelShouldCancelTestRun()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.CancelTestRun, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+
+            mockExecutionManager.Verify(e => e.Cancel());
+            this.SendSessionEnd();
+        }
+
         // ProcessRequestsExecutionCancelShouldStopRequestProcessing
-        // ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage
-        // ProcessRequestsExecutionAbortShouldStopTestRun
+
+        [TestMethod]
+        public void ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsExecutionAbortShouldStopTestRun()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.AbortTestRun, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+
+            mockExecutionManager.Verify(e => e.Abort());
+            this.SendSessionEnd();
+        }
+
         // ProcessRequestsExecutionAbortShouldStopRequestProcessing
 
-        // SendExecutionCompleteShouldSendTestRunCompletePayloadOnChannel
-        // LaunchProcessWithDebuggerAttachedShouldSendProcessInformationOnChannel
-        // LaunchProcessWithDebuggerAttachedShouldWaitForProcessIdFromRunner
+        [TestMethod]
+        public void SendExecutionCompleteShouldSendTestRunCompletePayloadOnChannel()
+        {
+            var t1 = new TestCase("N.C.M1", new Uri("executor://mstest/v2"), "test1.dll");
+            var t2 = new TestCase("N.C.M2", new Uri("executor://mstest/v2"), "test1.dll");
+            var testCases = new[] { t1, t2 };
+            var testRunCriteriaWithTests = new TestRunCriteriaWithTests(testCases, "runsettings", null, null);
+            var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithTests, testRunCriteriaWithTests);
+            this.mockExecutionManager.Setup(em => em.StartTestRun(It.IsAny<IEnumerable<TestCase>>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                It.IsAny<ITestRunEventsHandler>())).Callback(() =>
+            {
+                this.requestHandler.SendExecutionComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>());
+            });
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.ExecutionComplete))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(msg);
+                        Assert.IsNotNull(payload);
+                    });
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            mockExecutionManager.Verify(e =>
+                e.StartTestRun(
+                    It.Is<IEnumerable<TestCase>>(tcs =>
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M1")) &&
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M2"))), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                    It.IsAny<ITestRunEventsHandler>()));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void LaunchProcessWithDebuggerAttachedShouldSendProcessInformationOnChannel()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, "123");
+            this.SetupChannel();
+
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.LaunchAdapterProcessWithDebuggerAttached))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(msg);
+                        Assert.IsNotNull(payload);
+                        this.SendMessageOnChannel(message);
+                        this.SendSessionEnd();
+                    });
+
+            var task = Task.Run(() => this.requestHandler.LaunchProcessWithDebuggerAttached(new TestProcessStartInfo()));
+        }
+
+        [TestMethod]
+        public void LaunchProcessWithDebuggerAttachedShouldWaitForProcessIdFromRunner()
+        {
+            var message = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, "123");
+            this.SetupChannel();
+
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.LaunchAdapterProcessWithDebuggerAttached))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(msg);
+                        Assert.IsNotNull(payload);
+                        this.SendMessageOnChannel(message);
+                        this.SendSessionEnd();
+                    });
+
+            var task = Task.Run(() => this.requestHandler.LaunchProcessWithDebuggerAttached(new TestProcessStartInfo()));
+
+            Assert.AreEqual(123, task.Result);
+        }
         #endregion
 
         #region Logging Protocol
-        // SendLogShouldSendTestMessageWithLevel
+        [TestMethod]
+        public void SendLogShouldSendTestMessageWithLevelOnChannel()
+        {
+            var logMsg = "Testing log message on channel";
+            this.SetupChannel();
+
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.TestMessage))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestMessagePayload>(msg);
+                        Assert.IsNotNull(payload);
+                        Assert.AreEqual(payload.Message, logMsg);
+                    });
+
+            this.requestHandler.SendLog(TestMessageLevel.Informational, "Testing log message on channel");
+
+            this.SendSessionEnd();
+        }
         #endregion
 
-        // ProcessRequestsEndSessionShouldCloseRequestHandler
-        // ProcessRequestsAbortSessionShouldBeNoOp
-        // ProcessRequestsInvalidMessageTypeShouldNotThrow
-        // ProcessRequestsInvalidMessageTypeShouldProcessFutureMessages
+        [TestMethod]
+        public void ProcessRequestsEndSessionShouldCloseRequestHandler()
+        {
+            this.SetupChannel();
 
-        // CloseShouldStopCommunicationChannel
-        // DisposeShouldStopCommunicationChannel
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendSessionEnd();
+
+            this.mockCommunicationClient.Verify(mc=>mc.Stop(), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessRequestsAbortSessionShouldBeNoOp()
+        {
+            var message = dataSerializer.SerializePayload(MessageType.SessionAbort, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            // Session abort should not close the client
+            this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Never);
+        }
+
+        [TestMethod]
+        public void ProcessRequestsInvalidMessageTypeShouldNotThrow()
+        {
+            var message = dataSerializer.SerializePayload("DummyMessage", string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsInvalidMessageTypeShouldProcessFutureMessages()
+        {
+            var message = dataSerializer.SerializePayload("DummyMessage", string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            // Should process this message, after the invalid message
+            this.SendSessionEnd();
+            this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Once);
+        }
+
+        [TestMethod]
+        public void DisposeShouldStopCommunicationChannel()
+        {
+            var testRequestHandler = this.requestHandler as TestRequestHandler;
+            Assert.IsNotNull(testRequestHandler);
+
+            testRequestHandler.Dispose();
+
+            this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Once);
+        }
 
         private void SetupChannel()
         {
@@ -304,8 +538,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public class TestableTestRequestHandler : TestRequestHandler
     {
         public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndPoint communicationClient, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
-            : base(testHostConnectionInfo, communicationClient, dataSerializer, jobQueue)
+            : base(testHostConnectionInfo, communicationClient, dataSerializer, jobQueue, OnAckMessageReceived)
         {
+        }
+
+        private static void OnAckMessageReceived(Message message)
+        {
+            Assert.AreEqual(message.MessageType, MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback);
         }
     }
 }

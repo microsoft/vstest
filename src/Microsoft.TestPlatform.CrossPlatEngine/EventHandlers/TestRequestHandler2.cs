@@ -48,14 +48,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
         {
             this.communicationEndPoint = communicationEndpoint;
             this.connectionInfo = connectionInfo;
             this.dataSerializer = dataSerializer;
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
-            this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
+            this.onAckMessageRecieved = onAckMessageRecieved;
             this.jobQueue = jobQueue;
         }
 
@@ -86,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void InitializeCommunication()
+        public virtual void InitializeCommunication()
         {
             this.communicationEndPoint.Connected += (sender, connectedArgs) =>
             {
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void Close()
+        public virtual void Close()
         {
             this.Dispose();
         }
@@ -192,7 +192,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
-            return 0;
+            var waitHandle = new AutoResetEvent(false);
+            Message ackMessage = null;
+            this.onAckMessageRecieved = (ackRawMessage) =>
+            {
+                ackMessage = ackRawMessage;
+                waitHandle.Set();
+            };
+
+            var data = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttached,
+                testProcessStartInfo, protocolVersion);
+
+            this.channel.Send(data);
+
+            waitHandle.WaitOne();
+            this.onAckMessageRecieved = null;
+            return this.dataSerializer.DeserializePayload<int>(ackMessage);
         }
 
         private ITestCaseEventsHandler GetTestCaseEventsHandler(string runSettings)
@@ -239,7 +254,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
-                        //jobQueue.Flush();
                         break;
                     }
 
@@ -264,7 +278,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
-                        //jobQueue.Flush();
                         break;
                     }
 
