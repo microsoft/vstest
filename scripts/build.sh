@@ -24,6 +24,14 @@ CI_BUILD=false
 VERBOSE=false
 PROJECT_NAME_PATTERNS=
 
+#
+# Source build repo api
+# See https://github.com/dotnet/source-build/blob/dev/release/2.0/Documentation/RepoApi.md
+#
+DOTNET_BUILD_FROM_SOURCE=0
+DOTNET_CORE_SDK_DIR=
+DOTNET_BUILD_TOOLS_DIR=
+
 while [ $# -gt 0 ]; do
     lowerI="$(echo ${1:-} | awk '{print tolower($0)}')"
     case $lowerI in
@@ -33,24 +41,42 @@ while [ $# -gt 0 ]; do
             ;;
         -c)
             CONFIGURATION=$2
+            shift
             ;;
         -r)
             TARGET_RUNTIME=$2
+            shift
             ;;
         -v)
             VERSION=$2
+            shift
             ;;
         -vs)
             VERSION_SUFFIX=$2
+            shift
             ;;
         -noloc)
             DISABLE_LOCALIZED_BUILD=$2
+            shift
             ;;
         -ci)
             CI_BUILD=$2
+            shift
             ;;
         -p)
             PROJECT_NAME_PATTERNS=$2
+            shift
+            ;;
+        -dotnetbuildfromsource)
+            DOTNET_BUILD_FROM_SOURCE=1
+            ;;
+        -dotnetcoresdkdir)
+            DOTNET_CORE_SDK_DIR=$2
+            shift
+            ;;
+        -dotnetbuildtoolsdir)
+            DOTNET_BUILD_TOOLS_DIR=$2
+            shift
             ;;
         -verbose)
             VERBOSE=true
@@ -67,11 +93,13 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
-TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"
+TP_DOTNET_DIR="${DOTNET_CORE_SDK_DIR:-${TP_TOOLS_DIR}/dotnet}"
+TP_PACKAGES_DIR="${NUGET_PACKAGES:-${TP_ROOT_DIR}/packages}"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
 TP_PACKAGE_NUSPEC_DIR="$TP_ROOT_DIR/src/package/nuspec"
 TP_SRC_DIR="$TP_ROOT_DIR/src"
+TP_USE_REPO_API=$DOTNET_BUILD_FROM_SOURCE
 
 #
 # Dotnet configuration
@@ -80,8 +108,8 @@ TP_SRC_DIR="$TP_ROOT_DIR/src"
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 # Dotnet build doesnt support --packages yet. See https://github.com/dotnet/cli/issues/2712
 export NUGET_PACKAGES=$TP_PACKAGES_DIR
-DOTNET_CLI_VERSION="LATEST"
-DOTNET_RUNTIME_VERSION="LATEST"
+DOTNET_CLI_VERSION="2.1.0-preview1-007372"
+#DOTNET_RUNTIME_VERSION="LATEST"
 
 #
 # Build configuration
@@ -96,7 +124,6 @@ TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
-TPB_HasMono=$(command -v mono > /dev/null && echo true || echo false)
 
 #
 # Logging
@@ -138,38 +165,46 @@ function usage()
 #
 function install_cli()
 {
-    local failed=false
-    local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
-    local remote_path="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
+    if [[ $TP_USE_REPO_API = 0 ]]; then
+        # Skip download of dotnet toolset if REPO API is enabled
+        local failed=false
+        local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
+        local remote_path="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
 
-    log "Installing dotnet cli..."
-    local start=$SECONDS
+        log "Installing dotnet cli..."
+        local start=$SECONDS
 
-    # Install the latest version of dotnet-cli
-    curl --retry 10 -sSL --create-dirs -o $install_script $remote_path || failed=true
-    if [ "$failed" = true ]; then
-        error "Failed to download dotnet-install.sh script."
+        # Install the latest version of dotnet-cli
+        curl --retry 10 -sSL --create-dirs -o $install_script $remote_path || failed=true
+        if [ "$failed" = true ]; then
+            error "Failed to download dotnet-install.sh script."
+            return 1
+        fi
+        chmod u+x $install_script
+
+        log "install_cli: Get the latest dotnet cli toolset..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
+
+        # Get netcoreapp1.1 shared components
+        log "install_cli: Get the shared netcoreapp1.0 runtime..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
+        log "install_cli: Get the shared netcoreapp1.1 runtime..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
+        log "install_cli: Get the shared netcoreapp2.0 runtime..."
+        $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
+        #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
+        #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
+    fi
+
+    local dotnet_path=$(_get_dotnet_path)
+    if [[ ! -e $dotnet_path ]]; then
+        log "dotnet not found at $dotnet_path. Did the dotnet cli installation succeed?"
         return 1
     fi
-    chmod u+x $install_script
-
-    log "install_cli: Get the latest dotnet cli toolset..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_CLI_VERSION
-
-    # Get netcoreapp1.1 shared components
-    log "install_cli: Get the shared netcoreapp1.0 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
-    log "install_cli: Get the shared netcoreapp1.1 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
-    log "install_cli: Get the shared netcoreapp2.0 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
-    #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
-    #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
 
     log "install_cli: Complete. Elapsed $(( SECONDS - start ))s."
     return 0
 }
-
 
 function restore_package()
 {
@@ -198,42 +233,13 @@ function invoke_build()
     local start=$SECONDS
     log ".. .. Build: Source: $TPB_Solution"
     
-    if $TPB_HasMono; then
-        if [ -z "$PROJECT_NAME_PATTERNS" ]
-        then
-            $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
-        else
-            find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -f netcoreapp1.0
-        fi
+    # Workaround for https://github.com/dotnet/sdk/issues/335
+    export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
+    if [ -z "$PROJECT_NAME_PATTERNS" ]
+    then
+        $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
     else
-        # Need to target the appropriate targetframework for each project until netstandard2.0 ships
-        PROJECTFRAMEWORKMAP=( \
-            Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine:netstandard1.4 \
-            testhost.x86/testhost.x86:netcoreapp1.0 \
-            Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netcoreapp1.0 \
-            Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netstandard1.0 \
-            package/package/package:netcoreapp1.0 \
-            Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel:netstandard1.4 \
-            Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.5 \
-            datacollector/datacollector:netcoreapp2.0 \
-            vstest.console/vstest.console:netcoreapp2.0 \
-            Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common:netstandard1.4 \
-            Microsoft.TestPlatform.Client/Microsoft.TestPlatform.Client:netstandard1.4 \
-            Microsoft.TestPlatform.Extensions.TrxLogger/Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.5 \
-            Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities:netstandard1.4 \
-            Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities:netstandard1.4 \
-            Microsoft.TestPlatform.Build/Microsoft.TestPlatform.Build:netstandard1.3 \
-            testhost/testhost:netcoreapp1.0 \
-            Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities:netstandard1.4
-        )
-        
-        for item in "${PROJECTFRAMEWORKMAP[@]}" ;
-        do
-            projectToBuild="${item%%:*}"
-            framework="${item##*:}"
-            verbose "$dotnet build src/$projectToBuild.csproj --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:TargetFramework=$framework"
-            $dotnet build src/$projectToBuild.csproj --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:TargetFramework=$framework
-        done
+        find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     fi
 
     log ".. .. Build: Complete."
@@ -270,11 +276,6 @@ function publish_package()
             $TP_ROOT_DIR/src/datacollector/datacollector.csproj
         )
 
-        if [ "$framework" == "net451" ] && ! $TPB_HasMono; then
-            # Skip publish if mono is not available
-            continue
-        fi
-
         log "Package: Publish projects for $framework"
         for project in "${projects[@]}" ;
         do
@@ -282,15 +283,12 @@ function publish_package()
             $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
         done
 
-        # Copy TestHost for desktop targets if we've built net451
-        # packages with mono
-        if $TPB_HasMono; then
-            local testhost=$packageDir/TestHost
-            mkdir -p $testhost
-            cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x64/* $testhost
-        fi
-        
+        # Copy TestHost for desktop targets
+        local testhost=$packageDir/TestHost
+        mkdir -p $testhost
+        cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
+        cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x86/* $testhost
+
         # Copy over the logger assemblies to the Extensions folder.
         local extensionsDir="$packageDir/Extensions"
         # Create an extensions directory.
@@ -356,12 +354,8 @@ function create_package()
     packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
     mkdir -p $packageOutputDir
 
-    DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
-    if [[ ! -e $DOTNET_PATH ]]; then
-        log "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
-    fi
-
-    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec" "TestPlatform.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
+    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec"\
+        "Microsoft.TestPlatform.nuspec" "Microsoft.TestPlatform.Portable.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
     projectFiles=("Microsoft.TestPlatform.CLI.csproj" "Microsoft.TestPlatform.Build.csproj")
     binDir="$TP_ROOT_DIR/bin/packages"
 
@@ -381,9 +375,9 @@ function create_package()
 
 
     for i in ${projectFiles[@]}; do
-        log "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
-        && $DOTNET_PATH restore $stagingDir/${i} \
-        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
+        log "$dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
+        && $dotnet restore $stagingDir/${i} \
+        && $dotnet pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
     done
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."
@@ -394,7 +388,7 @@ function create_package()
 #
 _get_dotnet_path()
 {
-    echo "$TP_TOOLS_DIR/dotnet/dotnet"
+    echo "$TP_DOTNET_DIR/dotnet"
 }
 
 # Execute build
@@ -406,11 +400,6 @@ log "Test platform environment variables: "
 log "Test platform build variables: "
 (set | grep ^TPB_)
 
-if $TPB_HasMono; then
-    # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=$(dirname $(which mono))/../lib/mono/4.5/
-fi
-
 if [ -z "$PROJECT_NAME_PATTERNS" ]
 then
     install_cli && restore_package && invoke_build && publish_package && create_package
@@ -418,8 +407,9 @@ else
     invoke_build
 fi
 
-log "Build complete. Elapsed $(( SECONDS - start ))s."
-
 if [[ $? -ne 0 ]]; then
+    log "Build failed. Elapsed $(( SECONDS - start ))s."
     exit 1
 fi
+
+log "Build complete. Elapsed $(( SECONDS - start ))s."
