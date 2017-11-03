@@ -34,7 +34,7 @@
 </source>
         <target state="translated">Testovací běh použije knihovny DLL sestavené pro rozhraní {0} a platformu {1}. Tyto knihovny DLL nebudou součástí běhu: {2}Další podrobnosti o správě těchto nastavení najdete na adrese {3}.
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Spuštění testu použije DLL(s) vybudované framework {0} a platformu {1}. Po DLL(s) nebudou součástí run: {2} {3} podrobnosti přejít na správu těchto nastavení.</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">Produkt {0} je sestaven pro rozhraní {1} a platformu {2}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
