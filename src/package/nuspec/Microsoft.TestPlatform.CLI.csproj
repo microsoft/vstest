@@ -8,5 +8,7 @@
     <!-- Don't include the output.dll and output.runtimeconfig.json files in nuget package -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <NoBuild>true</NoBuild>
   </PropertyGroup>
 </Project>

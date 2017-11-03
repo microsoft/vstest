@@ -7,7 +7,7 @@ def branch = GithubBranchName
 
 // Generate the builds for debug and release, commit and PRJob
 [true, false].each { isPR -> // Defines a closure over true and false, value assigned to isPR
-    ['Windows_NT', 'Ubuntu16.04'].each { osName ->
+    ['Windows_NT', 'Ubuntu14.04'].each { osName ->
         ['Debug', 'Release'].each { configuration ->
 
             // Determine the name for the new job. A _prtest suffix is appended if isPR is true.
@@ -39,7 +39,7 @@ def branch = GithubBranchName
                     Utilities.setMachineAffinity(newJob, 'Windows_NT', 'latest-or-auto')
                     break;
 
-                case "Ubuntu16.04":
+                case "Ubuntu14.04":
                     // Define your build/test strings here.
                     def buildString = """./build.sh -c ${configuration}"""
                     // TODO add test scripts
