@@ -11,8 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Resources;
@@ -22,17 +20,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     /// </summary>
     public class VSExtensionManager : IVSExtensionManager
     {
-        private const string PrivateAssembliesDirName = "PrivateAssemblies";
-        private const string PublicAssembliesDirName = "PublicAssemblies";
         private const string ExtensionManagerService = "Microsoft.VisualStudio.ExtensionManager.ExtensionManagerService";
         private const string ExtensionManagerAssemblyName = @"Microsoft.VisualStudio.ExtensionManager";
         private const string ExtensionManagerImplAssemblyName = @"Microsoft.VisualStudio.ExtensionManager.Implementation";
-        private const string DevenvExe = "devenv.exe";
 
         private const string SettingsManagerTypeName = "Microsoft.VisualStudio.Settings.ExternalSettingsManager";
         private const string SettingsManagerAssemblyName = @"Microsoft.VisualStudio.Settings.15.0";
-        
-        private IFileHelper fileHelper;
+
+        private readonly IFileHelper fileHelper;
 
         private Assembly extensionManagerAssembly;
         private Assembly extensionManagerImplAssembly;
@@ -81,31 +76,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             // Navigate up to the IDE folder
             // In case of xcopyable vstest.console, this functionality is not supported.
-            var vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent?.Parent?.Parent?.FullName;
-            string pathToDevenv = null;
-
-            if (!string.IsNullOrEmpty(vsInstallPath))
-            {
-                pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
-            }
-
-            if (string.IsNullOrEmpty(pathToDevenv) || !this.fileHelper.Exists(pathToDevenv))
+            var installContext = new InstallationContext(this.fileHelper);
+            if (!installContext.TryGetVisualStudioDirectory(out string vsInstallPath))
             {
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound));
             }
 
             // Adding resolution paths for resolving dependencies.
-            var resolutionPaths = new string[] {
-                vsInstallPath,
-                Path.Combine(vsInstallPath, PrivateAssembliesDirName),
-                Path.Combine(vsInstallPath, PublicAssembliesDirName)
-            };
+            var resolutionPaths = installContext.GetVisualStudioCommonLocations(vsInstallPath);
             using (var assemblyResolver = new AssemblyResolver(resolutionPaths))
             {
                 object extensionManager;
                 object settingsManager;
 
-                settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { pathToDevenv });
+                settingsManager = SettingsManagerType.GetMethod("CreateForApplication", new Type[] { typeof(String) }).Invoke(null, new object[] { installContext.GetVisualStudioPath(vsInstallPath) });
                 if (settingsManager != null)
                 {
                     try
@@ -198,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 return extensionManagerServiceType;
             }
         }
-        
+
         /// <summary>
         /// Used to explicitly load Microsoft.VisualStudio.Settings.15.0.dll
         /// </summary>

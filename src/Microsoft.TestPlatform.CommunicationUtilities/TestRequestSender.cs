@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                                 ? ConnectionRole.Client
                                                 : ConnectionRole.Host;
 
-            if (connectionInfo.Role == ConnectionRole.Host)
+            if (this.connectionInfo.Role == ConnectionRole.Client)
             {
                 this.communicationEndpoint = new SocketClient();
             }
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         #region Discovery Protocol
 
         /// <inheritdoc />
-        public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions)
         {
             var message = this.dataSerializer.SerializePayload(
                 MessageType.DiscoveryInitialize,
@@ -302,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         #region Execution Protocol
 
         /// <inheritdoc />
-        public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions)
         {
             var message = this.dataSerializer.SerializePayload(
                 MessageType.ExecutionInitialize,

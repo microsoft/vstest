@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private List<ITestRunStatistics> testRunStatsList;
 
-        private ConcurrentDictionary<string, double> metricsAggregator;
+        private ConcurrentDictionary<string, object> metricsAggregator;
 
         private object dataUpdateSyncObject = new object();
 
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             executorUris = new List<string>();
             testRunStatsList = new List<ITestRunStatistics>();
 
-            metricsAggregator = new ConcurrentDictionary<string, double>();
+            metricsAggregator = new ConcurrentDictionary<string, object>();
 
             IsAborted = false;
             IsCanceled = false;
@@ -94,11 +94,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Returns the Aggregated Run Data Metrics
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, double> GetAggregatedRunDataMetrics()
+        public IDictionary<string, object> GetAggregatedRunDataMetrics()
         {
             if (this.metricsAggregator == null || this.metricsAggregator.Count == 0)
             {
-               return new ConcurrentDictionary<string, double>();
+                return new ConcurrentDictionary<string, object>();
             }
 
             var adapterUsedCount = this.metricsAggregator.Count(metrics =>
@@ -176,13 +176,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (metric.Key.Contains(TelemetryDataConstants.TimeTakenToRunTestsByAnAdapter) || metric.Key.Contains(TelemetryDataConstants.TimeTakenByAllAdaptersInSec) || (metric.Key.Contains(TelemetryDataConstants.TotalTestsRun) || metric.Key.Contains(TelemetryDataConstants.TotalTestsRanByAdapter)))
                 {
                     var newValue = Convert.ToDouble(metric.Value);
-                    Double oldValue;
+                    object oldValue;
 
                     if (this.metricsAggregator.TryGetValue(metric.Key, out oldValue))
                     {
-                        this.metricsAggregator[metric.Key] = newValue + oldValue;
+                        var oldDoubleValue = Convert.ToDouble(oldValue);
+                        this.metricsAggregator[metric.Key] = newValue + oldDoubleValue;
                     }
-
                     else
                     {
                         this.metricsAggregator.TryAdd(metric.Key, newValue);

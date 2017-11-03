@@ -20,6 +20,10 @@
     <TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
+
+    <!-- On non windows environment, make UAP behave like desktop .NET framework -->
+    <TargetFrameworkIdentifier Condition="'$(OS)' != 'Windows_NT'">.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion Condition="'$(OS)' != 'Windows_NT'">v4.5.1</TargetFrameworkVersion>
   </PropertyGroup>
     
   <ItemGroup>

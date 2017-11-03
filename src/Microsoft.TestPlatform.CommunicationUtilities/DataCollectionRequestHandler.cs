@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         try
                         {
-                            this.testCaseEventMonitorTask.Wait(this.cancellationTokenSource.Token);
+                            this.testCaseEventMonitorTask?.Wait(this.cancellationTokenSource.Token);
                             this.dataCollectionTestCaseEventHandler.Close();
                         }
                         catch (Exception ex)
@@ -350,7 +350,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                     if (extensionAssemblies.Count > 0)
                     {
-                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, true);
+                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                     }
                 }
             }

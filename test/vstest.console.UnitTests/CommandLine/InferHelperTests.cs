@@ -75,6 +75,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         }
 
         [TestMethod]
+        public void AutoDetectArchitectureShouldSetAnyCpuArchForNotDotNetAssembly()
+        {
+            inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, sourceArchitectures);
+            Assert.AreEqual(Architecture.AnyCPU, sourceArchitectures["NotDotNetAssebly.appx"]);
+        }
+
+        [TestMethod]
         public void AutoDetectArchitectureShouldReturnDefaultArchForAllAnyCpuAssemblies()
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))

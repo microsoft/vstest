@@ -214,12 +214,17 @@
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+      Change the verbosity level in log messages for console logger as shown below
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal and normal.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -229,7 +234,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
+        <target state="new">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
       Specifica un logger per i risultati dei test. Ad esempio, per registrare risultati in un 
       file di risultati dei test di Visual Studio (TRX), usare /logger:trx. [;LogFileName=&lt;il valore predefinito è un nome file univoco&gt;]
       Crea nella directory TestResults il file con il valore specificato per LogFileName.
@@ -245,7 +250,7 @@
                 [;Platform=&lt;valore predefinito "Any CPU"&gt;]
                 [;Flavor=&lt;valore predefinito "Debug"&gt;]
                 [;RunTitle=&lt;titolo&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Logger Uri/FriendlyName &gt;
       Specificare un logger per risultati di test.  Ad esempio, per registrare i risultati in un Visual Studio Test risultati File (TRX) utilizzano /logger:trx.

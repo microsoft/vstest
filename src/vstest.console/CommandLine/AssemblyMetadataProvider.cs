@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             try
             {
-                using (var assemblyStream = File.Open(filePath, FileMode.Open))
+                using (var assemblyStream = File.Open(filePath, FileMode.Open, FileAccess.Read))
                 {
                     frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream);
                 }
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
+                EqtTrace.Info("AssemblyMetadataProvider.GetFrameWork: Determined framework:'{0}' for source: '{1}'", frameworkName, filePath);
             }
 
             return frameworkName;
@@ -52,24 +52,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 // AssemblyName won't load the assembly into current domain.
-                archType  = MapToArchitecture(new AssemblyName(assemblyPath).ProcessorArchitecture);
+                var assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
+                archType = MapToArchitecture(assemblyName.ProcessorArchitecture);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // AssemblyName will thorw Exception if assembly contains native code or no manifest.
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("AssemblyMetadataProvider.GetArchitecture: Failed get ProcessorArchitecture using AssemblyName API with exception: {0}", ex);
+                }
+
                 try
                 {
                     archType = GetArchitectureForSource(assemblyPath);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    EqtTrace.Error("Failed to determine Assembly Architecture: {0}", ex);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Failed to determine Assembly Architecture with exception: {0}", e);
+                    }
                 }
             }
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("GetArchitecture: determined atchitecture:{0} info for assembly: {1}", archType,
+                EqtTrace.Info("AssemblyMetadataProvider.GetArchitecture: Determined architecture:{0} info for assembly: {1}", archType,
                     assemblyPath);
             }
 
@@ -79,23 +89,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         private static FrameworkName GetFrameworkNameFromAssemblyMetadata(FileStream assemblyStream)
         {
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
-            var peReader = new PEReader(assemblyStream);
-            var metadataReader = peReader.GetMetadataReader();
-
-            foreach (var customAttributeHandle in metadataReader.CustomAttributes)
+            using (var peReader = new PEReader(assemblyStream))
             {
-                var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
-                var result = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(attr.Value));
-                if (result.Contains(".NET") && result.Contains(",Version="))
+                var metadataReader = peReader.GetMetadataReader();
+
+                foreach (var customAttributeHandle in metadataReader.CustomAttributes)
                 {
-                    var fxStartIndex = result.IndexOf(".NET", StringComparison.Ordinal);
-                    var fxEndIndex = result.IndexOf("\u0001", fxStartIndex, StringComparison.Ordinal);
-                    if (fxStartIndex > -1 && fxEndIndex > fxStartIndex)
+                    var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
+                    var result = Encoding.UTF8.GetString(metadataReader.GetBlobBytes(attr.Value));
+                    if (result.Contains(".NET") && result.Contains(",Version="))
                     {
-                        // Using -3 because custom attribute values seperated by unicode characters.
-                        result = result.Substring(fxStartIndex, fxEndIndex - 3);
-                        frameworkName = new FrameworkName(result);
-                        break;
+                        var fxStartIndex = result.IndexOf(".NET", StringComparison.Ordinal);
+                        var fxEndIndex = result.IndexOf("\u0001", fxStartIndex, StringComparison.Ordinal);
+                        if (fxStartIndex > -1 && fxEndIndex > fxStartIndex)
+                        {
+                            // Using -3 because custom attribute values seperated by unicode characters.
+                            result = result.Substring(fxStartIndex, fxEndIndex - 3);
+                            frameworkName = new FrameworkName(result);
+                            break;
+                        }
                     }
                 }
             }
@@ -107,6 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         {
             Architecture arch = Architecture.AnyCPU;
             // Mapping to Architecture based on https://msdn.microsoft.com/en-us/library/system.reflection.processorarchitecture(v=vs.110).aspx
+
             if (processorArchitecture.Equals(ProcessorArchitecture.Amd64)
                 || processorArchitecture.Equals(ProcessorArchitecture.IA64))
             {
@@ -151,10 +164,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 //get the input stream
                 using (Stream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                using (var reader = new BinaryReader(fs))
                 {
                     var validImage = true;
 
-                    var reader = new BinaryReader(fs);
                     //PE Header starts @ 0x3C (60). Its a 4 byte header.
                     fs.Position = 0x3C;
                     peHeader = reader.ReadUInt32();

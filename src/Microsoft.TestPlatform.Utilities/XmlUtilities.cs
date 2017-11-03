@@ -51,12 +51,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         internal static void AppendOrModifyChild(
-            XPathNavigator parentNavigator,
+            XmlDocument xmlDocument,
             string nodeXPath,
             string nodeName,
             string innerXml)
         {
-            var childNodeNavigator = parentNavigator.SelectSingleNode(nodeXPath);
+            var childNode = xmlDocument.SelectSingleNode(nodeXPath);
 
             // Todo: There isn't an equivalent API to SecurityElement.Escape in Core yet. 
             // So trusting that the XML is always valid for now.
@@ -65,37 +65,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 #else
             var secureInnerXml = innerXml;
 #endif
-            if (childNodeNavigator == null)
+            if (childNode == null)
             {
-                var doc = new XmlDocument();
-                var childElement = doc.CreateElement(nodeName);
+                var childElement = xmlDocument.CreateElement(nodeName);
 
                 if (!string.IsNullOrEmpty(innerXml))
                 {
                     childElement.InnerXml = secureInnerXml;
                 }
 
-                childNodeNavigator = childElement.CreateNavigator();
-                parentNavigator.AppendChild(childNodeNavigator);
+                var parentNode = xmlDocument.SelectSingleNode(nodeXPath.Substring(0, nodeXPath.LastIndexOf('/')));
+                parentNode?.AppendChild(childElement);
             }
             else if (!string.IsNullOrEmpty(innerXml))
             {
-#if NET451
-                childNodeNavigator.InnerXml = secureInnerXml;
-#else
-                // .Net Core has a bug where calling childNodeNavigator.InnerXml throws an XmlException with "Data at the root level is invalid".
-                // So doing the below instead.
-                var doc = new XmlDocument();
-
-                var childElement = doc.CreateElement(nodeName);
-
-                if (!string.IsNullOrEmpty(innerXml))
-                {
-                    childElement.InnerXml = secureInnerXml;
-                }
-
-                childNodeNavigator.ReplaceSelf(childElement.CreateNavigator().OuterXml);
-#endif
+                childNode.InnerXml = secureInnerXml;
             }
         }
 

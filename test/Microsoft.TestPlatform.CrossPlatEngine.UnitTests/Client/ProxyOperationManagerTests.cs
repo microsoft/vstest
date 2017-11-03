@@ -202,6 +202,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void SetupChannelShouldHonorTimeOutSetByUser()
+        {
+            Environment.SetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT", "100");
+
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(100000)).Returns(true);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
+
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(100000), Times.Exactly(1));
+
+            this.connectionTimeout = 400;
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldNotHonorGarbageTimeOutSetByUser()
+        {
+            Environment.SetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT", "garbage");
+
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
+
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Exactly(1));
+        }
+
+        [TestMethod]
         public void SetupChannelShouldThrowIfWaitForTestHostConnectionTimesOut()
         {
             SetupTestHostLaunched(true);

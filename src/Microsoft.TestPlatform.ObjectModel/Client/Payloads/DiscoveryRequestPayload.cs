@@ -22,5 +22,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public string RunSettings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the test platform options
+        /// </summary>
+        [DataMember]
+        public TestPlatformOptions TestPlatformOptions
+        {
+            get;
+            set;
+        }
     }
 }

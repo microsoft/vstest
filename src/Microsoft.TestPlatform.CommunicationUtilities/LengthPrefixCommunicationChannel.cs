@@ -42,6 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debugger.Launch();
                 EqtTrace.Verbose("LengthPrefixCommunicationChannel: Error sending data: {0}.", ex);
                 throw new CommunicationException("Unable to send data over channel.", ex);
             }

@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private IAssemblyLoadContext platformAssemblyLoadContext;
 
-        private static readonly string[] SupportedFileExtensions = new string[] { ".dll", ".exe" };
+        private static readonly string[] SupportedFileExtensions = { ".dll", ".exe" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblyResolver"/> class.
@@ -104,11 +104,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // args.Name is like: "Microsoft.VisualStudio.TestTools.Common, Version=[VersionMajor].0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
             lock (this.resolvedAssemblies)
             {
-                Assembly assembly;
-                if (this.resolvedAssemblies.TryGetValue(args.Name, out assembly))
+                if (this.resolvedAssemblies.TryGetValue(args.Name, out var assembly))
                 {
                     EqtTrace.Info("AssemblyResolver: {0}: Resolved from cache.", args.Name);
-                    return (assembly);
+                    return assembly;
                 }
 
                 AssemblyName requestedName = null;
@@ -124,6 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         EqtTrace.Info("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
                     }
 
+                    this.resolvedAssemblies[args.Name] = null;
                     return null;
                 }
 
@@ -176,9 +176,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         }
                     }
                 }
-            }
 
-            return null;
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly.", args.Name);
+                }
+
+                this.resolvedAssemblies[args.Name] = null;
+                return null;
+            }
         }
 
         /// <summary>

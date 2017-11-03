@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// </summary>
     public partial class ProcessHelper : IProcessHelper
     {
+        private static readonly string ARM = "arm";
+
         /// <inheritdoc/>
         public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack)
         {
@@ -48,11 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 {
                     process.Exited += (sender, args) =>
                     {
-                        // Call WaitForExit again to ensure all streams are flushed
+                        // Call WaitForExit without again to ensure all streams are flushed,
+                        // Add timeout to avoid indefinite waiting on child process exist.
                         var p = sender as Process;
                         try
                         {
-                            p.WaitForExit();
+                            p.WaitForExit(500);
                         }
                         catch (InvalidOperationException)
                         {
@@ -160,6 +163,29 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             var proc = process as Process;
             return proc?.Id ?? -1;
+        }
+
+        /// <inheritdoc/>
+        public PlatformArchitecture GetCurrentProcessArchitecture()
+        {
+            if (IntPtr.Size == 8)
+            {
+                return PlatformArchitecture.X64;
+            }
+
+            return PlatformArchitecture.X86;
+        }
+
+        /// <inheritdoc/>
+        public string GetNativeDllDirectory()
+        {
+            var osArchitecture = new PlatformEnvironment().Architecture;
+            if (osArchitecture == PlatformArchitecture.ARM || osArchitecture == PlatformArchitecture.ARM64)
+            {
+                return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower(), ARM);
+            }
+
+            return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower());
         }
     }
 }

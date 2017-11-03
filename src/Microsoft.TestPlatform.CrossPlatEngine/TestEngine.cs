@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// Cross Platform test engine entry point for the client.
@@ -107,9 +108,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            // Collecting IsDataCollector Enabled
-            requestData.MetricsCollection.Add(TelemetryDataConstants.DataCollectorsEnabled, isDataCollectorEnabled.ToString());
-
             var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
@@ -133,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager.GetTestHostConnectionInfo());
 
-                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
+                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings))
                                                 : new ProxyExecutionManager(requestData, requestSender, hostManager);
             };
 
@@ -237,6 +235,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 {
                     EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in isolation");
                 }
+                return false;
+            }
+
+            // Run tests in isolation if run is authored using testsettings.
+            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            {
                 return false;
             }
 

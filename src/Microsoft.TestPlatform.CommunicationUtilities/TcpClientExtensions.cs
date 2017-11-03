@@ -31,10 +31,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 try
                 {
-                    if (client.Client.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
-                    {
+                    ////if (client.Client.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
+                    ////{
                         channel.NotifyDataAvailable();
-                    }
+                    ////}
                 }
                 catch (IOException ioException)
                 {
