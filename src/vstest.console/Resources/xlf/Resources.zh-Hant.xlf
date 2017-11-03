@@ -1547,13 +1547,13 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">若使用測試設定來設定測試回合，則不支援 --Collect|/Collect:"{0}"。</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">內嵌測試設定不支援透過回合設定來設定的資料收集器。如需詳細資訊，請參閱 https://aka.ms/vstest-configure-datacollector。回合設定: 0}。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

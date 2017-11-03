@@ -1547,13 +1547,13 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:testsettings를 사용하여 테스트 실행을 구성하는 경우 "{0}"은(는) 지원되지 않습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">실행 설정을 통해 구성된 데이터 수집기는 포함된 테스트 설정으로는 지원되지 않습니다. 자세한 내용은 https://aka.ms/vstest-configure-datacollector를 참조하세요. 실행 설정: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

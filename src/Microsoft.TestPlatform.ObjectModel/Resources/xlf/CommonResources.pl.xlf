@@ -34,7 +34,7 @@
 </source>
         <target state="translated">Uruchomienie testu użyje plików DLL przeznaczonych dla struktury {0} i platformy {1}. Następujące pliki DLL nie będą częścią uruchomienia: {2}.Aby uzyskać więcej informacji na temat zarządzania tymi ustawieniami, przejdź do strony {3}.
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uruchom test użyje dll (s), zbudowane dla framework {0} i platformy {1}. Po dll (s) nie będzie częścią run: {2} Przejdź do {3} szczegółowe informacje dotyczące zarządzania tych ustawień.</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">Element {0} został skompilowany dla struktury {1} i platformy {2}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

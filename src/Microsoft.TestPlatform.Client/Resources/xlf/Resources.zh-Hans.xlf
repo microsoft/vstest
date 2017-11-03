@@ -45,8 +45,8 @@
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider found for this run.</source>
-        <target state="new">No suitable test runtime provider found for this run.</target>
-        <note></note>
+        <target state="translated">对于此运行，未找到适合的测试运行时提供程序。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

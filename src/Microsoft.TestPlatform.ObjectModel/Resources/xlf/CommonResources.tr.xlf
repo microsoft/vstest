@@ -34,7 +34,7 @@
 </source>
         <target state="translated">Test çalıştırmasında, {0} çerçevesi ve {1} platformu için oluşturulan DLL’ler kullanılacak. Şu DLL’ler çalıştırmaya dahil edilmeyecek: {2}Bu ayarları yönetmeye ilişkin ayrıntılar için {3} sayfasına gidin.
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test çalışması DLL(s) framework {0} ve {1} platform için yerleşik kullanır. DLL(s) aşağıdaki çalışma parçası olmayacak: {2} Git {3} daha fazla ayrıntı için bu ayarları yönetme hakkında.</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">{0}, {1} Çerçevesi ve {2} Platformu için derlenmiştir.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
