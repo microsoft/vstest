@@ -376,6 +376,8 @@
     <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\zh-Hant\vstest.console.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\zh-Hant\vstest.console.resources.dll" />
     <file src="Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll"	target="tools\net451\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
+    <file src="Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll"	target="tools\net451\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" />
+    <file src="Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll"	target="tools\net451\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.config"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.config" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" />
