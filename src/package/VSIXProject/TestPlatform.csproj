@@ -140,8 +140,8 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\CoreCon\*.*">
       <VSIXSubPath>CoreCon</VSIXSubPath>
     </VsixSourceItem>
-    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.*" Exclude="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.pdb">
-      <VSIXSubPath>Extensions\CppUnitFramework</VSIXSubPath>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\Cpp\*.*" Exclude="$(VsixInputFileLocation)\Extensions\Cpp\*.pdb">
+      <VSIXSubPath>Extensions\Cpp</VSIXSubPath>
     </VsixSourceItem>
     
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\TestImpact\ComComponents\x64\*.*">
