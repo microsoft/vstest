@@ -375,10 +375,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Framework effectiveFramework,
             string resultsDirectory)
         {
-            var resultsDirectoryNavigator = xmlDocument.SelectSingleNode(ResultsDirectoryNodePath);
-            if (null != resultsDirectoryNavigator)
+            var childNode = xmlDocument.SelectSingleNode(ResultsDirectoryNodePath);
+            if (null != childNode)
             {
-                resultsDirectory = resultsDirectoryNavigator.InnerXml;
+                resultsDirectory = childNode.InnerXml;
             }
 
             XmlUtilities.AppendOrModifyChild(xmlDocument, RunConfigurationNodePath, RunConfigurationNodeName, null);

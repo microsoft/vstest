@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             string nodeName,
             string innerXml)
         {
-            var childNodeNavigator = xmlDocument.SelectSingleNode(nodeXPath);
+            var childNode = xmlDocument.SelectSingleNode(nodeXPath);
 
             // Todo: There isn't an equivalent API to SecurityElement.Escape in Core yet. 
             // So trusting that the XML is always valid for now.
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 #else
             var secureInnerXml = innerXml;
 #endif
-            if (childNodeNavigator == null)
+            if (childNode == null)
             {
                 var childElement = xmlDocument.CreateElement(nodeName);
 
@@ -75,11 +75,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
 
                 var parentNode = xmlDocument.SelectSingleNode(nodeXPath.Substring(0, nodeXPath.LastIndexOf('/')));
-                parentNode.AppendChild(childElement);
+                parentNode?.AppendChild(childElement);
             }
             else if (!string.IsNullOrEmpty(innerXml))
             {
-                childNodeNavigator.InnerXml = secureInnerXml;
+                childNode.InnerXml = secureInnerXml;
             }
         }
 
