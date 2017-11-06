@@ -63,8 +63,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
-            System.Diagnostics.Debugger.Launch();
-
             this.vstestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
