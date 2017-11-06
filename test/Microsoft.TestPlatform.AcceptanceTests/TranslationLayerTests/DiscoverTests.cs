@@ -3,8 +3,11 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
 
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -13,57 +16,62 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class DiscoverTests : AcceptanceTestBase
     {
-        private List<string> testAssemblies;
+        private const string Netcoreapp = "netcoreapp";
+        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
+
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler discoveryEventHandler;
         private DiscoveryEventHandler2 discoveryEventHandler2;
 
-        string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
-                                        <RunConfiguration>
-                                        <BatchSize>3</BatchSize>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-
         public DiscoverTests()
         {
-            this.testAssemblies = new List<string>
-                              {
-                                  this.GetAssetFullPath("SimpleTestProject.dll"),
-                                  this.GetAssetFullPath("SimpleTestProject2.dll")
-                              };
-
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.discoveryEventHandler = new DiscoveryEventHandler();
             this.discoveryEventHandler2 = new DiscoveryEventHandler2();
         }
 
-        [TestMethod]
-        public void DiscoverTestsUsingDiscoveryEventHandler1()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
         {
-            this.vstestConsoleWrapper.DiscoverTests(this.testAssemblies, this.GetDefaultRunSettings(), this.discoveryEventHandler);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
 
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
         }
 
-        [TestMethod]
-        public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
             this.vstestConsoleWrapper.DiscoverTests(
-                this.testAssemblies,
+               this.GetTestAssemblies(),
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { CollectMetrics = false },
                 this.discoveryEventHandler2);
 
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
+            Assert.AreEqual(0, this.discoveryEventHandler2.Metrics.Count);
         }
 
-        [TestMethod]
-        public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
         {
-            this.vstestConsoleWrapper.DiscoverTests(this.testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
 
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
@@ -74,12 +82,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.DiscoveryState));
         }
 
-        [TestMethod]
-        public void DiscoverTestsUsingEventHandler2AndBatchSize()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <BatchSize>3</BatchSize>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+
             this.vstestConsoleWrapper.DiscoverTests(
-                this.testAssemblies,
-                this.runSettingsXml,
+               this.GetTestAssemblies(),
+                runSettingsXml,
                 new TestPlatformOptions { CollectMetrics = false },
                 this.discoveryEventHandler2);
 
@@ -87,17 +107,92 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
         }
 
-
-        [TestMethod]
-        public void DiscoverTestsUsingEventHandler1AndBatchSize()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <BatchSize>3</BatchSize>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+
             this.vstestConsoleWrapper.DiscoverTests(
-                this.testAssemblies,
-                this.runSettingsXml,
+               this.GetTestAssemblies(),
+                runSettingsXml,
                 this.discoveryEventHandler);
 
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        <DisableAppDomain>true</DisableAppDomain>
+                                        <DisableParallelization>true</DisableParallelization>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+
+            this.vstestConsoleWrapper.DiscoverTests(
+               this.GetTestAssemblies(),
+                runSettingsXml,
+                this.discoveryEventHandler);
+
+            // Assert
+            Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            this.vstestConsoleWrapper.DiscoverTests(
+               this.GetTestAssemblies(),
+                this.GetDefaultRunSettings(),
+                this.discoveryEventHandler);
+
+            // Assert.
+            var testCase =
+                this.discoveryEventHandler.DiscoveredTestCases.Where(dt => dt.FullyQualifiedName.Equals("SampleUnitTestProject.UnitTest1.PassingTest"));
+
+            // Release builds optimize code, hence line numbers are different.
+            if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.AreEqual(23, testCase.FirstOrDefault().LineNumber);
+            }
+            else
+            {
+                Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
+            }
+        }
+
+        private IEnumerable<string> GetTestAssemblies()
+        {
+            var testAssemblies = new List<string>
+                                     {
+                                         this.GetAssetFullPath("SimpleTestProject.dll"),
+                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                     };
+
+            return testAssemblies;
         }
     }
 }

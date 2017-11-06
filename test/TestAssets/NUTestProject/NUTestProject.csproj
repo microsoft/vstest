@@ -4,23 +4,21 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;net451;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <AssemblyName>NUTestProject</AssemblyName>
+    <!--
+    <DebugType>Full</DebugType>-->
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
-    <PackageReference Include="NUnit">
-      <Version>$(NUnitFrameworkVersion)</Version>
-    </PackageReference>
-    <PackageReference Include="NUnitTestAdapter">
-      <Version>$(NUnitAdapterVersion)</Version>
-    </PackageReference>
-  </ItemGroup>
-
-  <!-- Allow build in unix machines -->
-  <ItemGroup Condition="'$(TargetFramework)' != 'net451'">
+  <ItemGroup>
     <PackageReference Include="NUnit">
       <Version>$(NUnit3FrameworkVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="NUnit3TestAdapter">
+      <Version>$(NUnit3AdapterVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>$(NETTestSdkPreviousVersion)</Version>
     </PackageReference>
   </ItemGroup>
 </Project>

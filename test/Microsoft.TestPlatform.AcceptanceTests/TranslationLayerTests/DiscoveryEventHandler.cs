@@ -72,8 +72,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             if (lastChunk != null)
             {
                 this.DiscoveredTestCases.AddRange(lastChunk);
-                this.Metrics = discoveryCompleteEventArgs.Metrics;
             }
+
+            this.Metrics = discoveryCompleteEventArgs.Metrics;
         }
 
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)

@@ -40,8 +40,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)
             {
                 this.TestResults.AddRange(lastChunkArgs.NewTestResults);
-                this.Metrics = testRunCompleteArgs.Metrics;
             }
+
+            this.Metrics = testRunCompleteArgs.Metrics;
         }
 
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)

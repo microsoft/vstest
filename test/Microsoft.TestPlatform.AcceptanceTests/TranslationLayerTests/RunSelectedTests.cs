@@ -15,28 +15,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunSelectedTests : AcceptanceTestBase
     {
+        private const string Netcoreapp = "netcoreapp";
+        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
         private IVsTestConsoleWrapper vstestConsoleWrapper;
-        private List<string> testAssemblies;
         private RunEventHandler runEventHandler;
         private DiscoveryEventHandler discoveryEventHandler;
 
         public RunSelectedTests()
         {
-            this.testAssemblies = new List<string>
-                              {
-                                  this.GetAssetFullPath("SimpleTestProject.dll"),
-                                  this.GetAssetFullPath("SimpleTestProject2.dll")
-                              };
-
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
             this.discoveryEventHandler = new DiscoveryEventHandler();
         }
 
-        [TestMethod]
-        public void RunSelectedTestsWithoutTestPlatformOptions()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
         {
-            this.vstestConsoleWrapper.DiscoverTests(this.testAssemblies, this.GetDefaultRunSettings(), this.discoveryEventHandler);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
             var testCases = this.discoveryEventHandler.DiscoveredTestCases;
 
             this.vstestConsoleWrapper.RunTests(testCases, this.GetDefaultRunSettings(), this.runEventHandler);
@@ -48,10 +48,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [TestMethod]
-        public void RunSelectedTestsWithTestPlatformOptions()
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
         {
-            this.vstestConsoleWrapper.DiscoverTests(this.testAssemblies, this.GetDefaultRunSettings(), this.discoveryEventHandler);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
             var testCases = this.discoveryEventHandler.DiscoveredTestCases;
 
             this.vstestConsoleWrapper.RunTests(
@@ -68,6 +73,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.TimeTakenInSecForRun));
             Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringExecution));
             Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
+        }
+
+        private IEnumerable<string> GetTestAssemblies()
+        {
+            var testAssemblies = new List<string>
+                                     {
+                                         this.GetAssetFullPath("SimpleTestProject.dll"),
+                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                     };
+
+            return testAssemblies;
         }
     }
 }
