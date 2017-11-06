@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
             this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
             var testCases = this.discoveryEventHandler.DiscoveredTestCases;
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
             this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
             var testCases = this.discoveryEventHandler.DiscoveredTestCases;
