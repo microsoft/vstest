@@ -34,7 +34,7 @@
 </source>
         <target state="translated">테스트 실행에서는 프레임워크 {0} 및 플랫폼 {1}용으로 작성된 DLL을 사용합니다. 다음 DLL은 실행에서 사용할 수 없습니다. {2}.이러한 설정의 관리에 대한 자세한 내용은 {3}을(를) 참조하세요.
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 실행 프레임 워크 {0}에서 {1} 플랫폼에 대 한 빌드 DLL(s)를 사용 합니다. DLL(s) 다음 부분에서는 실행 되지 것입니다: 이러한 설정을 관리에 대 한 자세한 내용은 {3} {2} 이동 합니다.</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">{0}은(는) 프레임워크 {1} 및 플랫폼 {2}을(를) 대상으로 빌드됩니다.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
