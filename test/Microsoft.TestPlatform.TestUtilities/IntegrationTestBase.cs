@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common";
-        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\{0}\lib";
+        private const string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\lib";
         private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
         private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
 
