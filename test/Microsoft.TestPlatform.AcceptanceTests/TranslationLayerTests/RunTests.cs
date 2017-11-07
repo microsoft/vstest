@@ -535,6 +535,43 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+
+            if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
+            {
+                // On release, x64 builds, recursive calls may be replaced with loops (tail call optimization)
+                Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
+                return;
+            }
+
+            var source = new List<string>()
+                             {
+                                 this.GetAssetFullPath("SimpleTestProject3.dll")
+                             };
+
+            this.vstestConsoleWrapper.RunTests(
+                source,
+                this.GetDefaultRunSettings(),
+                new TestPlatformOptions() { TestCaseFilter = "ExitWithStackoverFlow" },
+                this.runEventHandler);
+
+            var errorMessage = "The active test run was aborted. Reason: Process is terminated due to StackOverflowException.\r\n";
+            if (runnerInfo.TargetFramework.StartsWith("netcoreapp2."))
+            {
+                errorMessage =
+                    "The active test run was aborted. Reason: Process is terminating due to StackOverflowException.\r\n";
+            }
+
+            // Assert
+            Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
+        }
+
         private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
