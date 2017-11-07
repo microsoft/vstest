@@ -45,20 +45,27 @@
       <Version>2.0.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <!-- Required for resolution of desktop dependencies in non windows environment.
+         We've to set to net46 since the net451 and other packages have assemblies in wrong case.
+         E.g. System.XML instead of System.Xml. -->
+   <PackageReference Include="Microsoft.TargetingPack.NETFramework.v4.6">
+      <Version>1.0.1</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>15.5.0-preview-1055876</Version>
+      <Version>15.6.0-preview-1105397</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>15.5.0-preview-1050541</Version>
+      <Version>15.6.0-preview-1109037</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors">
-      <Version>15.5.0-preview-1050541</Version>
+      <Version>15.6.0-preview-1109037</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
-      <Version>15.5.0-preview-20171018-01</Version>
+      <Version>15.5.0-preview-20171102-03</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">

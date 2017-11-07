@@ -24,10 +24,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\..\..\packages\castle.core\4.1.0\lib\net45\Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Runtime" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
   </ItemGroup>
