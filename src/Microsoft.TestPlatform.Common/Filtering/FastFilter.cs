@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -41,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             else
             {
-                throw new ArgumentException();
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FastFilterException));
             }
         }
 

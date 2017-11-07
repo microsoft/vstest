@@ -3,10 +3,12 @@
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
 {
+    using System;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using System.Collections.Immutable;
 
     [TestClass]
     public class FastFilterTests
@@ -311,6 +313,21 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
 
             Assert.AreEqual(null, filterExpressionWrapper.fastFilter);
             Assert.IsFalse(string.IsNullOrEmpty(filterExpressionWrapper.ParseError));
+        }
+
+        [TestMethod]
+        public void FastFilterShouldThrowExceptionForUnsupportedOperatorOperationCombination()
+        {
+            ImmutableHashSet<string>.Builder filterHashSetBuilder = ImmutableHashSet.CreateBuilder<string>();
+            try
+            {
+                var filter = new FastFilter("dummyName", filterHashSetBuilder.ToImmutableHashSet(), Operation.Equal, Operator.And);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is ArgumentException);
+                Assert.AreEqual("An error occured while creating Fast filter.", ex.Message);
+            }
         }
     }
 }
