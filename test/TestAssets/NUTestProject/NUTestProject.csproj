@@ -6,8 +6,6 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net451;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <AssemblyName>NUTestProject</AssemblyName>
-    <!--
-    <DebugType>Full</DebugType>-->
   </PropertyGroup>
 
   <ItemGroup>

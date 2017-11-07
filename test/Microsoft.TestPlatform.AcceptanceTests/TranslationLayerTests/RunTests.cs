@@ -216,8 +216,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                               {
                                   this.GetAssetFullPath("NUTestProject.dll")
                               };
-            var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(UnitTestFramework.NUnit), "*.TestAdapter.dll").ToList();
-            this.vstestConsoleWrapper.InitializeExtensions(new List<string>() { testAdapterPath.FirstOrDefault() });
 
             this.vstestConsoleWrapper.RunTests(
                 sources,
