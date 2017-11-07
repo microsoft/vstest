@@ -328,7 +328,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (testFramework == UnitTestFramework.NUnit)
             {
-                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnitAdapterVersion"]);
+                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.XUnit)
             {
