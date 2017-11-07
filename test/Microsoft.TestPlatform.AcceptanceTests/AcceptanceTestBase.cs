@@ -6,8 +6,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
 
     using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public class AcceptanceTestBase : IntegrationTestBase
@@ -100,18 +98,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         /// <summary>
-        /// Returns the VsTestConsole Wrapper.
-        /// </summary>
-        /// <returns></returns>
-        protected IVsTestConsoleWrapper GetVsTestConsoleWrapper()
-        {
-            var vsConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
-            vsConsoleWrapper.StartSession();
-
-            return vsConsoleWrapper;
-        }
-
-        /// <summary>
         /// Default RunSettings
         /// </summary>
         /// <returns></returns>
@@ -123,21 +109,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                         </RunConfiguration>
                                     </RunSettings>";
             return runSettingsXml;
-        }
-
-        /// <summary>
-        /// Execute Tests that are not supported with given Runner framework.
-        /// </summary>
-        /// <param name="runnerFramework">Runner Framework</param>
-        /// <param name="framework">Framework for which Tests are not supported</param>
-        /// <param name="message">Message to be shown</param>
-        public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
-        {
-            if (runnerFramework.StartsWith(framework))
-            {
-                Assert.Inconclusive(message);
-                return;
-            }
         }
     }
 }
