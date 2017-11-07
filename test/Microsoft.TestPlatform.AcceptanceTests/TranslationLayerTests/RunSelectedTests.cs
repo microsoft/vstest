@@ -75,7 +75,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
         }
 
-        private IEnumerable<string> GetTestAssemblies()
+        private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {

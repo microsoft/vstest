@@ -311,16 +311,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count);
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
-
-            // Release builds optimize code, hence line numbers are different.
-            if (IntegrationTestEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-            {
-                Assert.AreEqual(2, testCase.FirstOrDefault().TestCase.LineNumber);
-            }
-            else
-            {
-                Assert.AreEqual(1, testCase.FirstOrDefault().TestCase.LineNumber);
-            }
+            Assert.AreEqual(1, testCase.FirstOrDefault().TestCase.LineNumber);
         }
 
         [CustomDataTestMethod]
@@ -544,7 +535,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        private IEnumerable<string> GetTestAssemblies()
+        private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {

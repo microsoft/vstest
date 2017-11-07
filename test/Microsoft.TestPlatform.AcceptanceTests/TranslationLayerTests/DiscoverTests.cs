@@ -184,7 +184,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
         }
 
-        private IEnumerable<string> GetTestAssemblies()
+        private IList<string> GetTestAssemblies()
         {
             var testAssemblies = new List<string>
                                      {
