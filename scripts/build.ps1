@@ -361,7 +361,7 @@ function Publish-Package
 
     # Copy IntelliTrace components.
     $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\15.5.0-preview-20171102-03\tools"
-    $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
+    $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"    
 
     if (-not (Test-Path $intellitraceTargetDirectory)) {
         New-Item $intellitraceTargetDirectory -Type Directory -Force | Out-Null
@@ -369,6 +369,19 @@ function Publish-Package
 
     Copy-Item -Recurse $intellitraceSourceDirectory\* $intellitraceTargetDirectory -Force
     
+    # Copy Microsoft.VisualStudio.Telemetry APIs
+    $testPlatformDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace\Common7\IDE\Extensions\TestPlatform"
+    
+    if (-not (Test-Path $testPlatformDirectory)) {
+        New-Item $testPlatformDirectory -Type Directory -Force | Out-Null
+    }
+
+    $visualStudioTelemetryDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Telemetry\15.6.815-master284DF69C\lib\net45"
+    $visualStudioUtilitiesDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.Utilities.Internal\14.0.74-masterCEEA65A3\lib\net45"
+
+    Copy-Item "$visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll" $testPlatformDirectory -Force
+    Copy-Item "$visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll" $testPlatformDirectory -Force
+
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
