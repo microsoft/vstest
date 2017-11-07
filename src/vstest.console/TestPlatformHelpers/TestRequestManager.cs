@@ -65,6 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
 
         private object syncobject = new object();
+        private object syncDispose = new object();
 
         private Task<IMetricsPublisher> metricsPublisher;
 
@@ -342,8 +343,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
 
-            this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
-            this.currentTestRunRequest?.CancelAsync();
+            lock (syncDispose)
+            {
+                this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+                this.currentTestRunRequest?.CancelAsync();
+            }
         }
 
         /// <summary>
@@ -353,8 +357,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
 
-            this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
-            this.currentTestRunRequest?.Abort();
+            lock (syncDispose)
+            {
+                this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+                this.currentTestRunRequest?.Abort();
+            }
         }
 
         #endregion
@@ -476,31 +483,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 try
                 {
-                    using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria))
+                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
+                    this.runRequestCreatedEventHandle.Set();
+
+                    try
                     {
-                        this.currentTestRunRequest = testRunRequest;
-                        this.runRequestCreatedEventHandle.Set();
+                        this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
+                        this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
+                        testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
 
-                        try
+                        this.testPlatformEventSource.ExecutionRequestStart();
+
+                        this.currentTestRunRequest.ExecuteAsync();
+
+                        // Wait for the run completion event
+                        this.currentTestRunRequest.WaitForCompletion();
+                    }
+                    finally
+                    {
+                        this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
+
+                        lock(syncDispose)
                         {
-                            this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
-                            this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
-                            testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
-
-                            this.testPlatformEventSource.ExecutionRequestStart();
-
-                            testRunRequest.ExecuteAsync();
-
-                            // Wait for the run completion event
-                            testRunRequest.WaitForCompletion();
-                        }
-                        finally
-                        {
-                            this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
-                            this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
-                            testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
+                            this.currentTestRunRequest.Dispose();
+                            this.currentTestRunRequest = null;
                         }
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -518,7 +529,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
                 }
 
-                this.currentTestRunRequest = null;
                 return success;
             }
         }

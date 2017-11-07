@@ -840,7 +840,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        [Ignore]
         public void CancelTestRunShouldWaitForCreateTestRunRequest()
         {
             var payload = new TestRunRequestPayload()
@@ -848,8 +847,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 Sources = new List<string>() { "a", "b" },
                 RunSettings = DefaultRunsettings
             };
-
-            TestRunCriteria observedCriteria = null;
 
             var sw = new Stopwatch();
             sw.Start();
@@ -859,11 +856,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-               (TestRunCriteria runCriteria, ProtocolConfig config) =>
+               (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                {
                    Thread.Sleep(1);
                    createRunRequestTime = sw.ElapsedMilliseconds;
-                   observedCriteria = runCriteria;
                }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
@@ -884,8 +880,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        [Ignore]
-        public void AbortTestRunShouldWaitForCreateTestRunRequest()
+        public void CancelShouldNotThrowExceptionIfTestRunRequestHasBeenDisposed()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -893,7 +888,37 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 RunSettings = DefaultRunsettings
             };
 
-            TestRunCriteria observedCriteria = null;
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+            this.testRequestManager.CancelTestRun();
+        }
+
+        [TestMethod]
+        public void AbortShouldNotThrowExceptionIfTestRunRequestHasBeenDisposed()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = DefaultRunsettings
+            };
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+            this.testRequestManager.AbortTestRun();
+        }
+
+        [TestMethod]
+        public void AbortTestRunShouldWaitForCreateTestRunRequest()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = DefaultRunsettings
+            };
 
             var sw = new Stopwatch();
             sw.Start();
@@ -903,11 +928,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (TestRunCriteria runCriteria, ProtocolConfig config) =>
+                (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                 {
                     Thread.Sleep(1);
                     createRunRequestTime = sw.ElapsedMilliseconds;
-                    observedCriteria = runCriteria;
                 }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
