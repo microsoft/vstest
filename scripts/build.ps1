@@ -23,6 +23,10 @@ Param(
     [System.String] $VersionSuffix = "dev",
 
     [Parameter(Mandatory=$false)]
+    [Alias("bn")]
+    [System.String] $BuildNumber = "49999999-99",
+
+    [Parameter(Mandatory=$false)]
     [Alias("ff")]
     [System.Boolean] $FailFast = $true,
 
@@ -678,11 +682,11 @@ function Update-VsixVersion($vsixProjectDir)
     $packageDir = Get-FullCLRPackageDirectory
     $vsixVersion = $Version
 
-    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
+    # Build number comes in the form 20170111-01(yyyymmdd-buildNoOfThatDay)
     # So Version of the vsix will be 15.1.0.2017011101
-    $vsixVersionSuffix = $VersionSuffix.Split("-");
+    $vsixVersionSuffix = $BuildNumber.Split("-");
     if($vsixVersionSuffix.Length -ige 2) {
-        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
+        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[0])$($vsixVersionSuffix[1])"
     }
 
     $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
