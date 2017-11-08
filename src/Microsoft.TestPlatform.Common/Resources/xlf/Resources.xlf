@@ -136,6 +136,11 @@
         <target state="new">Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="FastFilterException">
+        <source>An error occured while creating Fast filter.</source>
+        <target state="new">An error occured while creating Fast filter.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
