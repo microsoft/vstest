@@ -65,7 +65,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
 
         private object syncobject = new object();
-        private object syncDispose = new object();
 
         private Task<IMetricsPublisher> metricsPublisher;
 
@@ -343,11 +342,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
 
-            lock (syncDispose)
-            {
-                this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
-                this.currentTestRunRequest?.CancelAsync();
-            }
+            this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+            this.currentTestRunRequest?.CancelAsync();
         }
 
         /// <summary>
@@ -357,11 +353,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
 
-            lock (syncDispose)
-            {
-                this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
-                this.currentTestRunRequest?.Abort();
-            }
+            this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+            this.currentTestRunRequest?.Abort();
         }
 
         #endregion
@@ -505,11 +498,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
                         testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 
-                        lock(syncDispose)
-                        {
-                            this.currentTestRunRequest.Dispose();
-                            this.currentTestRunRequest = null;
-                        }
+                        this.currentTestRunRequest = null;
                     }
 
                 }
