@@ -386,7 +386,7 @@
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />
-
-
+    <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
+    <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
   </files>
 </package>

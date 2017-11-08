@@ -201,6 +201,8 @@
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\TDEnvCleanup.exe" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />
       <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
+      <IntellitraceAssembliesToSign Include="$(ArtifactsBaseDirectory)Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
