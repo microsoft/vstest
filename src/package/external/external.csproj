@@ -46,7 +46,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>15.6.0-preview-1121665</Version>
+      <Version>15.6.0-preview-1121756</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
