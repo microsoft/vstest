@@ -152,9 +152,20 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(string.Empty, rcxmlDocument.InnerXml);
         }
 
+        [TestMethod]
+        public void AppendOrModifyChildShouldNotModifyIfParentNodeDoesNotExist()
+        {
+            var settingsXml = @"<RunSettings></RunSettings>";
+            var xmlDocument = this.GetXmlDocument(settingsXml);
+
+            XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC/RD", "RD", null);
+
+            Assert.AreEqual(settingsXml, xmlDocument.OuterXml);
+        }
+
         #endregion
 
-        #region AppendOrModifyChild tests
+        #region RemoveChildNode tests
 
         [TestMethod]
         public void RemoveChildNodeShouldNotModifyExistingXmlIfNodeDoesnotExist()

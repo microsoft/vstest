@@ -161,6 +161,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to An error occured while creating Fast filter..
+        /// </summary>
+        internal static string FastFilterException
+        {
+            get
+            {
+                return ResourceManager.GetString("FastFilterException", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to There are multiple configurations that have diagnostic data adapter  type &apos;{0}&apos; or Uri &apos;{1}&apos;. Duplicate configurations will be ignored in the test run..
         /// </summary>
         internal static string IgnoredDuplicateConfiguration {

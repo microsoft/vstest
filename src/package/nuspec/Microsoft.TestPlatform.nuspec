@@ -7,11 +7,12 @@
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>The cross platform Microsoft Test Platform.</description>
-    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <description>This package contains full set of binaries for the Visual Studio Test Platform (vstest). vstest provides a modern, cross platform testing engine that also powers the testing on .NET Core. Supports the following popular test frameworks - MSTest V2, xUnit and Nunit with support for extensibility. Visit https://github.com/microsoft/vstest to know more about vstest platform.</description>
+    <licenseUrl>https://www.visualstudio.com/microsoft-visual-studio-test-platform</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>vstest visual-studio unittest testplatform mstest microsoft</tags>
   </metadata>
   <files>
     <!-- Add a third party notice file -->
@@ -226,18 +227,18 @@
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TraceDataCollector.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TraceDataCollector.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.dll" />
     <file src="net451\$Runtime$\Extensions\VSTestVideoRecorder.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\VSTestVideoRecorder.exe" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\dbghelp.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\dbghelp.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
-    <file src="net451\$Runtime$\Extensions\CppUnitFramework\x64\dbghelp.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\CppUnitFramework\x64\dbghelp.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\dbghelp.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\dbghelp.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll.manifest" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll.manifest" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
+    <file src="net451\$Runtime$\Extensions\Cpp\x64\dbghelp.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\x64\dbghelp.dll" />
     <file src="net451\$Runtime$\Extensions\TestImpact\ComComponents\x64\msdia140.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x64\msdia140.dll" />
     <file src="net451\$Runtime$\Extensions\TestImpact\ComComponents\x64\msdia140.dll.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x64\msdia140.dll.manifest" />
     <file src="net451\$Runtime$\Extensions\TestImpact\ComComponents\x86\msdia140.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\TestImpact\ComComponents\x86\msdia140.dll" />
@@ -376,6 +377,8 @@
     <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="net451\$Runtime$\zh-Hant\vstest.console.resources.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\zh-Hant\vstest.console.resources.dll" />
     <file src="Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll"	target="tools\net451\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.Core.dll" />
+    <file src="Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll"	target="tools\net451\Common7\IDE\PrivateAssemblies\Microsoft.IntelliTrace.ObjectModel.dll" />
+    <file src="Intellitrace\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll"	target="tools\net451\Common7\IDE\PrivateAssemblies\Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.config"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.config" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\codecoveragemessages.dll" />
@@ -384,7 +387,7 @@
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\CodeCoverage.exe" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\covrun64.dll" />
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />
-
-
+    <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
+    <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
   </files>
 </package>
