@@ -95,10 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void AbortIfTestRunRequestDisposedShouldThrowObjectDisposedException()
+        public void AbortIfTestRunRequestDisposedShouldNotThrowException()
         {
             testRunRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => testRunRequest.Abort());
+            testRunRequest.Abort();
         }
 
         [TestMethod]
@@ -133,10 +133,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void CancelAsyncIfTestRunRequestDisposedThrowsObjectDisposedException()
+        public void CancelAsyncIfTestRunRequestDisposedShouldNotThrowException()
         {
             testRunRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => testRunRequest.CancelAsync());
+            testRunRequest.CancelAsync();
         }
 
         [TestMethod]
