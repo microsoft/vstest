@@ -479,29 +479,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
                     this.runRequestCreatedEventHandle.Set();
 
-                    try
-                    {
-                        this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
-                        this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
-                        testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
+                    this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
+                    this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
+                    testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
 
-                        this.testPlatformEventSource.ExecutionRequestStart();
+                    this.testPlatformEventSource.ExecutionRequestStart();
 
-                        this.currentTestRunRequest.ExecuteAsync();
+                    this.currentTestRunRequest.ExecuteAsync();
 
-                        // Wait for the run completion event
-                        this.currentTestRunRequest.WaitForCompletion();
-                    }
-                    finally
-                    {
-                        this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
-                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
-                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
-
-                        this.currentTestRunRequest.Dispose();
-                        this.currentTestRunRequest = null;
-                    }
-
+                    // Wait for the run completion event
+                    this.currentTestRunRequest.WaitForCompletion();
                 }
                 catch (Exception ex)
                 {
@@ -517,6 +504,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     {
                         throw;
                     }
+                }
+                finally
+                {
+                    this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
+                    this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
+                    testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
+
+                    this.currentTestRunRequest.Dispose();
+                    this.currentTestRunRequest = null;
                 }
 
                 return success;
