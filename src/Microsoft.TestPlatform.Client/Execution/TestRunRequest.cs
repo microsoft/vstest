@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("testRunRequest");
+                    EqtTrace.Warning("Ignoring TestRunRequest.CancelAsync() as testRunRequest aboject has already been disposed.");
                 }
 
                 if (this.State != TestRunState.InProgress)
@@ -264,7 +264,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("testRunRequest");
+                    EqtTrace.Warning("Ignoring TestRunRequest.Abort() as testRunRequest aboject has already been disposed");
                 }
 
                 if (this.State != TestRunState.InProgress)

@@ -498,6 +498,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
                         testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 
+                        this.currentTestRunRequest.Dispose();
                         this.currentTestRunRequest = null;
                     }
 
