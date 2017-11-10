@@ -72,8 +72,12 @@
       <Version>14.0.0</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VSSDK.BuildTools ">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools">
       <Version>15.0.26201</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Telemetry">
+      <Version>15.6.815-master284DF69C</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
