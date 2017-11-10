@@ -7,7 +7,7 @@
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>This package contains full set of binaries for the Visual Studio Test Platform (vstest). vstest provides a modern, cross platform testing engine that also powers the testing on .NET Core. Supports the following popular test frameworks - MSTest V2, xUnit and Nunit with support for extensibility. Visit https://github.com/microsoft/vstest to know more about vstest platform.</description>
+    <description>This package contains full set of binaries for the Visual Studio Test Platform (vstest). vstest provides a modern, cross platform testing engine that also powers the testing on .NET Core. Supports the following popular test frameworks - MSTest, xUnit and Nunit with support for extensibility. Visit https://github.com/microsoft/vstest to know more about vstest platform.</description>
     <licenseUrl>https://www.visualstudio.com/microsoft-visual-studio-test-platform</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
