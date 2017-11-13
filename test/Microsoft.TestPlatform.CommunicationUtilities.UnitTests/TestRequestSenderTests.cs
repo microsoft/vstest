@@ -646,7 +646,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendTestRunCancelShouldSendCancelTestRunMessage()
         {
-            // System.Diagnostics.Debugger.Launch();
             this.SetupFakeCommunicationChannel();
 
             this.testRequestSender.SendTestRunCancel();
@@ -667,15 +666,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         #endregion
-
-        private void CheckAndSetProtocolVersion()
-        {
-            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolConfig.Version };
-
-            // this.mockCommunicationEndPoint.Setup(mc => mc.).Returns(message);
-            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(this.protocolConfig.Version);
-            this.testRequestSender.CheckVersionWithTestHost();
-        }
 
         private string SetupFakeCommunicationChannel(string connectionArgs = "123")
         {
