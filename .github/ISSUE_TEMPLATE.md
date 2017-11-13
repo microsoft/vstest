@@ -1,10 +1,13 @@
 ## Description
-> Describe the issue you've observed
+> **IMPORTANT**: if the defect is reproduced only in a workflow from within the Visual Studio IDE then do not report the issue here - instead, please report it using Visual Studio's "Send Feedback" option that can be accessed from the Help menu.
+>
+> For a defect reproducable from the vstest commanline, describe the issue you've observed.
 
 ## Steps to reproduce
 > What steps can reproduce the defect?
 > Please share the setup, commandline for vstest.console, sample project, target
 > framework etc.
+>
 
 ## Expected behavior
 > Share the expected output
