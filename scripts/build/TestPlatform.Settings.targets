@@ -10,7 +10,7 @@
 
     <!-- Override the AssemblyVersion as 15.0.0 since protocol depends on this version for
          serialization. This is also defined in build script. -->
-    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.6.0</AssemblyVersion>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
