@@ -172,7 +172,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             this.tcpListener.Start();
 
-            return ((IPEndPoint)this.tcpListener.LocalEndpoint).Port.ToString();
+            return ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
         }
     }
 }

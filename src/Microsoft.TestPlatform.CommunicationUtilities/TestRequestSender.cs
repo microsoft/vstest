@@ -25,8 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // Time to wait for test host exit (in seconds)
         private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
 
-        private readonly ICommunicationEndPoint communicationEndpoint;
-
         private readonly IDataSerializer dataSerializer;
 
         private readonly ManualResetEventSlim connected;
@@ -34,6 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly ManualResetEventSlim clientExited;
 
         private readonly int clientExitedWaitTime;
+
+        private ICommunicationEndPoint communicationEndpoint;
 
         private ICommunicationChannel channel;
 
@@ -63,10 +63,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public TestRequestSender(ProtocolConfig protocolConfig, TestHostConnectionInfo connectionInfo)
             : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, CLIENTPROCESSEXITWAIT)
         {
+            if (this.connectionInfo.Role == ConnectionRole.Client)
+            {
+                this.communicationEndpoint = new SocketClient();
+            }
+            else
+            {
+                this.communicationEndpoint = new SocketServer();
+            }
+        }
+
+        internal TestRequestSender(
+            TestHostConnectionInfo connectionInfo,
+            IDataSerializer serializer,
+            ProtocolConfig protocolConfig,
+            int clientExitedWaitTime)
+        {
+            this.dataSerializer = serializer;
+            this.connected = new ManualResetEventSlim(false);
+            this.clientExited = new ManualResetEventSlim(false);
+            this.clientExitedWaitTime = clientExitedWaitTime;
+            this.operationCompleted = 0;
+
+            this.highestSupportedVersion = protocolConfig.Version;
+
+            // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
+            this.connectionInfo.Endpoint = connectionInfo.Endpoint;
+            this.connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
+                ? ConnectionRole.Client
+                : ConnectionRole.Host;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
+        /// Used only for testing to inject communication endpoint.
         /// </summary>
         /// <param name="communicationEndPoint">Communication server implementation.</param>
         /// <param name="connectionInfo">ConnectionInfo to set up transport layer</param>
@@ -79,63 +109,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 IDataSerializer serializer,
                 ProtocolConfig protocolConfig,
                 int clientExitedWaitTime)
+            : this(connectionInfo, serializer, protocolConfig, clientExitedWaitTime)
         {
-            // TODO why we need clientExitedWaitTime
             this.communicationEndpoint = communicationEndPoint;
-            this.dataSerializer = serializer;
-            this.connected = new ManualResetEventSlim(false);
-            this.clientExited = new ManualResetEventSlim(false);
-            this.clientExitedWaitTime = clientExitedWaitTime;
-            this.operationCompleted = 0;
-
-            this.highestSupportedVersion = protocolConfig.Version;
-
-            // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
-            this.connectionInfo.Endpoint = connectionInfo.Endpoint;
-            this.connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
-                                                ? ConnectionRole.Client
-                                                : ConnectionRole.Host;
-
-            // if (connectionInfo.Role == ConnectionRole.Host)
-            // {
-            //    this.communicationEndpoint = new SocketClient();
-            // }
-            // else
-            // {
-            //    this.communicationEndpoint = new SocketServer();
-            // }
-
-            // this.transport = new SocketTransport(communicationEndpoint, connectionInfo);
-        }
-
-        internal TestRequestSender(
-                TestHostConnectionInfo connectionInfo,
-                IDataSerializer serializer,
-                ProtocolConfig protocolConfig,
-                int clientExitedWaitTime)
-        {
-            this.dataSerializer = serializer;
-            this.connected = new ManualResetEventSlim(false);
-            this.clientExited = new ManualResetEventSlim(false);
-            this.clientExitedWaitTime = clientExitedWaitTime;
-            this.operationCompleted = 0;
-
-            this.highestSupportedVersion = protocolConfig.Version;
-
-            // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
-            this.connectionInfo.Endpoint = connectionInfo.Endpoint;
-            this.connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
-                                                ? ConnectionRole.Client
-                                                : ConnectionRole.Host;
-
-            if (this.connectionInfo.Role == ConnectionRole.Client)
-            {
-                this.communicationEndpoint = new SocketClient();
-            }
-            else
-            {
-                this.communicationEndpoint = new SocketServer();
-            }
         }
 
         /// <inheritdoc />
@@ -188,6 +164,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
+                }
+                else if (message.MessageType == MessageType.TestMessage)
+                {
+                    // There are some test hosts which sends log messages, hence logging and ignoring.
+                    var testMessage = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                    EqtTrace.Info("TestMessage received during version check. Message level : , Message : ", testMessage.MessageLevel, testMessage.Message);
+                    return;
                 }
                 else
                 {

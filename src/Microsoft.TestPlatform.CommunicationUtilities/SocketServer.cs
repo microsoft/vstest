@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Initializes a new instance of the <see cref="SocketServer"/> class.
         /// </summary>
         public SocketServer()
-            : this((stream) => new LengthPrefixCommunicationChannel(stream))
+            : this(stream => new LengthPrefixCommunicationChannel(stream))
         {
         }
 

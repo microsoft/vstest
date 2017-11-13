@@ -19,278 +19,177 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
-    /// <summary>
-    /// Utility class to fecilitate the IPC comunication. Acts as Client.
-    /// </summary>
-    public class TestRequestHandler3 : IDisposable, ITestRequestHandler
+    public class TestRequestHandler : IDisposable, ITestRequestHandler
     {
-        private ICommunicationManager communicationManager;
+        private readonly IDataSerializer dataSerializer;
+        private ITestHostManagerFactory testHostManagerFactory;
+        private ICommunicationEndPoint communicationEndPoint;
+        private int protocolVersion = 1;
 
-        private ITransport transport;
+        private TestHostConnectionInfo connectionInfo;
 
-        private IDataSerializer dataSerializer;
+        private int highestSupportedVersion = 2;
+        private JobQueue<Action> jobQueue;
+        private ICommunicationChannel channel;
+
+        private ManualResetEventSlim requestSenderConnected;
+
+        private ManualResetEventSlim sessionCompleted;
 
         private Action<Message> onAckMessageRecieved;
 
-        private int highestSupportedVersion = 2;
-
-        // Set default to 1, if protocol version check does not happen
-        // that implies runner is using version 1
-        private int protocolVersion = 1;
-
-        public TestRequestHandler3(TestHostConnectionInfo connectionInfo)
-            : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance)
-        {
-        }
-
-        internal TestRequestHandler3(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
-        {
-            this.communicationManager = communicationManager;
-            this.transport = new SocketTransport(communicationManager, connectionInfo);
-            this.dataSerializer = dataSerializer;
-        }
-
-        /// <inheritdoc/>
-        public void InitializeCommunication()
-        {
-            this.transport.Initialize();
-        }
-
-        /// <inheritdoc/>
-        public bool WaitForRequestSenderConnection(int connectionTimeout)
-        {
-            return this.transport.WaitForConnection(connectionTimeout);
-        }
-
         /// <summary>
-        /// Listens to the commands from server
+        /// Initializes a new instance of the <see cref="TestRequestHandler2" />.
         /// </summary>
-        /// <param name="testHostManagerFactory">the test host manager.</param>
-        public void ProcessRequests(ITestHostManagerFactory testHostManagerFactory)
+        public TestRequestHandler(TestHostConnectionInfo connectionInfo) : this(connectionInfo, JsonDataSerializer.Instance)
         {
-            bool isSessionEnd = false;
+        }
 
-            var jobQueue = new JobQueue<Action>(
-                action => { action(); },
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
+        {
+            this.communicationEndPoint = communicationEndpoint;
+            this.connectionInfo = connectionInfo;
+            this.dataSerializer = dataSerializer;
+            this.requestSenderConnected = new ManualResetEventSlim(false);
+            this.sessionCompleted = new ManualResetEventSlim(false);
+            this.onAckMessageRecieved = onAckMessageRecieved;
+            this.jobQueue = jobQueue;
+        }
+
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
+        {
+            this.connectionInfo = connectionInfo;
+            this.dataSerializer = dataSerializer;
+            this.requestSenderConnected = new ManualResetEventSlim(false);
+            this.sessionCompleted = new ManualResetEventSlim(false);
+            this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
+
+            if (this.connectionInfo.Role == ConnectionRole.Host)
+            {
+                this.communicationEndPoint = new SocketServer();
+            }
+            else
+            {
+                this.communicationEndPoint = new SocketClient();
+            }
+
+            this.jobQueue = new JobQueue<Action>(
+                (action) => { action(); },
                 "TestHostOperationQueue",
                 500,
                 25000000,
                 true,
                 (message) => EqtTrace.Error(message));
-
-            do
-            {
-                var message = this.communicationManager.ReceiveMessage();
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("TestRequestHandler.ProcessRequests: received message: {0}", message);
-                }
-
-                switch (message.MessageType)
-                {
-                    case MessageType.VersionCheck:
-                        var version = this.dataSerializer.DeserializePayload<int>(message);
-                        this.protocolVersion = Math.Min(version, highestSupportedVersion);
-                        this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolVersion);
-
-                        // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
-                        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
-                        {
-                            this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
-                        }
-                        else if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
-                        {
-                            this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
-                        }
-
-                        break;
-
-                    case MessageType.DiscoveryInitialize:
-                        {
-                            EqtTrace.Info("Discovery Session Initialize.");
-                            var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
-                            jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetDiscoveryManager()
-                                    .Initialize(pathToAdditionalExtensions),
-                                0);
-                            break;
-                        }
-
-                    case MessageType.StartDiscovery:
-                        {
-                            EqtTrace.Info("Discovery started.");
-
-                            var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                            var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
-                            jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetDiscoveryManager()
-                                    .DiscoverTests(discoveryCriteria, discoveryEventsHandler),
-                                0);
-
-                            break;
-                        }
-
-                    case MessageType.ExecutionInitialize:
-                        {
-                            EqtTrace.Info("Discovery Session Initialize.");
-                            var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
-                            jobQueue.QueueJob(
-                                () => testHostManagerFactory.GetExecutionManager()
-                                    .Initialize(pathToAdditionalExtensions),
-                                0);
-                            break;
-                        }
-
-                    case MessageType.StartTestExecutionWithSources:
-                        {
-                            EqtTrace.Info("Execution started.");
-                            var testRunEventsHandler = new TestRunEventsHandler(this);
-
-                            var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
-                            jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetExecutionManager()
-                                    .StartTestRun(
-                                        testRunCriteriaWithSources.AdapterSourceMap,
-                                        testRunCriteriaWithSources.Package,
-                                        testRunCriteriaWithSources.RunSettings,
-                                        testRunCriteriaWithSources.TestExecutionContext,
-                                        this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
-                                        testRunEventsHandler),
-                                0);
-
-                            break;
-                        }
-
-                    case MessageType.StartTestExecutionWithTests:
-                        {
-                            EqtTrace.Info("Execution started.");
-                            var testRunEventsHandler = new TestRunEventsHandler(this);
-
-                            var testRunCriteriaWithTests =
-                                this.communicationManager.DeserializePayload<TestRunCriteriaWithTests>(message);
-
-                            jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetExecutionManager()
-                                    .StartTestRun(
-                                        testRunCriteriaWithTests.Tests,
-                                        testRunCriteriaWithTests.Package,
-                                        testRunCriteriaWithTests.RunSettings,
-                                        testRunCriteriaWithTests.TestExecutionContext,
-                                        this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
-                                        testRunEventsHandler),
-                                0);
-
-                            break;
-                        }
-
-                    case MessageType.CancelTestRun:
-                        jobQueue.Pause();
-                        testHostManagerFactory.GetExecutionManager().Cancel();
-                        break;
-
-                    case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
-                        this.onAckMessageRecieved?.Invoke(message);
-                        break;
-
-                    case MessageType.AbortTestRun:
-                        jobQueue.Pause();
-                        testHostManagerFactory.GetExecutionManager().Abort();
-                        break;
-
-                    case MessageType.SessionEnd:
-                        {
-                            EqtTrace.Info("Session End message received from server. Closing the connection.");
-                            isSessionEnd = true;
-                            this.Close();
-                            break;
-                        }
-
-                    case MessageType.SessionAbort:
-                        {
-                            // Dont do anything for now.
-                            break;
-                        }
-
-                    default:
-                        {
-                            EqtTrace.Info("Invalid Message types");
-                            break;
-                        }
-                }
-            }
-            while (!isSessionEnd);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
+        public virtual void InitializeCommunication()
+        {
+            this.communicationEndPoint.Connected += (sender, connectedArgs) =>
+            {
+                if (!connectedArgs.Connected)
+                {
+                    requestSenderConnected.Set();
+                    throw connectedArgs.Fault;
+                }
+                this.channel = connectedArgs.Channel;
+                this.channel.MessageReceived += this.OnMessageReceived;
+                requestSenderConnected.Set();
+            };
+
+            this.communicationEndPoint.Start(connectionInfo.Endpoint);
+        }
+
+        /// <inheritdoc />
+        public bool WaitForRequestSenderConnection(int connectionTimeout)
+        {
+            return requestSenderConnected.Wait(connectionTimeout);
+        }
+
+        /// <inheritdoc />
+        public void ProcessRequests(ITestHostManagerFactory testHostManagerFactory)
+        {
+            this.testHostManagerFactory = testHostManagerFactory;
+            this.sessionCompleted.Wait();
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
-            this.transport.Dispose();
+            this.communicationEndPoint.Stop();
+            this.channel?.Dispose();
         }
 
-        /// <inheritdoc/>
-        public void Close()
+        /// <inheritdoc />
+        public virtual void Close()
         {
             this.Dispose();
-            EqtTrace.Info("Closing the connection !");
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases, this.protocolVersion);
+            var data = this.dataSerializer.SerializePayload(MessageType.TestCasesFound, discoveredTestCases, this.protocolVersion);
+            this.channel.Send(data);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
-            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs, this.protocolVersion);
+            var data = this.dataSerializer.SerializePayload(MessageType.TestRunStatsChange, testRunChangedArgs, this.protocolVersion);
+            this.channel.Send(data);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
-            var testMessagePayload = new TestMessagePayload { MessageLevel = messageLevel, Message = message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, this.protocolVersion);
+            var data = this.dataSerializer.SerializePayload(
+                    MessageType.TestMessage,
+                    new TestMessagePayload { MessageLevel = messageLevel, Message = message },
+                    this.protocolVersion);
+            this.channel.Send(data);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public void SendExecutionComplete(
-            TestRunCompleteEventArgs testRunCompleteArgs,
-            TestRunChangedEventArgs lastChunkArgs,
-            ICollection<AttachmentSet> runContextAttachments,
-            ICollection<string> executorUris)
+                TestRunCompleteEventArgs testRunCompleteArgs,
+                TestRunChangedEventArgs lastChunkArgs,
+                ICollection<AttachmentSet> runContextAttachments,
+                ICollection<string> executorUris)
         {
-            var payload = new TestRunCompletePayload
-            {
-                TestRunCompleteArgs = testRunCompleteArgs,
-                LastRunTests = lastChunkArgs,
-                RunAttachments = runContextAttachments,
-                ExecutorUris = executorUris
-            };
-
-            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload, this.protocolVersion);
+            var data = this.dataSerializer.SerializePayload(
+                    MessageType.ExecutionComplete,
+                    new TestRunCompletePayload
+                    {
+                        TestRunCompleteArgs = testRunCompleteArgs,
+                        LastRunTests = lastChunkArgs,
+                        RunAttachments = runContextAttachments,
+                        ExecutorUris = executorUris
+                    },
+                    this.protocolVersion);
+            this.channel.Send(data);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public void DiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
         {
-            var discoveryCompletePayload = new DiscoveryCompletePayload
-            {
-                TotalTests = discoveryCompleteEventArgs.TotalCount,
-                LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
-                IsAborted = discoveryCompleteEventArgs.IsAborted,
-                Metrics = discoveryCompleteEventArgs.Metrics
-            };
-
-            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);
+            var data = this.dataSerializer.SerializePayload(
+                    MessageType.DiscoveryComplete,
+                    new DiscoveryCompletePayload
+                    {
+                        TotalTests = discoveryCompleteEventArgs.TotalCount,
+                        LastDiscoveredTests = discoveryCompleteEventArgs.IsAborted ? null : lastChunk,
+                        IsAborted = discoveryCompleteEventArgs.IsAborted,
+                        Metrics = discoveryCompleteEventArgs.Metrics
+                    },
+                    this.protocolVersion);
+            this.channel.Send(data);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             var waitHandle = new AutoResetEvent(false);
@@ -301,7 +200,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 waitHandle.Set();
             };
 
-            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo, this.protocolVersion);
+            var data = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttached,
+                testProcessStartInfo, protocolVersion);
+
+            this.channel.Send(data);
 
             waitHandle.WaitOne();
             this.onAckMessageRecieved = null;
@@ -312,13 +214,151 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             ITestCaseEventsHandler testCaseEventsHandler = null;
 
+            // Listen to test case events only if data collection is enabled
             if ((XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings) && DataCollectionTestCaseEventSender.Instance != null) || XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {
                 testCaseEventsHandler = new TestCaseEventsHandler();
-                var testEventsPublisher = testCaseEventsHandler as ITestEventsPublisher;
             }
 
             return testCaseEventsHandler;
+        }
+
+        public void OnMessageReceived(object sender, MessageReceivedEventArgs messageReceivedArgs)
+        {
+            var message = this.dataSerializer.DeserializeMessage(messageReceivedArgs.Data);
+
+            switch (message.MessageType)
+            {
+                case MessageType.VersionCheck:
+                    var version = this.dataSerializer.DeserializePayload<int>(message);
+                    this.protocolVersion = Math.Min(version, highestSupportedVersion);
+
+                    // Send the negotiated protocol to request sender
+                    this.channel.Send(this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.protocolVersion));
+
+                    // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
+                    if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+                    {
+                        this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
+                    }
+                    else if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                    {
+                        this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
+                    }
+                    break;
+
+                case MessageType.DiscoveryInitialize:
+                    {
+                        EqtTrace.Info("Discovery Session Initialize.");
+                        var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
+                        jobQueue.QueueJob(
+                                () =>
+                                testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
+                        break;
+                    }
+
+                case MessageType.StartDiscovery:
+                    {
+                        EqtTrace.Info("Discovery started.");
+
+                        var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
+                        var discoveryCriteria = message.Payload.ToObject<DiscoveryCriteria>();
+                        jobQueue.QueueJob(
+                                () =>
+                                testHostManagerFactory.GetDiscoveryManager()
+                                .DiscoverTests(discoveryCriteria, discoveryEventsHandler), 0);
+
+                        break;
+                    }
+
+                case MessageType.ExecutionInitialize:
+                    {
+                        EqtTrace.Info("Discovery Session Initialize.");
+                        var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
+                        jobQueue.QueueJob(
+                                () =>
+                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
+                        break;
+                    }
+
+                case MessageType.StartTestExecutionWithSources:
+                    {
+                        EqtTrace.Info("Execution started.");
+                        var testRunEventsHandler = new TestRunEventsHandler(this);
+
+                        var testRunCriteriaWithSources = message.Payload.ToObject<TestRunCriteriaWithSources>();
+                        jobQueue.QueueJob(
+                                () =>
+                                testHostManagerFactory.GetExecutionManager()
+                                .StartTestRun(
+                                    testRunCriteriaWithSources.AdapterSourceMap,
+                                    testRunCriteriaWithSources.Package,
+                                    testRunCriteriaWithSources.RunSettings,
+                                    testRunCriteriaWithSources.TestExecutionContext,
+                                    this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
+                                    testRunEventsHandler),
+                                0);
+
+                        break;
+                    }
+
+                case MessageType.StartTestExecutionWithTests:
+                    {
+                        EqtTrace.Info("Execution started.");
+                        var testRunEventsHandler = new TestRunEventsHandler(this);
+
+                        var testRunCriteriaWithTests =
+                            this.dataSerializer.DeserializePayload<TestRunCriteriaWithTests>(message);
+
+                        jobQueue.QueueJob(
+                                () =>
+                                testHostManagerFactory.GetExecutionManager()
+                                .StartTestRun(
+                                    testRunCriteriaWithTests.Tests,
+                                    testRunCriteriaWithTests.Package,
+                                    testRunCriteriaWithTests.RunSettings,
+                                    testRunCriteriaWithTests.TestExecutionContext,
+                                    this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
+                                    testRunEventsHandler),
+                                0);
+
+                        break;
+                    }
+
+                case MessageType.CancelTestRun:
+                    jobQueue.Pause();
+                    testHostManagerFactory.GetExecutionManager().Cancel();
+                    break;
+
+                case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
+                    this.onAckMessageRecieved?.Invoke(message);
+                    break;
+
+                case MessageType.AbortTestRun:
+                    jobQueue.Pause();
+                    testHostManagerFactory.GetExecutionManager().Abort();
+                    break;
+
+                case MessageType.SessionEnd:
+                    {
+                        EqtTrace.Info("Session End message received from server. Closing the connection.");
+                        sessionCompleted.Set();
+                        this.Close();
+                        break;
+                    }
+
+                case MessageType.SessionAbort:
+                    {
+                        // Dont do anything for now.
+                        break;
+                    }
+
+                default:
+                    {
+                        EqtTrace.Info("Invalid Message types");
+                        break;
+                    }
+            }
         }
     }
 }

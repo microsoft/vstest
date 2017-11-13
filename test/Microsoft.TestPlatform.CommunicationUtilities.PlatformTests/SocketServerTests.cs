@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var connectionInfo = this.socketServer.Start(this.defaultConnection);
 
             Assert.IsFalse(string.IsNullOrEmpty(connectionInfo));
-            await this.ConnectToServer(int.Parse(connectionInfo));
+            await this.ConnectToServer(this.GetIpEndPoint(connectionInfo).Port);
             Assert.IsTrue(this.tcpClient.Connected);
         }
 
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             {
                 // This method throws ExtendedSocketException (which is private). It is not possible
                 // to use Assert.ThrowsException in this case.
-                this.ConnectToServer(int.Parse(connectionInfo)).GetAwaiter().GetResult();
+                this.ConnectToServer(this.GetIpEndPoint(connectionInfo).Port).GetAwaiter().GetResult();
             }
             catch (SocketException)
             {
@@ -105,13 +105,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public void SocketServerStopShouldCloseChannel()
         {
-            ManualResetEvent waitEvent = new ManualResetEvent(false);
+            var waitEvent = new ManualResetEventSlim(false);
             var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
             this.socketServer.Disconnected += (s, e) => { waitEvent.Set(); };
 
             this.socketServer.Stop();
 
-            waitEvent.WaitOne();
+            waitEvent.Wait();
             Assert.ThrowsException<CommunicationException>(() => channel.Send(DUMMYDATA));
         }
 
@@ -139,6 +139,16 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             Assert.IsTrue(clientDisconnected.Error is IOException);
         }
 
+        [TestMethod]
+        public async Task SocketEndpointShouldInitializeChannelOnServerConnection()
+        {
+            var channel = this.SetupChannel(out ConnectedEventArgs _);
+
+            await channel.Send(DUMMYDATA);
+
+            Assert.AreEqual(DUMMYDATA, ReadData(this.Client));
+        }
+
         protected override ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEvent)
         {
             ICommunicationChannel channel = null;
@@ -152,7 +162,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             };
 
             var connectionInfo = this.socketServer.Start(this.defaultConnection);
-            this.ConnectToServer(int.Parse(connectionInfo)).GetAwaiter().GetResult();
+            var port = this.GetIpEndPoint(connectionInfo).Port;
+            this.ConnectToServer(port).GetAwaiter().GetResult();
             waitEvent.WaitOne();
 
             connectedEvent = clientConnectedEvent;

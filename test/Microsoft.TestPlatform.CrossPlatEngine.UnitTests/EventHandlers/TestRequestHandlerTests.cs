@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     [TestClass]
-    public class TestRequestHandlerTests2
+    public class TestRequestHandlerTests
     {
         private readonly Mock<ICommunicationEndPoint> mockCommunicationClient;
         private readonly Mock<ICommunicationChannel> mockChannel;
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly TestHostConnectionInfo testHostConnectionInfo;
         private readonly JobQueue<Action> jobQueue;
 
-        public TestRequestHandlerTests2()
+        public TestRequestHandlerTests()
         {
             this.mockCommunicationClient = new Mock<ICommunicationEndPoint>();
             this.mockChannel = new Mock<ICommunicationChannel>();
