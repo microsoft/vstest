@@ -54,7 +54,7 @@ $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
 $Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
 $Script:TPT_PayLoads=New-Object System.Collections.ArrayList
-$Script:TPT_PerfIterations = 5
+$Script:TPT_PerfIterations = 10
 $Script:TPT_Results = New-Object System.Collections.ArrayList
 $Script:TPT_DependencyProps = [xml] (Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)
 
@@ -315,12 +315,13 @@ function Invoke-PerformanceTests
                                             elseif($runner -eq "nunit.consolerunner")
                                             {
                                                 $payload | Add-Member currentRunnerVersion "$($Script:TPT_DependencyProps.Project.PropertyGroup.NUnitConsoleRunnerVersion)" -Force
-                                                Measure-DiscoveryTime {&$runnerPath $testContainer --explore} $payload
-                                                Measure-ExecutionTime {&$runnerPath $testContainer} $payload
+                                                Measure-DiscoveryTime {&$runnerPath $testContainer --explore --inprocess} $payload
+                                                Measure-ExecutionTime {&$runnerPath $testContainer --inprocess} $payload
                                             }
                                             elseif($runner -eq "xunit.runner.console")
                                             {
                                                 $payload | Add-Member currentRunnerVersion "$($Script:TPT_DependencyProps.Project.PropertyGroup.XUnitConsoleRunnerVersion)" -Force
+                                                Measure-DiscoveryTime {&$runnerPath $testContainer -class foo} $payload
                                                 Measure-ExecutionTime {&$runnerPath $testContainer} $payload
                                             }
                                         }
