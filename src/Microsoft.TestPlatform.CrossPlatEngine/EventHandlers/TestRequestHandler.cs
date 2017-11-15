@@ -124,9 +124,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public virtual void Close()
+        public void Close()
         {
             this.Dispose();
+            EqtTrace.Info("Closing the connection !");
         }
 
         /// <inheritdoc />
@@ -192,7 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
-            var waitHandle = new AutoResetEvent(false);
+            var waitHandle = new ManualResetEventSlim(false);
             Message ackMessage = null;
             this.onAckMessageRecieved = (ackRawMessage) =>
             {
@@ -205,7 +206,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             this.channel.Send(data);
 
-            waitHandle.WaitOne();
+            EqtTrace.Verbose("Waiting for LaunchAdapterProcessWithDebuggerAttached ack");
+            waitHandle.Wait();
             this.onAckMessageRecieved = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
         }
