@@ -362,7 +362,20 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             string consoleRunnerPath = string.Empty;
 
-            if (this.IsDesktopRunner())
+            if (this.testEnvironment.portableRunner)
+            {
+                consoleRunnerPath = Path.Combine(
+                    this.testEnvironment.PublishDirectory,
+                    "..",
+                    "..",
+                    "Intellitrace",
+                    "Common7",
+                    "IDE",
+                    "Extensions",
+                    "Testplatform",
+                    "vstest.console.exe");
+            }
+            else if (this.IsDesktopRunner())
             {
                 consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.exe");
             }

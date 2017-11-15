@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.TestPlatform.TestAssets</id>
+    <version>1.0.0</version>
+    <title>Microsoft.TestPlatform.TestAssets</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <description>MSDia typelib for reading debug symbols from managed code.</description>
+    <copyright>Copyright © Microsoft Corporation</copyright>
+    <contentFiles>
+      <!-- Include Assets as Content -->
+      <files include="**/*.*" buildAction="None" copyToOutput="true" flatten="false" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="CPPSimpleTestProject\CPPSimpleProj\Release\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\CPPSimpleProj\release" />
+    <file src="CPPSimpleTestProject\CPPSimpleProj\x64\Release\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\CPPSimpleProj\x64\release\" />
+    <file src="CPPSimpleTestProject\CPPSimpleProj\Debug\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\CPPSimpleProj\debug" />
+    <file src="CPPSimpleTestProject\CPPSimpleProj\x64\Debug\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\CPPSimpleProj\x64\debug\" />
+
+    <file src="FakesTestProject\bin\Debug\*" target="contentFiles\any\any\FakesTestProject\debug\" />
+    <file src="FakesTestProject\bin\Release\*" target="contentFiles\any\any\FakesTestProject\release\" />
+    <file src="FakesTestProject\bin\x64\Debug\*" target="contentFiles\any\any\FakesTestProject\x64\debug\" />
+    <file src="FakesTestProject\bin\x64\Release\*" target="contentFiles\any\any\FakesTestProject\x64\release\" />
+
+  </files>
+</package>

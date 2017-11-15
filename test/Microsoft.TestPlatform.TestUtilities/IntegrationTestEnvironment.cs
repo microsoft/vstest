@@ -23,6 +23,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private readonly bool runningInCli;
         private string targetRuntime;
+        // Flag to run integration tests using xcopyable vstest.console.exe, Eg: C:\vstest\artifacts\Debug\Intellitrace\Common7\IDE\Extensions\Testplatform\vstest.console.exe
+        public bool portableRunner;
 
         public IntegrationTestEnvironment()
         {

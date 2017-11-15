@@ -386,6 +386,16 @@ function Publish-Package
     Copy-Item "$visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll" $testPlatformDirectory -Force
     Copy-Item "$visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll" $testPlatformDirectory -Force
 
+    # Copy full clr artifacts to Extensions/Testplatform folder similar to Testplatform vsix installed directory to run CC and Fakes acceptance tests.
+    $TestplatformExtensionsDirectory = [System.IO.Path]::combine($intellitraceTargetDirectory, "Common7", "IDE", "Extensions", "Testplatform")
+
+    if (-not (Test-Path $TestplatformExtensionsDirectory)) {
+        New-Item $TestplatformExtensionsDirectory -Type Directory -Force | Out-Null
+    }
+
+    $FullCLRPackageDirectory = Get-FullCLRPackageDirectory
+    Copy-Item -Recurse "$FullCLRPackageDirectory\*" $TestplatformExtensionsDirectory -Force
+
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
