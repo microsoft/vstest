@@ -63,6 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public TestRequestSender(ProtocolConfig protocolConfig, TestHostConnectionInfo connectionInfo)
             : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, CLIENTPROCESSEXITWAIT)
         {
+            // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
             if (this.connectionInfo.Role == ConnectionRole.Client)
             {
                 this.communicationEndpoint = new SocketClient();

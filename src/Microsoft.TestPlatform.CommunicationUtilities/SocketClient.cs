@@ -47,13 +47,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         /// <inheritdoc />
-        // public void Start(string connectionInfo)
-        // {
-        //     this.tcpClient.ConnectAsync(IPAddress.Loopback, int.Parse(connectionInfo))
-        //         .ContinueWith(this.OnServerConnected);
-        // }
-
-        /// <inheritdoc />
         public string Start(string endpoint)
         {
             var ipEndPoint = endpoint.GetIPEndPoint();
@@ -75,10 +68,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnServerConnected(Task connectAsyncTask)
         {
-            // if (connectAsyncTask.IsFaulted)
-            // {
-            //    throw connectAsyncTask.Exception;
-            // }
             if (this.Connected != null)
             {
                 if (connectAsyncTask.IsFaulted)
