@@ -34,6 +34,7 @@
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
+    <Reference Include="System.Text.RegularExpressions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

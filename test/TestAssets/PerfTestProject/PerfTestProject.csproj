@@ -9,7 +9,6 @@
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AssemblyName>PerfTestProject</AssemblyName>
-    <PackageTargetFallback Condition="$(TargetFramework) == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <DebugType>portable</DebugType>
@@ -17,6 +16,10 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46'">
     <DebugType>full</DebugType>
   </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System" />
+    <Reference Include="System.Runtime" />
+  </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>

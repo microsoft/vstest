@@ -17,6 +17,7 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <ProjectReference Include="..\UnitTestProject\UnitTestProject.csproj" />
     <Reference Include="System" />
+    <Reference Include="System.Runtime" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
