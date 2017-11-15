@@ -12,12 +12,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     /// <inheritdoc />
     public class RunEventHandler : ITestRunEventsHandler
     {
+        /// <summary>
+        /// Gets the test results.
+        /// </summary>
         public List<TestResult> TestResults { get; private set; }
 
+        /// <summary>
+        /// Gets the metrics.
+        /// </summary>
         public IDictionary<string, object> Metrics { get; private set; }
 
+        /// <summary>
+        /// Gets the log message.
+        /// </summary>
         public string LogMessage { get; private set; }
 
+        /// <summary>
+        /// Gets the test message level.
+        /// </summary>
         public TestMessageLevel TestMessageLevel { get; private set; }
 
         public RunEventHandler()

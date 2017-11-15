@@ -151,7 +151,6 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (runnerFramework.StartsWith(framework))
             {
                 Assert.Inconclusive(message);
-                return;
             }
         }
 

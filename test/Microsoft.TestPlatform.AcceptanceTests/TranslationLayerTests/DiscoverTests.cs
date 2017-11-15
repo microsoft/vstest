@@ -90,6 +90,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
+            var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
+
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
                                     <RunSettings>     
                                         <RunConfiguration>
@@ -100,11 +102,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.vstestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 runSettingsXml,
-                new TestPlatformOptions { CollectMetrics = false },
-                this.discoveryEventHandler2);
+                null,
+                discoveryEventHandlerForBatchSize);
 
             // Assert.
-            Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
+            Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
+            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.batchSize);
         }
 
         [CustomDataTestMethod]
@@ -115,6 +118,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
 
+            var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
+
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
                                     <RunSettings>     
                                         <RunConfiguration>
@@ -125,10 +130,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.vstestConsoleWrapper.DiscoverTests(
                this.GetTestAssemblies(),
                 runSettingsXml,
-                this.discoveryEventHandler);
+                discoveryEventHandlerForBatchSize);
 
             // Assert.
-            Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
+            Assert.AreEqual(6, discoveryEventHandlerForBatchSize.DiscoveredTestCases.Count);
+            Assert.AreEqual(3, discoveryEventHandlerForBatchSize.batchSize);
         }
 
         [CustomDataTestMethod]
