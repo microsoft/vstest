@@ -209,6 +209,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var message = this.dataSerializer.DeserializeMessage(messageReceivedArgs.Data);
 
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("TestRequestHandler.ProcessRequests: received message: {0}", message);
+            }
+
             switch (message.MessageType)
             {
                 case MessageType.VersionCheck:

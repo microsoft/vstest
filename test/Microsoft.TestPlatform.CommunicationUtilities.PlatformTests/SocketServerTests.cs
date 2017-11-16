@@ -9,7 +9,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -48,7 +47,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var connectionInfo = this.socketServer.Start(this.defaultConnection);
 
             Assert.IsFalse(string.IsNullOrEmpty(connectionInfo));
-            await this.ConnectToServer(this.GetIpEndPoint(connectionInfo).Port);
+            await this.ConnectToServer(connectionInfo.GetIPEndPoint().Port);
             Assert.IsTrue(this.tcpClient.Connected);
         }
 
@@ -63,7 +62,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             {
                 // This method throws ExtendedSocketException (which is private). It is not possible
                 // to use Assert.ThrowsException in this case.
-                this.ConnectToServer(this.GetIpEndPoint(connectionInfo).Port).GetAwaiter().GetResult();
+                this.ConnectToServer(connectionInfo.GetIPEndPoint().Port).GetAwaiter().GetResult();
             }
             catch (SocketException)
             {
@@ -162,7 +161,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             };
 
             var connectionInfo = this.socketServer.Start(this.defaultConnection);
-            var port = this.GetIpEndPoint(connectionInfo).Port;
+            var port = connectionInfo.GetIPEndPoint().Port;
             this.ConnectToServer(port).GetAwaiter().GetResult();
             waitEvent.WaitOne();
 

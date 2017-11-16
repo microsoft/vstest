@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -62,15 +63,5 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         }
 
         protected abstract ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEventArgs);
-
-        protected IPEndPoint GetIpEndPoint(string value)
-        {
-            if (Uri.TryCreate(string.Concat("tcp://", value), UriKind.Absolute, out Uri uri))
-            {
-                return new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port);
-            }
-
-            return new IPEndPoint(IPAddress.Loopback, 0);
-        }
     }
 }

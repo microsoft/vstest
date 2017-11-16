@@ -51,6 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var ipEndPoint = endPoint.GetIPEndPoint();
 
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("Waiting for connecting to server");
+            }
+
             // Don't start if the endPoint port is zero
             this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port).ContinueWith(this.OnServerConnected);
             return ipEndPoint.ToString();
