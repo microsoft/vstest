@@ -58,9 +58,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
-        public string Start(string endpoint)
+        public string Start(string endPoint)
         {
-            this.tcpListener = new TcpListener(endpoint.GetIPEndPoint());
+            this.tcpListener = new TcpListener(endPoint.GetIPEndPoint());
 
             this.tcpListener.Start();
 
@@ -92,6 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 this.channel = this.channelFactory(this.tcpClient.GetStream());
                 this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("Client connected, and starting MessageLoopAsync");
+                }
 
                 // Start the message loop
                 Task.Run(() => this.tcpClient.MessageLoopAsync(this.channel, error => this.Stop(error), this.cancellation.Token)).ConfigureAwait(false);

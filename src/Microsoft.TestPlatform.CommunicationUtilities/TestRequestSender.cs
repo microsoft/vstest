@@ -22,8 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class TestRequestSender : ITestRequestSender
     {
-        // Time to wait for test host exit (in seconds)
-        private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
+        // Time to wait for test host exit
+        private const int ClientProcessExitWaitTimeout = 10 * 1000;
 
         private readonly IDataSerializer dataSerializer;
 
@@ -61,17 +61,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="protocolConfig">Protocol configuration.</param>
         /// <param name="connectionInfo">Transport layer to set up connection</param>
         public TestRequestSender(ProtocolConfig protocolConfig, TestHostConnectionInfo connectionInfo)
-            : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, CLIENTPROCESSEXITWAIT)
+            : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, ClientProcessExitWaitTimeout)
         {
-            // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
-            if (this.connectionInfo.Role == ConnectionRole.Client)
-            {
-                this.communicationEndpoint = new SocketClient();
-            }
-            else
-            {
-                this.communicationEndpoint = new SocketServer();
-            }
+            this.SetCommunicationEndPoint();
         }
 
         internal TestRequestSender(
@@ -166,13 +158,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
                 }
-                else if (message.MessageType == MessageType.TestMessage)
-                {
-                    // There are some test hosts which sends log messages, hence logging and ignoring.
-                    var testMessage = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                    EqtTrace.Info("TestMessage received during version check. Message level : , Message : ", testMessage.MessageLevel, testMessage.Message);
-                    return;
-                }
                 else
                 {
                     throw new TestPlatformException(string.Format(
@@ -226,52 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 {
                     this.OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
                 };
-            this.onMessageReceived = (sender, args) =>
-                {
-                    try
-                    {
-                        var rawMessage = args.Data;
-
-                        // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("TestRequestSender: Received message: {0}", rawMessage);
-                        }
-
-                        // Send raw message first to unblock handlers waiting to send message to IDEs
-                        discoveryEventsHandler.HandleRawMessage(rawMessage);
-
-                        var data = this.dataSerializer.DeserializeMessage(rawMessage);
-                        switch (data.MessageType)
-                        {
-                            case MessageType.TestCasesFound:
-                                var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(data);
-                                discoveryEventsHandler.HandleDiscoveredTests(testCases);
-                                break;
-                            case MessageType.DiscoveryComplete:
-                                var discoveryCompletePayload =
-                                    this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
-                                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
-                                discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
-                                discoveryEventsHandler.HandleDiscoveryComplete(
-                                    discoveryCompleteEventArgs,
-                                    discoveryCompletePayload.LastDiscoveredTests);
-                                this.SetOperationComplete();
-                                break;
-                            case MessageType.TestMessage:
-                                var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(
-                                    data);
-                                discoveryEventsHandler.HandleLogMessage(
-                                    testMessagePayload.MessageLevel,
-                                    testMessagePayload.Message);
-                                break;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        this.OnDiscoveryAbort(discoveryEventsHandler, ex, false);
-                    }
-                };
+            this.onMessageReceived = (sender, args) => this.OnDiscoveryMessageReceived(discoveryEventsHandler, args);
 
             this.channel.MessageReceived += this.onMessageReceived;
             var message = this.dataSerializer.SerializePayload(
@@ -280,7 +220,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.protocolVersion);
             this.channel.Send(message);
         }
-
         #endregion
 
         #region Execution Protocol
@@ -436,6 +375,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
         }
 
+        private void OnDiscoveryMessageReceived(ITestDiscoveryEventsHandler2 discoveryEventsHandler, MessageReceivedEventArgs args)
+        {
+            try
+            {
+                var rawMessage = args.Data;
+
+                // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestRequestSender: Received message: {0}", rawMessage);
+                }
+
+                // Send raw message first to unblock handlers waiting to send message to IDEs
+                discoveryEventsHandler.HandleRawMessage(rawMessage);
+
+                var data = this.dataSerializer.DeserializeMessage(rawMessage);
+                switch (data.MessageType)
+                {
+                    case MessageType.TestCasesFound:
+                        var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(data);
+                        discoveryEventsHandler.HandleDiscoveredTests(testCases);
+                        break;
+                    case MessageType.DiscoveryComplete:
+                        var discoveryCompletePayload =
+                            this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(data);
+                        var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                        discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                        discoveryEventsHandler.HandleDiscoveryComplete(
+                            discoveryCompleteEventArgs,
+                            discoveryCompletePayload.LastDiscoveredTests);
+                        this.SetOperationComplete();
+                        break;
+                    case MessageType.TestMessage:
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(
+                            data);
+                        discoveryEventsHandler.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.OnDiscoveryAbort(discoveryEventsHandler, ex, false);
+            }
+        }
+
         private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
         {
             if (this.IsOperationComplete())
@@ -543,6 +529,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // Complete the currently ongoing operation (Discovery/Execution)
             Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
+        }
+
+        private void SetCommunicationEndPoint()
+        {
+            // TODO: Use factory to get the communication endpoint. It will abstract out the type of communication endpoint like socket, shared memory or named pipe etc.,
+            if (this.connectionInfo.Role == ConnectionRole.Client)
+            {
+                this.communicationEndpoint = new SocketClient();
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestSender is acting as client");
+                }
+            }
+            else
+            {
+                this.communicationEndpoint = new SocketServer();
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestSender is acting as server");
+                }
+            }
         }
     }
 }

@@ -8,24 +8,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
     public interface ICommunicationEndPoint
     {
         /// <summary>
-        /// Event raised when an endpoint is connected.
+        /// Event raised when an endPoint is connected.
         /// </summary>
         event EventHandler<ConnectedEventArgs> Connected;
 
         /// <summary>
-        /// Event raised when an endpoint is disconnected.
+        /// Event raised when an endPoint is disconnected.
         /// </summary>
         event EventHandler<DisconnectedEventArgs> Disconnected;
 
         /// <summary>
-        /// Starts the endpoint and channel.
+        /// Starts the endPoint and channel.
         /// </summary>
-        /// <param name="endpoint">Address to connect</param>
-        /// <returns>Address of the connected endpoint</returns>
-        string Start(string endpoint);
+        /// <param name="endPoint">Address to connect</param>
+        /// <returns>Address of the connected endPoint</returns>
+        string Start(string endPoint);
 
         /// <summary>
-        /// Stops the endpoint and closes the underlying communication channel.
+        /// Stops the endPoint and closes the underlying communication channel.
         /// </summary>
         void Stop();
     }

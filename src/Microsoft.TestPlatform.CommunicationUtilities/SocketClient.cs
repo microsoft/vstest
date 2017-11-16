@@ -47,13 +47,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         /// <inheritdoc />
-        public string Start(string endpoint)
+        public string Start(string endPoint)
         {
-            var ipEndPoint = endpoint.GetIPEndPoint();
+            var ipEndPoint = endPoint.GetIPEndPoint();
 
-            // Don't start if the endpoint port is zero
+            // Don't start if the endPoint port is zero
             this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port).ContinueWith(this.OnServerConnected);
-            return endpoint;
+            return ipEndPoint.ToString();
         }
 
         /// <inheritdoc />
@@ -73,11 +73,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 if (connectAsyncTask.IsFaulted)
                 {
                     this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: ServerConnected");
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("Unable to connect to server, Exception occured : {0}", connectAsyncTask.Exception);
+                    }
                 }
                 else
                 {
                     this.channel = this.channelFactory(this.tcpClient.GetStream());
                     this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
+
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
+                    }
 
                     // Start the message loop
                     Task.Run(() => this.tcpClient.MessageLoopAsync(

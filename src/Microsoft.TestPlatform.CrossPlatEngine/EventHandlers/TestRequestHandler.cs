@@ -67,14 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
 
-            if (this.connectionInfo.Role == ConnectionRole.Host)
-            {
-                this.communicationEndPoint = new SocketServer();
-            }
-            else
-            {
-                this.communicationEndPoint = new SocketClient();
-            }
+            this.SetCommunicationEndPoint();
 
             this.jobQueue = new JobQueue<Action>(
                 (action) => { action(); },
@@ -210,19 +203,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             waitHandle.Wait();
             this.onAckMessageRecieved = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
-        }
-
-        private ITestCaseEventsHandler GetTestCaseEventsHandler(string runSettings)
-        {
-            ITestCaseEventsHandler testCaseEventsHandler = null;
-
-            // Listen to test case events only if data collection is enabled
-            if ((XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings) && DataCollectionTestCaseEventSender.Instance != null) || XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
-            {
-                testCaseEventsHandler = new TestCaseEventsHandler();
-            }
-
-            return testCaseEventsHandler;
         }
 
         public void OnMessageReceived(object sender, MessageReceivedEventArgs messageReceivedArgs)
@@ -362,5 +342,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     }
             }
         }
+
+        private ITestCaseEventsHandler GetTestCaseEventsHandler(string runSettings)
+        {
+            ITestCaseEventsHandler testCaseEventsHandler = null;
+
+            // Listen to test case events only if data collection is enabled
+            if ((XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings) && DataCollectionTestCaseEventSender.Instance != null) || XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
+            {
+                testCaseEventsHandler = new TestCaseEventsHandler();
+            }
+
+            return testCaseEventsHandler;
+        }
+
+        private void SetCommunicationEndPoint()
+        {
+            if (this.connectionInfo.Role == ConnectionRole.Host)
+            {
+                this.communicationEndPoint = new SocketServer();
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestHanlder is acting as server");
+                }
+            }
+            else
+            {
+                this.communicationEndPoint = new SocketClient();
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestHanlder is acting as client");
+                }
+            }
+        }
+
     }
 }
