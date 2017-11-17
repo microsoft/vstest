@@ -24,58 +24,73 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETCORETargetFramework]
         public void EnableCodeCoverageWithArguments(RunnerInfo runnerInfo)
         {
+            TestCodeCoverage(runnerInfo, " /EnableCodeCoverage /platform:x86");
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void EnableCodeCoverageWithPlatformX64(RunnerInfo runnerInfo)
+        {
+            TestCodeCoverage(runnerInfo, " /EnableCodeCoverage /platform:x64");
+        }
+
+        private void TestCodeCoverage(RunnerInfo runnerInfo, string additionalArgs)
+        {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
             {
                 Assert.Inconclusive("Code coverage not supported for .NET core runner");
-                return;
             }
+
             var projectName = "SimpleTestProject";
             var assemblyPath = this.GetAssetFullPath(projectName + ".dll");
 
-            var arguments = string.Concat(assemblyPath, " /EnableCodeCoverage");
+            var arguments = string.Concat(assemblyPath, additionalArgs);
             var trxFilePath = Path.GetTempFileName();
-            var resultsDirectory = Path.GetTempPath();
+            var resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
-            arguments = string.Concat(arguments, " /ResultsDirectory:"+ resultsDirectory);
+            arguments = string.Concat(arguments, " /ResultsDirectory:" + resultsDirectory);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
-            var expectedCoverageFile =
-                Path.Combine(Path.GetDirectoryName(assemblyPath), "..", "..", "..", projectName + ".coverage");
+
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
-            // TODO validate coverage file content,  which required using Microsoft.VisualStudio.Coverage.Analysis lib. 
+            // TODO validate coverage file content,  which required using Microsoft.VisualStudio.Coverage.Analysis lib.
+
             Directory.Delete(resultsDirectory, true);
             File.Delete(trxFilePath);
-
-            var areIdentical = File.ReadAllBytes(expectedCoverageFile)
-                .SequenceEqual(File.ReadAllBytes(actualCoverageFile));
-            Assert.IsTrue(areIdentical, "Expected coverage file: {0} Actual coverage:{1} file are not identical.", expectedCoverageFile, actualCoverageFile);
         }
 
         private static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
         {
             Assert.IsTrue(File.Exists(trxFilePath), "Trx file not found: {0}", trxFilePath);
             XmlDocument doc = new XmlDocument();
-            doc.Load(new FileStream(trxFilePath, FileMode.Open, FileAccess.Read));
-            var deploymentElements = doc.GetElementsByTagName("Deployment");
-            Assert.IsTrue(deploymentElements.Count == 1, "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
-            var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
-            Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false, "runDeploymentRoot attatribute not found in trx file:{0}", trxFilePath);
-            var collectors = doc.GetElementsByTagName("Collector");
-
-            string fileName = string.Empty;
-            for (int i = 0; i < collectors.Count; i++)
+            using (var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read))
             {
-                if (string.Equals(collectors[i].Attributes.GetNamedItem("collectorDisplayName").Value, "Code Coverage", StringComparison.OrdinalIgnoreCase))
-                {
-                    fileName = collectors[i].FirstChild?.FirstChild?.FirstChild?.Attributes.GetNamedItem("href")?.Value;
-                }
-            }
+                doc.Load(trxStream);
+                var deploymentElements = doc.GetElementsByTagName("Deployment");
+                Assert.IsTrue(deploymentElements.Count == 1,
+                    "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
+                var deploymentDir = deploymentElements[0].Attributes.GetNamedItem("runDeploymentRoot")?.Value;
+                Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
+                    "runDeploymentRoot attatribute not found in trx file:{0}", trxFilePath);
+                var collectors = doc.GetElementsByTagName("Collector");
 
-            Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}", trxFilePath);
-            return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
+                string fileName = string.Empty;
+                for (int i = 0; i < collectors.Count; i++)
+                {
+                    if (string.Equals(collectors[i].Attributes.GetNamedItem("collectorDisplayName").Value,
+                        "Code Coverage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        fileName = collectors[i].FirstChild?.FirstChild?.FirstChild?.Attributes.GetNamedItem("href")
+                            ?.Value;
+                    }
+                }
+                Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}", trxFilePath);
+                return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
+            }
         }
 
     }

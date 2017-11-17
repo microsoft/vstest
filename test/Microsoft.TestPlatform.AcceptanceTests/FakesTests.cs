@@ -18,13 +18,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void EnableCodeCoverageWithArguments(RunnerInfo runnerInfo)
+        public void RunSimpleFakeTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
             {
                 Assert.Inconclusive("Fakes not supported for .NET core runner");
-                return;
             }
             var platforms = new string[] {"", "x64"};
             var configs = new string[] {"debug", "release"};
@@ -33,7 +32,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 foreach (var config in configs)
                 {
                     string assemblyRelativePathFormat =
-                        @"microsoft.testplatform.testassets\2.0.0\contentFiles\any\any\FakesTestProject\{0}\{1}\FakesTestProject.dll";
+                        @"microsoft.testPlatform.testassets.fakes\1.0.0\contentFiles\any\any\{0}\{1}\FakesTestProject.dll";
                     var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
                         ? string.Format(assemblyRelativePathFormat, platform, config)
                         : string.Format(assemblyRelativePathFormat, "", config);
