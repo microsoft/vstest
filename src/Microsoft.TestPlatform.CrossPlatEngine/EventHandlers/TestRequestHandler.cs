@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private ICommunicationChannel channel;
 
         private ManualResetEventSlim requestSenderConnected;
+        private ManualResetEventSlim testHostManagerFactoryReady;
 
         private ManualResetEventSlim sessionCompleted;
 
@@ -54,6 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.connectionInfo = connectionInfo;
             this.dataSerializer = dataSerializer;
             this.requestSenderConnected = new ManualResetEventSlim(false);
+            this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.onAckMessageRecieved = onAckMessageRecieved;
             this.jobQueue = jobQueue;
@@ -106,6 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequests(ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManagerFactory = testHostManagerFactory;
+            this.testHostManagerFactoryReady.Set();
             this.sessionCompleted.Wait();
         }
 
@@ -237,6 +240,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case MessageType.DiscoveryInitialize:
                     {
                         EqtTrace.Info("Discovery Session Initialize.");
+                        if (!this.testHostManagerFactoryReady.WaitHandle.WaitOne(2 * 1000))
+                        {
+                            EqtTrace.Error("TestHost Manager factory is not initialized.");
+                        }
                         var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
                         jobQueue.QueueJob(
                                 () =>
@@ -261,6 +268,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case MessageType.ExecutionInitialize:
                     {
                         EqtTrace.Info("Discovery Session Initialize.");
+                        if (!this.testHostManagerFactoryReady.WaitHandle.WaitOne(2 * 1000))
+                        {
+                            EqtTrace.Error("TestHost Manager factory is not initialized.");
+                        }
                         var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
                         jobQueue.QueueJob(
                                 () =>
@@ -314,6 +325,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 case MessageType.CancelTestRun:
                     jobQueue.Pause();
+                    if (!this.testHostManagerFactoryReady.WaitHandle.WaitOne(2 * 1000))
+                    {
+                        EqtTrace.Error("TestHost Manager factory is not initialized.");
+                    }
                     testHostManagerFactory.GetExecutionManager().Cancel();
                     break;
 
@@ -323,6 +338,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 case MessageType.AbortTestRun:
                     jobQueue.Pause();
+                    if (!this.testHostManagerFactoryReady.WaitHandle.WaitOne(2 * 1000))
+                    {
+                        EqtTrace.Error("TestHost Manager factory is not initialized.");
+                    }
                     testHostManagerFactory.GetExecutionManager().Abort();
                     break;
 
