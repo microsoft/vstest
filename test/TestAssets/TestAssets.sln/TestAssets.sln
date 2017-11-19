@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26815.3
+VisualStudioVersion = 15.0.27106.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitAdapterPerfTestProject", "..\NUnitAdapterPerfTestProject\NUnitAdapterPerfTestProject.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
 EndProject
@@ -12,8 +12,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUTestProject", "..\NUTestProject\NUTestProject.csproj", "{1ADE5795-2365-4790-8ACB-2EF0C2613D61}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlameUnitTestProject", "..\BlameUnitTestProject\BlameUnitTestProject.csproj", "{29294E06-3998-4FF4-910F-EE93A915C3A1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUPerfTestProject", "..\XUPerfTestProject\XUPerfTestProject.csproj", "{530FD85F-0222-4078-9610-4AC1C8A5E294}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUTestProject", "..\XUTestProject\XUTestProject.csproj", "{C8AB532E-28E9-4C5E-9F2D-06B6690FCB72}"
 EndProject
@@ -61,10 +59,6 @@ Global
 		{29294E06-3998-4FF4-910F-EE93A915C3A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29294E06-3998-4FF4-910F-EE93A915C3A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29294E06-3998-4FF4-910F-EE93A915C3A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{530FD85F-0222-4078-9610-4AC1C8A5E294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{530FD85F-0222-4078-9610-4AC1C8A5E294}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{530FD85F-0222-4078-9610-4AC1C8A5E294}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{530FD85F-0222-4078-9610-4AC1C8A5E294}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C8AB532E-28E9-4C5E-9F2D-06B6690FCB72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8AB532E-28E9-4C5E-9F2D-06B6690FCB72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8AB532E-28E9-4C5E-9F2D-06B6690FCB72}.Release|Any CPU.ActiveCfg = Release|Any CPU
