@@ -165,6 +165,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var waitEvent = new ManualResetEvent(false);
             this.socketClient.Disconnected += (s, e) => { waitEvent.Set(); };
             channel = this.SetupChannel(out ConnectedEventArgs _);
+            channel.MessageReceived += (sender, args) =>
+            {
+            };
             return waitEvent;
         }
 

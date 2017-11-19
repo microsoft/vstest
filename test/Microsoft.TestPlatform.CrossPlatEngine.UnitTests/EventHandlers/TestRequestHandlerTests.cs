@@ -187,6 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
 
             this.mockDiscoveryManager.Verify(d => d.DiscoverTests(It.Is<DiscoveryCriteria>(dc => dc.Sources.Contains("test.dll")), It.IsAny<ITestDiscoveryEventsHandler2>()));
             this.SendSessionEnd();
@@ -298,6 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
 
             this.SendSessionEnd();
         }

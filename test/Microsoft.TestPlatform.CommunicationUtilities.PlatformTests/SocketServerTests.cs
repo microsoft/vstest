@@ -126,6 +126,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             };
             var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
 
+            channel.MessageReceived += (sender, args) =>
+            {
+            };
+
             // Close the client channel. Message loop should stop.
 #if NET451
             // tcpClient.Close() calls tcpClient.Dispose().
