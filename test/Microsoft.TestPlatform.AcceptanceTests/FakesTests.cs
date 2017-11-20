@@ -11,12 +11,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class FakesTests : AcceptanceTestBase
     {
-        private const string SimpleTestSettingsContent =
+        private const string SimpleTestSettingsContentFormat =
             @"<?xml version='1.0' encoding='UTF-8'?>
               <TestSettings xmlns='http://microsoft.com/schemas/VisualStudio/TeamTest/2010' name='TestSettings1' id='bb640a13-3a47-4bc5-a7bf-00bfefc1d36e'>
                  <Description>These are default test settings for a local test run.</Description>
                  <Deployment enabled='false' />
-                 <Execution hostProcessPlatform='MSIL'>
+                 <Execution {0}>
                     <TestTypeSpecific>
                        <UnitTestRunConfig testTypeId='13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b'>
                           <AssemblyResolution>
@@ -39,22 +39,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETFullTargetFramework]
         public void RunSimpleFakeTests(RunnerInfo runnerInfo)
         {
-            RunFakesTests(runnerInfo, string.Empty, "FakesTestProject");
+            RunFakesTests(runnerInfo, "FakesTestProject", false);
         }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void RunSimpleFakeTestsWithTestSettings(RunnerInfo runnerInfo)
         {
-            var testsettingsFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".testsettings");
-            File.AppendAllText(testsettingsFile, SimpleTestSettingsContent);
-
-            var additionalArgs = $" /settings:{testsettingsFile}";
-            RunFakesTests(runnerInfo, additionalArgs, "MSTestV1FakesProject");
-            File.Delete(testsettingsFile);
+            RunFakesTests(runnerInfo, "MSTestV1FakesProject", true);
         }
 
-        private void RunFakesTests(RunnerInfo runnerInfo, string additionalArgs, string projectName)
+        private void RunFakesTests(RunnerInfo runnerInfo, string projectName, bool withTestsettings)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
@@ -67,22 +62,51 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 foreach (var config in configs)
                 {
+                    var testSettingsFile = string.Empty;
                     string assemblyRelativePathFormat =
                         @"microsoft.testPlatform.testassets.fakes\1.0.0\contentFiles\any\any\{0}\{1}\{2}\{0}.dll";
                     var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
                         ? string.Format(assemblyRelativePathFormat, projectName, platform, config)
                         : string.Format(assemblyRelativePathFormat, projectName, "", config);
-                    var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-                    var args = string.Concat(assemblyAbsolutePath, $" {additionalArgs}");
+                    var args = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
                     if (platform.Equals("x64", StringComparison.OrdinalIgnoreCase))
                     {
                         args = string.Concat(args, " /platform:x64");
                     }
 
+                    if (withTestsettings)
+                    {
+                        testSettingsFile = GetTestSettingsFile(platform);
+                        args = string.Concat(args, $" /settings:{testSettingsFile}");
+                    }
+
                     this.InvokeVsTest(args, this.GetIntelliTraceEnvVariables(platform));
                     this.ValidateSummaryStatus(1, 0, 0);
+                    if (!string.IsNullOrEmpty(testSettingsFile))
+                    {
+                        File.Delete(testSettingsFile);
+                    }
                 }
             }
+        }
+
+        private string GetTestSettingsFile(string platform)
+        {
+            string testSettingsContent;
+
+            if(platform.Equals("x64", StringComparison.OrdinalIgnoreCase))
+            {
+                testSettingsContent = string.Format(SimpleTestSettingsContentFormat, "hostProcessPlatform='MSIL'");
+            }
+            else
+            {
+                testSettingsContent = string.Format(SimpleTestSettingsContentFormat, string.Empty);
+            }
+
+            var testsettingsFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".testsettings");
+            File.AppendAllText(testsettingsFile, testSettingsContent);
+
+            return testsettingsFile;
         }
     }
 }

@@ -460,8 +460,10 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.StartInfo.CreateNoWindow = true;
                 if (envVariables != null)
                 {
+                    Console.WriteLine("Environment Variables:..");
                     foreach (KeyValuePair<string, string> pair in envVariables)
                     {
+                        Console.WriteLine($"Key: {pair.Key}, Value: {pair.Value}");
                         vstestconsole.StartInfo.AddEnvironmentVariable(pair.Key, pair.Value);
                     }
                 }
@@ -550,12 +552,12 @@ namespace Microsoft.TestPlatform.TestUtilities
             IDictionary<string, string> envVaribles = new Dictionary<string, string>(1);
             if (platform.Equals("x64"))
             {
-                envVaribles[this.testEnvironment.IntelliTraceProfierPathFormat] =
+                envVaribles[IntegrationTestEnvironment.IntelliTraceProfierEnvVaribleName] =
                     string.Format(this.testEnvironment.IntelliTraceProfierPathFormat, "amd64");
             }
             else
             {
-                envVaribles[this.testEnvironment.IntelliTraceProfierPathFormat] =
+                envVaribles[IntegrationTestEnvironment.IntelliTraceProfierEnvVaribleName] =
                     string.Format(this.testEnvironment.IntelliTraceProfierPathFormat, "x86");
             }
 
