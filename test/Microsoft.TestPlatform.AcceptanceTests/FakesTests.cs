@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 Assert.Inconclusive("Fakes not supported for .NET core runner");
             }
-            var platforms = new string[] {"", "x64"};
+            var platforms = new string[] {"x86", "x64"};
             var configs = new string[] {"debug", "release"};
             foreach (var platform in platforms)
             {
@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         args = string.Concat(args, " /platform:x64");
                     }
 
-                    this.InvokeVsTest(args);
+                    this.InvokeVsTest(args, this.GetIntelliTraceEnvVariables(platform));
                     this.ValidateSummaryStatus(1, 0, 0);
                 }
             }

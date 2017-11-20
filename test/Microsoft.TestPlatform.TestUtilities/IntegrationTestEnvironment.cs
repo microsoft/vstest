@@ -18,6 +18,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     public class IntegrationTestEnvironment
     {
         public static string TestPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
+        public static string IntelliTraceProfierEnvVaribleName = "COR_PROFILER_PATH";
 
         private static Dictionary<string, string> dependencyVersions;
 
@@ -108,6 +109,24 @@ namespace Microsoft.TestPlatform.TestUtilities
                     this.TargetRuntime);
                 Assert.IsTrue(Directory.Exists(value), "'{0}' directory doesn't exists, Did you run ./build.(cmd/sh) ?");
                 return value;
+            }
+        }
+
+        /// <summary>
+        /// Gets the publish directory for <c>vstest.console</c> package.
+        /// </summary>
+        public string IntelliTraceProfierPathFormat
+        {
+            get
+            {
+                var value = Path.Combine(
+                    TestPlatformRootDirectory,
+                    "artifacts",
+                    BuildConfiguration,
+                    @"Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\ProfilerProxy");
+
+
+                return string.Format(@"{0}\{1}\{2}", value, "{0}", "Microsoft.IntelliTrace.ProfilerProxy.dll");
             }
         }
 

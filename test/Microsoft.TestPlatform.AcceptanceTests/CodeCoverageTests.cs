@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Xml;
@@ -54,7 +55,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETCORETargetFramework]
         public void EnableCodeCoverageWithArguments(RunnerInfo runnerInfo)
         {
-            TestCodeCoverage(runnerInfo, " /EnableCodeCoverage /platform:x86", () => this.ValidateSummaryStatus(1, 1, 1));
+            TestCodeCoverage(runnerInfo, " /EnableCodeCoverage", "x86", () => this.ValidateSummaryStatus(1, 1, 1));
         }
 
         [CustomDataTestMethod]
@@ -62,7 +63,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETCORETargetFramework]
         public void EnableCodeCoverageWithPlatformX64(RunnerInfo runnerInfo)
         {
-            TestCodeCoverage(runnerInfo, " /EnableCodeCoverage /platform:x64", () => this.ValidateSummaryStatus(1, 1, 1));
+            TestCodeCoverage(runnerInfo, " /EnableCodeCoverage", "x64", () => this.ValidateSummaryStatus(1, 1, 1));
         }
 
         [Ignore("Static Code coverage not supported with XCopyable package. Static Code coverage need VSPerfMon.exe, Which is not ships with XCopyable package.")]
@@ -77,11 +78,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var testsettingsFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".testsettings");
             File.AppendAllText(testsettingsFile, StaticCodeCoverageTestSettingsContent);
-            TestCodeCoverage(runnerInfo, $" /platform:{platform} /settings:{testsettingsFile}", () => this.ValidateSummaryStatus(2, 2, 1), "MstestV1UnitTestProject");
+            TestCodeCoverage(runnerInfo, $"/settings:{testsettingsFile}", platform, () => this.ValidateSummaryStatus(2, 2, 1), "MstestV1UnitTestProject");
             File.Delete(testsettingsFile);
         }
 
-        private void TestCodeCoverage(RunnerInfo runnerInfo, string additionalArgs, Action validation, string projectName = "SimpleTestProject")
+        private void TestCodeCoverage(RunnerInfo runnerInfo, string additionalArgs, string platform, Action validation, string projectName = "SimpleTestProject")
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
@@ -96,8 +97,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
             arguments = string.Concat(arguments, " /ResultsDirectory:" + resultsDirectory);
+            arguments = string.Concat(arguments, " /platform:" + platform);
 
-            this.InvokeVsTest(arguments);
+            this.InvokeVsTest(arguments, this.GetIntelliTraceEnvVariables(platform));
             validation();
 
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
