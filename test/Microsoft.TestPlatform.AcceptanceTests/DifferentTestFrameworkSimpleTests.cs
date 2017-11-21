@@ -61,6 +61,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [NETCORETargetFramework]
         public void NUnitRunAllTestExecution(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
