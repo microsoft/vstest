@@ -98,7 +98,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         {
             List<string> eventLogNames = new List<string>();
             eventLogNames.Add("System");
-            eventLogNames.Add("Security");
             eventLogNames.Add("Application");
 
             this.eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
