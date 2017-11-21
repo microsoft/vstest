@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
     [TestClass]
     public class AssemblyMetadataProviderTests : IntegrationTestBase
     {
-        private const int ExpectedTimeForFindingArchForDotNetAssembly = 10; // In milliseconds.
+        private const int ExpectedTimeForFindingArchForDotNetAssembly = 15; // In milliseconds.
         private const string PerfAssertMessageFormat = "Expected Elapsed Time: {0} ms, Actual Elapsed Time: {1} ms";
 
         private IAssemblyMetadataProvider assemblyMetadataProvider;
