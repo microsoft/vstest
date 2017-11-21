@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
 
     using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public class AcceptanceTestBase : IntegrationTestBase
     {
@@ -62,7 +63,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         protected string GetTargetFramworkForRunsettings()
         {
             var targetFramework = string.Empty;
-            if(this.testEnvironment.TargetFramework == DesktopTargetFramework)
+            if (this.testEnvironment.TargetFramework == DesktopTargetFramework)
             {
                 targetFramework = "Framework45";
             }
@@ -94,6 +95,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             return testHostProcessName;
+        }
+
+        /// <summary>
+        /// Default RunSettings
+        /// </summary>
+        /// <returns></returns>
+        public string GetDefaultRunSettings()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                    <RunSettings>     
+                                        <RunConfiguration>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+            return runSettingsXml;
         }
     }
 }
