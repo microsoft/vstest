@@ -37,5 +37,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 ### License
 VSTest platform is licensed under the [MIT license](https://github.com/Microsoft/vstest/blob/master/LICENSE)
 
+### Issue Tracking
+Please see [issue tracking](https://github.com/Microsoft/vstest-docs/blob/master/issuetracking.md) for a description of the workflow we use to process issues.
+
 ### Roadmap
 For details on our planned features and future direction please refer to our [roadmap](https://github.com/Microsoft/vstest-docs/blob/master/roadmap.md).
