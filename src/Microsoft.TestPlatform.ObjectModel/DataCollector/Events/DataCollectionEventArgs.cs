@@ -45,15 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             internal set;
         }
 
-        /// <summary>
-        /// Gets or sets Data collector Uri this notification is targeted for
-        /// </summary>
-        public Uri TargetDataCollectorUri
-        {
-            get;
-            set;
-        }
-
         #endregion
 
         #region Private Methods
