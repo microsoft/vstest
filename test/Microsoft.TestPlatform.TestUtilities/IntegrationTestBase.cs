@@ -12,6 +12,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Text.RegularExpressions;
     using System.Xml;
 
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -34,7 +36,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common";
-        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\{0}\lib";
+        private const string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build";
         private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
         private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
 
@@ -136,6 +138,20 @@ namespace Microsoft.TestPlatform.TestUtilities
             
             // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
             this.InvokeVsTest(arguments);
+        }
+
+        /// <summary>
+        /// Execute Tests that are not supported with given Runner framework.
+        /// </summary>
+        /// <param name="runnerFramework">Runner Framework</param>
+        /// <param name="framework">Framework for which Tests are not supported</param>
+        /// <param name="message">Message to be shown</param>
+        public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+        {
+            if (runnerFramework.StartsWith(framework))
+            {
+                Assert.Inconclusive(message);
+            }
         }
 
         /// <summary>
@@ -328,7 +344,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (testFramework == UnitTestFramework.NUnit)
             {
-                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnitAdapterVersion"]);
+                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.XUnit)
             {
@@ -388,6 +404,18 @@ namespace Microsoft.TestPlatform.TestUtilities
                 " ",
                 args);
             return args;
+        }
+
+        /// <summary>
+        /// Returns the VsTestConsole Wrapper.
+        /// </summary>
+        /// <returns></returns>
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        {
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
+            vstestConsoleWrapper.StartSession();
+
+            return vstestConsoleWrapper;
         }
 
         /// <summary>

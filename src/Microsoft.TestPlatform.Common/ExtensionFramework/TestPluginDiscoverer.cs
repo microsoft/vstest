@@ -95,17 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private void AddKnownExtensions(ref IEnumerable<string> extensionPaths)
         {
-            // For C++ UWP adatper
-            if(this.fileHelper.Exists("Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll"))
-            {
-                extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" });
-            }
-
-            // For OLD C# UWP(MSTest V1) adatper
-            if (this.fileHelper.Exists("Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll"))
-            {
-                extensionPaths = extensionPaths.Concat(new[]{ "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
-            }
+            // For C++ UWP adatper, & OLD C# UWP(MSTest V1) adatper
+            // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.
+            // Include these two dll's if so far no adapters(extensions) were found, & let Assembly.Load() fail if they are not present.
+            extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
         }
 
         /// <summary>
