@@ -354,6 +354,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
             var args = new TestCaseEndEventArgs();
+            args.TestElement = new TestCase();
             this.dataCollectionManager.TestCaseEnded(args);
 
             Assert.IsTrue(isEndInvoked);

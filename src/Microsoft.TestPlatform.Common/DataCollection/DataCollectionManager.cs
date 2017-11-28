@@ -273,7 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, new TestExecId(testCaseStartEventArgs.TestCaseId));
+            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
             testCaseStartEventArgs.Context = context;
 
             this.SendEvent(testCaseStartEventArgs);
@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return new Collection<AttachmentSet>();
             }
 
-            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, new TestExecId(testCaseEndEventArgs.TestCaseId));
+            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
             testCaseEndEventArgs.Context = context;
 
             this.SendEvent(testCaseEndEventArgs);
