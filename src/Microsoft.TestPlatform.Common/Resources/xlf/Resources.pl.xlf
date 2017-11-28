@@ -231,7 +231,7 @@
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
         <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
-        <target state="translated">Istnieje wiele konfiguracji, które zawierają przyjazną nazwę modułu zbierającego dane „{0}”. Zduplikowane konfiguracje będą ignorowane w uruchomieniu testu.</target>
+        <target state="translated">Istnieje wiele konfiguracji, które zawierają przyjazną nazwę modułu zbierającego dane „{0}”. Zduplikowane konfiguracje będą ignorowane w przebiegu testu.</target>
         <note />
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
@@ -261,8 +261,8 @@
       </trans-unit>
       <trans-unit id="FastFilterException">
         <source>An error occured while creating Fast filter.</source>
-        <target state="new">An error occured while creating Fast filter.</target>
-        <note></note>
+        <target state="translated">Wystąpił błąd podczas tworzenia szybkiego filtru.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
