@@ -32,7 +32,7 @@
       </trans-unit>
       <trans-unit id="TestRunningSummary">
         <source>Test run for {0}({1})</source>
-        <target state="translated">Uruchomienie testu dla: {0}({1})</target>
+        <target state="translated">Przebieg testu dla: {0}({1})</target>
         <note />
       </trans-unit>
     </body>

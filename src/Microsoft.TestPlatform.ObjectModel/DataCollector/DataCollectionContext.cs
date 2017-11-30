@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         /// <param name="sessionId">The session under which the data collection occurs.  Cannot be null.</param>
         protected internal DataCollectionContext(SessionId sessionId)
-            : this(sessionId, null)
+            : this(sessionId, (TestExecId)null)
         {
         }
 
@@ -65,6 +65,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             this.sessionId = sessionId;
             this.testExecId = testExecId;
             this.hashCode = ComputeHashCode();
+        }
+
+        protected internal DataCollectionContext(SessionId sessionId, TestCase testCase) : this(sessionId, new TestExecId(testCase.Id))
+        {
+            this.TestCase = testCase;
+
         }
         #endregion
 
