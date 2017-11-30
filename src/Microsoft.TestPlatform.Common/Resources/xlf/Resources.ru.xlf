@@ -259,6 +259,11 @@
         <target state="translated">Этот параметр работает, только если в рамках Visual Studio установлена служебная программа vstest.console.exe.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FastFilterException">
+        <source>An error occured while creating Fast filter.</source>
+        <target state="new">An error occured while creating Fast filter.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestsRun">
         <source>The active Tests Run was aborted.</source>
-        <target state="translated">Aktywne uruchomienie testów zostało przerwane.</target>
+        <target state="translated">Aktywny przebieg testów został przerwany.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aktywne testy przeprowadzone zostało przerwane.</target>

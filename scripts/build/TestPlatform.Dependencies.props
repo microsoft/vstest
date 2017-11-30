@@ -6,17 +6,18 @@
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <NETTestSdkPreviousVersion>15.3.0-preview-20170628-02</NETTestSdkPreviousVersion>
 
-    <MSTestFrameworkVersion>1.2.0-beta</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>1.2.0-beta</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>1.2.0</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>1.2.0</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
     
-    <XUnitFrameworkVersion>2.3.0-beta3-build3705</XUnitFrameworkVersion>
-    <XUnitAdapterVersion>2.3.0-beta3-build3705</XUnitAdapterVersion>
-    <XUnitConsoleRunnerVersion>2.3.0-beta3-build3705</XUnitConsoleRunnerVersion>
+    <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
+    <XUnitAdapterVersion>2.3.1</XUnitAdapterVersion>
+    <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
 
-    <NUnit3FrameworkVersion>3.7.1</NUnit3FrameworkVersion>
-    <NUnit3AdapterVersion>3.8.0</NUnit3AdapterVersion>
-    <NUnitConsoleRunnerVersion>3.7.0</NUnitConsoleRunnerVersion>
+    <NUnit3FrameworkVersion>3.9.0-dev-04564</NUnit3FrameworkVersion>
+    <NUnit3AdapterVersion>3.9.0</NUnit3AdapterVersion>
+    <NUnitConsoleRunnerVersion>3.8.0-dev-03796</NUnitConsoleRunnerVersion>
+    
     <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
 

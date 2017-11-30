@@ -76,34 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
         }
 
-        /// <summary>
-        /// Sends custom data from the collector
-        /// </summary>
-        /// <param name="context">Context under which the data collection is happening</param>
-        /// <param name="matchingEventArgs">Custom notification arguments to which the data is being sent in respose to.</param>
-        /// <param name="data">Custom data to be sent</param>
-        /// <remarks>
-        /// When a Data Collector invokes this method, Client would get called on OnCollectionData( ) with a CollectionDataMessageEventArgs.
-        /// The datacollectioncontext of the matchingeventargs will be used for sending the data.
-        /// </remarks>
-        public virtual void SendData(CustomNotificationEventArgs matchingEventArgs, CustomCollectorData data)
-        {
-            // Default no-op.
-        }
-
-        /// <summary>
-        /// Sends custom data from the collector
-        /// </summary>
-        /// <param name="context">Context under which the data collection is happening</param>
-        /// <param name="data">Custom data to be sent</param>
-        /// <remarks>
-        /// When a Data Collector invokes this method, Client would get called on OnCollectionException( ) with a CollectionExceptionMessageEventArgs.
-        /// </remarks>
-        public virtual void SendData(DataCollectionContext context, CustomCollectorData data)
-        {
-            // Default no-op.
-        }
-
         #endregion
     }
 }

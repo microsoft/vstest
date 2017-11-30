@@ -544,7 +544,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 // Default to collecting these standard logs
                 this.eventLogNames.Add("System");
-                this.eventLogNames.Add("Security");
                 this.eventLogNames.Add("Application");
             }
 

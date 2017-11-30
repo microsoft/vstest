@@ -231,7 +231,7 @@
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
         <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
-        <target state="translated">Istnieje wiele konfiguracji, które zawierają przyjazną nazwę modułu zbierającego dane „{0}”. Zduplikowane konfiguracje będą ignorowane w uruchomieniu testu.</target>
+        <target state="translated">Istnieje wiele konfiguracji, które zawierają przyjazną nazwę modułu zbierającego dane „{0}”. Zduplikowane konfiguracje będą ignorowane w przebiegu testu.</target>
         <note />
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
@@ -257,6 +257,11 @@
       <trans-unit id="VSInstallationNotFound">
         <source>This option works only with vstest.console.exe installed as part of Visual Studio.</source>
         <target state="translated">Ta opcja działa wyłącznie z elementem vstest.console.exe zainstalowanym jako część programu Visual Studio.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FastFilterException">
+        <source>An error occured while creating Fast filter.</source>
+        <target state="translated">Wystąpił błąd podczas tworzenia szybkiego filtru.</target>
         <note />
       </trans-unit>
     </body>
