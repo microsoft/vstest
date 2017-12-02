@@ -50,9 +50,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -60,9 +60,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTests(runnerInfo.RunnerFramework);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

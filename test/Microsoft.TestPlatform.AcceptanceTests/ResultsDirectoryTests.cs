@@ -9,9 +9,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class ResultsDirectoryTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void TrxFileShouldBeCreatedInResultsDirectory(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -30,9 +30,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void ResultsDirectoryRelativePathShouldWork(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

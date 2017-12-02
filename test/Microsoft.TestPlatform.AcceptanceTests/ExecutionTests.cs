@@ -15,9 +15,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class ExecutionTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -30,9 +30,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(1); // failing tests
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void RunMultipleTestAssembliesWithoutTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -49,9 +49,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(1); // failing tests
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -98,9 +99,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(1); // failing tests
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void TestSessionTimeOutTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -120,8 +121,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputDoesNotContains("Total tests: 6");
         }
 
-        [CustomDataTestMethod]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetCoreTargetFrameworkDataSource]
         public void TestPlatformShouldBeCompatibleWithOldTestHost(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -135,9 +136,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void WorkingDirectoryIsSourceDirectory(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -152,9 +153,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -188,9 +189,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             File.Delete(diagLogFilePath);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -211,8 +212,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             File.Delete(diagLogFilePath);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

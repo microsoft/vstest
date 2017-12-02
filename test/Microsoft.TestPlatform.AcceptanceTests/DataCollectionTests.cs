@@ -32,9 +32,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -57,9 +57,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.VaildateDataCollectorOutput();
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void ExecuteTestsWithDataCollectionUsingCollectArgument(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

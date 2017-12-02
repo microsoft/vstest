@@ -38,9 +38,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.runEventHandler = new RunEventHandler();
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -55,9 +55,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -79,9 +79,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(this.runEventHandler.Metrics.ContainsKey(TelemetryDataConstants.RunState));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -98,9 +98,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(0, this.runEventHandler.Metrics.Count);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -122,9 +122,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(TestOutcome.Passed, this.runEventHandler.TestResults.FirstOrDefault().Outcome);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -147,9 +147,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithSourceNavigation(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -181,9 +181,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -204,9 +204,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithNunitAdapter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -241,9 +241,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -288,9 +288,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -319,9 +319,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(1, testCase.FirstOrDefault().TestCase.LineNumber);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -378,8 +379,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -409,9 +410,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             File.Delete(testsettingsFile);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -465,9 +467,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithCustomTestHostLaunch(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -484,9 +486,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -512,9 +514,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

@@ -28,9 +28,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.discoveryEventHandler = new DiscoveryEventHandler();
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -48,9 +48,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

@@ -1,12 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+// To run acceptance tests in parallel
+[assembly: Parallelize(Workers = 0, Scope = ExecutionScope.MethodLevel)]
+
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
 
     using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public class AcceptanceTestBase : IntegrationTestBase
     {

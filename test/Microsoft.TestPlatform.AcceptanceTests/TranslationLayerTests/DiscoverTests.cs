@@ -30,9 +30,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.discoveryEventHandler2 = new DiscoveryEventHandler2();
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -44,9 +44,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -63,9 +63,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(0, this.discoveryEventHandler2.Metrics.Count);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -82,9 +82,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.IsTrue(this.discoveryEventHandler2.Metrics.ContainsKey(TelemetryDataConstants.DiscoveryState));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -110,9 +110,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(3, discoveryEventHandlerForBatchSize.batchSize);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -137,9 +137,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(3, discoveryEventHandlerForBatchSize.batchSize);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -162,9 +162,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(6, this.discoveryEventHandler.DiscoveredTestCases.Count);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

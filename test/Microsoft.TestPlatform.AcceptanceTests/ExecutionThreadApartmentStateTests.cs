@@ -8,8 +8,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class ExecutionThreadApartmentStateTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void UITestShouldPassIfApartmentStateIsSTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -21,8 +21,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetCoreTargetFrameworkDataSource]
         public void WarningShouldBeShownWhenValueIsSTAForNetCore(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -36,8 +36,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void UITestShouldFailWhenDefaultApartmentStateIsMTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -51,8 +51,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

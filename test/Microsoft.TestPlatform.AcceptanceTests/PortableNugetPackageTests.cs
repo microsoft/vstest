@@ -31,9 +31,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Directory.Delete(portablePackageFolder, true);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -46,9 +46,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(1); // failing tests
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void DiscoverAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

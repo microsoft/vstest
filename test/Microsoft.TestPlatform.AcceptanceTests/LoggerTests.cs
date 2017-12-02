@@ -12,8 +12,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class LoggerTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void TrxLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -32,8 +32,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
         }
 
-        [CustomDataTestMethod]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetCoreTargetFrameworkDataSource]
         public void TrxLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

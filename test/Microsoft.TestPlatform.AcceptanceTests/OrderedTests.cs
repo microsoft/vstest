@@ -16,8 +16,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// Ordered Tests created using earlier versions of Visual Studio(i.e. before VS2017) should work fine.
         /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

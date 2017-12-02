@@ -17,8 +17,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class AppDomainTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

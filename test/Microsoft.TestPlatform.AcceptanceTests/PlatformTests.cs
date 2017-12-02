@@ -15,9 +15,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// The run test execution with platform x64.
         /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -34,9 +35,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// The run test execution with platform x86.
         /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        [DoNotParallelize]
         public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

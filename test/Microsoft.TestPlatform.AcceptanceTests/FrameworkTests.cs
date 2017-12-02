@@ -9,9 +9,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class FrameworkTests : AcceptanceTestBase
     {
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -23,9 +23,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 1);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
