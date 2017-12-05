@@ -209,6 +209,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void InitializeShouldMergeMultipleTestAdapterPathsWithPathsInRunSettings()
+        {
+            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(runSettingsXml);
+            RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+            var mockFileHelper = new Mock<IFileHelper>();
+            var mockOutput = new Mock<IOutput>();
+
+            mockFileHelper.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
+            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
+
+            executor.Initialize("c:\\users;e:\\users");
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual("d:\\users;f:\\users;c:\\users;e:\\users", runConfiguration.TestAdaptersPaths);
+        }
+
+        [TestMethod]
         public void InitializeShouldAddRightAdapterPathInErrorMessage()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
