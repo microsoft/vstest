@@ -186,7 +186,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 
                 foreach (var testadapterPath in testAdapterPaths)
                 {
-                    var testAdapterFullPath = Path.GetFullPath(testadapterPath);
+                    // TestAdaptersPaths could contain environment variables
+                    var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
 
                     if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
                     {
