@@ -143,7 +143,6 @@
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="net451\$Runtime$\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.Deployment.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.Deployment.dll" />
     <file src="net451\$Runtime$\msdia140typelib_clr0200.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\msdia140typelib_clr0200.dll" />
     <file src="net451\$Runtime$\Newtonsoft.Json.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Newtonsoft.Json.dll" />
     <file src="net451\$Runtime$\QTAgent.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\QTAgent.exe" />
@@ -225,7 +224,6 @@
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll" />
     <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TraceDataCollector.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.TraceDataCollector.dll" />
-    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.dll" />
     <file src="net451\$Runtime$\Extensions\VSTestVideoRecorder.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\VSTestVideoRecorder.exe" />
     <file src="net451\$Runtime$\Extensions\Cpp\dbghelp.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\dbghelp.dll" />
     <file src="net451\$Runtime$\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Extensions\Cpp\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
