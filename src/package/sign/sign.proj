@@ -69,7 +69,6 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
 
       <!-- UWP runtime provider and dependent dlls -->
-      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.UwpTestHostRuntimeProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)CoreCon\VisualStudioDatastoreConfigurationProvider.dll" />
 
       <!-- Qualitytools dlls -->
@@ -137,8 +136,6 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
-      
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.UwpTestHostRuntimeProvider.Deployment.dll" />
 
       <!-- NetFullExtensions -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
