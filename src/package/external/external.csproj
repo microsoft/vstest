@@ -57,15 +57,15 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>15.6.0-preview-1109037</Version>
+      <Version>15.6.0-preview-1202328</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors">
-      <Version>15.6.0-preview-1109037</Version>
+      <Version>15.6.0-preview-1202328</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
-      <Version>15.5.0-preview-20171102-03</Version>
+      <Version>15.5.0-preview-20171207-01</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Dia">
