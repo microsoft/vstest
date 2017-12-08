@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
     /// <summary>
     /// Implementing this interface allows you to customize XmlStore persistence.
     /// </summary>
-    public interface IXmlTestStoreCustom
+    internal interface IXmlTestStoreCustom
     {
         /// <summary>
         /// Gets the name of the tag to use to persist this object.

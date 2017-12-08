@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// Class that uniquely identifies a test.
     /// </summary>
-    public sealed class TestId : IEquatable<TestId>, IComparable<TestId>, IComparable, IXmlTestStore
+    internal sealed class TestId : IEquatable<TestId>, IComparable<TestId>, IComparable, IXmlTestStore
     {
         #region Constants
 
