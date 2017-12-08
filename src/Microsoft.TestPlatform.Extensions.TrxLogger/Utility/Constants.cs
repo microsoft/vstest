@@ -40,11 +40,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public const string TestTypePropertyIdentifier = "TestType";
 
         /// <summary>
-        /// Property Id storing the ExecutionId.
-        /// </summary>
-        public const string InnerResultsCountPropertyIdentifier = "InnerResultsCount"; // remove if not required
-
-        /// <summary>
         /// Property Id storing the TMITestId.
         /// </summary>
         public const string TmiTestIdPropertyIdentifier = "MSTestDiscoverer.TmiTestId";

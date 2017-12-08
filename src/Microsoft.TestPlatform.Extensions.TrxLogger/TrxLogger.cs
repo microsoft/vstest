@@ -238,12 +238,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.testRun.RunConfiguration = testrunConfig;
         }
 
-        private int GetInnerResultsCount(ObjectModel.TestResult testResult)
-        {
-            ObjectModel.TestProperty innerResultsCountProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(TrxLoggerConstants.InnerResultsCountPropertyIdentifier));
-            return innerResultsCountProperty == null ? 0 : testResult.GetPropertyValue(innerResultsCountProperty, default(int));
-        }
-
         private Guid GetParentExecutionId(ObjectModel.TestResult testResult)
         {
             ObjectModel.TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(TrxLoggerConstants.ParentExecutionIdPropertyIdentifier));
@@ -295,7 +289,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
                 this.HandleSkippedTest(e.Result);
 
-            var innerResultsCount = GetInnerResultsCount(e.Result);
             var executionId = GetExecutionId(e.Result); // TODO: instead of creating these in converter also, create at only one place.
             var parentExecutionId = GetParentExecutionId(e.Result);
 
