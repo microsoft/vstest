@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -16,8 +17,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         #region Fields
 
         private TestId testId;
-        private TestExecId execId;
-        private TestExecId parentExecId;
+        private Guid executionId;
+        private Guid parentExecutionId;
         private TestListCategoryId categoryId;
         private List<TestEntry> testEntries = new List<TestEntry>();
 
@@ -48,28 +49,28 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets or sets the exec id.
         /// </summary>
-        public TestExecId ExecId
+        public Guid ExecutionId
         {
-            get { return this.execId; }
+            get { return this.executionId; }
 
             set
             {
                 Debug.Assert(value != null, "ExecId is null");
-                this.execId = value;
+                this.executionId = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the parent exec id.
         /// </summary>
-        public TestExecId ParentExecId
+        public Guid ParentExecutionId
         {
-            get { return this.parentExecId; }
+            get { return this.parentExecutionId; }
 
             set
             {
                 Debug.Assert(value != null, "ExecId is null");
-                this.parentExecId = value;
+                this.parentExecutionId = value;
             }
         }
 
@@ -101,10 +102,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 return false;
             }
 
-            Debug.Assert(this.execId != null, "this.execId is null");
-            Debug.Assert(e.execId != null, "e.execId is null");
+            Debug.Assert(this.executionId != null, "this.executionId is null");
+            Debug.Assert(e.executionId != null, "e.executionId is null");
 
-            if (!this.execId.Equals(e.execId))
+            if (!this.executionId.Equals(e.executionId))
             {
                 return false;
             }
@@ -122,7 +123,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </returns>
         public override int GetHashCode()
         {
-            return this.execId.GetHashCode();
+            return this.executionId.GetHashCode();
         }
 
         #endregion
@@ -144,9 +145,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             helper.SaveSingleFields(element, this, parameters);
 
             helper.SaveObject(this.testId, element, null);
-            helper.SaveGuid(element, "@executionId", this.execId.Id);
-            if (parentExecId != null)
-                helper.SaveGuid(element, "@parentExecutionId", this.parentExecId.Id);
+            helper.SaveGuid(element, "@executionId", this.executionId);
+            if (parentExecutionId != null)
+                helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
             helper.SaveGuid(element, "@testListId", this.categoryId.Id);
             if (testEntries.Count > 0)
                 helper.SaveIEnumerable(testEntries, element, "TestEntries", ".", "TestEntry", parameters);

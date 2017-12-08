@@ -9,14 +9,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
     internal abstract class TestAggregation : TestElement, ITestAggregation
     {
-        protected List<TestLink> testLinks = new List<TestLink>();
+        protected Dictionary<Guid, TestLink> testLinks = new Dictionary<Guid, TestLink>();
 
         public TestAggregation(
             Guid id,
             string name,
             string adapter) : base(id, name, adapter) { }
 
-        public List<TestLink> TestLinks
+        public Dictionary<Guid, TestLink> TestLinks
         {
             get { return testLinks; }
         }
@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
             XmlPersistence h = new XmlPersistence();
             if (testLinks.Count > 0)
-                h.SaveIEnumerable(testLinks, element, "TestLinks", ".", "TestLink", parameters);
+                h.SaveIEnumerable(testLinks.Values, element, "TestLinks", ".", "TestLink", parameters);
         }
     }
 }

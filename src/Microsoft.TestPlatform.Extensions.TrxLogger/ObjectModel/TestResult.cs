@@ -551,7 +551,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 Debug.Assert(!string.IsNullOrEmpty(resultFile), "'resultFile' is null or empty");
                 Debug.Assert(resultFile.Trim() == resultFile, "'resultFile' has whitespace at the ends");
-                Debug.Assert(Path.IsPathRooted(resultFile), "'resultFile' is a relative path");
 
                 this.resultFiles[FileHelper.MakePathRelative(resultFile, testResultsDirectory)] = null;
             }

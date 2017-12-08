@@ -76,7 +76,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             XmlPersistence h = new XmlPersistence();
 
             h.SaveSimpleField(element, "TestMethod/@codeBase", this.codeBase, string.Empty);
-            h.SaveSimpleField(element, "TestMethod/@executorUri", this.adapter, string.Empty);
+            h.SaveSimpleField(element, "TestMethod/@adapterTypeName", this.adapter, string.Empty);
             h.SaveObject(this.testMethod, element, "TestMethod", parameters);
         }
     }
