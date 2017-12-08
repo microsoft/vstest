@@ -3,9 +3,9 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
     /// <summary>
@@ -17,7 +17,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         private TestId testId;
         private TestExecId execId;
+        private TestExecId parentExecId;
         private TestListCategoryId categoryId;
+        private List<TestEntry> testEntries = new List<TestEntry>();
 
         #endregion
 
@@ -48,16 +50,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public TestExecId ExecId
         {
-            get
-            {
-                return this.execId;
-            }
+            get { return this.execId; }
 
             set
             {
                 Debug.Assert(value != null, "ExecId is null");
                 this.execId = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the parent exec id.
+        /// </summary>
+        public TestExecId ParentExecId
+        {
+            get { return this.parentExecId; }
+
+            set
+            {
+                Debug.Assert(value != null, "ExecId is null");
+                this.parentExecId = value;
+            }
+        }
+
+        public List<TestEntry> TestEntries
+        {
+            get { return this.testEntries; }
         }
 
         #endregion
@@ -127,7 +145,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
             helper.SaveObject(this.testId, element, null);
             helper.SaveGuid(element, "@executionId", this.execId.Id);
+            if (parentExecId != null)
+                helper.SaveGuid(element, "@parentExecutionId", this.parentExecId.Id);
             helper.SaveGuid(element, "@testListId", this.categoryId.Id);
+            if (testEntries.Count > 0)
+                helper.SaveIEnumerable(testEntries, element, "TestEntries", ".", "TestEntry", parameters);
         }
 
         #endregion
