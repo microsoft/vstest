@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    // TODO***: write test cases
 
     /// <summary>
     /// Logger for Generating TRX
@@ -42,6 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> additionalResults;
         private Dictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
         private Dictionary<Guid, TestEntry> entries;
+        private Dictionary<Guid, TestEntry> additionalTestEntries;
 
         /// <summary>
         /// Specifies the run level "out" messages
@@ -268,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             testType = (testTypeProperty == null) ? testType : testResult.GetPropertyValue(testTypeProperty, testType);
 
             // Except OrderedTest, all test types are updated to unit test type.
-            testType = (testType == TrxLoggerConstants.OrderedTestType) ? testType : TrxLoggerConstants.UnitTestType;
+            testType = (testType == TrxLoggerConstants.OrderedTestType) ? testType : TrxLoggerConstants.UnitTestType; // think about it as its only present in tmi adn is used only for orderedtest
 
             return testType;
         }
@@ -337,11 +339,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     var name = e.Result.TestCase.DisplayName;
                     testElement = Converter.ToTestElement(testType, name, executionId, parentExecutionId, e.Result.TestCase); // TODO: if resulttype is not used anywhere else, then move creation of result type also in converter.
                     testElements.Add(testId, testElement);
-                    (parentTestElement as OrderedTestElement).TestLinks.Add(new TestLink(testElement.Id.Id, testElement.Name, testElement.Storage));
                 }
                 else
                 {
                     this.testElements.TryGetValue(testId, out testElement);
+                }
+                if (!(parentTestElement as OrderedTestElement).TestLinks.ContainsKey(testElement.Id.Id))
+                {
+                    (parentTestElement as OrderedTestElement).TestLinks.Add(testElement.Id.Id, new TestLink(testElement.Id.Id, testElement.Name, testElement.Storage));
                 }
                 //create/get test element if not exists. and link this test element to parent test element
             }
@@ -375,7 +380,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 this.results.Add(executionId, testResult);
 
                 TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id);
-                te.ExecId = testElement.ExecutionId;
+                te.ExecutionId = executionId;
                 this.entries.Add(executionId, te);
             }
             else if (parentTestElement is OrderedTestElement)
@@ -384,11 +389,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 this.additionalResults.Add(executionId, testResult);
 
                 TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id);
-                te.ExecId = testElement.ExecutionId;
-                te.ParentExecId = testElement.ParentExecutionId;
+                te.ExecutionId = executionId;
+                te.ParentExecutionId = parentExecutionId;
 
                 this.entries.TryGetValue(parentExecutionId, out var parentTestEntry); // todo: handle null case.
+                if (parentTestEntry == null)
+                {
+                    this.additionalTestEntries.TryGetValue(parentExecutionId, out parentTestEntry);
+                }
                 parentTestEntry.TestEntries.Add(te);
+                this.additionalTestEntries.Add(executionId, te);
             }
             else
             {
@@ -542,6 +552,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.additionalResults = new Dictionary<Guid, TrxLoggerObjectModel.ITestResult>();
             this.testElements = new Dictionary<Guid, ITestElement>();
             this.entries = new Dictionary<Guid,TestEntry>();
+            this.additionalTestEntries = new Dictionary<Guid, TestEntry>();
             this.runLevelErrorsAndWarnings = new List<RunInfo>();
             this.testRun = null;
             this.totalTests = 0;
