@@ -154,6 +154,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     EqtTrace.Info(@"TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.protocolVersion);
                 }
+
+                // TRH can also send TestMessage if tracing is enabled, so log it at runner end
+                else if (message.MessageType == MessageType.TestMessage)
+                {
+                    // Only Deserialize if Tracing is enabled
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        EqtTrace.Info("TestRequestSender.CheckVersionWithTestHost: " + testMessagePayload.Message);
+                    }
+                }
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
