@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// Class that provides a basic implementation of IUriAttachment, which can be used by plugin
     /// writers to send any resource accessible by a URI as an attachment.
     /// </summary>
-    public class UriDataAttachment : IDataAttachment, IXmlTestStore
+    internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     {
         #region Private fields
 
