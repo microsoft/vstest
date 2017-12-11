@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
     {
         private readonly TcpListener tcpListener;
 
-        private readonly ICommunicationClient socketClient;
+        private readonly ICommunicationEndPoint socketClient;
 
         private TcpClient tcpClient;
 
@@ -139,7 +139,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             ICommunicationChannel channel = null;
             ConnectedEventArgs serverConnectedEvent = null;
             ManualResetEvent waitEvent = new ManualResetEvent(false);
-            this.socketClient.ServerConnected += (sender, eventArgs) =>
+            this.socketClient.Connected += (sender, eventArgs) =>
             {
                 serverConnectedEvent = eventArgs;
                 channel = eventArgs.Channel;
@@ -163,8 +163,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         private ManualResetEvent SetupClientDisconnect(out ICommunicationChannel channel)
         {
             var waitEvent = new ManualResetEvent(false);
-            this.socketClient.ServerDisconnected += (s, e) => { waitEvent.Set(); };
+            this.socketClient.Disconnected += (s, e) => { waitEvent.Set(); };
             channel = this.SetupChannel(out ConnectedEventArgs _);
+            channel.MessageReceived += (sender, args) =>
+            {
+            };
             return waitEvent;
         }
 
@@ -172,7 +175,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             this.tcpListener.Start();
 
-            return ((IPEndPoint)this.tcpListener.LocalEndpoint).Port.ToString();
+            return ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
         }
     }
 }
