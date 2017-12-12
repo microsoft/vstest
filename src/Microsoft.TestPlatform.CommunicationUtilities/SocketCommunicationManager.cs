@@ -196,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Verbose("Connection Failed with error {0}, retrying", ex.Message);
+                    EqtTrace.Verbose("Connection Failed with error {0}, retrying", ex.ToString());
                 }
             }
             while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);

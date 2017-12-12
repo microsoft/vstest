@@ -55,13 +55,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 WaitForDebuggerIfEnabled();
                 Run(args);
             }
-            catch (SocketException ex)
-            {
-                EqtTrace.Error("DataCollector: Socket exception is thrown : {0}", ex);
-            }
             catch (Exception ex)
             {
                 EqtTrace.Error("DataCollector: Error occured during initialization of Datacollector : {0}", ex);
+                throw;
             }
         }
 

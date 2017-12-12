@@ -450,7 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
 
                 // Log error.
-                dataCollectorInfo.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex.Message));
+                dataCollectorInfo.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex.ToString()));
 
                 // Dispose datacollector.
                 dataCollectorInfo.DisposeDataCollector();

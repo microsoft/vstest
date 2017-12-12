@@ -135,7 +135,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
 
-            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
+            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
             Assert.AreEqual(0, result.EnvironmentVariables.Count);
             Assert.AreEqual(false, result.AreTestCaseLevelEventsRequired);
             Assert.AreEqual(0, result.DataCollectionEventsPort);
@@ -171,7 +171,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, mockRunEventsHandler.Object);
 
-            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
+            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
         }
 
 

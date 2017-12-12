@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 //Ignore all exception
                 EqtTrace.Info(
                     "GetArchitectureForSource: Returning default:{0}. Unhandled exception: {1}.",
-                    archType, ex.Message);
+                    archType, ex);
             }
 
             return archType;

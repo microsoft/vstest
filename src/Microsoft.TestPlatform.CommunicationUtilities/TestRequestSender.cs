@@ -110,6 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public int InitializeCommunication()
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.InitializeCommunication: initialize communication. ");
+            }
+
             // this.clientExitCancellationSource = new CancellationTokenSource();
             this.clientExitErrorMessage = string.Empty;
 
@@ -133,6 +138,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout)
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
+            }
+
             return this.connected.Wait(connectionTimeout);
         }
 
@@ -147,6 +157,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.onMessageReceived = (sender, args) =>
             {
                 var message = this.dataSerializer.DeserializeMessage(args.Data);
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestSender.CheckVersionWithTestHost: onMessageReceived received message: {0}", message);
+                }
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
@@ -242,6 +257,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 MessageType.ExecutionInitialize,
                 pathToAdditionalExtensions,
                 this.protocolVersion);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.InitializeExecution: Sending initializing execution with message: {0}", message);
+            }
+
             this.channel.Send(message);
         }
 
@@ -260,6 +280,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 MessageType.StartTestExecutionWithSources,
                 runCriteria,
                 this.protocolVersion);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
+            }
+
             this.channel.Send(message);
         }
 
@@ -278,18 +304,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 MessageType.StartTestExecutionWithTests,
                 runCriteria,
                 this.protocolVersion);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.StartTestRun: Sending test run with message: {0}", message);
+            }
+
             this.channel.Send(message);
         }
 
         /// <inheritdoc />
         public void SendTestRunCancel()
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
+            }
+
             this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.CancelTestRun));
         }
 
         /// <inheritdoc />
         public void SendTestRunAbort()
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");
+            }
+
             this.channel?.Send(this.dataSerializer.SerializeMessage(MessageType.AbortTestRun));
         }
 
@@ -300,6 +341,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             if (!this.IsOperationComplete())
             {
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestSender.EndSession: Sending end session.");
+                }
+
                 this.channel.Send(this.dataSerializer.SerializeMessage(MessageType.SessionEnd));
             }
         }
@@ -309,7 +355,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // This method is called on test host exit. If test host has any errors, stdError
             // provides the crash call stack.
-            EqtTrace.Info("TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: " + stdError);
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: " +
+                              stdError);
+            }
+
             this.clientExitErrorMessage = stdError;
             this.clientExited.Set();
 
@@ -340,6 +391,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             try
             {
                 var rawMessage = messageReceived.Data;
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
+                }
 
                 // Send raw message first to unblock handlers waiting to send message to IDEs
                 testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -375,6 +430,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
                                 processId,
                                 this.protocolVersion);
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Sending LaunchAdapterProcessWithDebuggerAttachedCallback message: {0}", data);
+                        }
 
                         this.channel.Send(data);
                         break;
@@ -393,9 +452,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var rawMessage = args.Data;
 
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-                if (EqtTrace.IsInfoEnabled)
+                if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Info("TestRequestSender: Received message: {0}", rawMessage);
+                    EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
                 }
 
                 // Send raw message first to unblock handlers waiting to send message to IDEs
@@ -539,6 +598,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void SetOperationComplete()
         {
             // Complete the currently ongoing operation (Discovery/Execution)
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
+            }
+
             Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
         }
 

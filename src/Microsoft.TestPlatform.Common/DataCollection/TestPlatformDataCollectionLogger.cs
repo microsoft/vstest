@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 CultureInfo.CurrentCulture,
                 Resources.Resources.ReportDataCollectorException,
                 exception.GetType(),
-                exception.Message,
+                exception.ToString(),
                 text);
             this.SendTextMessage(context, message, TestMessageLevel.Error);
         }

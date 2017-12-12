@@ -108,7 +108,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             proxyExecutionManager.Initialize();
             Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
             Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
-            Assert.AreEqual("MyException", proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2);
+            StringAssert.Contains(proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2, "MyException");
         }
 
         [TestMethod]

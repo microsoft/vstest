@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 EqtTrace.Error(exception);
             }
 
-            runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.Message);
+            runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.ToString());
         }
 
         private IList<string> GetCommandLineArguments(int portNumber)
