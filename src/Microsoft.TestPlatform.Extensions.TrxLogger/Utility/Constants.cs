@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-using System; // check where it should be? within namespace or outside?
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 {  
@@ -28,7 +28,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         public const string LogFileNameKey = "LogFileName";
 
+        /// <summary>
+        /// Ordered test element name
+        /// </summary>
         public const string OrderedTestElementName = "OrderedTest";
+
+        /// <summary>
+        /// Unit test element name
+        /// </summary>
         public const string UnitTestElementName = "UnitTest";
 
         /// <summary>
@@ -41,6 +48,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         public const string ParentExecutionIdPropertyIdentifier = "ParentExecId";
 
+        /// <summary>
+        /// Property If storing the TestType.
+        /// </summary>
         public const string TestTypePropertyIdentifier = "TestType";
 
         /// <summary>
@@ -48,10 +58,24 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         public const string TmiTestIdPropertyIdentifier = "MSTestDiscoverer.TmiTestId";
 
+        /// <summary>
+        /// Ordered test type
+        /// </summary>
         public static readonly Guid OrderedTestType = new Guid("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
+
+        /// <summary>
+        /// Ordered test type instance
+        /// </summary>
         public static readonly TestType OrderedTestTypeInstance = new TestType(OrderedTestType);
 
+        /// <summary>
+        /// Unit test type
+        /// </summary>
         public static readonly Guid UnitTestType = new Guid("13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B");
+
+        /// <summary>
+        /// Unit test type instance.
+        /// </summary>
         public static readonly TestType UnitTestTypeInstance = new TestType(UnitTestType);
     }
 }
