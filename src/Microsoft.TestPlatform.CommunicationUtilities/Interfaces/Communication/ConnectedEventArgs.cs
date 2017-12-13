@@ -24,11 +24,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         public ConnectedEventArgs(ICommunicationChannel channel)
         {
             this.Channel = channel;
+            this.Connected = true;
+        }
+
+        public ConnectedEventArgs(Exception faultException)
+        {
+            this.Connected = false;
+            this.Fault = faultException;
         }
 
         /// <summary>
         /// Gets the communication channel based on this connection.
         /// </summary>
         public ICommunicationChannel Channel { get; private set; }
+
+        /// <summary>
+        /// Gets true if it's connected.
+        /// </summary>
+        public bool Connected { get; private set; }
+
+        /// <summary>
+        /// Gets the exception if it's not connected.
+        /// </summary>
+        public Exception Fault { get; private set; }
     }
 }
