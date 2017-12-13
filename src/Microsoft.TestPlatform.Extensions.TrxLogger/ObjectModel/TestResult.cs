@@ -213,54 +213,23 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     {
         #region Fields
 
-        /// <summary>
-        /// Id of test within run
-        /// </summary>
         private TestResultId id;
-
-        /// <summary>
-        /// Name of test within run
-        /// </summary>
         private string testName;
-
         private string computerInfo;
-
-        private TimeSpan duration;
-
-        private DateTime startTime;
-
-        private DateTime endTime;
-
-        /// <summary>
-        /// Type of test (Guid)
-        /// </summary>
-        private TestType testType;
-
-        /// <summary>
-        /// The outcome of the test result
-        /// </summary>
-        private TestOutcome outcome;
-
-        /// <summary>
-        /// The test run in which the test was executed
-        /// </summary>
-        private TestRun testRun;
-
         private string stdOut;
-
         private string stdErr;
-
         private string debugTrace;
-
-        private TestResultErrorInfo errorInfo;
-
-        private TestListCategoryId categoryId;
-
-        private ArrayList textMessages;
-
-        private int dataRowInfo;
-
         private string resultType;
+        private int dataRowInfo;
+        private TimeSpan duration;
+        private DateTime startTime;
+        private DateTime endTime;
+        private TestType testType;
+        private TestOutcome outcome;
+        private TestRun testRun;
+        private TestResultErrorInfo errorInfo;
+        private TestListCategoryId categoryId;
+        private ArrayList textMessages;
 
         /// <summary>
         /// Directory containing the test result files, relative to the root test results directory
@@ -483,12 +452,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             get { return this.relativeTestResultsDirectory; }
         }
 
+        /// <summary>
+        /// Gets or sets the data row info.
+        /// </summary>
         public int DataRowInfo
         {
             get { return this.dataRowInfo; }
             set { this.dataRowInfo = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the result type.
+        /// </summary>
         public string ResultType
         {
             get { return this.resultType; }

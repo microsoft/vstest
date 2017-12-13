@@ -7,6 +7,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System.Collections.Generic;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+    /// <summary>
+    /// Test result aggregation.
+    /// </summary>
     internal class TestResultAggregation : TestResult, ITestResultAggregation
     {
         protected List<ITestResult> innerResults = new List<ITestResult>();
@@ -20,6 +23,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             ITestElement test,
             TestOutcome outcome) : base(testName, computerName, runId, executionId, parentExecutionId, test, outcome) { }
 
+        /// <summary>
+        /// Gets the inner results.
+        /// </summary>
         public List<ITestResult> InnerResults
         {
             get { return innerResults; }

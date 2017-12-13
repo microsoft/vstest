@@ -7,15 +7,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using System.Collections.Generic;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+    /// <summary>
+    /// Test aggregation element.
+    /// </summary>
     internal abstract class TestAggregation : TestElement, ITestAggregation
     {
         protected Dictionary<Guid, TestLink> testLinks = new Dictionary<Guid, TestLink>();
 
-        public TestAggregation(
-            Guid id,
-            string name,
-            string adapter) : base(id, name, adapter) { }
+        public TestAggregation(Guid id, string name, string adapter) : base(id, name, adapter) { }
 
+        /// <summary>
+        /// Test links.
+        /// </summary>
         public Dictionary<Guid, TestLink> TestLinks
         {
             get { return testLinks; }

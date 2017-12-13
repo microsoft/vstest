@@ -8,11 +8,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+    /// <summary>
+    /// Unit test element.
+    /// </summary>
     internal class UnitTestElement : TestElement, IXmlTestStoreCustom
     {
-        private static readonly Guid TestTypeGuid = new Guid("13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B"); // move to constants
-        private static readonly TestType TestTypeInstance = new TestType(TestTypeGuid);
-
         private string codeBase;
         private TestMethod testMethod;
 
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         string IXmlTestStoreCustom.ElementName
         {
-            get { return "UnitTest"; }
+            get { return Constants.UnitTestElementName; }
         }
 
         string IXmlTestStoreCustom.NamespaceUri
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public override TestType TestType
         {
-            get { return TestTypeInstance; }
+            get { return Constants.UnitTestTypeInstance; }
         }
 
         /// <summary>

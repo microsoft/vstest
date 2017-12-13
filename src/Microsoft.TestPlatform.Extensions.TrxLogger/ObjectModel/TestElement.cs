@@ -10,6 +10,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
+    /// <summary>
+    /// Test element.
+    /// </summary>
     internal abstract class TestElement : ITestElement, IXmlTestStore
     {
         /// <summary>
@@ -20,19 +23,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected TestId id;
         protected string name;
         protected string owner;
-        protected int priority;
         protected string storage;
+        protected string adapter;
+        protected int priority;
+        protected bool isRunnable;
         protected TestExecId executionId;
         protected TestExecId parentExecutionId;
-        protected bool isRunnable;
         protected TestCategoryItemCollection testCategories;
-        protected string adapter;
         protected TestListCategoryId catId;
 
-        public TestElement(
-            Guid id,
-            string name,
-            string adapter)
+        public TestElement(Guid id, string name, string adapter)
         {
             Debug.Assert(!string.IsNullOrEmpty(name), "name is null");
             Debug.Assert(!string.IsNullOrEmpty(adapter), "adapter is null");
@@ -107,7 +107,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets or sets the execution id.
         /// </summary>
-        public TestExecId ExecutionId // remove variables for properties if not required
+        public TestExecId ExecutionId
         {
             get { return this.executionId; }
             set { this.executionId = value; }
@@ -122,6 +122,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             set { this.parentExecutionId = value; }
         }
 
+        /// <summary>
+        /// Gets the isRunnable value.
+        /// </summary>
         public bool IsRunnable
         {
             get { return this.isRunnable; }
@@ -158,13 +161,23 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             }
         }
 
+        /// <summary>
+        /// Gets the adapter name.
+        /// </summary>
         public string Adapter
         {
             get { return adapter; }
         }
 
+        /// <summary>
+        /// Gets the test type.
+        /// </summary>
         public abstract TestType TestType { get; }
 
+        /// <summary>
+        /// Override for ToString.
+        /// </summary>
+        /// <returns>String representation of test element.</returns>
         public override string ToString()
         {
             return string.Format(
