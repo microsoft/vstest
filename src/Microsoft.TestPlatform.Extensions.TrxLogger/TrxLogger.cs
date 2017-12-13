@@ -232,26 +232,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             // Save default test settings
             string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
             TestRunConfiguration testrunConfig = new TestRunConfiguration("default");
-
             testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
-
             this.testRun.RunConfiguration = testrunConfig;
         }
 
+        /// <summary>
+        /// Gets parent execution id of test result.
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns>Parent execution id.</returns>
         private Guid GetParentExecutionId(ObjectModel.TestResult testResult)
         {
-            ObjectModel.TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(TrxLoggerConstants.ParentExecutionIdPropertyIdentifier));
-            return parentExecutionIdProperty == null ? Guid.Empty : testResult.GetPropertyValue(parentExecutionIdProperty, default(Guid));
+            TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
+                property => property.Id.Equals(TrxLoggerConstants.ParentExecutionIdPropertyIdentifier));
+
+            return parentExecutionIdProperty == null ? 
+                Guid.Empty :
+                testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
         }
 
+        /// <summary>
+        /// Gets execution Id of test result. Creates new id if not present in test result properties.
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns>Execution id.</returns>
         private Guid GetExecutionId(ObjectModel.TestResult testResult)
         {
-            ObjectModel.TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(TrxLoggerConstants.ExecutionIdPropertyIdentifier));// TODO: should we pass executionid and parentExecutionId from trxlogger itself?
+            TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(
+                property => property.Id.Equals(TrxLoggerConstants.ExecutionIdPropertyIdentifier));// TODO: should we pass executionid and parentExecutionId from trxlogger itself?
+
             var executionId = Guid.Empty;
             if (executionIdProperty != null)
-            {
-                executionId = testResult.GetPropertyValue(executionIdProperty, Guid.NewGuid());
-            }
+                executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
+
             return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
         }
 
@@ -281,7 +294,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         internal void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
         {
+            // TODO: if this value is false for any adapter, then parent result will not go. So in that case trx logger will get parent execution id of results but not the result. So for this case, flatten out the results.
             System.Diagnostics.Debugger.Launch();
+            // Create test run
             if (this.testRun == null)
                 CreateTestRun();
 
