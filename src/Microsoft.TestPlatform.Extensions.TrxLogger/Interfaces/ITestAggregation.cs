@@ -8,6 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
     internal interface ITestAggregation : ITestElement
     {
-        Dictionary<Guid, TestLink> TestLinks { get; } // move to ITestElement
+        Dictionary<Guid, TestLink> TestLinks { get; }
     }
 }
