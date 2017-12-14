@@ -493,10 +493,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             if (executionId != Guid.Empty)
             {
-                this.results.TryGetValue(executionId, out testResult); // todo: handle guid empty case
+                this.results.TryGetValue(executionId, out testResult);
 
                 if (testResult == null)
-                    this.additionalResults.TryGetValue(executionId, out testResult); // change this additional results name
+                    this.additionalResults.TryGetValue(executionId, out testResult); // todo: change this additional results name
             }
 
             return testResult;
