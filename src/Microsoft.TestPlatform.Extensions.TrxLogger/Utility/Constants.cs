@@ -54,28 +54,38 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public const string TestTypePropertyIdentifier = "TestType";
 
         /// <summary>
+        /// Parent data driven result type.
+        /// </summary>
+        public const string ParentDataDrivenResultType = "DataDrivenTest";
+
+        /// <summary>
+        /// Inner data driven result type.
+        /// </summary>
+        public const string InnerDataDrivenResultType = "DataDrivenDataRow";
+
+        /// <summary>
         /// Property Id storing the TMITestId.
         /// </summary>
         public const string TmiTestIdPropertyIdentifier = "MSTestDiscoverer.TmiTestId";
 
         /// <summary>
-        /// Ordered test type
+        /// Ordered test type guid
         /// </summary>
-        public static readonly Guid OrderedTestType = new Guid("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
+        public static readonly Guid OrderedTestTypeGuid = new Guid("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");
 
         /// <summary>
-        /// Ordered test type instance
+        /// Ordered test type
         /// </summary>
-        public static readonly TestType OrderedTestTypeInstance = new TestType(OrderedTestType);
+        public static readonly TestType OrderedTestType = new TestType(OrderedTestTypeGuid);
+
+        /// <summary>
+        /// Unit test type guid
+        /// </summary>
+        public static readonly Guid UnitTestTypeGuid = new Guid("13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B");
 
         /// <summary>
         /// Unit test type
         /// </summary>
-        public static readonly Guid UnitTestType = new Guid("13CDC9D9-DDB5-4fa4-A97D-D965CCFC6D4B");
-
-        /// <summary>
-        /// Unit test type instance.
-        /// </summary>
-        public static readonly TestType UnitTestTypeInstance = new TestType(UnitTestType);
+        public static readonly TestType UnitTestType = new TestType(UnitTestTypeGuid);
     }
 }

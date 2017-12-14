@@ -15,13 +15,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected List<ITestResult> innerResults = new List<ITestResult>();
 
         public TestResultAggregation(
-            string testName,
-            string computerName,
             Guid runId,
+            Guid testId,
             Guid executionId,
             Guid parentExecutionId,
-            ITestElement test,
-            TestOutcome outcome) : base(testName, computerName, runId, executionId, parentExecutionId, test, outcome) { }
+            string resultName,
+            string computerName,
+            TestOutcome outcome,
+            TestType testType,
+            TestListCategoryId testCategoryId) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId) { }
 
         /// <summary>
         /// Gets the inner results.

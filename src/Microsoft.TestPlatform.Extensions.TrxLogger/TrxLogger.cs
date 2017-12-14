@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Text;
     using System.Xml;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
@@ -22,7 +21,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-    // TODO***: write test cases
 
     /// <summary>
     /// Logger for Generating TRX
@@ -184,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// Event args
         /// </param>
-        internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+        public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
             System.Diagnostics.Debugger.Launch();
             ValidateArg.NotNull<object>(sender, "sender");
@@ -212,78 +210,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         }
 
         /// <summary>
-        /// Creates test run.
-        /// </summary>
-        private void CreateTestRun()
-        {
-            // Don't create run if already created.
-            if (testRun != null)
-                return;
-
-            Guid runId = Guid.NewGuid();
-            this.testRun = new TestRun(runId);
-
-            // We cannot rely on the StartTime for the first test result
-            // In case of parallel, first test result is the fastest test and not the one which started first.
-            // Setting Started to DateTime.Now in Intialize will make sure we include the startup cost, which was being ignored earlier.
-            // This is in parity with the way we set this.testRun.Finished
-            this.testRun.Started = this.testRunStartTime;
-
-            // Save default test settings
-            string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
-            TestRunConfiguration testrunConfig = new TestRunConfiguration("default");
-            testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
-            this.testRun.RunConfiguration = testrunConfig;
-        }
-
-        /// <summary>
-        /// Gets parent execution id of test result.
-        /// </summary>
-        /// <param name="testResult"></param>
-        /// <returns>Parent execution id.</returns>
-        private Guid GetParentExecutionId(ObjectModel.TestResult testResult)
-        {
-            TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
-                property => property.Id.Equals(TrxLoggerConstants.ParentExecutionIdPropertyIdentifier));
-
-            return parentExecutionIdProperty == null ? 
-                Guid.Empty :
-                testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
-        }
-
-        /// <summary>
-        /// Gets execution Id of test result. Creates new id if not present in test result properties.
-        /// </summary>
-        /// <param name="testResult"></param>
-        /// <returns>Execution id.</returns>
-        private Guid GetExecutionId(ObjectModel.TestResult testResult)
-        {
-            TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(
-                property => property.Id.Equals(TrxLoggerConstants.ExecutionIdPropertyIdentifier));// TODO: should we pass executionid and parentExecutionId from trxlogger itself?
-
-            var executionId = Guid.Empty;
-            if (executionIdProperty != null)
-                executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
-
-            return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
-        }
-
-        private Guid GetTestType(ObjectModel.TestResult testResult)
-        {
-            var testType = TrxLoggerConstants.UnitTestType;
-
-            // Get test type from property. default to unit test type.
-            ObjectModel.TestProperty testTypeProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(TrxLoggerConstants.TestTypePropertyIdentifier));
-            testType = (testTypeProperty == null) ? testType : testResult.GetPropertyValue(testTypeProperty, testType);
-
-            // Except OrderedTest, all test types are updated to unit test type.
-            testType = (testType == TrxLoggerConstants.OrderedTestType) ? testType : TrxLoggerConstants.UnitTestType; // think about it as its only present in tmi adn is used only for orderedtest
-
-            return testType;
-        }
-
-
-        /// <summary>
         /// Called when a test result is received.
         /// </summary>
         /// <param name="sender">
@@ -292,10 +218,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// The eventArgs.
         /// </param>
-        internal void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
+        public void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
         {
-            // TODO: if this value is false for any adapter, then parent result will not go. So in that case trx logger will get parent execution id of results but not the result. So for this case, flatten out the results.
-            System.Diagnostics.Debugger.Launch();
             // Create test run
             if (this.testRun == null)
                 CreateTestRun();
@@ -304,120 +228,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
                 this.HandleSkippedTest(e.Result);
 
-            var executionId = GetExecutionId(e.Result); // TODO: instead of creating these in converter also, create at only one place.
-            var parentExecutionId = GetParentExecutionId(e.Result);
+            var testType = Converter.GetTestType(e.Result);
+            var executionId = Converter.GetExecutionId(e.Result);
 
-            ITestResult parentTestResult = null;
-            ITestElement parentTestElement = null;
-            if (parentExecutionId != Guid.Empty)
+            // Setting parent properties like parent result, parent test element, parent execution id.
+            var parentExecutionId = Converter.GetParentExecutionId(e.Result);
+            var parentTestResult = GetTestResult(parentExecutionId);
+            var parentTestElement = (parentTestResult != null) ? GetTestElement(parentTestResult.Id.TestId) : null;
+            if (parentTestResult == null || parentTestElement == null || parentExecutionId == Guid.Empty)
             {
-                this.results.TryGetValue(parentExecutionId, out parentTestResult); // todo: handle guid empty case
-                if (parentTestResult == null)
-                {
-                    this.additionalResults.TryGetValue(parentExecutionId, out parentTestResult);
-                }
-                // we should always get parentTestResult. If not that a problem.
-                this.testElements.TryGetValue(parentTestResult.Id.TestId.Id, out parentTestElement); // todo: handle parent test result null case.
+                parentTestResult = null;
+                parentTestElement = null;
+                parentExecutionId = Guid.Empty;
             }
 
-            var testType = GetTestType(e.Result);
-                //e.Result.TestCase.ExecutorUri.ToString().ToLower().Contains("orderedtestadapter") ? "orderedtest" : "unittest"; //TODO: all hard coded vars in consts
+            // Create trx test element from rocksteady test case
+            var testElement = GetOrCreateTestElement(executionId, parentExecutionId, testType, parentTestElement, e.Result.TestCase);
 
-            // Create MSTest test element from rocksteady test case
-            ITestElement testElement = null;
-            if (parentExecutionId == Guid.Empty)
-            {
-                Guid testId = Converter.GetTestId(e.Result.TestCase);
-                if (!this.testElements.ContainsKey(testId))
-                {
-                    var name = e.Result.TestCase.DisplayName;
-                    testElement = Converter.ToTestElement(testType, name, executionId, parentExecutionId, e.Result.TestCase); // TODO: if resulttype is not used anywhere else, then move creation of result type also in converter.
-                    testElements.Add(testId, testElement);
-                }
-                else
-                {
-                    this.testElements.TryGetValue(testId, out testElement);
-                }
-            }
-            else if(parentTestElement != null && parentTestElement is OrderedTestElement)
-            {
-                Guid testId = Converter.GetTestId(e.Result.TestCase); // TODO: if we are adding test id here, then dont create test id in totestelement. its a duplicacy.
-                if (!this.testElements.ContainsKey(testId))
-                {
-                    var name = e.Result.TestCase.DisplayName;
-                    testElement = Converter.ToTestElement(testType, name, executionId, parentExecutionId, e.Result.TestCase); // TODO: if resulttype is not used anywhere else, then move creation of result type also in converter.
-                    testElements.Add(testId, testElement);
-                }
-                else
-                {
-                    this.testElements.TryGetValue(testId, out testElement);
-                }
-                if (!(parentTestElement as OrderedTestElement).TestLinks.ContainsKey(testElement.Id.Id))
-                {
-                    (parentTestElement as OrderedTestElement).TestLinks.Add(testElement.Id.Id, new TestLink(testElement.Id.Id, testElement.Name, testElement.Storage));
-                }
-                //create/get test element if not exists. and link this test element to parent test element
-            }
-            else if (parentTestElement != null)
-            {
-                testElement = parentTestElement;
-                //getParent test element
-            }
-            else
-            {
-                testElement = null;
-                // this case should never come. If it comes, throw error.
-            }
+            // Update test links
+            UpdateTestLinks(testElement, parentTestElement);
 
-            // Convert the rocksteady result to MSTest result
-            ITestResult testResult;
-            TrxLoggerObjectModel.TestOutcome testOutcome = Converter.ToOutcome(e.Result.Outcome);
-            if (testElement is OrderedTestElement)
-            {
-                // it should be orderedtestelement
-                testResult = Converter.ToTestResult(e.Result, executionId, parentExecutionId, testElement, testOutcome, this.testRun, this.testResultsDirPath); // TODO: if resulttype is not used anywhere else, then move creation of result type also in converter.
-            }
-            else
-            {
-                // it should be unitTestElement
-                testResult = Converter.ToTestResult(e.Result, executionId, parentExecutionId, testElement, testOutcome, this.testRun, this.testResultsDirPath); // TODO: if resulttype is not used anywhere else, then move creation of result type also in converter.
-            }
+            // Convert the rocksteady result to trx test result
+            var testResult = CreateTestResult(executionId, parentExecutionId, testType, testElement, parentTestElement, parentTestResult, e.Result);
 
-            if (parentExecutionId == Guid.Empty)
-            {
-                this.results.Add(executionId, testResult);
-
-                TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id);
-                te.ExecutionId = executionId;
-                this.entries.Add(executionId, te);
-            }
-            else if (parentTestElement is OrderedTestElement)
-            {
-                (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
-                this.additionalResults.Add(executionId, testResult);
-
-                TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id);
-                te.ExecutionId = executionId;
-                te.ParentExecutionId = parentExecutionId;
-
-                this.entries.TryGetValue(parentExecutionId, out var parentTestEntry); // todo: handle null case.
-                if (parentTestEntry == null)
-                {
-                    this.additionalTestEntries.TryGetValue(parentExecutionId, out parentTestEntry);
-                }
-                parentTestEntry.TestEntries.Add(te);
-                this.additionalTestEntries.Add(executionId, te);
-            }
-            else
-            {
-                testResult.DataRowInfo = (parentTestResult as TestResultAggregation).InnerResults.Count;
-                testResult.ResultType = "DataDrivenDataRow"; // todo: hard coding
-                parentTestResult.ResultType = "DataDrivenTest"; // todo: hard coding
-                (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
-            }
-            // todo: is there any use of inner results? If not remove it.
-            // todo: in case parent test result or parent test element is not found, what should we do? this case should never happen. So we should error out.
-
+            // Update test entries
+            UpdateTestEntries(executionId, parentExecutionId, testElement, parentTestElement);
 
             // Set various counts (passtests, failed tests, total tests)
             this.totalTests++;
@@ -441,7 +276,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// Test run complete events arguments.
         /// </param>
-        internal void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+        public void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             System.Diagnostics.Debugger.Launch();
             if (this.testRun != null)
@@ -620,6 +455,182 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
             this.trxFilePath = FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
+        }
+
+        /// <summary>
+        /// Creates test run.
+        /// </summary>
+        private void CreateTestRun()
+        {
+            // Skip run creation if already exists.
+            if (testRun != null)
+                return;
+
+            Guid runId = Guid.NewGuid();
+            this.testRun = new TestRun(runId);
+
+            // We cannot rely on the StartTime for the first test result
+            // In case of parallel, first test result is the fastest test and not the one which started first.
+            // Setting Started to DateTime.Now in Intialize will make sure we include the startup cost, which was being ignored earlier.
+            // This is in parity with the way we set this.testRun.Finished
+            this.testRun.Started = this.testRunStartTime;
+
+            // Save default test settings
+            string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
+            TestRunConfiguration testrunConfig = new TestRunConfiguration("default");
+            testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
+            this.testRun.RunConfiguration = testrunConfig;
+        }
+
+        /// <summary>
+        /// Gets test result from stored test results.
+        /// </summary>
+        /// <param name="executionId"></param>
+        /// <returns>Test result</returns>
+        private ITestResult GetTestResult(Guid executionId)
+        {
+            ITestResult testResult = null;
+
+            if (executionId != Guid.Empty)
+            {
+                this.results.TryGetValue(executionId, out testResult); // todo: handle guid empty case
+
+                if (testResult == null)
+                    this.additionalResults.TryGetValue(executionId, out testResult); // change this additional results name
+            }
+
+            return testResult;
+        }
+
+        /// <summary>
+        /// Gets test element from stored test elements.
+        /// </summary>
+        /// <param name="testId"></param>
+        /// <returns></returns>
+        private ITestElement GetTestElement(Guid testId)
+        {
+            this.testElements.TryGetValue(testId, out var testElement);
+            return testElement;
+        }
+
+        /// <summary>
+        /// Gets or creates test element.
+        /// </summary>
+        /// <param name="executionId"></param>
+        /// <param name="parentExecutionId"></param>
+        /// <param name="testType"></param>
+        /// <param name="parentTestElement"></param>
+        /// <param name="rockSteadyTestCase"></param>
+        /// <returns>Trx test element</returns>
+        private ITestElement GetOrCreateTestElement(Guid executionId, Guid parentExecutionId, TestType testType, ITestElement parentTestElement, ObjectModel.TestCase rockSteadyTestCase)
+        {
+            ITestElement testElement = parentTestElement;
+            if (parentTestElement == null || parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
+            {
+                Guid testId = Converter.GetTestId(rockSteadyTestCase);
+                testElement = GetTestElement(testId);
+
+                if (testElement == null)
+                {
+                    testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testType, rockSteadyTestCase);
+                    testElements.Add(testId, testElement);
+                }
+            }
+
+            return testElement;
+        }
+
+        /// <summary>
+        /// Update test links
+        /// </summary>
+        /// <param name="testElement"></param>
+        /// <param name="parentTestElement"></param>
+        private void UpdateTestLinks(ITestElement testElement, ITestElement parentTestElement)
+        {
+            if (parentTestElement != null &&
+                parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType) &&
+                !(parentTestElement as OrderedTestElement).TestLinks.ContainsKey(testElement.Id.Id))
+            {
+                (parentTestElement as OrderedTestElement).TestLinks.Add(testElement.Id.Id, new TestLink(testElement.Id.Id, testElement.Name, testElement.Storage));
+            }
+        }
+
+        /// <summary>
+        /// Creates test result
+        /// </summary>
+        /// <param name="executionId"></param>
+        /// <param name="parentExecutionId"></param>
+        /// <param name="testType"></param>
+        /// <param name="testElement"></param>
+        /// <param name="parentTestElement"></param>
+        /// <param name="parentTestResult"></param>
+        /// <param name="rocksteadyTestResult"></param>
+        /// <returns>Trx test result</returns>
+        private ITestResult CreateTestResult(Guid executionId, Guid parentExecutionId, TestType testType, 
+            ITestElement testElement, ITestElement parentTestElement, ITestResult parentTestResult, ObjectModel.TestResult rocksteadyTestResult)
+        {
+            // Create test result
+            TrxLoggerObjectModel.TestOutcome testOutcome = Converter.ToOutcome(rocksteadyTestResult.Outcome);
+            var testResult = Converter.ToTestResult(testElement.Id.Id, executionId, parentExecutionId, testElement.Name,
+                this.testResultsDirPath, testType, testElement.CategoryId, testOutcome, this.testRun, rocksteadyTestResult);
+
+            // Normal result scenario
+            if (parentTestResult == null)
+            {
+                this.results.Add(executionId, testResult);
+                return testResult;
+            }
+
+            // Ordered test inner result scenario
+            if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
+            {
+                (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
+                this.additionalResults.Add(executionId, testResult);
+                return testResult;
+            }
+            
+            // Data driven inner result scenario
+            if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.UnitTestType))
+            {
+                (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
+                testResult.DataRowInfo = (parentTestResult as TestResultAggregation).InnerResults.Count;
+                testResult.ResultType = TrxLoggerConstants.InnerDataDrivenResultType;
+                parentTestResult.ResultType = TrxLoggerConstants.ParentDataDrivenResultType;
+                return testResult;
+            }
+
+            return testResult;
+        }
+
+        /// <summary>
+        /// Update test entries
+        /// </summary>
+        /// <param name="executionId"></param>
+        /// <param name="parentExecutionId"></param>
+        /// <param name="testElement"></param>
+        /// <param name="parentTestElement"></param>
+        private void UpdateTestEntries(Guid executionId, Guid parentExecutionId, ITestElement testElement, ITestElement parentTestElement)
+        {
+            TestEntry te = new TestEntry(testElement.Id, TestListCategory.UncategorizedResults.Id);
+            te.ExecutionId = executionId;
+
+            if (parentTestElement == null)
+            {
+                this.entries.Add(executionId, te);
+            }
+            else if (parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
+            {
+                te.ParentExecutionId = parentExecutionId;
+
+                this.entries.TryGetValue(parentExecutionId, out var parentTestEntry);
+                if (parentTestEntry == null)
+                    this.additionalTestEntries.TryGetValue(parentExecutionId, out parentTestEntry);
+
+                if (parentTestEntry != null)
+                    parentTestEntry.TestEntries.Add(te);
+
+                this.additionalTestEntries.Add(executionId, te);
+            }
         }
 
         #endregion

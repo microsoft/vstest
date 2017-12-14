@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         private Guid runId;
         private Guid executionId;
         private Guid parentExecutionId;
-        private TestId testId;
+        private Guid testId;
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="testId">
         /// The test id.
         /// </param>
-        public TestResultId(Guid runId, Guid executionId, Guid parentExecutionId, TestId testId)
+        public TestResultId(Guid runId, Guid executionId, Guid parentExecutionId, Guid testId)
         {
             this.runId = runId;
             this.executionId = executionId;
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Gets the test id.
         /// </summary>
-        public TestId TestId
+        public Guid TestId
         {
             get { return this.testId; }
         }
@@ -214,7 +214,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         #region Fields
 
         private TestResultId id;
-        private string testName;
+        private string resultName;
         private string computerInfo;
         private string stdOut;
         private string stdErr;
@@ -265,29 +265,30 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <param name="outcome">
         /// The outcome.
         /// </param>
-        public TestResult(string testName,
-            string computerName,
-            Guid runId, Guid executionId,
+        public TestResult(
+            Guid runId,
+            Guid testId,
+            Guid executionId,
             Guid parentExecutionId,
-            ITestElement test,
-            TestOutcome outcome)
+            string resultName,
+            string computerName,
+            TestOutcome outcome,
+            TestType testType,
+            TestListCategoryId testCategoryId)
         {
-            // check if we can remove dependency on test element.
             Debug.Assert(computerName != null, "computername is null");
-            Debug.Assert(test != null, "test is null");
-            Debug.Assert(!Guid.Empty.Equals(test.ExecutionId.Id), "ExecutionId is empty");
-            Debug.Assert(!Guid.Empty.Equals(test.Id.Id), "Id is empty");
+            Debug.Assert(!Guid.Empty.Equals(executionId), "ExecutionId is empty");
+            Debug.Assert(!Guid.Empty.Equals(testId), "TestId is empty");
 
             this.Initialize();
 
-            this.id = new TestResultId(runId, executionId, parentExecutionId, test.Id);
-            this.testName = testName;
-            this.testType = test.TestType;
+            this.id = new TestResultId(runId, executionId, parentExecutionId, testId);
+            this.resultName = resultName;
+            this.testType = testType;
             this.computerInfo = computerName;
-
             this.outcome = outcome;
-            this.categoryId = test.CategoryId;
-            this.relativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(test.ExecutionId.Id);
+            this.categoryId = testCategoryId;
+            this.relativeTestResultsDirectory = TestRunDirectories.GetRelativeTestResultsDirectory(executionId);
         }
 
         #endregion
@@ -577,7 +578,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             XmlPersistence helper = new XmlPersistence();
 
             helper.SaveObject(this.id, element, ".", parameters);
-            helper.SaveSimpleField(element, "@testName", this.testName, string.Empty);
+            helper.SaveSimpleField(element, "@testName", this.resultName, string.Empty);
             helper.SaveSimpleField(element, "@computerName", this.computerInfo, string.Empty);
             helper.SaveSimpleField(element, "@duration", this.duration, default(TimeSpan));
             helper.SaveSimpleField(element, "@startTime", this.startTime, default(DateTime));

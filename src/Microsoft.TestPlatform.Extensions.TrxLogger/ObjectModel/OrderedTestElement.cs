@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public override TestType TestType
         {
-            get { return Constants.OrderedTestTypeInstance; }
+            get { return Constants.OrderedTestType; }
         }
     }
 }

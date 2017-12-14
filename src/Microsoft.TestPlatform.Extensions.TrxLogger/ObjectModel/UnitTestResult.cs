@@ -11,12 +11,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     internal class UnitTestResult: TestResultAggregation
     {
         public UnitTestResult(
-            string testName,
-            string computerName, 
-            Guid runId, 
+            Guid runId,
+            Guid testId,
             Guid executionId,
             Guid parentExecutionId,
-            ITestElement test, 
-            TestOutcome outcome) : base(testName, computerName, runId, executionId, parentExecutionId, test, outcome) { }
+            string resultName,
+            string computerName,
+            TestOutcome outcome,
+            TestType testType,
+            TestListCategoryId testCategoryId) : base(runId, testId, executionId, parentExecutionId, resultName, computerName, outcome, testType, testCategoryId) { }
     }
 }

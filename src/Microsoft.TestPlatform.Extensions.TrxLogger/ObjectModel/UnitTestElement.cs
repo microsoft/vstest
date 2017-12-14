@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public override TestType TestType
         {
-            get { return Constants.UnitTestTypeInstance; }
+            get { return Constants.UnitTestType; }
         }
 
         /// <summary>
