@@ -38,10 +38,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private TrxLoggerObjectModel.TestRun testRun;
         private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
-        private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> additionalResults;
+        private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
         private Dictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
         private Dictionary<Guid, TestEntry> entries;
-        private Dictionary<Guid, TestEntry> additionalTestEntries;
+        private Dictionary<Guid, TestEntry> innerTestEntries;
 
         /// <summary>
         /// Specifies the run level "out" messages
@@ -392,10 +392,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private void InitializeInternal()
         {
             this.results = new Dictionary<Guid, TrxLoggerObjectModel.ITestResult>();
-            this.additionalResults = new Dictionary<Guid, TrxLoggerObjectModel.ITestResult>();
+            this.innerResults = new Dictionary<Guid, TrxLoggerObjectModel.ITestResult>();
             this.testElements = new Dictionary<Guid, ITestElement>();
             this.entries = new Dictionary<Guid,TestEntry>();
-            this.additionalTestEntries = new Dictionary<Guid, TestEntry>();
+            this.innerTestEntries = new Dictionary<Guid, TestEntry>();
             this.runLevelErrorsAndWarnings = new List<RunInfo>();
             this.testRun = null;
             this.totalTests = 0;
@@ -496,7 +496,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 this.results.TryGetValue(executionId, out testResult);
 
                 if (testResult == null)
-                    this.additionalResults.TryGetValue(executionId, out testResult); // todo: change this additional results name
+                    this.innerResults.TryGetValue(executionId, out testResult);
             }
 
             return testResult;
@@ -585,7 +585,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
             {
                 (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
-                this.additionalResults.Add(executionId, testResult);
+                this.innerResults.Add(executionId, testResult);
                 return testResult;
             }
             
@@ -622,15 +622,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             {
                 te.ParentExecutionId = parentExecutionId;
 
-                this.entries.TryGetValue(parentExecutionId, out var parentTestEntry);
-                if (parentTestEntry == null)
-                    this.additionalTestEntries.TryGetValue(parentExecutionId, out parentTestEntry);
-
+                var parentTestEntry = GetTestEntry(parentExecutionId);
                 if (parentTestEntry != null)
                     parentTestEntry.TestEntries.Add(te);
 
-                this.additionalTestEntries.Add(executionId, te);
+                this.innerTestEntries.Add(executionId, te);
             }
+        }
+
+        /// <summary>
+        /// Gets test entry from stored test entries.
+        /// </summary>
+        /// <param name="executionId"></param>
+        /// <returns>Test entry</returns>
+        private TestEntry GetTestEntry(Guid executionId)
+        {
+            TestEntry testEntry = null;
+
+            if (executionId != Guid.Empty)
+            {
+                this.entries.TryGetValue(executionId, out testEntry);
+
+                if (testEntry == null)
+                    this.innerTestEntries.TryGetValue(executionId, out testEntry);
+            }
+
+            return testEntry;
         }
 
         #endregion
