@@ -312,7 +312,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("InvalidSettingsXmlElement", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid URI in data collector settings &apos;{0}&apos;..
+        /// </summary>
+        internal static string InvalidDataCollectorUriInSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidSettingsXmlElement", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid data collector settings. Expected attribute &apos;{0}&apos; is missing.  A typical data collector setting would look like &lt;DataCollector uri=&quot;dataCollector://Samples/SampleCollector/1.0&quot; assemblyQualifiedName=&quot;Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111&quot; friendlyName=&quot;sampleCollector&quot;&gt;..
         /// </summary>
