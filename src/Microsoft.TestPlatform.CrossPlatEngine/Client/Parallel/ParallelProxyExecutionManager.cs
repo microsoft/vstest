@@ -197,21 +197,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 return true;
             }
 
-            // In case of DataCollection we only start dc.exe on initialize, & close once the TestRun is complete,
-            // So instead of resuing ProxyExecutionManager, we will close it here, & create new PEMWDC
-            // In Case of Abort, clean old one and create new proxyExecutionManager in place of old one.
-            if (!this.SharedHosts || testRunCompleteArgs.IsAborted || (proxyExecutionManager is ProxyExecutionManagerWithDataCollection))
-            {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", this.SharedHosts, testRunCompleteArgs.IsAborted);
-                }
 
-                this.RemoveManager(proxyExecutionManager);
-                proxyExecutionManager = CreateNewConcurrentManager();
-                var parallelEventsHandler = this.GetEventsHandler(proxyExecutionManager);
-                this.AddManager(proxyExecutionManager, parallelEventsHandler);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("ParallelProxyExecutionManager: HandlePartialRunComplete: Replace execution manager. Shared: {0}, Aborted: {1}.", this.SharedHosts, testRunCompleteArgs.IsAborted);
             }
+
+            this.RemoveManager(proxyExecutionManager);
+            proxyExecutionManager = CreateNewConcurrentManager();
+            var parallelEventsHandler = this.GetEventsHandler(proxyExecutionManager);
+            this.AddManager(proxyExecutionManager, parallelEventsHandler);
 
             // If cancel is triggered for any one run or abort is requested by test platform, there is no reason to fetch next source
             // and queue another test run

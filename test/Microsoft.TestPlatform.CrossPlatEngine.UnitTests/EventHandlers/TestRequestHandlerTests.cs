@@ -1,120 +1,550 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests
+using System;
+using System.Net.Sockets;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    using System.Net;
+    using System.IO;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     [TestClass]
     public class TestRequestHandlerTests
     {
-        private ITestRequestHandler testRequestHandler;
-        private Mock<ICommunicationManager> mockCommunicationManager;
-        private Mock<IDataSerializer> mockDataSerializer;
-        private ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
-        private TestHostConnectionInfo connectionInfo;
+        private readonly Mock<ICommunicationEndPoint> mockCommunicationClient;
+        private readonly Mock<ICommunicationChannel> mockChannel;
+        private readonly Mock<ITestHostManagerFactory> mockTestHostManagerFactory;
+        private readonly Mock<IDiscoveryManager> mockDiscoveryManager;
+        private readonly Mock<IExecutionManager> mockExecutionManager;
 
-        [TestInitialize]
-        public void TestInit()
+        private readonly JsonDataSerializer dataSerializer;
+        private readonly ITestRequestHandler requestHandler;
+        private readonly TestHostConnectionInfo testHostConnectionInfo;
+        private readonly JobQueue<Action> jobQueue;
+
+        public TestRequestHandlerTests()
         {
-            this.connectionInfo = new TestHostConnectionInfo
+            this.mockCommunicationClient = new Mock<ICommunicationEndPoint>();
+            this.mockChannel = new Mock<ICommunicationChannel>();
+            this.dataSerializer = JsonDataSerializer.Instance;
+            this.testHostConnectionInfo = new TestHostConnectionInfo
             {
-                                          Endpoint = IPAddress.Loopback + ":0",
-                                          Role = ConnectionRole.Client,
-                Transport = Transport.Sockets
-                                      };
-            this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRequestHandler = new TestRequestHandler(this.mockCommunicationManager.Object, this.connectionInfo, this.mockDataSerializer.Object);
+                Endpoint = IPAddress.Loopback + ":123",
+                Role = ConnectionRole.Host
+            };
+
+            this.jobQueue = new JobQueue<Action>(
+                action => { action(); },
+                "TestHostOperationQueue",
+                500,
+                25000000,
+                true,
+                message => EqtTrace.Error(message));
+
+            // Setup mock discovery and execution managers
+            this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
+            this.mockDiscoveryManager = new Mock<IDiscoveryManager>();
+            this.mockExecutionManager = new Mock<IExecutionManager>();
+            this.mockTestHostManagerFactory.Setup(mf => mf.GetDiscoveryManager()).Returns(this.mockDiscoveryManager.Object);
+            this.mockTestHostManagerFactory.Setup(mf => mf.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
+
+            this.requestHandler = new TestableTestRequestHandler(
+                this.testHostConnectionInfo,
+                this.mockCommunicationClient.Object,
+                JsonDataSerializer.Instance,
+                jobQueue);
         }
 
         [TestMethod]
-        public void InitializeCommunicationShouldActAsClientIfTestHostIsClient()
+        public void InitializeCommunicationShouldConnectToServerAsynchronously()
         {
-            this.mockCommunicationManager.Setup(mc => mc.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, 0)));
+            this.requestHandler.InitializeCommunication();
 
-            this.testRequestHandler.InitializeCommunication();
-
-            this.mockCommunicationManager.Verify(mc => mc.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
+            this.mockCommunicationClient.Verify(c => c.Start(this.testHostConnectionInfo.Endpoint), Times.Once);
         }
 
         [TestMethod]
-        public void InitializeCommunicationShouldHostServerAndAcceptClientIfTestHostIsServer()
+        public void InitializeCommunicationShouldThrowIfServerIsNotAccessible()
         {
-            this.mockCommunicationManager.Setup(mc => mc.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, 123));
+            var connectionInfo = new TestHostConnectionInfo
+            {
+                Endpoint = IPAddress.Loopback + ":123",
+                Role = ConnectionRole.Host
+            };
+            var socketClient = new SocketClient();
+            socketClient.Connected += (sender, connectedEventArgs) =>
+            {
+                Assert.IsFalse(connectedEventArgs.Connected);
+                Assert.AreEqual(typeof(SocketException), connectedEventArgs.Fault.InnerException.GetType());
+            };
+            var rh = new TestableTestRequestHandler(connectionInfo, socketClient, this.dataSerializer, this.jobQueue);
 
-            // These settings are that received by(testhost)
-            this.connectionInfo = new TestHostConnectionInfo
-                                      {
-                                          Endpoint = IPAddress.Loopback + ":0",
-                                          Role = ConnectionRole.Host,
-                                          Transport = Transport.Sockets
-                                      };
-            this.testRequestHandler = new TestRequestHandler(this.mockCommunicationManager.Object, this.connectionInfo, this.mockDataSerializer.Object);
-
-            this.testRequestHandler.InitializeCommunication();
-
-            this.mockCommunicationManager.Verify(mc => mc.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
-            this.mockCommunicationManager.Verify(mc => mc.AcceptClientAsync(), Times.Once);
+            rh.InitializeCommunication();
+            this.requestHandler.WaitForRequestSenderConnection(1000);
         }
 
         [TestMethod]
-        public void WaitForRequestSenderConnectionShouldCallWaitForServerConnection()
+        public void WaitForRequestSenderConnectionShouldWaitUntilConnectionIsSetup()
         {
-            this.testRequestHandler.WaitForRequestSenderConnection(123);
+            this.SetupChannel();
 
-            this.mockCommunicationManager.Verify(mc => mc.WaitForServerConnection(123), Times.Once);
+            Assert.IsTrue(this.requestHandler.WaitForRequestSenderConnection(1000));
         }
 
         [TestMethod]
-        public void WaitForRequestHandlerConnectionShouldCallWaitForClientConnectionIfTestRunnerIsServer()
+        public void WaitForRequestSenderConnectionShouldReturnFalseIfConnectionSetupTimesout()
         {
-            // These settings are that recieved by Test runtime(testhost)
-            this.connectionInfo = new TestHostConnectionInfo
-                                      {
-                                          Endpoint = IPAddress.Loopback + ":0",
-                                          Role = ConnectionRole.Host,
-                                          Transport = Transport.Sockets
-                                      };
+            this.requestHandler.InitializeCommunication();
 
-            this.testRequestHandler = new TestRequestHandler(this.mockCommunicationManager.Object, this.connectionInfo, this.mockDataSerializer.Object);
-
-            this.testRequestHandler.WaitForRequestSenderConnection(123);
-
-            this.mockCommunicationManager.Verify(mc => mc.WaitForClientConnection(123), Times.Once);
+            Assert.IsFalse(this.requestHandler.WaitForRequestSenderConnection(1));
         }
 
         [TestMethod]
-        public void CloseShouldCallStopClientOnCommunicationManager()
+        public void ProcessRequestsShouldProcessMessagesUntilSessionCompleted()
         {
-            this.testRequestHandler.Close();
+            this.SetupChannel();
 
-            this.mockCommunicationManager.Verify(mc => mc.StopClient(), Times.Once);
+            var task = this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendSessionEnd();
+            Assert.IsTrue(task.Wait(5));
+        }
+
+        #region Version Check Protocol
+
+        [TestMethod]
+        public void ProcessRequestsVersionCheckShouldAckMinimumOfGivenAndHighestSupportedVersion()
+        {
+            var message = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
+            this.SetupChannel();
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+
+            this.VerifyResponseMessageEquals(this.Serialize(message));
+            this.SendSessionEnd();
         }
 
         [TestMethod]
-        public void CloseShouldCallStopServerOnCommunicationManagerIfTestRunnerIsServer()
+        public void ProcessRequestsVersionCheckShouldLogErrorIfDiagnosticsEnableFails()
         {
-            // These settings are that recieved by Test runtime(testhost)
-            this.connectionInfo = new TestHostConnectionInfo
-                                      {
-                                          Endpoint = IPAddress.Loopback + ":0",
-                                          Role = ConnectionRole.Host,
-                                          Transport = Transport.Sockets
-                                      };
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                // This test is no-op if diagnostics session is enabled
+                return;
+            }
+            EqtTrace.ErrorOnInitialization = "non-existent-error";
+            var message = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
+            this.SetupChannel();
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
-            this.testRequestHandler = new TestRequestHandler(this.mockCommunicationManager.Object, this.connectionInfo, this.mockDataSerializer.Object);
-            this.testRequestHandler.Close();
+            this.SendMessageOnChannel(message);
 
-            this.mockCommunicationManager.Verify(mc => mc.StopServer(), Times.Once);
+            this.VerifyResponseMessageContains(EqtTrace.ErrorOnInitialization);
+            this.SendSessionEnd();
+        }
+
+        #endregion
+
+        #region Discovery Protocol
+
+        [TestMethod]
+        public void ProcessRequestsDiscoveryInitializeShouldSetExtensionPaths()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.DiscoveryInitialize, new[] { "testadapter.dll" });
+            this.SetupChannel();
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            this.mockDiscoveryManager.Verify(d => d.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsDiscoveryStartShouldStartDiscoveryWithGivenCriteria()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.StartDiscovery, new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty));
+            this.SetupChannel();
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            this.mockDiscoveryManager.Verify(d => d.DiscoverTests(It.Is<DiscoveryCriteria>(dc => dc.Sources.Contains("test.dll")), It.IsAny<ITestDiscoveryEventsHandler2>()));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void DiscoveryCompleteShouldSendDiscoveryCompletePayloadOnChannel()
+        {
+            var discoveryComplete = new DiscoveryCompletePayload { TotalTests = 1, LastDiscoveredTests = Enumerable.Empty<TestCase>(), IsAborted = false };
+            var message = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, discoveryComplete);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.requestHandler.DiscoveryComplete(new DiscoveryCompleteEventArgs(discoveryComplete.TotalTests, discoveryComplete.IsAborted), discoveryComplete.LastDiscoveredTests);
+
+            this.VerifyResponseMessageEquals(message);
+            this.SendSessionEnd();
+        }
+
+        #endregion
+
+        #region Execution Protocol
+
+        [TestMethod]
+        public void ProcessRequestsExecutionInitializeShouldSetExtensionPaths()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.ExecutionInitialize, new[] { "testadapter.dll" });
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            this.mockExecutionManager.Verify(e => e.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsExecutionStartShouldStartExecutionWithGivenSources()
+        {
+            var asm = new Dictionary<string, IEnumerable<string>>();
+            asm["mstestv2"] = new[] {"test1.dll", "test2.dll"};
+            var testRunCriteriaWithSources = new TestRunCriteriaWithSources(asm, "runsettings", null, null);
+            var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithSources, testRunCriteriaWithSources);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            mockExecutionManager.Verify(e =>
+                e.StartTestRun(
+                    It.Is<Dictionary<string, IEnumerable<string>>>(d => d.ContainsKey("mstestv2")), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                    It.IsAny<ITestRunEventsHandler>()));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsExecutionStartShouldStartExecutionWithGivenTests()
+        {
+            var t1 = new TestCase("N.C.M1", new Uri("executor://mstest/v2"), "test1.dll");
+            var t2 = new TestCase("N.C.M2", new Uri("executor://mstest/v2"), "test1.dll");
+            var testCases = new [] { t1, t2 };
+            var testRunCriteriaWithTests = new TestRunCriteriaWithTests(testCases, "runsettings", null, null);
+            var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithTests, testRunCriteriaWithTests);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            mockExecutionManager.Verify(e =>
+                e.StartTestRun(
+                    It.Is<IEnumerable<TestCase>>(tcs =>
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M1")) &&
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M2"))), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                    It.IsAny<ITestRunEventsHandler>()));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsExecutionCancelShouldCancelTestRun()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.CancelTestRun, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            mockExecutionManager.Verify(e => e.Cancel());
+            this.SendSessionEnd();
+        }
+
+        // ProcessRequestsExecutionCancelShouldStopRequestProcessing
+
+        [TestMethod]
+        public void ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsExecutionAbortShouldStopTestRun()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.AbortTestRun, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            mockExecutionManager.Verify(e => e.Abort());
+            this.SendSessionEnd();
+        }
+
+        // ProcessRequestsExecutionAbortShouldStopRequestProcessing
+
+        [TestMethod]
+        public void SendExecutionCompleteShouldSendTestRunCompletePayloadOnChannel()
+        {
+            var t1 = new TestCase("N.C.M1", new Uri("executor://mstest/v2"), "test1.dll");
+            var t2 = new TestCase("N.C.M2", new Uri("executor://mstest/v2"), "test1.dll");
+            var testCases = new[] { t1, t2 };
+            var testRunCriteriaWithTests = new TestRunCriteriaWithTests(testCases, "runsettings", null, null);
+            var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithTests, testRunCriteriaWithTests);
+            this.mockExecutionManager.Setup(em => em.StartTestRun(It.IsAny<IEnumerable<TestCase>>(), It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                It.IsAny<ITestRunEventsHandler>())).Callback(() =>
+            {
+                this.requestHandler.SendExecutionComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>());
+            });
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.ExecutionComplete))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(msg);
+                        Assert.IsNotNull(payload);
+                    });
+            this.SendMessageOnChannel(message);
+            this.jobQueue.Flush();
+
+            mockExecutionManager.Verify(e =>
+                e.StartTestRun(
+                    It.Is<IEnumerable<TestCase>>(tcs =>
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M1")) &&
+                        tcs.Any(t => t.FullyQualifiedName.Equals("N.C.M2"))), It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<TestExecutionContext>(), It.IsAny<ITestCaseEventsHandler>(),
+                    It.IsAny<ITestRunEventsHandler>()));
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void LaunchProcessWithDebuggerAttachedShouldSendProcessInformationOnChannel()
+        {
+            var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, "123");
+            this.SetupChannel();
+
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.LaunchAdapterProcessWithDebuggerAttached))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(msg);
+                        Assert.IsNotNull(payload);
+                        this.SendMessageOnChannel(message);
+                        this.SendSessionEnd();
+                    });
+
+            var task = Task.Run(() => this.requestHandler.LaunchProcessWithDebuggerAttached(new TestProcessStartInfo()));
+        }
+
+        [TestMethod]
+        public void LaunchProcessWithDebuggerAttachedShouldWaitForProcessIdFromRunner()
+        {
+            var message = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, "123");
+            this.SetupChannel();
+
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.LaunchAdapterProcessWithDebuggerAttached))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(msg);
+                        Assert.IsNotNull(payload);
+                        this.SendMessageOnChannel(message);
+                        this.SendSessionEnd();
+                    });
+
+            var task = Task.Run(() => this.requestHandler.LaunchProcessWithDebuggerAttached(new TestProcessStartInfo()));
+
+            Assert.AreEqual(123, task.Result);
+        }
+        #endregion
+
+        #region Logging Protocol
+        [TestMethod]
+        public void SendLogShouldSendTestMessageWithLevelOnChannel()
+        {
+            var logMsg = "Testing log message on channel";
+            this.SetupChannel();
+
+            this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.TestMessage))))
+                .Callback<string>(
+                    (d) =>
+                    {
+                        var msg = this.dataSerializer.DeserializeMessage(d);
+                        var payload = this.dataSerializer.DeserializePayload<TestMessagePayload>(msg);
+                        Assert.IsNotNull(payload);
+                        Assert.AreEqual(payload.Message, logMsg);
+                    });
+
+            this.requestHandler.SendLog(TestMessageLevel.Informational, "Testing log message on channel");
+
+            this.SendSessionEnd();
+        }
+        #endregion
+
+        [TestMethod]
+        public void ProcessRequestsEndSessionShouldCloseRequestHandler()
+        {
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendSessionEnd();
+
+            this.mockCommunicationClient.Verify(mc=>mc.Stop(), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessRequestsAbortSessionShouldBeNoOp()
+        {
+            var message = dataSerializer.SerializePayload(MessageType.SessionAbort, string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            // Session abort should not close the client
+            this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Never);
+        }
+
+        [TestMethod]
+        public void ProcessRequestsInvalidMessageTypeShouldNotThrow()
+        {
+            var message = dataSerializer.SerializePayload("DummyMessage", string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            this.SendSessionEnd();
+        }
+
+        [TestMethod]
+        public void ProcessRequestsInvalidMessageTypeShouldProcessFutureMessages()
+        {
+            var message = dataSerializer.SerializePayload("DummyMessage", string.Empty);
+            this.SetupChannel();
+
+            this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
+            this.SendMessageOnChannel(message);
+
+            // Should process this message, after the invalid message
+            this.SendSessionEnd();
+            this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Once);
+        }
+
+        [TestMethod]
+        public void DisposeShouldStopCommunicationChannel()
+        {
+            var testRequestHandler = this.requestHandler as TestRequestHandler;
+            Assert.IsNotNull(testRequestHandler);
+
+            testRequestHandler.Dispose();
+
+            this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Once);
+        }
+
+        private void SetupChannel()
+        {
+            this.requestHandler.InitializeCommunication();
+            this.mockCommunicationClient.Raise(e => e.Connected += null, new ConnectedEventArgs(this.mockChannel.Object));
+        }
+
+        private void SendMessageOnChannel(Message message)
+        {
+            // Setup message to be returned on deserialization of data
+            var data = this.Serialize(message);
+            this.SendMessageOnChannel(data);
+        }
+
+        private void SendMessageOnChannel(string data)
+        {
+            this.mockChannel.Raise(c => c.MessageReceived += null, new MessageReceivedEventArgs { Data = data });
+        }
+
+        private void SendSessionEnd()
+        {
+            this.SendMessageOnChannel(new Message { MessageType = MessageType.SessionEnd, Payload = string.Empty });
+        }
+
+        private Task ProcessRequestsAsync()
+        {
+            return Task.Run(() => this.requestHandler.ProcessRequests(new Mock<ITestHostManagerFactory>().Object));
+        }
+
+        private Task ProcessRequestsAsync(ITestHostManagerFactory testHostManagerFactory)
+        {
+            return Task.Run(() => this.requestHandler.ProcessRequests(testHostManagerFactory));
+        }
+
+        private string Serialize(Message message)
+        {
+            return this.dataSerializer.SerializePayload(message.MessageType, message.Payload);
+        }
+
+        private void VerifyResponseMessageEquals(string message)
+        {
+            this.mockChannel.Verify(mc => mc.Send(It.Is<string>(s => s.Equals(message))));
+        }
+
+        private void VerifyResponseMessageContains(string message)
+        {
+            this.mockChannel.Verify(mc => mc.Send(It.Is<string>(s => s.Contains(message))));
+        }
+    }
+
+    public class TestableTestRequestHandler : TestRequestHandler
+    {
+        public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndPoint communicationClient, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
+            : base(testHostConnectionInfo, communicationClient, dataSerializer, jobQueue, OnAckMessageReceived)
+        {
+        }
+
+        private static void OnAckMessageReceived(Message message)
+        {
+            Assert.AreEqual(message.MessageType, MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback);
         }
     }
 }

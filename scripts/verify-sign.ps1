@@ -49,6 +49,10 @@ function Verify-Signature
                     if ($signature.SignerCertificate.Thumbprint -eq "98ED99A67886D020C564923B7DF25E9AC019DF26") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
+                    # For some dlls e.g. "Microsoft.DiaSymReader.dll", sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "49D59D86505D82942A076388693F4FB7B21254EE") {
+                        Write-Log "Valid (Prod Signed): $($_.FullName)."
+                    }
                     else {
                         Write-FailLog "Incorrect certificate. File: $($_.FullName). Certificate: $($signature.SignerCertificate.Thumbprint)."
                     }
