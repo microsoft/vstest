@@ -154,8 +154,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(FrameworkVersion.Framework40, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFramework = Framework.FromString("Framework45");
-            Assert.AreEqual(FrameworkVersion.Framework45, rungit gui
-                Configuration.TargetFrameworkVersion);
+            Assert.AreEqual(FrameworkVersion.Framework45, runConfiguration.TargetFrameworkVersion);
 
             runConfiguration.TargetFramework = Framework.FromString("FrameworkCore10");
             Assert.AreEqual(FrameworkVersion.FrameworkCore10, runConfiguration.TargetFrameworkVersion);
