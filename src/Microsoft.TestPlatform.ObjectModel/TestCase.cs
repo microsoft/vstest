@@ -7,10 +7,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.IO;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System.Globalization;
     using System.Collections.Generic;
     using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test case.
@@ -221,7 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // For example in the database adapter case this is not a file path.
             string source = this.Source;
 
-            if (File.Exists(source))
+            if (PlatformFile.Exists(source))
             {
                 source = Path.GetFileName(source);
             }

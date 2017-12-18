@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
@@ -203,8 +204,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
-            // We do not have scenario where full CLR tests are deployed to remote machine, so no need to udpate sources
-            return sources;
+            List<string> actualSources = new List<string>();
+
+            // We are doing this specifically for UWP, should we extract it out to some other utility?
+            // Why? Lets say if we have to do same for someother source extension, would we just add another if check?
+            var uwpSources = sources.Where(source => source.EndsWith(".appxrecipe", StringComparison.OrdinalIgnoreCase));
+
+            foreach (var uwpSource in uwpSources)
+            {
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.Load(XmlReader.Create(new StringReader(File.ReadAllText(uwpSource, Encoding.UTF8)), XmlRunSettingsUtilities.ReaderSettings));
+
+                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), xmlDocument.GetElementsByTagName("PackagePath").Cast<XmlNode>().Where(node => node.InnerText.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().InnerText));
+            }
+
+            return actualSources.Concat(sources.Except(uwpSources));
         }
 
         /// <inheritdoc/>
