@@ -24,7 +24,7 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("bn")]
-    [System.String] $BuildNumber = "49999999-99",
+    [System.String] $BuildNumber = "20200101-01",
 
     [Parameter(Mandatory=$false)]
     [Alias("ff")]
@@ -411,7 +411,7 @@ function Create-VsixPackage
     $legacyTestImpactComComponentsDir = Join-Path $extensionsPackageDir "V1\TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.6.0-preview-1121756\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.6.0-preview-1232095\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy QtAgent Related depedencies
