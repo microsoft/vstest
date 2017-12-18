@@ -28,12 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Maximum number of cores that the engine can use to run tests in parallel
         /// </summary>
         private int maxCpuCount;
-
-        /// <summary>
-        /// Older framework version counterpart
-        /// </summary>
-        private FrameworkVersion frameworkVersion;
-
+        
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
@@ -321,13 +316,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.frameworkVersion;
+                switch(this.framework?.Name)
+                {
+                    case Constants.DotNetFramework35:
+                        return FrameworkVersion.Framework35;
+                    case Constants.DotNetFramework40:
+                        return FrameworkVersion.Framework40;
+                    case Constants.DotNetFramework45:
+                        return FrameworkVersion.Framework45;
+                    case Constants.DotNetFrameworkCore10:
+                        return FrameworkVersion.FrameworkCore10;
+                    case Constants.DotNetFrameworkUap10:
+                        return FrameworkVersion.FrameworkUap10;
+                    default:
+                        return Constants.DefaultFramework;
+                }
             }
 
             set
             {
-                this.frameworkVersion = value;
-                this.framework = Framework.FromString(this.frameworkVersion.ToString());
+                this.framework = Framework.FromString(value.ToString());
                 this.TargetFrameworkSet = true;
             }
         }
