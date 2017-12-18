@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
             var thread = new Thread(() => SendData(clientChannel, watch));
 
             // Setup server
-            server.ClientConnected += (sender, args) =>
+            server.Connected += (sender, args) =>
             {
                 serverChannel = args.Channel;
                 serverChannel.MessageReceived += (channel, messageReceived) =>
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
                 clientConnected.Set();
             };
 
-            client.ServerConnected += (sender, args) =>
+            client.Connected += (sender, args) =>
             {
                 clientChannel = args.Channel;
 
@@ -58,7 +58,7 @@ namespace Microsoft.TestPlatform.PerformanceTests
                 serverConnected.Set();
             };
 
-            var port = server.Start();
+            var port = server.Start(IPAddress.Loopback.ToString()+":0");
             client.Start(port);
 
             clientConnected.Wait();

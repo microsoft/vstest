@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.IO;
+    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
@@ -68,6 +69,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             errorHandler(error);
 
             return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Converts a given string endpoint address to valid Ipv4, Ipv6 IPEndpoint
+        /// </summary>
+        /// <param name="value">Input endpoint address</param>
+        /// <returns>IPEndpoint from give string, if its not a valid string. It will create endpoint with loop back address with port 0</returns>
+        internal static IPEndPoint GetIPEndPoint(this string value)
+        {
+            if (Uri.TryCreate(string.Concat("tcp://", value), UriKind.Absolute, out Uri uri))
+            {
+                return new IPEndPoint(IPAddress.Parse(uri.Host), uri.Port < 0 ? 0 : uri.Port);
+            }
+
+            return new IPEndPoint(IPAddress.Loopback, 0);
         }
     }
 }

@@ -157,9 +157,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var proxyDataCollectionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2, setupTestCases: true);
 
-            parallelExecutionManager.StartTestRun(this.testRunCriteriaWithTests, this.mockHandler.Object);
-            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
-
             this.proxyManagerFuncCalled = false;
             parallelExecutionManager.HandlePartialRunComplete(proxyDataCollectionManager, completeArgs, null, null, null);
             Assert.IsTrue(this.proxyManagerFuncCalled);
@@ -172,9 +169,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2, setupTestCases: true);
-
-            parallelExecutionManager.StartTestRun(this.testRunCriteriaWithTests, this.mockHandler.Object);
-            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
 
             this.proxyManagerFuncCalled = false;
             var proxyExecutionManagerManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object);
@@ -361,7 +355,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private ParallelProxyExecutionManager SetupExecutionManager(Func<IProxyExecutionManager> proxyManagerFunc, int parallelLevel, bool setupTestCases)
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 2);
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, parallelLevel);
 
             if (setupTestCases)
             {
