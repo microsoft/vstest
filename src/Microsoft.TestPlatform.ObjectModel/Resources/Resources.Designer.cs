@@ -320,7 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         {
             get
             {
-                return ResourceManager.GetString("InvalidSettingsXmlElement", resourceCulture);
+                return ResourceManager.GetString("InvalidDataCollectorUriInSettings", resourceCulture);
             }
         }
 
