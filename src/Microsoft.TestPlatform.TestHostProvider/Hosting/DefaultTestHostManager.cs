@@ -13,12 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Xml;
+    using System.Xml.Linq;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -204,21 +205,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
-            List<string> actualSources = new List<string>();
-
             // We are doing this specifically for UWP, should we extract it out to some other utility?
             // Why? Lets say if we have to do same for someother source extension, would we just add another if check?
             var uwpSources = sources.Where(source => source.EndsWith(".appxrecipe", StringComparison.OrdinalIgnoreCase));
 
-            foreach (var uwpSource in uwpSources)
+            if (uwpSources.Any())
             {
-                XmlDocument xmlDocument = new XmlDocument();
-                xmlDocument.Load(XmlReader.Create(new StringReader(File.ReadAllText(uwpSource, Encoding.UTF8)), XmlRunSettingsUtilities.ReaderSettings));
+                List<string> actualSources = new List<string>();
+                foreach (var uwpSource in uwpSources)
+                {
+                    actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), this.GetUwpSources(uwpSource)));
+                }
 
-                actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), xmlDocument.GetElementsByTagName("PackagePath").Cast<XmlNode>().Where(node => node.InnerText.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)).FirstOrDefault().InnerText));
+                return actualSources;
             }
 
-            return actualSources.Concat(sources.Except(uwpSources));
+            return sources;
         }
 
         /// <inheritdoc/>
@@ -393,6 +395,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
             return this.testHostProcess != null;
+        }
+
+        private string GetUwpSources(string uwpSource)
+        {
+            var doc = XDocument.Load(uwpSource);
+            var ns = doc.Root.Name.Namespace;
+
+            string appxManifestPath = doc.Element(ns + "Project").
+                Element(ns + "ItemGroup").
+                Element(ns + "AppXManifest").
+                Attribute("Include").Value;
+
+            return AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
         }
     }
 }
