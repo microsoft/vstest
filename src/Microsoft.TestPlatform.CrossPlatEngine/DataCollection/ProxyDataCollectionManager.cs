@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
-            this.connectionTimeout = 5 * 1000;
+            this.connectionTimeout = 30 * 1000;
             this.LogEnabledDataCollectors();
         }
 
@@ -182,8 +182,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // Warn the user that execution will wait for debugger attach.
             var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
 
+            IncreaseConnectionTimeoutIfRequired(processId);
+
+            this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
+        }
+
+        private void IncreaseConnectionTimeoutIfRequired(int processId)
+        {
             var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
-            if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) && dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
+            if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) &&
+                dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
             {
                 ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.DataCollectorDebuggerWarning, OutputLevel.Warning);
                 ConsoleOutput.Instance.WriteLine(
@@ -194,7 +202,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 this.connectionTimeout = 5 * this.connectionTimeout;
             }
 
-            this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
+            var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_CONNECTION_TIMEOUT");
+            if (!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
+            {
+                this.connectionTimeout = result * 1000;
+            }
         }
 
         private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)

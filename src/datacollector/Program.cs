@@ -65,7 +65,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private static void Run(string[] args)
         {
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
-            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
+
+            // Setup logging if enabled
+            string logFile;
+            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            {
+                EqtTrace.InitializeVerboseTrace(logFile);
+            }
 
             // Attach to exit of parent process
             var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
@@ -80,13 +86,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                         Environment.Exit(1);
                     });
 
-            // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
-            {
-                EqtTrace.InitializeVerboseTrace(logFile);
-            }
-
             // Get server port and initialize communication.
             string portValue;
             int port = argsDictionary.TryGetValue(PortArgument, out portValue) ? int.Parse(portValue) : 0;
@@ -96,6 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 throw new ArgumentException("Incorrect/No Port number");
             }
 
+            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
             requestHandler.InitializeCommunication(port);
 
             // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
