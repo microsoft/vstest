@@ -407,6 +407,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 Element(ns + "AppXManifest").
                 Attribute("Include").Value;
 
+            if (!Path.IsPathRooted(appxManifestPath))
+            {
+                appxManifestPath = Path.Combine(Path.GetDirectoryName(uwpSource), appxManifestPath);
+            }
+
             return AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
         }
     }

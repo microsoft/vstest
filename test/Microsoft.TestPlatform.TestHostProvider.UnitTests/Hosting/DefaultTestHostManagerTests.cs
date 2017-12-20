@@ -8,6 +8,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
@@ -376,6 +377,15 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             Assert.IsTrue(pid.Result);
             Assert.AreEqual(currentProcess.Id, this.testHostId);
+        }
+
+        [TestMethod]
+        public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
+        {
+            var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
+            IEnumerable<string> sources = this.testHostManager.GetTestSources(new List<string> { sourcePath });
+            Assert.IsTrue(sources.Any());
+            Assert.IsTrue(sources.FirstOrDefault().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
         }
 
         [TestMethod]

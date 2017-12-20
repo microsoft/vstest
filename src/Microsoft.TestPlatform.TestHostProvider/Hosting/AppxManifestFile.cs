@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider
 {
     using System.Xml.Linq;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary> Wrapper for an appxmanifest file. </summary>
     internal static class AppxManifestFile
@@ -15,13 +16,18 @@ namespace Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider
         /// <returns>ExecutableName</returns>
         public static string GetApplicationExecutableName(string filePath)
         {
-            var doc = XDocument.Load(filePath);
-            var ns = doc.Root.Name.Namespace;
+            if (PlatformFile.Exists(filePath))
+            {
+                var doc = XDocument.Load(filePath);
+                var ns = doc.Root.Name.Namespace;
 
-            return doc.Element(ns + "Package").
-                Element(ns + "Applications").
-                Element(ns + "Application").
-                Attribute("Executable").Value;
+                return doc.Element(ns + "Package").
+                    Element(ns + "Applications").
+                    Element(ns + "Application").
+                    Attribute("Executable").Value;
+            }
+
+            return null;
         }
     }
 }
