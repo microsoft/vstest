@@ -227,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-            var framework = config.TargetFrameworkVersion;
+            var framework = config.TargetFramework;
 
             // This is expected to be called once every run so returning a new instance every time.
             if (framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0)

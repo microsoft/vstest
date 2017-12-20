@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
             Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
         }
 
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
         }
 
         [TestMethod]
