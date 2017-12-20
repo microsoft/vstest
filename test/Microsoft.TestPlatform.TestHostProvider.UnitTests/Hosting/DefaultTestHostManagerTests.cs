@@ -15,6 +15,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -386,6 +387,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             IEnumerable<string> sources = this.testHostManager.GetTestSources(new List<string> { sourcePath });
             Assert.IsTrue(sources.Any());
             Assert.IsTrue(sources.FirstOrDefault().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [TestMethod]
+        public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
+        {
+            var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
+            string source = AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
+            Assert.AreEqual("UnitTestApp8.exe", source);
         }
 
         [TestMethod]

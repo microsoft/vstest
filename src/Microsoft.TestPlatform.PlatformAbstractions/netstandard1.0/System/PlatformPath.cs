@@ -3,21 +3,21 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System;
+    using System.IO;
 
     /// <summary>
     /// File Abstraction
     /// </summary>
-    public static class PlatformFile
+    public static class PlatformPath
     {
         /// <summary>
         /// Checks if give file exists on disk
         /// </summary>
         /// <param name="filePath">input filePath</param>
-        /// <returns>True if file Exists</returns>
-        public static bool Exists(string filePath)
+        /// <param name="fileName">output fileName</param>
+        public static void TryGetFileName(string filePath, out string fileName)
         {
-            throw new NotImplementedException(filePath);
+            throw new FileNotFoundException();
         }
     }
 }
