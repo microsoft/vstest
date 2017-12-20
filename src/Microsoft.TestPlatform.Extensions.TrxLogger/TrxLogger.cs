@@ -184,7 +184,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            System.Diagnostics.Debugger.Launch();
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
 
