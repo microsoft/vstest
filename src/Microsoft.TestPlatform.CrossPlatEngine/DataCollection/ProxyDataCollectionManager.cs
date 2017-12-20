@@ -34,6 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private const string PortOption = "--port";
         private const string DiagOption = "--diag";
         private const string ParentProcessIdOption = "--parentprocessid";
+        public const int DataCollectorConnectionTimeout = 30 * 1000;  // In milliseconds.
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
@@ -100,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
-            this.connectionTimeout = 30 * 1000;
+            this.connectionTimeout = ProxyDataCollectionManager.DataCollectorConnectionTimeout;
             this.LogEnabledDataCollectors();
         }
 
@@ -182,13 +183,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // Warn the user that execution will wait for debugger attach.
             var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
 
-            IncreaseConnectionTimeoutIfRequired(processId);
+            ChangeConnectionTimeoutIfRequired(processId);
 
             this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
         }
 
-        private void IncreaseConnectionTimeoutIfRequired(int processId)
+        private void ChangeConnectionTimeoutIfRequired(int processId)
         {
+            // Increase connection timeout when debugging is enabled.
             var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
             if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) &&
                 dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
@@ -197,11 +199,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 ConsoleOutput.Instance.WriteLine(
                     string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(processId)),
                     OutputLevel.Information);
-
-                // Increase connection timeout when debugging is enabled.
                 this.connectionTimeout = 5 * this.connectionTimeout;
             }
 
+            // Change connection timeout if user specified environment variable VSTEST_DATACOLLECTOR_CONNECTION_TIMEOUT.
             var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_CONNECTION_TIMEOUT");
             if (!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
             {

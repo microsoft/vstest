@@ -51,7 +51,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.proxyDataCollectionManager.Initialize();
 
             this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string>>(), It.IsAny<IList<string>>()), Times.Once);
-            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(5000), Times.Once);
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout), Times.Once);
         }
 
         [TestMethod]
@@ -79,7 +79,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                             It.IsAny<IDictionary<string, string>>(),
                             It.Is<IList<string>>(list => list.Contains("--diag"))),
                     Times.Once);
-                this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(5000), Times.Once);
+                this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout), Times.Once);
             }
             finally
             {
