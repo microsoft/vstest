@@ -90,18 +90,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            // Update cache with Extension Folder's files
+            // Update cache with extension assemblies
             this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
+            this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
 
-            // Update and initialize loggers only when DesignMode is false
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            if (runConfiguration.DesignMode == false)
-            {
-                this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
-
-                // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers(requestData);
-            }
+            // Update and initialize loggers.
+            UpdateLoggersFromRunSettings(discoveryCriteria.RunSettings);
+            TestLoggerManager.Instance.InitializeLoggers(requestData);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
@@ -128,18 +123,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testRunCriteria));
             }
 
+            // Update cache with extension assemblies
             this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
+            this.AddExtensionAssembliesFromSource(testRunCriteria);
 
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-
-            // Update and initialize loggers only when DesignMode is false
-            if (runConfiguration.DesignMode == false)
-            {
-                this.AddExtensionAssembliesFromSource(testRunCriteria);
-
-                // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers(requestData);
-            }
+            // Update and initialize loggers
+            UpdateLoggersFromRunSettings(testRunCriteria.TestRunSettings);
+            TestLoggerManager.Instance.InitializeLoggers(requestData);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
@@ -284,6 +274,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe");
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
+            }
+        }
+
+        /// <summary>
+        /// Update the loggers from run settings
+        /// </summary>
+        /// <param name="runSettings"></param>
+        private void UpdateLoggersFromRunSettings(string runSettings)
+        {
+            var loggers = RunSettingsUtilities.GetLoggers(runSettings);
+
+            foreach (var logger in loggers)
+            {
+                string loggerIdentifier = null;
+                Dictionary<string, string> parameters = null;
+
+                var parseSucceeded = ParserUtilities.TryParseLoggerArgument(logger, out loggerIdentifier, out parameters);
+
+                if (parseSucceeded)
+                {
+                    TestLoggerManager.Instance.UpdateLoggerList(logger, loggerIdentifier, parameters);
+                }
+                else
+                {
+                    if (EqtTrace.IsWarningEnabled)
+                        EqtTrace.Warning(string.Format("The Test Logger URI &apos;{0}&apos; is not valid.  The Test Logger will be ignored.", logger));
+                    continue;
+                }
             }
         }
     }

@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Update the logger list which will later use to initialize it.
         /// </summary>
-        /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
+        /// <param name="argument"> the actual argument pass by the user through --logger argument or Loggers node in run settings</param>
         /// <param name="loggerIdentifier">friendly name of the logger</param>
         /// <param name="parameters">parameter passed to logger</param>
         public void UpdateLoggerList(string argument, string loggerIdentifier, Dictionary<string, string> parameters)

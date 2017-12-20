@@ -118,7 +118,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// Gets the test adapters path from the run configuration
         /// </summary>
         /// <param name="runSettings">Test run settings</param>
-        /// <param name="returnNullIfNotSet">True to return null, if adapter paths is not set.</param>
         /// <returns>Test adapters paths</returns>
         public static IEnumerable<string> GetTestAdaptersPaths(string runSettings)
         {
@@ -136,5 +135,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return testAdaptersPaths;
         }
 
+        /// <summary>
+        /// Gets loggers from the run configuration
+        /// </summary>
+        /// <param name="runSettings"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetLoggers(string runSettings)
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+            return (runConfiguration != null) ?
+                runConfiguration.Loggers :
+                Enumerable.Empty<string>();
+        }
     }
 }
