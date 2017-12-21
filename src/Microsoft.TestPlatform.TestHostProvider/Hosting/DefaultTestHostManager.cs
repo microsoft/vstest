@@ -13,11 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Xml.Linq;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -203,7 +205,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
-            // We do not have scenario where full CLR tests are deployed to remote machine, so no need to udpate sources
+            // We are doing this specifically for UWP, should we extract it out to some other utility?
+            // Why? Lets say if we have to do same for someother source extension, would we just add another if check?
+            var uwpSources = sources.Where(source => source.EndsWith(".appxrecipe", StringComparison.OrdinalIgnoreCase));
+
+            if (uwpSources.Any())
+            {
+                List<string> actualSources = new List<string>();
+                foreach (var uwpSource in uwpSources)
+                {
+                    actualSources.Add(Path.Combine(Path.GetDirectoryName(uwpSource), this.GetUwpSources(uwpSource)));
+                }
+
+                return actualSources;
+            }
+
             return sources;
         }
 
@@ -379,6 +395,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
             return this.testHostProcess != null;
+        }
+
+        private string GetUwpSources(string uwpSource)
+        {
+            var doc = XDocument.Load(uwpSource);
+            var ns = doc.Root.Name.Namespace;
+
+            string appxManifestPath = doc.Element(ns + "Project").
+                Element(ns + "ItemGroup").
+                Element(ns + "AppXManifest").
+                Attribute("Include").Value;
+
+            if (!Path.IsPathRooted(appxManifestPath))
+            {
+                appxManifestPath = Path.Combine(Path.GetDirectoryName(uwpSource), appxManifestPath);
+            }
+
+            return AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
         }
     }
 }
