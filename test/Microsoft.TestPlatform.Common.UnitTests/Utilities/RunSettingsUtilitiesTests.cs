@@ -106,6 +106,40 @@ namespace TestPlatform.Common.UnitTests.Utilities
 
             CollectionAssert.AreEqual(expectedResult, result);
         }
+
+        [TestMethod]
+        public void GetLoggersShouldReturnValidLoggers()
+        {
+            string settingXml = @"<RunSettings><RunConfiguration><ResultsDirectory>TestResults</ResultsDirectory><Loggers><Logger>trx;key1=value1</Logger><Logger>blame</Logger></Loggers></RunConfiguration></RunSettings>";
+            List<string> expectedResult = new List<string> { "trx;key1=value1", "blame" };
+
+            List<string> result = (List<string>)RunSettingsUtilities.GetLoggers(settingXml);
+
+            CollectionAssert.AreEqual(expectedResult, result);
+        }
+
+        [TestMethod]
+        public void GetLoggersShouldReturnEmptyWhenNoLoggersPresent()
+        {
+            string settingXml = @"<RunSettings><RunConfiguration><ResultsDirectory>TestResults</ResultsDirectory></RunConfiguration></RunSettings>";
+            List<string> expectedResult = new List<string> { };
+
+            List<string> result = (List<string>)RunSettingsUtilities.GetLoggers(settingXml);
+
+            CollectionAssert.AreEqual(expectedResult, result);
+        }
+
+        [TestMethod]
+        public void GetLoggersShouldNotReturnLoggerIfInvalidElement()
+        {
+            string settingXml = @"<RunSettings><RunConfiguration><ResultsDirectory>TestResults</ResultsDirectory><Loggers><Logger>trx;key1=value1</Logger><LoggerBad>blame</LoggerBad></Loggers></RunConfiguration></RunSettings>";
+            List<string> expectedResult = new List<string> { "trx;key1=value1" };
+
+            List<string> result = (List<string>)RunSettingsUtilities.GetLoggers(settingXml);
+
+            CollectionAssert.AreEqual(expectedResult, result);
+        }
+
     }
 
     [SettingsName("DummyMSTest")]
