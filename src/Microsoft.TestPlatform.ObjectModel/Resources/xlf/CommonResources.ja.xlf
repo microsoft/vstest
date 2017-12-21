@@ -34,7 +34,7 @@
 </source>
         <target state="translated">テスト実行ではフレームワーク {0} およびプラットフォーム {1} 用にビルドされた DLL を使用します。次の DLL は実行には含まれません: {2}これらの設定の管理方法の詳細については、{3} にアクセスしてください。
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テストの実行では、framework {0} と {1} のプラットフォーム用に構築された DLL(s) を使用します。次の DLL(s) は含まれませんの実行: {2} には、詳細については {3} にこれらの設定を管理します。</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">{0} はフレームワーク {1} およびプラットフォーム {2} 向けにビルドされます。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
