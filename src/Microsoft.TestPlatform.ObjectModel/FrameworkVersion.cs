@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         Framework35,
         Framework40,
         Framework45,
-        FrameworkCore10
+        FrameworkCore10,
+        FrameworkUap10
     }
 }
