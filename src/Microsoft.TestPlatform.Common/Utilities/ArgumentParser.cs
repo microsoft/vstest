@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// Utility methods for Parsing arguments via command line or run settings.
     /// </summary>
-    public static class ParserUtilities
+    public static class ArgumentParser
     {
         /// <summary>
         /// Parses the parameters passed as name values pairs along with the logger argument.

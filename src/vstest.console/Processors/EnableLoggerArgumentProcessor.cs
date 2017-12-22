@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 string loggerIdentifier = null;
                 Dictionary<string, string> parameters = null;
-                var parseSucceeded = ParserUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
+                var parseSucceeded = ArgumentParser.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
 
                 if (parseSucceeded)
                 {

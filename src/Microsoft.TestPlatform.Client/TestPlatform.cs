@@ -290,7 +290,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 string loggerIdentifier = null;
                 Dictionary<string, string> parameters = null;
 
-                var parseSucceeded = ParserUtilities.TryParseLoggerArgument(logger, out loggerIdentifier, out parameters);
+                var parseSucceeded = ArgumentParser.TryParseLoggerArgument(logger, out loggerIdentifier, out parameters);
 
                 if (parseSucceeded)
                 {
@@ -299,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 else
                 {
                     if (EqtTrace.IsWarningEnabled)
-                        EqtTrace.Warning(string.Format("The Test Logger URI &apos;{0}&apos; is not valid.  The Test Logger will be ignored.", logger));
+                        EqtTrace.Warning("The Test Logger URI \"{0}\" is not valid.  The Test Logger will be ignored.", logger);
                     continue;
                 }
             }
