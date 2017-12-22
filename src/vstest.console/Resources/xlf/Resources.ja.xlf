@@ -540,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
       指定されたテスト コンテナーから探索されたテストを一覧表示します。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">強い |-ListTests |/lt |/ListTests: &lt; ファイル名 &gt;
       リストは、指定したテスト コンテナーからのテストを発見しました。</target>

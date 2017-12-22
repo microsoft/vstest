@@ -540,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;파일 이름&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;파일 이름&gt;
       지정된 테스트 컨테이너에서 검색된 테스트를 나열합니다.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; 파일 이름 &gt;
       목록의 지정한 테스트 컨테이너에서 테스트를 발견 했습니다.</target>
