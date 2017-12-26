@@ -261,8 +261,8 @@
       </trans-unit>
       <trans-unit id="FastFilterException">
         <source>An error occured while creating Fast filter.</source>
-        <target state="new">An error occured while creating Fast filter.</target>
-        <note></note>
+        <target state="translated">Une erreur s'est produite lors de la création du filtre rapide.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

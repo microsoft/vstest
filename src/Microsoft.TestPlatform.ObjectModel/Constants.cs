@@ -68,6 +68,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM ? Architecture.ARM : Architecture.X86;
 
         /// <summary>
+        /// Adding this for compatibility
+        /// </summary>
+        public const FrameworkVersion DefaultFramework = FrameworkVersion.Framework40;
+
+        /// <summary>
         /// Default option for parallel execution
         /// </summary>
         public const int DefaultCpuCount = 1;
@@ -128,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string DotNetFrameworkCore10 = ".NETCoreApp,Version=v1.0";
 
-        public const string DotNetFrameworkUap10 = "Uap,Version=10.0";
+        public const string DotNetFrameworkUap10 = "Uap,Version=v10.0";
 
         public const string TargetFrameworkName = "TargetFrameworkName";
     }
