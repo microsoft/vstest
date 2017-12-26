@@ -226,7 +226,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
-                                                         { "TestPlaform", "123" }
+                                                         { "TargetPlatform", "123" }
                                                  };
             var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary);
             var arguments = PrepareArguments(
@@ -235,7 +235,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 runsettingsFilePath,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
-            this.StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings.  Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
+            this.StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings. Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
             File.Delete(runsettingsFilePath);
         }
 
