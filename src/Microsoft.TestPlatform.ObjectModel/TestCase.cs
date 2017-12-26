@@ -7,10 +7,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.IO;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System.Globalization;
     using System.Collections.Generic;
     using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test case.
@@ -221,9 +223,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // For example in the database adapter case this is not a file path.
             string source = this.Source;
 
-            if (File.Exists(source))
+            // As discussed with team, we found no scenario for netcore, & fullclr where the Source is not present where ID is generated,
+            // which means we would always use FileName to generate ID. In cases where somehow Source Path contained garbage character the API Path.GetFileName()
+            // we are simply returning original input.
+            // For UWP where source during discovery, & during execution can be on different machine, in such case we should always use Path.GetFileName()
+            try
             {
+                // If source name is malformed, GetFileName API will throw exception, so use same input malformed string to generate ID
                 source = Path.GetFileName(source);
+            }
+            catch
+            {
+                // do nothing
             }
 
             string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;

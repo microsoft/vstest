@@ -3,10 +3,13 @@
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 {
+    using System;
     using System.IO;
+    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,16 +27,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             this.SetupChannel(out ConnectedEventArgs connectedEventArgs);
 
             Assert.IsNotNull(connectedEventArgs);
-        }
-
-        [TestMethod]
-        public async Task SocketEndpointShouldInitializeChannelOnServerConnection()
-        {
-            var channel = this.SetupChannel(out ConnectedEventArgs _);
-
-            await channel.Send(DUMMYDATA);
-
-            Assert.AreEqual(DUMMYDATA, ReadData(this.Client));
         }
 
         [TestMethod]

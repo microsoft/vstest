@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public async Task NotifyDataAvailableShouldReadStreamIfNoListenersAreRegistered()
+        public async Task NotifyDataAvailableShouldNotReadStreamIfNoListenersAreRegistered()
         {
             this.writer.Write(DUMMYDATA);
             SeekToBeginning(this.stream);
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.UnitTests
 
             // Data is read irrespective of listeners. See note in NotifyDataAvailable
             // implementation.
-            Assert.AreEqual(11, this.stream.Position);
+            Assert.AreEqual(0, this.stream.Position);
         }
 
         [TestMethod]

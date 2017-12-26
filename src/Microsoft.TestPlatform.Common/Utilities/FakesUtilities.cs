@@ -65,8 +65,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
 
-            return config.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                   || config.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
+            return config.TargetFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                   || config.TargetFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         /// <summary>
