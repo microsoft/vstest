@@ -234,23 +234,28 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;記錄器 URI/FriendlyName&gt;
+        <target state="translated">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
       指定測試結果的記錄器。例如，若要將結果記錄到 
-      Visual Studio 測試結果檔案 (TRX)，請使用 /logger:trx [;LogFileName=&lt;預設為唯一的檔案名稱&gt;]
+      Visual Studio 測試結果檔案 (TRX)，請使用 /logger:trx[;LogFileName=&lt;預設為唯一的檔案名稱&gt;]
       使用指定的 LogFileName 在 TestResults 目錄中建立檔案。
 
-      變更主控台記錄器的詳細資訊層級。允許的詳細資訊值: quiet、minimal 與 normal。
+      變更主控台記錄器中，記錄訊息的詳細資訊層級，如下所示
       範例: /logger:console;verbosity=&lt;預設為 "minimal"&gt;
+      允許的詳細資訊值: quiet、minimal 及 normal。
 
-      若要將測試結果發行到 Team Foundation Server，請使用 TfsPublisher，如下所示
+      變更主控台記錄器的診斷層級前置詞，如下所示
+      範例: /logger:console;prefix=&lt;預設為 "false"&gt;
+      您可在此處找到主控台記錄器的詳細資訊: https://aka.ms/console-logger
+
+      若要將測試結果發佈至 Team Foundation Server，請使用 TfsPublisher，如下所示
       範例: /logger:TfsPublisher;
                 Collection=&lt;Team 專案集合 URL&gt;;
-                BuildName=&lt;專案集合&gt;;
+                BuildName=&lt;組建名稱&gt;;
                 TeamProject=&lt;Team 專案名稱&gt;
-                [;Platform=&lt;預設值為 [任何 CPU]&gt;]
-                [;Flavor=&lt;預設值為 [偵錯]&gt;]
+                [;Platform=&lt;預設為 [任何 CPU]&gt;]
+                [;Flavor=&lt;預設為 [偵錯]&gt;]
                 [;RunTitle=&lt;標題&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
       指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。
@@ -535,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;檔案名稱&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;檔案名稱&gt;
       列出從給定測試容器探索到的測試。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-长期 |-ListTests | / lt | / ListTests: &lt; 文件名 &gt;
       列表发现从给定的测试容器测试。</target>
@@ -1552,13 +1557,13 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">若使用測試設定來設定測試回合，則不支援 --Collect|/Collect:"{0}"。</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">內嵌測試設定不支援透過回合設定來設定的資料收集器。如需詳細資訊，請參閱 https://aka.ms/vstest-configure-datacollector。回合設定: 0}。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
