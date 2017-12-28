@@ -28,8 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     {
         #region Fields
 
-        private static readonly object Synclock = new object();
-        private static TestLoggerManager testLoggerManager;
         protected List<LoggerInfo> loggersInfoList = new List<LoggerInfo>();
 
         /// <summary>
@@ -54,12 +52,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private ITestRunRequest runRequest = null;
 
         /// <summary>
+        /// Discovery request that we have registered for events on. Used when disposing to unregister for the events.
+        /// </summary>
+        private IDiscoveryRequest discoveryRequest;
+
+        /// <summary>
         /// Gets an instance of the logger.
         /// </summary>
-        private IMessageLogger messageLogger;
+        private TestSessionMessageLogger messageLogger;
 
         private TestLoggerExtensionManager testLoggerExtensionManager;
-        private IDiscoveryRequest discoveryRequest;
 
         #endregion
 
@@ -68,41 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Default constructor.
         /// </summary>
-        protected TestLoggerManager(TestSessionMessageLogger sessionLogger, InternalTestLoggerEvents loggerEvents)
+        public TestLoggerManager(TestSessionMessageLogger sessionLogger, InternalTestLoggerEvents loggerEvents)
         {
             this.messageLogger = sessionLogger;
             this.testLoggerExtensionManager = null;
             this.loggerEvents = loggerEvents;
         }
-
-        /// <summary>
-        /// Gets the instance.
-        /// </summary>
-        public static TestLoggerManager Instance
-        {
-            get
-            {
-                if (testLoggerManager == null)
-                {
-                    lock (Synclock)
-                    {
-                        if (testLoggerManager == null)
-                        {
-                            testLoggerManager = new TestLoggerManager(TestSessionMessageLogger.Instance,
-                                new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
-                        }
-                    }
-                }
-
-                return testLoggerManager;
-            }
-
-            protected set
-            {
-                testLoggerManager = value;
-            }
-        }
-
         #endregion
 
         #region Properties
@@ -177,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 catch (InvalidLoggerException)
                 {
                     string loggerUri;
-                    if (testLoggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
+                    if (TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
                     {
                         this.AddLoggerByUri(loggerUri, parameters);
                     }
@@ -270,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             // Add the logger and if it is a non-existent logger, throw.
             try
             {
-                testLoggerManager.AddLogger(loggerUri, parameters);
+                AddLogger(loggerUri, parameters);
             }
             catch (InvalidOperationException e)
             {
@@ -447,21 +420,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 {
                     // Unregister from runrequests.
                     if (this.runRequest != null)
-                    {
-                        this.runRequest.TestRunMessage -= this.TestRunMessageHandler;
-                        this.runRequest.OnRunStart -= this.TestRunStartHandler;
-                        this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
-                        this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-                        this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
-                    }
+                        UnregisterTestRunEvents(this.runRequest);
 
+                    // Unregister from discoveryrequests.
                     if (this.discoveryRequest != null)
-                    {
-                        this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
-                        this.discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
-                        this.discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
-                        this.discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
-                    }
+                        UnregisterDiscoveryEvents(this.discoveryRequest);
 
                     this.loggerEvents.Dispose();
                 }

@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -140,12 +141,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         /// <param name="runSettings"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetLoggers(string runSettings)
+        public static IEnumerable<LoggerSetting> GetLoggerSettings(string runSettings)
         {
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-            return (runConfiguration != null) ?
-                runConfiguration.Loggers :
-                Enumerable.Empty<string>();
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
+            return (loggerRunSettings != null) ?
+                    loggerRunSettings.LoggerSettings :
+                    Enumerable.Empty<LoggerSetting>();
         }
     }
 }

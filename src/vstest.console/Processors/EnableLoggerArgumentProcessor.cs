@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using System;
+    using System.Xml;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Globalization;
@@ -15,6 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Linq;
 
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
@@ -46,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(TestLoggerManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -117,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         #region Fields
 
-        private readonly TestLoggerManager loggerManager;
+        private IRunSettingsProvider runSettingsManager;
 
         #endregion
 
@@ -126,12 +132,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
         /// </summary>
-        /// <param name="loggerManager">
-        /// The logger manager.
-        public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager)
+        public EnableLoggerArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
-            Contract.Requires(loggerManager != null);
-            this.loggerManager = loggerManager;
+            this.runSettingsManager = runSettingsManager;
         }
 
         #endregion
@@ -145,31 +148,79 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             if (string.IsNullOrWhiteSpace(argument))
-            {
                 HandleInvalidArgument(argument);
-            }
-            else
-            {
-                string loggerIdentifier = null;
-                Dictionary<string, string> parameters = null;
-                var parseSucceeded = ArgumentParser.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
 
-                if (parseSucceeded)
+            AddLoggerToRunSettings(argument, this.runSettingsManager);
+        }
+
+        internal static void AddLoggerToRunSettings(string argument, IRunSettingsProvider runSettingsManager)
+        {
+            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            if (settings == null)
+            {
+                runSettingsManager.AddDefaultRunSettings();
+                settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            }
+
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(settings) ?? new LoggerRunSettings();
+
+            string loggerIdentifier = null;
+            Dictionary<string, string> parameters = null;
+            var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
+
+            if (parseSucceeded)
+            {
+                if (!DoesLoggerSettingExist(loggerIdentifier, loggerRunSettings, out var loggerSetting))
                 {
-                    if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
+                    loggerSetting = new LoggerSetting();
+                    loggerSetting.Name = loggerIdentifier;
+                    loggerSetting.IsEnabled = true;
+                    loggerRunSettings.LoggerSettings.Add(loggerSetting);
+
+                    if (parameters!= null && parameters.Count > 0)
                     {
-                        this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
-                    }
-                    else
-                    {
-                        this.loggerManager.UpdateLoggerList(argument, loggerIdentifier, parameters);
+                        var XmlDocument = new XmlDocument();
+                        var outerNode = XmlDocument.CreateElement("Configuration");
+                        foreach (KeyValuePair<string, string> entry in parameters)
+                        {
+                            var node = XmlDocument.CreateElement(entry.Key);
+                            node.InnerText = entry.Value;
+                            outerNode.AppendChild(node);
+                        }
+
+                        loggerSetting.Configuration = outerNode;
                     }
                 }
                 else
                 {
-                    HandleInvalidArgument(argument);
+                    loggerSetting.IsEnabled = true;
+                }
+
+                runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+            }
+            else
+            {
+                HandleInvalidArgument(argument);
+            }
+        }
+
+        // TODO: what should get more preference? command line vs runsettings?
+        private static bool DoesLoggerSettingExist(string name,
+            LoggerRunSettings loggerRunSettings,
+            out LoggerSetting loggerSetting)
+        {
+            System.Diagnostics.Debugger.Launch();
+            loggerSetting = null;
+            foreach (var logger in loggerRunSettings.LoggerSettings)
+            {
+                if (logger.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    loggerSetting = logger;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         /// <summary>

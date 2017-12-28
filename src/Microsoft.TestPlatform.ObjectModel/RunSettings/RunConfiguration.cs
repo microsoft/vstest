@@ -112,7 +112,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.shouldCollectSourceInformation = false;
             this.targetDevice = null;
             this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
-            this.Loggers = new List<string>();
         }
 
         #endregion
@@ -380,15 +379,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets list of loggers which needs to be initialized.
-        /// </summary>
-        public IList<string> Loggers
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
         /// Gets or sets the execution thread apartment state.
         /// </summary>
         [CLSCompliant(false)]
@@ -562,18 +552,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement testAdaptersPaths = doc.CreateElement("TestAdaptersPaths");
                 testAdaptersPaths.InnerXml = this.TestAdaptersPaths;
                 root.AppendChild(testAdaptersPaths);
-            }
-
-            if(this.Loggers != null && this.Loggers.Count > 0)
-            {
-                var loggers = doc.CreateElement("Loggers");
-                foreach(var logger in this.Loggers)
-                {
-                    var loggerElement = doc.CreateElement("Logger");
-                    loggerElement.InnerXml = logger;
-                    loggers.AppendChild(loggerElement);
-                }
-                root.AppendChild(loggers);
             }
 
             XmlElement treatTestAdapterErrorsAsWarnings = doc.CreateElement("TreatTestAdapterErrorsAsWarnings");
@@ -805,32 +783,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "TestAdaptersPaths":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TestAdaptersPaths = reader.ReadElementContentAsString();
-                            break;
-
-                        case "Loggers":
-                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                            bool loggersNodeEmpty = reader.IsEmptyElement;
-                            reader.Read();
-                            if (!loggersNodeEmpty)
-                            {
-                                while (reader.NodeType == XmlNodeType.Element)
-                                {
-                                    if (reader.Name.Equals("Logger"))
-                                    {
-                                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                                        var content = reader.ReadElementContentAsString();
-                                        if (!string.IsNullOrWhiteSpace(content))
-                                            runConfiguration.Loggers.Add(content);
-                                    }
-                                    else
-                                    {
-                                        if (EqtTrace.IsErrorEnabled)
-                                            EqtTrace.Warning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidSettingsXmlElement, Constants.RunConfigurationSettingsName, reader.Name));
-                                        reader.Skip();
-                                    }
-                                }
-                                reader.ReadEndElement();
-                            }
                             break;
 
                         case "TreatTestAdapterErrorsAsWarnings":

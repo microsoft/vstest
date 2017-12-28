@@ -160,6 +160,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             return nodeValue;
         }
 
+        public static LoggerRunSettings GetLoggerRunSettings(string settingsXml)
+        {
+            return GetNodeValue<LoggerRunSettings>(
+                settingsXml,
+                Constants.LoggerRunSettingsName,
+                LoggerRunSettings.FromXml);
+        }
+
         /// <summary>
         /// Gets the set of user defined test run parameters from settings xml as key value pairs.
         /// </summary>

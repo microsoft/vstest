@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -90,14 +91,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            // Update cache with extension assemblies
-            this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
-            this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
-
-            // Update and initialize loggers.
-            UpdateLoggersFromRunSettings(discoveryCriteria.RunSettings);
-            TestLoggerManager.Instance.InitializeLoggers(requestData);
-
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
 
@@ -122,14 +115,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 throw new ArgumentNullException(nameof(testRunCriteria));
             }
-
-            // Update cache with extension assemblies
-            this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
-            this.AddExtensionAssembliesFromSource(testRunCriteria);
-
-            // Update and initialize loggers
-            UpdateLoggersFromRunSettings(testRunCriteria.TestRunSettings);
-            TestLoggerManager.Instance.InitializeLoggers(requestData);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
@@ -187,82 +172,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Update the test adapter paths provided through run settings to be used by the test service
-        /// </summary>
-        /// <param name="runSettings">
-        /// The run Settings.
-        /// </param>
-        private void AddExtensionAssemblies(string runSettings)
-        {
-            IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
-
-            if (customTestAdaptersPaths != null)
-            {
-                foreach (string customTestAdaptersPath in customTestAdaptersPaths)
-                {
-                    var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
-                    if (!Directory.Exists(adapterPath))
-                    {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
-                        }
-
-                        continue;
-                    }
-
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterEndsWithPattern, TestPlatformConstants.TestLoggerEndsWithPattern, TestPlatformConstants.RunTimeEndsWithPattern, TestPlatformConstants.SettingsProviderEndsWithPattern));
-                    if (extensionAssemblies.Count > 0)
-                    {
-                        this.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update the extension assemblies from source directory
-        /// </summary>
-        /// <param name="testRunCriteria">
-        /// The test Run Criteria.
-        /// </param>
-        private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
-        {
-            IEnumerable<string> sources = testRunCriteria.Sources;
-            if (testRunCriteria.HasSpecificTests)
-            {
-                // If the test execution is with a test filter, group them by sources
-                sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
-            }
-
-            AddExtensionAssembliesFromSource(sources);
-        }
-
-        /// <summary>
-        /// Update the test logger paths from source directory
-        /// </summary>
-        /// <param name="sources"></param>
-        private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
-        {
-            // Currently we support discovering loggers only from Source directory
-            var loggersToUpdate = new List<string>();
-
-            foreach (var source in sources)
-            {
-                var sourceDirectory = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
-                {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestPlatformConstants.TestLoggerEndsWithPattern));
-                }
-            }
-
-            if (loggersToUpdate.Count > 0)
-            {
-                this.UpdateExtensions(loggersToUpdate, skipExtensionFilters: false);
-            }
-        }
-
-        /// <summary>
         /// Find all test platform extensions from the `.\Extensions` directory. This is used to load the inbox extensions like
         /// Trx logger and legacy test extensions like mstest v1, mstest c++ etc..
         /// </summary>
@@ -274,34 +183,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe");
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
-            }
-        }
-
-        /// <summary>
-        /// Update the loggers from run settings
-        /// </summary>
-        /// <param name="runSettings"></param>
-        private void UpdateLoggersFromRunSettings(string runSettings)
-        {
-            var loggers = RunSettingsUtilities.GetLoggers(runSettings);
-
-            foreach (var logger in loggers)
-            {
-                string loggerIdentifier = null;
-                Dictionary<string, string> parameters = null;
-
-                var parseSucceeded = ArgumentParser.TryParseLoggerArgument(logger, out loggerIdentifier, out parameters);
-
-                if (parseSucceeded)
-                {
-                    TestLoggerManager.Instance.UpdateLoggerList(logger, loggerIdentifier, parameters);
-                }
-                else
-                {
-                    if (EqtTrace.IsWarningEnabled)
-                        EqtTrace.Warning("The Test Logger URI \"{0}\" is not valid.  The Test Logger will be ignored.", logger);
-                    continue;
-                }
             }
         }
     }
