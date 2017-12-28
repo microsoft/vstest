@@ -11,8 +11,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
 
     <!-- We need SimpleClassLibrary is dependency bucket of this test suite to allow loading symbols -->
     <ProjectReference Include="..\TestAssets\SimpleClassLibrary\SimpleClassLibrary.csproj">

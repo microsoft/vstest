@@ -11,9 +11,6 @@
     <AssemblyName>Microsoft.TestPlatform.Build.UnitTests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Build\Microsoft.TestPlatform.Build.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
