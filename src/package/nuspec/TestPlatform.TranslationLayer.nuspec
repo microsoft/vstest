@@ -12,6 +12,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>vstest visual-studio unittest testplatform mstest microsoft test</tags>
     <dependencies>
       <group targetFramework="net451">
         <dependency id="Newtonsoft.Json" version="9.0.1"/>

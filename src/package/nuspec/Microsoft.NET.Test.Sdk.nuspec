@@ -9,12 +9,24 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
-    <description>The MSbuild targets and properties for building the .Net core test projects.</description>
+    <description>The MSbuild targets and properties for building .NET Core, .NET Full framework and Universal Windows test projects.</description>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
+    <tags>vstest visual-studio unittest testplatform mstest microsoft test</tags>
     <dependencies>
-      <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
-      <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+      <group targetFramework="uap10.0">
+        <dependency id="System.ComponentModel.Primitives" version="4.1.0" />
+        <dependency id="System.ComponentModel.TypeConverter" version="4.1.0" />
+        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="4.0.0" />
+        <dependency id="Newtonsoft.Json" version="9.0.1" />
+      </group>
+      <group targetFramework="netcoreapp1.0">
+        <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
+        <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+      </group>
+      <group targetFramework="net45">
+        <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+      </group>
     </dependencies>
   </metadata>
   <files>
