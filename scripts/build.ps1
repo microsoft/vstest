@@ -464,6 +464,17 @@ function Create-VsixPackage
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
 
+    # Copy full clr artifacts to Extensions/Testplatform folder similar to Testplatform vsix installed directory to run CC and Fakes acceptance tests.
+    $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
+    $TestplatformExtensionsDirectory = [System.IO.Path]::combine($intellitraceTargetDirectory, "Common7", "IDE", "Extensions", "Testplatform")
+
+    if (-not (Test-Path $TestplatformExtensionsDirectory)) {
+        New-Item $TestplatformExtensionsDirectory -Type Directory -Force | Out-Null
+    }
+
+    $FullCLRPackageDirectory = Get-FullCLRPackageDirectory
+    Copy-Item -Recurse "$FullCLRPackageDirectory\*" $TestplatformExtensionsDirectory -Force
+
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
     

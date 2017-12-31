@@ -18,6 +18,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Base class for integration tests.
@@ -91,6 +92,17 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void InvokeVsTest(string arguments)
         {
             this.Execute(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+            this.FormatStandardOutCome();
+        }
+
+        /// <summary>
+        /// Invokes <c>vstest.console</c> with specified arguments.
+        /// </summary>
+        /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
+        /// <param name="envVariables">Environment varibles set to <c>vstest.console</c>.exe process</param>
+        public void InvokeVsTest(string arguments, IDictionary<string, string> envVariables)
+        {
+            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode, envVariables);
             this.FormatStandardOutCome();
         }
 
@@ -378,7 +390,20 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             string consoleRunnerPath = string.Empty;
 
-            if (this.IsDesktopRunner())
+            if (this.testEnvironment.portableRunner)
+            {
+                consoleRunnerPath = Path.Combine(
+                    this.testEnvironment.PublishDirectory,
+                    "..",
+                    "..",
+                    "Intellitrace",
+                    "Common7",
+                    "IDE",
+                    "Extensions",
+                    "Testplatform",
+                    "vstest.console.exe");
+            }
+            else if (this.IsDesktopRunner())
             {
                 consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.exe");
             }
@@ -438,6 +463,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private void Execute(string args, out string stdOut, out string stdError, out int exitCode)
         {
+            Execute(args, out stdOut, out stdError, out exitCode, null);
+        }
+
+        private void Execute(string args, out string stdOut, out string stdError, out int exitCode,
+            IDictionary<string, string> envVariables)
+        {
             if (this.IsNetCoreRunner())
             {
                 args = this.SetVSTestConsoleDLLPathInArgs(args);
@@ -455,6 +486,15 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.StartInfo.RedirectStandardError = true;
                 vstestconsole.StartInfo.RedirectStandardOutput = true;
                 vstestconsole.StartInfo.CreateNoWindow = true;
+                if (envVariables != null)
+                {
+                    Console.WriteLine("Environment Variables:..");
+                    foreach (KeyValuePair<string, string> pair in envVariables)
+                    {
+                        Console.WriteLine($"Key: {pair.Key}, Value: {pair.Value}");
+                        vstestconsole.StartInfo.AddEnvironmentVariable(pair.Key, pair.Value);
+                    }
+                }
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();
@@ -469,7 +509,8 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.BeginErrorReadLine();
                 if (!vstestconsole.WaitForExit(80 * 1000))
                 {
-                    Console.WriteLine("IntegrationTestBase.Execute: Timed out waiting for vstest.console.exe. Terminating the process.");
+                    Console.WriteLine(
+                        "IntegrationTestBase.Execute: Timed out waiting for vstest.console.exe. Terminating the process.");
                     vstestconsole.Kill();
                 }
                 else
@@ -532,6 +573,23 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             return string.Join(" ", assertFullPaths);
+        }
+
+        protected IDictionary<string, string> GetIntelliTraceEnvVariables(string platform)
+        {
+            IDictionary<string, string> envVaribles = new Dictionary<string, string>(1);
+            if (platform.Equals("x64"))
+            {
+                envVaribles[IntegrationTestEnvironment.IntelliTraceProfierEnvVaribleName] =
+                    string.Format(this.testEnvironment.IntelliTraceProfierPathFormat, "amd64");
+            }
+            else
+            {
+                envVaribles[IntegrationTestEnvironment.IntelliTraceProfierEnvVaribleName] =
+                    string.Format(this.testEnvironment.IntelliTraceProfierPathFormat, "x86");
+            }
+
+            return envVaribles;
         }
     }
 }
