@@ -18,7 +18,7 @@
         <dependency id="System.ComponentModel.Primitives" version="[4.1.0, )" />
         <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
-        <dependency id="Newtonsoft.Json" version="[9.0.1, )" />
+        <dependency id="Newtonsoft.Json" version="[$JsonNetVersion$, )" />
         <!-- TestHost gets shipped as ExtensionSDKs with name TestPlatform.Universal. -->
         <!-- Currently code coverage not supported for uap10.0. -->
       </group>
