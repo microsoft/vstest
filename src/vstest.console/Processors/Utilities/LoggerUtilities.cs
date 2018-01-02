@@ -27,6 +27,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 errorMessage = new TestRunMessageEventArgs(TestMessageLevel.Error, exception.InnerException.Message);
                 loggerManager.SendTestRunMessage(errorMessage);
             }
+
+            loggerManager.LoggerEvents.WaitForEventCompletion();
         }
 
         internal static void RaiseTestRunWarning(TestLoggerManager loggerManager, TestRunResultAggregator testRunResultAggregator, string warningMessage)
@@ -34,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             TestRunMessageEventArgs testRunMessage = new TestRunMessageEventArgs(TestMessageLevel.Warning, warningMessage);
             loggerManager.SendTestRunMessage(testRunMessage);
         }
-
+        
         /// <summary>
         /// Parses the parameters passed as name values pairs along with the logger argument.
         /// </summary>

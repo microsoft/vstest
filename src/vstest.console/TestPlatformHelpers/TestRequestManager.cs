@@ -507,12 +507,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
                 finally
                 {
-                    this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
-                    this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
-                    testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
+                    if (this.currentTestRunRequest != null)
+                    {
+                        this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 
-                    this.currentTestRunRequest.Dispose();
-                    this.currentTestRunRequest = null;
+                        this.currentTestRunRequest.Dispose();
+                        this.currentTestRunRequest = null;
+                    }
                 }
 
                 return success;
@@ -572,7 +575,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
         {
             // Collecting Target Framework.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFrameworkVersion.Name);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFramework.Name);
 
             // Collecting Target Platform.
             requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform.ToString());

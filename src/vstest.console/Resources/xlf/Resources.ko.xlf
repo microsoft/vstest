@@ -234,23 +234,28 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;로거 URI/FriendlyName&gt;
+        <target state="translated">--logger|/logger:&lt;로거 URI/FriendlyName&gt;
       테스트 결과에 대해 로거를 지정합니다. 예를 들어 
-      Visual Studio 테스트 결과 파일(TRX)에 결과를 기록하려면 /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]를 사용합니다.
+      Visual Studio 테스트 결과 파일(TRX)에 결과를 기록하려면 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]를 사용합니다.
       TestResults 디렉터리에 LogFileName이 지정된 파일을 만듭니다.
 
-      콘솔 로거에 대한 세부 정보 표시 수준을 변경합니다. 세부 정보 표시에 허용된 값은 quiet, minimal 및 normal입니다.
-      예: /logger:console;verbosity=&lt;Defaults to “minimal”&gt;
+      아래와 같이 콘솔 로거에 대한 로그 메시지의 세부 정보 표시 수준을 변경합니다.
+      예: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      세부 정보 표시에 허용된 값은 quiet, minimal 및 normal입니다.
+
+      아래와 같이 콘솔 로거에 대한 진단 수준 접두사를 변경합니다.
+      예: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      콘솔 로거에 대한 자세한 내용은 https://aka.ms/console-logger를 참조하세요.
 
       테스트 결과를 Team Foundation Server에 게시하려면 아래와 같이 TfsPublisher를 사용합니다.
       예: /logger:TfsPublisher;
                 Collection=&lt;team project collection url&gt;;
                 BuildName=&lt;build name&gt;;
                 TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to “Any CPU”&gt;]
+                [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-로 거 | / 거: &lt; 거 Uri/FriendlyName &gt;
       테스트 결과 대 한로 거를 지정 합니다.  예를 들어, 결과에 Visual Studio 테스트 결과 파일 (TRX) 기록 하려면 /logger:trx를 사용 합니다.
@@ -535,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;파일 이름&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;파일 이름&gt;
       지정된 테스트 컨테이너에서 검색된 테스트를 나열합니다.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; 파일 이름 &gt;
       목록의 지정한 테스트 컨테이너에서 테스트를 발견 했습니다.</target>
@@ -754,7 +759,7 @@
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
         <target state="translated">--Framework|/Framework:&lt;프레임워크 버전&gt;
       테스트 실행에 사용할 대상 .NET Framework 버전입니다. 
-      유효한 값은 “.NETFramework,Version=v4.5.1”, “.NETCoreApp,Version=v1.0” 등입니다.
+      유효한 값은 ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" 등입니다.
       지원되는 기타 값은 Framework35, Framework40, Framework45 및 FrameworkCore10입니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -767,7 +772,7 @@
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
-        <target state="translated">/Framework 인수에는 테스트 실행의 대상 .NET Framework 버전이 필요합니다. 예: /Framework:“.NETFramework,Version=v4.5.1”</target>
+        <target state="translated">/Framework 인수에는 테스트 실행의 대상 .NET Framework 버전이 필요합니다. 예: /Framework:".NETFramework,Version=v4.5.1"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework 인수가 필요 대상.Net Framework 버전 테스트 실행에 대 한.   예: /Framework: ". NETFramework, 버전 v4.6 = "</target>
@@ -1433,7 +1438,7 @@
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
         <target state="translated">RunSettings 인수:
-      명령줄을 통해 runsettings 구성을 전달하기 위한 인수입니다. 인수는 “--” 뒤에 [name]=[value] 형식의 이름-값 쌍으로 지정할 수 있습니다. -- 뒤의 공백에 주의하세요. 
+      명령줄을 통해 runsettings 구성을 전달하기 위한 인수입니다. 인수는 "--" 뒤에 [name]=[value] 형식의 이름-값 쌍으로 지정할 수 있습니다. -- 뒤의 공백에 주의하세요. 
       여러 [name]=[value]를 구분하려면 공백을 사용합니다.
       RunSettings 인수 지원에 대한 자세한 정보: https://aka.ms/vstest-runsettings-arguments</target>
         <note />
@@ -1498,7 +1503,7 @@
         <source>--Blame|/Blame
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
         <target state="translated">--Blame|/Blame
-      테스트를 원인 모드로 실행합니다. 이 옵션은 테스트 호스트 작동을 중단시키는 문제 있는 테스트를 격리하는 데 유용합니다. 이 경우 현재 디렉터리에 “Sequence.xml”라는 출력 파일을 만들며, 이 파일에는 작동 중단 이전 테스트 실행 순서가 캡처되어 있습니다.</target>
+      테스트를 원인 모드로 실행합니다. 이 옵션은 테스트 호스트 작동을 중단시키는 문제 있는 테스트를 격리하는 데 유용합니다. 이 경우 현재 디렉터리에 "Sequence.xml"이라는 출력 파일을 만들며, 이 파일에는 작동 중단 이전 테스트 실행 순서가 캡처되어 있습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
@@ -1552,13 +1557,13 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:testsettings를 사용하여 테스트 실행을 구성하는 경우 "{0}"은(는) 지원되지 않습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">실행 설정을 통해 구성된 데이터 수집기는 포함된 테스트 설정으로는 지원되지 않습니다. 자세한 내용은 https://aka.ms/vstest-configure-datacollector를 참조하세요. 실행 설정: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -34,7 +34,7 @@
 </source>
         <target state="translated">测试运行将使用为框架 {0} 和平台 {1} 生成的 DLL。以下 DLL 将不是运行的一部分: {2}转到 {3} 了解有关管理这些设置的详细信息。
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">测试运行将使用 DLL(s) 框架 {0} 和 {1} 的平台的构建。按照 DLL(s) 将不能运行的过程︰ {2} 转到详细 {3} 上管理这些设置。</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">{0} 适用于 {1} 框架和 {2} 平台。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

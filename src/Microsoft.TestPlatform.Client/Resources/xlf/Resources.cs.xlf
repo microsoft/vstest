@@ -45,8 +45,8 @@
       </trans-unit>
       <trans-unit id="NoTestHostProviderFound">
         <source>No suitable test runtime provider found for this run.</source>
-        <target state="new">No suitable test runtime provider found for this run.</target>
-        <note></note>
+        <target state="translated">Pro tento běh se nenašel žádný vhodný zprostředkovatel testů v režimu runtime.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
