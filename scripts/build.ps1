@@ -525,7 +525,7 @@ function Create-NugetPackages
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
 
-    # Pass Newtonsoft.Json version to nuget pack to keep the version consistency across all nuget packages.
+    # Pass Newtonsoft.Json version to nuget pack to keep the version consistent across all nuget packages.
     $JsonNetVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
 
     # package them from stagingDir
