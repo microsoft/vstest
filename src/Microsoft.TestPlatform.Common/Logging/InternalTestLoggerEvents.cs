@@ -186,6 +186,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.SafeInvokeAsync(() => this.TestRunMessage, args, 0, "InternalTestLoggerEvents.SendTestRunMessage");
         }
 
+        internal void WaitForEventCompletion()
+        {
+            this.loggerEventQueue.Flush();
+        }
+
         /// <summary>
         /// Raises a test result event to the enabled loggers.
         /// </summary>

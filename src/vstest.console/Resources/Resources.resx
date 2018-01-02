@@ -370,7 +370,7 @@
   </data>
   <data name="ListTestsHelp" xml:space="preserve">
     <value>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</value>
+      Lists all discovered tests from the given test container.</value>
   </data>
   <data name="LoggerFileIsReadOnly" xml:space="preserve">
     <value>The file {0} provided is read only</value>

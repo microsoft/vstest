@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Maximum number of cores that the engine can use to run tests in parallel
         /// </summary>
         private int maxCpuCount;
-
+        
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
@@ -292,9 +292,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
+        /// Gets or sets the target Framework this run is targeting.
         /// </summary>
-        public Framework TargetFrameworkVersion
+        public Framework TargetFramework
         {
             get
             {
@@ -304,6 +304,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set
             {
                 this.framework = value;
+                this.TargetFrameworkSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
+        /// </summary>
+        [Obsolete("Use TargetFramework instead")]
+        public FrameworkVersion TargetFrameworkVersion
+        {
+            get
+            {
+                switch(this.framework?.Name)
+                {
+                    case Constants.DotNetFramework35:
+                        return FrameworkVersion.Framework35;
+                    case Constants.DotNetFramework40:
+                        return FrameworkVersion.Framework40;
+                    case Constants.DotNetFramework45:
+                        return FrameworkVersion.Framework45;
+                    case Constants.DotNetFrameworkCore10:
+                        return FrameworkVersion.FrameworkCore10;
+                    case Constants.DotNetFrameworkUap10:
+                        return FrameworkVersion.FrameworkUap10;
+                    default:
+                        return Constants.DefaultFramework;
+                }
+            }
+
+            set
+            {
+                this.framework = Framework.FromString(value.ToString());
                 this.TargetFrameworkSet = true;
             }
         }
@@ -507,7 +539,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             root.AppendChild(disableParallelization);
 
             XmlElement targetFrameworkVersion = doc.CreateElement("TargetFrameworkVersion");
-            targetFrameworkVersion.InnerXml = this.TargetFrameworkVersion.ToString();
+            targetFrameworkVersion.InnerXml = this.TargetFramework.ToString();
             root.AppendChild(targetFrameworkVersion);
 
             XmlElement executionThreadApartmentState = doc.CreateElement("ExecutionThreadApartmentState");
@@ -744,7 +776,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
                             }
 
-                            runConfiguration.TargetFrameworkVersion = frameworkType;
+                            runConfiguration.TargetFramework = frameworkType;
                             break;
 
                         case "TestAdaptersPaths":

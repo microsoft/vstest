@@ -34,7 +34,7 @@
 </source>
         <target state="translated">При запуске тестов будут использоваться библиотеки DLL, собранные для платформ {0} и {1}. Следующие библиотеки DLL не будут участвовать в запуске: {2}.Дополнительные сведения об управлении этими параметрами см. в разделе {3}.
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тестовый запуск будет использовать DLL(s) для framework {0} и платформы {1}. После DLL(s) не будет частью выполнения: {2} перейти {3} для получения дополнительных сведений об управлении эти параметры.</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">{0} создается для программной платформы {1} и аппаратной платформы {2}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

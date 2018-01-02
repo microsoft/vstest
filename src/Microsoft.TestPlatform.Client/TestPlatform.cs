@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             if (testHostManager == null)
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(settingXml);
-                var framework = config.TargetFrameworkVersion;
+                var framework = config.TargetFramework;
 
                 EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
                 throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));

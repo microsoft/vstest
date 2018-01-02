@@ -227,7 +227,7 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
+      Lists all discovered tests from the given test container.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="TimeElapsed">
