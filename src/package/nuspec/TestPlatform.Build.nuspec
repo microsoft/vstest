@@ -12,7 +12,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
-    <tags>vstest visual-studio unittest testplatform mstest microsoft test</tags>
+    <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
   </metadata>
   <files>
     <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
