@@ -12,17 +12,16 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <dependencies>
       <group targetFramework="netcoreapp1.0">
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
-        
-        <!-- CommunicationUtilities requires 8.0.3, but 8.0.3 doesn't provide a netcoreapp1.0 target -->
-        <dependency id="Newtonsoft.Json" version="9.0.1"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="Microsoft.Extensions.DependencyModel" version="1.0.3"/>
       </group>
 
       <group targetFramework="uap10.0">
-        <dependency id="Newtonsoft.Json" version="9.0.1"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
         <dependency id="System.Xml.ReaderWriter" version="4.0.11" />
       </group>
