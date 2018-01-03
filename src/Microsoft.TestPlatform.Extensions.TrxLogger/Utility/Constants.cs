@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 {
     using System;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     internal static class Constants
     {
@@ -87,5 +88,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// Unit test type
         /// </summary>
         public static readonly TestType UnitTestType = new TestType(UnitTestTypeGuid);
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly TestProperty ExecutionIdProperty = TestProperty.Register("ExecutionId", ExecutionIdPropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly TestProperty ParentExecIdProperty = TestProperty.Register("ParentExecId", ParentExecutionIdPropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly TestProperty TestTypeProperty = TestProperty.Register("TestType", TestTypePropertyIdentifier, typeof(Guid), TestPropertyAttributes.Hidden, typeof(ObjectModel.TestResult));
+
     }
 }
