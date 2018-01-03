@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         private Guid executionId;
         private Guid parentExecutionId;
         private TestListCategoryId categoryId;
-        private List<TestEntry> testEntries = new List<TestEntry>();
+        private List<TestEntry> testEntries;
 
         #endregion
 
@@ -76,7 +76,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         public List<TestEntry> TestEntries
         {
-            get { return this.testEntries; }
+            get
+            {
+                if (this.testEntries == null)
+                {
+                    this.testEntries = new List<TestEntry>();
+                }
+
+                return this.testEntries;
+            }
         }
 
         #endregion
@@ -149,8 +157,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             if (parentExecutionId != null)
                 helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
             helper.SaveGuid(element, "@testListId", this.categoryId.Id);
-            if (testEntries.Count > 0)
-                helper.SaveIEnumerable(testEntries, element, "TestEntries", ".", "TestEntry", parameters);
+            if (this.TestEntries.Count > 0)
+                helper.SaveIEnumerable(TestEntries, element, "TestEntries", ".", "TestEntry", parameters);
         }
 
         #endregion

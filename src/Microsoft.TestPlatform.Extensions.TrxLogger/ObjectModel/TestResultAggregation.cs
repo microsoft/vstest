@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// </summary>
     internal class TestResultAggregation : TestResult, ITestResultAggregation
     {
-        protected List<ITestResult> innerResults = new List<ITestResult>();
+        protected List<ITestResult> innerResults;
 
         public TestResultAggregation(
             Guid runId,
@@ -30,7 +30,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// </summary>
         public List<ITestResult> InnerResults
         {
-            get { return innerResults; }
+            get
+            {
+                if (innerResults == null)
+                {
+                    innerResults = new List<ITestResult>();
+                }
+                return innerResults;
+            }
         }
 
         public override void Save(System.Xml.XmlElement element, XmlTestStoreParameters parameters)
@@ -38,8 +45,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             base.Save(element, parameters);
 
             XmlPersistence helper = new XmlPersistence();
-            if (innerResults.Count > 0)
-                helper.SaveIEnumerable(innerResults, element, "InnerResults", ".", null, parameters);
+            if (this.InnerResults.Count > 0)
+                helper.SaveIEnumerable(this.InnerResults, element, "InnerResults", ".", null, parameters);
         }
     }
 }

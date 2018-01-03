@@ -38,9 +38,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private TrxLoggerObjectModel.TestRun testRun;
         private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
-        private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
         private Dictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
         private Dictionary<Guid, TestEntry> entries;
+
+        // Caching results and inner test entries for constant time lookup for inner parents.
+        private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
         private Dictionary<Guid, TestEntry> innerTestEntries;
 
         /// <summary>
@@ -234,6 +236,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             var parentExecutionId = Converter.GetParentExecutionId(e.Result);
             var parentTestResult = GetTestResult(parentExecutionId);
             var parentTestElement = (parentTestResult != null) ? GetTestElement(parentTestResult.Id.TestId) : null;
+
+            // Switch to flat test results in case any parent related information is missing.
             if (parentTestResult == null || parentTestElement == null || parentExecutionId == Guid.Empty)
             {
                 parentTestResult = null;
@@ -244,7 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             // Create trx test element from rocksteady test case
             var testElement = GetOrCreateTestElement(executionId, parentExecutionId, testType, parentTestElement, e.Result.TestCase);
 
-            // Update test links
+            // Update test links. Test Links are updated in case of Ordered test.
             UpdateTestLinks(testElement, parentTestElement);
 
             // Convert the rocksteady result to trx test result
@@ -277,7 +281,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         public void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            System.Diagnostics.Debugger.Launch();
             if (this.testRun != null)
             {
                 XmlPersistence helper = new XmlPersistence();
