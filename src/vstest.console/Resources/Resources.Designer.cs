@@ -908,7 +908,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
 
         /// <summary>
         ///   Looks up a localized string similar to -lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-        ///      Lists discovered tests from the given test container..
+        ///      Lists all discovered tests from the given test container..
         /// </summary>
         public static string ListTestsHelp
         {
