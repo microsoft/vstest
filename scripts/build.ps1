@@ -530,6 +530,9 @@ function Create-NugetPackages
     # Pass Newtonsoft.Json version to nuget pack to keep the version consistent across all nuget packages.
     $JsonNetVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
 
+    # In CI build "Package: TestPlatform SDK" task, "Nuget.exe pack" required JsonNetVersion property for creating nuget package.
+    Write-Host "##vso[task.setvariable variable=JsonNetVersion;]$JsonNetVersion"
+
     # package them from stagingDir
     foreach ($file in $nuspecFiles) {
         $additionalArgs = ""
