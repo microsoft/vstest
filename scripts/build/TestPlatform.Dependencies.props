@@ -4,7 +4,7 @@
     <VSSdkBuildToolsVersion>15.0.26201</VSSdkBuildToolsVersion>
 
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
-    <NETTestSdkPreviousVersion>15.3.0-preview-20170628-02</NETTestSdkPreviousVersion>
+    <NETTestSdkPreviousVersion>15.5.0</NETTestSdkPreviousVersion>
 
     <MSTestFrameworkVersion>1.2.0</MSTestFrameworkVersion>
     <MSTestAdapterVersion>1.2.0</MSTestAdapterVersion>
@@ -25,5 +25,6 @@
 
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
+    <TestPlatformExternalsVersion>15.6.0-preview-1251113</TestPlatformExternalsVersion>
   </PropertyGroup>
 </Project>
