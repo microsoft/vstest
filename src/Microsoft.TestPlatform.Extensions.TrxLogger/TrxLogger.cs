@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -37,13 +38,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private string trxFilePath;
 
         private TrxLoggerObjectModel.TestRun testRun;
-        private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
-        private Dictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
-        private Dictionary<Guid, TestEntry> entries;
+        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
+        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestElement> testElements;
+        private ConcurrentDictionary<Guid, TestEntry> entries;
 
         // Caching results and inner test entries for constant time lookup for inner parents.
-        private Dictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
-        private Dictionary<Guid, TestEntry> innerTestEntries;
+        private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> innerResults;
+        private ConcurrentDictionary<Guid, TestEntry> innerTestEntries;
 
         /// <summary>
         /// Specifies the run level "out" messages
@@ -393,11 +394,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         // Initializes trx logger cache.
         private void InitializeInternal()
         {
-            this.results = new Dictionary<Guid, TrxLoggerObjectModel.ITestResult>();
-            this.innerResults = new Dictionary<Guid, TrxLoggerObjectModel.ITestResult>();
-            this.testElements = new Dictionary<Guid, ITestElement>();
-            this.entries = new Dictionary<Guid,TestEntry>();
-            this.innerTestEntries = new Dictionary<Guid, TestEntry>();
+            this.results = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
+            this.innerResults = new ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult>();
+            this.testElements = new ConcurrentDictionary<Guid, ITestElement>();
+            this.entries = new ConcurrentDictionary<Guid,TestEntry>();
+            this.innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
             this.runLevelErrorsAndWarnings = new List<RunInfo>();
             this.testRun = null;
             this.totalTests = 0;
@@ -535,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 if (testElement == null)
                 {
                     testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testType, rockSteadyTestCase);
-                    testElements.Add(testId, testElement);
+                    testElements.TryAdd(testId, testElement);
                 }
             }
 
@@ -579,7 +580,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             // Normal result scenario
             if (parentTestResult == null)
             {
-                this.results.Add(executionId, testResult);
+                this.results.TryAdd(executionId, testResult);
                 return testResult;
             }
 
@@ -587,7 +588,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
             {
                 (parentTestResult as TestResultAggregation).InnerResults.Add(testResult);
-                this.innerResults.Add(executionId, testResult);
+                this.innerResults.TryAdd(executionId, testResult);
                 return testResult;
             }
             
@@ -618,7 +619,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             if (parentTestElement == null)
             {
-                this.entries.Add(executionId, te);
+                this.entries.TryAdd(executionId, te);
             }
             else if (parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
             {
@@ -628,7 +629,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 if (parentTestEntry != null)
                     parentTestEntry.TestEntries.Add(te);
 
-                this.innerTestEntries.Add(executionId, te);
+                this.innerTestEntries.TryAdd(executionId, te);
             }
         }
 
