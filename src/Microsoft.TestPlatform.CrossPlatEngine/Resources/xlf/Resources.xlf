@@ -102,6 +102,11 @@
         <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="FailedToConnectDataCollector">
+        <source>Failed to connect datacollector.</source>
+        <target state="new">Failed to connect datacollector.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

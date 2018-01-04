@@ -134,6 +134,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to connect datacollector..
+        /// </summary>
+        internal static string FailedToConnectDataCollector {
+            get {
+                return ResourceManager.GetString("FailedToConnectDataCollector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to launch testhost with error: {0}.
         /// </summary>
         internal static string FailedToLaunchTestHost {

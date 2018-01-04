@@ -55,6 +55,37 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
+        public void InitializeShouldThrowExceptionIfConnectionTimeouts()
+        {
+            this.mockDataCollectionRequestSender.Setup( x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(false);
+
+            Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize());
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
+        {
+            var timeout = 10;
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, timeout.ToString());
+
+            this.proxyDataCollectionManager.Initialize();
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, string.Empty);
+
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(timeout * 1000), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetTimeoutBasedOnDebugEnvironmentVaribleName()
+        {
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, "1");
+
+            this.proxyDataCollectionManager.Initialize();
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
+
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5), Times.Once);
+        }
+
+        [TestMethod]
         public void InitializeShouldPassDiagArgumentsIfDiagIsEnabled()
         {
             // Saving the EqtTrace state

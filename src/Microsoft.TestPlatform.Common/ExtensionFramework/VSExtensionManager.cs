@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             catch (Exception ex)
             {
-                string message = string.Format(CultureInfo.CurrentCulture, Resources.FailedToFindInstalledUnitTestExtensions, ex.ToString());
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.FailedToFindInstalledUnitTestExtensions, ex);
                 throw new TestPlatformException(message, ex);
             }
         }
