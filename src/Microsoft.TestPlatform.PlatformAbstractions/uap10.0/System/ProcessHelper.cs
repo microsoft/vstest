@@ -62,11 +62,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
-        public void SetExitCallback(int parentProcessId, Action callbackAction)
-        {
-        }
-
-        /// <inheritdoc/>
         public void SetExitCallback(int parentProcessId, Action<object> callbackAction)
         {
         }
