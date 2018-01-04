@@ -313,8 +313,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.clientExitErrorMessage = stdError;
             this.clientExited.Set();
 
-            // Note that we're not explicitly disconnecting the communication channel; wait for the
-            // channel to determine the disconnection on its own.
+            // Break communication loop.
+            this.communicationEndpoint.Stop();
         }
 
         /// <inheritdoc />

@@ -143,6 +143,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
+        public void SetExitCallback(int processId, Action<object> callbackAction)
+        {
+            var process = Process.GetProcessById(processId);
+
+            process.EnableRaisingEvents = true;
+            process.Exited += (sender, args) =>
+            {
+                callbackAction.Invoke(process);
+            };
+        }
+
+        /// <inheritdoc/>
         public void TerminateProcess(object process)
         {
             var proc = process as Process;
