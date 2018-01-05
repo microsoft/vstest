@@ -48,6 +48,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void InitializeShouldInitializeCommunication()
         {
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
             this.proxyDataCollectionManager.Initialize();
 
             this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string>>(), It.IsAny<IList<string>>()), Times.Once);
@@ -65,8 +66,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
         {
+
             var timeout = 10;
             Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, timeout.ToString());
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(timeout * 1000)).Returns(true);
 
             this.proxyDataCollectionManager.Initialize();
             Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, string.Empty);
@@ -78,6 +81,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void InitializeShouldSetTimeoutBasedOnDebugEnvironmentVaribleName()
         {
             Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, "1");
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5)).Returns(true);
 
             this.proxyDataCollectionManager.Initialize();
             Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
@@ -101,6 +105,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             try
             {
                 EqtTrace.InitializeVerboseTrace("mylog.txt");
+                this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
 
                 this.proxyDataCollectionManager.Initialize();
 

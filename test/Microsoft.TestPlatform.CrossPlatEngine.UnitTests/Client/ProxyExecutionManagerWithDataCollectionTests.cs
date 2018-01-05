@@ -100,6 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var mockRequestSender = new Mock<IDataCollectionRequestSender>();
             mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
+            mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
 
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
             var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
