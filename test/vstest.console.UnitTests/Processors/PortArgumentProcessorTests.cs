@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             this.executor.Initialize(port.ToString());
 
-            this.mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action>()), Times.Once);
+            this.mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action<object>>()), Times.Once);
         }
 
         [TestMethod]
