@@ -51,10 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     process.Exited += (sender, args) =>
                     {
                         // Call WaitForExit without again to ensure all streams are flushed,
-                        // Add timeout to avoid indefinite waiting on child process exist.
                         var p = sender as Process;
                         try
                         {
+                            // Add timeout to avoid indefinite waiting on child process exit.
                             p.WaitForExit(500);
                         }
                         catch (InvalidOperationException)
@@ -137,11 +137,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             {
                 var process = Process.GetProcessById(processId);
                 process.EnableRaisingEvents = true;
-                process.Exited += (sender, args) => callbackAction.Invoke(process);
+                process.Exited += (sender, args) => callbackAction?.Invoke(sender);
             }
             catch (ArgumentException)
             {
-                // Ignore the exception if process is not running.
+                // Process.GetProcessById() throws ArgumentException if process is not running(identifier might be expired).
+                // Invoke callback immediately.
+                callbackAction?.Invoke(null);
             }
         }
 
