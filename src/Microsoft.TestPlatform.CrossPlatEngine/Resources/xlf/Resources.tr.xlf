@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="1612553793">
     <header>
@@ -190,6 +190,11 @@
         <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
         <target state="translated">Eski bir Microsoft.NET.Test.Sdk sürümü kullanıyorsunuz. Lütfen 15.3.0 veya daha yeni bir sürüme geçin.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="FailedToConnectDataCollector">
+        <source>Failed to connect to datacollector process.</source>
+        <target state="new">Failed to connect datacollector.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

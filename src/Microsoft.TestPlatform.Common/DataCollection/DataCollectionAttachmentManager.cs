@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
             catch (Exception ex)
             {
-                EqtTrace.Error(ex.Message);
+                EqtTrace.Error("DataCollectionAttachmentManager.GetAttachments: Fail to get attachments: {0} ", ex);
             }
 
             List<AttachmentSet> attachments = new List<AttachmentSet>();
@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     catch (Exception ex)
                     {
                         this.LogError(
-                           ex.Message,
+                           ex.ToString(),
                            uri,
                            friendlyName,
                            Guid.Parse(testCaseId));

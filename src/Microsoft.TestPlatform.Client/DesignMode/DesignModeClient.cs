@@ -136,7 +136,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     var message = this.communicationManager.ReceiveMessage();
 
-                    EqtTrace.Info("DesignModeClient: Processing Message of message type: {0}", message.MessageType);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
+                    }
+
                     switch (message.MessageType)
                     {
                         case MessageType.VersionCheck:
