@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var processHelper = new ProcessHelper();
             processHelper.SetExitCallback(
                 parentProcessId,
-                () =>
+                (obj) =>
                     {
                         EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);
                         Environment.Exit(1);

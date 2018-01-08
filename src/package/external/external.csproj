@@ -53,15 +53,15 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>15.6.0-preview-1202328</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>15.6.0-preview-1202328</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools.DataCollectors">
-      <Version>15.6.0-preview-1202328</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.Intellitrace">
