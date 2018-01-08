@@ -5,15 +5,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Text;
     using System.Xml;
     using System.Xml.XPath;
+    using OMResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
     using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
     /// <summary>
@@ -42,6 +41,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         // To make things compatible for older runsettings
         private const string MsTestTargetDeviceNodePath = @"/RunSettings/MSPhoneTest/TargetDevice";
 
+        private const string CodeCoverageCollectorUri = @"datacollector://microsoft/CodeCoverage/2.0";
+        private const string FakesCollectorUri = @"datacollector://microsoft/unittestisolation/1.0";
+        private const string CodeCoverageFriendlyName = "Code Coverage";
+        private const string FakesFriendlyName = "UnitTestIsolation";
 
         /// <summary>
         /// Make runsettings compatible with testhost of version 15.0.0-preview
@@ -213,7 +216,73 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="overwrite">Overwrite option.</param>
         public static void UpdateTargetFramework(XmlDocument runSettingsDocument, string framework, bool overwrite = false)
         {
-            AddNodeIfNotPresent<string>(runSettingsDocument, TargetFrameworkNodePath, TargetFrameworkNodeName, framework, overwrite);
+            AddNodeIfNotPresent(runSettingsDocument, TargetFrameworkNodePath, TargetFrameworkNodeName, framework, overwrite);
+        }
+
+        /// <summary>
+        /// Validates the collectors in runsettings when an inlined testsettings is specified
+        /// </summary>
+        /// <param name="runsettings">RunSettings used for the run</param>
+        /// <returns>True if an incompatible collector is found</returns>
+        public static bool AreRunSettingsCollectorsInCompatibleWithTestSettings(string runsettings)
+        {
+            // If there's no embedded testsettings.. bail out
+            if (!IsTestSettingsEnabled(runsettings))
+            {
+                return false;
+            }
+
+            // Explicitly blocking usage of data collectors through modes runsettings and testsettings except 
+            // for couple of scenarios where the IDE generates the collector settings in the runsettings file even when
+            // it has an embedded testsettings file. Longterm runsettings will be the single run configuration source
+            // Inproc collectos are incompatible with testsettings
+            var inprocDataCollectionSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(runsettings);
+            if (inprocDataCollectionSettings != null && inprocDataCollectionSettings.IsCollectionEnabled && inprocDataCollectionSettings.DataCollectorSettingsList != null)
+            {
+                foreach (var collectorSettings in inprocDataCollectionSettings.DataCollectorSettingsList)
+                {
+                    if (collectorSettings.IsEnabled)
+                    {
+                        EqtTrace.Warning($"Incompatible collector found. {collectorSettings.FriendlyName} : {collectorSettings.Uri}");
+                        return true;
+                    }
+                }
+            }
+
+            // TestSettings and collection is enabled in runsetttings.. the only allowed collectors are codecoverage and fakes
+            var datacollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(runsettings);
+            if (datacollectionSettings != null && datacollectionSettings.IsCollectionEnabled && datacollectionSettings.DataCollectorSettingsList != null)
+            {
+                foreach (var collectorRef in datacollectionSettings.DataCollectorSettingsList)
+                {
+                    // Ignore disabled collector
+                    if (!collectorRef.IsEnabled)
+                    {
+                        continue;
+                    }
+
+                    // If the configured collector is code coverage or fakes.. ignore
+                    if (!string.IsNullOrWhiteSpace(collectorRef.FriendlyName) &&
+                         (FakesFriendlyName.Equals(collectorRef.FriendlyName, StringComparison.OrdinalIgnoreCase) ||
+                          CodeCoverageFriendlyName.Equals(collectorRef.FriendlyName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+
+                    // If the configured collector is code coverage or fakes.. ignore
+                    if (collectorRef.Uri != null &&
+                        (CodeCoverageCollectorUri.Equals(collectorRef.Uri.ToString(), StringComparison.OrdinalIgnoreCase) ||
+                         FakesCollectorUri.Equals(collectorRef.Uri.ToString(), StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+
+                    EqtTrace.Warning($"Incompatible collector found. {collectorRef.FriendlyName} : {collectorRef.Uri}");
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -248,29 +317,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <returns></returns>
         public static bool IsTestSettingsEnabled(string runsettingsXml)
         {
-            if (!string.IsNullOrWhiteSpace(runsettingsXml))
+            if (string.IsNullOrWhiteSpace(runsettingsXml))
             {
-                using (var stream = new StringReader(runsettingsXml))
-                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                return false;
+            }
+
+            using (var stream = new StringReader(runsettingsXml))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var runSettingsNavigator = document.CreateNavigator();
+
+                // Move navigator to MSTest node
+                if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+                    !runSettingsNavigator.MoveToChild("MSTest", string.Empty))
                 {
-                    var document = new XmlDocument();
-                    document.Load(reader);
+                    EqtTrace.Info("InferRunSettingsHelper.IsTestSettingsEnabled: Unable to navigate to RunSettings/MSTest. Current node: " + runSettingsNavigator.LocalName);
+                    return false;
+                }
 
-                    var runSettingsNavigator = document.CreateNavigator();
-
-                    // Move navigator to MSTest node
-                    if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
-                        !runSettingsNavigator.MoveToChild("MSTest", string.Empty))
-                    {
-                        EqtTrace.Info("InferRunSettingsHelper.IsTestSettingsEnabled: Unable to navigate to RunSettings/MSTest. Current node: " + runSettingsNavigator.LocalName);
-                        return false;
-                    }
-
-                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-                    if (node != null && !string.IsNullOrEmpty(node.InnerXml))
-                    {
-                        return true;
-                    }
+                var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+                if (node != null && !string.IsNullOrEmpty(node.InnerXml))
+                {
+                    return true;
                 }
             }
 
@@ -398,16 +469,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             Func<string, bool> validator = (string xml) =>
+            {
+                var value = (Architecture)Enum.Parse(typeof(Architecture), xml, true);
+
+                if (!Enum.IsDefined(typeof(Architecture), value) || value == Architecture.Default || value == Architecture.AnyCPU)
                 {
-                    var value = (Architecture)Enum.Parse(typeof(Architecture), xml, true);
+                    return false;
+                }
 
-                    if (!Enum.IsDefined(typeof(Architecture), value) || value == Architecture.Default || value == Architecture.AnyCPU)
-                    {
-                        return false;
-                    }
-
-                    return true;
-                };
+                return true;
+            };
 
             return XmlUtilities.IsValidNodeXmlValue(platformXml, validator);
         }
@@ -425,22 +496,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             Func<string, bool> validator = (string xml) =>
+            {
+                if (Framework.FromString(xml) != null)
                 {
-                    if (Framework.FromString(xml) != null)
-                    {
-                        // Allow TargetFrameworkMoniker values like .NETFramework,Version=v4.5, ".NETCoreApp,Version=v1.0
-                        return true;
-                    }
-
-                    var value = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), xml, true);
-
-                    if (!Enum.IsDefined(typeof(FrameworkVersion), value) || value == FrameworkVersion.None)
-                    {
-                        return false;
-                    }
-
+                    // Allow TargetFrameworkMoniker values like .NETFramework,Version=v4.5, ".NETCoreApp,Version=v1.0
                     return true;
-                };
+                }
+
+                var value = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), xml, true);
+
+                if (!Enum.IsDefined(typeof(FrameworkVersion), value) || value == FrameworkVersion.None)
+                {
+                    return false;
+                }
+
+                return true;
+            };
 
             return XmlUtilities.IsValidNodeXmlValue(frameworkXml, validator);
         }
