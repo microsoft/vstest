@@ -370,6 +370,20 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void LaunchTestHostShouldSetExitCallBackInCaseCustomHost()
+        {
+            var expectedProcessId = Process.GetCurrentProcess().Id;
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+            var startInfo = this.GetDefaultStartInfo();
+            this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
+            this.dotnetHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None).Wait();
+
+            this.mockProcessHelper.Verify(ph => ph.SetExitCallback(expectedProcessId, It.IsAny<Action<object>>()));
+        }
+
+        [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
         {
             // Absolute path to the source directory

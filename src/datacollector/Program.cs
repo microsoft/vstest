@@ -55,20 +55,23 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 WaitForDebuggerIfEnabled();
                 Run(args);
             }
-            catch (SocketException ex)
-            {
-                EqtTrace.Error("DataCollector: Socket exception is thrown : {0}", ex);
-            }
             catch (Exception ex)
             {
                 EqtTrace.Error("DataCollector: Error occured during initialization of Datacollector : {0}", ex);
+                throw;
             }
         }
 
         private static void Run(string[] args)
         {
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
-            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
+
+            // Setup logging if enabled
+            string logFile;
+            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            {
+                EqtTrace.InitializeVerboseTrace(logFile);
+            }
 
             // Attach to exit of parent process
             var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
@@ -77,18 +80,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var processHelper = new ProcessHelper();
             processHelper.SetExitCallback(
                 parentProcessId,
-                () =>
+                (obj) =>
                     {
                         EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);
                         Environment.Exit(1);
                     });
-
-            // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
-            {
-                EqtTrace.InitializeVerboseTrace(logFile);
-            }
 
             // Get server port and initialize communication.
             string portValue;
@@ -99,6 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 throw new ArgumentException("Incorrect/No Port number");
             }
 
+            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
             requestHandler.InitializeCommunication(port);
 
             // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized

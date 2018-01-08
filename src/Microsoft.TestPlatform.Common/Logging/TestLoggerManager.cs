@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Gets the logger events.
         /// </summary>
-        public TestLoggerEvents LoggerEvents
+        public InternalTestLoggerEvents LoggerEvents
         {
             get
             {

@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (parentProcessId > 0)
             {
-                processHelper.SetExitCallback(parentProcessId, () =>
+                processHelper.SetExitCallback(parentProcessId, (obj) =>
                 {
                     EqtTrace.Info($"PortArgumentProcessor: parent process:{parentProcessId} exited.");
                     DesignModeClient.Instance?.HandleParentProcessExit();

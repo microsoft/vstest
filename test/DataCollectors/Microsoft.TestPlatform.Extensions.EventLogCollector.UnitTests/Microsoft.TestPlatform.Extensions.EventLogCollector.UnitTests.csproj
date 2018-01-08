@@ -18,9 +18,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj" />
-    <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Runtime" />

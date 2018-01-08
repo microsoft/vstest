@@ -10,9 +10,6 @@
     <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.CoreUtilities.UnitTests</AssemblyName>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="System.Diagnostics.Process">
       <Version>4.3.0</Version>

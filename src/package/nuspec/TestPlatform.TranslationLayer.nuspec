@@ -12,9 +12,10 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <dependencies>
       <group targetFramework="net451">
-        <dependency id="Newtonsoft.Json" version="9.0.1"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
       </group>
       <group targetFramework="netstandard1.5">
@@ -29,7 +30,7 @@
         <!-- TestPlatform.Common dependencies -->
         <dependency id="System.Runtime.Loader" version="[4.0.0, )" />
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
-        <dependency id="Newtonsoft.Json" version="9.0.1"/>
+        <dependency id="Newtonsoft.Json" version="$JsonNetVersion$"/>
       </group>
     </dependencies>
     <frameworkAssemblies>
