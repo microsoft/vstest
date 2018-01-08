@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Error("ProxyDiscoveryManager.DiscoverTests: Failed to discover tests: {0}", exception);
 
                 // Log to vs ide test output
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
                 var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
                 this.HandleRawMessage(rawMessage);
 
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
                 // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
                 // and the test host is lost as well.
-                this.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                this.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 

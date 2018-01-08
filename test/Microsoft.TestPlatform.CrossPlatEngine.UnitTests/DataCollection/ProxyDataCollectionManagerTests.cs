@@ -48,10 +48,45 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void InitializeShouldInitializeCommunication()
         {
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
             this.proxyDataCollectionManager.Initialize();
 
             this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string>>(), It.IsAny<IList<string>>()), Times.Once);
-            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(5000), Times.Once);
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowExceptionIfConnectionTimeouts()
+        {
+            this.mockDataCollectionRequestSender.Setup( x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(false);
+
+            Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize());
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
+        {
+
+            var timeout = 10;
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, timeout.ToString());
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(timeout * 1000)).Returns(true);
+
+            this.proxyDataCollectionManager.Initialize();
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, string.Empty);
+
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(timeout * 1000), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetTimeoutBasedOnDebugEnvironmentVaribleName()
+        {
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, "1");
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5)).Returns(true);
+
+            this.proxyDataCollectionManager.Initialize();
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
+
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5), Times.Once);
         }
 
         [TestMethod]
@@ -70,6 +105,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             try
             {
                 EqtTrace.InitializeVerboseTrace("mylog.txt");
+                this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
 
                 this.proxyDataCollectionManager.Initialize();
 
@@ -79,7 +115,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                             It.IsAny<IDictionary<string, string>>(),
                             It.Is<IList<string>>(list => list.Contains("--diag"))),
                     Times.Once);
-                this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(5000), Times.Once);
+                this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout), Times.Once);
             }
             finally
             {
@@ -135,7 +171,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
 
-            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
+            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
             Assert.AreEqual(0, result.EnvironmentVariables.Count);
             Assert.AreEqual(false, result.AreTestCaseLevelEventsRequired);
             Assert.AreEqual(0, result.DataCollectionEventsPort);
@@ -171,7 +207,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, mockRunEventsHandler.Object);
 
-            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
+            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
         }
 
 
