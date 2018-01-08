@@ -165,19 +165,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 if (message.MessageType == MessageType.VersionCheck)
                 {
                     this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
-
-                    EqtTrace.Info(@"TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.protocolVersion);
                 }
 
                 // TRH can also send TestMessage if tracing is enabled, so log it at runner end
                 else if (message.MessageType == MessageType.TestMessage)
                 {
-                    // Only Deserialize if Tracing is enabled
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                        EqtTrace.Info("TestRequestSender.CheckVersionWithTestHost: " + testMessagePayload.Message);
-                    }
+                    // Ignore test messages. Currently we don't have handler(which sends messages to client/console.) here.
+                    // Above we are logging it to EqtTrace.
                 }
                 else if (message.MessageType == MessageType.ProtocolError)
                 {

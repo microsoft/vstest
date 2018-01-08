@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to connect datacollector..
+        ///   Looks up a localized string similar to Failed to connect to datacollector process..
         /// </summary>
         internal static string FailedToConnectDataCollector {
             get {
