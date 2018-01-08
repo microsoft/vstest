@@ -340,6 +340,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 {
                     var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
                     this.testHostProcess = Process.GetProcessById(processId);
+                    this.processHelper.SetExitCallback(processId, this.ExitCallBack);
                 }
             }
             catch (OperationCanceledException ex)

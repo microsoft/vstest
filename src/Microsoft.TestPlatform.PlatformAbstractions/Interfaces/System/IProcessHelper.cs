@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <param name="callbackAction">
         /// Callback on process exit.
         /// </param>
-        void SetExitCallback(int processId, Action callbackAction);
+        void SetExitCallback(int processId, Action<object> callbackAction);
 
         /// <summary>
         /// Terminates a process.

@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     var processHelper = new ProcessHelper();
                     processHelper.SetExitCallback(
                         parentProcessId,
-                        () =>
+                        (obj) =>
                             {
                                 EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
                                 new PlatformEnvironment().Exit(1);

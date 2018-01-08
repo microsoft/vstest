@@ -381,6 +381,18 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void LaunchTestHostShouldSetExitCallbackInCaseCustomHost()
+        {
+            var mockCustomLauncher = new Mock<ITestHostLauncher>();
+            this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
+            var currentProcess = Process.GetCurrentProcess();
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None).Wait();
+
+            this.mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object>>()));
+        }
+
+        [TestMethod]
         public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
         {
             var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
