@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             // Create trx test element from rocksteady test case
-            var testElement = GetOrCreateTestElement(executionId, parentExecutionId, testType, parentTestElement, e.Result.TestCase);
+            var testElement = GetOrCreateTestElement(executionId, parentExecutionId, testType, parentTestElement, e.Result);
 
             // Update test links. Test Links are updated in case of Ordered test.
             UpdateTestLinks(testElement, parentTestElement);
@@ -525,19 +525,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="parentTestElement"></param>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Trx test element</returns>
-        private ITestElement GetOrCreateTestElement(Guid executionId, Guid parentExecutionId, TestType testType, ITestElement parentTestElement, ObjectModel.TestCase rockSteadyTestCase)
+        private ITestElement GetOrCreateTestElement(Guid executionId, Guid parentExecutionId, TestType testType, ITestElement parentTestElement, ObjectModel.TestResult rockSteadyTestResult)
         {
             ITestElement testElement = parentTestElement;
-            if (parentTestElement == null || parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
-            {
-                Guid testId = Converter.GetTestId(rockSteadyTestCase);
-                testElement = GetTestElement(testId);
 
-                if (testElement == null)
-                {
-                    testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testType, rockSteadyTestCase);
-                    testElements.TryAdd(testId, testElement);
-                }
+            // For scenarios like data driven tests, test element is same as parent test element.
+            if (parentTestElement != null && !parentTestElement.TestType.Equals(TrxLoggerConstants.OrderedTestType))
+            {
+                return testElement;
+            }
+
+            Guid testId = Converter.GetTestId(rockSteadyTestResult.TestCase);
+
+            // Scenario for inner test case when parent test element is not present.
+            var testName = rockSteadyTestResult.TestCase.DisplayName;
+            if (parentTestElement == null && !string.IsNullOrEmpty(rockSteadyTestResult.DisplayName))
+            {
+                testId = Guid.NewGuid();
+                testName = rockSteadyTestResult.DisplayName;
+            }
+
+            // Get test element
+            testElement = GetTestElement(testId);
+
+            // Create test element
+            if (testElement == null)
+            {
+                testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testName, testType, rockSteadyTestResult.TestCase);
+                testElements.TryAdd(testId, testElement);
             }
 
             return testElement;

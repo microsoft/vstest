@@ -637,7 +637,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
 
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, TrxLoggerConstants.UnitTestType, testCase);
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
             object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
 
@@ -653,7 +653,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
 
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, TrxLoggerConstants.UnitTestType, testCase);
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
             object[] expected = Enumerable.Empty<Object>().ToArray();
 

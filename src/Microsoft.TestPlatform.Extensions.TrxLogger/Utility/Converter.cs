@@ -36,10 +36,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             Guid testId,
             Guid executionId,
             Guid parentExecutionId,
+            String testName,
             TestType testType,
             ObjectModel.TestCase rockSteadyTestCase)
         {
-            var testElement = CreateTestElement(testId, rockSteadyTestCase.DisplayName, rockSteadyTestCase.FullyQualifiedName, rockSteadyTestCase.ExecutorUri.ToString(), rockSteadyTestCase.Source, testType);
+            var testElement = CreateTestElement(testId, testName, rockSteadyTestCase.FullyQualifiedName, rockSteadyTestCase.ExecutorUri.ToString(), rockSteadyTestCase.Source, testType);
 
             testElement.Storage = rockSteadyTestCase.Source;
             testElement.Priority = GetPriority(rockSteadyTestCase);

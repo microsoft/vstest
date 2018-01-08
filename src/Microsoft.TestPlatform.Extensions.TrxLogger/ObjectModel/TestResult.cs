@@ -66,6 +66,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         }
 
         /// <summary>
+        /// Gets the parent execution id.
+        /// </summary>
+        public Guid ParentExecutionId
+        {
+            get { return this.parentExecutionId; }
+        }
+
+        /// <summary>
         /// Gets the test id.
         /// </summary>
         public Guid TestId
@@ -140,7 +148,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             if (this.parentExecutionId != null)
                 helper.SaveGuid(element, "@parentExecutionId", this.parentExecutionId);
 
-            helper.SaveObject(this.testId, element, null);
+            helper.SaveGuid(element, "@testId", this.testId);
         }
 
         #endregion
