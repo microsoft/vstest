@@ -235,6 +235,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsTrue(fileOutput.Contains("Test2"));
         }
 
+        [TestMethod]
+        public void DiscoveryShouldFilterCategoryTestsAndReturnSuccess()
+        {
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            var mockConsoleOutput = new Mock<IOutput>();
+
+            this.RunListFullyQualifiedTestArgumentProcessorWithTraits(mockDiscoveryRequest, mockConsoleOutput);
+
+            mockDiscoveryRequest.Verify(dr => dr.DiscoverAsync(), Times.Once);
+
+            var fileOutput = File.ReadAllLines(this.dummyFilePath);
+            Assert.IsTrue(fileOutput.Length == 1);
+            Assert.IsTrue(fileOutput.Contains("Test1"));
+            Assert.IsTrue(!fileOutput.Contains("Test2"));
+        }
+
         [ExpectedException(typeof(CommandLineException))]
         [TestMethod]
         public void ExecutorExecuteShouldThrowWhenListFullyQualifiedTestsTargetPathIsEmpty()
@@ -267,6 +283,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.mockTestPlatformEventSource.Verify(x => x.DiscoveryRequestStop(), Times.Once);
         }
         #endregion
+
+        private void RunListFullyQualifiedTestArgumentProcessorWithTraits(Mock<IDiscoveryRequest> mockDiscoveryRequest, Mock<IOutput> mockConsoleOutput, bool legitPath = true)
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            var list = new List<TestCase>();
+
+            var t1 = new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1");
+            t1.Traits.Add(new Trait("Category", "MyCat"));
+            list.Add(t1);
+
+            var t2 = new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2");
+            t2.Traits.Add(new Trait("Category", "MyBat"));
+            list.Add(t2);
+
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+
+            this.ResetAndAddSourceToCommandLineOptions(legitPath);
+            var cmdOptions = CommandLineOptions.Instance;
+            cmdOptions.TestCaseFilterValue = "TestCategory=MyCat";
+
+            var testRequestManager = new TestRequestManager(cmdOptions, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+
+            GetExecutor(testRequestManager, mockConsoleOutput.Object).Execute();
+        }
 
         private void RunListFullyQualifiedTestArgumentProcessorExecuteWithMockSetup(Mock<IDiscoveryRequest> mockDiscoveryRequest, Mock<IOutput> mockConsoleOutput, bool legitPath = true)
         {
