@@ -291,9 +291,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     reader.ReadToNextElement();
 
                     // Read till we reach DC element or reach EOF
-                    while (!string.Equals(reader.Name, Constants.DataCollectionRunSettingsName)
-                           &&
-                           !reader.EOF)
+                    while (!string.Equals(reader.Name, Constants.DataCollectionRunSettingsName) && !reader.EOF)
                     {
                         reader.SkipToNextElement();
                     }
@@ -310,9 +308,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
             catch (XmlException ex)
             {
-                throw new SettingsException(
-                    string.Format(CultureInfo.CurrentCulture, "{0} {1}", Resources.CommonResources.MalformedRunSettingsFile, ex.Message),
-                    ex);
+                throw new SettingsException(string.Format(CultureInfo.CurrentCulture, "{0} {1}", Resources.CommonResources.MalformedRunSettingsFile, ex.Message), ex);
             }
         }
 
@@ -328,37 +324,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         public static DataCollectionRunSettings GetInProcDataCollectionRunSettings(string runSettingsXml)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
-            if (!string.IsNullOrWhiteSpace(runSettingsXml))
+            if (string.IsNullOrWhiteSpace(runSettingsXml))
             {
-                runSettingsXml = runSettingsXml.Trim();
-                using (StringReader stringReader1 = new StringReader(runSettingsXml))
-                {
-                    XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
-
-                    // read to the fist child
-                    XmlReaderUtilities.ReadToRootNode(reader);
-                    reader.ReadToNextElement();
-
-                    // Read till we reach In Proc IDC element or reach EOF
-                    while (!string.Equals(reader.Name, Constants.InProcDataCollectionRunSettingsName)
-                           &&
-                           !reader.EOF)
-                    {
-                        reader.SkipToNextElement();
-                    }
-
-                    // If reached EOF => IDC element not there
-                    if (reader.EOF)
-                    {
-                        return null;
-                    }
-
-                    // Reached here => In Proc IDC element present.
-                    return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
-                }
+                return null;
             }
 
-            return null;
+            runSettingsXml = runSettingsXml.Trim();
+            using (StringReader stringReader1 = new StringReader(runSettingsXml))
+            {
+                XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
+
+                // read to the fist child
+                XmlReaderUtilities.ReadToRootNode(reader);
+                reader.ReadToNextElement();
+
+                // Read till we reach In Proc IDC element or reach EOF
+                while (!string.Equals(reader.Name, Constants.InProcDataCollectionRunSettingsName) && !reader.EOF)
+                {
+                    reader.SkipToNextElement();
+                }
+
+                // If reached EOF => IDC element not there
+                if (reader.EOF)
+                {
+                    return null;
+                }
+
+                // Reached here => In Proc IDC element present.
+                return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
+            }
         }
 
         /// <summary>

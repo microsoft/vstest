@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.XPath;
-
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
@@ -338,27 +337,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(runsettings))
             {
-                bool throwException = false;
-                if (this.commandLineOptions.EnableCodeCoverage)
-                {
-                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
-                    if (dataCollectorsFriendlyNames.Count >= 2)
-                    {
-                        throwException = true;
-                    }
-
-                }
-                else if (XmlRunSettingsUtilities.IsDataCollectionEnabled(runsettings))
-                {
-                    throwException = true;
-                }
-
-                if (throwException)
-                {
-                    throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
-                }
+                throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
