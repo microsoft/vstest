@@ -281,6 +281,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             private static TestCaseFilterExpression filterExpression;
             private const string TestCategory = "TestCategory";
+            private const string Category = "Category";
             private const string Traits = "Traits";
 
             public TestCaseFilter()
@@ -434,6 +435,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                             traitValueList.Add(trait.Value);
                         }
                     }
+                }
+
+                //This is hack for NUnit,Xunit to understand test category -> This method is called only for NUnit/Xunit
+                if (!traitDictionary.ContainsKey(TestCategory) && traitDictionary.ContainsKey(Category))
+                {
+                    traitDictionary.TryGetValue(Category, out var categoryValue);
+                    traitDictionary.Add(TestCategory, categoryValue);
                 }
 
                 return traitDictionary;
