@@ -134,6 +134,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
         }
 
+        public override int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        {
+            if (this.dataCollectionEnvironmentVariables != null)
+            {
+                if (testProcessStartInfo.EnvironmentVariables == null)
+                {
+                    testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string>();
+                }
+
+                foreach(var envVariable in this.dataCollectionEnvironmentVariables)
+                {
+                    if (testProcessStartInfo.EnvironmentVariables.ContainsKey(envVariable.Key))
+                    {
+                        testProcessStartInfo.EnvironmentVariables[envVariable.Key] = envVariable.Value;
+                    }
+                    else
+                    {
+                        testProcessStartInfo.EnvironmentVariables.Add(envVariable.Key, envVariable.Value);
+                    }
+                }
+            }
+
+            return base.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
         /// <inheritdoc />
         protected override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
