@@ -1561,9 +1561,9 @@
         <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="translated">嵌入测试设置不支持通过运行设置配置的数据收集器。请参阅 https://aka.ms/vstest-configure-datacollector 以了解详细信息。运行测试: {0}。</target>
-        <note />
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">嵌入测试设置不支持通过运行设置配置的数据收集器。请参阅 https://aka.ms/vstest-configure-datacollector 以了解详细信息。运行测试: {0}。</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>
