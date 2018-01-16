@@ -16,8 +16,6 @@ NOCOLOR='\033[0m'
 #
 CONFIGURATION="Debug"
 TARGET_RUNTIME="ubuntu.16.04-x64"
-VERSION="15.6.0"
-VERSION_SUFFIX="dev"
 FAIL_FAST=false
 VERBOSE=false
 PROJECT_NAME_PATTERNS=**Unit*bin*Debug*netcoreapp1.0*UnitTests*dll
