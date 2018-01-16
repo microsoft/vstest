@@ -58,6 +58,7 @@ $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
 # Set Version from scripts/build/TestPlatform.Settings.targets
 $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix
+$Version = ($Version).Trim()
 
 #
 # Dotnet configuration
