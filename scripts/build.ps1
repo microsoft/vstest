@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "",
+    [System.String] $Version = "", # Will set this later by reading TestPlatform.Settings.targets file.
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -56,7 +56,7 @@ $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
-
+# Set Version from scripts/build/TestPlatform.Settings.targets
 $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix
 
 #
