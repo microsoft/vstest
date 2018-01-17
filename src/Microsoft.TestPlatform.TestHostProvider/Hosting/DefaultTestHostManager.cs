@@ -385,11 +385,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 {
                     int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
                     this.testHostProcess = Process.GetProcessById(processId);
+                    this.processHelper.SetExitCallback(processId, this.ExitCallBack);
                 }
             }
             catch (OperationCanceledException ex)
             {
-                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.Message);
+                EqtTrace.Error("DefaultTestHostManager.LaunchHost: Failed to launch testhost: {0}", ex);
+                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.ToString());
                 return false;
             }
 

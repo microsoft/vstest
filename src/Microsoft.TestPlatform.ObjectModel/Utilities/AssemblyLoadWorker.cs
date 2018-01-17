@@ -376,7 +376,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 //Ignore all exception
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("AssemblyLoadWorker:GetArchitectureForSource() Returning default:{0}. Unhandled exception: {1}.", "AnyCPU", ex.Message);
+                    EqtTrace.Error("AssemblyLoadWorker:GetArchitectureForSource() Returning default:{0}. Unhandled exception: {1}.", "AnyCPU", ex.ToString());
                 }
             }
 

@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
-                this.LogMessage(TestMessageLevel.Error, exception.Message);
+                this.LogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
@@ -178,6 +178,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
         }
 
+        /// <inheritdoc/>
+        public virtual int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        {
+            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
         /// <summary>
         /// Aborts the test run.
         /// </summary>
@@ -196,12 +202,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             this.baseTestRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
-        }
-
-        /// <inheritdoc/>
-        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
-        {
-            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc/>

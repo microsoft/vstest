@@ -467,7 +467,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
         }
-        
+
         [TestMethod]
         public void IsTestSettingsEnabledShouldReturnTrueIfRunsettingsHasTestSettings()
         {
@@ -493,6 +493,180 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.IsFalse(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
         }
 
+        #region RunSettingsIncompatibeWithTestSettings Tests
+
+        [TestMethod]
+        public void RunSettingsWithCodeCoverageAndInlineTestSettingsXml()
+        {
+            // Setup
+            var runSettingsWithCodeCoverageAndInlineTestSettingsXml = @"
+                    <RunSettings>
+                      <RunConfiguration>
+                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                        <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                        <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                        <TargetPlatform>X86</TargetPlatform>
+                      </RunConfiguration>
+                      <MSTest>
+                        <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                        <IgnoreTestImpact>true</IgnoreTestImpact>
+                      </MSTest>
+                      <DataCollectionRunSettings>
+                        <DataCollectors>
+                          <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
+                            <Configuration>
+                              <CoverageFileName>DevBox 2018-01-07 20_42_30.coverage</CoverageFileName>
+                              <CodeCoverage>
+                              </CodeCoverage>
+                            </Configuration>
+                          </DataCollector>
+                        </DataCollectors>
+                      </DataCollectionRunSettings>
+                    </RunSettings>";
+
+            // Act and validate
+            Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                runSettingsWithCodeCoverageAndInlineTestSettingsXml), "Invalid response");
+            Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
+        }
+
+        [TestMethod]
+        public void RunSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml()
+        {
+            var runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml = @"
+                <RunSettings>
+                  <RunConfiguration>
+                    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                    <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                    <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                    <TargetPlatform>X86</TargetPlatform>
+                  </RunConfiguration>
+                  <MSTest>
+                    <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                    <IgnoreTestImpact>true</IgnoreTestImpact>
+                  </MSTest>
+                  <DataCollectionRunSettings>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
+                      </DataCollector>
+                      <DataCollector friendlyName=""UnitTestIsolation"" uri=""datacollector://Microsoft/unittestisolation/1.0"" assemblyQualifiedName=""DynamicCoverageDataCollector"">
+                      </DataCollector>
+                    </DataCollectors>
+                  </DataCollectionRunSettings>
+                </RunSettings>";
+
+            // Act and validate
+            Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml), "Invalid response");
+            Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithFakesAndCodeCoverageAndInlineTestSettingsXml)), "Invalid response");
+        }
+
+        [TestMethod]
+        public void RunSettingsWithEnabledAndDisabledCollectorAndNoEmbeddedTestSettingsXml()
+        {
+            var runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml = @"
+                <RunSettings>
+                    <RunConfiguration>
+                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                        <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                        <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                        <TargetPlatform>X86</TargetPlatform>
+                    </RunConfiguration>
+                    <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" assemblyQualifiedName=""VideoCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    </DataCollectionRunSettings>
+                </RunSettings>";
+
+            // Act and validate
+            Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml), "Invalid response");
+            Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
+        }
+
+        [TestMethod]
+        public void RunSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml()
+        {
+            var runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml = @"
+                <RunSettings>
+                    <RunConfiguration>
+                        <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                        <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                        <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                        <TargetPlatform>X86</TargetPlatform>
+                    </RunConfiguration>
+                    <MSTest>
+                        <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                        <ForcedLegacyMode>true</ForcedLegacyMode>
+                        <IgnoreTestImpact>true</IgnoreTestImpact>
+                    </MSTest>
+                    <DataCollectionRunSettings>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" assemblyQualifiedName=""VideoCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    <DataCollectors>
+                        <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
+                        </DataCollector>
+                    </DataCollectors>
+                    </DataCollectionRunSettings>
+                </RunSettings>";
+
+            // Act and validate
+            Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml), "Invalid response");
+            Assert.IsTrue(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithEnabledAndDisabledCollectorAndInlineTestSettingsXml)), "Invalid response");
+        }
+
+        [TestMethod]
+        public void RunSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml()
+        {
+            var runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml = @"
+                <RunSettings>
+                  <RunConfiguration>
+                    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                    <ResultsDirectory>C:\TestProject1\TestResults</ResultsDirectory>
+                    <SolutionDirectory>C:\TestProject1\</SolutionDirectory>
+                    <TargetPlatform>X86</TargetPlatform>
+                  </RunConfiguration>
+                  <MSTest>
+                    <SettingsFile>C:\TestProject1\TestSettings1.testsettings</SettingsFile>
+                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                    <IgnoreTestImpact>true</IgnoreTestImpact>
+                  </MSTest>
+                  <DataCollectionRunSettings>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""Video"" uri=""datacollector://Microsoft/Video/2.0"" enabled=""false"" assemblyQualifiedName=""VideoCollector"">
+                      </DataCollector>
+                    </DataCollectors>
+                    <DataCollectors>
+                      <DataCollector friendlyName=""EventLog"" uri=""datacollector://Microsoft/Log/2.0"" enabled=""false"" assemblyQualifiedName=""LogCollector"">
+                      </DataCollector>
+                    </DataCollectors>
+                  </DataCollectionRunSettings>
+                </RunSettings>";
+
+            // Act and validate
+            Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml), "Invalid response");
+            Assert.IsFalse(InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(
+                ConvertOutOfProcToInProcDataCollectionSettings(runSettingsWithDisabledCollectionSettingsAndInlineTestSettingsXml)), "Invalid response");
+        }
+
+        #endregion
+
         #region private methods
 
         private string GetSourceIncompatibleMessage(string source)
@@ -512,6 +686,16 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         {
             return xmlDocument.SelectSingleNode(xpath).InnerText;
         }
+
+        private string ConvertOutOfProcToInProcDataCollectionSettings(string settings)
+        {
+            return settings.Replace("DataCollectionRunSettings", "InProcDataCollectionRunSettings")
+                           .Replace("<DataCollectors>", "<InProcDataCollectors>")
+                           .Replace("</DataCollectors>", "</InProcDataCollectors>")
+                           .Replace("<DataCollector ", "<InProcDataCollector ")
+                           .Replace("</DataCollector>", "</InProcDataCollector>");
+        }
+
         #endregion
     }
 }
