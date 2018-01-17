@@ -76,6 +76,15 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.IsTrue(enumerable.Length == 2);
         }
 
+        [TestMethod]
+        public void SplitStringOnlyWithEscapeCharOnly()
+        {
+            var data = "foo\\bar";
+            var argsList = data.Tokenize(SplitChar, EscapeChar);
+            var enumerable = argsList as string[] ?? argsList.ToArray();
+            Assert.IsTrue(enumerable.Length == 1);
+        }
+
         private const char SplitChar = ',';
         private const char EscapeChar = '\\';
     }
