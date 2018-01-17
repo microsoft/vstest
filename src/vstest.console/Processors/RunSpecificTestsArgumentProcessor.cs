@@ -12,13 +12,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
@@ -83,6 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     {
+        public const char SplitDelimiter = ',';
+        public const char EscapeDelimiter = '\\';
+
         #region Fields
 
         /// <summary>
@@ -171,7 +174,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (!string.IsNullOrWhiteSpace(argument))
             {
-                this.selectedTestNames = new Collection<string>(argument.Split(new[] { CommandLineResources.SearchStringDelimiter }, StringSplitOptions.RemoveEmptyEntries));
+                this.selectedTestNames = new Collection<string>(
+                    argument.Tokenize(SplitDelimiter, EscapeDelimiter)
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Select(s => s.Trim()).ToList());
             }
 
             if (this.selectedTestNames == null || this.selectedTestNames.Count <= 0)
@@ -194,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.testRequestManager != null);
             Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager.ActiveRunSettings.SettingsXml));
 
-            if (this.commandLineOptions.Sources.Count() <= 0)
+            if (!this.commandLineOptions.Sources.Any())
             {
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
