@@ -83,6 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
     {
+        public const char SplitDelimeter = ',';
+        public const char EscapeDelimeter = '\\';
+
         #region Fields
 
         /// <summary>
@@ -171,9 +174,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (!string.IsNullOrWhiteSpace(argument))
             {
-                //todo fix the resource file
                 this.selectedTestNames = new Collection<string>(
-                    argument.Tokenize(CommandLineResources.SearchStringDelimiter.ToCharArray()[0], '\\')
+                    argument.Tokenize(SplitDelimeter, EscapeDelimeter)
                         .Where(x => !string.IsNullOrWhiteSpace(x))
                         .Select(s => s.Trim()).ToList());
             }
