@@ -13,52 +13,57 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
     public class StringUtilitiesTests
     {
         [TestMethod]
-        public void EmptyNullStringShouldNotSplit()
+        public void SplitShouldReturnWhenStringisNullOrEmpty()
         {
             var argsList = string.Empty.Tokenize(SplitChar, EscapeChar);
+
             Assert.IsTrue(argsList.IsNullOrEmpty());
         }
 
         [TestMethod]
-        public void SplitStringDoesntContainSplitChar()
+        public void SplitShouldReturnWhenStringDoesntContainSplitChar()
         {
             var data = "foobar";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
             var enumerable = argsList as string[] ?? argsList.ToArray();
+
             Assert.IsTrue(enumerable.Length == 1);
             Assert.IsTrue(enumerable.First().Equals(data));
         }
 
         [TestMethod]
-        public void SplitStringSplitsBySplitChar()
+        public void SplitShouldSplitWhenStringContainsSplitChar()
         {
             var data = "foo,bar";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
             var enumerable = argsList as string[] ?? argsList.ToArray();
+
             Assert.IsTrue(enumerable.Length == 2);
         }
 
         [TestMethod]
-        public void SplitStringSplitsBySplitCharWithStartEnd()
+        public void SplitShouldSplitWhenStringWithSplitCharStartEnd()
         {
             var data = ",foo,bar,";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
             var enumerable = argsList as string[] ?? argsList.ToArray();
+
             Assert.IsTrue(enumerable.Length == 4);
         }
 
         [TestMethod]
-        public void SplitStringSplitsWithEscapedChar()
+        public void SplitShouldEscapeSplitCharWhenEscapedCharPresent()
         {
             var data = "foo\\,bar";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
             var enumerable = argsList as string[] ?? argsList.ToArray();
+
             Assert.IsTrue(enumerable.Length == 1);
             Assert.IsTrue(enumerable.First().Equals("foo,bar"));
         }
 
         [TestMethod]
-        public void SplitStringSplitsWithEscapedCharWithSeperator()
+        public void SplitShouldEscapeSplitCharWhenEscapedNonEscapedCharPresent()
         {
             var data = "foo\\,,bar";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
@@ -68,20 +73,22 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
-        public void SplitStringOnlyWithSplitChar()
+        public void SplitShouldSplitWhenOnlySplitCharPresent()
         {
             var data = ",";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
             var enumerable = argsList as string[] ?? argsList.ToArray();
+
             Assert.IsTrue(enumerable.Length == 2);
         }
 
         [TestMethod]
-        public void SplitStringOnlyWithEscapeCharOnly()
+        public void SplitShouldNotSplitWhenNoSplitCharPresent()
         {
             var data = "foo\\bar";
             var argsList = data.Tokenize(SplitChar, EscapeChar);
             var enumerable = argsList as string[] ?? argsList.ToArray();
+
             Assert.IsTrue(enumerable.Length == 1);
         }
 

@@ -102,11 +102,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         #region RunSpecificTestsArgumentExecutorTests
 
         [TestMethod]
-        public void InitializeShouldThrowIfArguemntIsNull()
+        public void InitializeShouldThrowIfArgumentIsNull()
         {
             CommandLineOptions.Instance.Reset();
+            
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
+            
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(null); });
         }
 
@@ -114,8 +116,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsEmpty()
         {
             CommandLineOptions.Instance.Reset();
+            
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
+            
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(String.Empty); });
         }
 
@@ -123,8 +127,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsWhiteSpace()
         {
             CommandLineOptions.Instance.Reset();
+            
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
+            
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(" "); });
         }
 
@@ -132,8 +138,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentsAreEmpty()
         {
             CommandLineOptions.Instance.Reset();
+            
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
+            
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(" , "); });
         }
 
@@ -141,8 +149,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorShouldSplitTestsSeperatedByComma()
         {
             CommandLineOptions.Instance.Reset();
+            
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
+            
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
@@ -150,8 +160,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
         {
             CommandLineOptions.Instance.Reset();
+            
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
+            
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
@@ -372,13 +384,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void RunTestsWithCommaSeperatedTests()
+        public void ExecutorShouldRunTestsWhenTestsAreCommaSeperated()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
-            this.ResetAndAddSourceToCommandLineOptions();
+            ResetAndAddSourceToCommandLineOptions();
 
             List<TestCase> list = new List<TestCase>();
             list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
@@ -390,22 +402,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-
+            
             executor.Initialize("Test1, Test2");
-
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            this.mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
+
+            mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
             Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
         }
 
         [TestMethod]
-        public void RunTestsWithFilteredTest()
+        public void ExecutorShouldRunTestsWhenTestsAreFiltered()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
-            this.ResetAndAddSourceToCommandLineOptions();
+            ResetAndAddSourceToCommandLineOptions();
 
             List<TestCase> list = new List<TestCase>();
             list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
@@ -419,20 +431,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = GetExecutor(testRequestManager);
 
             executor.Initialize("Test1");
-
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            this.mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
+
+            mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
             Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
         }
 
         [TestMethod]
-        public void RunTestsWithNonAvailableTest()
+        public void ExecutorShouldWarnWhenTestsAreNotAvailable()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
-            this.ResetAndAddSourceToCommandLineOptions();
+            ResetAndAddSourceToCommandLineOptions();
 
             List<TestCase> list = new List<TestCase>();
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri1"), "Source1"));
@@ -445,20 +457,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = GetExecutor(testRequestManager);
 
             executor.Initialize("Test1, Test2");
-
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            this.mockOutput.Verify(o => o.WriteLine("A total of 1 tests were discovered but some tests do not match the specified selection criteria(Test1). Use right value(s) and try again.", OutputLevel.Warning), Times.Once);
+
+            mockOutput.Verify(o => o.WriteLine("A total of 1 tests were discovered but some tests do not match the specified selection criteria(Test1). Use right value(s) and try again.", OutputLevel.Warning), Times.Once);
             Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
         }
 
         [TestMethod]
-        public void RunTestsWithEscapedCommaTests()
+        public void ExecutorShouldRunTestsWhenTestsAreCommaSeperatedWithEscape()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
-            this.ResetAndAddSourceToCommandLineOptions();
+            ResetAndAddSourceToCommandLineOptions();
 
             List<TestCase> list = new List<TestCase>();
             list.Add(new TestCase("Test1(a,b)", new Uri("http://FooTestUri1"), "Source1"));
@@ -472,9 +484,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = GetExecutor(testRequestManager);
 
             executor.Initialize("Test1(a\\,b), Test2(c\\,d)");
-
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            this.mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
+
+            mockOutput.Verify(o => o.WriteLine(It.IsAny<string>(), OutputLevel.Warning), Times.Never);
             Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
         }
 

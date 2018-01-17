@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         public static IEnumerable<string> Tokenize(this string input, char separator, char escape)
         {
             if (string.IsNullOrEmpty(input)) yield break;
+
             var buffer = new StringBuilder();
             var escaping = false;
             foreach (var c in input)
