@@ -105,10 +105,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsNull()
         {
             CommandLineOptions.Instance.Reset();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(null); });
         }
 
@@ -116,10 +116,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsEmpty()
         {
             CommandLineOptions.Instance.Reset();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(String.Empty); });
         }
 
@@ -127,10 +127,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentIsWhiteSpace()
         {
             CommandLineOptions.Instance.Reset();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(" "); });
         }
 
@@ -138,21 +138,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfArgumentsAreEmpty()
         {
             CommandLineOptions.Instance.Reset();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(" , "); });
         }
 
         [TestMethod]
-        public void ExecutorShouldSplitTestsSeperatedByComma()
+        public void ExecutorShouldSplitTestsSeparatedByComma()
         {
             CommandLineOptions.Instance.Reset();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
@@ -160,10 +160,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
         {
             CommandLineOptions.Instance.Reset();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
@@ -384,7 +384,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorShouldRunTestsWhenTestsAreCommaSeperated()
+        public void ExecutorShouldRunTestsWhenTestsAreCommaSeparated()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -402,7 +402,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
-            
+
             executor.Initialize("Test1, Test2");
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
 
@@ -464,7 +464,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorShouldRunTestsWhenTestsAreCommaSeperatedWithEscape()
+        public void ExecutorShouldRunTestsWhenTestsAreCommaSeparatedWithEscape()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
