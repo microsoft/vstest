@@ -234,22 +234,28 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      为测试结果指定记录器。例如，若要将结果记录到 
-      Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx [;LogFileName=&lt;默认为唯一文件名&gt;]
-      使用给定 LogFileName 在 TestResults 目录中创建文件。
-      更改控制台记录器的详细级别。允许的详细程度值: 最简单、最小和常规。
-      例如: /logger:console;verbosity=&lt;默认为“最小”&gt;
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      为测试结果指定记录器。例如，若要将结果记录到
+      Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx[;LogFileName=&lt;默认为唯一文件名&gt;]
+      使用给定的 LogFileName 在 TestResults 目录中创建文件。
 
-      若要将测试结果发布到 Team Foundation Server，请使用 TfsPublisher，如下所示
-      例如: /logger:TfsPublisher；
-                Collection=&lt;团队项目集合 URL&gt;；
-                BuildName=&lt;生成名称&gt;；
+      更改控制台记录器的日志消息的详细级别，如下所示
+      例如: /logger:console;verbosity=&lt;默认为“最小”&gt;
+      允许的详细程度值: 最简单、最小和正常。
+
+      更改控制台记录器的诊断级别前缀，如下所示
+      示例: /logger:console;prefix=&lt;默认为 "false"&gt;
+      在此处查看控制台记录器的详细信息: https://aka.ms/console-logger
+
+      要将测试结果发布到 Team Foundation Server，请如下使用 TfsPublisher
+      示例: /logger:TfsPublisher;
+                Collection=&lt;团队项目集合 URL&gt;;
+                BuildName=&lt;生成名称&gt;;
                 TeamProject=&lt;团队项目名称&gt;
                 [;Platform=&lt;默认为“任何 CPU”&gt;]
                 [;Flavor=&lt;默认为“调试”&gt;]
                 [;RunTitle=&lt;标题&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
       指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。
@@ -534,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       列出给定测试容器中已发现的测试。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-长期 |-ListTests | / lt | / ListTests: &lt; 文件名 &gt;
       列表发现从给定的测试容器测试。</target>
@@ -1551,12 +1557,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/如果使用测试设置配置了测试运行，则不支持收集:“{0}”。</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">嵌入测试设置不支持通过运行设置配置的数据收集器。请参阅 https://aka.ms/vstest-configure-datacollector 以了解详细信息。运行测试: {0}。</target>
         <note></note>
       </trans-unit>
     </body>

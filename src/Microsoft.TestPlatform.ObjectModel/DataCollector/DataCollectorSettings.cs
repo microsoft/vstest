@@ -160,7 +160,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     {
                         case "uri":
                             ValidateArg.NotNullOrEmpty(reader.Value, "uri");
-                            settings.Uri = new Uri(reader.Value);
+                            try
+                            {
+                                settings.Uri = new Uri(reader.Value);
+                            }
+                            catch (UriFormatException)
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture, Resources.Resources.InvalidDataCollectorUriInSettings, reader.Value));
+                            }
+
                             break;
 
                         case "assemblyQualifiedName":

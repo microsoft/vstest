@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             RunConfiguration runConfiguration =
                 XmlRunSettingsUtilities.GetRunConfigurationNode(this.settingsProvider.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
-            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            Assert.AreEqual(runConfiguration.TargetFramework.ToString(), Framework.DefaultFramework.ToString());
             Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
 
         }

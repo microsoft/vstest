@@ -11,12 +11,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.XPath;
-
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -30,8 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -260,27 +258,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(runsettings))
             {
-                bool throwException = false;
-                if (this.commandLineOptions.EnableCodeCoverage)
-                {
-                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
-                    if (dataCollectorsFriendlyNames.Count >= 2)
-                    {
-                        throwException = true;
-                    }
-
-                }
-                else if (XmlRunSettingsUtilities.IsDataCollectionEnabled(runsettings))
-                {
-                    throwException = true;
-                }
-
-                if (throwException)
-                {
-                    throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
-                }
+                throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
@@ -507,12 +487,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
                 finally
                 {
-                    this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
-                    this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
-                    testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
+                    if (this.currentTestRunRequest != null)
+                    {
+                        this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 
-                    this.currentTestRunRequest.Dispose();
-                    this.currentTestRunRequest = null;
+                        this.currentTestRunRequest.Dispose();
+                        this.currentTestRunRequest = null;
+                    }
                 }
 
                 return success;
@@ -572,7 +555,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
         {
             // Collecting Target Framework.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFrameworkVersion.Name);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFramework.Name);
 
             // Collecting Target Platform.
             requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform.ToString());

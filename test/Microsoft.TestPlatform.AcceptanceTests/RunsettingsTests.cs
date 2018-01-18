@@ -221,6 +221,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         [NetCoreTargetFrameworkDataSource]
+        public void RunSettingsWithInvalidValueShouldLogError(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var runConfigurationDictionary = new Dictionary<string, string>
+                                                 {
+                                                         { "TargetPlatform", "123" }
+                                                 };
+            var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                string.Empty,
+                runsettingsFilePath,
+                runnerInfo.InIsolationValue);
+            this.InvokeVsTest(arguments);
+            this.StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings. Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
+            File.Delete(runsettingsFilePath);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void TestAdapterPathFromRunSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

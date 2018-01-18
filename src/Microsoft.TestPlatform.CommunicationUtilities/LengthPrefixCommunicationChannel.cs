@@ -55,10 +55,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Try read data even if no one is listening to the data stream. Some server
             // implementations (like Sockets) depend on the read operation to determine if a
             // connection is closed.
-            var data = this.reader.ReadString();
-
             if (this.MessageReceived != null)
             {
+                var data = this.reader.ReadString();
                 this.MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
             }
 

@@ -535,10 +535,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;nazwa pliku&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;nazwa pliku&gt;
       Wyświetla listę wykrytych testów z danego kontenera testów.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--nazwa | / lt | / nazwa: &lt; nazwa pliku &gt;
       List znaleziony testy z kontenera danego badania.</target>
@@ -1556,9 +1556,9 @@
         <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="translated">Moduły zbierające dane skonfigurowane za pośrednictwem ustawień uruchamiania nie są obsługiwane przez osadzone ustawienia testów. Zobacz https://aka.ms/vstest-configure-datacollector w celu uzyskania dalszych informacji. Ustawienia uruchamiania: {0}.</target>
-        <note />
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Moduły zbierające dane skonfigurowane za pośrednictwem ustawień uruchamiania nie są obsługiwane przez osadzone ustawienia testów. Zobacz https://aka.ms/vstest-configure-datacollector w celu uzyskania dalszych informacji. Ustawienia uruchamiania: {0}.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

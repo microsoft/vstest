@@ -234,13 +234,18 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
+        <target state="translated">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
       Určuje protokolovač pro výsledky testu. Pokud třeba chcete protokolovat výsledky 
-      do souboru výsledků testování sady Visual Studio (TRX), použijte /logger:trx [;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
+      do souboru výsledků testů sady Visual Studio (TRX), použijte /logger:trx[;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
       Vytvoří soubor v adresáři TestResults s daným názvem LogFileName.
 
-      Změna úrovně podrobností pro protokolovač konzoly. Povolené hodnoty podrobností: quiet, minimal a normal.
+      Změna úrovně podrobností zpráv v protokolu pro protokolovač konzoly, jak je znázorněno níže
       Příklad: /logger:console;verbosity=&lt;Výchozí hodnotou je minimal.&gt;
+      Povolené hodnoty pro úroveň podrobností: quiet, minimal a normal
+
+      Změna prefixu úrovně diagnostiku pro protokolovač konzoly, jak je znázorněno níže
+      Příklad: /logger:console;prefix=&lt;Výchozí hodnotou je false.&gt;
+      Další informace o protokolovači konzoly: https://aka.ms/console-logger
 
       Pokud chcete výsledky testu publikovat na Team Foundation Server, použijte TfsPublisher podle ukázky níže.
       Příklad: /logger:TfsPublisher;
@@ -250,7 +255,7 @@
                 [;Platform=&lt;Výchozí hodnotou je Any CPU.&gt;]
                 [;Flavor=&lt;Výchozí hodnotou je Debug.&gt;]
                 [;RunTitle=&lt;nadpis&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--protokoly | / logger: &lt; Uri/FriendlyName protokolovacího nástroje &gt;
       Zadejte protokolovací nástroj pro výsledky testů.  Výsledky do Visual Studio testovací výsledky souboru (TRX) použijte k přihlášení /logger:trx.
@@ -535,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Název souboru&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;Název souboru&gt;
       Vypíše zjištěné testy z daného kontejneru testů.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; název souboru &gt;
       Seznamy zjištěných z kontejneru dané zkušební testy.</target>
@@ -1552,12 +1557,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:"{0}" není podporován, pokud je testovací běh nakonfigurován pomocí nastavení testů.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Kolekce dat konfigurované prostřednictvím nastavení běhu nejsou podporované s vloženým nastavením testů. Další informace viz https://aka.ms/vstest-configure-datacollector. Nastavení běhu: {0}.</target>
         <note></note>
       </trans-unit>
     </body>

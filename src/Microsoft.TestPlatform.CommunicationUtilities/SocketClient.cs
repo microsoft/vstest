@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// <summary>
     /// Communication client implementation over sockets.
     /// </summary>
-    public class SocketClient : ICommunicationClient
+    public class SocketClient : ICommunicationEndPoint
     {
         private readonly CancellationTokenSource cancellation;
         private readonly TcpClient tcpClient;
@@ -41,16 +41,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public event EventHandler<ConnectedEventArgs> ServerConnected;
+        public event EventHandler<ConnectedEventArgs> Connected;
 
         /// <inheritdoc />
-        public event EventHandler<DisconnectedEventArgs> ServerDisconnected;
+        public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         /// <inheritdoc />
-        public void Start(string connectionInfo)
+        public string Start(string endPoint)
         {
-            this.tcpClient.ConnectAsync(IPAddress.Loopback, int.Parse(connectionInfo))
-                .ContinueWith(this.OnServerConnected);
+            var ipEndPoint = endPoint.GetIPEndPoint();
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("Waiting for connecting to server");
+            }
+
+            // Don't start if the endPoint port is zero
+            this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port).ContinueWith(this.OnServerConnected);
+            return ipEndPoint.ToString();
         }
 
         /// <inheritdoc />
@@ -65,22 +73,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnServerConnected(Task connectAsyncTask)
         {
-            if (connectAsyncTask.IsFaulted)
+            if (this.Connected != null)
             {
-                throw connectAsyncTask.Exception;
-            }
+                if (connectAsyncTask.IsFaulted)
+                {
+                    this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: ServerConnected");
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("Unable to connect to server, Exception occured : {0}", connectAsyncTask.Exception);
+                    }
+                }
+                else
+                {
+                    this.channel = this.channelFactory(this.tcpClient.GetStream());
+                    this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
 
-            this.channel = this.channelFactory(this.tcpClient.GetStream());
-            if (this.ServerConnected != null)
-            {
-                this.ServerConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("Connected to server, and starting MessageLoopAsync");
+                    }
 
-                // Start the message loop
-                Task.Run(() => this.tcpClient.MessageLoopAsync(
-                        this.channel,
-                        this.Stop,
-                        this.cancellation.Token))
-                    .ConfigureAwait(false);
+                    // Start the message loop
+                    Task.Run(() => this.tcpClient.MessageLoopAsync(
+                            this.channel,
+                            this.Stop,
+                            this.cancellation.Token))
+                        .ConfigureAwait(false);
+                }
             }
         }
 
@@ -102,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Dispose();
                 this.cancellation.Dispose();
 
-                this.ServerDisconnected?.SafeInvoke(this, new DisconnectedEventArgs(), "SocketClient: ServerDisconnected");
+                this.Disconnected?.SafeInvoke(this, new DisconnectedEventArgs(), "SocketClient: ServerDisconnected");
             }
         }
     }

@@ -670,7 +670,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 }
                 catch (NotSupportedException nosupportEx)
                 {
-                    EqtTrace.Info("TypeConverter not supported for {0} : NotSupportedException Exception Message {1}", value.ToString(), nosupportEx.Message);
+                    EqtTrace.Info("TypeConverter not supported for {0} : NotSupportedException: {1}", value.ToString(), nosupportEx);
                     valueToSave = value.ToString();
                 }
             }

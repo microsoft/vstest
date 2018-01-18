@@ -34,7 +34,7 @@
 </source>
         <target state="translated">A execução de teste usará DLLs criadas para a estrutura {0} e a plataforma {1}. As seguintes DLLs não farão parte da execução: {2}Acesse {3} para obter mais detalhes sobre como gerenciar essas configurações.
 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Execução do teste usará DLL(s) criado para o framework {0} e plataforma {1}. DLL(s) a seguir não farão parte da execução: {2} vá para {3} para obter mais detalhes sobre como gerenciar essas configurações.</target>
         </alt-trans>
@@ -56,8 +56,8 @@
       </trans-unit>
       <trans-unit id="SourceIncompatible">
         <source>{0} is built for Framework {1} and Platform {2}.</source>
-        <target state="new">{0} is built for Framework {1} and Platform {2}.</target>
-        <note></note>
+        <target state="translated">{0} é compilado para Framework {1} e Platform {2}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

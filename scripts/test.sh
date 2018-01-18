@@ -16,8 +16,6 @@ NOCOLOR='\033[0m'
 #
 CONFIGURATION="Debug"
 TARGET_RUNTIME="ubuntu.16.04-x64"
-VERSION="15.6.0"
-VERSION_SUFFIX="dev"
 FAIL_FAST=false
 VERBOSE=false
 PROJECT_NAME_PATTERNS=**Unit*bin*Debug*netcoreapp1.0*UnitTests*dll
@@ -113,7 +111,7 @@ function invoke_test()
     local dotnet=$(_get_dotnet_path)
     local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel
+    find ./test -path $PROJECT_NAME_PATTERNS | xargs --verbose $dotnet $vstest --parallel
 }
 
 #

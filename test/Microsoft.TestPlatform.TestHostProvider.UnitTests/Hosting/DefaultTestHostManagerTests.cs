@@ -8,12 +8,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.DesktopTestHostRuntimeProvider;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -376,6 +378,35 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             Assert.IsTrue(pid.Result);
             Assert.AreEqual(currentProcess.Id, this.testHostId);
+        }
+
+        [TestMethod]
+        public void LaunchTestHostShouldSetExitCallbackInCaseCustomHost()
+        {
+            var mockCustomLauncher = new Mock<ITestHostLauncher>();
+            this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
+            var currentProcess = Process.GetCurrentProcess();
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None).Wait();
+
+            this.mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object>>()));
+        }
+
+        [TestMethod]
+        public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
+        {
+            var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
+            IEnumerable<string> sources = this.testHostManager.GetTestSources(new List<string> { sourcePath });
+            Assert.IsTrue(sources.Any());
+            Assert.IsTrue(sources.FirstOrDefault().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [TestMethod]
+        public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
+        {
+            var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
+            string source = AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
+            Assert.AreEqual("UnitTestApp8.exe", source);
         }
 
         [TestMethod]

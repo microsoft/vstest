@@ -191,6 +191,11 @@
         <target state="translated">你使用的是旧版 Microsoft.NET.Test.Sdk。请迁移到 15.3.0 及更高版本。</target>
         <note />
       </trans-unit>
+      <trans-unit id="FailedToConnectDataCollector">
+        <source>Failed to connect to datacollector process.</source>
+        <target state="new">Failed to connect datacollector.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -234,15 +234,21 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
       Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
       Visual Studio Test Sonuçları Dosyası’na (TRX) kaydetmek için şunu kullanın: /logger:trx [;LogFileName=&lt;Varsayılan değer benzersiz dosya adıdır&gt;]
       Dosyayı belirtilen LogFileName ile TestResults dizininde oluşturur.
 
-      Konsol günlükçüsü için ayrıntı düzeyini değiştirin. İzin verilen verbosity değerleri: quiet, minimal ve normal.
+      Konsol günlükçüsü için günlük iletilerinin ayrıntı düzeyini aşağıdaki gibi değiştirin
       Örnek: /logger:console;verbosity=&lt;Varsayılan değer "minimal"&gt;
+      İzin verilen verbosity değerleri: quiet, minimal ve normal.
 
-      Test sonuçlarını Team Foundation Server’da yayımlamak için, TfsPublisher’ı aşağıda gösterildiği gibi kullanın
+      Konsol günlükçüsü için tanılama düzeyi önekini aşağıdaki gibi değiştirin
+      Örnek: /logger:console;prefix=&lt;Varsayılan değer "false"&gt;
+      Konsol Günlükçüsü hakkında daha fazla bilgi için bkz. https://aka.ms/console-logger
+
+
+      Test sonuçlarını Team Foundation Server’da yayımlamak için, TfsPublisher’ı aşağıdaki gibi kullanın
       Örnek: /logger:TfsPublisher;
                 Collection=&lt;takım projesi koleksiyonu URL’si&gt;;
                 BuildName=&lt;derleme adı&gt;;
@@ -250,7 +256,7 @@
                 [;Platform=&lt;Varsayılan değer "Any CPU"&gt;]
                 [;Flavor=&lt;Varsayılan değer "Debug"&gt;]
                 [;RunTitle=&lt;başlık&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Günlükçü | / Günlükçü: &lt; Günlükçü URI/FriendlyName &gt;
       Test sonuçları için Günlükçü belirtin.  Örneğin, oturum açmak için /logger:trx sonuçları içine bir Visual Studio Test sonuçları dosyası (TRX) kullanın.
@@ -535,10 +541,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Belirtilen test kapsayıcısında bulunan testleri listeler.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; dosya adı &gt;
       Listeleri belirli test kapsayıcı testlerden keşfetti.</target>
@@ -1552,12 +1558,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect: Test çalıştırmasını yapılandırmak için test ayarları kullanıldığında "{0}" desteklenmez.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Çalışma ayarları aracılığıyla yapılandırılan veri toplayıcılar, ekli test ayarlarında desteklenmiyor. Daha fazla bilgi için lütfen https://aka.ms/vstest-configure-datacollector adresini ziyaret edin. Çalışma ayarları: {0}.</target>
         <note></note>
       </trans-unit>
     </body>

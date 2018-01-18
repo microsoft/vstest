@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         CrossPlatEngineResources.DiscovererInstantiationException,
                         e.Message);
                     logger.SendMessage(TestMessageLevel.Warning, mesage);
-                    EqtTrace.Error(e);
+                    EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
 
                     continue;
                 }
@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         e.Message);
 
                     logger.SendMessage(TestMessageLevel.Error, message);
-                    EqtTrace.Error(e);
+                    EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
                 }
             }
 
