@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -90,19 +91,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            // Update cache with Extension Folder's files
-            this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
-
-            // Update and initialize loggers only when DesignMode is false
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            if (runConfiguration.DesignMode == false)
-            {
-                this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
-
-                // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers(requestData);
-            }
-
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
 
@@ -126,19 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             if (testRunCriteria == null)
             {
                 throw new ArgumentNullException(nameof(testRunCriteria));
-            }
-
-            this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
-
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-
-            // Update and initialize loggers only when DesignMode is false
-            if (runConfiguration.DesignMode == false)
-            {
-                this.AddExtensionAssembliesFromSource(testRunCriteria);
-
-                // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
@@ -193,82 +168,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
                 EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
                 throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
-            }
-        }
-
-        /// <summary>
-        /// Update the test adapter paths provided through run settings to be used by the test service
-        /// </summary>
-        /// <param name="runSettings">
-        /// The run Settings.
-        /// </param>
-        private void AddExtensionAssemblies(string runSettings)
-        {
-            IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
-
-            if (customTestAdaptersPaths != null)
-            {
-                foreach (string customTestAdaptersPath in customTestAdaptersPaths)
-                {
-                    var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
-                    if (!Directory.Exists(adapterPath))
-                    {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
-                        }
-
-                        continue;
-                    }
-
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterEndsWithPattern, TestPlatformConstants.TestLoggerEndsWithPattern, TestPlatformConstants.RunTimeEndsWithPattern, TestPlatformConstants.SettingsProviderEndsWithPattern));
-                    if (extensionAssemblies.Count > 0)
-                    {
-                        this.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update the extension assemblies from source directory
-        /// </summary>
-        /// <param name="testRunCriteria">
-        /// The test Run Criteria.
-        /// </param>
-        private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
-        {
-            IEnumerable<string> sources = testRunCriteria.Sources;
-            if (testRunCriteria.HasSpecificTests)
-            {
-                // If the test execution is with a test filter, group them by sources
-                sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
-            }
-
-            AddExtensionAssembliesFromSource(sources);
-        }
-
-        /// <summary>
-        /// Update the test logger paths from source directory
-        /// </summary>
-        /// <param name="sources"></param>
-        private void AddExtensionAssembliesFromSource(IEnumerable<string> sources)
-        {
-            // Currently we support discovering loggers only from Source directory
-            var loggersToUpdate = new List<string>();
-
-            foreach (var source in sources)
-            {
-                var sourceDirectory = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
-                {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestPlatformConstants.TestLoggerEndsWithPattern));
-                }
-            }
-
-            if (loggersToUpdate.Count > 0)
-            {
-                this.UpdateExtensions(loggersToUpdate, skipExtensionFilters: false);
             }
         }
 

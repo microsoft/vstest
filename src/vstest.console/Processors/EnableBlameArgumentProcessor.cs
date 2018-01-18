@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, TestLoggerManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -98,23 +98,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private static string BlameFriendlyName = "blame";
 
         /// <summary>
-        /// Test logger manager instance
-        /// </summary>
-        private readonly TestLoggerManager loggerManager;
-
-        /// <summary>
         /// Run settings manager
         /// </summary>
         private IRunSettingsProvider runSettingsManager;
 
         #region Constructor
 
-        internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, TestLoggerManager loggerManager)
+        internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
-            Contract.Requires(loggerManager != null);
-
             this.runSettingsManager = runSettingsManager;
-            this.loggerManager = loggerManager;
         }
         #endregion
 
@@ -127,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             // Add Blame Logger
-            this.loggerManager.UpdateLoggerList(BlameFriendlyName, BlameFriendlyName, null);
+            EnableLoggerArgumentExecutor.AddLoggerToRunSettings(BlameFriendlyName, this.runSettingsManager);
 
             // Add Blame Data Collector
             CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);

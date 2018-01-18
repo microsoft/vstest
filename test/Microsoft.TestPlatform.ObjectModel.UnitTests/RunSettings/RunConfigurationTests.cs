@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
     using System;
-
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -29,6 +29,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
             Assert.AreEqual(null, runConfiguration.BinariesRoot);
             Assert.AreEqual(null, runConfiguration.TestAdaptersPaths);
+            Assert.AreEqual(0, runConfiguration.Loggers.Count);
             Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
             Assert.AreEqual(false, runConfiguration.DisableAppDomain);
             Assert.AreEqual(false, runConfiguration.DisableParallelization);
@@ -73,6 +74,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <MaxCpuCount>2</MaxCpuCount>
                        <BatchSize>5</BatchSize>
                        <TestSessionTimeout>10000</TestSessionTimeout>
+                       <Loggers><Logger>trx;key1=value1</Logger><Logger>blame</Logger></Loggers>
                        <TestAdaptersPaths>C:\a\b;D:\x\y</TestAdaptersPaths>
                        <BinariesRoot>E:\x\z</BinariesRoot>
                        <DesignMode>true</DesignMode>
@@ -109,6 +111,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(true, runConfiguration.InIsolation);
             Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
             Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
+            CollectionAssert.AreEqual(new List<string> { "trx;key1=value1", "blame" }, (List<string>)runConfiguration.Loggers);
         }
 
         [TestMethod]

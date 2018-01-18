@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
-        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunAll()
+        public void CreateTestRunRequestShouldUpdateLoggerExtensionForRunAll()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
-                       <DesignMode>false</DesignMode>
+                       <DesignMode>true</DesignMode>
                      </RunConfiguration>
                 </RunSettings>";
 
@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
-        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesignModeIsFalseForRunSelected()
+        public void CreateTestRunRequestShouldUpdateLoggerExtensionForRunSelected()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         /// Logger extensions should be updated when design mode is false.
         /// </summary>
         [TestMethod]
-        public void CreateDiscoveryRequestShouldUpdateLoggerExtensionWhenDesignModeIsFalse()
+        public void CreateDiscoveryRequestShouldUpdateLoggerExtension()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -304,7 +304,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
-                       <DesignMode>false</DesignMode>
+                       <DesignMode>true</DesignMode>
                      </RunConfiguration>
                 </RunSettings>";
 

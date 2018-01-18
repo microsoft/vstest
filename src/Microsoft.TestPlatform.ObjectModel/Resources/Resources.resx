@@ -335,6 +335,9 @@
   <data name="FailedToLoadMsDia" xml:space="preserve">
     <value>Failed to load msdia</value>
   </data>
+  <data name="MissingLoggerAttributes" xml:space="preserve">
+    <value>Invalid logger settings. Expected attribute '{0}' is missing.  A typical logger setting would look like &lt;Logger name="sampleLoggerFriendlyName"&gt;.</value>
+  </data>
   <data name="InvalidDataCollectorUriInSettings" xml:space="preserve">
     <value>Invalid URI in data collector settings '{0}'.</value>
   </data>

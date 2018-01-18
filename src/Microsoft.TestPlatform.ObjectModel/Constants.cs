@@ -41,6 +41,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string RunConfigurationSettingsName = "RunConfiguration";
 
         /// <summary>
+        /// Name of logger run settings node in RunSettings.
+        /// </summary>
+        public const string LoggerRunSettingsName = "LoggerRunSettings";
+
+        /// <summary>
+        /// Name of Loggers settings node in RunSettings.
+        /// </summary>
+        public const string LoggersSettingName = "Loggers";
+
+        /// <summary>
+        /// Name of Logger settings node in RunSettings.
+        /// </summary>
+        public const string LoggerSettingName = "Logger";
+
+        /// <summary>
         /// Default testrunner if testrunner is not specified
         /// </summary>
         public const string UnspecifiedAdapterPath = "_none_";
