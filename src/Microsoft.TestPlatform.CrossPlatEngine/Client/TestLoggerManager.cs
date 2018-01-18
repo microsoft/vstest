@@ -1,20 +1,24 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
-
+    using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -24,12 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     /// Responsible for managing logger extensions and broadcasting results
     /// and error/warning/informational messages to them.
     /// </summary>
-    internal class TestLoggerManager : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar, IDisposable
+    internal class TestLoggerManager : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar, ITestLoggerManager, IDisposable
     {
         #region Fields
 
         private static readonly object Synclock = new object();
-        private static TestLoggerManager testLoggerManager;
         protected List<LoggerInfo> loggersInfoList = new List<LoggerInfo>();
 
         /// <summary>
@@ -54,9 +57,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private ITestRunRequest runRequest = null;
 
         /// <summary>
-        /// Gets an instance of the logger.
+        /// Message logger.
         /// </summary>
         private IMessageLogger messageLogger;
+
+        /// <summary>
+        /// Request data.
+        /// </summary>
+        private IRequestData requestData;
 
         private TestLoggerExtensionManager testLoggerExtensionManager;
         private IDiscoveryRequest discoveryRequest;
@@ -66,41 +74,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         #region Constructor
 
         /// <summary>
-        /// Default constructor.
+        /// 
         /// </summary>
-        protected TestLoggerManager(TestSessionMessageLogger sessionLogger, InternalTestLoggerEvents loggerEvents)
+        /// <param name="requestData">Request Data for Providing Common Services/Data for Discovery and Execution.</param>
+        /// <param name="messageLogger">Message Logger.</param>
+        /// <param name="loggerEvents">Logger events.</param>
+        public TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger, InternalTestLoggerEvents loggerEvents)
         {
-            this.messageLogger = sessionLogger;
+            this.requestData = requestData;
+            this.messageLogger = messageLogger;
             this.testLoggerExtensionManager = null;
             this.loggerEvents = loggerEvents;
-        }
-
-        /// <summary>
-        /// Gets the instance.
-        /// </summary>
-        public static TestLoggerManager Instance
-        {
-            get
-            {
-                if (testLoggerManager == null)
-                {
-                    lock (Synclock)
-                    {
-                        if (testLoggerManager == null)
-                        {
-                            testLoggerManager = new TestLoggerManager(TestSessionMessageLogger.Instance,
-                                new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
-                        }
-                    }
-                }
-
-                return testLoggerManager;
-            }
-
-            protected set
-            {
-                testLoggerManager = value;
-            }
         }
 
         #endregion
@@ -161,38 +145,58 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Initializes all the loggers passed by user
         /// </summary>
-        /// <param name="requestData">Request Data for Providing Common Services/Data for Discovery and Execution</param>
-        public void InitializeLoggers(IRequestData requestData)
+        public void Initialize(string runSettings)
         {
-            foreach (var logger in this.loggersInfoList)
-            {
-                string loggerIdentifier = logger.loggerIdentifier;
-                Dictionary<string, string> parameters = logger.parameters;
+            //List<Logger> loggers = RunSett
+            var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
-                // First assume the logger is specified by URI. If that fails try with friendly name.
-                try
+            foreach (var logger in loggers.LoggerSettingsList ?? Enumerable.Empty<LoggerSettings>())
+            {
+                // reading using friendly name
+                // TODO: console might not work.
+                // TODO: enabled check for logger
+                if (TryGetUriFromFriendlyName(logger.FriendlyName, out var loggerUri))
                 {
-                    this.AddLoggerByUri(loggerIdentifier, parameters);
-                }
-                catch (InvalidLoggerException)
-                {
-                    string loggerUri;
-                    if (testLoggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
-                    {
-                        this.AddLoggerByUri(loggerUri, parameters);
-                    }
-                    else
-                    {
-                        throw new InvalidLoggerException(
-                        String.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.LoggerNotFound,
-                        logger.argument));
-                    }
+                    //var paramters = GetParametersFromConfigurationElement(logger.Configuration);
+                    this.AddLoggerByUri(loggerUri, null);
                 }
             }
 
+            //foreach (var logger in this.loggersInfoList)
+            //{
+            //    string loggerIdentifier = logger.loggerIdentifier;
+            //    Dictionary<string, string> parameters = logger.parameters;
+
+            //    // First assume the logger is specified by URI. If that fails try with friendly name.
+            //    try
+            //    {
+            //        this.AddLoggerByUri(loggerIdentifier, parameters);
+            //    }
+            //    catch (InvalidLoggerException)
+            //    {
+            //        string loggerUri;
+            //        if (TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
+            //        {
+            //            this.AddLoggerByUri(loggerUri, parameters);
+            //        }
+            //        else
+            //        {
+            //            throw new InvalidLoggerException(
+            //            String.Format(
+            //            CultureInfo.CurrentUICulture,
+            //            CommonResources.LoggerNotFound,
+            //            logger.argument));
+            //        }
+            //    }
+            //}
+
             requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join(",", this.initializedLoggers.ToArray()));
+        }
+
+        private Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
+        {
+            //LoggerNameValueConfigurationManager configuration = new LoggerNameValueConfigurationManager();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -270,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             // Add the logger and if it is a non-existent logger, throw.
             try
             {
-                testLoggerManager.AddLogger(loggerUri, parameters);
+                AddLogger(loggerUri, parameters);
             }
             catch (InvalidOperationException e)
             {

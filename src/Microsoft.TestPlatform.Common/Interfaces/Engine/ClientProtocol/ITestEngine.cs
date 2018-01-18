@@ -37,5 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <returns>ITestExtensionManager object that helps with extensibility</returns>
         ITestExtensionManager GetExtensionManager();
+
+        ITestLoggerManager GetLoggerManager(IRequestData requestData);
     }
 }

@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.Common.UnitTests.Logging
+namespace TestPlatform.CrossPlatEngine.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading;
-
+    using global::TestPlatform.Common.UnitTests.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -34,21 +34,24 @@ namespace TestPlatform.Common.UnitTests.Logging
         [TestInitialize]
         public void Initialize()
         {
-            TestPluginCacheTests.SetupMockExtensions();
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location },
+                () => { });
         }
 
         [TestCleanup]
-        public void Cleanup()
+        public void TestCleanup()
         {
-            new DummyTestLoggerManager().Cleanup();
+            TestPluginCacheTests.ResetExtensionsCache();
         }
 
         [TestMethod]
         public void TryGetUriFromFriendlyNameShouldReturnUriIfLoggerIsAdded()
         {
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
             string uri;
-            TestLoggerManager.Instance.TryGetUriFromFriendlyName("TestLoggerExtension", out uri);
+            testLoggerManager.TryGetUriFromFriendlyName("TestLoggerExtension", out uri);
             Assert.AreEqual(uri, loggerUri);
         }
 
@@ -56,14 +59,16 @@ namespace TestPlatform.Common.UnitTests.Logging
         public void TryGetUriFromFriendlyNameShouldNotReturnUriIfLoggerIsNotAdded()
         {
             string uri;
-            TestLoggerManager.Instance.TryGetUriFromFriendlyName("TestLoggerExtension1", out uri);
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.TryGetUriFromFriendlyName("TestLoggerExtension1", out uri);
             Assert.IsNull(uri);
         }
 
         [TestMethod]
         public void GetResultsDirectoryShouldReturnNullIfRunSettingsIsNull()
         {
-            string result = TestLoggerManager.Instance.GetResultsDirectory(null);
+            var testLoggerManager = new DummyTestLoggerManager();
+            string result = testLoggerManager.GetResultsDirectory(null);
             Assert.AreEqual(null, result);
         }
 
@@ -83,7 +88,8 @@ namespace TestPlatform.Common.UnitTests.Logging
             RunSettings runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runSettingsXml);
 
-            string result = TestLoggerManager.Instance.GetResultsDirectory(runsettings);
+            var testLoggerManager = new DummyTestLoggerManager();
+            string result = testLoggerManager.GetResultsDirectory(runsettings);
             Assert.AreEqual(string.Compare("DummyTestResultsFolder", result), 0);
         }
 
@@ -102,7 +108,8 @@ namespace TestPlatform.Common.UnitTests.Logging
             RunSettings runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runSettingsXml);
 
-            string result = TestLoggerManager.Instance.GetResultsDirectory(runsettings);
+            var testLoggerManager = new DummyTestLoggerManager();
+            string result = testLoggerManager.GetResultsDirectory(runsettings);
 
             Assert.AreEqual(string.Compare(Constants.DefaultResultsDirectory, result), 0);
         }
@@ -112,14 +119,15 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             counter = 0;
             waitHandle.Reset();
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -135,14 +143,15 @@ namespace TestPlatform.Common.UnitTests.Logging
             counter = 0;
             waitHandle.Reset();
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -151,7 +160,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
-            TestLoggerManager.Instance.UnregisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.UnregisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -166,14 +175,15 @@ namespace TestPlatform.Common.UnitTests.Logging
             counter = 0;
             waitHandle.Reset();
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -189,14 +199,15 @@ namespace TestPlatform.Common.UnitTests.Logging
             counter = 0;
             waitHandle.Reset();
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -205,7 +216,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
-            TestLoggerManager.Instance.UnregisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.UnregisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -220,14 +231,15 @@ namespace TestPlatform.Common.UnitTests.Logging
             counter = 0;
             waitHandle.Reset();
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -253,14 +265,15 @@ namespace TestPlatform.Common.UnitTests.Logging
             counter = 0;
             waitHandle.Reset();
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -279,7 +292,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
-            TestLoggerManager.Instance.UnregisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.UnregisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -301,28 +314,31 @@ namespace TestPlatform.Common.UnitTests.Logging
         [TestMethod]
         public void AddLoggerShouldNotThrowExceptionIfUriIsNull()
         {
+            var testLoggerManager = new DummyTestLoggerManager();
             Assert.ThrowsException<ArgumentNullException>(
                 () =>
-                    {
-                        TestLoggerManager.Instance.AddLogger(null, null);
-                    });
+                {
+                    testLoggerManager.AddLogger(null, null);
+                });
         }
 
         [TestMethod]
         public void AddLoggerShouldNotThrowExceptionIfUriIsNonExistent()
         {
+            var testLoggerManager = new DummyTestLoggerManager();
             Assert.ThrowsException<InvalidOperationException>(
                 () =>
-                    {
-                        TestLoggerManager.Instance.AddLogger(new Uri("logger://NotALogger"), null);
-                    });
+                {
+                    testLoggerManager.AddLogger(new Uri("logger://NotALogger"), null);
+                });
         }
 
         [TestMethod]
         public void AddLoggerShouldAddDefaultLoggerParameterForTestLoggerWithParameters()
         {
             ValidLoggerWithParameters.Reset();
-            TestLoggerManager.Instance.AddLogger(new Uri("test-logger-with-parameter://logger"), new Dictionary<string, string>());
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri("test-logger-with-parameter://logger"), new Dictionary<string, string>());
             Assert.IsNotNull(ValidLoggerWithParameters.parameters, "parameters not getting passed");
             Assert.IsTrue(
                 ValidLoggerWithParameters.parameters.ContainsKey(DefaultLoggerParameterNames.TestRunDirectory),
@@ -337,43 +353,46 @@ namespace TestPlatform.Common.UnitTests.Logging
         public void DisposeShouldNotThrowExceptionIfCalledMultipleTimes()
         {
             // Dispose the logger manager multiple times and verify that no exception is thrown.
-            var manager = TestLoggerManager.Instance;
-            manager.Dispose();
-            manager.Dispose();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.Dispose();
+            testLoggerManager.Dispose();
         }
 
         [TestMethod]
         public void AddLoggerShouldThrowObjectDisposedExceptionAfterDisposedIsCalled()
         {
-            TestLoggerManager.Instance.Dispose();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.Dispose();
 
             Assert.ThrowsException<ObjectDisposedException>(
                 () =>
-                    {
-                        TestLoggerManager.Instance.AddLogger(new Uri("some://uri"), null);
-                    });
+                {
+                    testLoggerManager.AddLogger(new Uri("some://uri"), null);
+                });
         }
 
 
         [TestMethod]
         public void EnableLoggingShouldThrowObjectDisposedExceptionAfterDisposedIsCalled()
         {
-            TestLoggerManager.Instance.Dispose();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(
                 () =>
-                    {
-                        TestLoggerManager.Instance.EnableLogging();
-                    });
+                {
+                    testLoggerManager.EnableLogging();
+                });
         }
 
         [TestMethod]
         public void RegisterTestRunEventsThrowsExceptionWithNullasArgument()
         {
+            var testLoggerManager = new DummyTestLoggerManager();
             Assert.ThrowsException<ArgumentNullException>(
                 () =>
-                    {
-                        TestLoggerManager.Instance.RegisterTestRunEvents(null);
-                    });
+                {
+                    testLoggerManager.RegisterTestRunEvents(null);
+                });
         }
 
         [TestMethod]
@@ -381,12 +400,13 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             var mockRequestData = new Mock<IRequestData>();
             var mockMetricsCollection = new Mock<IMetricsCollection>();
-
             mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
-            TestLoggerManager.Instance.AddLogger(new Uri(this.loggerUri), new Dictionary<string, string>());
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.AddLogger(new Uri(this.loggerUri), new Dictionary<string, string>());
 
             // Act.
-            TestLoggerManager.Instance.InitializeLoggers(mockRequestData.Object);
+            testLoggerManager.Initialize(null);
 
             // Verify
             mockMetricsCollection.Verify(
@@ -401,31 +421,32 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             counter = 0;
             waitHandle.Reset();
-          
+
             DiscoveryCriteria discoveryCriteria = new DiscoveryCriteria() { TestCaseFilter = "Name=Test1" };
             DiscoveryStartEventArgs discoveryStartEventArgs = new DiscoveryStartEventArgs(discoveryCriteria);
-          
+
             // mock for IDiscoveryRequest
             var discoveryRequest = new Mock<IDiscoveryRequest>();
 
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // Register DiscoveryRequest object
-            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.RegisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
                 m => m.OnDiscoveryStart += null,
                 discoveryStartEventArgs);
-          
+
             // Assertions when discovery events registered
             waitHandle.WaitOne();
             Assert.AreEqual(counter, 1);
 
             // Unregister DiscoveryRequest object
-            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.UnregisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -451,11 +472,12 @@ namespace TestPlatform.Common.UnitTests.Logging
             var discoveryRequest = new Mock<IDiscoveryRequest>();
 
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // Register DiscoveryRequest object
-            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.RegisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -467,7 +489,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.AreEqual(counter, 1);
 
             // Unregister DiscoveryRequest object
-            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.UnregisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -486,19 +508,20 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             counter = 0;
             waitHandle.Reset();
-  
+
             TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
             TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
 
             // mock for ITestRunRequest
             var testRunRequest = new Mock<ITestRunRequest>();
-  
+
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // Register TestRunRequest object
-            TestLoggerManager.Instance.RegisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.RegisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -510,7 +533,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.AreEqual(counter, 1);
 
             // Unregister TestRunRequest object
-            TestLoggerManager.Instance.UnregisterTestRunEvents(testRunRequest.Object);
+            testLoggerManager.UnregisterTestRunEvents(testRunRequest.Object);
 
             //Raise an event on mock object
             testRunRequest.Raise(
@@ -536,11 +559,12 @@ namespace TestPlatform.Common.UnitTests.Logging
             var discoveryRequest = new Mock<IDiscoveryRequest>();
 
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // Register DiscoveryRequest object
-            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.RegisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -552,7 +576,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.AreEqual(counter, 1);
 
             // Unregister DiscoveryRequest object
-            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.UnregisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -579,11 +603,12 @@ namespace TestPlatform.Common.UnitTests.Logging
             var discoveryRequest = new Mock<IDiscoveryRequest>();
 
             // setup TestLogger
-            TestLoggerManager.Instance.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
-            TestLoggerManager.Instance.EnableLogging();
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.AddLogger(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
 
             // Register DiscoveryRequest object
-            TestLoggerManager.Instance.RegisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.RegisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -595,7 +620,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.AreEqual(counter, 1);
 
             // Unregister DiscoveryRequest object
-            TestLoggerManager.Instance.UnregisterDiscoveryEvents(discoveryRequest.Object);
+            testLoggerManager.UnregisterDiscoveryEvents(discoveryRequest.Object);
 
             //Raise an event on mock object
             discoveryRequest.Raise(
@@ -606,9 +631,40 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.AreEqual(counter, 1);
         }
 
+        /// <summary>
+        /// Initialize should initialize loggers from runsettings
+        /// </summary>
+        [TestMethod]
+        public void InitializeShouldInitializeLoggerWithFriendlyNameWhenOnlyFriendlyNamePresent()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerWithParameterExtension""></Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
+            Assert.AreEqual(1, ValidLoggerWithParameters.counter);
+        }
+        // TODO: add other cases like error etc.
+        // TODO: initialize should not happen more than once even if loggers are duplicated.
+        // TODO: test command line that when no run settings given, then whether the loggers are initialized or not.
+        // TODO: check case when no loggers are present.
+
         [ExtensionUri("testlogger://logger")]
         [FriendlyName("TestLoggerExtension")]
-        private class ValidLogger3 : ITestLogger
+        private class ValidLogger : ITestLogger
         {
             public void Initialize(TestLoggerEvents events, string testRunDirectory)
             {
@@ -616,7 +672,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 events.TestRunComplete += Events_TestRunComplete;
                 events.TestResult += Events_TestResult;
                 events.TestRunStart += TestRunStartHandler;
-              
+
                 events.DiscoveryStart += DiscoveryStartHandler;
                 events.DiscoveryMessage += DiscoveryMessageHandler;
                 events.DiscoveredTests += DiscoveredTestsHandler;
@@ -675,6 +731,15 @@ namespace TestPlatform.Common.UnitTests.Logging
                 TestLoggerManagerTests.counter++;
                 TestLoggerManagerTests.waitHandle.Set();
             }
+        }
+
+        [ExtensionUri("testlogger://logger2")]
+        [FriendlyName("TestLoggerExtension2")]
+        private class ValidLogger2 : ITestLogger
+        {
+            public void Initialize(TestLoggerEvents events, string testRunDirectory)
+            {
+            }
 
         }
 
@@ -683,32 +748,36 @@ namespace TestPlatform.Common.UnitTests.Logging
         private class ValidLoggerWithParameters : ITestLoggerWithParameters
         {
             public static Dictionary<string, string> parameters;
+            public static int counter = 0;
+
             public void Initialize(TestLoggerEvents events, string testRunDirectory)
             {
-
+                counter++;
             }
 
             public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
             {
+                counter++;
                 ValidLoggerWithParameters.parameters = parameters;
             }
 
             public static void Reset()
             {
+                counter = 0;
                 ValidLoggerWithParameters.parameters = null;
             }
         }
 
         internal class DummyTestLoggerManager : TestLoggerManager
         {
-            public DummyTestLoggerManager() : base(TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance)) 
+            public DummyTestLoggerManager() : base(null, TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
             {
 
             }
 
-            public void Cleanup()
+            public DummyTestLoggerManager(IRequestData requestData) : base(requestData, TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
             {
-                Instance = null;
+
             }
         }
     }

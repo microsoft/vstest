@@ -31,9 +31,64 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string InProcDataCollectorsSettingName = "InProcDataCollectors";
 
         /// <summary>
-        /// Name of data collection settigns node in RunSettings.
+        /// Name of data collection settings node in RunSettings.
         /// </summary>
         public const string DataCollectionRunSettingsName = "DataCollectionRunSettings";
+
+        /// <summary>
+        /// Name of logger run settings node in RunSettings.
+        /// </summary>
+        public const string LoggerRunSettingsName = "LoggerRunSettings";
+
+        /// <summary>
+        /// Name of loggers node in RunSettings.
+        /// </summary>
+        public const string LoggersSettingName = "Loggers";
+
+        /// <summary>
+        /// Name of logger node in RunSettings.
+        /// </summary>
+        public const string LoggerSettingName = "Logger";
+
+        /// <summary>
+        /// Name of friendlyName attribute of logger node.
+        /// </summary>
+        public const string LoggerFriendlyName = "friendlyName";
+
+        /// <summary>
+        /// Name of friendlyName attribute of logger node in lower case.
+        /// </summary>
+        public const string LoggerFriendlyNameLower = "friendlyname";
+
+        /// <summary>
+        /// Name of uri attribute of logger node.
+        /// </summary>
+        public const string LoggerUriName = "uri";
+
+        /// <summary>
+        /// Name of assemblyQualifiedName attribute of logger node.
+        /// </summary>
+        public const string LoggerAssemblyQualifiedName = "assemblyQualifiedName";
+
+        /// <summary>
+        /// Name of assemblyQualifiedName attribute of logger node in lower case.
+        /// </summary>
+        public const string LoggerAssemblyQualifiedNameLower = "assemblyqualifiedname";
+
+        /// <summary>
+        /// Name of enabled attribute of logger node.
+        /// </summary>
+        public const string LoggerEnabledName = "enabled";
+
+        /// <summary>
+        /// Name of configuration element of logger node.
+        /// </summary>
+        public const string LoggerConfigurationName = "Configuration";
+
+        /// <summary>
+        /// Name of configuration element of logger node in lower case.
+        /// </summary>
+        public const string LoggerConfigurationNameLower = "configuration";
 
         /// <summary>
         /// Name of RunConfiguration settings node in RunSettings.

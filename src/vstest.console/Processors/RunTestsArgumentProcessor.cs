@@ -201,6 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (EqtTrace.IsInfoEnabled)
             {
+                // TODO: add result also here.
                 EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is completed.");
             }
 

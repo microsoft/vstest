@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 {
+    // TODO: remove useless unit tests from all classes.
+
     using System;
     using System.Collections.Generic;
 
@@ -28,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         private readonly Mock<ITestExtensionManager> extensionManager;
         private readonly Mock<ITestRuntimeProvider> hostManager;
         private readonly Mock<IProxyExecutionManager> executionManager;
+        private readonly Mock<ITestLoggerManager> loggerManager;
         private readonly Mock<IFileHelper> mockFileHelper;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
@@ -38,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
             this.extensionManager = new Mock<ITestExtensionManager>();
             this.executionManager = new Mock<IProxyExecutionManager>();
+            this.loggerManager = new Mock<ITestLoggerManager>();
             this.hostManager = new Mock<ITestRuntimeProvider>();
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
@@ -98,6 +102,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateTestRunRequestShouldThrowExceptionIfNoTestHostproviderFound()
         {
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -129,7 +135,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(additionalExtensions);
-
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
 
             string settingsXml =
@@ -146,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
@@ -174,6 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
@@ -204,6 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
@@ -218,6 +226,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
             this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
@@ -239,6 +249,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
             this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
@@ -322,6 +334,56 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             // Verify
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
+
+        /// <summary>
+        /// Create test run request should initialize logger manager fro design mode.
+        /// </summary>
+        [TestMethod]
+        public void CreateTestRunRequestShouldInitializeLoggerManagerForDesignMode()
+        {
+            this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>";
+            var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+
+            this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
+        }
+
+        /// <summary>
+        /// Create test run request should initialize logger manager fro design mode.
+        /// </summary>
+        [TestMethod]
+        public void CreateTestRunRequestShouldInitializeLoggerManagerForNonDesignMode()
+        {
+            this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>";
+            var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, settingsXml);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+
+            this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
+        }
+
+        // TODO: write test for discovery also.
 
         private class TestableTestPlatform : TestPlatform
         {

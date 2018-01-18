@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
 
                 // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers(requestData);
+                //TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
@@ -132,14 +132,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
-            // Update and initialize loggers only when DesignMode is false
+            // Update extension assemblies from source when design mode is false.
             if (runConfiguration.DesignMode == false)
             {
                 this.AddExtensionAssembliesFromSource(testRunCriteria);
-
-                // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
+
+            // Initialize loggers
+            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            loggerManager.Initialize(testRunCriteria.TestRunSettings);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);

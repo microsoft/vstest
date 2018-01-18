@@ -155,6 +155,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return this.testExtensionManager ?? (this.testExtensionManager = new TestExtensionManager());
         }
 
+        /// <summary>
+        /// Fetches the logger manager for this engine. This manager will provide logger extensibility features that this engine supports.
+        /// </summary>
+        /// <returns>ITestLoggerManager object that helps with logger extensibility.</returns>
+        public ITestLoggerManager GetLoggerManager(IRequestData requestData)
+        {
+            return new TestLoggerManager(
+                requestData,
+                TestSessionMessageLogger.Instance, 
+                new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
+        }
+
         #endregion
 
         private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)

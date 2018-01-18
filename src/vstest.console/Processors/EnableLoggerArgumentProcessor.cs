@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(TestLoggerManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor());
                 }
 
                 return this.executor;
@@ -114,23 +114,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// </summary>
     internal class EnableLoggerArgumentExecutor : IArgumentExecutor
     {
-        #region Fields
-
-        private readonly TestLoggerManager loggerManager;
-
-        #endregion
-
         #region Constructors
+        // TODO: check every where that if any argument is removed, then it is also removed from comment.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
         /// </summary>
-        /// <param name="loggerManager">
-        /// The logger manager.
-        public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager)
+        public EnableLoggerArgumentExecutor()
         {
-            Contract.Requires(loggerManager != null);
-            this.loggerManager = loggerManager;
         }
 
         #endregion
@@ -157,11 +148,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
+                        //this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
                     }
                     else
                     {
-                        this.loggerManager.UpdateLoggerList(argument, loggerIdentifier, parameters);
+                        //this.loggerManager.UpdateLoggerList(argument, loggerIdentifier, parameters);
                     }
                 }
                 else

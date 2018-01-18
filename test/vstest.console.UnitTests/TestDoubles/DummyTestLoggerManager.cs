@@ -7,6 +7,7 @@ namespace vstest.console.UnitTests.TestDoubles
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
     internal class DummyTestLoggerManager : TestLoggerManager
     {
@@ -15,7 +16,7 @@ namespace vstest.console.UnitTests.TestDoubles
         }
 
         public DummyTestLoggerManager(InternalTestLoggerEvents loggerEvents)
-            : base(TestSessionMessageLogger.Instance, loggerEvents)
+            : base(null, TestSessionMessageLogger.Instance, loggerEvents)
         {
         }
 
@@ -32,9 +33,6 @@ namespace vstest.console.UnitTests.TestDoubles
             return this.loggersInfoList.ToList().Find(l => l.loggerIdentifier == loggerIdentifier) != null;
         }
 
-        public static void Cleanup()
-        {
-            Instance = null;
-        }
+        // TODO: we removed cleanup methods here. Should we consider disposig events here? Also we removed from testLoggermanagertests.
     }
 }
