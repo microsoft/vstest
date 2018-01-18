@@ -15,6 +15,7 @@ Write-Host "##vso[task.setvariable variable=PackageVersion;]$packageVersion"
 
 # Set Newtonsoft.Json version to consume in  CI build "Package: TestPlatform SDK" task.
 # "Nuget.exe pack" required JsonNetVersion property for creating nuget package.
-$env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
-$JsonNetVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
+
+$TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
+$JsonNetVersion = ([xml](Get-Content $TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
 Write-Host "##vso[task.setvariable variable=JsonNetVersion;]$JsonNetVersion"
