@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector of type : {0} from location : {1}. Error : ", CodeCoverageAnalysisAssemblyName, assemblyPath, ex.Message);
+                    EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector of type : {0} from location : {1}. Error : {2}", CodeCoverageAnalysisAssemblyName, assemblyPath, ex.ToString());
                 }
             }
 

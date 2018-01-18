@@ -55,6 +55,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <returns>Port number</returns>
         public int InitializeCommunication()
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DataCollectionRequestSender.InitializeCommunication : Initialize communication. ");
+            }
+
             var endpoint = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
             this.communicationManager.AcceptClientAsync();
             return endpoint.Port;
@@ -67,6 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <returns>True, if Handler is connected</returns>
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DataCollectionRequestSender.WaitForRequestHandlerConnection : Waiting for connection with timeout: {0}", clientConnectionTimeout);
+            }
+
             return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
         }
 
@@ -97,11 +107,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             var isDataCollectionStarted = false;
             BeforeTestRunStartResult result = null;
 
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Send BeforeTestRunStart message with settingsXml: {0}", settingsXml);
+            }
+
             this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, settingsXml);
 
             while (!isDataCollectionStarted)
             {
                 var message = this.communicationManager.ReceiveMessage();
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Received message: {0}", message);
+                }
 
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
@@ -124,6 +144,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             var isDataCollectionComplete = false;
             Collection<AttachmentSet> attachmentSets = null;
 
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
+            }
+
             this.communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
 
             // Cycle through the messages that the datacollector sends.
@@ -131,6 +156,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             while (!isDataCollectionComplete)
             {
                 var message = this.communicationManager.ReceiveMessage();
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult : Received message: {0}", message);
+                }
 
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {

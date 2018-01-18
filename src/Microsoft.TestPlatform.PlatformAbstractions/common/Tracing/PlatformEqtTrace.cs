@@ -352,7 +352,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 catch (Exception e)
                 {
                     UnInitializeVerboseTrace();
-                    ErrorOnInitialization = e.Message;
+                    ErrorOnInitialization = e.ToString();
                     return false;
                 }
 

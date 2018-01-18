@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -34,6 +35,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private const string PortOption = "--port";
         private const string DiagOption = "--diag";
         private const string ParentProcessIdOption = "--parentprocessid";
+        public const int DataCollectorConnectionTimeout = 30 * 1000;  // In milliseconds.
+        public const string TimeoutEnvironmentVaribleName = "VSTEST_DATACOLLECTOR_CONNECTION_TIMEOUT";
+        public const string DebugEnvironmentVaribleName = "VSTEST_DATACOLLECTOR_DEBUG";
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
@@ -100,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
-            this.connectionTimeout = 5 * 1000;
+            this.connectionTimeout = ProxyDataCollectionManager.DataCollectorConnectionTimeout;
             this.LogEnabledDataCollectors();
         }
 
@@ -182,19 +186,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // Warn the user that execution will wait for debugger attach.
             var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
 
-            var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
-            if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) && dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
+            ChangeConnectionTimeoutIfRequired(processId);
+            var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
+            if (connected == false)
+            {
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToConnectDataCollector));
+            }
+        }
+
+        private void ChangeConnectionTimeoutIfRequired(int processId)
+        {
+            // Increase connection timeout when debugging is enabled.
+            var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable(DebugEnvironmentVaribleName);
+            if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) &&
+                dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
             {
                 ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.DataCollectorDebuggerWarning, OutputLevel.Warning);
                 ConsoleOutput.Instance.WriteLine(
                     string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(processId)),
                     OutputLevel.Information);
-
-                // Increase connection timeout when debugging is enabled.
                 this.connectionTimeout = 5 * this.connectionTimeout;
             }
 
-            this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
+            // Change connection timeout if user specified environment variable VSTEST_DATACOLLECTOR_CONNECTION_TIMEOUT.
+            var userSpecifiedTimeout = Environment.GetEnvironmentVariable(TimeoutEnvironmentVaribleName);
+            if (!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
+            {
+                this.connectionTimeout = result * 1000;
+            }
         }
 
         private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)
@@ -230,7 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 EqtTrace.Error(exception);
             }
 
-            runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.Message);
+            runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, exception.ToString());
         }
 
         private IList<string> GetCommandLineArguments(int portNumber)
