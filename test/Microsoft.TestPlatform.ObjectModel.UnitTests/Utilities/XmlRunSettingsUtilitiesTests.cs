@@ -502,6 +502,25 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         }
 
         [TestMethod]
+        public void GetLoggerRunSettingsShouldReturnLoggerWithCorrectCodeBase()
+        {
+            string runSettingsWithLoggerHavingAssemblyQualifiedName =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <RunConfiguration>
+                  </RunConfiguration>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger assemblyQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" CodeBase=""C:\Sample\Sample.TestLogger.dll""></Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettingsWithLoggerHavingAssemblyQualifiedName);
+            Assert.AreEqual(@"C:\Sample\Sample.TestLogger.dll", loggerRunSettings.LoggerSettingsList.First().CodeBase);
+        }
+
+        [TestMethod]
         public void GetLoggerRunSettingsShouldReturnLoggerWithCorrectEnabledAttributeValue()
         {
             string runSettingsWithLoggerHavingEnabledAttribute =
@@ -597,7 +616,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                   </RunConfiguration>
                   <LoggerRunSettings>
                     <Loggers>
-                      <Logger friendlyName=""TestLoggerWithParameterExtension"" uri=""testlogger://logger"" assemblyQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" enabled=""faLSe""></Logger>
+                      <Logger friendlyName=""TestLoggerWithParameterExtension"" uri=""testlogger://logger"" assemblyQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" coDEbase=""C:\Sample\Sample.TestLogger.dll"" enabled=""faLSe""></Logger>
                     </Loggers>
                   </LoggerRunSettings>
                 </RunSettings>";
@@ -606,6 +625,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             Assert.AreEqual("TestLoggerWithParameterExtension", loggerRunSettings.LoggerSettingsList.First().FriendlyName);
             Assert.IsTrue(new Uri("testlogger://logger").Equals(loggerRunSettings.LoggerSettingsList.First().Uri));
             Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerRunSettings.LoggerSettingsList.First().AssemblyQualifiedName);
+            Assert.AreEqual(@"C:\Sample\Sample.TestLogger.dll", loggerRunSettings.LoggerSettingsList.First().CodeBase);
             Assert.IsFalse(loggerRunSettings.LoggerSettingsList.First().IsEnabled);
         }
 
@@ -619,7 +639,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                   </RunConfiguration>
                   <loGGerRunSettings>
                     <LOGgers>
-                      <loGGer FRIEndlyNAME=""TestLoggerWithParameterExtension"" uRI=""testlogger://logger"" AssEMBLYQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" enaBLED=""faLSe""></loGGer>
+                      <loGGer FRIEndlyNAME=""TestLoggerWithParameterExtension"" uRI=""testlogger://logger"" AssEMBLYQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" coDEbase=""C:\Sample\Sample.TestLogger.dll"" enaBLED=""faLSe""></loGGer>
                     </LOGgers>
                   </loGGerRunSettings>
                 </RunSettings>";
@@ -628,6 +648,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             Assert.AreEqual("TestLoggerWithParameterExtension", loggerRunSettings.LoggerSettingsList.First().FriendlyName);
             Assert.IsTrue(new Uri("testlogger://logger").Equals(loggerRunSettings.LoggerSettingsList.First().Uri));
             Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerRunSettings.LoggerSettingsList.First().AssemblyQualifiedName);
+            Assert.AreEqual(@"C:\Sample\Sample.TestLogger.dll", loggerRunSettings.LoggerSettingsList.First().CodeBase);
             Assert.IsFalse(loggerRunSettings.LoggerSettingsList.First().IsEnabled);
         }
 
@@ -1006,7 +1027,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
                           <Key2>Value2</Key2>
                         </ConfiGUration>
                       </Logger>
-                      <Logger friendlyName=""TestLogger"" uri=""testlogger://logger"" assemblyQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" enabled=""faLSe""></Logger>
+                      <Logger friendlyName=""TestLogger"" uri=""testlogger://logger"" assemblyQualifiedName=""Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx"" coDEbase=""C:\Sample\Sample.TestLogger.dll"" enabled=""faLSe""></Logger>
                       <Logger uri=""testlogger://loggerTemp"">
                         <ConfiGUration>
                           <Key3>Value3</Key3>
@@ -1027,6 +1048,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             Assert.AreEqual("TestLoggerWithParameterExtension", loggerFirst.FriendlyName);
             Assert.IsTrue(string.IsNullOrWhiteSpace(loggerFirst.Uri?.ToString()));
             Assert.IsTrue(string.IsNullOrWhiteSpace(loggerFirst.AssemblyQualifiedName));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(loggerFirst.CodeBase));
             Assert.IsTrue(loggerFirst.IsEnabled);
             Assert.AreEqual("<Key1>Value1</Key1><Key2>Value2</Key2>", loggerFirst.Configuration.InnerXml);
 
@@ -1035,6 +1057,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             Assert.AreEqual("TestLogger", loggerSecond.FriendlyName);
             Assert.AreEqual(new Uri("testlogger://logger").ToString(), loggerSecond.Uri.ToString());
             Assert.AreEqual("Sample.Sample.Sample.SampleLogger, Sample.Sample.Logger, Version=0.0.0.0, Culture=neutral, PublicKeyToken=xxxxxxxxxxxxxxxx", loggerSecond.AssemblyQualifiedName);
+            Assert.AreEqual(@"C:\Sample\Sample.TestLogger.dll", loggerSecond.CodeBase);
             Assert.IsFalse(loggerSecond.IsEnabled);
             Assert.IsNull(loggerSecond.Configuration);
 
@@ -1043,6 +1066,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
             Assert.IsTrue(string.IsNullOrWhiteSpace(loggerThird.FriendlyName));
             Assert.AreEqual(new Uri("testlogger://loggerTemp").ToString(), loggerThird.Uri.ToString());
             Assert.IsTrue(string.IsNullOrWhiteSpace(loggerThird.AssemblyQualifiedName));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(loggerThird.CodeBase));
             Assert.IsTrue(loggerThird.IsEnabled);
             Assert.AreEqual("<Key3>Value3</Key3><Key4>Value4</Key4>", loggerThird.Configuration.InnerXml);
         }

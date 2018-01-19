@@ -76,6 +76,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string LoggerAssemblyQualifiedNameLower = "assemblyqualifiedname";
 
         /// <summary>
+        /// Name of codeBase attribute of logger node.
+        /// </summary>
+        public const string LoggerCodeBase = "codeBase";
+
+        /// <summary>
+        /// Name of codeBase attribute of logger node in lower case.
+        /// </summary>
+        public const string LoggerCodeBaseLower = "codebase";
+
+        /// <summary>
         /// Name of enabled attribute of logger node.
         /// </summary>
         public const string LoggerEnabledName = "enabled";

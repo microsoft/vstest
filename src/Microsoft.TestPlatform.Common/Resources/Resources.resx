@@ -166,10 +166,10 @@
     <value>Error: Invalid operator '{0}'</value>
   </data>
   <data name="LoggerInitializationError" xml:space="preserve">
-    <value>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</value>
+    <value>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</value>
   </data>
   <data name="LoggerNotFound" xml:space="preserve">
-    <value>Could not find a test logger with URI or FriendlyName '{0}'.</value>
+    <value>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</value>
   </data>
   <data name="LoggerUriInvalid" xml:space="preserve">
     <value>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</value>

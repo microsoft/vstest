@@ -59,6 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             this.testEngine.Setup(te => te.GetDiscoveryManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
 
             var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
@@ -275,6 +276,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateDiscoveryRequestShouldThrowExceptionIfNoTestHostproviderFound()
         {
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object))
+                .Returns(this.loggerManager.Object);
+
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -326,6 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             this.testEngine.Setup(te => te.GetDiscoveryManager(It.IsAny<IRequestData>(), this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             // Action
@@ -336,7 +341,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         /// <summary>
-        /// Create test run request should initialize logger manager fro design mode.
+        /// Create test run request should initialize logger manager for design mode.
         /// </summary>
         [TestMethod]
         public void CreateTestRunRequestShouldInitializeLoggerManagerForDesignMode()
@@ -360,7 +365,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         /// <summary>
-        /// Create test run request should initialize logger manager fro design mode.
+        /// Create discovery request should initialize logger manager for design mode.
+        /// </summary>
+        [TestMethod]
+        public void CreateDiscoveryRequestShouldInitializeLoggerManagerForDesignMode()
+        {
+            this.testEngine.Setup(te => te.GetDiscoveryManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>";
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, settingsXml);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+
+            this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
+        }
+
+        /// <summary>
+        /// Create test run request should initialize logger manager for design mode.
         /// </summary>
         [TestMethod]
         public void CreateTestRunRequestShouldInitializeLoggerManagerForNonDesignMode()
@@ -383,7 +412,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
         }
 
-        // TODO: write test for discovery also.
+        /// <summary>
+        /// Create discovery request should initialize logger manager for design mode.
+        /// </summary>
+        [TestMethod]
+        public void CreateDiscoveryRequestShouldInitializeLoggerManagerForNonDesignMode()
+        {
+            this.testEngine.Setup(te => te.GetDiscoveryManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>";
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 10, settingsXml);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+
+            this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
+        }
 
         private class TestableTestPlatform : TestPlatform
         {

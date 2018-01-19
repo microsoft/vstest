@@ -32,6 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets value CodeBase of logger DLL. The syntax is same as Code Base in AssemblyName class.
+        /// </summary>
+        public string CodeBase
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the friendly name.
         /// </summary>
         public string FriendlyName
@@ -162,6 +171,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                         case Constants.LoggerAssemblyQualifiedNameLower:
                             settings.AssemblyQualifiedName = reader.Value;
+                            break;
+
+                        case Constants.LoggerCodeBaseLower:
+                            settings.CodeBase = reader.Value;
                             break;
 
                         case Constants.LoggerEnabledName:

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
@@ -8,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
@@ -21,14 +24,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
     /// Responsible for managing logger extensions and broadcasting results
     /// and error/warning/informational messages to them.
     /// </summary>
-    internal class TestLoggerManager : ITestDiscoveryEventsRegistrar, ITestRunEventsRegistrar, ITestLoggerManager, IDisposable
+    internal class TestLoggerManager : ITestLoggerManager, IDisposable
     {
         #region Fields
 
@@ -43,18 +47,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Used to keep track of which loggers have been initialized.
         /// </summary>
-        private HashSet<String> initializedLoggers = new HashSet<String>();
+        private HashSet<Type> initializedLoggers = new HashSet<Type>();
 
         /// <summary>
         /// Keeps track if we are disposed.
         /// </summary>
         private bool isDisposed = false;
 
-        /// <summary>
-        /// Run request that we have registered for events on.  Used when
-        /// disposing to unregister for the events.
-        /// </summary>
-        private ITestRunRequest runRequest = null;
+        ///// <summary>
+        ///// Run request that we have registered for events on.  Used when
+        ///// disposing to unregister for the events.
+        ///// </summary>
+        //private ITestRunRequest runRequest = null;
 
         /// <summary>
         /// Message logger.
@@ -67,24 +71,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IRequestData requestData;
 
         private TestLoggerExtensionManager testLoggerExtensionManager;
-        private IDiscoveryRequest discoveryRequest;
+        //private IDiscoveryRequest discoveryRequest;
+
+        /// <summary>
+        /// AssemblyLoadContext for current platform
+        /// </summary>
+        private IAssemblyLoadContext assemblyLoadContext;
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// 
+        /// Test logger manager.
         /// </summary>
         /// <param name="requestData">Request Data for Providing Common Services/Data for Discovery and Execution.</param>
         /// <param name="messageLogger">Message Logger.</param>
         /// <param name="loggerEvents">Logger events.</param>
-        public TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger, InternalTestLoggerEvents loggerEvents)
+        public TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger, InternalTestLoggerEvents loggerEvents) : this(requestData, messageLogger, loggerEvents, new PlatformAssemblyLoadContext())
+        {
+        }
+
+        /// <summary>
+        /// Test logger manager.
+        /// </summary>
+        /// <param name="requestData"></param>
+        /// <param name="messageLogger"></param>
+        /// <param name="loggerEvents"></param>
+        /// <param name="assemblyLoadContext"></param>
+        internal TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger,
+            InternalTestLoggerEvents loggerEvents, IAssemblyLoadContext assemblyLoadContext)
         {
             this.requestData = requestData;
             this.messageLogger = messageLogger;
             this.testLoggerExtensionManager = null;
             this.loggerEvents = loggerEvents;
+            this.assemblyLoadContext = assemblyLoadContext;
         }
 
         #endregion
@@ -106,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Gets the initialized loggers.
         /// </summary>
         /// This property is added to assist in testing
-        protected HashSet<string> InitializedLoggers
+        protected HashSet<Type> InitializedLoggers
         {
             get
             {
@@ -147,56 +169,65 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Initialize(string runSettings)
         {
-            //List<Logger> loggers = RunSett
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
-            foreach (var logger in loggers.LoggerSettingsList ?? Enumerable.Empty<LoggerSettings>())
+            foreach (var logger in loggers?.LoggerSettingsList ?? Enumerable.Empty<LoggerSettings>())
             {
-                // reading using friendly name
-                // TODO: console might not work.
-                // TODO: enabled check for logger
-                if (TryGetUriFromFriendlyName(logger.FriendlyName, out var loggerUri))
+                if (!logger.IsEnabled)
                 {
-                    //var paramters = GetParametersFromConfigurationElement(logger.Configuration);
-                    this.AddLoggerByUri(loggerUri, null);
+                    // Dont add logger if its disabled.
+                    continue;
+                }
+
+                var parameters = GetParametersFromConfigurationElement(logger.Configuration);
+                var loggerInitialized = false;
+
+                if (!string.IsNullOrWhiteSpace(logger.AssemblyQualifiedName))
+                {
+                    loggerInitialized = AddLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase, parameters);
+                }
+
+                if (!loggerInitialized &&
+                    !string.IsNullOrWhiteSpace(logger.Uri?.ToString()))
+                {
+                    loggerInitialized = AddLogger(logger.Uri, parameters);
+                }
+
+                if (!loggerInitialized &&
+                    TryGetUriFromFriendlyName(logger.FriendlyName, out var loggerUri) &&
+                    loggerUri != null)
+                {
+                    loggerInitialized = AddLogger(loggerUri, parameters);
+                }
+
+                if (!loggerInitialized)
+                {
+                    var value = !string.IsNullOrWhiteSpace(logger.AssemblyQualifiedName)
+                        ? logger.AssemblyQualifiedName
+                        : !string.IsNullOrWhiteSpace(logger.Uri?.ToString())
+                            ? logger.Uri.ToString()
+                            : logger.FriendlyName;
+
+                    EqtTrace.Error(
+                        String.Format(
+                            CultureInfo.CurrentUICulture,
+                            CommonResources.LoggerNotFound,
+                            value));
                 }
             }
 
-            //foreach (var logger in this.loggersInfoList)
-            //{
-            //    string loggerIdentifier = logger.loggerIdentifier;
-            //    Dictionary<string, string> parameters = logger.parameters;
-
-            //    // First assume the logger is specified by URI. If that fails try with friendly name.
-            //    try
-            //    {
-            //        this.AddLoggerByUri(loggerIdentifier, parameters);
-            //    }
-            //    catch (InvalidLoggerException)
-            //    {
-            //        string loggerUri;
-            //        if (TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
-            //        {
-            //            this.AddLoggerByUri(loggerUri, parameters);
-            //        }
-            //        else
-            //        {
-            //            throw new InvalidLoggerException(
-            //            String.Format(
-            //            CultureInfo.CurrentUICulture,
-            //            CommonResources.LoggerNotFound,
-            //            logger.argument));
-            //        }
-            //    }
-            //}
-
-            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join(",", this.initializedLoggers.ToArray()));
+            requestData.MetricsCollection.Add(TelemetryDataConstants.LoggerUsed, string.Join<Type>(",", this.initializedLoggers.ToArray()));
         }
 
+        /// <summary>
+        /// Get parameters from configuration element.
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         private Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
         {
-            //LoggerNameValueConfigurationManager configuration = new LoggerNameValueConfigurationManager();
-            throw new NotImplementedException();
+            var configurationManager = new LoggerNameValueConfigurationManager(configuration);
+            return configurationManager.NameValuePairs;
         }
 
         /// <summary>
@@ -205,17 +236,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="logger">The logger that needs to be initialized</param>
         /// <param name="extensionUri">URI of the logger</param>
         /// <param name="parameters">Logger parameters</param>
-        public void AddLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
+        public bool AddLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
         {
             this.CheckDisposed();
 
             // If the logger has already been initialized just return.
-            if (this.initializedLoggers.Contains(extensionUri, StringComparer.OrdinalIgnoreCase))
+            if (this.initializedLoggers.Contains(logger.GetType()))
             {
-                return;
+                EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.GetType());
+                return false;
             }
-            this.initializedLoggers.Add(extensionUri);
-            InitializeLogger(logger, extensionUri, parameters);
+            var initialized = InitializeLogger(logger, extensionUri, parameters);
+
+            if (initialized)
+            {
+                this.initializedLoggers.Add(logger.GetType());
+            }
+
+            return initialized;
         }
 
         /// <summary>
@@ -225,18 +263,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="uri">URI of the logger to add.</param>
         /// <param name="parameters">Logger parameters.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Case insensitive needs to be supported "), SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Third party loggers could potentially throw all kinds of exceptions.")]
-        public void AddLogger(Uri uri, Dictionary<string, string> parameters)
+        public bool AddLogger(Uri uri, Dictionary<string, string> parameters)
         {
             ValidateArg.NotNull<Uri>(uri, "uri");
 
             this.CheckDisposed();
-
-            // If the logger has already been initialized just return.
-            if (this.initializedLoggers.Contains(uri.AbsoluteUri, StringComparer.OrdinalIgnoreCase))
-            {
-                return;
-            }
-            this.initializedLoggers.Add(uri.AbsoluteUri);
 
             // Look up the extension and initialize it if one is found.
             var extensionManager = this.TestLoggerExtensionManager;
@@ -244,45 +275,128 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (logger == null)
             {
-                throw new InvalidOperationException(
+                EqtTrace.Error(
                     String.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.LoggerNotFound,
                         uri.OriginalString));
+                return false;
             }
 
-            InitializeLogger(logger.Value, logger.Metadata.ExtensionUri, parameters);
+            // If the logger has already been initialized just return.
+            if (this.initializedLoggers.Contains(logger.Value.GetType()))
+            {
+                EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.Value.GetType());
+                return false;
+            }
+
+            var initialized = InitializeLogger(logger.Value, logger.Metadata.ExtensionUri, parameters);
+
+            if (initialized)
+            {
+                this.initializedLoggers.Add(logger.Value.GetType());
+            }
+
+            return initialized;
         }
 
-        private void AddLoggerByUri(string argument, Dictionary<string, string> parameters)
+        /// <summary>
+        /// Add logger by type.
+        /// </summary>
+        /// <param name="assemblyQualifiedName"></param>
+        /// <param name="codeBase"></param>
+        /// <param name="parameters"></param>
+        /// <returns>Returns true if initialized successfully.</returns>
+        private bool AddLoggerByType(string assemblyQualifiedName, string codeBase, Dictionary<string, string> parameters)
         {
-            // Get the uri and if it is not valid, throw.
-            Uri loggerUri = null;
+            this.CheckDisposed();
+            Assembly assembly = null;
             try
             {
-                loggerUri = new Uri(argument);
+                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
             }
-            catch (UriFormatException)
+            catch (Exception ex)
             {
-                throw new InvalidLoggerException(
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommonResources.LoggerUriInvalid,
-                    argument));
+                EqtTrace.Error(
+                    "TestLoggerManager: Error occured while loading the Logger assembly : {0} , Exception Details : {1}", codeBase, ex);
+                return false;
             }
 
-            // Add the logger and if it is a non-existent logger, throw.
+            var loggerType =
+                assembly?.GetTypes()
+                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName));
+
+            object logger = null;
+
             try
             {
-                AddLogger(loggerUri, parameters);
+                var constructorInfo = loggerType?.GetConstructor(Type.EmptyTypes);
+                logger = constructorInfo?.Invoke(new object[] { });
             }
-            catch (InvalidOperationException e)
+            catch (Exception ex)
             {
-                throw new InvalidLoggerException(e.Message, e);
+                EqtTrace.Error(
+                    "TestLoggerManager: Error occured while creating logger instance: {0} , Exception Details : {1}", loggerType, ex);
+                return false;
             }
+
+            if (logger == null)
+            {
+                EqtTrace.Error(
+                    "TestLoggerManager: Unable to find Logger with assemblyQualifieldName: {0}, CodeBase : {1}", assemblyQualifiedName, codeBase);
+                return false;
+            }
+
+            // If the logger has already been initialized just return.
+            if (this.initializedLoggers.Contains(logger.GetType()))
+            {
+                EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.GetType());
+                return false;
+            }
+
+            // Get Logger instance and initialize.
+            try
+            {
+                switch (logger)
+                {
+                    case ITestLoggerWithParameters _:
+                        ((ITestLoggerWithParameters) logger).Initialize(loggerEvents,
+                            UpdateLoggerParameters(parameters));
+                        break;
+
+                    case ITestLogger _:
+                        ((ITestLogger) logger).Initialize(loggerEvents,
+                            GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
+                        break;
+
+                    default:
+                        // If logger is of different type, then logger should not be initialized.
+                        EqtTrace.Error(
+                            "TestLoggerManager: Incorrect logger type: {0}", logger.GetType());
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(
+                    "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}", logger.GetType(), ex);
+
+                this.messageLogger.SendMessage(
+                    TestMessageLevel.Error,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.LoggerInitializationError,
+                        "type",
+                        logger.GetType(),
+                        ex));
+                return false;
+            }
+
+            this.initializedLoggers.Add(logger.GetType());
+            return true;
         }
 
-        private void InitializeLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
+        private bool InitializeLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
         {
             try
             {
@@ -302,9 +416,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.LoggerInitializationError,
+                        "uri",
                         extensionUri,
                         e));
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>
@@ -313,14 +431,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="friendlyName">The friendly Name.</param>
         /// <param name="loggerUri">The logger Uri.</param>
         /// <returns><see cref="bool"/></returns>
-        public bool TryGetUriFromFriendlyName(string friendlyName, out string loggerUri)
+        public bool TryGetUriFromFriendlyName(string friendlyName, out Uri loggerUri)
         {
             var extensionManager = this.TestLoggerExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
                 if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    loggerUri = extension.Metadata.ExtensionUri;
+                    try
+                    {
+                        loggerUri = new Uri(extension.Metadata.ExtensionUri);
+                    }
+                    catch (UriFormatException)
+                    {
+                        EqtTrace.Error(
+                            string.Format(
+                                CultureInfo.CurrentUICulture,
+                                CommonResources.LoggerUriInvalid,
+                                extension.Metadata.ExtensionUri));
+                        loggerUri = null;
+                        return false;
+                    }
+
                     return true;
                 }
             }
@@ -329,73 +461,73 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return false;
         }
 
-        /// <summary>
-        /// Registers to receive events from the provided test run request.
-        /// These events will then be broadcast to any registered loggers.
-        /// </summary>
-        /// <param name="testRunRequest">The run request to register for events on.</param>
-        public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
-        {
-            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
+        ///// <summary>
+        ///// Registers to receive events from the provided test run request.
+        ///// These events will then be broadcast to any registered loggers.
+        ///// </summary>
+        ///// <param name="testRunRequest">The run request to register for events on.</param>
+        //public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
+        //{
+        //    ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
 
-            this.CheckDisposed();
+        //    this.CheckDisposed();
 
-            // Keep track of the run requests so we can unregister for the
-            // events when disposed.
-            this.runRequest = testRunRequest;
+        //    // Keep track of the run requests so we can unregister for the
+        //    // events when disposed.
+        //    this.runRequest = testRunRequest;
 
-            // Redirect the events to the InternalTestLoggerEvents
-            testRunRequest.TestRunMessage += this.TestRunMessageHandler;
-            testRunRequest.OnRunStart += this.TestRunStartHandler;
-            testRunRequest.OnRunStatsChange += this.TestRunStatsChangedHandler;
-            testRunRequest.OnRunCompletion += this.TestRunCompleteHandler;
-            testRunRequest.DataCollectionMessage += this.DataCollectionMessageHandler;
-        }
+        //    // Redirect the events to the InternalTestLoggerEvents
+        //    testRunRequest.TestRunMessage += this.TestRunMessageHandler;
+        //    testRunRequest.OnRunStart += this.TestRunStartHandler;
+        //    testRunRequest.OnRunStatsChange += this.TestRunStatsChangedHandler;
+        //    testRunRequest.OnRunCompletion += this.TestRunCompleteHandler;
+        //    testRunRequest.DataCollectionMessage += this.DataCollectionMessageHandler;
+        //}
 
-        /// <summary>
-        /// Registers to receive discovery events from discovery request.
-        /// These events will then be broadcast to any registered loggers.
-        /// </summary>
-        /// <param name="discoveryRequest">The discovery request to register for events on.</param>
-        public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
-        {
-            ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
+        ///// <summary>
+        ///// Registers to receive discovery events from discovery request.
+        ///// These events will then be broadcast to any registered loggers.
+        ///// </summary>
+        ///// <param name="discoveryRequest">The discovery request to register for events on.</param>
+        //public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
+        //{
+        //    ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
 
-            this.CheckDisposed();
-            this.discoveryRequest = discoveryRequest;
-            discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
-            discoveryRequest.OnDiscoveryStart += this.DiscoveryStartHandler;
-            discoveryRequest.OnDiscoveredTests += this.DiscoveredTestsHandler;
-            discoveryRequest.OnDiscoveryComplete += this.DiscoveryCompleteHandler;
-        }
+        //    this.CheckDisposed();
+        //    this.discoveryRequest = discoveryRequest;
+        //    discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
+        //    discoveryRequest.OnDiscoveryStart += this.DiscoveryStartHandler;
+        //    discoveryRequest.OnDiscoveredTests += this.DiscoveredTestsHandler;
+        //    discoveryRequest.OnDiscoveryComplete += this.DiscoveryCompleteHandler;
+        //}
 
-        /// <summary>
-        /// Unregisters the events from the test run request. 
-        /// </summary>
-        /// <param name="testRunRequest">The run request from which events should be unregistered.</param>
-        public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
-        {
-            ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
+        ///// <summary>
+        ///// Unregisters the events from the test run request. 
+        ///// </summary>
+        ///// <param name="testRunRequest">The run request from which events should be unregistered.</param>
+        //public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
+        //{
+        //    ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
 
-            testRunRequest.TestRunMessage -= this.TestRunMessageHandler;
-            testRunRequest.OnRunStart -= this.TestRunStartHandler;
-            testRunRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
-            testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-            testRunRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
-        }
+        //    testRunRequest.TestRunMessage -= this.TestRunMessageHandler;
+        //    testRunRequest.OnRunStart -= this.TestRunStartHandler;
+        //    testRunRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
+        //    testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
+        //    testRunRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
+        //}
 
-        /// <summary>
-        /// Unregister the events from the discovery request.
-        /// </summary>
-        /// <param name="discoveryRequest">The discovery request from which events should be unregistered.</param>
-        public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
-        {
-            ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
-            discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
-            discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
-            discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
-            discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
-        }
+        ///// <summary>
+        ///// Unregister the events from the discovery request.
+        ///// </summary>
+        ///// <param name="discoveryRequest">The discovery request from which events should be unregistered.</param>
+        //public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
+        //{
+        //    ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
+        //    discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
+        //    discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
+        //    discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
+        //    discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
+        //}
 
         /// <summary>
         /// Enables sending of events to the loggers which are registered.
@@ -424,18 +556,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// Sends the error message to all registered loggers.
-        /// This is required so that out of test run execution errors 
-        /// can also mark test run test run failure.
-        /// </summary>
-        /// <param name="e">
-        /// The e.
-        /// </param>
-        public void SendTestRunMessage(TestRunMessageEventArgs e)
-        {
-            this.TestRunMessageHandler(null, e);
-        }
+        ///// <summary>
+        ///// Sends the error message to all registered loggers.
+        ///// This is required so that out of test run execution errors 
+        ///// can also mark test run test run failure.
+        ///// </summary>
+        ///// <param name="e">
+        ///// The e.
+        ///// </param>
+        //public void SendTestRunMessage(TestRunMessageEventArgs e)
+        //{
+        //    this.HandleTestRunMessage(e);
+        //}
 
         /// <summary>
         /// Ensure that all pending messages are sent to the loggers.
@@ -449,23 +581,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 if (disposing)
                 {
-                    // Unregister from runrequests.
-                    if (this.runRequest != null)
-                    {
-                        this.runRequest.TestRunMessage -= this.TestRunMessageHandler;
-                        this.runRequest.OnRunStart -= this.TestRunStartHandler;
-                        this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
-                        this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-                        this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
-                    }
+                    //// Unregister from runrequests.
+                    //if (this.runRequest != null)
+                    //{
+                    //    this.runRequest.TestRunMessage -= this.TestRunMessageHandler;
+                    //    this.runRequest.OnRunStart -= this.TestRunStartHandler;
+                    //    this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
+                    //    this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
+                    //    this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
+                    //}
 
-                    if (this.discoveryRequest != null)
-                    {
-                        this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
-                        this.discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
-                        this.discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
-                        this.discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
-                    }
+                    //if (this.discoveryRequest != null)
+                    //{
+                    //    this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
+                    //    this.discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
+                    //    this.discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
+                    //    this.discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
+                    //}
 
                     this.loggerEvents.Dispose();
                 }
@@ -532,98 +664,99 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region Event Handlers
 
         /// <summary>
-        /// Called when a test run message is received.
+        /// Handles test run message event.
         /// </summary>
-        private void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
+        public void HandleTestRunMessage(TestRunMessageEventArgs e)
         {
-            this.loggerEvents.RaiseTestRunMessage(e);
-        }
-
-        /// <summary>
-        /// Called when a test run stats are changed.
-        /// </summary>
-        private void TestRunStatsChangedHandler(object sender, TestRunChangedEventArgs e)
-        {
-            foreach (TestResult result in e.NewTestResults)
+            // TODO: UTs for disposed
+            if (!this.isDisposed)
             {
-                this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
+                this.loggerEvents.RaiseTestRunMessage(e);
             }
         }
 
         /// <summary>
-        /// Called when a test run starts.
+        /// Handle test run stats change event.
         /// </summary>
-        private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+        public void HandleTestRunStatsChange(TestRunChangedEventArgs e)
         {
-            this.loggerEvents.RaiseTestRunStart(e);
-        }
-
-        /// <summary>
-        /// Called when a test run is complete.
-        /// </summary>
-        private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
-        {
-            this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error, e.AttachmentSets, e.ElapsedTimeInRunningTests);
-        }
-
-        /// <summary>
-        /// Called when data collection message is received.
-        /// </summary>
-        private void DataCollectionMessageHandler(object sender, DataCollectionMessageEventArgs e)
-        {
-            string message;
-            if (null == e.Uri)
+            if (!this.isDisposed)
             {
-                // Message from data collection framework.
-                message = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectionMessageFormat, e.Message);
+                foreach (TestResult result in e.NewTestResults)
+                {
+                    this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
+                }
             }
-            else
+        }
+
+        /// <summary>
+        /// Handles test run start event.
+        /// </summary>
+        public void HandleTestRunStart(TestRunStartEventArgs e)
+        {
+            if (!this.isDisposed)
             {
-                // Message from individual data collector.
-                message = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectorMessageFormat, e.FriendlyName, e.Message);
+                this.loggerEvents.RaiseTestRunStart(e);
             }
-            this.TestRunMessageHandler(sender, new TestRunMessageEventArgs(e.Level, message));
-        }
-
-
-        /// <summary>
-        /// Send discovery message to all registered listeners.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DiscoveryMessageHandler(object sender, TestRunMessageEventArgs e)
-        {
-            this.loggerEvents.RaiseDiscoveryMessage(e);
         }
 
         /// <summary>
-        /// Send discovered tests to all registered listeners.
+        /// Handles test run complete.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DiscoveredTestsHandler(object sender, DiscoveredTestsEventArgs e)
+        public void HandleTestRunComplete(TestRunCompleteEventArgs e)
         {
-            this.loggerEvents.RaiseDiscoveredTests(e);
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error, e.AttachmentSets, e.ElapsedTimeInRunningTests);
+            }
         }
 
         /// <summary>
-        /// Called when test discovery is complete
+        /// Handles discovery message event.
         /// </summary>
-        /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DiscoveryCompleteHandler(object sender, DiscoveryCompleteEventArgs e)
+        public void HandleDiscoveryMessage(TestRunMessageEventArgs e)
         {
-            this.loggerEvents.RaiseDiscoveryComplete(e);
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveryMessage(e);
+            }
         }
 
         /// <summary>
-        /// Called when test discovery starts.
+        /// Handle discovered tests.
         /// </summary>
-        /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DiscoveryStartHandler(object sender, DiscoveryStartEventArgs e)
+        public void HandleDiscoveredTests(DiscoveredTestsEventArgs e)
         {
-            this.loggerEvents.RaiseDiscoveryStart(e);
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveredTests(e);
+            }
+        }
+
+        /// <summary>
+        /// Handles discovery complete event.
+        /// </summary>
+        /// <param name="e"></param>
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveryComplete(e);
+            }
+        }
+
+        /// <summary>
+        /// Handles discovery start event.
+        /// </summary>
+        /// <param name="e"></param>
+        public void HandleDiscoveryStart(DiscoveryStartEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveryStart(e);
+            }
         }
         #endregion
 

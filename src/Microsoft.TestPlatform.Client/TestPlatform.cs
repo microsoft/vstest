@@ -98,10 +98,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             if (runConfiguration.DesignMode == false)
             {
                 this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
-
-                // Initialize loggers
-                //TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
+
+            // Initialize loggers
+            var loggerManager = this.TestEngine.GetLoggerManager(requestData);
+            loggerManager.Initialize(discoveryCriteria.RunSettings);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
@@ -111,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
             discoveryManager.Initialize();
 
-            return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager);
+            return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
         }
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
             executionManager.Initialize();
 
-            return new TestRunRequest(requestData, testRunCriteria, executionManager);
+            return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }
 
         /// <summary>

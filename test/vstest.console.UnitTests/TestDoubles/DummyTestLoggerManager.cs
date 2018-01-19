@@ -20,7 +20,7 @@ namespace vstest.console.UnitTests.TestDoubles
         {
         }
 
-        public HashSet<String> GetInitializedLoggers
+        public HashSet<Type> GetInitializedLoggers
         {
             get
             {
