@@ -16,22 +16,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
-        private readonly string resultsDir;
-
-        public DataCollectionTests()
-        {
-            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            if (Directory.Exists(this.resultsDir))
-            {
-                Directory.Delete(this.resultsDir, true);
-            }
-        }
-
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
@@ -41,7 +25,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string runSettings = this.GetRunsettingsFilePath();
-            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            string resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
@@ -54,7 +39,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
-            this.VaildateDataCollectorOutput();
+            this.VaildateDataCollectorOutput(resultsDir);
         }
 
         [TestMethod]
@@ -65,7 +50,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            string resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            string diagFileName = Path.Combine(resultsDir, "diaglog.txt");
             var extensionsPath = Path.Combine(
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
@@ -79,7 +65,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
-            this.VaildateDataCollectorOutput();
+            this.VaildateDataCollectorOutput(resultsDir);
         }
 
         private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
@@ -108,7 +94,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private void VaildateDataCollectorOutput()
+        private void VaildateDataCollectorOutput(string resultsDir)
         {
             // Output of datacollection attachment.
             this.StdOutputContains("filename.txt");
@@ -126,7 +112,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var testCaseLevelAttachmentsCount = 0;
             var diaglogsFileCount = 0;
 
-            var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
+            var resultFiles = Directory.GetFiles(resultsDir, "*.txt", SearchOption.AllDirectories);
 
             foreach (var file in resultFiles)
             {
@@ -151,6 +137,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(isTestRunLevelAttachmentFound);
             Assert.AreEqual(3, testCaseLevelAttachmentsCount);
             Assert.AreEqual(3, diaglogsFileCount);
+
+            if (Directory.Exists(resultsDir))
+            {
+                Directory.Delete(resultsDir, true);
+            }
         }
 
         private string GetRunsettingsFilePath()

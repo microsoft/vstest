@@ -36,7 +36,11 @@ Param(
     # Only test cases matching the filter are run. This input is converted to
     # /testCaseFilter:<filter>
     [Parameter(Mandatory=$false)]
-    [System.String] $Filter
+    [System.String] $Filter,
+
+    [Parameter(Mandatory=$false)]
+    [Alias("w")]
+    [System.Int32] $Workers = 0
 )
 
 function Get-DotNetPath
@@ -249,7 +253,7 @@ function Invoke-Test
                 {
 
                     Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter -- MSTest.Parallelize.Workers=$Workers MSTest.Parallelize.Scope=ClassLevel
                 }
                 else
                 {

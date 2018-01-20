@@ -107,9 +107,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <returns></returns>
         public string GetDefaultRunSettings()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-                                    <RunSettings>     
+            string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                                    <RunSettings>
                                         <RunConfiguration>
+                                        <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
                                         </RunConfiguration>
                                     </RunSettings>";
             return runSettingsXml;

@@ -126,7 +126,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        [NetCoreTargetFrameworkDataSource]
         public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

@@ -74,9 +74,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
                                         <RunConfiguration>
+                                        <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
                                         <MaxCpuCount>2</MaxCpuCount>
                                         </RunConfiguration>
                                     </RunSettings>";
@@ -137,7 +138,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             string testSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?><TestSettings></TestSettings>";
 
             File.WriteAllText(testsettingsFile, testSettingsXml, Encoding.UTF8);
-            var runSettings = "<RunSettings><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
+            var runSettings = $"<RunSettings><RunConfiguration><TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion></RunConfiguration><MSTest><SettingsFile>" + testsettingsFile + "</SettingsFile></MSTest></RunSettings>";
             var sources = new List<string>
                               {
                                   this.GetAssetFullPath("MstestV1UnitTestProject.dll")
