@@ -412,9 +412,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns></returns>
         public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
-            var logFileName = @"C:\Users\samadala\AppData\Local\Temp\accep\vstest" + Guid.NewGuid().ToString() + ".txt";
-            Console.WriteLine("Log file name: " + logFileName);
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath(), new ConsoleParameters { LogFilePath = logFileName });
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
@@ -460,8 +458,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();
-                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
-                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data);
+                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data);
 
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);

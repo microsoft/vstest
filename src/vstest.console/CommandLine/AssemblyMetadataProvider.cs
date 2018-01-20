@@ -4,8 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 {
     using System;
-    using System.Collections;
-    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using System.Reflection.Metadata;
@@ -36,8 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
             catch (Exception ex)
             {
-                GetFileProcesses(filePath);
-                EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion: {0} for assembly: {1}", ex, filePath);
+                EqtTrace.Warning("GetFrameWorkFromMetadata: failed to determine TargetFrameworkVersion: {0} for assembly: {1}", ex, filePath);
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -46,49 +43,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
 
             return frameworkName;
-        }
-
-        public void GetFileProcesses(string strFile)
-        {
-            EqtTrace.Error("Start getFileProcesses: Locked process filename :");
-            Process myProcess;
-            Process[] processes = Process.GetProcesses();
-            int i = 0;
-            for (i = 0; i <= processes.GetUpperBound(0) - 1; i++)
-            {
-                myProcess = processes[i];
-                EqtTrace.Error("getFileProcesses: checking process name :{0}", myProcess.ProcessName);
-                try
-                {
-                    if(!myProcess.ProcessName.Contains("test") && !myProcess.ProcessName.Contains("dotnet"))
-                    {
-                        continue;
-                    }
-
-                    if (!myProcess.HasExited)
-                    {
-                        
-                        ProcessModuleCollection modules = myProcess.Modules;
-                        int j = 0;
-                        EqtTrace.Error("getFileProcesses: number of modules :" + modules.Count);
-                        
-                        for (j = 0; j <= modules.Count - 1; j++)
-                        {
-                            if ((modules[j].FileName.ToLower().CompareTo(strFile.ToLower()) == 0))
-                            {
-                                EqtTrace.Error("getFileProcesses: Locked process name :" + myProcess.ProcessName + "module " + strFile);
-                                break;
-                            }
-                        }
-                        EqtTrace.Error("getFileProcesses: main module :" + myProcess.MainModule);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    EqtTrace.Error("getFileProcesses: exception :{0}", ex);
-                    EqtTrace.Error("getFileProcesses: Error process name :{0}", myProcess.ProcessName);
-                }
-            }
         }
 
         /// <inheritdoc />
@@ -135,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         private static FrameworkName GetFrameworkNameFromAssemblyMetadata(FileStream assemblyStream)
         {
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
-            using (var peReader = new PEReader(assemblyStream, PEStreamOptions.PrefetchMetadata))
+            using (var peReader = new PEReader(assemblyStream))
             {
                 var metadataReader = peReader.GetMetadataReader();
 
