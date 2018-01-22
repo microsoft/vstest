@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             // Add Blame Logger
-            //this.loggerManager.UpdateLoggerList(BlameFriendlyName, BlameFriendlyName, null);
+            EnableLoggerArgumentExecutor.AddLoggerToRunSettings(BlameFriendlyName, this.runSettingsManager);
 
             // Add Blame Data Collector
             CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);

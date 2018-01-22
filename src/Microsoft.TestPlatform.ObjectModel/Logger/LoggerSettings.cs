@@ -67,7 +67,56 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set;
         }
 
-        // TODO: ToXml()
+        /// <summary>
+        /// The to xml.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="XmlElement"/>.
+        /// </returns>
+        public XmlElement ToXml()
+        {
+            return ToXml(Constants.LoggerSettingName);
+        }
+
+        /// <summary>
+        /// The to xml.
+        /// </summary>
+        /// <param name="loggerName">
+        /// The logger name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="XmlElement"/>.
+        /// </returns>
+        public XmlElement ToXml(string loggerName)
+        {
+            var doc = new XmlDocument();
+            var root = doc.CreateElement(loggerName);
+
+            AppendAttribute(doc, root, Constants.LoggerFriendlyName, this.FriendlyName);
+            AppendAttribute(doc, root, Constants.LoggerUriName, this.Uri?.ToString());
+            AppendAttribute(doc, root, Constants.LoggerAssemblyQualifiedName, this.AssemblyQualifiedName);
+            AppendAttribute(doc, root, Constants.LoggerCodeBase, this.CodeBase);
+            AppendAttribute(doc, root, Constants.LoggerEnabledName, this.IsEnabled.ToString());
+
+            if (Configuration != null)
+            {
+                root.AppendChild(doc.ImportNode(Configuration, true));
+            }
+
+            return root;
+        }
+
+        private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+        {
+            if (string.IsNullOrWhiteSpace(attributeValue))
+            {
+                return;
+            }
+
+            XmlAttribute attribute = doc.CreateAttribute(attributeName);
+            attribute.Value = attributeValue;
+            owner.Attributes.Append(attribute);
+        }
 
         ///// <summary>
         ///// The to xml.

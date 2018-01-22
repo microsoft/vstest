@@ -34,6 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class TestLoggerManager : ITestLoggerManager, IDisposable
     {
+        // TODO: enableloggigng in initializtion. without loggin enabled, events should not be called.
         #region Fields
 
         private static readonly object Synclock = new object();

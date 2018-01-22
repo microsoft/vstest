@@ -41,8 +41,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public override XmlElement ToXml()
         {
-            // TODO
-            throw new System.NotImplementedException();
+            var doc = new XmlDocument();
+            var root = doc.CreateElement(this.loggerRunSettingsName);
+            var subRoot = doc.CreateElement(this.loggersSettingName);
+            root.AppendChild(subRoot);
+
+            foreach (var loggerSettings in this.LoggerSettingsList)
+            {
+                XmlNode child = doc.ImportNode(loggerSettings.ToXml(this.loggerSettingName), true);
+                subRoot.AppendChild(child);
+            }
+
+            return root;
         }
 
         /// <summary>

@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
+    // TODO: add test in test platform that if console logger is present in run settings, then it should get initialized.
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -21,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -421,11 +423,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
+                    var designMode = runConfiguration.DesignModeSet ?
+                        runConfiguration.DesignMode :
+                        this.commandLineOptions.IsDesignMode;
+
+                    if (!designMode)
+                    {
+                        AddOrUpdateConsoleLogger(document, runConfiguration, runsettingsXml);
+                        settingsUpdated = true;
+                    }
+
                     updatedRunSettingsXml = navigator.OuterXml;
                 }
             }
 
             return settingsUpdated;
+        }
+
+        private void AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, string runsettingsXml)
+        {
+            // TODO: dont take all tha param args. reduce it.
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
+            var existingLoggerIndex = LoggerUtilities.GetExistingLoggerIndex(ConsoleLogger.FriendlyName, new Uri(ConsoleLogger.ExtensionUri),
+                loggerRunSettings.LoggerSettingsList);
+
+            var consoleLogger = default(LoggerSettings);
+            if (existingLoggerIndex > 0)
+            {
+                consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
+                consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
+            }
+            else
+            {
+                consoleLogger = new LoggerSettings
+                {
+                    FriendlyName = ConsoleLogger.FriendlyName,
+                    Uri = new Uri(ConsoleLogger.ExtensionUri),
+                    AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName,
+                    IsEnabled = true
+                };
+
+                loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
+            }
+
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
         }
 
         private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)

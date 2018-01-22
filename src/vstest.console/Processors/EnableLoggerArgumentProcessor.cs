@@ -1,6 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.ComponentModel;
+using System.Xml;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -14,6 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.Client;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Collections.ObjectModel;
 
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
@@ -45,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor());
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -114,14 +123,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// </summary>
     internal class EnableLoggerArgumentExecutor : IArgumentExecutor
     {
+        private readonly IRunSettingsProvider runSettingsManager;
+
         #region Constructors
-        // TODO: check every where that if any argument is removed, then it is also removed from comment.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
         /// </summary>
-        public EnableLoggerArgumentExecutor()
+        public EnableLoggerArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
+            Contract.Requires(runSettingsManager != null);
+            this.runSettingsManager = runSettingsManager;
         }
 
         #endregion
@@ -134,32 +146,101 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
+            AddLoggerToRunSettings(argument, runSettingsManager);
+        }
+
+        /// <summary>
+        /// Add logger to runsettings.
+        /// </summary>
+        /// <param name="loggerArgument"></param>
+        /// <param name="runSettingsManager"></param>
+        public static void AddLoggerToRunSettings(string loggerArgument, IRunSettingsProvider runSettingsManager)
+        {
+            if (string.IsNullOrWhiteSpace(loggerArgument))
             {
-                HandleInvalidArgument(argument);
+                HandleInvalidArgument(loggerArgument);
+            }
+
+            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            if (settings == null)
+            {
+                runSettingsManager.AddDefaultRunSettings();
+                settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            }
+
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(settings) ?? new LoggerRunSettings();
+            string loggerIdentifier = null;
+            Dictionary<string, string> parameters = null;
+            var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(loggerArgument, out loggerIdentifier, out parameters);
+
+            if (parseSucceeded)
+            {
+                var logger = default(LoggerSettings);
+
+                try
+                {
+                    // Logger as uri in command line.
+                    var loggerUri = new Uri(loggerIdentifier);
+                    logger = new LoggerSettings
+                    {
+                        Uri = loggerUri,
+                        IsEnabled = true
+                    };
+                }
+                catch (UriFormatException)
+                {
+                    // Logger as friendlyName in command line.
+                    logger = new LoggerSettings
+                    {
+                        FriendlyName = loggerIdentifier,
+                        IsEnabled = true
+                    };
+                }
+
+                // Converting logger cosole params to Configuration element
+                if (parameters != null && parameters.Count > 0)
+                {
+                    var XmlDocument = new XmlDocument();
+                    var outerNode = XmlDocument.CreateElement("Configuration");
+                    foreach (KeyValuePair<string, string> entry in parameters)
+                    {
+                        var node = XmlDocument.CreateElement(entry.Key);
+                        node.InnerText = entry.Value;
+                        outerNode.AppendChild(node);
+                    }
+
+                    logger.Configuration = outerNode;
+                }
+
+                // Remove existing logger.
+                var existingLoggerIndex = LoggerUtilities.GetExistingLoggerIndex(logger.FriendlyName, logger.Uri,
+                    loggerRunSettings.LoggerSettingsList);
+                if (existingLoggerIndex > 0)
+                {
+                    loggerRunSettings.LoggerSettingsList.RemoveAt(existingLoggerIndex);
+                }
+
+                loggerRunSettings.LoggerSettingsList.Add(logger);
             }
             else
             {
-                string loggerIdentifier = null;
-                Dictionary<string, string> parameters = null;
-                var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
-
-                if (parseSucceeded)
-                {
-                    if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        //this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
-                    }
-                    else
-                    {
-                        //this.loggerManager.UpdateLoggerList(argument, loggerIdentifier, parameters);
-                    }
-                }
-                else
-                {
-                    HandleInvalidArgument(argument);
-                }
+                HandleInvalidArgument(loggerArgument);
             }
+
+            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+        }
+
+        /// <summary>
+        /// Throws an exception indicating that the argument is invalid.
+        /// </summary>
+        /// <param name="argument">Argument which is invalid.</param>
+        private static void HandleInvalidArgument(string argument)
+        {
+            throw new CommandLineException(
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CommandLineResources.LoggerUriInvalid,
+                    argument));
         }
 
         /// <summary>
@@ -172,22 +253,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Nothing to do since we enabled the logger in the initialize method.
             return ArgumentProcessorResult.Success;
-        }
-
-        #endregion
-
-        #region Private Methods
-        /// <summary>
-        /// Throws an exception indicating that the argument is invalid.
-        /// </summary>
-        /// <param name="argument">Argument which is invalid.</param>
-        private static void HandleInvalidArgument(string argument)
-        {
-            throw new CommandLineException(
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommandLineResources.LoggerUriInvalid,
-                    argument));
         }
 
         #endregion

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
@@ -1772,6 +1773,319 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
         }
 
+        [TestMethod]
+        public void RunTestsShouldAddConsoleLoggerInRunSettingsInNonDesignMode()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = false;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
+            Assert.AreEqual(1, loggerSettingsList.Count);
+            Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldAddConsoleLoggerInRunSettingsIfDesignModeSetFalseInRunSettings()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("Console", loggerSettingsList[1].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldAddConsoleLoggerInRunSettingsIfDesignModeSetFalseInRunSettings()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = true;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria.RunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("Console", loggerSettingsList[1].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotAddConsoleLoggerInRunSettingsInDesignMode()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = false;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+            System.Diagnostics.Debugger.Launch();
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains("LoggerRunSettings"));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldAddConsoleLoggerInRunSettingsInNonDesignMode()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria.RunSettings).LoggerSettingsList;
+            Assert.AreEqual(1, loggerSettingsList.Count);
+            Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotAddConsoleLoggerInRunSettingsInDesignMode()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains("LoggerRunSettings"));
+        }
+
+        [TestMethod]
+        public void RunTestsShouldOverrideOnlyAssemblyNameIfConsoleLoggerAlreadyPresent()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("console", loggerSettingsList[1].FriendlyName);
+            Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri.ToString());
+            Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldOverrideOnlyAssemblyNameIfConsoleLoggerAlreadyPresent()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""consoleTemp"" uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" assemblyQualifiedName=""tempAssemblyName"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria.RunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("consoleTemp", loggerSettingsList[1].FriendlyName);
+            Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri.ToString());
+            Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+        }
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
         {

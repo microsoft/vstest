@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             // Update cache with Extension Folder's files
             this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
-            // Update and initialize loggers only when DesignMode is false
+            // Update extension assemblies from source when design mode is false.
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
             if (runConfiguration.DesignMode == false)
             {

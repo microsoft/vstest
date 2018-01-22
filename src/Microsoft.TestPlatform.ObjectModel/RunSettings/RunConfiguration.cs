@@ -191,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary> 
-        /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
+        /// Gets or sets the design mode value.
         /// </summary>
         public bool DesignMode
         {

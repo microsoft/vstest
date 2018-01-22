@@ -130,13 +130,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 if (!this.ExecuteArgumentProcessor(processor, ref exitCode))
                 {
-                    // TODO: put debug while breaking
                     break;
                 }
-                // TODO: if exit code is 1, write in log along with command name.
             }
-
-            // TODO: add in debug the exit code just after executeargumentprocessor.
 
             // Use the test run result aggregator to update the exit code.
             exitCode |= (TestRunResultAggregator.Instance.Outcome == TestOutcome.Passed) ? 0 : 1;
@@ -347,7 +343,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
             }
 
-            // TODO: Fix this &&
             Debug.Assert(
                 result >= ArgumentProcessorResult.Success && result <= ArgumentProcessorResult.Abort,
                 "Invalid argument processor result.");
@@ -359,7 +354,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             if (result == ArgumentProcessorResult.Abort)
             {
-                // TODO: debug log when we are exiting it.
                 continueExecution = false;
             }
 
