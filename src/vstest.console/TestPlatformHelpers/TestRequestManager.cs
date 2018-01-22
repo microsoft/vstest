@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
@@ -450,6 +451,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
                 consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
+                consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
             }
             else
             {
@@ -458,6 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     FriendlyName = ConsoleLogger.FriendlyName,
                     Uri = new Uri(ConsoleLogger.ExtensionUri),
                     AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName,
+                    CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location,
                     IsEnabled = true
                 };
 

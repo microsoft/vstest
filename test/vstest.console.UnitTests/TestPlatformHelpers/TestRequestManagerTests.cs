@@ -1843,13 +1843,14 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 {
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
-
+            System.Diagnostics.Debugger.Launch();
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
             Assert.AreEqual(1, loggerSettingsList.Count);
             Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
             Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[0].CodeBase);
         }
 
         [TestMethod]
@@ -1892,6 +1893,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
             Assert.AreEqual("Console", loggerSettingsList[1].FriendlyName);
             Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
         }
 
         [TestMethod]
@@ -1937,6 +1939,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
             Assert.AreEqual("Console", loggerSettingsList[1].FriendlyName);
             Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
         }
 
         [TestMethod]
@@ -1998,6 +2001,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual(1, loggerSettingsList.Count);
             Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
             Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[0].CodeBase);
         }
 
         [TestMethod]
@@ -2050,7 +2054,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                              <Key1>Value1</Key1>
                            </Configuration>
                          </Logger>
-                         <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"">
+                         <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"" codeBase=""tempCodeBase"">
                            <Configuration>
                              <Key1>Value1</Key1>
                            </Configuration>
@@ -2077,8 +2081,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("console", loggerSettingsList[1].FriendlyName);
             Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri.ToString());
             Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.AreNotEqual("tempCodeBase", loggerSettingsList[1].CodeBase);
             Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
             Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
         }
 
         [TestMethod]
@@ -2130,8 +2136,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("consoleTemp", loggerSettingsList[1].FriendlyName);
             Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri.ToString());
             Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].CodeBase);
             Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
             Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
         }
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
