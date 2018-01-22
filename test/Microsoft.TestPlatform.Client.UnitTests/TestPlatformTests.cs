@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 {
-    // TODO: remove useless unit tests from all classes.
-
     using System;
     using System.Collections.Generic;
 

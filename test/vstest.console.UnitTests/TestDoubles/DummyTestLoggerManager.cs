@@ -32,7 +32,5 @@ namespace vstest.console.UnitTests.TestDoubles
         {
             return this.loggersInfoList.ToList().Find(l => l.loggerIdentifier == loggerIdentifier) != null;
         }
-
-        // TODO: we removed cleanup methods here. Should we consider disposig events here? Also we removed from testLoggermanagertests.
     }
 }

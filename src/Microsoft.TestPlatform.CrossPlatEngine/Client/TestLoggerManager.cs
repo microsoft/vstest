@@ -34,7 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class TestLoggerManager : ITestLoggerManager, IDisposable
     {
-        // TODO: enableloggigng in initializtion. without loggin enabled, events should not be called.
         #region Fields
 
         private static readonly object Synclock = new object();
@@ -171,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void Initialize(string runSettings)
         {
             // Enable logger events
-            this.loggerEvents.EnableEvents();
+            EnableLogging();
 
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -465,74 +464,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return false;
         }
 
-        ///// <summary>
-        ///// Registers to receive events from the provided test run request.
-        ///// These events will then be broadcast to any registered loggers.
-        ///// </summary>
-        ///// <param name="testRunRequest">The run request to register for events on.</param>
-        //public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
-        //{
-        //    ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
-
-        //    this.CheckDisposed();
-
-        //    // Keep track of the run requests so we can unregister for the
-        //    // events when disposed.
-        //    this.runRequest = testRunRequest;
-
-        //    // Redirect the events to the InternalTestLoggerEvents
-        //    testRunRequest.TestRunMessage += this.TestRunMessageHandler;
-        //    testRunRequest.OnRunStart += this.TestRunStartHandler;
-        //    testRunRequest.OnRunStatsChange += this.TestRunStatsChangedHandler;
-        //    testRunRequest.OnRunCompletion += this.TestRunCompleteHandler;
-        //    testRunRequest.DataCollectionMessage += this.DataCollectionMessageHandler;
-        //}
-
-        ///// <summary>
-        ///// Registers to receive discovery events from discovery request.
-        ///// These events will then be broadcast to any registered loggers.
-        ///// </summary>
-        ///// <param name="discoveryRequest">The discovery request to register for events on.</param>
-        //public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
-        //{
-        //    ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
-
-        //    this.CheckDisposed();
-        //    this.discoveryRequest = discoveryRequest;
-        //    discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
-        //    discoveryRequest.OnDiscoveryStart += this.DiscoveryStartHandler;
-        //    discoveryRequest.OnDiscoveredTests += this.DiscoveredTestsHandler;
-        //    discoveryRequest.OnDiscoveryComplete += this.DiscoveryCompleteHandler;
-        //}
-
-        ///// <summary>
-        ///// Unregisters the events from the test run request. 
-        ///// </summary>
-        ///// <param name="testRunRequest">The run request from which events should be unregistered.</param>
-        //public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
-        //{
-        //    ValidateArg.NotNull<ITestRunRequest>(testRunRequest, "testRunRequest");
-
-        //    testRunRequest.TestRunMessage -= this.TestRunMessageHandler;
-        //    testRunRequest.OnRunStart -= this.TestRunStartHandler;
-        //    testRunRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
-        //    testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-        //    testRunRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
-        //}
-
-        ///// <summary>
-        ///// Unregister the events from the discovery request.
-        ///// </summary>
-        ///// <param name="discoveryRequest">The discovery request from which events should be unregistered.</param>
-        //public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
-        //{
-        //    ValidateArg.NotNull<IDiscoveryRequest>(discoveryRequest, "discoveryRequest");
-        //    discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
-        //    discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
-        //    discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
-        //    discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
-        //}
-
         /// <summary>
         /// Enables sending of events to the loggers which are registered.
         /// </summary>
@@ -542,7 +473,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// want them broadcast out to the loggers until all loggers have been enabled.  Without this
         /// all loggers would not receive the errors which were sent prior to initialization finishing.
         /// </remarks>
-        public void EnableLogging()
+        internal void EnableLogging()
         {
             this.CheckDisposed();
             this.loggerEvents.EnableEvents();
@@ -560,18 +491,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             GC.SuppressFinalize(this);
         }
 
-        ///// <summary>
-        ///// Sends the error message to all registered loggers.
-        ///// This is required so that out of test run execution errors 
-        ///// can also mark test run test run failure.
-        ///// </summary>
-        ///// <param name="e">
-        ///// The e.
-        ///// </param>
-        //public void SendTestRunMessage(TestRunMessageEventArgs e)
-        //{
-        //    this.HandleTestRunMessage(e);
-        //}
 
         /// <summary>
         /// Ensure that all pending messages are sent to the loggers.
@@ -585,24 +504,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 if (disposing)
                 {
-                    //// Unregister from runrequests.
-                    //if (this.runRequest != null)
-                    //{
-                    //    this.runRequest.TestRunMessage -= this.TestRunMessageHandler;
-                    //    this.runRequest.OnRunStart -= this.TestRunStartHandler;
-                    //    this.runRequest.OnRunStatsChange -= this.TestRunStatsChangedHandler;
-                    //    this.runRequest.OnRunCompletion -= this.TestRunCompleteHandler;
-                    //    this.runRequest.DataCollectionMessage -= this.DataCollectionMessageHandler;
-                    //}
-
-                    //if (this.discoveryRequest != null)
-                    //{
-                    //    this.discoveryRequest.OnDiscoveryMessage -= this.DiscoveryMessageHandler;
-                    //    this.discoveryRequest.OnDiscoveryStart -= this.DiscoveryStartHandler;
-                    //    this.discoveryRequest.OnDiscoveredTests -= this.DiscoveredTestsHandler;
-                    //    this.discoveryRequest.OnDiscoveryComplete -= this.DiscoveryCompleteHandler;
-                    //}
-
                     this.loggerEvents.Dispose();
                 }
 
@@ -672,7 +573,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void HandleTestRunMessage(TestRunMessageEventArgs e)
         {
-            // TODO: UTs for disposed
             if (!this.isDisposed)
             {
                 this.loggerEvents.RaiseTestRunMessage(e);

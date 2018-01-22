@@ -428,7 +428,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (!designMode)
                     {
-                        AddOrUpdateConsoleLogger(document, runConfiguration, runsettingsXml);
+                        AddOrUpdateConsoleLogger(document, runsettingsXml);
                         settingsUpdated = true;
                     }
 
@@ -439,9 +439,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
-        private void AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, string runsettingsXml)
+        private void AddOrUpdateConsoleLogger(XmlDocument document, string runsettingsXml)
         {
-            // TODO: dont take all tha param args. reduce it.
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
             var existingLoggerIndex = LoggerUtilities.GetExistingLoggerIndex(ConsoleLogger.FriendlyName, new Uri(ConsoleLogger.ExtensionUri),
                 loggerRunSettings.LoggerSettingsList);

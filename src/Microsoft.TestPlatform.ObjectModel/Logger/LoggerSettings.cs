@@ -118,72 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             owner.Attributes.Append(attribute);
         }
 
-        ///// <summary>
-        ///// The to xml.
-        ///// </summary>
-        ///// <returns>
-        ///// The <see cref="XmlElement"/>.
-        ///// </returns>
-        //[SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-        //    Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        //public XmlElement ToXml()
-        //{
-        //    XmlDocument doc = new XmlDocument();
-        //    XmlElement root = doc.CreateElement(Constants.DataCollectorSettingName);
-        //    AppendAttribute(doc, root, "uri", this.Uri.ToString());
-        //    AppendAttribute(doc, root, "assemblyQualifiedName", this.AssemblyQualifiedName);
-        //    AppendAttribute(doc, root, "friendlyName", this.FriendlyName);
-
-        //    root.AppendChild(doc.ImportNode(this.Configuration, true));
-
-        //    return root;
-        //}
-
-        ///// <summary>
-        ///// The to xml.
-        ///// </summary>
-        ///// <param name="dataCollectorName">
-        ///// The data collector name.
-        ///// </param>
-        ///// <returns>
-        ///// The <see cref="XmlElement"/>.
-        ///// </returns>
-        //[SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-        //    Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        //public XmlElement ToXml(string dataCollectorName)
-        //{
-        //    XmlDocument doc = new XmlDocument();
-        //    XmlElement root = doc.CreateElement(dataCollectorName);
-        //    if (this.Uri != null)
-        //    {
-        //        AppendAttribute(doc, root, "uri", this.Uri.ToString());
-        //    }
-
-        //    if (!string.IsNullOrWhiteSpace(this.AssemblyQualifiedName))
-        //    {
-        //        AppendAttribute(doc, root, "assemblyQualifiedName", this.AssemblyQualifiedName);
-        //    }
-
-        //    if (!string.IsNullOrWhiteSpace(this.FriendlyName))
-        //    {
-        //        AppendAttribute(doc, root, "friendlyName", this.FriendlyName);
-        //    }
-
-        //    AppendAttribute(doc, root, "enabled", this.IsEnabled.ToString());
-
-        //    if (this.Configuration != null)
-        //    {
-        //        root.AppendChild(doc.ImportNode(this.Configuration, true));
-        //    }
-
-        //    return root;
-        //}
-
-
         internal static LoggerSettings FromXml(XmlReader reader)
         {
-            // TODO: shorten methods
-
             var elementName = reader.Name;
             var empty = reader.IsEmptyElement;
             var settings = new LoggerSettings
@@ -288,12 +224,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return settings;
         }
-
-        //private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
-        //{
-        //    XmlAttribute attribute = doc.CreateAttribute(attributeName);
-        //    attribute.Value = attributeValue;
-        //    owner.Attributes.Append(attribute);
-        //}
     }
 }
