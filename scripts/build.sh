@@ -16,7 +16,7 @@ NOCOLOR='\033[0m'
 #
 CONFIGURATION="Debug"
 TARGET_RUNTIME="ubuntu.16.04-x64"
-VERSION="15.6.0"
+VERSION="" # Will set this later by reading TestPlatform.Settings.targets file.
 VERSION_SUFFIX="dev"
 FAIL_FAST=false
 DISABLE_LOCALIZED_BUILD=false
@@ -100,6 +100,9 @@ TP_PACKAGE_PROJ_DIR="$TP_ROOT_DIR/src/package/package"
 TP_PACKAGE_NUSPEC_DIR="$TP_ROOT_DIR/src/package/nuspec"
 TP_SRC_DIR="$TP_ROOT_DIR/src"
 TP_USE_REPO_API=$DOTNET_BUILD_FROM_SOURCE
+
+# Set VERSION from scripts/build/TestPlatform.Settings.targets
+VERSION=$(test -z $VERSION && grep TPVersionPrefix $TP_ROOT_DIR/scripts/build/TestPlatform.Settings.targets  | head -1 | cut -d'>' -f2 | cut -d'<' -f1 || echo $VERSION)
 
 #
 # Dotnet configuration
