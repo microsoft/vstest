@@ -178,6 +178,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
         }
 
+        /// <inheritdoc/>
+        public virtual int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        {
+            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
         /// <summary>
         /// Aborts the test run.
         /// </summary>
@@ -196,12 +202,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             this.baseTestRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
-        }
-
-        /// <inheritdoc/>
-        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
-        {
-            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc/>

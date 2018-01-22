@@ -1561,9 +1561,9 @@
         <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="translated">실행 설정을 통해 구성된 데이터 수집기는 포함된 테스트 설정으로는 지원되지 않습니다. 자세한 내용은 https://aka.ms/vstest-configure-datacollector를 참조하세요. 실행 설정: {0}.</target>
-        <note />
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">실행 설정을 통해 구성된 데이터 수집기는 포함된 테스트 설정으로는 지원되지 않습니다. 자세한 내용은 https://aka.ms/vstest-configure-datacollector를 참조하세요. 실행 설정: {0}.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>
