@@ -170,6 +170,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Initialize(string runSettings)
         {
+            // Enable logger events
+            this.loggerEvents.EnableEvents();
+
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
             foreach (var logger in loggers?.LoggerSettingsList ?? Enumerable.Empty<LoggerSettings>())

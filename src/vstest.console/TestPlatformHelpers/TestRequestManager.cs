@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
-    // TODO: add test in test platform that if console logger is present in run settings, then it should get initialized.
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -196,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     ex is SettingsException ||
                     ex is InvalidOperationException)
                 {
-                    LoggerUtilities.RaiseTestRunError(null, ex);
+                    ConsoleLogger.RaiseTestRunError(null, ex);
                     success = false;
                 }
                 else
@@ -393,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
-                        LoggerUtilities.RaiseTestRunWarning(this.testRunResultAggregator, incompatibleSettingWarning);
+                        ConsoleLogger.RaiseTestRunWarning(this.testRunResultAggregator, incompatibleSettingWarning);
                     }
 
                     if (EqtTrace.IsInfoEnabled)
@@ -501,7 +500,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         ex is SettingsException ||
                         ex is InvalidOperationException)
                     {
-                        LoggerUtilities.RaiseTestRunError(this.testRunResultAggregator, ex);
+                        ConsoleLogger.RaiseTestRunError(this.testRunResultAggregator, ex);
                         success = false;
                     }
                     else

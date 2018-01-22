@@ -38,6 +38,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Moq;
 
     using vstest.console.UnitTests.TestDoubles;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
     [TestClass]
     public class TestRequestManagerTests
@@ -46,6 +48,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         private TestLoggerManager mockLoggerManager;
         private CommandLineOptions commandLineOptions;
         private Mock<ITestPlatform> mockTestPlatform;
+        private Mock<IOutput> mockOutput;
         private Mock<IDiscoveryRequest> mockDiscoveryRequest;
         private Mock<ITestRunRequest> mockRunRequest;
         private Mock<IAssemblyMetadataProvider> mockAssemblyMetadataProvider;
@@ -69,6 +72,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
             this.mockLoggerManager = new DummyTestLoggerManager(this.mockLoggerEvents);
             this.commandLineOptions = new DummyCommandLineOptions();
+            this.mockOutput = new Mock<IOutput>();
             this.mockTestPlatform = new Mock<ITestPlatform>();
             this.mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             this.mockRunRequest = new Mock<ITestRunRequest>();
@@ -104,20 +108,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void Cleanup()
         {
             CommandLineOptions.Instance.Reset();
-        }
-
-        [TestMethod]
-        public void TestRequestManagerShouldInitializeConsoleLogger()
-        {
-            CommandLineOptions.Instance.IsDesignMode = false;
-            var requestManager = new TestRequestManager(CommandLineOptions.Instance,
-                new Mock<ITestPlatform>().Object,
-                TestRunResultAggregator.Instance,
-                new Mock<ITestPlatformEventSource>().Object,
-                this.inferHelper,
-            this.mockMetricsPublisherTask);
-
-            // Assert.IsTrue(this.mockLoggerEvents.EventsSubscribed());
         }
 
         [TestMethod]
@@ -1310,6 +1300,64 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        public void RunTestsShouldOutputErrorForInvalidOperationException()
+        {
+            ConsoleLogger consoleLogger = new ConsoleLogger(mockOutput.Object);
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll", "b.dll" },
+                RunSettings = DefaultRunsettings
+            };
+
+            TestRunCriteria observedCriteria = null;
+            var mockRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    observedCriteria = runCriteria;
+                }).Returns(mockRunRequest.Object);
+
+            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new InvalidOperationException("HelloWorld"));
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+
+            Assert.IsFalse(success, "RunTests call must fail due to exception");
+            mockOutput.Verify(ot => ot.WriteLine("HelloWorld", OutputLevel.Error));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldOutputErrorForInvalidOperationException()
+        {
+            ConsoleLogger consoleLogger = new ConsoleLogger(mockOutput.Object);
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll", "b.dll" },
+                RunSettings = DefaultRunsettings
+            };
+
+            DiscoveryCriteria observedCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    observedCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            mockDiscoveryRequest.Setup(mr => mr.DiscoverAsync()).Throws(new InvalidOperationException("HelloWorld"));
+
+            var mockDiscoveryEventsRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryEventsRegistrar.Object, this.protocolConfig);
+
+            Assert.IsFalse(success, "DiscoverTests call must fail due to exception");
+            mockOutput.Verify(ot => ot.WriteLine("HelloWorld", OutputLevel.Error));
+        }
+
+        [TestMethod]
         public void RunTestsIfThrowsInvalidOperationExceptionShouldNotThrowOut()
         {
             var payload = new TestRunRequestPayload()
@@ -1914,7 +1962,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 {
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
-            System.Diagnostics.Debugger.Launch();
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains("LoggerRunSettings"));
