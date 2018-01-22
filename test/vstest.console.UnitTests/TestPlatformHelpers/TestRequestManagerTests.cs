@@ -1843,7 +1843,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 {
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
-            System.Diagnostics.Debugger.Launch();
+
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
