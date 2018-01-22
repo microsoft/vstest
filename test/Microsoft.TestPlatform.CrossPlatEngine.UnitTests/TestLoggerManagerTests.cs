@@ -1280,6 +1280,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         }
 
         [TestMethod]
+        public void InitializeShouldNotThrowWhenLoggersNotPresentInRunSettings()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
+            Assert.AreEqual(0, ValidLoggerWithParameters.counter);
+            mockMetricsCollection.Verify(
+                rd => rd.Add(TelemetryDataConstants.LoggerUsed, ""));
+        }
+
+        [TestMethod]
         public void InitializeShouldNotInitializeAnyLoggerIfEmptyLoggersNode()
         {
             ValidLoggerWithParameters.Reset();
