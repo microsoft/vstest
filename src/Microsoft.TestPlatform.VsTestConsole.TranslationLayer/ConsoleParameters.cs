@@ -60,6 +60,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <summary>
+        /// Console arguments for vstest console.
+        /// </summary>
+        public string OtherConsoleArguments { get; set; }
+
+        /// <summary>
         /// Port Number for communication
         /// vstest.console will need this port number to communicate with this component - translation layer
         /// Currently Internal as we are not intentionally exposing this to consumers of translation layer

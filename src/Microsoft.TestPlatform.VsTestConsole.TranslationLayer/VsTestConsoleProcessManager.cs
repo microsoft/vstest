@@ -138,6 +138,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath));
             }
 
+            if(!string.IsNullOrWhiteSpace(parameters.OtherConsoleArguments))
+            {
+                args.Add(parameters.OtherConsoleArguments);
+            }
+
             return args.ToArray();
         }
     }
