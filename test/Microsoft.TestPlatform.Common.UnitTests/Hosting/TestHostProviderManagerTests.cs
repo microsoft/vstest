@@ -46,14 +46,14 @@ namespace TestPlatform.Common.UnitTests.Logging
         [TestMethod]
         public void TestHostProviderManagerShouldReturnTestHostBasedOnRunConfiguration()
         {
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
-    <RunSettings>     
-      <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
-        <TargetPlatform> x64 </TargetPlatform>     
-        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
-      </RunConfiguration>     
-    </RunSettings> ";
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform> x64 </TargetPlatform>
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>
+    </RunSettings>";
 
             var manager = TestRuntimeProviderManager.Instance;
             Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
@@ -132,6 +132,22 @@ namespace TestPlatform.Common.UnitTests.Logging
             Assert.IsFalse(testHostManager.Shared, "Default TestHostManager must NOT be shared if DisableAppDomain is true");
         }
 
+        [TestMethod]
+        public void TestHostProviderManagerShouldReturnNullIfTargetFrameworkIsPortable()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>
+        <TargetPlatform>x64</TargetPlatform>
+        <TargetFrameworkVersion>.NETPortable,Version=v4.5</TargetFrameworkVersion>
+      </RunConfiguration>
+    </RunSettings> ";
+
+            var manager = TestRuntimeProviderManager.Instance;
+            Assert.IsNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
+        }
+
         #region implementations
 
         [ExtensionUri("executor://DesktopTestHost")]
@@ -148,17 +164,16 @@ namespace TestPlatform.Common.UnitTests.Logging
             public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                var framework = config.TargetFrameworkVersion;
+                var framework = config.TargetFramework;
                 this.Shared = !config.DisableAppDomain;
 
                 // This is expected to be called once every run so returning a new instance every time.
-                if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (framework.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    return false;
+                    return true;
                 }
 
-                return true;
+                return false;
             }
 
             public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
@@ -226,7 +241,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-                var framework = config.TargetFrameworkVersion;
+                var framework = config.TargetFramework;
                 this.Shared = !config.DisableAppDomain;
 
                 // This is expected to be called once every run so returning a new instance every time.

@@ -355,7 +355,7 @@
       </trans-unit>
       <trans-unit id="NoTestCaseFilterForSpecificTests">
         <source>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</source>
-        <target state="translated">Nie można określić elementu TestCaseFilter dla określonego uruchomienia testu. Element FilterCriteria jest przeznaczony tylko dla uruchomienia ze źródłami.</target>
+        <target state="translated">Nie można określić elementu TestCaseFilter dla określonego przebiegu testów. Element FilterCriteria jest przeznaczony tylko dla przebiegu ze źródłami.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie można określić TestCaseFilter dla konkretnego testów. FilterCriteria jest tylko uruchomić ze źródłami.</target>
@@ -596,6 +596,11 @@
         <source>Failed to load msdia</source>
         <target state="translated">Nie można załadować elementu msdia</target>
         <note />
+      </trans-unit>
+      <trans-unit id="InvalidDataCollectorUriInSettings">
+        <source>Invalid URI in data collector settings '{0}'.</source>
+        <target state="new">Invalid URI in data collector settings '{0}'.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

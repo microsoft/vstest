@@ -121,11 +121,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             ICommunicationManager communicationManager,
             IMessageSink messageSink)
         {
+            ValidateArg.NotNull(communicationManager, nameof(communicationManager));
+            ValidateArg.NotNull(messageSink, nameof(messageSink));
             if (Instance == null)
             {
-                ValidateArg.NotNull(communicationManager, nameof(communicationManager));
-                ValidateArg.NotNull(messageSink, nameof(messageSink));
-
                 lock (SyncObject)
                 {
                     if (Instance == null)
@@ -165,6 +164,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             do
             {
                 var message = this.communicationManager.ReceiveMessage();
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DataCollectionRequestHandler.ProcessRequests : Datacollector received message: {0}", message);
+                }
+
                 switch (message.MessageType)
                 {
                     case MessageType.BeforeTestRunStart:
@@ -215,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                             {
                                                 EqtTrace.Error(
                                                     "DataCollectionRequestHandler.ProcessRequests : Error occured during initialization of TestHost : {0}",
-                                                    e.Message);
+                                                    e);
                                             }
                                         }
                                     },
@@ -247,14 +252,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         try
                         {
-                            this.testCaseEventMonitorTask.Wait(this.cancellationTokenSource.Token);
+                            this.testCaseEventMonitorTask?.Wait(this.cancellationTokenSource.Token);
                             this.dataCollectionTestCaseEventHandler.Close();
                         }
                         catch (Exception ex)
                         {
                             if (EqtTrace.IsErrorEnabled)
                             {
-                                EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : {0}", ex.Message);
+                                EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : {0}", ex.ToString());
                             }
                         }
 
@@ -351,7 +356,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                     if (extensionAssemblies.Count > 0)
                     {
-                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, true);
+                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                     }
                 }
             }

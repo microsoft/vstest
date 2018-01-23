@@ -28,5 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </remarks>
         [DataMember]
         public FilterOptions FilterOptions { get; set; }
+
+        /// <summary>
+        ///  Gets or sets whether Metrics should be collected or not.
+        /// </summary>
+        [DataMember]
+        public bool CollectMetrics { get; set; }
     }
 }

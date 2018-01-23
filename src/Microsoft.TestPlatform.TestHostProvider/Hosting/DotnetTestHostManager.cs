@@ -273,7 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-            var framework = config.TargetFrameworkVersion;
+            var framework = config.TargetFramework;
 
             // This is expected to be called once every run so returning a new instance every time.
             if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
@@ -340,11 +340,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 {
                     var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
                     this.testHostProcess = Process.GetProcessById(processId);
+                    this.processHelper.SetExitCallback(processId, this.ExitCallBack);
                 }
             }
             catch (OperationCanceledException ex)
             {
-                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.Message);
+                EqtTrace.Error("DotnetTestHostManager.LaunchHost: Failed to launch testhost: {0}", ex);
+                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.ToString());
                 return false;
             }
 

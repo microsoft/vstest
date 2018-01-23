@@ -214,12 +214,17 @@
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+      Change the verbosity level in log messages for console logger as shown below
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal and normal.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -229,21 +234,26 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
-      テスト結果のロガーを指定します。たとえば、結果を 
-      Visual Studio テスト結果ファイル (TRX) に記録する場合は、/logger:trx [;LogFileName=&lt;既定値は一意のファイル名&gt;] を使用します。
+        <target state="translated">--logger|/logger:&lt;ロガー Uri/FriendlyName&gt;
+      テスト結果のロガーを指定します。たとえば、結果を
+      Visual Studio テスト結果ファイル (TRX) に記録する場合は、/logger:trx[;LogFileName=&lt;既定値は一意のファイル名] を使用します。
       TestResults ディレクトリに指定の LogFileName でファイルを作成します。
 
-      コンソール ロガーの詳細レベルを変更します。詳細設定に指定できる値は quiet、minimal、normal です。
-      例: /logger:console;verbosity=&lt;既定値は "minimal"&gt;
+      コンソール ロガーのログ メッセージの詳細レベルを次のように変更します。
+      例: /logger:console;verbosity=&lt;既定は "minimal"&gt;
+      詳細に指定できる値は、quiet、minimal、normal です。
 
-      テスト結果を Team Foundation Server に発行するには、次のように TfsPublisher をご使用ください
+      コンソール ロガーの診断レベルのプレフィックスを次のように変更します。
+      例: /logger:console;prefix=&lt;既定は "false"&gt;
+      コンロール ロガーの詳細については、https://aka.ms/console-logger を参照してください。
+
+      テスト結果を Team Foundation Server に発行するには、TfsPublisher を次のように使用します。
       例: /logger:TfsPublisher;
-                Collection=&lt;チーム プロジェクト コレクション URL&gt;;
+                Collection=&lt;チーム プロジェクト コレクション url&gt;;
                 BuildName=&lt;ビルド名&gt;;
                 TeamProject=&lt;チーム プロジェクト名&gt;
-                [;Platform=&lt;既定値は "Any CPU"&gt;]
-                [;Flavor=&lt;既定値は "Debug"&gt;]
+                [;Platform=&lt;既定は "Any CPU"&gt;]
+                [;Flavor=&lt;既定は "Debug"&gt;]
                 [;RunTitle=&lt;タイトル&gt;]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -530,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
       指定されたテスト コンテナーから探索されたテストを一覧表示します。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">強い |-ListTests |/lt |/ListTests: &lt; ファイル名 &gt;
       リストは、指定したテスト コンテナーからのテストを発見しました。</target>
@@ -1547,12 +1557,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:"{0}" は、testsettings を使用してテストの実行が構成されている場合、サポートされません。</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">実行設定を経由して構成されているデータ コレクターは、埋め込まれたテストの設定ではサポートされていません。詳細については、https://aka.ms/vstest-configure-datacollector を参照してください。実行設定: {0}。</target>
         <note></note>
       </trans-unit>
     </body>

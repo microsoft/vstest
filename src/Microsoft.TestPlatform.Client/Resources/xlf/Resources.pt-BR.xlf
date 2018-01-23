@@ -43,6 +43,11 @@
         <target state="translated">Anulando a execução de teste: o tempo limite da execução de teste de {0} milissegundos foi excedido.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">Nenhum provedor de tempo de execução de teste encontrado para esta execução.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

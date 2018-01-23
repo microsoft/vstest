@@ -259,6 +259,11 @@
         <target state="translated">Questa opzione funziona solo se vstest.console.exe è installato con Visual Studio.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FastFilterException">
+        <source>An error occured while creating Fast filter.</source>
+        <target state="translated">Si è verificato un errore durante la creazione del filtro Fast.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

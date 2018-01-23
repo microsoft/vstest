@@ -174,7 +174,7 @@
       </trans-unit>
       <trans-unit id="CancelationRequested">
         <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">Uruchomienie testu jest anulowane, ponieważ zażądano anulowania.</target>
+        <target state="translated">Przebieg testu jest anulowany, ponieważ zażądano anulowania.</target>
       </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
@@ -190,6 +190,11 @@
         <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
         <target state="translated">Używamy starszej wersji zestawu Microsoft.NET.Test.Sdk. Przejdź na wersję 15.3.0 lub nowszą.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="FailedToConnectDataCollector">
+        <source>Failed to connect to datacollector process.</source>
+        <target state="new">Failed to connect datacollector.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

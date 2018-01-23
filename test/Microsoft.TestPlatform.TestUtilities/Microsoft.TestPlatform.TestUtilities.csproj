@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">
@@ -34,6 +35,7 @@
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
+    <Reference Include="System.Text.RegularExpressions" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

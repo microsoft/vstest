@@ -259,6 +259,11 @@
         <target state="translated">此選項僅適用於隨 Visual Studio 安裝的 vstest.console.exe。</target>
         <note />
       </trans-unit>
+      <trans-unit id="FastFilterException">
+        <source>An error occured while creating Fast filter.</source>
+        <target state="translated">建立快速篩選時發生錯誤。</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

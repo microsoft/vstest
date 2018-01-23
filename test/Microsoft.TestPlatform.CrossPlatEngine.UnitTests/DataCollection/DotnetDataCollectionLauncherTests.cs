@@ -57,5 +57,16 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), string.Format("{0} \"{1}\" {2} ", "exec", dataCollectorAssemblyPath, string.Join(" ", arguments)), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>()), Times.Once());
         }
+
+        [TestMethod]
+        public void LaunchDataCollectorShouldLaunchDataCollectorProcessWithCurrecntWorkingDirectory()
+        {
+            List<string> arguments = new List<string>();
+            this.dataCollectionLauncher.LaunchDataCollector(null, arguments);
+
+            string currentWorkingDirectory = Directory.GetCurrentDirectory();
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), currentWorkingDirectory, It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<object, string>>(), It.IsAny<Action<Object>>()), Times.Once());
+        }
     }
 }

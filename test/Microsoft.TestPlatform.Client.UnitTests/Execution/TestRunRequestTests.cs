@@ -22,6 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using ObjectModel.Engine;
     using System.Collections.ObjectModel;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+
     [TestClass]
     public class TestRunRequestTests
     {
@@ -30,13 +34,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         TestRunCriteria testRunCriteria;
         private Mock<IRequestData> mockRequestData;
 
+        private Mock<IDataSerializer> mockDataSerializer;
+
         public TestRunRequestTests()
         {
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1);
             executionManager = new Mock<IProxyExecutionManager>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
-            testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object);
+            this.mockDataSerializer = new Mock<IDataSerializer>();
+            testRunRequest = new TestRunRequest(this.mockRequestData.Object, testRunCriteria, executionManager.Object, this.mockDataSerializer.Object);
         }
 
         [TestMethod]
@@ -88,10 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void AbortIfTestRunRequestDisposedShouldThrowObjectDisposedException()
+        public void AbortIfTestRunRequestDisposedShouldNotThrowException()
         {
             testRunRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => testRunRequest.Abort());
+            testRunRequest.Abort();
         }
 
         [TestMethod]
@@ -126,10 +133,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void CancelAsyncIfTestRunRequestDisposedThrowsObjectDisposedException()
+        public void CancelAsyncIfTestRunRequestDisposedShouldNotThrowException()
         {
             testRunRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => testRunRequest.CancelAsync());
+            testRunRequest.CancelAsync();
         }
 
         [TestMethod]
@@ -284,6 +291,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             Assert.AreEqual(rawMessage, messageReceived, "RunRequest should just pass the message as is.");
             testRunRequest.OnRawMessageReceived -= handler;
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldAddVSTestDataPointsIfTelemetryOptedIn()
+        {
+            bool onDiscoveryCompleteInvoked = true;
+            this.mockRequestData.Setup(x => x.IsTelemetryOptedIn).Returns(true);
+            this.testRunRequest.OnRawMessageReceived += (object sender, string e) =>
+                {
+                    onDiscoveryCompleteInvoked = true;
+                };
+
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+                .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+                .Returns(new TestRunCompletePayload()
+                {
+                    TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MinValue)
+                });
+
+            this.testRunRequest.HandleRawMessage(string.Empty);
+
+            this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<TestRunCompletePayload>()), Times.Once);
+            this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
+            Assert.IsTrue(onDiscoveryCompleteInvoked);
         }
 
         [TestMethod]

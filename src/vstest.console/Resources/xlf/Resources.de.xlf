@@ -214,12 +214,17 @@
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+      Change the verbosity level in log messages for console logger as shown below
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal and normal.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -231,11 +236,16 @@
                 [;RunTitle=&lt;title&gt;]</source>
         <target state="translated">--logger|/logger:&lt;Protokollierungs-Uri/FriendlyName&gt;
       Gibt eine Protokollierung für die Testergebnisse an. Zum Protokollieren der Ergebnisse in eine 
-      Visual Studio-Testergebnisdatei (TRX-Datei) verwenden Sie z.B.: /logger:trx [;LogFileName=&lt;Entspricht standardmäßig einem eindeutigen Dateinamen&gt;]
+      Visual Studio-Testergebnisdatei (TRX-Datei) verwenden Sie z.B.: /logger:trx[;LogFileName=&lt;Entspricht standardmäßig einem eindeutigen Dateinamen&gt;]
        Erstellt eine Datei im TestResults-Verzeichnis mit dem entsprechenden LogFileName.
 
-      Ändern Sie den Ausführlichkeitsgrad für die Konsolenprotokollierung. Zulässige Werte für die Ausführlichkeit: quiet, minimal und normal.
+      Ändern Sie den Ausführlichkeitsgrad in Protokollnachrichten für die Konsolenprotokollierung wie unten gezeigt:
       Beispiel: /logger:console;verbosity=&lt;Standardwert ist "minimal"&gt;
+      Zulässige Werte für die Ausführlichkeit: quiet, minimal und normal.
+
+      Ändern Sie das Präfix der Diagnoseebene für die Konsolenprotokollierung wie unten gezeigt:
+      Beispiel: /logger:console;prefix=&lt;Standardwert ist "false"&gt;
+      Weitere Informationen zur Konsolenprotokollierung finden Sie hier: https://aka.ms/console-logger
 
       Zum Veröffentlichen der Testergebnisse für Team Foundation Server verwenden Sie TfsPublisher wie unten gezeigt.
       Beispiel: /logger:TfsPublisher;
@@ -530,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests: &lt; Dateiname &gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests: &lt; Dateiname &gt;
       Listet ermittelte Tests aus dem angegebenen Testcontainer auf.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Lt |-ListTests | / Lt | / ListTests: &lt; Dateiname &gt;
       Listen entdeckt Tests im angegebenen Testcontainer.</target>
@@ -1547,12 +1557,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:"{0}" wird nicht unterstützt, wenn der Testlauf mithilfe von "testsettings" konfiguriert wurde.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Eingebettete Testeinstellungen werden nicht für Datensammler unterstützt, die über Ausführungseinstellungen konfiguriert wurden. Weitere Informationen finden Sie unter https://aka.ms/vstest-configure-datacollector. Ausführungseinstellungen: {0}.</target>
         <note></note>
       </trans-unit>
     </body>

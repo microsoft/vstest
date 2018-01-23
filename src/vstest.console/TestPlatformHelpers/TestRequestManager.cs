@@ -11,14 +11,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.XPath;
-
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -29,9 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -93,7 +91,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testPlatformEventSource = testPlatformEventSource;
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
-            this.telemetryOptedIn = IsTelemetryOptedIn();
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -122,15 +119,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #region ITestRequestManager
 
-        /// <summary>
-        /// Initializes the extensions while probing additional paths.
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions">Paths to Additional extensions</param>
-        public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
+        /// <inheritdoc />
+        public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
+            // It is possible for an Editor/IDE to keep running the runner in design mode for long duration.
+            // We clear the extensions cache to ensure the extensions don't get reused across discovery/run
+            // requests.
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
             this.testPlatform.ClearExtensions();
-            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, false);
+            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
@@ -154,8 +151,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
             bool success = false;
-
             var runsettings = discoveryPayload.RunSettings;
+
+            if (discoveryPayload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.CollectMetrics;
+            }
 
             var requestData = this.GetRequestData(protocolConfig);
             if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
@@ -166,8 +167,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            // Collect Metrics
-            this.CollectMetrics(requestData, runConfiguration);
+            if (requestData.IsTelemetryOptedIn)
+            {
+                // Collect Metrics
+                this.CollectMetrics(requestData, runConfiguration);
+
+                // Collect Commands
+                this.LogCommandsTelemetryPoints(requestData);
+            }
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
@@ -235,6 +242,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
+
+            if (testRunRequestPayload.TestPlatformOptions != null)
+            {
+                this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.CollectMetrics;
+            }
+
             var requestData = this.GetRequestData(protocolConfig);
 
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
@@ -245,33 +258,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            if (InferRunSettingsHelper.IsTestSettingsEnabled(runsettings))
+            if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(runsettings))
             {
-                bool throwException = false;
-                if (this.commandLineOptions.EnableCodeCoverage)
-                {
-                    var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(runsettings);
-                    if (dataCollectorsFriendlyNames.Count >= 2)
-                    {
-                        throwException = true;
-                    }
-
-                }
-                else if (XmlRunSettingsUtilities.IsDataCollectionEnabled(runsettings))
-                {
-                    throwException = true;
-                }
-
-                if(throwException)
-                {
-                    throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
-                }
+                throw new SettingsException(string.Format(Resources.RunsettingsWithDCErrorMessage, runsettings));
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
-            this.CollectMetrics(requestData, runConfiguration);
+            if (requestData.IsTelemetryOptedIn)
+            {
+                // Collect Metrics
+                this.CollectMetrics(requestData, runConfiguration);
+
+                // Collect Commands
+                this.LogCommandsTelemetryPoints(requestData);
+            }
 
             if (!commandLineOptions.IsDesignMode)
             {
@@ -386,33 +388,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
-                    if(updateFramework)
+                    if (updateFramework)
                     {
-                        InferRunSettingsHelper.UpdateTargetFramework(navigator, inferedFramework?.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetFramework(document, inferedFramework?.ToString(), overwrite: true);
                         chosenFramework = inferedFramework;
                         settingsUpdated = true;
                     }
 
                     if (updatePlatform)
                     {
-                        InferRunSettingsHelper.UpdateTargetPlatform(navigator, inferedPlatform.ToString(), overwrite: true);
+                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferedPlatform.ToString(), overwrite: true);
                         chosenPlatform = inferedPlatform;
                         settingsUpdated = true;
                     }
 
-                    string incompatiableSettingWarning = string.Empty;
+                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
 
-                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out incompatiableSettingWarning);
-
-                    if(!string.IsNullOrEmpty(incompatiableSettingWarning))
+                    if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
-                        EqtTrace.Info(incompatiableSettingWarning);
-                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatiableSettingWarning);
+                        EqtTrace.Info(incompatibleSettingWarning);
+                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatibleSettingWarning);
                     }
 
                     if (EqtTrace.IsInfoEnabled)
                     {
-                        EqtTrace.Info("Compatiable sources list : ");
+                        EqtTrace.Info("Compatible sources list : ");
                         EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
                     }
 
@@ -421,19 +421,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (!runConfiguration.DesignModeSet)
                     {
-                        InferRunSettingsHelper.UpdateDesignMode(navigator, this.commandLineOptions.IsDesignMode);
+                        InferRunSettingsHelper.UpdateDesignMode(document, this.commandLineOptions.IsDesignMode);
                         settingsUpdated = true;
                     }
 
                     if (!runConfiguration.CollectSourceInformationSet)
                     {
-                        InferRunSettingsHelper.UpdateCollectSourceInformation(navigator, this.commandLineOptions.ShouldCollectSourceInformation);
+                        InferRunSettingsHelper.UpdateCollectSourceInformation(document, this.commandLineOptions.ShouldCollectSourceInformation);
                         settingsUpdated = true;
                     }
 
                     if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
                     {
-                        InferRunSettingsHelper.UpdateTargetDevice(navigator, deviceXml);
+                        InferRunSettingsHelper.UpdateTargetDevice(document, deviceXml);
                         settingsUpdated = true;
                     }
 
@@ -456,31 +456,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 try
                 {
-                    using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria))
-                    {
-                        this.currentTestRunRequest = testRunRequest;
-                        this.runRequestCreatedEventHandle.Set();
+                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
+                    this.runRequestCreatedEventHandle.Set();
 
-                        try
-                        {
-                            this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
-                            this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
-                            testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
+                    this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
+                    this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
+                    testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
 
-                            this.testPlatformEventSource.ExecutionRequestStart();
+                    this.testPlatformEventSource.ExecutionRequestStart();
 
-                            testRunRequest.ExecuteAsync();
+                    this.currentTestRunRequest.ExecuteAsync();
 
-                            // Wait for the run completion event
-                            testRunRequest.WaitForCompletion();
-                        }
-                        finally
-                        {
-                            this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
-                            this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
-                            testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
-                        }
-                    }
+                    // Wait for the run completion event
+                    this.currentTestRunRequest.WaitForCompletion();
                 }
                 catch (Exception ex)
                 {
@@ -497,8 +485,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         throw;
                     }
                 }
+                finally
+                {
+                    if (this.currentTestRunRequest != null)
+                    {
+                        this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
+                        testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 
-                this.currentTestRunRequest = null;
+                        this.currentTestRunRequest.Dispose();
+                        this.currentTestRunRequest = null;
+                    }
+                }
+
                 return success;
             }
         }
@@ -512,7 +511,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 bool isValidFx =
                     InferRunSettingsHelper.TryGetFrameworkXml(navigator, out var frameworkFromrunsettingsXml);
                 required = !isValidFx || string.IsNullOrWhiteSpace(frameworkFromrunsettingsXml);
-                if(!required)
+                if (!required)
                 {
                     chosenFramework = Framework.FromString(frameworkFromrunsettingsXml);
                 }
@@ -534,9 +533,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 bool isValidPlatform = InferRunSettingsHelper.TryGetPlatformXml(navigator, out var platformXml);
                 required = !isValidPlatform || string.IsNullOrWhiteSpace(platformXml);
-                if(!required)
+                if (!required)
                 {
-                    chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml);
+                    chosenPlatform = (Architecture)Enum.Parse(typeof(Architecture), platformXml, true);
                 }
             }
             else if (!commandLineOptions.IsDesignMode && commandLineOptions.ArchitectureSpecified)
@@ -556,10 +555,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private void CollectMetrics(IRequestData requestData, RunConfiguration runConfiguration)
         {
             // Collecting Target Framework.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFrameworkVersion);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetFramework, runConfiguration.TargetFramework.Name);
 
             // Collecting Target Platform.
-            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform);
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetPlatform, runConfiguration.TargetPlatform.ToString());
 
             // Collecting Max Cpu count.
             requestData.MetricsCollection.Add(TelemetryDataConstants.MaxCPUcount, runConfiguration.MaxCpuCount);
@@ -582,6 +581,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // Collecting TestPlatform Version
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestPlatformVersion, Product.Version);
+
+            // Collecting TargetOS
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
         }
 
         /// <summary>
@@ -596,6 +598,75 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
+        /// Log Command Line switches for Telemetry purposes
+        /// </summary>
+        /// <param name="requestData">Request Data providing common discovery/execution services.</param>
+        private void LogCommandsTelemetryPoints(IRequestData requestData)
+        {
+            var commandsUsed = new List<string>();
+
+            var parallel = this.commandLineOptions.Parallel;
+            if (parallel)
+            {
+                commandsUsed.Add("/Parallel");
+            }
+
+            var platform = this.commandLineOptions.ArchitectureSpecified;
+            if (platform)
+            {
+                commandsUsed.Add("/Platform");
+            }
+
+            var enableCodeCoverage = this.commandLineOptions.EnableCodeCoverage;
+            if (enableCodeCoverage)
+            {
+                commandsUsed.Add("/EnableCodeCoverage");
+            }
+
+            var inIsolation = this.commandLineOptions.InIsolation;
+            if (inIsolation)
+            {
+                commandsUsed.Add("/InIsolation");
+            }
+
+            var useVsixExtensions = this.commandLineOptions.UseVsixExtensions;
+            if (useVsixExtensions)
+            {
+                commandsUsed.Add("/UseVsixExtensions");
+            }
+
+            var frameworkVersionSpecified = this.commandLineOptions.FrameworkVersionSpecified;
+            if (frameworkVersionSpecified)
+            {
+                commandsUsed.Add("/Framework");
+            }
+
+            var settings = this.commandLineOptions.SettingsFile;
+            if (!string.IsNullOrEmpty(settings))
+            {
+                var extension = Path.GetExtension(settings);
+                if (string.Equals(extension, ".runsettings", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.RunSettings");
+                }
+                else if (string.Equals(extension, ".testsettings", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.TestSettings");
+                }
+                else if (string.Equals(extension, ".vsmdi", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.vsmdi");
+                }
+                else if (string.Equals(extension, ".testrunConfig", StringComparison.OrdinalIgnoreCase))
+                {
+                    commandsUsed.Add("/settings//.testrunConfig");
+                }
+            }
+
+            requestData.MetricsCollection.Add(TelemetryDataConstants.CommandLineSwitches, string.Join(",", commandsUsed.ToArray()));
+        }
+
+        /// <summary>
         /// Gets Request Data
         /// </summary>
         /// <param name="protocolConfig">Protocol Config</param>
@@ -606,10 +677,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 ProtocolConfig = protocolConfig,
                 MetricsCollection =
-                               this.telemetryOptedIn
+                               this.telemetryOptedIn || IsTelemetryOptedIn()
                                    ? (IMetricsCollection)new MetricsCollection()
                                    : new NoOpMetricsCollection(),
-                IsTelemetryOptedIn = this.telemetryOptedIn
+                IsTelemetryOptedIn = this.telemetryOptedIn || IsTelemetryOptedIn()
             };
         }
 

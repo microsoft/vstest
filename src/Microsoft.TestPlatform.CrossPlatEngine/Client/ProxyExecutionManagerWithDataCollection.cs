@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
-        /// <param name="testRequestSender">
+        /// <param name="requestSender">
         /// Test request sender instance.
         /// </param>
         /// <param name="testHostManager">
@@ -44,6 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
+            this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -131,6 +132,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 base.Cancel();
             }
+        }
+
+        public override int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        {
+            if (this.dataCollectionEnvironmentVariables != null)
+            {
+                if (testProcessStartInfo.EnvironmentVariables == null)
+                {
+                    testProcessStartInfo.EnvironmentVariables = new Dictionary<string, string>();
+                }
+
+                foreach(var envVariable in this.dataCollectionEnvironmentVariables)
+                {
+                    if (testProcessStartInfo.EnvironmentVariables.ContainsKey(envVariable.Key))
+                    {
+                        testProcessStartInfo.EnvironmentVariables[envVariable.Key] = envVariable.Value;
+                    }
+                    else
+                    {
+                        testProcessStartInfo.EnvironmentVariables.Add(envVariable.Key, envVariable.Value);
+                    }
+                }
+            }
+
+            return base.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc />

@@ -141,7 +141,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void InitializeExtensionsShouldCallTestPlatformToClearAndUpdateExtensions()
         {
             var paths = new List<string>() { "a", "b" };
-            this.testRequestManager.InitializeExtensions(paths);
+            this.testRequestManager.InitializeExtensions(paths, false);
 
             this.mockTestPlatform.Verify(mt => mt.ClearExtensions(), Times.Once);
             this.mockTestPlatform.Verify(mt => mt.UpdateExtensions(paths, false), Times.Once);
@@ -271,6 +271,410 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             // Verify.
             Assert.AreEqual(4, actualRequestData.ProtocolConfig.Version);
+        }
+
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectMetrics()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+                              {
+                                  Sources = new List<string>() { "a", "b" },
+                                  RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                </RunConfiguration>
+                                <MSPhoneTest>
+                                  <TargetDevice>169.254.193.190</TargetDevice>
+                                </MSPhoneTest>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify.
+            object targetDevice;
+            object maxcount;
+            object targetPlatform;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
+            Assert.AreEqual("Other", targetDevice);
+            Assert.AreEqual(2, maxcount);
+            Assert.AreEqual("X86", targetPlatform.ToString());
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectTargetDeviceLocalMachineIfTargetDeviceStringisEmpty()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice></TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify.
+            object targetDevice;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+            Assert.AreEqual("Local Machine", targetDevice);
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectTargetDeviceIfTargetDeviceIsDevice()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify.
+            object targetDevice;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+            Assert.AreEqual("Device", targetDevice);
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectTargetDeviceIfTargetDeviceIsEmulator()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice>Emulator 8.1 U1 WVGA 4 inch 512MB</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify.
+            object targetDevice;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+            Assert.AreEqual("Emulator 8.1 U1 WVGA 4 inch 512MB", targetDevice);
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectCommands()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            CommandLineOptions.Instance.Parallel = true;
+            CommandLineOptions.Instance.EnableCodeCoverage = true;
+            CommandLineOptions.Instance.InIsolation = true;
+            CommandLineOptions.Instance.UseVsixExtensions = true;
+            CommandLineOptions.Instance.SettingsFile = @"c://temp/.runsettings";
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify
+            object commandLineSwitches;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+
+            var commandLineArray = commandLineSwitches.ToString();
+
+            Assert.IsTrue(commandLineArray.Contains("/Parallel"));
+            Assert.IsTrue(commandLineArray.Contains("/EnableCodeCoverage"));
+            Assert.IsTrue(commandLineArray.Contains("/InIsolation"));
+            Assert.IsTrue(commandLineArray.Contains("/UseVsixExtensions"));
+            Assert.IsTrue(commandLineArray.Contains("/settings//.RunSettings"));
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectTestSettings()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            CommandLineOptions.Instance.SettingsFile = @"c://temp/.testsettings";
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify
+            object commandLineSwitches;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+
+            var commandLineArray = commandLineSwitches.ToString();
+
+            Assert.IsTrue(commandLineArray.Contains("/settings//.TestSettings"));
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectVsmdiFile()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            CommandLineOptions.Instance.SettingsFile = @"c://temp/.vsmdi";
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify
+            object commandLineSwitches;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+
+            var commandLineArray = commandLineSwitches.ToString();
+
+            Assert.IsTrue(commandLineArray.Contains("/settings//.vsmdi"));
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCollectTestRunConfigFile()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <TargetDevice>Device</TargetDevice>
+                                </RunConfiguration>
+                            </RunSettings>"
+            };
+
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) => { actualRequestData = requestData; }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            CommandLineOptions.Instance.SettingsFile = @"c://temp/.testrunConfig";
+
+            // Act
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
+
+            // Verify
+            object commandLineSwitches;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+
+            var commandLineArray = commandLineSwitches.ToString();
+
+            Assert.IsTrue(commandLineArray.Contains("/settings//.testrunConfig"));
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -436,7 +840,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        [Ignore]
         public void CancelTestRunShouldWaitForCreateTestRunRequest()
         {
             var payload = new TestRunRequestPayload()
@@ -444,8 +847,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 Sources = new List<string>() { "a", "b" },
                 RunSettings = DefaultRunsettings
             };
-
-            TestRunCriteria observedCriteria = null;
 
             var sw = new Stopwatch();
             sw.Start();
@@ -455,11 +856,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-               (TestRunCriteria runCriteria, ProtocolConfig config) =>
+               (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                {
                    Thread.Sleep(1);
                    createRunRequestTime = sw.ElapsedMilliseconds;
-                   observedCriteria = runCriteria;
                }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
@@ -480,8 +880,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        [Ignore]
-        public void AbortTestRunShouldWaitForCreateTestRunRequest()
+        public void CancelShouldNotThrowExceptionIfTestRunRequestHasBeenDisposed()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -489,7 +888,37 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 RunSettings = DefaultRunsettings
             };
 
-            TestRunCriteria observedCriteria = null;
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+            this.testRequestManager.CancelTestRun();
+        }
+
+        [TestMethod]
+        public void AbortShouldNotThrowExceptionIfTestRunRequestHasBeenDisposed()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = DefaultRunsettings
+            };
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+            this.testRequestManager.AbortTestRun();
+        }
+
+        [TestMethod]
+        public void AbortTestRunShouldWaitForCreateTestRunRequest()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = DefaultRunsettings
+            };
 
             var sw = new Stopwatch();
             sw.Start();
@@ -499,11 +928,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (TestRunCriteria runCriteria, ProtocolConfig config) =>
+                (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                 {
                     Thread.Sleep(1);
                     createRunRequestTime = sw.ElapsedMilliseconds;
-                    observedCriteria = runCriteria;
                 }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
@@ -572,6 +1000,117 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             // Verify.
             Assert.AreEqual(4, actualRequestData.ProtocolConfig.Version);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldCollectCommands()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new TestRunRequestPayload()
+                              {
+                                  Sources = new List<string>() { "a" },
+                                  RunSettings = DefaultRunsettings
+                              };
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                    {
+                        actualRequestData = requestData;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            CommandLineOptions.Instance.Parallel = true;
+            CommandLineOptions.Instance.EnableCodeCoverage = true;
+            CommandLineOptions.Instance.InIsolation = true;
+            CommandLineOptions.Instance.UseVsixExtensions = true;
+            CommandLineOptions.Instance.SettingsFile = @"c://temp/.runsettings";
+
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+
+            // Verify
+            object commandLineSwitches;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.CommandLineSwitches, out commandLineSwitches));
+
+            var commandLineArray = commandLineSwitches.ToString();
+
+            Assert.IsTrue(commandLineArray.Contains("/Parallel"));
+            Assert.IsTrue(commandLineArray.Contains("/EnableCodeCoverage"));
+            Assert.IsTrue(commandLineArray.Contains("/InIsolation"));
+            Assert.IsTrue(commandLineArray.Contains("/UseVsixExtensions"));
+            Assert.IsTrue(commandLineArray.Contains("/settings//.RunSettings"));
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void RunTestsShouldCollectMetrics()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                </RunConfiguration>
+                                <MSPhoneTest>
+                                  <TargetDevice>169.254.193.190</TargetDevice>
+                                </MSPhoneTest>
+                            </RunSettings>"
+            };
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualRequestData = requestData;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+
+            // Verify
+            // Verify.
+            object targetDevice;
+            object maxcount;
+            object targetPlatform;
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
+            Assert.AreEqual("Other", targetDevice);
+            Assert.AreEqual(2, maxcount);
+            Assert.AreEqual("X86", targetPlatform.ToString());
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -983,6 +1522,46 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        [DataRow("x86")]
+        [DataRow("X86")]
+        [DataRow("ARM")]
+        [DataRow("aRm")]
+        public void RunTestsShouldNotUpdatePlatformIfSpecifiedInDesignModeButInferred(string targetPlatform)
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                         <TargetPlatform>{targetPlatform}</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
+                .Returns(Architecture.X86);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+                .Returns(new FrameworkName(Constants.DotNetFramework451));
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
+            this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
+
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(targetPlatform));
         }
 
         [TestMethod]

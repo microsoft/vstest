@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Text.RegularExpressions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -41,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             else
             {
-                throw new ArgumentException();
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FastFilterException));
             }
         }
 
@@ -66,12 +67,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             if (singleValue != null)
             {
                 var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
-                matched = value != null && this.FilterPropertyValues.Contains(value);
+                matched = value != null && this.FilterPropertyValues.Contains(value.ToLowerInvariant());
             }
             else
             {
                 matched = (PropertyValueRegex == null ? multiValues : multiValues.Select(value => ApplyRegex(value)))
-                    .Any(result => result != null && this.FilterPropertyValues.Contains(result));
+                    .Any(result => result != null && this.FilterPropertyValues.Contains(result.ToLowerInvariant()));
             }
 
             return IsFilteredOutWhenMatched ? !matched : matched;
@@ -150,6 +151,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     {
                         operatorEncountered = true;
                         fastFilterOperator = @operator;
+                        if ((fastFilterOperation == Operation.NotEqual && fastFilterOperator == Operator.Or)
+                            || (fastFilterOperation == Operation.Equal && fastFilterOperator == Operator.And))
+                        {
+                            containsValidFilter = false;
+                        }
                     }
                 }
                 else
@@ -169,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 {
                     if (condition.Operation == fastFilterOperation && condition.Name.Equals(filterPropertyName, StringComparison.OrdinalIgnoreCase))
                     {
-                        filterHashSetBuilder.Add(condition.Value);
+                        filterHashSetBuilder.Add(condition.Value?.ToLowerInvariant());
                     }
                     else
                     {
@@ -181,8 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     conditionEncountered = true;
                     fastFilterOperation = condition.Operation;
                     filterPropertyName = condition.Name;
-
-                    filterHashSetBuilder.Add(condition.Value);
+                    filterHashSetBuilder.Add(condition.Value?.ToLowerInvariant());
 
                     // Don't support `Contains`.
                     if (fastFilterOperation != Operation.Equal && fastFilterOperation != Operation.NotEqual)

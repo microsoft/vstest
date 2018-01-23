@@ -214,12 +214,17 @@
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+      Change the verbosity level in log messages for console logger as shown below
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal and normal.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -231,11 +236,16 @@
                 [;RunTitle=&lt;title&gt;]</source>
         <target state="translated">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
       Určuje protokolovač pro výsledky testu. Pokud třeba chcete protokolovat výsledky 
-      do souboru výsledků testování sady Visual Studio (TRX), použijte /logger:trx [;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
+      do souboru výsledků testů sady Visual Studio (TRX), použijte /logger:trx[;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
       Vytvoří soubor v adresáři TestResults s daným názvem LogFileName.
 
-      Změna úrovně podrobností pro protokolovač konzoly. Povolené hodnoty podrobností: quiet, minimal a normal.
+      Změna úrovně podrobností zpráv v protokolu pro protokolovač konzoly, jak je znázorněno níže
       Příklad: /logger:console;verbosity=&lt;Výchozí hodnotou je minimal.&gt;
+      Povolené hodnoty pro úroveň podrobností: quiet, minimal a normal
+
+      Změna prefixu úrovně diagnostiku pro protokolovač konzoly, jak je znázorněno níže
+      Příklad: /logger:console;prefix=&lt;Výchozí hodnotou je false.&gt;
+      Další informace o protokolovači konzoly: https://aka.ms/console-logger
 
       Pokud chcete výsledky testu publikovat na Team Foundation Server, použijte TfsPublisher podle ukázky níže.
       Příklad: /logger:TfsPublisher;
@@ -530,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Název souboru&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;Název souboru&gt;
       Vypíše zjištěné testy z daného kontejneru testů.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; název souboru &gt;
       Seznamy zjištěných z kontejneru dané zkušební testy.</target>
@@ -1547,12 +1557,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:"{0}" není podporován, pokud je testovací běh nakonfigurován pomocí nastavení testů.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Kolekce dat konfigurované prostřednictvím nastavení běhu nejsou podporované s vloženým nastavením testů. Další informace viz https://aka.ms/vstest-configure-datacollector. Nastavení běhu: {0}.</target>
         <note></note>
       </trans-unit>
     </body>

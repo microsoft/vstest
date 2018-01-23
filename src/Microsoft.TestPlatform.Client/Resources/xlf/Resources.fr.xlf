@@ -43,6 +43,11 @@
         <target state="translated">Abandon de la série de tests : dépassement du délai d'expiration de la série de tests fixé à {0} millisecondes.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">Aucun fournisseur d'exécution de tests approprié n'a été trouvé pour cette série.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

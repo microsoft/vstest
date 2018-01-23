@@ -96,18 +96,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                var discoveryEngineStartTime = DateTime.UtcNow;
-
                 this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
-
-                    // Collecting Time Taken to Start Discovery Engine
-                    var discoveryEngineTotalTime = DateTime.UtcNow - discoveryEngineStartTime;
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecToStartDiscoveryEngine, discoveryEngineTotalTime.TotalSeconds);
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, this);
                 }
@@ -117,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Error("ProxyDiscoveryManager.DiscoverTests: Failed to discover tests: {0}", exception);
 
                 // Log to vs ide test output
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
                 var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
                 this.HandleRawMessage(rawMessage);
 
@@ -126,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
                 // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
                 // and the test host is lost as well.
-                this.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                this.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
@@ -174,21 +168,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = new List<string>();
-
-            if (TestPluginCache.Instance.PathToExtensions != null)
-            {
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterEndsWithPattern, StringComparison.OrdinalIgnoreCase)));
-            }
-
-            extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern);
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+                this.RequestSender.InitializeDiscovery(platformExtensions);
             }
         }
     }

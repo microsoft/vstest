@@ -43,6 +43,11 @@
         <target state="translated">Anulando la serie de pruebas: se superó el tiempo de espera de {0} milisegundos para la serie de pruebas.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoTestHostProviderFound">
+        <source>No suitable test runtime provider found for this run.</source>
+        <target state="translated">No se encontró un proveedor de tiempo de ejecución de prueba adecuado para esta ejecución.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

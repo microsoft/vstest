@@ -158,6 +158,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
+        public void InitializeDataCollectorsShouldLogExceptionToMessageSinkIfSetEnvironmentVariableFails()
+        {
+            this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Throws<Exception>();
+
+            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
+
+            Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
+            this.mockMessageSink.Verify(x => x.SendMessage(It.IsAny<DataCollectionMessageEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
         public void InitializeDataCollectorsShouldReturnFirstEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
         {
             this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
@@ -343,6 +354,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
             var args = new TestCaseEndEventArgs();
+            args.TestElement = new TestCase();
             this.dataCollectionManager.TestCaseEnded(args);
 
             Assert.IsTrue(isEndInvoked);

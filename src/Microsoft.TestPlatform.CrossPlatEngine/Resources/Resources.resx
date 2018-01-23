@@ -189,4 +189,7 @@
   <data name="OldTestHostIsGettingUsed" xml:space="preserve">
     <value>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</value>
   </data>
+  <data name="FailedToConnectDataCollector" xml:space="preserve">
+    <value>Failed to connect to datacollector process.</value>
+  </data>
 </root>

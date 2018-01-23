@@ -119,6 +119,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// For file related operation
         /// </summary>
         private IFileHelper fileHelper;
+        
+        /// <summary>
+        /// Separators for multiple paths in argument.
+        /// </summary>
+        private readonly char[] argumentSeparators = new [] { ';' };
 
         #endregion
 
@@ -161,43 +166,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             try
             {
+                var testAdapterPaths = new List<string>();
+                var testAdapterFullPaths = new List<string>();
+                
                 // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
                 // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
                 // Remove leading and trailing ' " ' chars...
                 argument = argument.Trim().Trim(new char[] { '\"' });
-                customAdaptersPath = Path.GetFullPath(argument);
-                if (!fileHelper.DirectoryExists(customAdaptersPath))
-                {
-                    throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
-                }
 
                 // Get testadapter paths from RunSettings.
                 var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
 
                 if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
                 {
-                    var testAdapterFullPaths = new List<string>();
-                    var testAdapterPathsInRunSettingsArray = testAdapterPathsInRunSettings.Split(
-                        new[] { ';' },
-                        StringSplitOptions.RemoveEmptyEntries);
+                    testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
+                }
+                
+                testAdapterPaths.AddRange(SplitPaths(argument));
+                
+                foreach (var testadapterPath in testAdapterPaths)
+                {
+                    // TestAdaptersPaths could contain environment variables
+                    var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
 
-                    foreach (var testadapterPath in testAdapterPathsInRunSettingsArray)
+                    if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
                     {
-                        var testAdapterFullPath = Path.GetFullPath(testadapterPath);
-
-                        if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
-                        {
-                            invalidAdapterPathArgument = testadapterPath;
-                            throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
-                        }
-
-                        testAdapterFullPaths.Add(testAdapterFullPath);
+                        invalidAdapterPathArgument = testadapterPath;
+                        throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
                     }
 
-                    testAdapterFullPaths.Add(customAdaptersPath);
-                    testAdapterFullPaths = testAdapterFullPaths.Distinct().ToList();
-                    customAdaptersPath = string.Join(";", testAdapterFullPaths.ToArray());
+                    testAdapterFullPaths.Add(testAdapterFullPath);
                 }
+
+                customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
 
                 this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
             }
@@ -208,6 +209,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.TestAdapterPath = customAdaptersPath;
+        }
+
+        /// <summary>
+        /// Splits provided paths into array.
+        /// </summary>
+        /// <param name="paths">Source paths joined by semicolons.</param>
+        /// <returns>Paths.</returns>
+        private string[] SplitPaths(string paths)
+        {
+            if (string.IsNullOrWhiteSpace(paths))
+            {
+                return new string[] { };
+            }
+
+            return paths.Split(argumentSeparators, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>

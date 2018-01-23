@@ -259,6 +259,11 @@
         <target state="translated">이 옵션은 Visual Studio의 일부로 설치된 vstest.console.exe에서만 실행됩니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FastFilterException">
+        <source>An error occured while creating Fast filter.</source>
+        <target state="translated">빠른 필터를 만드는 중 오류가 발생했습니다.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

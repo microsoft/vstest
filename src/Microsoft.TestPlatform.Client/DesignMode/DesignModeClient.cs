@@ -136,7 +136,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     var message = this.communicationManager.ReceiveMessage();
 
-                    EqtTrace.Info("DesignModeClient: Processing Message of message type: {0}", message.MessageType);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("DesignModeClient.ProcessRequests: Processing Message: {0}", message);
+                    }
+
                     switch (message.MessageType)
                     {
                         case MessageType.VersionCheck:
@@ -149,8 +153,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.ExtensionsInitialize:
                             {
+                                // Do not filter the Editor/IDE provided extensions by name
                                 var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
-                                testRequestManager.InitializeExtensions(extensionPaths);
+                                testRequestManager.InitializeExtensions(extensionPaths, skipExtensionFilters: true);
                                 break;
                             }
 

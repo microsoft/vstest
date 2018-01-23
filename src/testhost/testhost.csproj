@@ -8,6 +8,7 @@
     <AssemblyName>testhost</AssemblyName>
     <TargetFrameworks>netstandard1.4;netcoreapp1.0;net451</TargetFrameworks>
     <OutputType Condition="'$(TargetFramework)' != 'netstandard1.4'">Exe</OutputType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
@@ -34,10 +35,11 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Runtime" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

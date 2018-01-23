@@ -47,7 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestData">The Request Data for providing services and data for Run.</param>
         /// <param name="requestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
-        public ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
+        public ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : 
+            this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
         {
         }
 
@@ -94,8 +95,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             try
             {
-                var executionEngineStartTime = DateTime.UtcNow;
-
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
@@ -119,12 +118,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
 
                     this.InitializeExtensions(testPackages);
-
-                    // Collecting Time Taken to Start Discovery Engine
-                    var executionEngineTotalTime = DateTime.UtcNow - executionEngineStartTime;
-
-                    // Collecting Data Point for Time taken to start Execution Engine. In case of Parallel, it will be maximum time taken.
-                    this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToStartExecutionEngineExe, executionEngineTotalTime.TotalSeconds);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
                     var executionContext = new TestExecutionContext(
@@ -159,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
-                this.LogMessage(TestMessageLevel.Error, exception.Message);
+                this.LogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
@@ -185,6 +178,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
         }
 
+        /// <inheritdoc/>
+        public virtual int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        {
+            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+        }
+
         /// <summary>
         /// Aborts the test run.
         /// </summary>
@@ -203,12 +202,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             this.baseTestRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
-        }
-
-        /// <inheritdoc/>
-        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
-        {
-            return this.baseTestRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
 
         /// <inheritdoc/>
@@ -244,21 +237,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = new List<string>();
-
-            if (TestPluginCache.Instance.PathToExtensions != null)
-            {
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterEndsWithPattern, StringComparison.OrdinalIgnoreCase)));
-            }
-
-            extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern);
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.RequestSender.InitializeExecution(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+                this.RequestSender.InitializeExecution(platformExtensions);
             }
         }
     }

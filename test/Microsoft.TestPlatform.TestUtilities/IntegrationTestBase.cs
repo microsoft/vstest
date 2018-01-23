@@ -12,6 +12,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Text.RegularExpressions;
     using System.Xml;
 
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -27,13 +29,14 @@ namespace Microsoft.TestPlatform.TestUtilities
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
+        private int runnerExitCode = -1;
 
         private string arguments = string.Empty;
 
         protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common";
-        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\{0}\lib";
+        private const string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build";
         private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
         private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
 
@@ -87,7 +90,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
-            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError);
+            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
             this.FormatStandardOutCome();
         }
 
@@ -122,7 +125,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'" 
+        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'"
         /// is appended to the arguments.
         /// </summary>
         /// <param name="testAssembly">A test assembly.</param>
@@ -132,8 +135,23 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
-           // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
+            
+            // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
             this.InvokeVsTest(arguments);
+        }
+
+        /// <summary>
+        /// Execute Tests that are not supported with given Runner framework.
+        /// </summary>
+        /// <param name="runnerFramework">Runner Framework</param>
+        /// <param name="framework">Framework for which Tests are not supported</param>
+        /// <param name="message">Message to be shown</param>
+        public void ExecuteNotSupportedRunnerFrameworkTests(string runnerFramework, string framework, string message)
+        {
+            if (runnerFramework.StartsWith(framework))
+            {
+                Assert.Inconclusive(message);
+            }
         }
 
         /// <summary>
@@ -201,6 +219,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void StdOutputDoesNotContains(string substring)
         {
             Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
+        }
+
+        public void ExitCodeEquals(int exitCode)
+        {
+            Assert.AreEqual(exitCode, this.runnerExitCode, $"ExitCode - [{this.runnerExitCode}] doesn't match expected '{exitCode}'.");
         }
 
         /// <summary>
@@ -290,7 +313,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             var fileOutput = File.ReadAllLines(filePath);
             Assert.IsTrue(fileOutput.Length == 3);
-            
+
             foreach (var test in discoveredTestsList)
             {
                 var flag = fileOutput.Contains(test)
@@ -321,7 +344,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (testFramework == UnitTestFramework.NUnit)
             {
-                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnitAdapterVersion"]);
+                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnit3AdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.XUnit)
             {
@@ -351,7 +374,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns>
         /// Full path to test runner
         /// </returns>
-        public string GetConsoleRunnerPath()
+        public virtual string GetConsoleRunnerPath()
         {
             string consoleRunnerPath = string.Empty;
 
@@ -372,6 +395,29 @@ namespace Microsoft.TestPlatform.TestUtilities
             return consoleRunnerPath;
         }
 
+        protected virtual string SetVSTestConsoleDLLPathInArgs(string args)
+        {
+            var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+            vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
+            args = string.Concat(
+                vstestConsoleDll,
+                " ",
+                args);
+            return args;
+        }
+
+        /// <summary>
+        /// Returns the VsTestConsole Wrapper.
+        /// </summary>
+        /// <returns></returns>
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        {
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
+            vstestConsoleWrapper.StartSession();
+
+            return vstestConsoleWrapper;
+        }
+
         /// <summary>
         /// Gets the test method name from full name.
         /// </summary>
@@ -390,16 +436,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private void Execute(string args, out string stdOut, out string stdError)
+        private void Execute(string args, out string stdOut, out string stdError, out int exitCode)
         {
             if (this.IsNetCoreRunner())
             {
-                var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
-                vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
-                args = string.Concat(
-                    vstestConsoleDll,
-                    " ",
-                    args);
+                args = this.SetVSTestConsoleDLLPathInArgs(args);
             }
 
             this.arguments = args;
@@ -439,7 +480,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
-                Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
+                exitCode = vstestconsole.ExitCode;
+                Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", exitCode);
             }
         }
 

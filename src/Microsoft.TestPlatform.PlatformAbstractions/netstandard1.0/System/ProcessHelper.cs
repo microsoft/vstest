@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
-        public void SetExitCallback(int parentProcessId, Action callbackAction)
+        public void SetExitCallback(int parentProcessId, Action<object> callbackAction)
         {
             throw new NotImplementedException();
         }
@@ -75,6 +75,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         /// <inheritdoc/>
         public int GetProcessId(object process)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public string GetNativeDllDirectory()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public PlatformArchitecture GetCurrentProcessArchitecture()
         {
             throw new NotImplementedException();
         }

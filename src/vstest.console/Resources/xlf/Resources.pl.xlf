@@ -214,12 +214,17 @@
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+      Change the verbosity level in log messages for console logger as shown below
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal and normal.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -367,7 +372,7 @@
       </trans-unit>
       <trans-unit id="TestRunFailed">
         <source>Test Run Failed.</source>
-        <target state="translated">Nie można uruchomić testu.</target>
+        <target state="translated">Przebieg testu nie powiódł się.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Przebieg badania nie powiodło się.</target>
@@ -376,7 +381,7 @@
       </trans-unit>
       <trans-unit id="TestRunSuccessful">
         <source>Test Run Successful.</source>
-        <target state="translated">Pomyślne uruchomienie testu.</target>
+        <target state="translated">Przebieg testu zakończony powodzeniem.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Pomyślne uruchomienie testu.</target>
@@ -394,7 +399,7 @@
       </trans-unit>
       <trans-unit id="UseVsixExtensionsValueRequired">
         <source>The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</source>
-        <target state="translated">Parametr /UseVsixExtensions wymaga podania wartości. Jeśli wartość to „true”, zainstalowane rozszerzenia VSIX (jeśli istnieją) zostaną użyte w ramach uruchomienia testu. Jeśli wartość to „false”, rozszerzenia zostaną zignorowane. Przykład: /UseVsixExtensions:true</target>
+        <target state="translated">Parametr /UseVsixExtensions wymaga podania wartości. Jeśli wartość to „true”, zainstalowane rozszerzenia VSIX (jeśli istnieją) zostaną użyte w ramach przebiegu testu. Jeśli wartość to „false”, rozszerzenia zostaną zignorowane. Przykład: /UseVsixExtensions:true</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametr /UseVsixExtensions wymaga podania wartości. Jeśli 'true' zainstalowanych rozszerzeń VSIX (jeśli istnieje) będzie służyć w uruchomionym teście. Jeśli ma wartość FAŁSZ, zostaną one zignorowane.   Przykład: / usevsixextensions: true</target>
@@ -433,7 +438,7 @@
       Example  /UseVsixExtensions:true</source>
         <target state="translated">/UseVsixExtensions
       Powoduje to, że proces vstest.console.exe używa lub pomija zainstalowane 
-      rozszerzenia VSIX (jeśli istnieją) w uruchomieniu testu.
+      rozszerzenia VSIX (jeśli istnieją) w przebiegu testu.
       Przykład: /UseVsixExtensions:true</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -530,10 +535,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;nazwa pliku&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;nazwa pliku&gt;
       Wyświetla listę wykrytych testów z danego kontenera testów.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--nazwa | / lt | / nazwa: &lt; nazwa pliku &gt;
       List znaleziony testy z kontenera danego badania.</target>
@@ -711,7 +716,7 @@
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
-        <target state="translated">Argument /Platform wymaga podania typu platformy docelowej dla uruchomienia testu. Przykład: /Platform:x86</target>
+        <target state="translated">Argument /Platform wymaga podania typu platformy docelowej dla przebiegu testu. Przykład: /Platform:x86</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Argument opcji/platform wymaga typu platformy docelowej dla testu mają być dostarczone.   Przykład: / Platform: x 86</target>
@@ -735,7 +740,7 @@
       </trans-unit>
       <trans-unit id="SwitchToIsolationInMultiTargetingMode">
         <source>Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="translated">Używanie trybu izolacji do uruchomienia testów w sposób wymagany przez obowiązujące ustawienia platformy ({0}) i programu .NET Framework ({1}) dla uruchomienia testu. Użyj parametru /InIsolation, aby pominąć to ostrzeżenie.</target>
+        <target state="translated">Używanie trybu izolacji do uruchomienia testów w sposób wymagany przez obowiązujące ustawienia platformy ({0}) i programu .NET Framework ({1}) dla przebiegu testu. Użyj parametru /InIsolation, aby pominąć to ostrzeżenie.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aby uruchomić testy zgodnie z wymogami efektywnej platformy przy użyciu trybu izolacji: {0}, jak i .net Framework: {1} ustawienia dla testu. Użyj parametru /inIsolation, aby pominąć to ostrzeżenie.</target>
@@ -762,7 +767,7 @@
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
-        <target state="translated">Argument /Framework wymaga docelowej wersji programu .NET Framework na potrzeby uruchomienia testu. Przykład: /Framework:".NETFramework,Version=v4.5.1"</target>
+        <target state="translated">Argument /Framework wymaga docelowej wersji programu .NET Framework na potrzeby przebiegu testu. Przykład: /Framework:".NETFramework,Version=v4.5.1"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Argument ramy wymaga obiektu docelowego systemu .net Framework w wersji dla testu.   Przykład: Ramy: ". NETFramework, wersja = v4.6 "</target>
@@ -780,7 +785,7 @@
       </trans-unit>
       <trans-unit id="AppContainerTestPrerequisiteFail">
         <source>Could not start test run for unit tests for Windows Store app: {0}.</source>
-        <target state="translated">Nie można rozpocząć uruchomienia testu dla testów jednostkowych aplikacji ze Sklepu Windows: {0}.</target>
+        <target state="translated">Nie można rozpocząć przebiegu testu dla testów jednostkowych aplikacji ze Sklepu Windows: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie można uruchomić testu dla testów jednostkowych dla aplikacji magazynu systemu Windows: {0}.</target>
@@ -893,7 +898,7 @@
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
         <target state="translated">/EnableCodeCoverage
-      Włącza moduł zbierający dane „CodeCoverage” dla uruchomienia testu.</target>
+      Włącza moduł zbierający dane „CodeCoverage” dla przebiegu testu.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
@@ -921,7 +926,7 @@
       </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
-        <target state="translated">Pokrycie kodu nie jest dostępne dla aplikacji ze Sklepu Windows. Pominięto analizę pokrycia kodu dla tego uruchomienia testu.</target>
+        <target state="translated">Pokrycie kodu nie jest dostępne dla aplikacji ze Sklepu Windows. Pominięto analizę pokrycia kodu dla tego przebiegu testu.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Pokrycie kodu nie jest dostępne dla aplikacji magazynu systemu Windows. Pominięto analizy pokrycia kodu do tego przebiegu testowego.</target>
@@ -944,7 +949,7 @@
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <target state="translated">--TestAdapterPath | / TestAdapterPath
       Powoduje to, że proces vstest.console.exe używa niestandardowych adapterów 
-      testowych z podanej ścieżki (jeśli istnieje) w ramach uruchomienia testu. 
+      testowych z podanej ścieżki (jeśli istnieje) w ramach przebiegu testu. 
       Przykład: /TestAdapterPath:&lt;ścieżka do adapterów niestandardowych&gt;</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -993,7 +998,7 @@
       </trans-unit>
       <trans-unit id="PhoneAppContainerTestPrerequisiteFail">
         <source>Could not start test run for the tests for Windows Phone app: {0}.</source>
-        <target state="translated">Nie można rozpocząć uruchomienia testu dla testów dla aplikacji Windows Phone: {0}.</target>
+        <target state="translated">Nie można rozpocząć przebiegu testu dla testów dla aplikacji Windows Phone: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie można uruchomić testu dla testów dla aplikacji Windows Phone: {0}.</target>
@@ -1011,7 +1016,7 @@
       </trans-unit>
       <trans-unit id="DisablingCodeCoverageInPhoneAppContainerTestExecution">
         <source>Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run.</source>
-        <target state="translated">Pokrycie kodu nie jest dostępne dla aplikacji systemu Windows Phone. Pominięto analizę pokrycia kodu dla tego uruchomienia testu.</target>
+        <target state="translated">Pokrycie kodu nie jest dostępne dla aplikacji systemu Windows Phone. Pominięto analizę pokrycia kodu dla tego przebiegu testu.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Pokrycie kodu nie jest dostępne dla aplikacji Windows Phone. Pominięto analizy pokrycia kodu do tego przebiegu testowego.</target>
@@ -1476,7 +1481,7 @@
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="translated">--Collect|/Collect:&lt;przyjazna nazwa modułu zbierającego dane&gt;
-      Włącza moduł zbierający dane dla uruchomienia testu. Więcej informacji: https://aka.ms/vstest-collect</target>
+      Włącza moduł zbierający dane dla przebiegu testu. Więcej informacji: https://aka.ms/vstest-collect</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
@@ -1498,12 +1503,12 @@
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
-        <target state="translated">Uruchomienie testu zostało przerwane.</target>
+        <target state="translated">Przebieg testu został przerwany.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
-        <target state="translated">Uruchomienie testu zostało anulowane.</target>
+        <target state="translated">Przebieg testu został anulowany.</target>
         <note />
       </trans-unit>
       <trans-unit id="OpenResponseFileError">
@@ -1547,12 +1552,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect: element „{0}” nie jest obsługiwany, jeśli przebieg testu został skonfigurowany za pomocą pliku testsettings.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Moduły zbierające dane skonfigurowane za pośrednictwem ustawień uruchamiania nie są obsługiwane przez osadzone ustawienia testów. Zobacz https://aka.ms/vstest-configure-datacollector w celu uzyskania dalszych informacji. Ustawienia uruchamiania: {0}.</target>
         <note></note>
       </trans-unit>
     </body>

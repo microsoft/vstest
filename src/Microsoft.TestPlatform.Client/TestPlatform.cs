@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -20,10 +21,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
     /// <summary>
     /// Implementation for TestPlatform
@@ -45,7 +48,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        /// <param name="isInIsolation">inIsolation command line arg value</param>
         public TestPlatform() : this(new TestEngine(), new FileHelper(), TestRuntimeProviderManager.Instance)
         {
         }
@@ -98,10 +100,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 this.AddExtensionAssembliesFromSource(discoveryCriteria.Sources);
 
                 // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers();
+                TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, discoveryCriteria.RunSettings);
+
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
@@ -134,10 +138,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 this.AddExtensionAssembliesFromSource(testRunCriteria);
 
                 // Initialize loggers
-                TestLoggerManager.Instance.InitializeLoggers();
+                TestLoggerManager.Instance.InitializeLoggers(requestData);
             }
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+            ThrowExceptionIfTestHostManagerIsNull(testHostManager, testRunCriteria.TestRunSettings);
+
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
             if (testRunCriteria.TestHostLauncher != null)
@@ -163,11 +169,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// The update extensions.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        /// <param name="loadOnlyWellKnownExtensions"> The load only well known extensions. </param>
-        public void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
+        /// <param name="skipExtensionFilters">Skips filtering by name (if true).</param>
+        public void UpdateExtensions(IEnumerable<string> pathToAdditionalExtensions, bool skipExtensionFilters)
         {
             this.TestEngine.GetExtensionManager()
-                   .UseAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+                   .UseAdditionalExtensions(pathToAdditionalExtensions, skipExtensionFilters);
         }
 
         /// <summary>
@@ -176,6 +182,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         public void ClearExtensions()
         {
             this.TestEngine.GetExtensionManager().ClearExtensions();
+        }
+
+        private void ThrowExceptionIfTestHostManagerIsNull(ITestRuntimeProvider testHostManager, string settingXml)
+        {
+            if (testHostManager == null)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(settingXml);
+                var framework = config.TargetFramework;
+
+                EqtTrace.Error("TestPlatform.CreateTestRunRequest: No suitable testHostProvider found for runsettings : {0}", settingXml);
+                throw new TestPlatformException(String.Format(CultureInfo.CurrentCulture, ClientResources.NoTestHostProviderFound));
+            }
         }
 
         /// <summary>
@@ -206,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterEndsWithPattern, TestPlatformConstants.TestLoggerEndsWithPattern, TestPlatformConstants.RunTimeEndsWithPattern, TestPlatformConstants.SettingsProviderEndsWithPattern));
                     if (extensionAssemblies.Count > 0)
                     {
-                        this.UpdateExtensions(extensionAssemblies, true);
+                        this.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                     }
                 }
             }
@@ -250,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             if (loggersToUpdate.Count > 0)
             {
-                this.UpdateExtensions(loggersToUpdate, true);
+                this.UpdateExtensions(loggersToUpdate, skipExtensionFilters: false);
             }
         }
 

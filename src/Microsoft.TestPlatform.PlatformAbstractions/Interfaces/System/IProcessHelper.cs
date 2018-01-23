@@ -42,6 +42,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         string GetTestEngineDirectory();
 
         /// <summary>
+        /// Gets the location of native dll's, depending on current process architecture..
+        /// </summary>
+        /// <returns>Location of native dll's</returns>
+        string GetNativeDllDirectory();
+
+        /// <summary>
+        /// Gets current process architecture
+        /// </summary>
+        /// <returns>Process Architecture</returns>
+        PlatformArchitecture GetCurrentProcessArchitecture();
+
+        /// <summary>
         /// Gets the process id of test engine.
         /// </summary>
         /// <returns>process id of test engine.</returns>
@@ -78,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <param name="callbackAction">
         /// Callback on process exit.
         /// </param>
-        void SetExitCallback(int processId, Action callbackAction);
+        void SetExitCallback(int processId, Action<object> callbackAction);
 
         /// <summary>
         /// Terminates a process.

@@ -273,7 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, new TestExecId(testCaseStartEventArgs.TestCaseId));
+            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
             testCaseStartEventArgs.Context = context;
 
             this.SendEvent(testCaseStartEventArgs);
@@ -287,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return new Collection<AttachmentSet>();
             }
 
-            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, new TestExecId(testCaseEndEventArgs.TestCaseId));
+            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
             testCaseEndEventArgs.Context = context;
 
             this.SendEvent(testCaseEndEventArgs);
@@ -450,7 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 }
 
                 // Log error.
-                dataCollectorInfo.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex.Message));
+                dataCollectorInfo.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex));
 
                 // Dispose datacollector.
                 dataCollectorInfo.DisposeDataCollector();
@@ -537,9 +537,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
             {
-                dataCollectorInfo.SetTestExecutionEnvironmentVariables();
                 try
                 {
+                    dataCollectorInfo.SetTestExecutionEnvironmentVariables();
                     this.AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);
                 }
                 catch (Exception ex)

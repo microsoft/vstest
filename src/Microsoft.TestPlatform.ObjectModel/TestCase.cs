@@ -7,10 +7,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.IO;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System.Globalization;
     using System.Collections.Generic;
     using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test case.
@@ -18,13 +20,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     [DataContract]
     public sealed class TestCase : TestObject
     {
-#if TODO
         /// <summary>
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
-        private Object m_localExtensionData;
-#endif
+        private Object localExtensionData;
+
         private Guid defaultId = Guid.Empty;
         private Guid id;
         private string displayName;
@@ -70,17 +71,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Properties
 
-#if TODO
         /// <summary>
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
         public Object LocalExtensionData
         {
-            get { return m_localExtensionData; }
-            set { m_localExtensionData = value; }
+            get { return localExtensionData; }
+            set { localExtensionData = value; }
         }
-#endif
 
         /// <summary>
         /// Gets or sets the id of the test case.
@@ -224,9 +223,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // For example in the database adapter case this is not a file path.
             string source = this.Source;
 
-            if (File.Exists(source))
+            // As discussed with team, we found no scenario for netcore, & fullclr where the Source is not present where ID is generated,
+            // which means we would always use FileName to generate ID. In cases where somehow Source Path contained garbage character the API Path.GetFileName()
+            // we are simply returning original input.
+            // For UWP where source during discovery, & during execution can be on different machine, in such case we should always use Path.GetFileName()
+            try
             {
+                // If source name is malformed, GetFileName API will throw exception, so use same input malformed string to generate ID
                 source = Path.GetFileName(source);
+            }
+            catch
+            {
+                // do nothing
             }
 
             string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;

@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var additionalExtensions = new List<string> { "e1.dll", "e2.dll" };
 
-            tp.UpdateExtensions(additionalExtensions, loadOnlyWellKnownExtensions: true);
+            tp.UpdateExtensions(additionalExtensions, skipExtensionFilters: true);
 
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
         }
@@ -93,6 +93,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             tp.ClearExtensions();
 
             this.extensionManager.Verify(em => em.ClearExtensions());
+        }
+
+        [TestMethod]
+        public void CreateTestRunRequestShouldThrowExceptionIfNoTestHostproviderFound()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>.NETPortable,Version=v4.5</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, null);
+            bool exceptionThrown = false;
+
+            try
+            {
+                tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            }
+            catch(TestPlatformException ex)
+            {
+                exceptionThrown = true;
+                Assert.AreEqual("No suitable test runtime provider found for this run.", ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "TestPlatformException should get thrown");
         }
 
         [TestMethod]
@@ -122,11 +150,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
         [TestMethod]
-        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunSelected()
+        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesignModeIsFalseForRunSelected()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -150,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
         [TestMethod]
@@ -180,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
             this.hostManager.Verify(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
@@ -231,11 +259,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(this.mockRequestData.Object, null));
         }
 
+
+        [TestMethod]
+        public void CreateDiscoveryRequestShouldThrowExceptionIfNoTestHostproviderFound()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>.NETPortable,Version=v4.5</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { @"x:dummy\foo.dll" }, 1, settingsXml);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, null);
+            bool exceptionThrown = false;
+
+            try
+            {
+                tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+            }
+            catch (TestPlatformException ex)
+            {
+                exceptionThrown = true;
+                Assert.AreEqual("No suitable test runtime provider found for this run.", ex.Message);
+            }
+
+            Assert.IsTrue(exceptionThrown, "TestPlatformException should get thrown");
+        }
+
         /// <summary>
         /// Logger extensions should be updated when design mode is false.
         /// </summary>
         [TestMethod]
-        public void CreateDiscoveryRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalse()
+        public void CreateDiscoveryRequestShouldUpdateLoggerExtensionWhenDesignModeIsFalse()
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -260,10 +317,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             // Action
-            var discoveryRequest = tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), discoveryCriteria);
+            var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
 
             // Verify
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
         private class TestableTestPlatform : TestPlatform

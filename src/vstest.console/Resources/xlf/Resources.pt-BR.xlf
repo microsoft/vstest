@@ -214,12 +214,17 @@
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+      Change the verbosity level in log messages for console logger as shown below
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal and normal.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -230,14 +235,20 @@
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
         <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Especifique um agente para resultados de teste. Por exemplo, para registrar os resultados em um TRX (Arquivos de Resultados de Teste) do Visual Studio, use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
-      Cria um arquivo no diretório TestResults com o LogFileName fornecido.
+      Especifique um agente para resultados de teste. Por exemplo, para registrar os resultados em um
+      TRX (Arquivos de Resultados de Teste) do Visual Studio, use/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Cria um arquivo no diretório TestResults directory com o LogFileName fornecido.
 
-      Altere o nível de detalhamento do agente do console. Valores permitidos para detalhamento: quiet, minimal e normal.
+      Altere o nível de detalhamento nas mensagens de registro do agente do console, conforme mostrado abaixo
       Exemplo: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Valores permitidos para nível de detalhes: quiet, minimal e normal.
 
-      Para publicar resultados de teste no Team Foundation Server, use o TfsPublisher conforme mostrado abaixo
-      Exemplo: /logger:TfsPublisher;
+      Altere o prefixo do nível de diagnóstico para o agente do console, conforme mostrado abaixo
+      Exemplo: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      Mais informações sobre o Agente do Console aqui: https://aka.ms/console-logger
+
+      Para publicar os resultados de teste no Team Foundation Server, use TfsPublisher conforme mostrado abaixo
+      Example: /logger:TfsPublisher;
                 Collection=&lt;team project collection url&gt;;
                 BuildName=&lt;build name&gt;;
                 TeamProject=&lt;team project name&gt;
@@ -529,10 +540,10 @@
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</source>
-        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
+      Lists all discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lista os testes descobertos do contêiner de testes fornecido.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; nome do arquivo &gt;
       Listas de descobertas testes do recipiente determinado teste.</target>
@@ -1546,12 +1557,12 @@
       </trans-unit>
       <trans-unit id="CollectWithTestSettingErrorMessage">
         <source>--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</source>
-        <target state="new">--Collect|/Collect:"{0}" is not supported if test run is configured using testsettings.</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:"{0}" não é compatível se a execução de teste é configurada usando configurações de teste.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
-        <source>Data collectors configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">DataCollector:"{0}" in runsettings in not supported if test run is configured using testsettings.</target>
+        <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
+        <target state="new">Coletores de dados configurados por meio de configurações de execução não são compatíveis com configurações de teste integradas. Confira https://aka.ms/vstest-configure-datacollector para mais informações. Configurações de execução: {0}.</target>
         <note></note>
       </trans-unit>
     </body>

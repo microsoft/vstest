@@ -193,7 +193,7 @@
       </trans-unit>
       <trans-unit id="Common_MissingRunInResult">
         <source>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</source>
-        <target state="translated">Wynik nie został skojarzony z uruchomieniem testu. Użyj wyniku uzyskanego z uruchomienia testu, który jest w toku lub który został zakończony.</target>
+        <target state="translated">Wynik nie został skojarzony z przebiegiem testu. Użyj wyniku uzyskanego z przebiegu testu, który jest w toku lub który został zakończony.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Wynik nie jest skojarzony z jazd testowych. Użyj wynik, który uzyskano z w toku lub zakończonego badania Uruchom.</target>
@@ -232,7 +232,7 @@ Szczegóły błędu: {1}: {2}</target>
       </trans-unit>
       <trans-unit id="MessageForSkippedTests">
         <source>Test '{0}' was skipped in the test run.</source>
-        <target state="translated">Test „{0}” został pominięty w uruchomieniu testu.</target>
+        <target state="translated">Test „{0}” został pominięty w przebiegu testu.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test "{0}" zostało pominięte w uruchomionym teście.</target>
