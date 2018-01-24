@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     /// <summary>
     /// Provides access to the command-line options.
     /// </summary>
-    internal class CommandLineOptions
+    public class CommandLineOptions
     {
         #region Constants/Readonly 
         
@@ -229,7 +229,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 return IsDesignMode;
             }
-        }        
+        }
+
+        /// <summary>
+        /// The instance of Executor that is used in current instance of process.
+        /// </summary>
+        public Executor CurrentExecutor
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Specifies if /Platform has been specified on command line or not.

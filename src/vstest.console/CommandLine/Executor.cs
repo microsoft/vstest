@@ -46,10 +46,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     /// <summary>
     /// Performs the execution based on the arguments provided.
     /// </summary>
-    internal class Executor
+    public class Executor
     {
         private ITestPlatformEventSource testPlatformEventSource;
         private bool showHelp;
+        List<IArgumentProcessor> lazyExecutorList = new List<IArgumentProcessor>();
 
         #region Constructor
 
@@ -58,6 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance)
         {
+            CommandLineOptions.Instance.CurrentExecutor = this;
         }
 
         internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource)
@@ -148,6 +150,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.testPlatformEventSource.MetricsDisposeStop();
             return exitCode;
+        }
+
+        public void LazyExecuteProcessors()
+        {
+            if (this.lazyExecutorList != null)
+            {
+                foreach (var executor in this.lazyExecutorList)
+                {
+                    int exitcode = 0;
+                    ExecuteArgumentProcessor(executor, ref exitcode);
+                }
+            }
         }
 
         #endregion
@@ -325,7 +339,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             ArgumentProcessorResult result;
             try
             {
-                result = processor.Executor.Value.Execute();
+                if (CommandLineOptions.Instance.IsDesignMode)
+                {
+                    if (!processor.Executor.Value.LazyExecuteInDesignMode)
+                    {
+                        result = processor.Executor.Value.Execute();
+                    }
+                    else
+                    {
+                        // Add to lazy Dict
+                        lazyExecutorList.Add(processor);
+                        return continueExecution;
+                    }
+                }
+                else
+                {
+                    result = processor.Executor.Value.Execute();
+                }
             }
             catch (Exception ex)
             {

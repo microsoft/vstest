@@ -159,6 +159,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Abort;
         }
 
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
         #endregion
 
         #region Private Methods

@@ -103,6 +103,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
 
+        private string argument;
+
         #endregion
 
         #region Constructor
@@ -134,7 +136,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 throw new CommandLineException(CommandLineResources.FrameworkVersionRequired);
             }
-            
+
+            var validFramework = Framework.FromString(argument);
+            if (validFramework == null)
+            {
+                throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
+            }
+
+            this.argument = argument;
+        }
+
+        /// <summary>
+        /// The output path is already set, return success.
+        /// </summary>
+        /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
+        public ArgumentProcessorResult Execute()
+        {
             var validFramework = Framework.FromString(argument);
             if (validFramework == null)
             {
@@ -166,16 +184,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 EqtTrace.Info("Using .Net Framework version:{0}", commandLineOptions.TargetFrameworkVersion);
             }
-        }
 
-        /// <summary>
-        /// The output path is already set, return success.
-        /// </summary>
-        /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
-        public ArgumentProcessorResult Execute()
-        {
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }

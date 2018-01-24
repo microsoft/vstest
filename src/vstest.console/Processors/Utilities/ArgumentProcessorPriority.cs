@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// Priority of processors related to design mode. This needs to be higher priority
         /// since some of the functionalities (like logger) depend on this.
         /// </summary>
-        DesignMode = 2,
+        DesignMode = 13,
 
         /// <summary>
         /// Priority of UseVsixArgumentProcessor.

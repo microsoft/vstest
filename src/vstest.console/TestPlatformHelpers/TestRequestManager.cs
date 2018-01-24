@@ -164,6 +164,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
+            this.ExecuteProcessorsForDesignMode(ref runsettings);
+
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
             var batchSize = runConfiguration.BatchSize;
 
@@ -257,6 +259,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 runsettings = updatedRunsettings;
             }
+
+            this.ExecuteProcessorsForDesignMode(ref runsettings);
 
             if (InferRunSettingsHelper.AreRunSettingsCollectorsInCompatibleWithTestSettings(runsettings))
             {
@@ -442,6 +446,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             return settingsUpdated;
+        }
+
+        private void ExecuteProcessorsForDesignMode(ref string runsettings)
+        {
+            if (this.commandLineOptions.IsDesignMode)
+            {
+                var runSettings = new RunSettings();
+                runSettings.LoadSettingsXml(runsettings);
+                RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+
+                this.commandLineOptions.CurrentExecutor.LazyExecuteProcessors();
+                runsettings = RunSettingsManager.Instance.ActiveRunSettings.SettingsXml;
+            }
         }
 
         private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)

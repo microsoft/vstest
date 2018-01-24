@@ -22,5 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// The <see cref="ArgumentProcessorResult"/>.
         /// </returns>
         ArgumentProcessorResult Execute();
+
+        /// <summary>
+        /// Tells executor to lazy execute in design mode.
+        /// </summary>
+        bool LazyExecuteInDesignMode { get; }
     }
 }

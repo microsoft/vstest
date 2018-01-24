@@ -104,6 +104,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
 
+        private string testResultsDirectory;
+
         #endregion
 
         #region Constructor
@@ -153,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.ResultsDirectory = argument;
-            this.runSettingsManager.UpdateRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath, argument);
+            this.testResultsDirectory = argument;
         }
 
         /// <summary>
@@ -162,9 +164,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
         public ArgumentProcessorResult Execute()
         {
+            this.runSettingsManager.UpdateRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath, this.testResultsDirectory);
+
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }

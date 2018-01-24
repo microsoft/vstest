@@ -199,5 +199,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Nothing to do here, the work was done in initialization.
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
     }
 }

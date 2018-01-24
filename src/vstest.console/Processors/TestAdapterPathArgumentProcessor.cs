@@ -125,6 +125,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private readonly char[] argumentSeparators = new [] { ';' };
 
+        private string argument;
+
         #endregion
 
         #region Constructor
@@ -154,21 +156,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            string invalidAdapterPathArgument = argument;
+            this.argument = argument;
 
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
             }
+        }
 
+        /// <summary>
+        /// Splits provided paths into array.
+        /// </summary>
+        /// <param name="paths">Source paths joined by semicolons.</param>
+        /// <returns>Paths.</returns>
+        private string[] SplitPaths(string paths)
+        {
+            if (string.IsNullOrWhiteSpace(paths))
+            {
+                return new string[] { };
+            }
+
+            return paths.Split(argumentSeparators, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        /// <summary>
+        /// Executes the argument processor.
+        /// </summary>
+        /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
+        public ArgumentProcessorResult Execute()
+        {
+            string invalidAdapterPathArgument = argument;
             string customAdaptersPath;
 
             try
             {
                 var testAdapterPaths = new List<string>();
                 var testAdapterFullPaths = new List<string>();
-                
+
                 // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
                 // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
                 // Remove leading and trailing ' " ' chars...
@@ -181,9 +206,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
                 }
-                
+
                 testAdapterPaths.AddRange(SplitPaths(argument));
-                
+
                 foreach (var testadapterPath in testAdapterPaths)
                 {
                     // TestAdaptersPaths could contain environment variables
@@ -209,32 +234,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.TestAdapterPath = customAdaptersPath;
-        }
 
-        /// <summary>
-        /// Splits provided paths into array.
-        /// </summary>
-        /// <param name="paths">Source paths joined by semicolons.</param>
-        /// <returns>Paths.</returns>
-        private string[] SplitPaths(string paths)
-        {
-            if (string.IsNullOrWhiteSpace(paths))
-            {
-                return new string[] { };
-            }
-
-            return paths.Split(argumentSeparators, StringSplitOptions.RemoveEmptyEntries);
-        }
-
-        /// <summary>
-        /// Executes the argument processor.
-        /// </summary>
-        /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
-        public ArgumentProcessorResult Execute()
-        {
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }

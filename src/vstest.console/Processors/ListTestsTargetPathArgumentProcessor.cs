@@ -125,6 +125,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
+
         #endregion
     }
 }

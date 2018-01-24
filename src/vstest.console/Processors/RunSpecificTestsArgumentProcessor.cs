@@ -12,8 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -222,6 +220,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             return result ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
 
         #endregion
 
