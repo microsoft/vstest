@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.SmokeTests
         [TestMethod]
         public void RunAllTestExecution()
         {
-            this.InvokeVsTestForExecution(this.GetSampleTestAssembly(), this.GetTestAdapterPath());
+            this.InvokeVsTestForExecution(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), ".NETFramework,Version=v4.5.1");
             this.ValidateSummaryStatus(1, 1, 1);
             this.ValidatePassedTests("SampleUnitTestProject.UnitTest1.PassingTest");
             this.ValidateFailedTests("SampleUnitTestProject.UnitTest1.FailingTest");
@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.SmokeTests
         [TestMethod]
         public void RunSelectedTests()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, ".NETFramework,Version=v4.5.1");
             arguments = string.Concat(arguments, " /Tests:PassingTest");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);

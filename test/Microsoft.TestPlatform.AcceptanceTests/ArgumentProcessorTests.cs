@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " /badArgument");
 
             this.InvokeVsTest(arguments);

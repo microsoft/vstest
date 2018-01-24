@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
             this.InvokeVsTest(arguments);
@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=Categorya\"");
             this.InvokeVsTest(arguments);
@@ -53,7 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
             this.InvokeVsTest(arguments);
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(
                 arguments,
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
             this.InvokeVsTest(arguments);
@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
             this.InvokeVsTest(arguments);
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
             this.InvokeVsTest(arguments);
@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
             this.InvokeVsTest(arguments);
@@ -169,7 +169,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll"),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
@@ -200,7 +200,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 testAssemblyPath,
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);

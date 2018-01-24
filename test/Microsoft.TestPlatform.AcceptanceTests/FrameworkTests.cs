@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " ", $"/Framework:{this.FrameworkArgValue}");
 
             this.InvokeVsTest(arguments);
@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
             if (runnerInfo.TargetFramework.Contains("netcore"))
             {
                 arguments = string.Concat(arguments, " ", "/Framework:Framework45");

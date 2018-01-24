@@ -233,7 +233,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 string.Empty,
-                runsettingsFilePath,
+                runsettingsFilePath, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings. Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
@@ -255,7 +255,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 string.Empty,
-                runsettingsFilePath,
+                runsettingsFilePath, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -284,7 +284,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 runsettingsPath = this.GetRunsettingsFilePath(runConfigurationDictionary);
             }
 
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.testEnvironment.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
 
             if (!string.IsNullOrWhiteSpace(additionalArgs))
             {

@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("EventLogUnitTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
 
             this.InvokeVsTest(arguments);
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
 
             string runSettings = this.GetRunsettingsFilePath();
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
 
             this.InvokeVsTest(arguments);

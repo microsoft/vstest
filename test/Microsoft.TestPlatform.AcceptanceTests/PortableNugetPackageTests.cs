@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
 
             this.ValidateSummaryStatus(2, 2, 2);
             this.ExitCodeEquals(1); // failing tests

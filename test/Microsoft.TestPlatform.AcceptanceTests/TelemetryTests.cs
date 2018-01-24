@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject2.dll");
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
             this.ValidateOutput("Execution");
         }
 

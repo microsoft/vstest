@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 orderedTestFileAbsolutePath,
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);

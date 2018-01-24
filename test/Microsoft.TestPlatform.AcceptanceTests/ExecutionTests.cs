@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), this.FrameworkArgValue, string.Empty);
 
             this.ValidateSummaryStatus(2, 2, 2);
             this.ExitCodeEquals(1); // failing tests
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testEnvironment.GetTestAsset("XUTestProject.dll");
 
             assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
-            this.InvokeVsTestForExecution(assemblyPaths, string.Empty, string.Empty, this.FrameworkArgValue);
+            this.InvokeVsTestForExecution(assemblyPaths, string.Empty, this.FrameworkArgValue, string.Empty);
 
             this.ValidateSummaryStatus(2, 2, 1);
             this.ExitCodeEquals(1); // failing tests
@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
             string testhostProcessName = string.Empty;
@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
 
             // set TestSessionTimeOut = 7 sec
@@ -128,7 +128,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SampleProjectWithOldTestHost.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);
 
@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /tests:WorkingDirectoryTest");
 
             this.InvokeVsTest(arguments);
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             File.Delete(diagLogFilePath);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
@@ -201,7 +201,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
@@ -220,7 +220,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings.SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /testcasefilter:PassingTestx86");
 
             this.InvokeVsTest(arguments);

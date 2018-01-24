@@ -18,12 +18,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             this.InvokeVsTest(arguments);
 
-            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);
@@ -38,12 +38,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
             arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName{trxFileName}\"");
             this.InvokeVsTest(arguments);
 
-            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, runnerInfo.InIsolationValue);
+            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName={trxFileName}\"");
             arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);

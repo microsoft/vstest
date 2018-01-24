@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System;
     using System.IO;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -56,7 +57,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
                 var listOfTests = new[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
 
-                this.InvokeVsTestForFullyQualifiedDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), this.dummyFilePath, string.Empty);
+                var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
+                arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
+                this.InvokeVsTest(arguments);
 
                 this.ValidateFullyQualifiedDiscoveredTests(this.dummyFilePath, listOfTests);
                 this.ExitCodeEquals(0);

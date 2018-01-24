@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 testJSFileAbsolutePath,
                 this.GetTestAdapterPath(UnitTestFramework.Chutzpah),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 this.testEnvironment.InIsolationValue);
 
             this.InvokeVsTest(arguments);
@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty);
+                string.Empty, this.FrameworkArgValue);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -160,7 +160,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty);
+                string.Empty, this.FrameworkArgValue);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
