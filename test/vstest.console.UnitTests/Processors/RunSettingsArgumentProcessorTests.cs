@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new RunSettingsArgumentProcessorCapabilities();
             Assert.AreEqual("/Settings", capabilities.CommandName);
-            Assert.AreEqual("--Settings|/Settings:<Settings File>\n      Settings to use when running tests.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Settings|/Settings:<Settings File>\r\n      Settings to use when running tests.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.RunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

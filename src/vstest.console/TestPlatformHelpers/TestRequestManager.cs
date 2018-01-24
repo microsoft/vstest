@@ -450,7 +450,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private void ExecuteProcessorsForDesignMode(ref string runsettings)
         {
-            if (this.commandLineOptions.IsDesignMode)
+            if (this.commandLineOptions.IsDesignMode && this.commandLineOptions.CurrentExecutor != null)
             {
                 var runSettings = new RunSettings();
                 runSettings.LoadSettingsXml(runsettings);

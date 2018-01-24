@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(null, isolationProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, isolationProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.InIsolationArgumentProcessorHelpPriority, isolationProcessor.Metadata.Value.HelpPriority);
-            Assert.AreEqual("--InIsolation|/InIsolation\n      Runs the tests in an isolated process. This makes vstest.console.exe \n      process less likely to be stopped on an error in the tests, but tests \n      may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName);
+            Assert.AreEqual("--InIsolation|/InIsolation\r\n      Runs the tests in an isolated process. This makes vstest.console.exe \r\n      process less likely to be stopped on an error in the tests, but tests \r\n      may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName);
         }
 
         [TestMethod]
@@ -68,9 +68,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetInIsolationValue()
+        public void ExecuteShouldSetInIsolationValue()
         {
             this.executor.Initialize(null);
+            executor.Execute();
             Assert.IsTrue(CommandLineOptions.Instance.InIsolation, "InProcess option must be set to true.");
             Assert.AreEqual("true", this.runSettingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }

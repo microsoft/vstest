@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ParentProcessIdArgumentProcessorCapabilities();
             Assert.AreEqual("/ParentProcessId", capabilities.CommandName);
-            Assert.AreEqual("--ParentProcessId|/ParentProcessId:<ParentProcessId>\n      Process Id of the Parent Process responsible for launching current process.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--ParentProcessId|/ParentProcessId:<ParentProcessId>\r\n      Process Id of the Parent Process responsible for launching current process.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ParentProcessIdArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

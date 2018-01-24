@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new PlatformArgumentProcessorCapabilities();
             Assert.AreEqual("/Platform", capabilities.CommandName);
-            Assert.AreEqual("--Platform|/Platform:<Platform type>\n      Target platform architecture to be used for test execution. \n      Valid values are x86, x64 and ARM.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Platform|/Platform:<Platform type>\r\n      Target platform architecture to be used for test execution. \r\n      Valid values are x86, x64 and ARM.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.PlatformArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -99,17 +99,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsArchitecture()
+        public void ExecuteShouldSetCommandLineOptionsArchitecture()
         {
             this.executor.Initialize("x64");
+            this.executor.Execute();
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
             Assert.AreEqual(ObjectModel.Architecture.X64.ToString(), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
-        public void InitializeShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
+        public void ExecuteShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
         {
             executor.Initialize("ArM");
+            this.executor.Execute();
             Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
             Assert.AreEqual(ObjectModel.Architecture.ARM.ToString(), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }

@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class CollectArgumentExecutor : IArgumentExecutor
     {
         private IRunSettingsProvider runSettingsManager;
-        private string argument;
+        private List<string> arguments = new List<string>();
         internal static List<string> EnabledDataCollectors = new List<string>();
 
         internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager)
@@ -121,13 +121,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new SettingsException(string.Format(CommandLineResources.CollectWithTestSettingErrorMessage, argument));
             }
 
-            this.argument = argument;
+            this.arguments.Add(argument);
         }
 
         /// <inheritdoc />
         public ArgumentProcessorResult Execute()
         {
-            AddDataCollectorToRunSettings(argument, this.runSettingsManager);
+            foreach (var argument in arguments)
+            {
+                AddDataCollectorToRunSettings(argument, this.runSettingsManager);
+            }
 
             return ArgumentProcessorResult.Success;
         }

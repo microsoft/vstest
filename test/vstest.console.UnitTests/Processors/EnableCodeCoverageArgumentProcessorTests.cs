@@ -73,7 +73,7 @@ namespace vstest.console.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldCreateEntryForCodeCoverageInRunSettingsIfNotAlreadyPresent()
+        public void InitializeShouldNotCreateEntryForCodeCoverageInRunSettingsIfNotAlreadyPresent()
         {
             var runsettingsString = string.Format(DefaultRunSettings, "");
             var runsettings = new RunSettings();
@@ -84,11 +84,27 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsFalse(dataCollectorsFriendlyNames.Contains("Code Coverage"), "Code coverage setting in not avilabe in runsettings");
+        }
+
+        [TestMethod]
+        public void ExecuteShouldCreateEntryForCodeCoverageInRunSettingsIfNotAlreadyPresent()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.executor.Initialize(string.Empty);
+            this.executor.Execute();
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            var dataCollectorsFriendlyNames = XmlRunSettingsUtilities.GetDataCollectorsFriendlyName(this.settingsProvider.ActiveRunSettings.SettingsXml);
             Assert.IsTrue(dataCollectorsFriendlyNames.Contains("Code Coverage"), "Code coverage setting in not avilabe in runsettings");
         }
 
         [TestMethod]
-        public void InitializeShouldEnableCodeCoverageIfDisabledInRunSettings()
+        public void ExecuteShouldEnableCodeCoverageIfDisabledInRunSettings()
         {
             var runsettingsString = string.Format(DefaultRunSettings, "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" />");
             var runsettings = new RunSettings();
@@ -96,12 +112,13 @@ namespace vstest.console.UnitTests.Processors
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
             this.executor.Initialize(string.Empty);
+            this.executor.Execute();
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
-        public void InitializeShouldNotDisableOtherDataCollectors()
+        public void ExecuteShouldNotDisableOtherDataCollectors()
         {
             CollectArgumentExecutor.EnabledDataCollectors.Add("mydatacollector1");
             var runsettingsString = string.Format(DefaultRunSettings, "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />");
@@ -110,12 +127,13 @@ namespace vstest.console.UnitTests.Processors
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
             this.executor.Initialize(string.Empty);
+            this.executor.Execute();
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
-        public void InitializeShouldNotEnableOtherDataCollectors()
+        public void ExecuteShouldNotEnableOtherDataCollectors()
         {
             var runsettingsString = string.Format(DefaultRunSettings, "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />");
             var runsettings = new RunSettings();
@@ -123,6 +141,7 @@ namespace vstest.console.UnitTests.Processors
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
             this.executor.Initialize(string.Empty);
+            this.executor.Execute();
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }

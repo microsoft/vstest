@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ResultsDirectoryArgumentProcessorCapabilities();
             Assert.AreEqual("/ResultsDirectory", capabilities.CommandName);
-            Assert.AreEqual("--ResultsDirectory|/ResultsDirectory\n      Test results directory will be created in specified path if not exists.\n      Example  /ResultsDirectory:<pathToResultsDirectory>", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--ResultsDirectory|/ResultsDirectory\r\n      Test results directory will be created in specified path if not exists.\r\n      Example  /ResultsDirectory:<pathToResultsDirectory>", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ResultsDirectoryArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -126,20 +126,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
+        public void ExecuteShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
         {
             var relativePath = @".\relative\path";
             var absolutePath = Path.GetFullPath(relativePath);
             this.executor.Initialize(relativePath);
+            this.executor.Execute();
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
             Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
+        public void ExecuteShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
             var absolutePath = @"c:\Users\someone\testresults";
             this.executor.Initialize(absolutePath);
+            this.executor.Execute();
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
             Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
@@ -151,6 +153,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
+            var relativePath = @".\relative\path";
+            var absolutePath = Path.GetFullPath(relativePath);
+            this.executor.Initialize(relativePath);
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }
 
