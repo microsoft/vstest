@@ -397,9 +397,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns></returns>
         public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
-            var logFileName = @"C:\Users\samadala\AppData\Local\Temp\accep\vstest" + Guid.NewGuid().ToString() + ".txt";
-            Console.WriteLine("Log file name: " + logFileName);
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath(), new ConsoleParameters { LogFilePath = logFileName });
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
