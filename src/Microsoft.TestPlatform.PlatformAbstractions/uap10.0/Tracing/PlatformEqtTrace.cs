@@ -64,7 +64,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
-            LogFile = Path.GetTempPath() + Path.GetFileNameWithoutExtension(customLogFile).Replace(" ", "_") + ".TpTrace.log";
+            // Generate log file name using a GUID, as Path.GetFileNameWithoutExtension is throwing exception
+            LogFile = Path.GetTempPath() + Guid.NewGuid().ToString() + ".TpTrace.log";
             TraceLevel = PlatformTraceLevel.Verbose;
 
             return this.TraceInitialized();
