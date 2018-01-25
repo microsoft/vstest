@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             HelpArgumentProcessorCapabilities capabilities = new HelpArgumentProcessorCapabilities();
             Assert.AreEqual("/Help", capabilities.CommandName);
-            Assert.AreEqual("-?|--Help|/?|/Help\r\n      Display this usage message.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("-?|--Help|/?|/Help\n      Display this usage message.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.HelpArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsTrue(output.Lines.Contains("Arguments:"));
             Assert.IsTrue(output.Lines.Contains("Options:"));
             Assert.IsTrue(output.Lines.Contains("Description: Runs tests from the specified files."));
-            Assert.IsTrue(output.Lines.Contains("  To run tests:\r\n    >vstest.console.exe tests.dll \r\n  To run tests with additional settings such as  data collectors:\r\n    >vstest.console.exe  tests.dll /Settings:Local.RunSettings"));
+            Assert.IsTrue(output.Lines.Contains("  To run tests:\n    >vstest.console.exe tests.dll \n  To run tests with additional settings such as  data collectors:\n    >vstest.console.exe  tests.dll /Settings:Local.RunSettings"));
         }
     }
 
