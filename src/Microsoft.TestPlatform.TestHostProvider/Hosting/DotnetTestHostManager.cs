@@ -365,7 +365,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 EqtTrace.Verbose("DotnetTestHostmanager: Reading file {0} to get path of testhost.dll", depsFilePath);
 
                 // Get testhost relative path
-                using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open))
+                using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open, FileAccess.Read))
                 {
                     var context = new DependencyContextJsonReader().Read(stream);
                     var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
@@ -391,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 // Get probing path
-                using (StreamReader file = new StreamReader(this.fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open)))
+                using (StreamReader file = new StreamReader(this.fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open, FileAccess.Read)))
                 using (JsonTextReader reader = new JsonTextReader(file))
                 {
                     JObject context = (JObject)JToken.ReadFrom(reader);
