@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
@@ -19,6 +20,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class SocketClient : ICommunicationEndPoint
     {
+        /// <summary>
+        /// Time for which the client wait for executor/runner process to start, and host server
+        /// </summary>
+        private const int CONNECTIONRETRYTIMEOUT = 50 * 1000;
+
         private readonly CancellationTokenSource cancellation;
         private readonly TcpClient tcpClient;
         private readonly Func<Stream, ICommunicationChannel> channelFactory;
@@ -56,8 +62,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("Waiting for connecting to server");
             }
 
-            // Don't start if the endPoint port is zero
-            this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port).ContinueWith(this.OnServerConnected);
+            Task connectionTask = null;
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            // It is possible that first ConnectAsync call could not connect to server, so do a repoll to connect to server for 50secs
+            do
+            {
+                try
+                {
+                    connectionTask = this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port);
+                    connectionTask.Wait();
+                }
+                catch (Exception ex)
+                {
+                    EqtTrace.Verbose("Connection Failed with error {0}, retrying", ex.Message);
+                }
+            }
+            while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);
+
+            this.OnServerConnected(connectionTask);
+
             return ipEndPoint.ToString();
         }
 
@@ -75,9 +101,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             if (this.Connected != null)
             {
-                if (connectAsyncTask.IsFaulted)
+                if (connectAsyncTask.IsFaulted || !this.tcpClient.Connected)
                 {
-                    this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: ServerConnected");
+                    this.Disconnected.SafeInvoke(this, new DisconnectedEventArgs { Error = connectAsyncTask.Exception }, "SocketClient: ServerDisconnected");
                     if (EqtTrace.IsVerboseEnabled)
                     {
                         EqtTrace.Verbose("Unable to connect to server, Exception occured : {0}", connectAsyncTask.Exception);
