@@ -4,7 +4,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
-
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
@@ -183,6 +183,38 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Verify.
             Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--telemetryoptedin false"));
+        }
+
+        [TestMethod]
+        public void LaunchProcessWithDebuggerAttachedShouldUpdateEnvironmentVariables()
+        {
+            // Setup
+            var mockRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            TestProcessStartInfo launchedStartInfo = null;
+            mockRunEventsHandler.Setup(runHandler => runHandler.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback
+                ((TestProcessStartInfo startInfo) => { launchedStartInfo = startInfo; });
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
+            var testProcessStartInfo = new TestProcessStartInfo
+            {
+                Arguments = string.Empty,
+                EnvironmentVariables = new Dictionary<string, string>
+                {
+                    {"variable1", "value1" },
+                    {"variable2", "value2" }
+                }
+            };
+
+            // Act.
+            proxyExecutionManager.StartTestRun(mockTestRunCriteria.Object, mockRunEventsHandler.Object);
+            proxyExecutionManager.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
+
+            // Verify.
+            Assert.IsTrue(launchedStartInfo != null, "Failed to get the startinfo");
+            foreach(var envVaribale in testProcessStartInfo.EnvironmentVariables)
+            {
+                Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
+            }
         }
     }
 
