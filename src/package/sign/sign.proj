@@ -120,6 +120,38 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.ArchitectureTools.PEReader.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TraceDataCollector.dll" />
+
+      <!-- CUIT related dlls -->
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Measurement.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Sqm.dll" />
+      <!-- This is already signed -->
+      <!--AssembliesToSign Include="$(ArtifactsDirectory)Interop.UIAutomationClient.dll" /-->
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.ShDocVw.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.OLE.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.UITesting.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)UIAComwrapper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
