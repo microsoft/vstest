@@ -399,9 +399,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 case TestOutcome.Passed:
                     {
                         testsPassed++;
+                        if (verbosityLevel == Verbosity.Quiet)
+                        {
+                            break;
+                        }
+
                         var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, testDisplayName);
                         Output.Information(false, output);
-
                         if (verbosityLevel == Verbosity.Detailed)
                         {
                             DisplayFullInformation(e.Result);
