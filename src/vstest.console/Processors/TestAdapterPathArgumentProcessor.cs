@@ -227,8 +227,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
 
                     customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
-
-                    this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
                 }
                 catch (Exception e)
                 {
@@ -236,6 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
                 }
 
+                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
                 this.commandLineOptions.TestAdapterPath = customAdaptersPath;
             }
 
