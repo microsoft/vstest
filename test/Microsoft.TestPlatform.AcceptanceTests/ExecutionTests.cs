@@ -217,7 +217,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings.SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
+            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings. SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
