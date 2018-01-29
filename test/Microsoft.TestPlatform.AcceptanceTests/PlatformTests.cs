@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        [DoNotParallelize]
         public void RunTestExecutionWithPlatformx64(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -38,7 +37,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        [DoNotParallelize]
         public void RunTestExecutionWithPlatformx86(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

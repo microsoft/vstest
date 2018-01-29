@@ -67,7 +67,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        [DoNotParallelize]
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -161,7 +160,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        [DoNotParallelize]
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
