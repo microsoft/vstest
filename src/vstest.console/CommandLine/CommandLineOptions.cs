@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     /// <summary>
     /// Provides access to the command-line options.
     /// </summary>
-    public class CommandLineOptions
+    internal class CommandLineOptions
     {
         #region Constants/Readonly 
         

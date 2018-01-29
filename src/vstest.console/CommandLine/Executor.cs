@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     /// <summary>
     /// Performs the execution based on the arguments provided.
     /// </summary>
-    public class Executor
+    internal class Executor
     {
         private ITestPlatformEventSource testPlatformEventSource;
         private bool showHelp;
