@@ -115,6 +115,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
     }
     #endregion
 
@@ -151,6 +154,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
     }
     #endregion
 
@@ -188,6 +194,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
 
         private class NullMessageLogger : IMessageLogger
         {
@@ -231,6 +240,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
     }
     #endregion
 }

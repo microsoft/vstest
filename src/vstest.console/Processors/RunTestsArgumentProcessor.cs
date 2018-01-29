@@ -177,6 +177,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
         }
 
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
+
         private bool RunTests(IEnumerable<string> sources)
         {
             // create/start test run

@@ -126,20 +126,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
+        public void ExecuteShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
         {
             var relativePath = @".\relative\path";
             var absolutePath = Path.GetFullPath(relativePath);
             this.executor.Initialize(relativePath);
+            this.executor.Execute();
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
             Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
+        public void ExecuteShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
             var absolutePath = @"c:\Users\someone\testresults";
             this.executor.Initialize(absolutePath);
+            this.executor.Execute();
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
             Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
@@ -151,6 +153,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
+            var relativePath = @".\relative\path";
+            var absolutePath = Path.GetFullPath(relativePath);
+            this.executor.Initialize(relativePath);
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }
 

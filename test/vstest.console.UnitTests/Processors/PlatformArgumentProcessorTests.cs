@@ -99,17 +99,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsArchitecture()
+        public void ExecuteShouldSetCommandLineOptionsArchitecture()
         {
             this.executor.Initialize("x64");
+            this.executor.Execute();
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
             Assert.AreEqual(ObjectModel.Architecture.X64.ToString(), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
-        public void InitializeShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
+        public void ExecuteShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
         {
             executor.Initialize("ArM");
+            this.executor.Execute();
             Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
             Assert.AreEqual(ObjectModel.Architecture.ARM.ToString(), this.runSettingsProvider.QueryRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath));
         }

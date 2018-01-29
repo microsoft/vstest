@@ -75,9 +75,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetParallelValue()
+        public void ExecuteShouldSetParallelValue()
         {
             this.executor.Initialize(null);
+            executor.Execute();
             Assert.IsTrue(CommandLineOptions.Instance.Parallel, "Parallel option must be set to true.");
             Assert.AreEqual("0", this.runSettingsProvider.QueryRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath));
         }

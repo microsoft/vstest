@@ -128,6 +128,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             var args = new List<string>();
 
+            if (!string.IsNullOrWhiteSpace(parameters.OtherConsoleArguments))
+            {
+                args.Add(parameters.OtherConsoleArguments);
+            }
+
             // Start Vstest.console.exe with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
             args.Add(string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId));
             args.Add(string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber));

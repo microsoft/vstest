@@ -26,5 +26,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             Assert.IsTrue(result.StartsWith("\""));
         }
+
+        [TestMethod]
+        public void OtherConsoleArgumentsShouldPersistValue()
+        {
+            var sut = new ConsoleParameters();
+
+            sut.OtherConsoleArguments = "/framework:4.5 /logger:trx";
+
+            Assert.AreEqual("/framework:4.5 /logger:trx", sut.OtherConsoleArguments);
+        }
+
+        [TestMethod]
+        public void OtherConsoleArgumentsShouldPersistEmptyValue()
+        {
+            var sut = new ConsoleParameters();
+
+            sut.OtherConsoleArguments = string.Empty;
+
+            Assert.AreEqual(string.Empty, sut.OtherConsoleArguments);
+        }
     }
 }

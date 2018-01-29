@@ -194,7 +194,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             this.commandLineOptions.EnableCodeCoverage = true;
+        }
 
+        /// <inheritdoc />
+        public ArgumentProcessorResult Execute()
+        {
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
             CollectArgumentExecutor.AddDataCollectorFriendlyName(FriendlyName);
             try
@@ -206,13 +210,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new SettingsException(
                     string.Format(CultureInfo.CurrentCulture, "{0} {1}", ObjectModel.Resources.CommonResources.MalformedRunSettingsFile, e.Message), e);
             }
+
+            return ArgumentProcessorResult.Success;
         }
 
         /// <inheritdoc />
-        public ArgumentProcessorResult Execute()
-        {
-            return ArgumentProcessorResult.Success;
-        }
+        public bool LazyExecuteInDesignMode => true;
 
         /// <summary>
         /// Updates with code coverage settings if not configured.

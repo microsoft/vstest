@@ -119,7 +119,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.InIsolation = true;
-            this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
         }
 
         /// <summary>
@@ -127,9 +126,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         public ArgumentProcessorResult Execute()
         {
+
+            this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
+
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => false;
 
         #endregion
     }

@@ -101,6 +101,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
 
+        private Architecture architecture;
+
         #endregion
 
         #region Constructor
@@ -142,8 +144,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (validPlatform)
             {
+                this.architecture = platform;
                 this.commandLineOptions.TargetArchitecture = platform;
-                this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
             else
             {
@@ -163,8 +165,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
         public ArgumentProcessorResult Execute()
         {
+            this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, this.architecture.ToString());
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }

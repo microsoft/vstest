@@ -125,6 +125,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private readonly char[] argumentSeparators = new [] { ';' };
 
+        private List<string> arguments = new List<string>(); 
+
         #endregion
 
         #region Constructor
@@ -154,61 +156,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            string invalidAdapterPathArgument = argument;
-
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
             }
 
-            string customAdaptersPath;
 
-            try
-            {
-                var testAdapterPaths = new List<string>();
-                var testAdapterFullPaths = new List<string>();
-                
-                // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
-                // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
-                // Remove leading and trailing ' " ' chars...
-                argument = argument.Trim().Trim(new char[] { '\"' });
-
-                // Get testadapter paths from RunSettings.
-                var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
-
-                if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
-                {
-                    testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
-                }
-                
-                testAdapterPaths.AddRange(SplitPaths(argument));
-                
-                foreach (var testadapterPath in testAdapterPaths)
-                {
-                    // TestAdaptersPaths could contain environment variables
-                    var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
-
-                    if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
-                    {
-                        invalidAdapterPathArgument = testadapterPath;
-                        throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
-                    }
-
-                    testAdapterFullPaths.Add(testAdapterFullPath);
-                }
-
-                customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
-
-                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
-            }
-            catch (Exception e)
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
-            }
-
-            this.commandLineOptions.TestAdapterPath = customAdaptersPath;
+            this.arguments.Add(argument);
         }
 
         /// <summary>
@@ -232,9 +187,63 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
         public ArgumentProcessorResult Execute()
         {
+            foreach (var argument in this.arguments)
+            {
+                string invalidAdapterPathArgument = argument;
+                string customAdaptersPath;
+
+                try
+                {
+                    var testAdapterPaths = new List<string>();
+                    var testAdapterFullPaths = new List<string>();
+
+                    // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
+                    // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
+                    // Remove leading and trailing ' " ' chars...
+                    var arg = argument.Trim().Trim(new char[] { '\"' });
+
+                    // Get testadapter paths from RunSettings.
+                    var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
+
+                    if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
+                    {
+                        testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
+                    }
+
+                    testAdapterPaths.AddRange(SplitPaths(arg));
+
+                    foreach (var testadapterPath in testAdapterPaths)
+                    {
+                        // TestAdaptersPaths could contain environment variables
+                        var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
+
+                        if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
+                        {
+                            invalidAdapterPathArgument = testadapterPath;
+                            throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
+                        }
+
+                        testAdapterFullPaths.Add(testAdapterFullPath);
+                    }
+
+                    customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
+                }
+                catch (Exception e)
+                {
+                    throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
+                }
+
+                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
+                this.commandLineOptions.TestAdapterPath = customAdaptersPath;
+            }
+
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }

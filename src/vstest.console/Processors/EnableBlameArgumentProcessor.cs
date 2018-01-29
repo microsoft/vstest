@@ -128,7 +128,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Add Blame Logger
             this.loggerManager.UpdateLoggerList(BlameFriendlyName, BlameFriendlyName, null);
+        }
 
+        /// <summary>
+        /// Executes the argument processor.
+        /// </summary>
+        /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
+        public ArgumentProcessorResult Execute()
+        {
             // Add Blame Data Collector
             CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);
 
@@ -171,26 +178,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             outernode.AppendChild(node);
             node.InnerText = resultsDirectory;
 
-            foreach(var item in dataCollectionRunSettings.DataCollectorSettingsList)
+            foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
             {
-                if( item.FriendlyName.Equals(BlameFriendlyName))
+                if (item.FriendlyName.Equals(BlameFriendlyName))
                 {
                     item.Configuration = outernode;
                 }
             }
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
-        }
 
-        /// <summary>
-        /// Executes the argument processor.
-        /// </summary>
-        /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
-        public ArgumentProcessorResult Execute()
-        {
             // Nothing to do since we updated the logger and data collector list in initialize
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }

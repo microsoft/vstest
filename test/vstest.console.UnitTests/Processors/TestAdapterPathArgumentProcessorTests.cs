@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldThrowIfPathDoesNotExist()
+        public void ExecuteShouldThrowIfPathDoesNotExist()
         {
             var mockRunSettingsProvider = new Mock<IRunSettingsProvider>();
             var mockOutput = new Mock<IOutput>();
@@ -145,6 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             try
             {
                 executor.Initialize(folder);
+                executor.Execute();
             }
             catch (Exception ex)
             {
@@ -157,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldUpdateTestAdapterPathInRunSettings()
+        public void ExecuteShouldUpdateTestAdapterPathInRunSettings()
         {
             RunSettingsManager.Instance.AddDefaultRunSettings();
 
@@ -168,6 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
 
             executor.Initialize(currentFolder);
+            executor.Execute();
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(currentFolder, runConfiguration.TestAdaptersPaths);
         }
@@ -186,6 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
             executor.Initialize("c:\\users");
+            executor.Execute();
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             Assert.AreEqual("d:\\users;f:\\users;c:\\users", runConfiguration.TestAdaptersPaths);
         }
@@ -209,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldMergeMultipleTestAdapterPathsWithPathsInRunSettings()
+        public void ExecuteShouldMergeMultipleTestAdapterPathsWithPathsInRunSettings()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
             var runSettings = new RunSettings();
@@ -222,12 +225,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
             executor.Initialize("c:\\users;e:\\users");
+            executor.Execute();
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             Assert.AreEqual("d:\\users;f:\\users;c:\\users;e:\\users", runConfiguration.TestAdaptersPaths);
         }
 
         [TestMethod]
-        public void InitializeShouldHonorEnvironmentVariablesInTestAdapterPaths()
+        public void ExecuteShouldHonorEnvironmentVariablesInTestAdapterPaths()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>%temp%\\adapters1</TestAdaptersPaths></RunConfiguration></RunSettings>";
             var runSettings = new RunSettings();
@@ -240,6 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
             executor.Initialize("%temp%\\adapters2");
+            executor.Execute();
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
 
             var tempPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables("%temp%"));
@@ -247,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldAddRightAdapterPathInErrorMessage()
+        public void ExecuteShouldAddRightAdapterPathInErrorMessage()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
             var runSettings = new RunSettings();
@@ -269,6 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             try
             {
                 executor.Initialize("c:\\users");
+                executor.Execute();
             }
             catch (Exception ex)
             {
@@ -281,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldTrimTrailingAndLeadingDoubleQuotes()
+        public void ExecuteShouldTrimTrailingAndLeadingDoubleQuotes()
         {
             var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
             var runSettings = new RunSettings();
@@ -294,6 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
             executor.Initialize("\"c:\\users\"");
+            executor.Execute();
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             Assert.AreEqual("d:\\users;c:\\users", runConfiguration.TestAdaptersPaths);
 

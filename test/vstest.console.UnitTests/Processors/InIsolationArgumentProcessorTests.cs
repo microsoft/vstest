@@ -68,9 +68,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetInIsolationValue()
+        public void ExecuteShouldSetInIsolationValue()
         {
             this.executor.Initialize(null);
+            executor.Execute();
             Assert.IsTrue(CommandLineOptions.Instance.InIsolation, "InProcess option must be set to true.");
             Assert.AreEqual("true", this.runSettingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }

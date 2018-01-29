@@ -131,9 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidParallelCommand, argument));
             }
-
-            commandLineOptions.Parallel = true;
-            this.runSettingsManager.UpdateRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath, "0");
         }
 
         /// <summary>
@@ -142,8 +139,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
         public ArgumentProcessorResult Execute()
         {
+            commandLineOptions.Parallel = true;
+            this.runSettingsManager.UpdateRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath, "0");
+
             return ArgumentProcessorResult.Success;
         }
+
+        /// <inheritdoc />
+        public bool LazyExecuteInDesignMode => true;
 
         #endregion
     }
