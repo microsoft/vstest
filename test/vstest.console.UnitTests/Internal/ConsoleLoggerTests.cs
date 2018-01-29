@@ -191,6 +191,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void NormalVerbosityShowNotStdOutMessagesForPassedTests()
+        {
+            // Setup
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
+
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Passed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
+        }
+
+        [TestMethod]
+        public void DetailedVerbosityShowStdOutMessagesForPassedTests()
+        {
+            // Setup
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "detailed" }
+            };
+
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase)
+            {
+                Outcome = TestOutcome.Passed
+            };
+
+            testresult.Messages.Add(testResultMessage);
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Act. Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
         public void TestResultHandlerShouldNotShowStdOutMessagesBannerIfStdOutIsEmpty()
         {
             var parameters = new Dictionary<string, string>();
