@@ -105,6 +105,79 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private static string codeCoverageCollectorSettingsTemplate =
 @"      <DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=15.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
+@"        <Configuration>" + Environment.NewLine +
+@"          <CodeCoverage>" + Environment.NewLine +
+@"            <ModulePaths>" + Environment.NewLine +
+@"              <Exclude>" + Environment.NewLine +
+@"                 <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*testhost.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*datacollector.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*qtagent32.*</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*msvcr.*dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*msvcp.*dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*clr.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*clr.ni.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*clrjit.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*clrjit.ni.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*mscoree.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*mscoreei.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*mscoreei.ni.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*mscorlib.dll$</ModulePath>" + Environment.NewLine +
+@"                 <ModulePath>.*mscorlib.ni.dll$</ModulePath>" + Environment.NewLine +
+@"               </Exclude>" + Environment.NewLine +
+@"            </ModulePaths>" + Environment.NewLine +
+@"            <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>" + Environment.NewLine +
+@"            <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>" + Environment.NewLine +
+@"            <CollectFromChildProcesses>True</CollectFromChildProcesses>" + Environment.NewLine +
+@"            <CollectAspDotNet>false</CollectAspDotNet>" + Environment.NewLine +
+@"            <SymbolSearchPaths />" + Environment.NewLine +
+@"            <Functions>" + Environment.NewLine +
+@"              <Exclude>" + Environment.NewLine +
+@"                <Function>^std::.*</Function>" + Environment.NewLine +
+@"                <Function>^ATL::.*</Function>" + Environment.NewLine +
+@"                <Function>.*::__GetTestMethodInfo.*</Function>" + Environment.NewLine +
+@"                <Function>.*__CxxPureMSILEntry.*</Function>" + Environment.NewLine +
+@"                <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>" + Environment.NewLine +
+@"                <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>" + Environment.NewLine +
+@"                <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>" + Environment.NewLine +
+@"                <Function>^__.*</Function>" + Environment.NewLine +
+@"                <Function>.*::__.*</Function>" + Environment.NewLine +
+@"              </Exclude>" + Environment.NewLine +
+@"            </Functions>" + Environment.NewLine +
+@"            <Attributes>" + Environment.NewLine +
+@"              <Exclude>" + Environment.NewLine +
+@"                <Attribute>^System.Diagnostics.DebuggerHidden.*</Attribute>" + Environment.NewLine +
+@"                <Attribute>^System.Diagnostics.DebuggerNonUserCode.*</Attribute>" + Environment.NewLine +
+@"                <Attribute>^System.Runtime.CompilerServices.CompilerGenerated.*</Attribute>" + Environment.NewLine +
+@"                <Attribute>^System.CodeDom.Compiler.GeneratedCode.*</Attribute>" + Environment.NewLine +
+@"                <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage.*</Attribute>" + Environment.NewLine +
+@"              </Exclude>" + Environment.NewLine +
+@"            </Attributes>" + Environment.NewLine +
+@"            <Sources>" + Environment.NewLine +
+@"              <Exclude>" + Environment.NewLine +
+@"                <Source>.*\\atlmfc\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\vctools\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\public\\sdk\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\externalapis\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\microsoft sdks\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\vc\\include\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\msclr\\.*</Source>" + Environment.NewLine +
+@"                <Source>.*\\ucrt\\.*</Source>" + Environment.NewLine +
+@"              </Exclude>" + Environment.NewLine +
+@"            </Sources>" + Environment.NewLine +
+@"            <CompanyNames/>" + Environment.NewLine +
+@"            <PublicKeyTokens/>" + Environment.NewLine +
+@"          </CodeCoverage>" + Environment.NewLine +
+@"        </Configuration>" + Environment.NewLine +
 @"      </DataCollector>";
 
         #endregion
