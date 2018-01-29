@@ -1,35 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- Package dependency versions -->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
   </PropertyGroup>
+  <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
+
   <PropertyGroup>
-    <OutputType>library</OutputType>
+    <AssemblyName>CUITTestProject</AssemblyName>
     <TargetFrameworks>net451</TargetFrameworks>
-    <AssemblyName>MstestV1UnitTestProject</AssemblyName>
+    <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
   </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework" />
+    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common" />
+    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension" />
+    <Reference Include="Microsoft.VisualStudio.TestTools.UITesting" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.cuit">
+      <Version>15.6.0-preview-1329213</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>15.5.0-preview-1046721</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="MstestV1UnitTestProjectTestSettings.testsettings">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="MixedTests.orderedtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
