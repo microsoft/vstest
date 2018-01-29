@@ -15,7 +15,7 @@
     <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
 
     <NUnit3FrameworkVersion>3.9.0-dev-04564</NUnit3FrameworkVersion>
-    <NUnit3AdapterVersion>3.9.0</NUnit3AdapterVersion>
+    <NUnit3AdapterVersion>3.10.0-dev-00671</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0-dev-03796</NUnitConsoleRunnerVersion>
     
     <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
