@@ -3,9 +3,6 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-// To run acceptance tests in parallel
-// [assembly: Parallelize(Workers = 0, Scope = ExecutionScope.ClassLevel)]
-
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
