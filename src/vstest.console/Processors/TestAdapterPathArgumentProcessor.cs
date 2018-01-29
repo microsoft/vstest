@@ -125,7 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private readonly char[] argumentSeparators = new [] { ';' };
 
-        private string argument;
+        private List<string> arguments = new List<string>(); 
 
         #endregion
 
@@ -156,13 +156,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            this.argument = argument;
-
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
             }
+
+
+            this.arguments.Add(argument);
         }
 
         /// <summary>
@@ -186,54 +187,57 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
         public ArgumentProcessorResult Execute()
         {
-            string invalidAdapterPathArgument = argument;
-            string customAdaptersPath;
-
-            try
+            foreach (var argument in this.arguments)
             {
-                var testAdapterPaths = new List<string>();
-                var testAdapterFullPaths = new List<string>();
+                string invalidAdapterPathArgument = argument;
+                string customAdaptersPath;
 
-                // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
-                // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
-                // Remove leading and trailing ' " ' chars...
-                argument = argument.Trim().Trim(new char[] { '\"' });
-
-                // Get testadapter paths from RunSettings.
-                var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
-
-                if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
+                try
                 {
-                    testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
-                }
+                    var testAdapterPaths = new List<string>();
+                    var testAdapterFullPaths = new List<string>();
 
-                testAdapterPaths.AddRange(SplitPaths(argument));
+                    // VSTS task add double quotes around TestAdapterpath. For example if user has given TestAdapter path C:\temp,
+                    // Then VSTS task will add TestAdapterPath as "/TestAdapterPath:\"C:\Temp\"".
+                    // Remove leading and trailing ' " ' chars...
+                    var arg = argument.Trim().Trim(new char[] { '\"' });
 
-                foreach (var testadapterPath in testAdapterPaths)
-                {
-                    // TestAdaptersPaths could contain environment variables
-                    var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
+                    // Get testadapter paths from RunSettings.
+                    var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
 
-                    if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
+                    if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
                     {
-                        invalidAdapterPathArgument = testadapterPath;
-                        throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
+                        testAdapterPaths.AddRange(SplitPaths(testAdapterPathsInRunSettings));
                     }
 
-                    testAdapterFullPaths.Add(testAdapterFullPath);
+                    testAdapterPaths.AddRange(SplitPaths(arg));
+
+                    foreach (var testadapterPath in testAdapterPaths)
+                    {
+                        // TestAdaptersPaths could contain environment variables
+                        var testAdapterFullPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(testadapterPath));
+
+                        if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
+                        {
+                            invalidAdapterPathArgument = testadapterPath;
+                            throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
+                        }
+
+                        testAdapterFullPaths.Add(testAdapterFullPath);
+                    }
+
+                    customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
+
+                    this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
+                }
+                catch (Exception e)
+                {
+                    throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
                 }
 
-                customAdaptersPath = string.Join(";", testAdapterFullPaths.Distinct().ToArray());
-
-                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
+                this.commandLineOptions.TestAdapterPath = customAdaptersPath;
             }
-            catch (Exception e)
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
-            }
-
-            this.commandLineOptions.TestAdapterPath = customAdaptersPath;
 
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
