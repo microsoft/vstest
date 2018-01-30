@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
-    
+
     /// <summary>
     /// The test session message logger.
     /// </summary>
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Gets the instance of the singleton.
         /// </summary>
-        internal static TestSessionMessageLogger Instance
+        public static TestSessionMessageLogger Instance
         {
             get
             {

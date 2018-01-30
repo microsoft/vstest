@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
@@ -20,8 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -39,8 +40,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private ITestPlatform testPlatform;
 
         private CommandLineOptions commandLineOptions;
-
-        private TestLoggerManager testLoggerManager;
 
         private ITestPlatformEventSource testPlatformEventSource;
 
@@ -74,7 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             : this(
                   CommandLineOptions.Instance,
                   TestPlatformFactory.GetTestPlatform(),
-                  TestLoggerManager.Instance,
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
                   new InferHelper(new AssemblyMetadataProvider()),
@@ -82,24 +80,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
-            this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
             this.testPlatformEventSource = testPlatformEventSource;
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
-
-            // Always enable logging for discovery or run requests
-            this.testLoggerManager.EnableLogging();
-
-            if (!this.commandLineOptions.IsDesignMode)
-            {
-                var consoleLogger = new ConsoleLogger();
-                this.testLoggerManager.AddLogger(consoleLogger, ConsoleLogger.ExtensionUri, null);
-            }
         }
 
         #endregion
@@ -186,7 +174,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 {
                     try
                     {
-                        this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
                         discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
 
                         this.testPlatformEventSource.DiscoveryRequestStart();
@@ -199,7 +186,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     finally
                     {
-                        this.testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
                         discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
                     }
                 }
@@ -210,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     ex is SettingsException ||
                     ex is InvalidOperationException)
                 {
-                    LoggerUtilities.RaiseTestRunError(testLoggerManager, null, ex);
+                    ConsoleLogger.RaiseTestRunError(null, ex);
                     success = false;
                 }
                 else
@@ -407,7 +393,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
-                        LoggerUtilities.RaiseTestRunWarning(this.testLoggerManager, this.testRunResultAggregator, incompatibleSettingWarning);
+                        ConsoleLogger.RaiseTestRunWarning(this.testRunResultAggregator, incompatibleSettingWarning);
                     }
 
                     if (EqtTrace.IsInfoEnabled)
@@ -437,11 +423,58 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
+                    var designMode = runConfiguration.DesignModeSet ?
+                        runConfiguration.DesignMode :
+                        this.commandLineOptions.IsDesignMode;
+
+                    if (!designMode)
+                    {
+                        AddOrUpdateConsoleLogger(document, runsettingsXml);
+                        settingsUpdated = true;
+                    }
+
                     updatedRunSettingsXml = navigator.OuterXml;
                 }
             }
 
             return settingsUpdated;
+        }
+
+        private void AddOrUpdateConsoleLogger(XmlDocument document, string runsettingsXml)
+        {
+            // Check if logger already exists in run settings.
+            var dummyConsoleLogger = new LoggerSettings
+            {
+                FriendlyName = ConsoleLogger.FriendlyName,
+                Uri = new Uri(ConsoleLogger.ExtensionUri)
+            };
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
+            var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(dummyConsoleLogger);
+
+            var consoleLogger = default(LoggerSettings);
+            if (existingLoggerIndex >= 0)
+            {
+                // Update assemblyQualifiedName and codeBase of existing logger.
+                consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
+                consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
+                consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
+            }
+            else
+            {
+                // Create new console logger if doesn't exists.
+                consoleLogger = new LoggerSettings
+                {
+                    FriendlyName = ConsoleLogger.FriendlyName,
+                    Uri = new Uri(ConsoleLogger.ExtensionUri),
+                    AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName,
+                    CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location,
+                    IsEnabled = true
+                };
+
+                loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
+            }
+
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
         }
 
         private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
@@ -459,7 +492,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
                     this.runRequestCreatedEventHandle.Set();
 
-                    this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
                     this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
 
@@ -477,7 +509,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         ex is SettingsException ||
                         ex is InvalidOperationException)
                     {
-                        LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
+                        ConsoleLogger.RaiseTestRunError(this.testRunResultAggregator, ex);
                         success = false;
                     }
                     else
@@ -489,7 +521,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 {
                     if (this.currentTestRunRequest != null)
                     {
-                        this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
                         this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
                         testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
 

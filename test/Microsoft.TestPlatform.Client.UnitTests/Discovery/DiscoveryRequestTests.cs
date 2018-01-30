@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
     {
         DiscoveryRequest discoveryRequest;
         Mock<IProxyDiscoveryManager> discoveryManager;
+        private readonly Mock<ITestLoggerManager> loggerManager;
         DiscoveryCriteria discoveryCriteria;
         private Mock<IRequestData> mockRequestData;
         private Mock<IDataSerializer> mockDataSerializer;
@@ -34,10 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         {
             this.discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
+            this.loggerManager = new Mock<ITestLoggerManager>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.discoveryRequest = new DiscoveryRequest(this.mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object, this.mockDataSerializer.Object);
+            this.discoveryRequest = new DiscoveryRequest(this.mockRequestData.Object, this.discoveryCriteria, this.discoveryManager.Object, loggerManager.Object, this.mockDataSerializer.Object);
         }
 
         [TestMethod]
@@ -122,6 +124,54 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         }
 
         [TestMethod]
+        public void HandleDiscoveryCompleteShouldInvokeHandleDiscoveryCompleteOfLoggerManager()
+        {
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
+
+            loggerManager.Verify(lm => lm.HandleDiscoveryComplete(discoveryCompleteEventArgs), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldNotInvokeHandleDiscoveredTestsIfLastChunkNotPresent()
+        {
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
+
+            loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldInvokeHandleDiscoveredTestsIfLastChunkPresent()
+        {
+            var activeTestCases = new List<ObjectModel.TestCase>
+            {
+                new ObjectModel.TestCase(
+                    "A.C.M2",
+                    new Uri("executor://dummy"),
+                    "A")
+            };
+
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, activeTestCases);
+
+            loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldDisposeLoggerManager()
+        {
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
+            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
+
+            loggerManager.Verify(lm => lm.Dispose(), Times.Once);
+        }
+
+        [TestMethod]
         public void HandleDiscoveryCompleteShouldCloseDiscoveryManagerBeforeRaiseDiscoveryComplete()
         {
             var events = new List<string>();
@@ -150,6 +200,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 
             // Assert
             Assert.IsTrue(onDiscoveryStartHandlerCalled, "DiscoverAsync should invoke OnDiscoveryStart event");
+        }
+
+        [TestMethod]
+        public void DiscoverAsyncShouldInvokeHandleDiscoveryStartofLoggerManager()
+        {
+            // Action
+            this.discoveryRequest.DiscoverAsync();
+
+            // Assert
+            loggerManager.Verify(lm => lm.HandleDiscoveryStart(It.IsAny<DiscoveryStartEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveredTestsShouldInvokeHandleDiscoveredTestsOfLoggerManager()
+        {
+            discoveryRequest.HandleDiscoveredTests(null);
+
+            loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Once);
         }
 
         [TestMethod]

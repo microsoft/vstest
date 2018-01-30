@@ -475,5 +475,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
         #endregion
+
+        /// <summary>
+        /// Raises test run errors occured before console logger starts listening error events.
+        /// </summary>
+        /// <param name="testRunResultAggregator"></param>
+        /// <param name="exception"></param>
+        public static void RaiseTestRunError(TestRunResultAggregator testRunResultAggregator, Exception exception)
+        {
+            if (Output == null)
+            {
+                Output = ConsoleOutput.Instance;
+            }
+
+            // testRunResultAggregator can be null, if error is being raised in discovery context.
+            testRunResultAggregator?.MarkTestRunFailed();
+
+            Output.Error(ConsoleLogger.AppendPrefix, exception.Message);
+
+            // Send inner exception only when its message is different to avoid duplicate.
+            if (exception is TestPlatformException &&
+                exception.InnerException != null &&
+                string.Compare(exception.Message, exception.InnerException.Message, StringComparison.CurrentCultureIgnoreCase) != 0)
+            {
+                Output.Error(ConsoleLogger.AppendPrefix, exception.InnerException.Message);
+            }
+        }
+
+        /// <summary>
+        /// Raises test run warning occured before console logger starts listening warning events.
+        /// </summary>
+        /// <param name="testRunResultAggregator"></param>
+        /// <param name="warningMessage"></param>
+        public static void RaiseTestRunWarning(TestRunResultAggregator testRunResultAggregator, string warningMessage)
+        {
+            if (ConsoleLogger.Output == null)
+            {
+                ConsoleLogger.Output = ConsoleOutput.Instance;
+            }
+
+            Output.Warning(ConsoleLogger.AppendPrefix, warningMessage);
+        }
     }
 }
