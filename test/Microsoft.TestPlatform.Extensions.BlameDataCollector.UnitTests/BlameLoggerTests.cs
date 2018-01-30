@@ -26,7 +26,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private Mock<TestLoggerEvents> events;
         private Mock<IOutput> mockOutput;
         private Mock<IBlameReaderWriter> mockBlameReaderWriter;
-        private TestLoggerManager testLoggerManager;
         private BlameLogger blameLogger;
 
         /// <summary>
@@ -40,14 +39,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockOutput = new Mock<IOutput>();
             this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
             this.blameLogger = new TestableBlameLogger(this.mockOutput.Object, this.mockBlameReaderWriter.Object);
-
-            // Create Instance of TestLoggerManager
-            this.testLoggerManager = new TestableTestLoggerManager();
-            this.testLoggerManager.AddLogger(this.blameLogger, BlameLogger.ExtensionUri, null);
-            this.testLoggerManager.EnableLogging();
-
-            // Register TestRunRequest object
-            this.testLoggerManager.RegisterTestRunEvents(this.testRunRequest.Object);
         }
 
         /// <summary>
@@ -59,19 +50,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 this.blameLogger.Initialize(null, string.Empty);
-            });
-        }
-
-        /// <summary>
-        /// The test result complete handler should throw exception if event args is null.
-        /// </summary>
-        [TestMethod]
-        public void TestResultCompleteHandlerShouldThrowExceptionIfEventArgsIsNull()
-        {
-            // Raise an event on mock object
-            Assert.ThrowsException<NullReferenceException>(() =>
-            {
-                this.testRunRequest.Raise(m => m.OnRunCompletion += null, default(TestRunCompleteEventArgs));
             });
         }
 
@@ -100,13 +78,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void TestRunCompleteHandlerShouldNotReadFileIfTestRunNotAborted()
         {
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            this.blameLogger.Initialize(loggerEvents, null);
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
-            this.testRunRequest.Raise(
-                m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0)));
+            loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
@@ -123,12 +101,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var attachmentSetList = new List<AttachmentSet> { attachmentSet };
 
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            this.blameLogger.Initialize(loggerEvents, null);
 
             // Setup and Raise event
-            this.testRunRequest.Raise(
-                m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+            loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
@@ -154,7 +132,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             }
 
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            this.blameLogger.Initialize(loggerEvents, null);
 
             var testCaseList =
                     new List<TestCase>
@@ -165,26 +145,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
-            this.testRunRequest.Raise(
-               m => m.OnRunCompletion += null,
-               new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+            loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Exactly(count));
-        }
-
-        /// <summary>
-        /// The testable test logger manager.
-        /// </summary>
-        internal class TestableTestLoggerManager : TestLoggerManager
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TestableTestLoggerManager"/> class.
-            /// </summary>
-            internal TestableTestLoggerManager()
-                : base(TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
-            {
-            }
         }
 
         /// <summary>

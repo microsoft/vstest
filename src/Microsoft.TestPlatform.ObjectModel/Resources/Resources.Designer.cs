@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -325,6 +325,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Invalid URI &apos;{0}&apos; in settings &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidUriInSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidUriInSettings", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Invalid data collector settings. Expected attribute &apos;{0}&apos; is missing.  A typical data collector setting would look like &lt;DataCollector uri=&quot;dataCollector://Samples/SampleCollector/1.0&quot; assemblyQualifiedName=&quot;Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111&quot; friendlyName=&quot;sampleCollector&quot;&gt;..
         /// </summary>
         internal static string MissingDataCollectorAttributes {
@@ -332,7 +343,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("MissingDataCollectorAttributes", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid settings &apos;{0}&apos;. Expected atleast one of the XmlAttribute among friendlyName, uri and assemblyQualifiedName..
+        /// </summary>
+        internal static string MissingLoggerAttributes
+        {
+            get
+            {
+                return ResourceManager.GetString("MissingLoggerAttributes", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources..
         /// </summary>

@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.Common.UnitTests.Logging
+namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
+    using global::TestPlatform.Common.UnitTests.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class TestLoggerExtensionManagerTests
