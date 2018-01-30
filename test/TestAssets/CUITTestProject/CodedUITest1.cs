@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace BlameUnitTestProject
+namespace CodedUITestProject
 {
     using System;
 	using System.Collections.Generic;
@@ -11,8 +11,6 @@ namespace BlameUnitTestProject
 	using Microsoft.VisualStudio.TestTools.UITesting;
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using Microsoft.VisualStudio.TestTools.UITest.Extension;
-	using Keyboard = Microsoft.VisualStudio.TestTools.UITesting.Keyboard;
-	using System.Threading;
 
     [CodedUITest]
     public class CodedUITestProject
