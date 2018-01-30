@@ -26,10 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.cuit">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>15.6.0-preview-1329213</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>$(TestPlatformExternalsVersion)</Version>
+      <Version>15.6.0-preview-1329213</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
