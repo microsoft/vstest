@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     };
                 }
 
-                // Converting logger cosole params to Configuration element
+                // Converting logger console params to Configuration element
                 if (parameters != null && parameters.Count > 0)
                 {
                     var XmlDocument = new XmlDocument();
@@ -213,8 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
 
                 // Remove existing logger.
-                var existingLoggerIndex = LoggerUtilities.GetExistingLoggerIndex(logger.FriendlyName, logger.Uri,
-                    loggerRunSettings.LoggerSettingsList);
+                var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
                 if (existingLoggerIndex > 0)
                 {
                     loggerRunSettings.LoggerSettingsList.RemoveAt(existingLoggerIndex);
@@ -244,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Execute.
+        /// Execute logger argument.
         /// </summary>
         /// <returns>
         /// The <see cref="ArgumentProcessorResult"/>.

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
@@ -13,9 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Reflection;
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -32,12 +30,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// Responsible for managing logger extensions and broadcasting results
     /// and error/warning/informational messages to them.
     /// </summary>
-    internal class TestLoggerManager : ITestLoggerManager, IDisposable
+    internal class TestLoggerManager : ITestLoggerManager
     {
-        #region Fields
-
-        private static readonly object Synclock = new object();
-        protected List<LoggerInfo> loggersInfoList = new List<LoggerInfo>();
+        #region FieldsLog
 
         /// <summary>
         /// Test Logger Events instance which will be passed to loggers when they are initialized.
@@ -54,12 +49,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         private bool isDisposed = false;
 
-        ///// <summary>
-        ///// Run request that we have registered for events on.  Used when
-        ///// disposing to unregister for the events.
-        ///// </summary>
-        //private ITestRunRequest runRequest = null;
-
         /// <summary>
         /// Message logger.
         /// </summary>
@@ -71,7 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IRequestData requestData;
 
         private TestLoggerExtensionManager testLoggerExtensionManager;
-        //private IDiscoveryRequest discoveryRequest;
 
         /// <summary>
         /// AssemblyLoadContext for current platform
@@ -154,17 +142,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region Public Methods
 
         /// <summary>
-        /// Update the logger list which will later use to initialize it.
-        /// </summary>
-        /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
-        /// <param name="loggerIdentifier">friendly name of the logger</param>
-        /// <param name="parameters">parameter passed to logger</param>
-        public void UpdateLoggerList(string argument, string loggerIdentifier, Dictionary<string, string> parameters)
-        {
-            this.loggersInfoList.Add(new LoggerInfo(argument, loggerIdentifier, parameters));
-        }
-
-        /// <summary>
         /// Initializes all the loggers passed by user
         /// </summary>
         public void Initialize(string runSettings)
@@ -176,33 +153,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             foreach (var logger in loggers?.LoggerSettingsList ?? Enumerable.Empty<LoggerSettings>())
             {
+                // Dont add logger if its disabled.
                 if (!logger.IsEnabled)
                 {
-                    // Dont add logger if its disabled.
                     continue;
                 }
 
                 var parameters = GetParametersFromConfigurationElement(logger.Configuration);
                 var loggerInitialized = false;
 
+                // Try initializing logger by type.
                 if (!string.IsNullOrWhiteSpace(logger.AssemblyQualifiedName))
                 {
-                    loggerInitialized = AddLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase, parameters);
+                    loggerInitialized = InitializeLoggerByType(logger.AssemblyQualifiedName, logger.CodeBase, parameters);
                 }
 
+                // Try initializing logger by uri.
                 if (!loggerInitialized &&
                     !string.IsNullOrWhiteSpace(logger.Uri?.ToString()))
                 {
-                    loggerInitialized = AddLogger(logger.Uri, parameters);
+                    loggerInitialized = InitializeLoggerByUri(logger.Uri, parameters);
                 }
 
+                // Try initializing logger by friendly name.
                 if (!loggerInitialized &&
                     TryGetUriFromFriendlyName(logger.FriendlyName, out var loggerUri) &&
                     loggerUri != null)
                 {
-                    loggerInitialized = AddLogger(loggerUri, parameters);
+                    loggerInitialized = InitializeLoggerByUri(loggerUri, parameters);
                 }
 
+                // Output error if logger is not initialized.
                 if (!loggerInitialized)
                 {
                     var value = !string.IsNullOrWhiteSpace(logger.AssemblyQualifiedName)
@@ -211,8 +192,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             ? logger.Uri.ToString()
                             : logger.FriendlyName;
 
-                    EqtTrace.Error(
-                        String.Format(
+                    throw new InvalidLoggerException(
+                        string.Format(
                             CultureInfo.CurrentUICulture,
                             CommonResources.LoggerNotFound,
                             value));
@@ -234,42 +215,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Add and initialize the logger with the given parameters
-        /// </summary>
-        /// <param name="logger">The logger that needs to be initialized</param>
-        /// <param name="extensionUri">URI of the logger</param>
-        /// <param name="parameters">Logger parameters</param>
-        public bool AddLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
-        {
-            this.CheckDisposed();
-
-            // If the logger has already been initialized just return.
-            if (this.initializedLoggers.Contains(logger.GetType()))
-            {
-                EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.GetType());
-                return false;
-            }
-            var initialized = InitializeLogger(logger, extensionUri, parameters);
-
-            if (initialized)
-            {
-                this.initializedLoggers.Add(logger.GetType());
-            }
-
-            return initialized;
-        }
-
-        /// <summary>
-        /// Adds the logger with the specified URI and parameters.
+        /// Initializes logger with the specified URI and parameters.
         /// For ex. TfsPublisher takes parameters such as  Platform, Flavor etc.
         /// </summary>
         /// <param name="uri">URI of the logger to add.</param>
         /// <param name="parameters">Logger parameters.</param>
+        /// <returns>Logger Initialized flag.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Case insensitive needs to be supported "), SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Third party loggers could potentially throw all kinds of exceptions.")]
-        public bool AddLogger(Uri uri, Dictionary<string, string> parameters)
+        public bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
         {
             ValidateArg.NotNull<Uri>(uri, "uri");
-
             this.CheckDisposed();
 
             // Look up the extension and initialize it if one is found.
@@ -278,11 +233,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (logger == null)
             {
-                EqtTrace.Error(
-                    String.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.LoggerNotFound,
-                        uri.OriginalString));
                 return false;
             }
 
@@ -290,11 +240,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             if (this.initializedLoggers.Contains(logger.Value.GetType()))
             {
                 EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.Value.GetType());
-                return false;
+                return true;
             }
 
+            // Initialize logger.
             var initialized = InitializeLogger(logger.Value, logger.Metadata.ExtensionUri, parameters);
 
+            // Add logger in initializedLoggers list.
             if (initialized)
             {
                 this.initializedLoggers.Add(logger.Value.GetType());
@@ -304,71 +256,77 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Add logger by type.
+        /// Initialize logger with the specified type and parameters.
         /// </summary>
-        /// <param name="assemblyQualifiedName"></param>
-        /// <param name="codeBase"></param>
-        /// <param name="parameters"></param>
-        /// <returns>Returns true if initialized successfully.</returns>
-        private bool AddLoggerByType(string assemblyQualifiedName, string codeBase, Dictionary<string, string> parameters)
+        /// <param name="assemblyQualifiedName">Assembly qualified name.</param>
+        /// <param name="codeBase">Code base.</param>
+        /// <param name="parameters">Logger parameters.</param>
+        /// <returns>Logger Initialized flag.</returns>
+        private bool InitializeLoggerByType(string assemblyQualifiedName, string codeBase, Dictionary<string, string> parameters)
         {
             this.CheckDisposed();
-            Assembly assembly = null;
             try
             {
-                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error(
-                    "TestLoggerManager: Error occured while loading the Logger assembly : {0} , Exception Details : {1}", codeBase, ex);
-                return false;
-            }
+                // Load logger assembly.
+                Assembly assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
+                var loggerType =
+                    assembly?.GetTypes()
+                        .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName));
 
-            var loggerType =
-                assembly?.GetTypes()
-                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName));
-
-            object logger = null;
-
-            try
-            {
+                // Create logger instance
                 var constructorInfo = loggerType?.GetConstructor(Type.EmptyTypes);
-                logger = constructorInfo?.Invoke(new object[] { });
+                var logger = constructorInfo?.Invoke(new object[] { });
+
+                // Handle logger null scenario.
+                if (logger == null)
+                {
+                    return false;
+                }
+
+                // If the logger has already been initialized just return.
+                if (this.initializedLoggers.Contains(logger.GetType()))
+                {
+                    EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.GetType());
+                    return true;
+                }
+
+                // Get Logger instance and initialize.
+                var initialized = InitializeLogger(logger, null, parameters);
+
+                // Add logger in initializedLoggers list.
+                if (initialized)
+                {
+                    this.initializedLoggers.Add(logger.GetType());
+                }
+
+                return initialized;
             }
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "TestLoggerManager: Error occured while creating logger instance: {0} , Exception Details : {1}", loggerType, ex);
+                    "TestLoggerManager: Error occured while initializing the Logger assemblyQualifiedName : {0}, codeBase : {1} , Exception Details : {2}", assemblyQualifiedName, codeBase, ex);
                 return false;
             }
+        }
 
+        private bool InitializeLogger(object logger, string extensionUri, Dictionary<string, string> parameters)
+        {
             if (logger == null)
             {
-                EqtTrace.Error(
-                    "TestLoggerManager: Unable to find Logger with assemblyQualifieldName: {0}, CodeBase : {1}", assemblyQualifiedName, codeBase);
                 return false;
             }
 
-            // If the logger has already been initialized just return.
-            if (this.initializedLoggers.Contains(logger.GetType()))
-            {
-                EqtTrace.Verbose("TestLoggerManager: Skipping duplicate logger initialization: {0}", logger.GetType());
-                return false;
-            }
-
-            // Get Logger instance and initialize.
             try
             {
                 switch (logger)
                 {
                     case ITestLoggerWithParameters _:
-                        ((ITestLoggerWithParameters) logger).Initialize(loggerEvents,
+                        ((ITestLoggerWithParameters)logger).Initialize(loggerEvents,
                             UpdateLoggerParameters(parameters));
                         break;
 
                     case ITestLogger _:
-                        ((ITestLogger) logger).Initialize(loggerEvents,
+                        ((ITestLogger)logger).Initialize(loggerEvents,
                             GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
                         break;
 
@@ -382,46 +340,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}", logger.GetType(), ex);
+                    "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}",
+                    string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri, ex);
 
                 this.messageLogger.SendMessage(
                     TestMessageLevel.Error,
                     string.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.LoggerInitializationError,
-                        "type",
-                        logger.GetType(),
+                        string.IsNullOrEmpty(extensionUri) ? "type" : "uri",
+                        string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri,
                         ex));
-                return false;
-            }
-
-            this.initializedLoggers.Add(logger.GetType());
-            return true;
-        }
-
-        private bool InitializeLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
-        {
-            try
-            {
-                if (logger is ITestLoggerWithParameters)
-                {
-                    ((ITestLoggerWithParameters)logger).Initialize(this.loggerEvents, this.UpdateLoggerParameters(parameters));
-                }
-                else
-                {
-                    ((ITestLogger)logger).Initialize(this.loggerEvents, this.GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
-                }
-            }
-            catch (Exception e)
-            {
-                this.messageLogger.SendMessage(
-                    TestMessageLevel.Error,
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CommonResources.LoggerInitializationError,
-                        "uri",
-                        extensionUri,
-                        e));
                 return false;
             }
 
@@ -447,13 +376,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
                     catch (UriFormatException)
                     {
-                        EqtTrace.Error(
+                        loggerUri = null;
+
+                        throw new InvalidLoggerException(
                             string.Format(
                                 CultureInfo.CurrentUICulture,
                                 CommonResources.LoggerUriInvalid,
                                 extension.Metadata.ExtensionUri));
-                        loggerUri = null;
-                        return false;
                     }
 
                     return true;
@@ -665,28 +594,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         #endregion
-
-        /// <summary>
-        /// Class to store logger information
-        /// </summary>
-        protected class LoggerInfo
-        {
-            public string argument;
-            public string loggerIdentifier;
-            public Dictionary<string, string> parameters = new Dictionary<string, string>();
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="LoggerInfo"/> class.
-            /// </summary>
-            /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
-            /// <param name="loggerIdentifier">friendly name of the logger</param>
-            /// <param name="parameters">parameter passed to logger</param>
-            public LoggerInfo(string argument, string loggerIdentifier, Dictionary<string, string> parameters)
-            {
-                this.argument = argument;
-                this.loggerIdentifier = loggerIdentifier;
-                this.parameters = parameters;
-            }
-        }
     }
 }

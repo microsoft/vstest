@@ -62,44 +62,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorInitializeWithValidArgumentsShouldAddOnlyConsoleLoggerToTestLoggerManager()
-        {
-            RunTestsArgumentProcessorTests.SetupMockExtensions();
-            var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-
-            //var countBefore = testloggerManager.GetInitializedLoggers.Count;
-
-            executor.Initialize("TestLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
-            //var countAfter = testloggerManager.GetInitializedLoggers.Count;
-            //Assert.IsTrue(countBefore == 0);
-            //Assert.IsTrue(countAfter == 0);
-
-            executor.Initialize("console;verbosity=minimal");
-            //countAfter = testloggerManager.GetInitializedLoggers.Count;
-            //Assert.IsTrue(countAfter == 1);
-        }
-
-        [TestMethod]
-        public void ExecutorInitializeWithValidArgumentsOtherThanConsoleLoggerShouldGetStoreInLoggerList()
-        {
-            var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-
-            executor.Initialize("DummyLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
-
-            //Assert.IsTrue(testloggerManager.LoggerExist("DummyLoggerExtension"));
-        }
-
-        [TestMethod]
-        public void ExecutorInitializeWithValidArgumentsShouldAddConsoleloggerToTestLoggerManager()
-        {
-            RunTestsArgumentProcessorTests.SetupMockExtensions();
-            var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-
-            executor.Initialize("console;verbosity=minimal");
-            //Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/ConsoleLogger/v1"));
-        }
-
-        [TestMethod]
         public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed()
         {
             var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);

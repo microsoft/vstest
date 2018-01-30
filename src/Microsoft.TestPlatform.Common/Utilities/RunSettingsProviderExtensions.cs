@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         public static void UpdateRunSettingsXmlDocumentInnerXml(XmlDocument xmlDocument, string key, string data)
         {
-            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
+            var node = GetXmlNode(xmlDocument, key) ?? CreateNode(xmlDocument, key);
             node.InnerXml = data;
         }
 

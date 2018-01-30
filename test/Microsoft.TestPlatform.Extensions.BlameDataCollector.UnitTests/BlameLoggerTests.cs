@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.Collections.ObjectModel;
 
     using Microsoft.TestPlatform.Extensions.BlameDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -38,14 +39,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockOutput = new Mock<IOutput>();
             this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
             this.blameLogger = new TestableBlameLogger(this.mockOutput.Object, this.mockBlameReaderWriter.Object);
-
-            // Create Instance of TestLoggerManager
-            // this.testLoggerManager = new TestableTestLoggerManager();
-            // this.testLoggerManager.AddLogger(this.blameLogger, BlameLogger.ExtensionUri, null);
-            // this.testLoggerManager.EnableLogging();
-
-            // Register TestRunRequest object
-            // this.testLoggerManager.RegisterTestRunEvents(this.testRunRequest.Object);
         }
 
         /// <summary>
@@ -61,25 +54,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The test result complete handler should throw exception if event args is null.
-        /// </summary>
-        [TestMethod]
-        public void TestResultCompleteHandlerShouldThrowExceptionIfEventArgsIsNull()
-        {
-            // Raise an event on mock object
-            // Assert.ThrowsException<NullReferenceException>(() =>
-            // {
-            //     this.testRunRequest.Raise(m => m.OnRunCompletion += null, default(TestRunCompleteEventArgs));
-            // });
-        }
-
-        /// <summary>
         /// The test run complete handler should get faulty test run if test run aborted.
         /// </summary>
         [TestMethod]
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAborted()
         {
-            // this.InitializeAndVerify(1);
+            this.InitializeAndVerify(1);
         }
 
         /// <summary>
@@ -88,7 +68,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAbortedForMultipleProjects()
         {
-            // this.InitializeAndVerify(2);
+            this.InitializeAndVerify(2);
         }
 
         /// <summary>
@@ -98,13 +78,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void TestRunCompleteHandlerShouldNotReadFileIfTestRunNotAborted()
         {
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            this.blameLogger.Initialize(loggerEvents, null);
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
-            this.testRunRequest.Raise(
-                m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0)));
+            loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
@@ -121,12 +101,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var attachmentSetList = new List<AttachmentSet> { attachmentSet };
 
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            this.blameLogger.Initialize(loggerEvents, null);
 
             // Setup and Raise event
-            this.testRunRequest.Raise(
-                m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+            loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
@@ -152,7 +132,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             }
 
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            this.blameLogger.Initialize(loggerEvents, null);
 
             var testCaseList =
                     new List<TestCase>
@@ -163,9 +145,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
-            this.testRunRequest.Raise(
-               m => m.OnRunCompletion += null,
-               new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+            loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Exactly(count));

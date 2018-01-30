@@ -185,5 +185,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return settings;
         }
+
+        /// <summary>
+        /// Gets existing logger index.
+        /// </summary>
+        /// <param name="loggerSettings">Logger settings.</param>
+        /// <returns>Index of given logger settings.</returns>
+        public int GetExistingLoggerIndex(LoggerSettings loggerSettings)
+        {
+            var existingLoggerIndex = -1;
+
+            for (int i = 0; i < LoggerSettingsList.Count; i++)
+            {
+                var logger = LoggerSettingsList[i];
+
+                if (logger.FriendlyName != null &&
+                    loggerSettings.FriendlyName != null &&
+                    logger.FriendlyName.Equals(loggerSettings.FriendlyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    existingLoggerIndex = i;
+                    break;
+                }
+
+                if (logger.Uri?.ToString() != null &&
+                    loggerSettings.Uri?.ToString() != null &&
+                    logger.Uri.ToString().Equals(loggerSettings.Uri.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    existingLoggerIndex = i;
+                    break;
+                }
+            }
+
+            return existingLoggerIndex;
+        }
     }
 }

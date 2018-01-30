@@ -296,13 +296,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             AddNodeIfNotPresent<string>(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
         }
 
-        public static void UpdateLoggerRunSettings(XmlDocument xmlDocument, string loggerRunSettings)
-        {
-            // TODO: No need for entry here. move to testrequestmanager.
-            var nodePath = @"/RunSettings/LoggerRunSettings";
-            XmlUtilities.AppendOrModifyChild(xmlDocument, nodePath, "LoggerRunSettings", loggerRunSettings);
-        }
-
         public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, out String deviceXml)
         {
             ValidateArg.NotNull(runSettingsNavigator, "runSettingsNavigator");

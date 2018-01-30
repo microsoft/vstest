@@ -3,13 +3,15 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
+    using System;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// Orchestrates logger operations for this engine.
     /// </summary>
-    public interface ITestLoggerManager
+    public interface ITestLoggerManager : IDisposable
     {
         /// <summary>
         /// Initialize loggers.
@@ -63,10 +65,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="e"></param>
         void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e);
-
-        /// <summary>
-        /// Dispose logger manager.
-        /// </summary>
-        void Dispose();
     }
 }

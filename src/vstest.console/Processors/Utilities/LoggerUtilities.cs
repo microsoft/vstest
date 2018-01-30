@@ -59,40 +59,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
             return parseSucceeded;
         }
-
-        /// <summary>
-        /// Gets existing logger index.
-        /// </summary>
-        /// <param name="friendlyName"></param>
-        /// <param name="uri"></param>
-        /// <param name="loggerSettingsList"></param>
-        /// <returns></returns>
-        public static int GetExistingLoggerIndex(string friendlyName, Uri uri, Collection<LoggerSettings> loggerSettingsList)
-        {
-            var oldLoggerIndex = -1;
-
-            for (int i = 0; i < loggerSettingsList.Count; i++)
-            {
-                var logger = loggerSettingsList[i];
-
-                if (logger.FriendlyName != null &&
-                    friendlyName != null &&
-                    logger.FriendlyName.Equals(friendlyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    oldLoggerIndex = i;
-                    break;
-                }
-
-                if (logger.Uri?.ToString() != null &&
-                    uri?.ToString() != null &&
-                    logger.Uri.ToString().Equals(uri.ToString(), StringComparison.OrdinalIgnoreCase))
-                {
-                    oldLoggerIndex = i;
-                    break;
-                }
-            }
-
-            return oldLoggerIndex;
-        }
     }
 }

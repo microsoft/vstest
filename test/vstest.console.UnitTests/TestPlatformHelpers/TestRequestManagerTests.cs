@@ -45,7 +45,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     public class TestRequestManagerTests
     {
         private DummyLoggerEvents mockLoggerEvents;
-        private TestLoggerManager mockLoggerManager;
         private CommandLineOptions commandLineOptions;
         private Mock<ITestPlatform> mockTestPlatform;
         private Mock<IOutput> mockOutput;
@@ -70,7 +69,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public TestRequestManagerTests()
         {
             this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-            this.mockLoggerManager = new DummyTestLoggerManager(this.mockLoggerEvents);
             this.commandLineOptions = new DummyCommandLineOptions();
             this.mockOutput = new Mock<IOutput>();
             this.mockTestPlatform = new Mock<ITestPlatform>();
@@ -109,13 +107,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         {
             CommandLineOptions.Instance.Reset();
         }
-
+        
         [TestMethod]
         public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
         {
             CommandLineOptions.Instance.IsDesignMode = true;
             this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-            this.mockLoggerManager = new DummyTestLoggerManager(this.mockLoggerEvents);
             var requestManager = new TestRequestManager(CommandLineOptions.Instance,
                 new Mock<ITestPlatform>().Object,
                 TestRunResultAggregator.Instance,

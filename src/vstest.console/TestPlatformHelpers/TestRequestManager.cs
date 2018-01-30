@@ -442,19 +442,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private void AddOrUpdateConsoleLogger(XmlDocument document, string runsettingsXml)
         {
+            // Check if logger already exists in run settings.
+            var dummyConsoleLogger = new LoggerSettings
+            {
+                FriendlyName = ConsoleLogger.FriendlyName,
+                Uri = new Uri(ConsoleLogger.ExtensionUri)
+            };
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
-            var existingLoggerIndex = LoggerUtilities.GetExistingLoggerIndex(ConsoleLogger.FriendlyName, new Uri(ConsoleLogger.ExtensionUri),
-                loggerRunSettings.LoggerSettingsList);
+            var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(dummyConsoleLogger);
 
             var consoleLogger = default(LoggerSettings);
             if (existingLoggerIndex > 0)
             {
+                // Update assemblyQualifiedName and codeBase of existing logger.
                 consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
                 consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
                 consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
             }
             else
             {
+                // Create new console logger if doesn't exists.
                 consoleLogger = new LoggerSettings
                 {
                     FriendlyName = ConsoleLogger.FriendlyName,
