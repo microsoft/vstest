@@ -116,8 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             ValidateArg.NotNull<Uri>(extensionUri, "extensionUri");
 
-            LazyExtension<TExtension, TMetadata> testExtension;
-            this.TestExtensionByUri.TryGetValue(extensionUri, out testExtension);
+            this.TestExtensionByUri.TryGetValue(extensionUri, out var testExtension);
 
             return testExtension;
         }

@@ -102,18 +102,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
-        <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
-        <target state="translated">初始化 URI 为“{0}”的记录器时发生异常。将不会使用该记录器。异常: {1}</target>
-        <note />
+        <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
+        <target state="new">初始化 URI 为“{0}”的记录器时发生异常。将不会使用该记录器。异常: {1}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">初始化记录器与 URI"{0} 时出现异常。 将不使用的记录器。 异常︰ {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="LoggerNotFound">
-        <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="translated">找不到 URI 或 FriendlyName 为“{0}”的测试记录器。</target>
-        <note />
+        <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
+        <target state="new">找不到 URI 或 FriendlyName 为“{0}”的测试记录器。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">找不到测试记录器与 URI 或友好名称"{0}。</target>
         </alt-trans>

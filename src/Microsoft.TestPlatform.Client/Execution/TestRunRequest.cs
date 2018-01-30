@@ -70,16 +70,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// </summary>
         private IRequestData requestData;
 
-        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager) :
-            this(requestData, testRunCriteria, executionManager, JsonDataSerializer.Instance)
+        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, ITestLoggerManager loggerManager) :
+            this(requestData, testRunCriteria, executionManager, loggerManager, JsonDataSerializer.Instance)
         {
         }
 
-        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, IDataSerializer dataSerializer)
+        internal TestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager, ITestLoggerManager loggerManager, IDataSerializer dataSerializer)
         {
             Debug.Assert(testRunCriteria != null, "Test run criteria cannot be null");
             Debug.Assert(executionManager != null, "ExecutionManager cannot be null");
             Debug.Assert(requestData != null, "request Data is null");
+            Debug.Assert(loggerManager != null, "LoggerManager cannot be null");
 
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -88,6 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             this.testRunCriteria = testRunCriteria;
             this.ExecutionManager = executionManager;
+            this.LoggerManager = loggerManager;
             this.State = TestRunState.Pending;
             this.dataSerializer = dataSerializer;
             this.requestData = requestData;
@@ -158,7 +160,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Start the stop watch for calculating the test run time taken overall
                     this.runRequestTimeTracker.Start();
-                    this.OnRunStart.SafeInvoke(this, new TestRunStartEventArgs(this.testRunCriteria), "TestRun.TestRunStart");
+                    var testRunStartEvent = new TestRunStartEventArgs(this.testRunCriteria);
+                    this.OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
+                    this.LoggerManager.HandleTestRunStart(testRunStartEvent);
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
 
                     if (EqtTrace.IsInfoEnabled)
@@ -340,6 +344,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             get; private set;
         }
 
+        /// <summary>
+        /// Logger manager.
+        /// </summary>
+        internal ITestLoggerManager LoggerManager
+        {
+            get; private set;
+        }
+
         #endregion
 
         #region IDisposable implementation
@@ -402,6 +414,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     {
                         // Raised the changed event also                         
                         this.OnRunStatsChange.SafeInvoke(this, lastChunkArgs, "TestRun.RunStatsChanged");
+                        this.LoggerManager.HandleTestRunStatsChange(lastChunkArgs);
                     }
 
                     TestRunCompleteEventArgs runCompletedEvent =
@@ -418,6 +431,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // by either engines - as both calculate at different points
                     // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
                     this.OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
+                    this.LoggerManager.HandleTestRunComplete(runCompletedEvent);
+                    this.LoggerManager.Dispose();
                 }
                 finally
                 {
@@ -491,6 +506,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // TODO: Invoke this event in a separate thread. 
                     // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
                     this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
+                    this.LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
                 }
 
                 EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
@@ -513,7 +529,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     return;
                 }
 
-                this.TestRunMessage.SafeInvoke(this, new TestRunMessageEventArgs(level, message), "TestRun.LogMessages");
+                var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+                this.TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
+                this.LoggerManager.HandleTestRunMessage(testRunMessageEvent);
             }
 
             EqtTrace.Info("TestRunRequest:SendTestRunMessage: Completed.");

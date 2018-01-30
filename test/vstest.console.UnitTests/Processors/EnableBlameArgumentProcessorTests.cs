@@ -15,14 +15,12 @@ namespace vstest.console.UnitTests.Processors
     {
         private TestableRunSettingsProvider settingsProvider;
         private EnableBlameArgumentExecutor executor;
-        private DummyTestLoggerManager testloggerManager;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors ></DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration><ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory></RunConfiguration>\r\n  </RunSettings>";
 
         public EnableBlameArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.testloggerManager = new DummyTestLoggerManager();
-            this.executor = new EnableBlameArgumentExecutor(this.settingsProvider,this.testloggerManager);
+            this.executor = new EnableBlameArgumentExecutor(this.settingsProvider);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
@@ -67,15 +65,7 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
-        }
-
-        [TestMethod]
-        public void ExecutorInitializeShouldAddBlameLoggerInLoggerList()
-        { 
-            executor.Initialize(String.Empty);
-
-            Assert.IsTrue(testloggerManager.LoggerExist("blame"));
+            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
     }
 }

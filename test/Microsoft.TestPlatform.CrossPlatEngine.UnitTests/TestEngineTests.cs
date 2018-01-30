@@ -491,5 +491,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
         }
+
+        /// <summary>
+        /// GetLoggerManager should return a non null instance.
+        /// </summary>
+        [TestMethod]
+        public void GetLoggerManagerShouldReturnNonNullInstance()
+        {
+            Assert.IsNotNull(this.testEngine.GetLoggerManager(mockRequestData.Object));
+        }
+
+        /// <summary>
+        /// GetLoggerManager should always return new instance of logger manager.
+        /// </summary>
+        [TestMethod]
+        public void GetLoggerManagerShouldAlwaysReturnNewInstance()
+        {
+            Assert.AreNotSame(this.testEngine.GetLoggerManager(mockRequestData.Object), this.testEngine.GetLoggerManager(mockRequestData.Object));
+        }
     }
 }
