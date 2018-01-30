@@ -11,6 +11,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -87,6 +88,31 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result.Value, typeof(ITestLogger));
+        }
+
+        [ExtensionUri("testlogger://logger")]
+        [FriendlyName("TestLoggerExtension")]
+        private class ValidLogger3 : ITestLogger
+        {
+            public void Initialize(TestLoggerEvents events, string testRunDirectory)
+            {
+                events.TestRunMessage += TestMessageHandler;
+                events.TestRunComplete += Events_TestRunComplete;
+                events.TestResult += Events_TestResult;
+            }
+
+            private void Events_TestResult(object sender, TestResultEventArgs e)
+            {
+            }
+
+            private void Events_TestRunComplete(object sender, TestRunCompleteEventArgs e)
+            {
+
+            }
+
+            private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+            {
+            }
         }
     }
 

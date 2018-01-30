@@ -31,8 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="requestData">The Request Data instance providing services and data for discovery</param>
         /// <param name="criteria">Discovery criterion.</param>
         /// <param name="discoveryManager">Discovery manager instance.</param>
-        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
-            : this(requestData, criteria, discoveryManager, JsonDataSerializer.Instance)
+        internal DiscoveryRequest(IRequestData requestData, DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager, ITestLoggerManager loggerManager)
+            : this(requestData, criteria, discoveryManager, loggerManager, JsonDataSerializer.Instance)
         {
         }
 
@@ -47,11 +47,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             IRequestData requestData,
             DiscoveryCriteria criteria,
             IProxyDiscoveryManager discoveryManager,
+            ITestLoggerManager loggerManager,
             IDataSerializer dataSerializer)
         {
             this.requestData = requestData;
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
+            this.LoggerManager = loggerManager;
             this.dataSerializer = dataSerializer;
         }
 
@@ -84,7 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, this.DiscoveryCriteria.Sources.Count());
 
                     // Invoke OnDiscoveryStart event
-                    this.OnDiscoveryStart.SafeInvoke(this, new DiscoveryStartEventArgs(this.DiscoveryCriteria), "DiscoveryRequest.DiscoveryStart");
+                    var discoveryStartEvent = new DiscoveryStartEventArgs(this.DiscoveryCriteria);
+                    this.OnDiscoveryStart.SafeInvoke(this, discoveryStartEvent, "DiscoveryRequest.DiscoveryStart");
+                    this.LoggerManager.HandleDiscoveryStart(discoveryStartEvent);
 
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
@@ -216,6 +220,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         internal IProxyDiscoveryManager DiscoveryManager { get; private set; }
 
+        /// <summary>
+        /// Logger manager.
+        /// </summary>
+        internal ITestLoggerManager LoggerManager { get; private set; }
+
         #region ITestDiscoveryEventsHandler2 Methods
 
         /// <inheritdoc/>
@@ -260,10 +269,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     // RS client is easier i.e. user does not have to listen on discovery complete event.)
                     if (lastChunk != null && lastChunk.Count() > 0)
                     {
-                        this.OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(lastChunk), "DiscoveryRequest.DiscoveryComplete");
+                        var discoveredTestsEvent = new DiscoveredTestsEventArgs(lastChunk);
+                        this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
+                        this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
                     }
 
                     this.OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
+                    this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
+                    this.LoggerManager.Dispose();
                 }
                 finally
                 {
@@ -329,7 +342,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     return;
                 }
 
-                this.OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(discoveredTestCases), "DiscoveryRequest.OnDiscoveredTests");
+                var discoveredTestsEvent = new DiscoveredTestsEventArgs(discoveredTestCases);
+                this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
+                this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -362,7 +377,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     return;
                 }
 
-                this.OnDiscoveryMessage.SafeInvoke(this, new TestRunMessageEventArgs(level, message), "DiscoveryRequest.OnTestMessageRecieved");
+                var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+                this.OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
+                this.LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
             }
 
             if (EqtTrace.IsInfoEnabled)

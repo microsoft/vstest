@@ -37,5 +37,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <returns>ITestExtensionManager object that helps with extensibility</returns>
         ITestExtensionManager GetExtensionManager();
+
+        /// <summary>
+        /// Fetches the logger manager for this engine. This manager will provide logger extensibility features that this engine supports.
+        /// </summary>
+        /// <param name="requestData">The request data for providing common execution services and data</param>
+        /// <returns>ITestLoggerManager object that helps with logger extensibility.</returns>
+        ITestLoggerManager GetLoggerManager(IRequestData requestData);
     }
 }
