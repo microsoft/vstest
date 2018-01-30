@@ -452,7 +452,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(dummyConsoleLogger);
 
             var consoleLogger = default(LoggerSettings);
-            if (existingLoggerIndex > 0)
+            if (existingLoggerIndex >= 0)
             {
                 // Update assemblyQualifiedName and codeBase of existing logger.
                 consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
