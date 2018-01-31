@@ -420,16 +420,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 case TestOutcome.Passed:
                     {
                         this.testsPassed++;
-                        if (this.verbosityLevel == Verbosity.Quiet)
+                        if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
-                            break;
-                        }
-
-                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, testDisplayName);
-                        Output.Information(false, output);
-                        if (this.verbosityLevel == Verbosity.Detailed)
-                        {
-                            DisplayFullInformation(e.Result);
+                            var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, testDisplayName);
+                            Output.Information(false, output);
+                            if (this.verbosityLevel == Verbosity.Detailed)
+                            {
+                                DisplayFullInformation(e.Result);
+                            }
                         }
 
                         break;
