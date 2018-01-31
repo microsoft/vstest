@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 else
                 {
                     // Inform the service about run cancellation
-                    this.ExecutionManager.Cancel();
+                    this.ExecutionManager.Cancel(this);
                 }
             }
 
@@ -275,7 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
                 else
                 {
-                    this.ExecutionManager.Abort();
+                    this.ExecutionManager.Abort(this);
                 }
             }
 
