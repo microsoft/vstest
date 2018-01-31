@@ -89,10 +89,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 4);
 
-            parallelExecutionManager.Abort();
+            parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Abort(), Times.Once));
+            createdMockManagers.ForEach(em => em.Verify(m => m.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once));
         }
 
         [TestMethod]
@@ -100,10 +100,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 4);
 
-            parallelExecutionManager.Cancel();
+            parallelExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Cancel(), Times.Once));
+            createdMockManagers.ForEach(em => em.Verify(m => m.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once));
         }
 
         [TestMethod]
@@ -215,7 +215,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.SetupMockManagers(this.processedSources, isCanceled: false, isAborted: false);
             SetupHandleTestRunComplete(this.executionCompleted);
 
-            parallelExecutionManager.Abort();
+            parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
             Task.Run(() => { parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object); });
 
             Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");

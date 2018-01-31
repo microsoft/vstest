@@ -31,12 +31,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Cancels the test run. On the test host, this will send a message to adapters.
         /// </summary>
-        void Cancel();
+        // <param name="eventHandler"> EventHandler for handling execution events from Engine. </param> 
+        void Cancel(ITestRunEventsHandler eventHandler);
 
         /// <summary>
         /// Aborts the test operation. This will forcefully terminate the test host.
         /// </summary>
-        void Abort();
+        // <param name="eventHandler"> EventHandler for handling execution events from Engine. </param> 
+        void Abort(ITestRunEventsHandler eventHandler);
 
         /// <summary>
         /// Closes the current test operation by sending a end session message.
