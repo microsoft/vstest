@@ -126,10 +126,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
 
-            Assert.ThrowsException<ArgumentNullException>( () =>
-            {
-                loggerEvents.RaiseTestRunMessage(default(TestRunMessageEventArgs));
-            });
+            Assert.ThrowsException<ArgumentNullException>(() =>
+           {
+               loggerEvents.RaiseTestRunMessage(default(TestRunMessageEventArgs));
+           });
         }
 
         [TestMethod]
@@ -206,12 +206,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         public void NormalVerbosityShowNotStdOutMessagesForPassedTests()
         {
             // Setup
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>
             {
                 { "verbosity", "normal" }
             };
 
-            this.consoleLogger.Initialize(this.events.Object, parameters);
+            this.consoleLogger.Initialize(loggerEvents, parameters);
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
             TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
@@ -220,11 +222,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             testresult.Outcome = TestOutcome.Passed;
             testresult.Messages.Add(testResultMessage);
 
-            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
-
             // Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
-            this.FlushLoggerMessages();
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
 
             // Verify
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
@@ -235,31 +234,125 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         public void DetailedVerbosityShowStdOutMessagesForPassedTests()
         {
             // Setup
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>
             {
                 { "verbosity", "detailed" }
             };
 
-            this.consoleLogger.Initialize(this.events.Object, parameters);
+            this.consoleLogger.Initialize(loggerEvents, parameters);
             var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
             string message = "Dummy message";
-            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
 
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
             var testresult = new ObjectModel.TestResult(testcase)
             {
                 Outcome = TestOutcome.Passed
             };
 
             testresult.Messages.Add(testResultMessage);
-            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
 
             // Act. Raise an event on mock object
-            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
-            this.FlushLoggerMessages();
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
 
             // Verify
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunErrorMessageShowShouldTestRunFailed()
+        {
+            // Setup
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "detailed" }
+            };
+
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+            string message = "Adapter Error";
+
+            // Act. Raise an event on mock object
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Error, message));
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void InQuietModeTestErrorMessageShowShouldShowTestRunFailed()
+        {
+            // Setup
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "quiet" }
+            };
+
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+            string message = "Adapter Error";
+
+            // Act. Raise an event on mock object
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Error, message));
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void InQuietModeTestWarningMessageShouldNotShow()
+        {
+            // Setup
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "quiet" }
+            };
+
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+            string message = "Adapter Warning";
+
+            // Act. Raise an event on mock object
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Warning, message));
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Warning), Times.Never());
+        }
+
+        [TestMethod]
+        public void InNormalModeTestWarningAndErrorMessagesShouldShow()
+        {
+            // Setup
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>
+            {
+                { "verbosity", "normal" }
+            };
+
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+            string message = "Adapter Warning";
+            string errorMessage = "Adapter Error";
+
+            // Act. Raise an event on mock object
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Warning, message));
+            loggerEvents.RaiseTestRunMessage(new TestRunMessageEventArgs(TestMessageLevel.Error, errorMessage));
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+
+            // Verify
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Warning), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(errorMessage, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -814,7 +907,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, "StandardErrorCategory"));
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, "AdditionalInfoCategory"));
             testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, "AnotherAdditionalInfoCategory"));
-            
+
             foreach (var testResult in testresults)
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
