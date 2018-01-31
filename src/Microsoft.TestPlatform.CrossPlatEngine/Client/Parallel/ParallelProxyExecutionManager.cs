@@ -120,16 +120,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             return this.StartTestRunPrivate(eventHandler);
         }
 
-        public void Abort()
+        public void Abort(ITestRunEventsHandler runEventsHandler)
         {
             // Test platform initiated abort.
             abortRequested = true;
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(runEventsHandler), doActionsInParallel: true);
         }
 
-        public void Cancel()
+        public void Cancel(ITestRunEventsHandler runEventsHandler)
         {
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(), doActionsInParallel: true);
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(runEventsHandler), doActionsInParallel: true);
         }
 
         public void Close()
