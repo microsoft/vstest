@@ -79,18 +79,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
     <RunSettings>     
       <RunConfiguration> 
-        <MaxCpuCount>0</MaxCpuCount>       
+        <MaxCpuCount>0</MaxCpuCount>
         <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>             
         <TargetPlatform> x64 </TargetPlatform>     
         <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
       </RunConfiguration>     
     </RunSettings> ";
 
-            RunSettings runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(runSettingsXml);
-
             var testLoggerManager = new DummyTestLoggerManager();
-            string result = testLoggerManager.GetResultsDirectory(runsettings);
+            string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
             Assert.AreEqual(string.Compare("DummyTestResultsFolder", result), 0);
         }
 
@@ -106,11 +103,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
       </RunConfiguration>     
     </RunSettings> ";
 
-            RunSettings runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(runSettingsXml);
-
             var testLoggerManager = new DummyTestLoggerManager();
-            string result = testLoggerManager.GetResultsDirectory(runsettings);
+            string result = testLoggerManager.GetResultsDirectory(runSettingsXml);
 
             Assert.AreEqual(string.Compare(Constants.DefaultResultsDirectory, result), 0);
         }
@@ -253,8 +247,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void AddLoggerShouldAddDefaultLoggerParameterForTestLoggerWithParameters()
         {
             ValidLoggerWithParameters.Reset();
-            var testLoggerManager = new DummyTestLoggerManager();
-            testLoggerManager.InitializeLoggerByUri(new Uri("test-logger-with-parameter://logger"), new Dictionary<string, string>());
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <RunConfiguration>
+                    <MaxCpuCount>0</MaxCpuCount>
+                    <TargetPlatform> x64 </TargetPlatform>
+                    <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+                  </RunConfiguration>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerExtension"" />
+                      <Logger uri=""test-logger-with-parameter://logger"" enabled=""true""></Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
             Assert.IsNotNull(ValidLoggerWithParameters.parameters, "parameters not getting passed");
             Assert.IsTrue(
                 ValidLoggerWithParameters.parameters.ContainsKey(DefaultLoggerParameterNames.TestRunDirectory),
@@ -1200,6 +1217,95 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
             Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
+            Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
+            mockMetricsCollection.Verify(
+                rd => rd.Add(TelemetryDataConstants.LoggerUsed, "TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger2,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLoggerWithParameters"));
+        }
+
+        [TestMethod]
+        public void InitializeShouldInitializeLoggersWithTestRunDirectoryIfPresentInRunSettings()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <RunConfiguration>
+                    <MaxCpuCount>0</MaxCpuCount>
+                    <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>
+                    <TargetPlatform> x64 </TargetPlatform>
+                    <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+                  </RunConfiguration>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerExtension"" />
+                      <Logger uri=""testlogger://logger2"" enabled=""true""></Logger>
+                      <Logger friendlyName=""TestLoggerWithParameterExtension"" uri=""invalid://invalid"" assemblyQualifiedName=""invalidAssembly"" codeBase=""" + codeBase + @""">
+                        <Configuration>
+                          <Key1>Value1</Key1>
+                          <Key2>Value2</Key2>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
+            Assert.AreEqual(1, ValidLoggerWithParameters.counter);
+            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
+            Assert.AreEqual("DummyTestResultsFolder", ValidLoggerWithParameters.parameters["testRunDirectory"]);
+            Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
+            mockMetricsCollection.Verify(
+                rd => rd.Add(TelemetryDataConstants.LoggerUsed, "TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger2,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLoggerWithParameters"));
+        }
+
+        [TestMethod]
+        public void InitializeShouldInitializeLoggersWithDefaultTestRunDirectoryIfNotPresentInRunSettings()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <RunConfiguration>
+                    <MaxCpuCount>0</MaxCpuCount>
+                    <TargetPlatform> x64 </TargetPlatform>
+                    <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+                  </RunConfiguration>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerExtension"" />
+                      <Logger uri=""testlogger://logger2"" enabled=""true""></Logger>
+                      <Logger friendlyName=""TestLoggerWithParameterExtension"" uri=""invalid://invalid"" assemblyQualifiedName=""invalidAssembly"" codeBase=""" + codeBase + @""">
+                        <Configuration>
+                          <Key1>Value1</Key1>
+                          <Key2>Value2</Key2>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
+            Assert.AreEqual(1, ValidLoggerWithParameters.counter);
+            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
+            Assert.AreEqual(Constants.DefaultResultsDirectory, ValidLoggerWithParameters.parameters["testRunDirectory"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
             mockMetricsCollection.Verify(
                 rd => rd.Add(TelemetryDataConstants.LoggerUsed, "TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger2,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLoggerWithParameters"));
