@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Xml;
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -65,6 +64,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// AssemblyLoadContext for current platform
         /// </summary>
         private IAssemblyLoadContext assemblyLoadContext;
+
+        /// <summary>
+        /// Test run directory.
+        /// </summary>
+        private string testRunDirectory;
 
         #endregion
 
@@ -148,6 +152,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             // Enable logger events
             EnableLogging();
+
+            // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
+            this.testRunDirectory = GetResultsDirectory(runSettings);
 
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
@@ -326,8 +333,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         break;
 
                     case ITestLogger _:
-                        ((ITestLogger)logger).Initialize(loggerEvents,
-                            GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
+                        ((ITestLogger)logger).Initialize(loggerEvents, testRunDirectory);
                         break;
 
                     default:
@@ -449,14 +455,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary> 
         /// <param name="runSettings">Test run settings.</param> 
         /// <returns>Test results directory</returns>
-        internal string GetResultsDirectory(RunSettings runSettings)
+        internal string GetResultsDirectory(string runSettings)
         {
             string resultsDirectory = null;
             if (runSettings != null)
             {
                 try
                 {
-                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings.SettingsXml);
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
                     resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
                 }
                 catch (SettingsException se)
@@ -483,7 +489,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // Add default logger parameters...
-            loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = this.GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings);
+            loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = testRunDirectory;
             return loggerParams;
         }
 

@@ -154,6 +154,11 @@
       <VSIXSubPath>Extensions\TestImpact\ComComponents\x86</VSIXSubPath>
     </VsixSourceItem>
 
+   <!-- CUIT -->
+    <VsixSourceItem Include="$(VsixInputFileLocation)\CUITPlugins\*.*" Exclude="$(VsixInputFileLocation)\CUITPlugins\*.pdb">
+      <VSIXSubPath>CUITPlugins</VSIXSubPath>
+    </VsixSourceItem>
+
    <!-- V1 Data Collectors -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\V1\*.*" Exclude="$(VsixInputFileLocation)\Extensions\V1\*.pdb">
       <VSIXSubPath>Extensions\V1</VSIXSubPath>
