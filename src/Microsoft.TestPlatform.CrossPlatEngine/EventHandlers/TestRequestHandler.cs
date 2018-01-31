@@ -321,7 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case MessageType.CancelTestRun:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();
-                    testHostManagerFactory.GetExecutionManager().Cancel();
+                    testHostManagerFactory.GetExecutionManager().Cancel(new TestRunEventsHandler(this));
                     break;
 
                 case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
@@ -331,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case MessageType.AbortTestRun:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();
-                    testHostManagerFactory.GetExecutionManager().Abort();
+                    testHostManagerFactory.GetExecutionManager().Abort(new TestRunEventsHandler(this));
                     break;
 
                 case MessageType.SessionEnd:

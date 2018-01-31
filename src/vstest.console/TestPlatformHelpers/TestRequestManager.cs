@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private ITestRunRequest currentTestRunRequest;
 
-        private readonly EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
+        private readonly EventWaitHandle runRequestStartedEventHandle = new AutoResetEvent(false);
 
         private object syncobject = new object();
 
@@ -308,7 +308,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
 
-            this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+            this.runRequestStartedEventHandle.WaitOne(runRequestTimeout);
             this.currentTestRunRequest?.CancelAsync();
         }
 
@@ -319,7 +319,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
 
-            this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
+            this.runRequestStartedEventHandle.WaitOne(runRequestTimeout);
             this.currentTestRunRequest?.Abort();
         }
 
@@ -524,7 +524,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 try
                 {
                     this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
-                    this.runRequestCreatedEventHandle.Set();
 
                     this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
@@ -532,6 +531,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.testPlatformEventSource.ExecutionRequestStart();
 
                     this.currentTestRunRequest.ExecuteAsync();
+                    
+                    this.runRequestStartedEventHandle.Set();
 
                     // Wait for the run completion event
                     this.currentTestRunRequest.WaitForCompletion();
