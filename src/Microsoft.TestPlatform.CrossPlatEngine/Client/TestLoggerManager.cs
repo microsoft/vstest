@@ -153,8 +153,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Enable logger events
             EnableLogging();
 
-            // Store test run directory
-            testRunDirectory = GetResultsDirectory(runSettings);
+            // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
+            this.testRunDirectory = GetResultsDirectory(runSettings);
 
             var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
 
