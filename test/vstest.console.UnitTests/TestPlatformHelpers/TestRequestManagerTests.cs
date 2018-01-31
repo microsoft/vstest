@@ -834,14 +834,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                {
-                   Thread.Sleep(1);
-                   createRunRequestTime = sw.ElapsedMilliseconds;
+                   createRunRequestTime = DateTime.Now.Ticks;
                }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
             {
-                Thread.Sleep(1);
-                cancelRequestTime = sw.ElapsedMilliseconds;
+                cancelRequestTime = DateTime.Now.Ticks;
             });
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
@@ -900,31 +898,29 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             sw.Start();
 
             long createRunRequestTime = 0;
-            long cancelRequestTime = 0;
+            long abortRequestTime = 0;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                 (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                 {
-                    Thread.Sleep(1);
-                    createRunRequestTime = sw.ElapsedMilliseconds;
+                    createRunRequestTime = DateTime.Now.Ticks;
                 }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
             {
-                Thread.Sleep(1);
-                cancelRequestTime = sw.ElapsedMilliseconds;
+                abortRequestTime = DateTime.Now.Ticks;
             });
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
-            var cancelTask = Task.Run(() => this.testRequestManager.AbortTestRun());
+            var abortTask = Task.Run(() => this.testRequestManager.AbortTestRun());
             var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig));
 
-            Task.WaitAll(cancelTask, runTask);
+            Task.WaitAll(abortTask, runTask);
 
-            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+            Assert.IsTrue(abortRequestTime > createRunRequestTime, "AbortRequest must execute after create run request");
         }
 
         [TestMethod]
