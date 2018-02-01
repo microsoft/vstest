@@ -53,6 +53,10 @@ function Verify-Signature
                     elseif ($signature.SignerCertificate.Thumbprint -eq "49D59D86505D82942A076388693F4FB7B21254EE") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
+					# For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "67B1757863E3EFF760EA9EBB02849AF07D3A8080") {
+                        Write-Log "Valid (Prod Signed): $($_.FullName)."
+                    }
                     else {
                         Write-FailLog "Incorrect certificate. File: $($_.FullName). Certificate: $($signature.SignerCertificate.Thumbprint)."
                     }
