@@ -32,6 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = Timeout.Infinite;
 
+        private const int DataConnectionClientListenTimeOut = 60 * 1000;
+
         private const string EndpointArgument = "--endpoint";
 
         private const string RoleArgument = "--role";
@@ -107,7 +109,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     var dataCollectionTestCaseEventSender = DataCollectionTestCaseEventSender.Create();
                     dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
-                    dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
+
+                    // It's possible that connection to vstest.console happens, but to datacollector fails, why?
+                    // DataCollector keeps the server alive for testhost only for 15secs(increased to 60 now), 
+                    // if somehow(on slower machines, with Profiler Enabled) testhost can take considerable time to launch,
+                    // in such scenario dc.exe would have killed the server, but testhost will wait infinitely to connect to it,
+                    // hence do not wait to connect to datacollector process infinitely, as it will cause process hang.
+                    dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(DataConnectionClientListenTimeOut);
                 }
 
                 // Checks for Telemetry Opted in or not from Command line Arguments.
