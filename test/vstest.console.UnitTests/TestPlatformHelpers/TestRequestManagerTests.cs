@@ -858,6 +858,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                    createTestRunRequestCalled = true;
                }).Returns(mockRunRequest.Object);
 
+            // Run request should not complete before the abort
+            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
+
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
             {
                 cancelCalledPostTestRunRequest = createTestRunRequestCalled;
@@ -924,6 +927,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 {
                     createTestRunRequestCalled = true;
                 }).Returns(mockRunRequest.Object);
+
+            // Run request should not complete before the abort
+            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
 
             mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
             {
