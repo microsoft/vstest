@@ -824,24 +824,19 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 RunSettings = DefaultRunsettings
             };
 
-            var sw = new Stopwatch();
-            sw.Start();
-
-            long createRunRequestTime = 0;
-            long cancelRequestTime = 0;
+            bool createTestRunRequestCalled = false;
+            bool cancelCalledPostTestRunRequest = false;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                {
-                   Thread.Sleep(1);
-                   createRunRequestTime = sw.ElapsedMilliseconds;
+                   createTestRunRequestCalled = true;
                }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
             {
-                Thread.Sleep(1);
-                cancelRequestTime = sw.ElapsedMilliseconds;
+                cancelCalledPostTestRunRequest = createTestRunRequestCalled;
             });
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
@@ -852,7 +847,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Task.WaitAll(cancelTask, runTask);
 
-            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+            Assert.IsTrue(cancelCalledPostTestRunRequest, "CancelRequest must execute after create run request");
         }
 
         [TestMethod]
@@ -895,25 +890,20 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 Sources = new List<string>() { "a", "b" },
                 RunSettings = DefaultRunsettings
             };
-
-            var sw = new Stopwatch();
-            sw.Start();
-
-            long createRunRequestTime = 0;
-            long cancelRequestTime = 0;
+            
+            bool createTestRunRequestCalled = false;
+            bool abortCalledPostTestRunRequest = false;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                 (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                 {
-                    Thread.Sleep(1);
-                    createRunRequestTime = sw.ElapsedMilliseconds;
+                    createTestRunRequestCalled = true;
                 }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
             {
-                Thread.Sleep(1);
-                cancelRequestTime = sw.ElapsedMilliseconds;
+                abortCalledPostTestRunRequest = createTestRunRequestCalled;
             });
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
@@ -924,7 +914,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Task.WaitAll(cancelTask, runTask);
 
-            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+            Assert.IsTrue(abortCalledPostTestRunRequest, "Abort Request must execute after create run request");
         }
 
         [TestMethod]
