@@ -451,6 +451,10 @@ function Create-VsixPackage
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
+	# Copy CUIT Related depedencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\contentFiles\any\any"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force    

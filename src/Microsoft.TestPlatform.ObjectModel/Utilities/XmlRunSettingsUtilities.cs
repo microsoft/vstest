@@ -348,21 +348,50 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         }
 
         /// <summary>
+        /// Get logger run settings from the settings XML.
+        /// </summary>
+        /// <param name="runSettings">The run Settings Xml.</param>
+        /// <returns> The <see cref="LoggerRunSettings"/>. </returns>
+        public static LoggerRunSettings GetLoggerRunSettings(String runSettings)
+        {
+            return GetNodeValue(
+                runSettings,
+                Constants.LoggerRunSettingsName,
+                LoggerRunSettings.FromXml);
+        }
+
+        /// <summary>
         /// Throws a settings exception if the node the reader is on has attributes defined.
         /// </summary>
         /// <param name="reader"> The xml reader. </param>
         internal static void ThrowOnHasAttributes(XmlReader reader)
         {
-            if (reader.HasAttributes)
-            {
-                reader.MoveToNextAttribute();
-                throw new SettingsException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        Resources.Resources.InvalidSettingsXmlAttribute,
-                        Constants.RunConfigurationSettingsName,
-                        reader.Name));
-            }
+            if (!reader.HasAttributes) return;
+
+            string elementName = reader.Name;
+            reader.MoveToNextAttribute();
+
+            throw new SettingsException(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.Resources.InvalidSettingsXmlAttribute,
+                    elementName,
+                    reader.Name));
+        }
+
+        /// <summary>
+        /// Throws a settings exception if the node the reader is on doesn't have attributes defined.
+        /// </summary>
+        /// <param name="reader"> The xml reader. </param>
+        internal static void ThrowOnNoAttributes(XmlReader reader)
+        {
+            if (reader.HasAttributes) return;
+
+            throw new SettingsException(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Resources.Resources.InvalidSettingsXmlAttribute,
+                    reader.Name));
         }
 
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",

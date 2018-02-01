@@ -102,18 +102,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
-        <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
-        <target state="translated">Během inicializace protokolovače s identifikátorem URI {0} došlo k výjimce. Protokolovač se nepoužije.  Výjimka: {1}</target>
-        <note />
+        <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
+        <target state="new">Během inicializace protokolovače s identifikátorem URI {0} došlo k výjimce. Protokolovač se nepoužije.  Výjimka: {1}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Při inicializaci protokolovacího nástroje s identifikátorem URI {0}' došlo k výjimce.  Protokolování nebude použito.  Výjimka: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="LoggerNotFound">
-        <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="translated">Nepovedlo se najít protokolovač testu s identifikátorem URI nebo popisným názvem {0}.</target>
-        <note />
+        <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
+        <target state="new">Nepovedlo se najít protokolovač testu s identifikátorem URI nebo popisným názvem {0}.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nelze najít zkušební protokoly s identifikátorem URI nebo FriendlyName {0}.</target>
         </alt-trans>
