@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.6.0",
+    [System.String] $Version = "", # Will set this later by reading TestPlatform.Settings.targets file.
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -55,6 +55,10 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
+
+# Set Version from scripts/build/TestPlatform.Settings.targets
+$Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix
+$Version = ($Version).Trim()
 
 #
 # Dotnet configuration
@@ -700,7 +704,10 @@ function Update-VsixVersion($vsixProjectDir)
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = $Version
+
+    # The last insertion for rel/15.6 had 15.7.0-* version
+	# Since the vsix version needs to be higher than the previous one, hardcoding this to 15.7.0
+    $vsixVersion = "15.7.0"
 
     # Build number comes in the form 20170111-01(yyyymmdd-buildNoOfThatDay)
     # So Version of the vsix will be 15.1.0.2017011101
