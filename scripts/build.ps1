@@ -700,7 +700,10 @@ function Update-VsixVersion($vsixProjectDir)
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = $Version
+
+    # The last insertion for rel/15.6 had 15.7.0-* version
+	# Since the vsix version needs to be higher than the previous one, hardcoding this to 15.7.0
+    $vsixVersion = "15.7.0"
 
     # Build number comes in the form 20170111-01(yyyymmdd-buildNoOfThatDay)
     # So Version of the vsix will be 15.1.0.2017011101
