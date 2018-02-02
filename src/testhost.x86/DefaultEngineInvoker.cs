@@ -32,6 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = Timeout.Infinite;
 
+        private const int DataConnectionClientListenTimeOut = 60 * 1000;
+
         private const string EndpointArgument = "--endpoint";
 
         private const string RoleArgument = "--role";
@@ -107,7 +109,16 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     var dataCollectionTestCaseEventSender = DataCollectionTestCaseEventSender.Create();
                     dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
-                    dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
+
+                    // It's possible that connection to vstest.console happens, but to datacollector fails, why?
+                    // DataCollector keeps the server alive for testhost only for 15secs(increased to 60 now), 
+                    // if somehow(on slower machines, with Profiler Enabled) testhost can take considerable time to launch,
+                    // in such scenario dc.exe would have killed the server, but testhost will wait infinitely to connect to it,
+                    // hence do not wait to connect to datacollector process infinitely, as it will cause process hang.
+                    if(!dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(DataConnectionClientListenTimeOut))
+                    {
+                        EqtTrace.Info("DefaultEngineInvoker: Connection to DataCollector failed: '{0}', DataCollection will not happen in this session", dcPort);
+                    }
                 }
 
                 // Checks for Telemetry Opted in or not from Command line Arguments.
@@ -152,6 +163,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 () =>
                     {
                         // Wait for the connection to the sender and start processing requests from sender
+                        // Note that we are waiting here infinitely to connect to vstest.console, but at the same time vstest.console doesn't wait infinitely.
+                        // It has a default timeout of 60secs(which is configurable), & then it kills testhost.exe
+                        // The reason to wait infinitely, was remote debugging scenarios of UWP app,
+                        // in such cases after the app gets launched, VS debugger takes control of it, & causes a lot of delay, which frequently causes timeout with vstest.console.
+                        // One fix would be just double this timeout, but there is no telling how much time it can actually take.
+                        // Hence we are waiting here indefinelty, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
+                        // In other cases if vstest.console's timeout exceeds it will definitelty such down the app.
                 if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                 {
                     requestHandler.ProcessRequests(managerFactory);
