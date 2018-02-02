@@ -115,7 +115,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     // if somehow(on slower machines, with Profiler Enabled) testhost can take considerable time to launch,
                     // in such scenario dc.exe would have killed the server, but testhost will wait infinitely to connect to it,
                     // hence do not wait to connect to datacollector process infinitely, as it will cause process hang.
-                    dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(DataConnectionClientListenTimeOut);
+                    if(!dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(DataConnectionClientListenTimeOut))
+                    {
+                        EqtTrace.Info("DefaultEngineInvoker: Connection to DataCollector failed: '{0}', DataCollection will not happen in this session", dcPort);
+                    }
                 }
 
                 // Checks for Telemetry Opted in or not from Command line Arguments.

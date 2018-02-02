@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     {
         // On Slower Machines(hosted agents) with Profiling enabled 15secs is not enough for testhost to get started(weird right!!),
         // hence increasing this timeout
-        private const int DATACOLLECTIONCONNTIMEOUT = 60 * 1000;
+        private const int DataCollectionCommTimeOut = 60 * 1000;
 
         private static readonly object SyncObject = new object();
 
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                         {
                                             if (
                                                 this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(
-                                                    DATACOLLECTIONCONNTIMEOUT))
+                                                    DataCollectionCommTimeOut))
                                             {
                                                 this.dataCollectionTestCaseEventHandler.ProcessRequests();
                                             }
