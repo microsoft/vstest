@@ -542,9 +542,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Belirtilen test kapsayıcısında bulunan testleri listeler.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Dosya Adı&gt;
+      Belirtilen test kapsayıcısında bulunan tüm testleri listeler.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; dosya adı &gt;
       Listeleri belirli test kapsayıcı testlerden keşfetti.</target>
@@ -1563,8 +1563,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">Çalışma ayarları aracılığıyla yapılandırılan veri toplayıcılar, ekli test ayarlarında desteklenmiyor. Daha fazla bilgi için lütfen https://aka.ms/vstest-configure-datacollector adresini ziyaret edin. Çalışma ayarları: {0}.</target>
-        <note></note>
+        <target state="translated">Çalıştırma ayarları aracılığıyla yapılandırılan Kod Kapsamı ve Microsoft Fakes dışındaki veri toplayıcılar, ekli test ayarlarında desteklenmiyor. Daha fazla bilgi için bkz. https://aka.ms/vstest-configure-datacollector. Çalıştırma ayarları: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
