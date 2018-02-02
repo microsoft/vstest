@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="1380117387">
     <header>
@@ -193,8 +193,8 @@
       </trans-unit>
       <trans-unit id="FailedToConnectDataCollector">
         <source>Failed to connect to datacollector process.</source>
-        <target state="new">Failed to connect datacollector.</target>
-        <note></note>
+        <target state="translated">無法連線到資料收集器處理序。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

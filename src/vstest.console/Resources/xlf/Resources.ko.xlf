@@ -541,9 +541,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;파일 이름&gt;
-      지정된 테스트 컨테이너에서 검색된 테스트를 나열합니다.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;파일 이름&gt;
+      지정된 테스트 컨테이너에서 검색된 테스트를 모두 나열합니다.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; 파일 이름 &gt;
       목록의 지정한 테스트 컨테이너에서 테스트를 발견 했습니다.</target>
@@ -1562,8 +1562,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">실행 설정을 통해 구성된 데이터 수집기는 포함된 테스트 설정으로는 지원되지 않습니다. 자세한 내용은 https://aka.ms/vstest-configure-datacollector를 참조하세요. 실행 설정: {0}.</target>
-        <note></note>
+        <target state="translated">실행 설정을 통해 구성된 코드 검사 및 Microsoft Fakes 이외의 데이터 수집기는 포함된 테스트 설정으로는 지원되지 않습니다. 자세한 내용은 https://aka.ms/vstest-configure-datacollector를 참조하세요. 실행 설정: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

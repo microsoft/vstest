@@ -541,9 +541,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;檔案名稱&gt;
-      列出從給定測試容器探索到的測試。</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;檔案名稱&gt;
+      列出從指定測試容器探索到的所有測試。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-长期 |-ListTests | / lt | / ListTests: &lt; 文件名 &gt;
       列表发现从给定的测试容器测试。</target>
@@ -1562,8 +1562,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">內嵌測試設定不支援透過回合設定來設定的資料收集器。如需詳細資訊，請參閱 https://aka.ms/vstest-configure-datacollector。回合設定: 0}。</target>
-        <note></note>
+        <target state="translated">除了程式碼涵蓋範圍與 Microsoft Fakes 以外，內嵌測試設定不支援透過回合設定來設定的資料收集器。如需詳細資訊，請參閱 https://aka.ms/vstest-configure-datacollector。回合設定: {0}。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
