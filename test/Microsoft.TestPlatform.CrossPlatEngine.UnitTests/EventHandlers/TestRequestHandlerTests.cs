@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var task = this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendSessionEnd();
-            Assert.IsTrue(task.Wait(5));
+            Assert.IsTrue(task.Wait(20));
         }
 
         #region Version Check Protocol

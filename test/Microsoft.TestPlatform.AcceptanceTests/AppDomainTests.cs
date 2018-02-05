@@ -17,8 +17,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class AppDomainTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void RunTestExecutionWithDisableAppDomain(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -34,6 +34,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
+                this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
 
             this.InvokeVsTest(arguments);

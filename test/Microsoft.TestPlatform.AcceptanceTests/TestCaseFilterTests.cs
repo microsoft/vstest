@@ -9,9 +9,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class TestCaseFilterTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: true, inProcess: true)]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -19,16 +19,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -36,16 +36,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=Categorya\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -53,16 +53,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(
                 arguments,
@@ -79,9 +79,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(0, 1, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -89,16 +89,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -106,16 +106,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
             this.InvokeVsTest(arguments);
@@ -134,9 +134,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// In case TestCaseFilter is provide without any property like Name or ClassName. ex. /TestCaseFilter:"UnitTest1"
         /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
         /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
             this.InvokeVsTest(arguments);
@@ -154,8 +154,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// Discover tests using mstest v1 adapter with test case filters.
         /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void DiscoverMstestV1TestsWithAndOperatorTrait(RunnerInfo runnerInfo)
         {
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
@@ -169,7 +169,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 this.testEnvironment.GetTestAsset("MstestV1UnitTestProject.dll"),
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:\"(TestCategory!=CategoryA&Priority!=3)\"");
 
@@ -184,8 +184,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// Discover tests using tmi adapter with test case filters.
         /// </summary>
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void DiscoverTmiTestsWithOnlyPropertyValue(RunnerInfo runnerInfo)
         {
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
@@ -200,7 +200,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 testAssemblyPath,
                 this.GetTestAdapterPath(),
-                string.Empty,
+                string.Empty, this.FrameworkArgValue,
                 runnerInfo.InIsolationValue);
             string testSettingsPath = Path.Combine(Path.GetDirectoryName(testAssemblyPath), "MstestV1UnitTestProjectTestSettings.testsettings");
             arguments = string.Concat(arguments, " /listtests /TestCaseFilter:PassingTest /settings:", testSettingsPath);
