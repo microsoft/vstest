@@ -8,8 +8,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class ListExtensionsTests : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: false, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListDiscoverersShouldShowInboxDiscoverers(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -43,8 +43,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: false, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListExecutorsShouldShowInboxExecutors(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -74,8 +74,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: false, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListLoggersShouldShowInboxLoggers(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -86,8 +86,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("logger://Microsoft/TestPlatform/TrxLogger/v1");
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework(inIsolation: false, inProcess: true)]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: false, inProcess: true)]
         public void ListSettingsProvidersShouldShowInboxSettingsProviders(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
