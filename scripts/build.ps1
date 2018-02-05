@@ -57,8 +57,11 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
 # Set Version from scripts/build/TestPlatform.Settings.targets
+if([string]::IsNullOrWhiteSpace($Version))
+{
 $Version = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix
 $Version = ($Version).Trim()
+}
 
 #
 # Dotnet configuration
@@ -449,6 +452,10 @@ function Create-VsixPackage
 
     # Copy Legacy data collectors Related depedencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.QualityTools.DataCollectors\$testPlatformExternalsVersion\contentFiles\any\any"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+	# Copy CUIT Related depedencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.VisualStudio.CUIT\$testPlatformExternalsVersion\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over

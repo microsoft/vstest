@@ -282,6 +282,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         }
 
         /// <summary>
+        /// Raises test run complete to the enabled loggers
+        /// </summary>
+        /// <param name="args"> Arguments to be raised </param>
+        internal void RaiseTestRunComplete(TestRunCompleteEventArgs args)
+        {
+            ValidateArg.NotNull<TestRunCompleteEventArgs>(args, "args");
+
+            CheckDisposed();
+
+            // Size is being send as 0. (It is good to send the size as the job queue uses it)
+            SafeInvokeAsync(() => this.TestRunComplete, args, 0, "InternalTestLoggerEvents.SendTestRunComplete");
+
+            // Wait for the loggers to finish processing the messages for the run.
+            this.loggerEventQueue.Flush();
+        }
+
+        /// <summary>
         /// Raise the test run complete event to test loggers and waits
         /// for the events to be processed.
         /// </summary>

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
@@ -22,6 +23,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -36,14 +38,16 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Moq;
 
     using vstest.console.UnitTests.TestDoubles;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
     [TestClass]
     public class TestRequestManagerTests
     {
         private DummyLoggerEvents mockLoggerEvents;
-        private TestLoggerManager mockLoggerManager;
         private CommandLineOptions commandLineOptions;
         private Mock<ITestPlatform> mockTestPlatform;
+        private Mock<IOutput> mockOutput;
         private Mock<IDiscoveryRequest> mockDiscoveryRequest;
         private Mock<ITestRunRequest> mockRunRequest;
         private Mock<IAssemblyMetadataProvider> mockAssemblyMetadataProvider;
@@ -65,8 +69,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public TestRequestManagerTests()
         {
             this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-            this.mockLoggerManager = new DummyTestLoggerManager(this.mockLoggerEvents);
             this.commandLineOptions = new DummyCommandLineOptions();
+            this.mockOutput = new Mock<IOutput>();
             this.mockTestPlatform = new Mock<ITestPlatform>();
             this.mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             this.mockRunRequest = new Mock<ITestRunRequest>();
@@ -81,7 +85,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 this.commandLineOptions,
                 this.mockTestPlatform.Object,
-                this.mockLoggerManager,
                 testRunResultAggregator,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -104,31 +107,14 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         {
             CommandLineOptions.Instance.Reset();
         }
-
-        [TestMethod]
-        public void TestRequestManagerShouldInitializeConsoleLogger()
-        {
-            CommandLineOptions.Instance.IsDesignMode = false;
-            var requestManager = new TestRequestManager(CommandLineOptions.Instance,
-                new Mock<ITestPlatform>().Object,
-                this.mockLoggerManager,
-                TestRunResultAggregator.Instance,
-                new Mock<ITestPlatformEventSource>().Object,
-                this.inferHelper,
-            this.mockMetricsPublisherTask);
-
-            Assert.IsTrue(this.mockLoggerEvents.EventsSubscribed());
-        }
-
+        
         [TestMethod]
         public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
         {
             CommandLineOptions.Instance.IsDesignMode = true;
             this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-            this.mockLoggerManager = new DummyTestLoggerManager(this.mockLoggerEvents);
             var requestManager = new TestRequestManager(CommandLineOptions.Instance,
                 new Mock<ITestPlatform>().Object,
-                this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
                 new Mock<ITestPlatformEventSource>().Object,
                 this.inferHelper,
@@ -210,7 +196,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterValue;
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -260,7 +245,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterValue;
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -306,7 +290,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -358,7 +341,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -404,7 +386,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -450,7 +431,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -496,7 +476,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -554,7 +533,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -604,7 +582,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -654,7 +631,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -848,24 +824,22 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 RunSettings = DefaultRunsettings
             };
 
-            var sw = new Stopwatch();
-            sw.Start();
-
-            long createRunRequestTime = 0;
-            long cancelRequestTime = 0;
+            bool createTestRunRequestCalled = false;
+            bool cancelCalledPostTestRunRequest = false;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                {
-                   Thread.Sleep(1);
-                   createRunRequestTime = sw.ElapsedMilliseconds;
+                   createTestRunRequestCalled = true;
                }).Returns(mockRunRequest.Object);
+
+            // Run request should not complete before the abort
+            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
             {
-                Thread.Sleep(1);
-                cancelRequestTime = sw.ElapsedMilliseconds;
+                cancelCalledPostTestRunRequest = createTestRunRequestCalled;
             });
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
@@ -876,7 +850,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Task.WaitAll(cancelTask, runTask);
 
-            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+            Assert.IsTrue(cancelCalledPostTestRunRequest, "CancelRequest must execute after create run request");
         }
 
         [TestMethod]
@@ -919,25 +893,23 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 Sources = new List<string>() { "a", "b" },
                 RunSettings = DefaultRunsettings
             };
-
-            var sw = new Stopwatch();
-            sw.Start();
-
-            long createRunRequestTime = 0;
-            long cancelRequestTime = 0;
+            
+            bool createTestRunRequestCalled = false;
+            bool abortCalledPostTestRunRequest = false;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
                 (IRequestData requestData, TestRunCriteria testRunCriteria) =>
                 {
-                    Thread.Sleep(1);
-                    createRunRequestTime = sw.ElapsedMilliseconds;
+                    createTestRunRequestCalled = true;
                 }).Returns(mockRunRequest.Object);
+
+            // Run request should not complete before the abort
+            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
 
             mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
             {
-                Thread.Sleep(1);
-                cancelRequestTime = sw.ElapsedMilliseconds;
+                abortCalledPostTestRunRequest = createTestRunRequestCalled;
             });
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
@@ -948,7 +920,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             Task.WaitAll(cancelTask, runTask);
 
-            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+            Assert.IsTrue(abortCalledPostTestRunRequest, "Abort Request must execute after create run request");
         }
 
         [TestMethod]
@@ -1025,7 +997,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -1088,7 +1059,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager = new TestRequestManager(
                 CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -1139,7 +1109,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             payload.TestPlatformOptions = new TestPlatformOptions { TestCaseFilter = testCaseFilterValue };
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
-                TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object,
                 this.inferHelper,
@@ -1321,6 +1290,64 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
             Assert.IsFalse(success, "RunTests call must fail due to exception");
+        }
+
+        [TestMethod]
+        public void RunTestsShouldOutputErrorForInvalidOperationException()
+        {
+            ConsoleLogger consoleLogger = new ConsoleLogger(mockOutput.Object);
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll", "b.dll" },
+                RunSettings = DefaultRunsettings
+            };
+
+            TestRunCriteria observedCriteria = null;
+            var mockRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    observedCriteria = runCriteria;
+                }).Returns(mockRunRequest.Object);
+
+            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new InvalidOperationException("HelloWorld"));
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+
+            Assert.IsFalse(success, "RunTests call must fail due to exception");
+            mockOutput.Verify(ot => ot.WriteLine("HelloWorld", OutputLevel.Error));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldOutputErrorForInvalidOperationException()
+        {
+            ConsoleLogger consoleLogger = new ConsoleLogger(mockOutput.Object);
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll", "b.dll" },
+                RunSettings = DefaultRunsettings
+            };
+
+            DiscoveryCriteria observedCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    observedCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            mockDiscoveryRequest.Setup(mr => mr.DiscoverAsync()).Throws(new InvalidOperationException("HelloWorld"));
+
+            var mockDiscoveryEventsRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryEventsRegistrar.Object, this.protocolConfig);
+
+            Assert.IsFalse(success, "DiscoverTests call must fail due to exception");
+            mockOutput.Verify(ot => ot.WriteLine("HelloWorld", OutputLevel.Error));
         }
 
         [TestMethod]
@@ -1787,6 +1814,326 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
         }
 
+        [TestMethod]
+        public void RunTestsShouldAddConsoleLoggerInRunSettingsInNonDesignMode()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = false;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
+            Assert.AreEqual(1, loggerSettingsList.Count);
+            Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[0].CodeBase);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldAddConsoleLoggerInRunSettingsIfDesignModeSetFalseInRunSettings()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("Console", loggerSettingsList[1].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldAddConsoleLoggerInRunSettingsIfDesignModeSetFalseInRunSettings()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = true;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria.RunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("Console", loggerSettingsList[1].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotAddConsoleLoggerInRunSettingsInDesignMode()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = false;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains("LoggerRunSettings"));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldAddConsoleLoggerInRunSettingsInNonDesignMode()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria.RunSettings).LoggerSettingsList;
+            Assert.AreEqual(1, loggerSettingsList.Count);
+            Assert.AreEqual("Console", loggerSettingsList[0].FriendlyName);
+            Assert.IsNotNull(loggerSettingsList[0].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[0].CodeBase);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotAddConsoleLoggerInRunSettingsInDesignMode()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>True</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains("LoggerRunSettings"));
+        }
+
+        [TestMethod]
+        public void RunTestsShouldOverrideOnlyAssemblyNameIfConsoleLoggerAlreadyPresent()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""console"" uri=""logger://tempconsoleUri"" assemblyQualifiedName=""tempAssemblyName"" codeBase=""tempCodeBase"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.IsDesignMode = true;
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockTestRunRequest.Object);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualTestRunCriteria.TestRunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("console", loggerSettingsList[1].FriendlyName);
+            Assert.AreEqual(new Uri("logger://tempconsoleUri").ToString(), loggerSettingsList[1].Uri.ToString());
+            Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.AreNotEqual("tempCodeBase", loggerSettingsList[1].CodeBase);
+            Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldOverrideOnlyAssemblyNameIfConsoleLoggerAlreadyPresent()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>False</DesignMode>
+                     </RunConfiguration>
+                     <LoggerRunSettings>
+                       <Loggers>
+                         <Logger friendlyName=""blabla"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                         <Logger friendlyName=""consoleTemp"" uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" assemblyQualifiedName=""tempAssemblyName"">
+                           <Configuration>
+                             <Key1>Value1</Key1>
+                           </Configuration>
+                         </Logger>
+                       </Loggers>
+                     </LoggerRunSettings>
+                </RunSettings>"
+            };
+            this.commandLineOptions.IsDesignMode = false;
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+
+            var loggerSettingsList = XmlRunSettingsUtilities.GetLoggerRunSettings(actualDiscoveryCriteria.RunSettings).LoggerSettingsList;
+            Assert.AreEqual(2, loggerSettingsList.Count);
+            Assert.IsNotNull(loggerSettingsList[0].Configuration);
+            Assert.AreEqual("blabla", loggerSettingsList[0].FriendlyName);
+            Assert.AreEqual("consoleTemp", loggerSettingsList[1].FriendlyName);
+            Assert.AreEqual(new Uri("logger://Microsoft/TestPlatform/ConsoleLogger/v1").ToString(), loggerSettingsList[1].Uri.ToString());
+            Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.AreNotEqual("tempAssemblyName", loggerSettingsList[1].CodeBase);
+            Assert.IsTrue(loggerSettingsList[1].Configuration.InnerXml.Contains("Value1"));
+            Assert.IsNotNull(loggerSettingsList[1].AssemblyQualifiedName);
+            Assert.IsNotNull(loggerSettingsList[1].CodeBase);
+        }
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)
         {

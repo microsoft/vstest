@@ -206,18 +206,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
                 return ResourceManager.GetString("InvalidOperator", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Exception occurred while initializing logger with URI &apos;{0}&apos;.  The logger will not be used.  Exception: {1}.
+        ///   Looks up a localized string similar to Exception occurred while initializing logger with {0}: &apos;{1}&apos;.  The logger will not be used.  Exception: {2}.
         /// </summary>
         internal static string LoggerInitializationError {
             get {
                 return ResourceManager.GetString("LoggerInitializationError", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Could not find a test logger with URI or FriendlyName &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName &apos;{0}&apos;..
         /// </summary>
         internal static string LoggerNotFound {
             get {

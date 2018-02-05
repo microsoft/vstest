@@ -102,18 +102,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
-        <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
-        <target state="translated">URI가 '{0}'인 로거를 초기화하는 동안 예외가 발생했습니다. 로거가 사용되지 않습니다. 예외: {1}</target>
-        <note />
+        <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
+        <target state="new">URI가 '{0}'인 로거를 초기화하는 동안 예외가 발생했습니다. 로거가 사용되지 않습니다. 예외: {1}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI ' {0} '이 (가)를 사용 하 여로 거를 초기화 하는 동안 예외가 발생 했습니다.  로 거의 사용 되지 않습니다.  예외: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="LoggerNotFound">
-        <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="translated">URI 또는 FriendlyName이 '{0}'인 테스트 로거를 찾을 수 없습니다.</target>
-        <note />
+        <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
+        <target state="new">URI 또는 FriendlyName이 '{0}'인 테스트 로거를 찾을 수 없습니다.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI ' {0} '이 (가) FriendlyName와 테스트로 거를 찾을 수 없습니다.</target>
         </alt-trans>

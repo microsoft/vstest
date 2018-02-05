@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Logger for sending output to the console.
@@ -61,7 +61,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             Quiet,
             Minimal,
-            Normal
+            Normal,
+            Detailed
         }
 
         #region Fields
@@ -76,11 +77,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private Verbosity verbosityLevel = Verbosity.Minimal;
 #endif
 
-        private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
+        private bool testRunHasErrorMessages = false;
+
         #endregion
 
         #region Constructor
@@ -168,10 +170,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
             if (prefixExists)
             {
-                bool.TryParse(prefix, out ConsoleLogger.AppendPrefix);
+                bool.TryParse(prefix, out AppendPrefix);
             }
 
-            this.Initialize(events, String.Empty);
+            Initialize(events, String.Empty);
         }
         #endregion
 
@@ -331,17 +333,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
-                    Output.Information(ConsoleLogger.AppendPrefix, e.Message);
-                    break;
+                    {
+                        if (verbosityLevel == Verbosity.Quiet || verbosityLevel == Verbosity.Minimal)
+                        {
+                            break;
+                        }
+
+                        Output.Information(AppendPrefix, e.Message);
+                        break;
+                    }
+
                 case TestMessageLevel.Warning:
-                    Output.Warning(ConsoleLogger.AppendPrefix, e.Message);
-                    break;
+                    {
+                        if (verbosityLevel == Verbosity.Quiet)
+                        {
+                            break;
+                        }
+
+                        Output.Warning(AppendPrefix, e.Message);
+                        break;
+                    }
+
                 case TestMessageLevel.Error:
-                    this.testOutcome = TestOutcome.Failed;
-                    Output.Error(ConsoleLogger.AppendPrefix, e.Message);
-                    break;
+                    {
+                        this.testRunHasErrorMessages = true;
+                        Output.Error(AppendPrefix, e.Message);
+                        break;
+                    }
                 default:
-                    Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
+                    EqtTrace.Warning("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
         }
@@ -357,51 +377,78 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
 
-            string name = null;
-            name = !string.IsNullOrEmpty(e.Result.DisplayName) ? e.Result.DisplayName : e.Result.TestCase.DisplayName;
+            string testDisplayName = e.Result.DisplayName;
+            if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
+            {
+                testDisplayName = e.Result.TestCase.DisplayName;
+            }
 
-            if (e.Result.Outcome == TestOutcome.Skipped)
+            switch (e.Result.Outcome)
             {
-                this.testsSkipped++;
-                if (!this.verbosityLevel.Equals(Verbosity.Quiet))
-                {
-                    var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator,
-                        name);
-                    Output.Warning(false, output);
-                    DisplayFullInformation(e.Result);
-                }
-            }
-            else if (e.Result.Outcome == TestOutcome.Failed)
-            {
-                this.testOutcome = TestOutcome.Failed;
-                this.testsFailed++;
-                if (!this.verbosityLevel.Equals(Verbosity.Quiet))
-                {
-                    var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator,
-                        name);
-                    Output.Information(false, ConsoleColor.Red, output);
-                    DisplayFullInformation(e.Result);
-                }
-            }
-            else if (e.Result.Outcome == TestOutcome.Passed)
-            {
-                if (this.verbosityLevel.Equals(Verbosity.Normal))
-                {
-                    var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
-                    Output.Information(false, output);
-                    DisplayFullInformation(e.Result);
-                }
-                this.testsPassed++;
-            }
-            else
-            {
-                if (!this.verbosityLevel.Equals(Verbosity.Quiet))
-                {
-                    var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator,
-                        name);
-                    Output.Information(false, output);
-                    DisplayFullInformation(e.Result);
-                }
+                case TestOutcome.Skipped:
+                    {
+                        this.testsSkipped++;
+                        if (this.verbosityLevel == Verbosity.Quiet)
+                        {
+                            break;
+                        }
+
+                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, testDisplayName);
+                        Output.Warning(false, output);
+                        if (this.verbosityLevel == Verbosity.Detailed)
+                        {
+                            DisplayFullInformation(e.Result);
+                        }
+
+                        break;
+                    }
+
+                case TestOutcome.Failed:
+                    {
+                        this.testsFailed++;
+                        if (this.verbosityLevel == Verbosity.Quiet)
+                        {
+                            break;
+                        }
+
+                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, testDisplayName);
+                        Output.Information(false, ConsoleColor.Red, output);
+                        DisplayFullInformation(e.Result);
+                        break;
+                    }
+
+                case TestOutcome.Passed:
+                    {
+                        this.testsPassed++;
+                        if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
+                        {
+                            var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, testDisplayName);
+                            Output.Information(false, output);
+                            if (this.verbosityLevel == Verbosity.Detailed)
+                            {
+                                DisplayFullInformation(e.Result);
+                            }
+                        }
+
+                        break;
+                    }
+
+                default:
+                    {
+                        if (this.verbosityLevel == Verbosity.Quiet)
+                        {
+                            break;
+                        }
+
+                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, testDisplayName);
+                        Output.Information(false, output);
+                        if (this.verbosityLevel == Verbosity.Detailed)
+                        {
+                            DisplayFullInformation(e.Result);
+                        }
+
+                        break;
+                    }
             }
         }
 
@@ -429,17 +476,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
 
             // Output a summary.
-            if (this.testsTotal > 0)
+            if (testsTotal > 0)
             {
                 string testCountDetails;
 
                 if (e.IsAborted || e.IsCanceled)
                 {
-                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, testsPassed, testsFailed, testsSkipped);
+                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, this.testsPassed, this.testsFailed, this.testsSkipped);
                 }
                 else
                 {
-                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, testsTotal, testsPassed, testsFailed, testsSkipped);
+                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, this.testsTotal, this.testsPassed, this.testsFailed, this.testsSkipped);
                 }
 
                 Output.Information(false, testCountDetails);
@@ -453,27 +500,68 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 Output.Error(false, CommandLineResources.TestRunAborted);
             }
-            else if (this.testOutcome == TestOutcome.Failed && this.testsTotal > 0)
+            else if (this.testsFailed > 0 || this.testRunHasErrorMessages)
             {
                 Output.Error(false, CommandLineResources.TestRunFailed);
             }
-            else if(this.testsTotal > 0)
+            else if (testsTotal > 0)
             {
                 Output.Information(false, ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
             }
 
-            if (this.testsTotal > 0)
+            if (testsTotal > 0)
             {
-                if (!e.ElapsedTimeInRunningTests.Equals(TimeSpan.Zero))
+                if (e.ElapsedTimeInRunningTests.Equals(TimeSpan.Zero))
                 {
-                    PrintTimeSpan(e.ElapsedTimeInRunningTests);
+                    EqtTrace.Info("Skipped printing test execution time on console because it looks like the test run had faced some errors");
                 }
                 else
                 {
-                    EqtTrace.Info("Skipped printing test execution time on console because it looks like the test run had faced some errors");
+                    PrintTimeSpan(e.ElapsedTimeInRunningTests);
                 }
             }
         }
         #endregion
+
+        /// <summary>
+        /// Raises test run errors occured before console logger starts listening error events.
+        /// </summary>
+        /// <param name="testRunResultAggregator"></param>
+        /// <param name="exception"></param>
+        public static void RaiseTestRunError(TestRunResultAggregator testRunResultAggregator, Exception exception)
+        {
+            if (Output == null)
+            {
+                Output = ConsoleOutput.Instance;
+            }
+
+            // testRunResultAggregator can be null, if error is being raised in discovery context.
+            testRunResultAggregator?.MarkTestRunFailed();
+
+            Output.Error(AppendPrefix, exception.Message);
+
+            // Send inner exception only when its message is different to avoid duplicate.
+            if (exception is TestPlatformException &&
+                exception.InnerException != null &&
+                string.Compare(exception.Message, exception.InnerException.Message, StringComparison.CurrentCultureIgnoreCase) != 0)
+            {
+                Output.Error(AppendPrefix, exception.InnerException.Message);
+            }
+        }
+
+        /// <summary>
+        /// Raises test run warning occured before console logger starts listening warning events.
+        /// </summary>
+        /// <param name="testRunResultAggregator"></param>
+        /// <param name="warningMessage"></param>
+        public static void RaiseTestRunWarning(TestRunResultAggregator testRunResultAggregator, string warningMessage)
+        {
+            if (ConsoleLogger.Output == null)
+            {
+                ConsoleLogger.Output = ConsoleOutput.Instance;
+            }
+
+            Output.Warning(AppendPrefix, warningMessage);
+        }
     }
 }
