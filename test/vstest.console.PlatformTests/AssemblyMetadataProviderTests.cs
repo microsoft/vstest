@@ -75,9 +75,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
 
-            Assert.AreEqual(Enum.Parse(typeof(Architecture), platform, ignoreCase: true), arch);
             Console.WriteLine("Platform:{0}, {1}", platform, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
-            Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+            Assert.AreEqual(Enum.Parse(typeof(Architecture), platform, ignoreCase: true), arch);
+
+            // We should not assert on time elapsed, it will vary depending on machine, & their state, commenting below assert
+            // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         [TestMethod]
@@ -109,7 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             }
 
             Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
-            Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+
+            // We should not assert on time elapsed, it will vary depending on machine, & their state, commenting below assert
+            // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         [TestMethod]
@@ -121,10 +125,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             var stopWatch = Stopwatch.StartNew();
             var fx = this.assemblyMetadataProvider.GetFrameWork(assemblyPath);
             stopWatch.Stop();
-            Assert.AreEqual(Framework.DefaultFramework.Name, fx.FullName);
 
             Console.WriteLine(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds);
-            Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+            Assert.AreEqual(Framework.DefaultFramework.Name, fx.FullName);
+
+            // We should not assert on time elapsed, it will vary depending on machine, & their state, commenting below assert
+            // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         private void TestDotnetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
@@ -134,11 +140,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             var stopWatch = Stopwatch.StartNew();
             var arch = this.assemblyMetadataProvider.GetArchitecture(assemblyPath);
             stopWatch.Stop();
-            Assert.AreEqual(expectedArch, arch, $"Expected: {expectedArch} Actual: {arch}");
+
             Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
-            Assert.IsTrue(
-                stopWatch.ElapsedMilliseconds < expectedElapsedTime,
-                string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
+            Assert.AreEqual(expectedArch, arch, $"Expected: {expectedArch} Actual: {arch}");
+
+            // We should not assert on time elapsed, it will vary depending on machine, & their state, commenting below assert
+            // Assert.IsTrue(stopWatch.ElapsedMilliseconds < expectedElapsedTime, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
         }
 
         private void LoadAssemblyIntoMemory(string assemblyPath)
