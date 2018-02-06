@@ -21,20 +21,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private RunEventHandler runEventHandler;
         private DiscoveryEventHandler discoveryEventHandler;
 
-        public RunSelectedTests()
+        private void Setup()
         {
             this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
             this.discoveryEventHandler = new DiscoveryEventHandler();
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestCleanup]
+        public void Cleanup()
+        {
+            this.vstestConsoleWrapper?.EndSession();
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            this.Setup();
 
             this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
             var testCases = this.discoveryEventHandler.DiscoveredTestCases;
@@ -48,13 +55,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            this.Setup();
 
             this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
             var testCases = this.discoveryEventHandler.DiscoveredTestCases;

@@ -12,8 +12,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class CUITTest : AcceptanceTestBase
     {
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
         public void CUITRunAllTests(RunnerInfo runnerInfo)
         {
             SetTestEnvironment(this.testEnvironment, runnerInfo);
@@ -32,7 +32,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty);
+                string.Empty,
+                this.FrameworkArgValue);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);

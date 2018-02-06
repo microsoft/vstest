@@ -9,28 +9,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class FrameworkTests : AcceptanceTestBase
     {
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " ", $"/Framework:{this.FrameworkArgValue}");
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
         }
 
-        [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        [NETCORETargetFramework]
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty);
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
             if (runnerInfo.TargetFramework.Contains("netcore"))
             {
                 arguments = string.Concat(arguments, " ", "/Framework:Framework45");
