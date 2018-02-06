@@ -542,9 +542,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;nombreDeArchivo&gt;
-      Enumera las pruebas detectadas en el contenedor de pruebas dado.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;nombreDeArchivo&gt;
+      Enumera todas las pruebas detectadas en el contenedor de pruebas dado.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; nombre de archivo &gt;
       Listas descubren pruebas desde el contenedor de prueba determinada.</target>
@@ -1567,8 +1567,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">Los recopiladores de datos configurados a través de la configuración de ejecución no se admiten con la configuración de pruebas integrada. Consulte https://aka.ms/vstest-configure-datacollector para obtener más información. Configuración de ejecución: {0}.</target>
-        <note></note>
+        <target state="translated">Los recopiladores de datos diferentes de Cobertura de código y Microsoft Fakes configurados a través de la configuración de ejecución no se admiten con la configuración de pruebas integrada. Consulte https://aka.ms/vstest-configure-datacollector para obtener más información. Configuración de ejecución: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
