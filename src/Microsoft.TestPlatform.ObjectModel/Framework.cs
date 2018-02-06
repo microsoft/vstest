@@ -56,21 +56,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch
             {
-                switch (frameworkString.Trim())
+                switch (frameworkString.Trim().ToLower())
                 {
-                    case "Framework35":
+                    case "framework35":
                         frameworkName = new FrameworkName(Constants.DotNetFramework35);
                         break;
-                    case "Framework40":
+                    case "framework40":
                         frameworkName = new FrameworkName(Constants.DotNetFramework40);
                         break;
-                    case "Framework45":
+                    case "framework45":
                         frameworkName = new FrameworkName(Constants.DotNetFramework45);
                         break;
-                    case "FrameworkCore10":
+                    case "frameworkcore10":
                         frameworkName = new FrameworkName(Constants.DotNetFrameworkCore10);
                         break;
-                    case "FrameworkUap10":
+                    case "frameworkuap10":
                         frameworkName = new FrameworkName(Constants.DotNetFrameworkUap10);
                         break;
                     default:
