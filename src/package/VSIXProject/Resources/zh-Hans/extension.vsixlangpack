@@ -1,0 +1,6 @@
+﻿<PackageLanguagePackManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
+  <Metadata>
+    <DisplayName>Microsoft Visual Studio Test Platform</DisplayName>
+    <Description>Extensible Test Platform that allows developers to discover, execute and analyze automated tests.</Description>
+  </Metadata>
+</PackageLanguagePackManifest>

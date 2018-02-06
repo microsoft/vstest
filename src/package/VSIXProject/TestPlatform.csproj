@@ -51,6 +51,48 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+
+    <!-- Localized langpack files -->
+    <VsixSourceItem Include="Resources\cs\extension.vsixlangpack">
+      <VSIXSubPath>cs</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\de\extension.vsixlangpack">
+      <VSIXSubPath>de</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\es\extension.vsixlangpack">
+      <VSIXSubPath>es</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\fr\extension.vsixlangpack">
+      <VSIXSubPath>fr</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\it\extension.vsixlangpack">
+      <VSIXSubPath>it</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\ja\extension.vsixlangpack">
+      <VSIXSubPath>ja</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\ko\extension.vsixlangpack">
+      <VSIXSubPath>ko</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\pl\extension.vsixlangpack">
+      <VSIXSubPath>pl</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\pt-BR\extension.vsixlangpack">
+      <VSIXSubPath>pt-BR</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\ru\extension.vsixlangpack">
+      <VSIXSubPath>ru</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\tr\extension.vsixlangpack">
+      <VSIXSubPath>tr</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\zh-Hans\extension.vsixlangpack">
+      <VSIXSubPath>zh-Hans</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="Resources\zh-Hant\extension.vsixlangpack">
+      <VSIXSubPath>zh-Hant</VSIXSubPath>
+    </VsixSourceItem>
+    
     <!-- Localized resources -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\cs\*.dll">
       <VSIXSubPath>cs</VSIXSubPath>
@@ -201,8 +243,7 @@
     <Content Include="testplatform.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-
+    </Content>    
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
