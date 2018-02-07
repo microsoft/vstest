@@ -3,9 +3,9 @@
   <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="1470250083">
     <body>
       <trans-unit id="NoTestHostFileExist">
-        <source>No test is available in {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate and try again.</source>
-        <target state="translated">{0}에서 테스트를 사용할 수 없습니다. 테스트 프로젝트에 “Microsoft.NET.Test.Sdk” 패키지의 nuget 참조가 있고 프레임워크 버전 설정이 적절한지 확인한 후 다시 시도하세요.</target>
-        <note />
+        <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
+        <target state="new">{0}에서 테스트를 사용할 수 없습니다. 테스트 프로젝트에 “Microsoft.NET.Test.Sdk” 패키지의 nuget 참조가 있고 프레임워크 버전 설정이 적절한지 확인한 후 다시 시도하세요.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.
