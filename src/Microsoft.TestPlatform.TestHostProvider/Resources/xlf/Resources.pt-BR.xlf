@@ -3,9 +3,9 @@
   <file datatype="xml" source-language="en" target-language="pt-BR" original="../Resources.resx" build-num="1733331294">
     <body>
       <trans-unit id="NoTestHostFileExist">
-        <source>No test is available in {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate and try again.</source>
-        <target state="translated">Nenhum teste disponível em {0}. Verifique se o projeto de teste tem uma referência NuGet do pacote "Microsoft.NET.Test.Sdk" e se as configurações de versão da estrutura são apropriadas e tente novamente.</target>
-        <note />
+        <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
+        <target state="new">Nenhum teste disponível em {0}. Verifique se o projeto de teste tem uma referência NuGet do pacote "Microsoft.NET.Test.Sdk" e se as configurações de versão da estrutura são apropriadas e tente novamente.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.
