@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
@@ -12,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -34,9 +33,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region FieldsLog
 
         /// <summary>
-        /// Test Logger Events instance which will be passed to loggers when they are initialized.
+        /// Keeps track if we are disposed.
         /// </summary>
-        private InternalTestLoggerEvents loggerEvents;
+        private bool isDisposed = false;
 
         /// <summary>
         /// Used to keep track of which loggers have been initialized.
@@ -44,9 +43,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private HashSet<Type> initializedLoggers = new HashSet<Type>();
 
         /// <summary>
-        /// Keeps track if we are disposed.
+        /// Test run directory.
         /// </summary>
-        private bool isDisposed = false;
+        private string testRunDirectory;
+
+        /// <summary>
+        /// Test Logger Events instance which will be passed to loggers when they are initialized.
+        /// </summary>
+        private InternalTestLoggerEvents loggerEvents;
 
         /// <summary>
         /// Message logger.
@@ -58,17 +62,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         private IRequestData requestData;
 
+        /// <summary>
+        /// Logger extension manager.
+        /// </summary>
         private TestLoggerExtensionManager testLoggerExtensionManager;
 
         /// <summary>
         /// AssemblyLoadContext for current platform
         /// </summary>
         private IAssemblyLoadContext assemblyLoadContext;
-
-        /// <summary>
-        /// Test run directory.
-        /// </summary>
-        private string testRunDirectory;
 
         #endregion
 
@@ -104,17 +106,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// Gets the logger events.
-        /// </summary>
-        public InternalTestLoggerEvents LoggerEvents
-        {
-            get
-            {
-                return this.loggerEvents;
-            }
-        }
 
         /// <summary>
         /// Gets the initialized loggers.
@@ -211,15 +202,137 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Get parameters from configuration element.
+        /// Handles test run message event.
         /// </summary>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
-        private Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
+        public void HandleTestRunMessage(TestRunMessageEventArgs e)
         {
-            var configurationManager = new LoggerNameValueConfigurationManager(configuration);
-            return configurationManager.NameValuePairs;
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseTestRunMessage(e);
+            }
         }
+
+        /// <summary>
+        /// Handle test run stats change event.
+        /// </summary>
+        public void HandleTestRunStatsChange(TestRunChangedEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                foreach (TestResult result in e.NewTestResults)
+                {
+                    this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles test run start event.
+        /// </summary>
+        public void HandleTestRunStart(TestRunStartEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseTestRunStart(e);
+            }
+        }
+
+        /// <summary>
+        /// Handles test run complete.
+        /// </summary>
+        public void HandleTestRunComplete(TestRunCompleteEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                try
+                {
+                    this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error,
+                        e.AttachmentSets, e.ElapsedTimeInRunningTests);
+                }
+                finally
+                {
+                    this.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles discovery message event.
+        /// </summary>
+        /// <param name="e"></param>
+        public void HandleDiscoveryMessage(TestRunMessageEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveryMessage(e);
+            }
+        }
+
+        /// <summary>
+        /// Handle discovered tests.
+        /// </summary>
+        /// <param name="e"></param>
+        public void HandleDiscoveredTests(DiscoveredTestsEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveredTests(e);
+            }
+        }
+
+        /// <summary>
+        /// Handles discovery complete event.
+        /// </summary>
+        /// <param name="e"></param>
+        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                try
+                {
+                    this.loggerEvents.RaiseDiscoveryComplete(e);
+                }
+                finally
+                {
+                    this.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if atleast one logger is initialized.
+        /// </summary>
+        /// <returns></returns>
+        public bool AreLoggersInitialized()
+        {
+            return this.initializedLoggers.Any();
+        }
+
+        /// <summary>
+        /// Handles discovery start event.
+        /// </summary>
+        /// <param name="e"></param>
+        public void HandleDiscoveryStart(DiscoveryStartEventArgs e)
+        {
+            if (!this.isDisposed)
+            {
+                this.loggerEvents.RaiseDiscoveryStart(e);
+            }
+        }
+
+        /// <summary>
+        /// Ensure that all pending messages are sent to the loggers.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
 
         /// <summary>
         /// Initializes logger with the specified URI and parameters.
@@ -229,7 +342,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="parameters">Logger parameters.</param>
         /// <returns>Logger Initialized flag.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2234:PassSystemUriObjectsInsteadOfStrings", Justification = "Case insensitive needs to be supported "), SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Third party loggers could potentially throw all kinds of exceptions.")]
-        public bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
+        internal bool InitializeLoggerByUri(Uri uri, Dictionary<string, string> parameters)
         {
             ValidateArg.NotNull<Uri>(uri, "uri");
             this.CheckDisposed();
@@ -260,6 +373,114 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             return initialized;
+        }
+
+        /// <summary>
+        /// Tries to get uri of the logger corresponding to the friendly name. If no such logger exists return null.
+        /// </summary>
+        /// <param name="friendlyName">The friendly Name.</param>
+        /// <param name="loggerUri">The logger Uri.</param>
+        /// <returns><see cref="bool"/></returns>
+        internal bool TryGetUriFromFriendlyName(string friendlyName, out Uri loggerUri)
+        {
+            var extensionManager = this.TestLoggerExtensionManager;
+            foreach (var extension in extensionManager.TestExtensions)
+            {
+                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    try
+                    {
+                        loggerUri = new Uri(extension.Metadata.ExtensionUri);
+                    }
+                    catch (UriFormatException)
+                    {
+                        loggerUri = null;
+
+                        throw new InvalidLoggerException(
+                            string.Format(
+                                CultureInfo.CurrentUICulture,
+                                CommonResources.LoggerUriInvalid,
+                                extension.Metadata.ExtensionUri));
+                    }
+
+                    return true;
+                }
+            }
+
+            loggerUri = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the test results directory.
+        /// </summary>
+        /// <param name="runSettings">Test run settings.</param>
+        /// <returns>Test results directory</returns>
+        internal string GetResultsDirectory(string runSettings)
+        {
+            string resultsDirectory = null;
+            if (runSettings != null)
+            {
+                try
+                {
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+                    resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+                }
+                catch (SettingsException se)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
+                    }
+                }
+            }
+
+            return resultsDirectory;
+        }
+
+        /// <summary>
+        /// Enables sending of events to the loggers which are registered.
+        /// </summary>
+        /// <remarks>
+        /// By default events are disabled and will not be raised until this method is called.
+        /// This is done because during logger initialization, errors could be sent and we do not
+        /// want them broadcast out to the loggers until all loggers have been enabled.  Without this
+        /// all loggers would not receive the errors which were sent prior to initialization finishing.
+        /// </remarks>
+        internal void EnableLogging()
+        {
+            this.CheckDisposed();
+            this.loggerEvents.EnableEvents();
+        }
+
+        /// <summary>
+        /// Ensure that all pending messages are sent to the loggers.
+        /// </summary>
+        /// <param name="disposing">
+        /// The disposing.
+        /// </param>
+        internal virtual void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                if (disposing)
+                {
+                    this.loggerEvents.Dispose();
+                }
+
+                this.isDisposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Get parameters from configuration element.
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private Dictionary<string, string> GetParametersFromConfigurationElement(XmlElement configuration)
+        {
+            var configurationManager = new LoggerNameValueConfigurationManager(configuration);
+            return configurationManager.NameValuePairs;
         }
 
         /// <summary>
@@ -364,120 +585,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Tries to get uri of the logger corresponding to the friendly name. If no such logger exists return null.
-        /// </summary>
-        /// <param name="friendlyName">The friendly Name.</param>
-        /// <param name="loggerUri">The logger Uri.</param>
-        /// <returns><see cref="bool"/></returns>
-        public bool TryGetUriFromFriendlyName(string friendlyName, out Uri loggerUri)
-        {
-            var extensionManager = this.TestLoggerExtensionManager;
-            foreach (var extension in extensionManager.TestExtensions)
-            {
-                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    try
-                    {
-                        loggerUri = new Uri(extension.Metadata.ExtensionUri);
-                    }
-                    catch (UriFormatException)
-                    {
-                        loggerUri = null;
-
-                        throw new InvalidLoggerException(
-                            string.Format(
-                                CultureInfo.CurrentUICulture,
-                                CommonResources.LoggerUriInvalid,
-                                extension.Metadata.ExtensionUri));
-                    }
-
-                    return true;
-                }
-            }
-
-            loggerUri = null;
-            return false;
-        }
-
-        /// <summary>
-        /// Enables sending of events to the loggers which are registered.
-        /// </summary>
-        /// <remarks>
-        /// By default events are disabled and will not be raised until this method is called.
-        /// This is done because during logger initialization, errors could be sent and we do not
-        /// want them broadcast out to the loggers until all loggers have been enabled.  Without this
-        /// all loggers would not receive the errors which were sent prior to initialization finishing.
-        /// </remarks>
-        internal void EnableLogging()
-        {
-            this.CheckDisposed();
-            this.loggerEvents.EnableEvents();
-        }
-
-        /// <summary>
-        /// Ensure that all pending messages are sent to the loggers.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// Ensure that all pending messages are sent to the loggers.
-        /// </summary>
-        /// <param name="disposing">
-        /// The disposing.
-        /// </param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.isDisposed)
-            {
-                if (disposing)
-                {
-                    this.loggerEvents.Dispose();
-                }
-
-                this.isDisposed = true;
-            }
-        }
-
-        #endregion
-
-        #region Private Members
-
-        /// <summary> 
-        /// Gets the test results directory. 
-        /// </summary> 
-        /// <param name="runSettings">Test run settings.</param> 
-        /// <returns>Test results directory</returns>
-        internal string GetResultsDirectory(string runSettings)
-        {
-            string resultsDirectory = null;
-            if (runSettings != null)
-            {
-                try
-                {
-                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-                    resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
-                }
-                catch (SettingsException se)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
-                    }
-                }
-            }
-
-            return resultsDirectory;
-        }
-
-        /// <summary>
         /// Populates user supplied and default logger parameters.
         /// </summary>
         private Dictionary<string, string> UpdateLoggerParameters(Dictionary<string, string> parameters)
@@ -500,105 +607,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 throw new ObjectDisposedException(typeof(TestLoggerManager).FullName);
             }
         }
-
-        #region Event Handlers
-
-        /// <summary>
-        /// Handles test run message event.
-        /// </summary>
-        public void HandleTestRunMessage(TestRunMessageEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.RaiseTestRunMessage(e);
-            }
-        }
-
-        /// <summary>
-        /// Handle test run stats change event.
-        /// </summary>
-        public void HandleTestRunStatsChange(TestRunChangedEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                foreach (TestResult result in e.NewTestResults)
-                {
-                    this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Handles test run start event.
-        /// </summary>
-        public void HandleTestRunStart(TestRunStartEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.RaiseTestRunStart(e);
-            }
-        }
-
-        /// <summary>
-        /// Handles test run complete.
-        /// </summary>
-        public void HandleTestRunComplete(TestRunCompleteEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error, e.AttachmentSets, e.ElapsedTimeInRunningTests);
-            }
-        }
-
-        /// <summary>
-        /// Handles discovery message event.
-        /// </summary>
-        /// <param name="e"></param>
-        public void HandleDiscoveryMessage(TestRunMessageEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.RaiseDiscoveryMessage(e);
-            }
-        }
-
-        /// <summary>
-        /// Handle discovered tests.
-        /// </summary>
-        /// <param name="e"></param>
-        public void HandleDiscoveredTests(DiscoveredTestsEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.RaiseDiscoveredTests(e);
-            }
-        }
-
-        /// <summary>
-        /// Handles discovery complete event.
-        /// </summary>
-        /// <param name="e"></param>
-        public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.RaiseDiscoveryComplete(e);
-            }
-        }
-
-        /// <summary>
-        /// Handles discovery start event.
-        /// </summary>
-        /// <param name="e"></param>
-        public void HandleDiscoveryStart(DiscoveryStartEventArgs e)
-        {
-            if (!this.isDisposed)
-            {
-                this.loggerEvents.RaiseDiscoveryStart(e);
-            }
-        }
-        #endregion
-
-        #endregion
     }
 }

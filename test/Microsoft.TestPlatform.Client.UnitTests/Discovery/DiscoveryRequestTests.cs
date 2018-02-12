@@ -124,16 +124,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         }
 
         [TestMethod]
-        public void HandleDiscoveryCompleteShouldInvokeHandleDiscoveryCompleteOfLoggerManager()
-        {
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
-            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
-
-            loggerManager.Verify(lm => lm.HandleDiscoveryComplete(discoveryCompleteEventArgs), Times.Once);
-        }
-
-        [TestMethod]
         public void HandleDiscoveryCompleteShouldNotInvokeHandleDiscoveredTestsIfLastChunkNotPresent()
         {
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
@@ -141,34 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
 
             loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Never);
-        }
-
-        [TestMethod]
-        public void HandleDiscoveryCompleteShouldInvokeHandleDiscoveredTestsIfLastChunkPresent()
-        {
-            var activeTestCases = new List<ObjectModel.TestCase>
-            {
-                new ObjectModel.TestCase(
-                    "A.C.M2",
-                    new Uri("executor://dummy"),
-                    "A")
-            };
-
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
-            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, activeTestCases);
-
-            loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void HandleDiscoveryCompleteShouldDisposeLoggerManager()
-        {
-            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(1, false);
-            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler2;
-            eventsHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, Enumerable.Empty<TestCase>());
-
-            loggerManager.Verify(lm => lm.Dispose(), Times.Once);
         }
 
         [TestMethod]
@@ -210,14 +172,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 
             // Assert
             loggerManager.Verify(lm => lm.HandleDiscoveryStart(It.IsAny<DiscoveryStartEventArgs>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void HandleDiscoveredTestsShouldInvokeHandleDiscoveredTestsOfLoggerManager()
-        {
-            discoveryRequest.HandleDiscoveredTests(null);
-
-            loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Once);
         }
 
         [TestMethod]
@@ -277,6 +231,66 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.mockDataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<DiscoveryCompletePayload>()), Times.Once);
             this.mockRequestData.Verify(x => x.MetricsCollection, Times.AtLeastOnce);
             Assert.IsTrue(onDiscoveryCompleteInvoked);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldInvokeHandleDiscoveryCompleteOfLoggerManager()
+        {
+            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+                .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
+                .Returns(new DiscoveryCompletePayload()
+                {
+                    TotalTests = 1,
+                    IsAborted = false,
+                    LastDiscoveredTests = Enumerable.Empty<TestCase>()
+                });
+
+            this.discoveryRequest.HandleRawMessage(string.Empty);
+
+            this.loggerManager.Verify(lm => lm.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldInvokeHandleDiscoveredTestsIfLastChunkPresent()
+        {
+            var activeTestCases = new List<ObjectModel.TestCase>
+            {
+                new ObjectModel.TestCase(
+                    "A.C.M2",
+                    new Uri("executor://dummy"),
+                    "A")
+            };
+
+            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+                .Returns(new Message() { MessageType = MessageType.DiscoveryComplete });
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<DiscoveryCompletePayload>(It.IsAny<Message>()))
+                .Returns(new DiscoveryCompletePayload()
+                {
+                    TotalTests = 1,
+                    IsAborted = false,
+                    LastDiscoveredTests = activeTestCases
+                });
+
+            this.discoveryRequest.HandleRawMessage(string.Empty);
+
+            this.loggerManager.Verify(lm => lm.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldInvokeHandleDiscoveredTestsOfLoggerManager()
+        {
+            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
+                .Returns(new Message() { MessageType = MessageType.TestCasesFound });
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<IEnumerable<TestCase>>(It.IsAny<Message>()))
+                .Returns(Enumerable.Empty<TestCase>());
+
+            this.discoveryRequest.HandleRawMessage(string.Empty);
+
+            loggerManager.Verify(lm => lm.HandleDiscoveredTests(It.IsAny<DiscoveredTestsEventArgs>()), Times.Once);
         }
     }
 }

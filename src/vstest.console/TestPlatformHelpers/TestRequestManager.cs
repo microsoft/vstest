@@ -427,10 +427,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         runConfiguration.DesignMode :
                         this.commandLineOptions.IsDesignMode;
 
+                    // Add or update console logger.
                     if (!designMode)
                     {
                         AddOrUpdateConsoleLogger(document, runsettingsXml);
                         settingsUpdated = true;
+                    }
+                    else
+                    {
+                        settingsUpdated = settingsUpdated || UpdateConsoleLoggerIfExists(document, runsettingsXml);
                     }
 
                     updatedRunSettingsXml = navigator.OuterXml;
@@ -440,41 +445,70 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
+        /// <summary>
+        /// Add or update console logger in runsettings.
+        /// </summary>
+        /// <param name="document">Runsettings document.</param>
+        /// <param name="runsettingsXml">Runsettings xml.</param>
         private void AddOrUpdateConsoleLogger(XmlDocument document, string runsettingsXml)
         {
-            // Check if logger already exists in run settings.
+            var consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, runsettingsXml);
+
+            if (!consoleLoggerUpdated)
+            {
+                AddConsoleLogger(document, runsettingsXml);
+            }
+        }
+
+        /// <summary>
+        /// Add console logger in runsettings.
+        /// </summary>
+        /// <param name="document">Runsettings document.</param>
+        /// <param name="runsettingsXml">Runsettings xml.</param>
+        private void AddConsoleLogger(XmlDocument document, string runsettingsXml)
+        {
+            var consoleLogger = new LoggerSettings
+            {
+                FriendlyName = ConsoleLogger.FriendlyName,
+                Uri = new Uri(ConsoleLogger.ExtensionUri),
+                AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName,
+                CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location,
+                IsEnabled = true
+            };
+
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
+            loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+        }
+
+        /// <summary>
+        /// Add console logger in runsettings if exists.
+        /// </summary>
+        /// <param name="document">Runsettings document.</param>
+        /// <param name="runsettingsXml">Runsettings xml.</param>
+        /// <returns>True if updated console logger in runsettings successfully.</returns>
+        private bool UpdateConsoleLoggerIfExists(XmlDocument document, string runsettingsXml)
+        {
             var dummyConsoleLogger = new LoggerSettings
             {
                 FriendlyName = ConsoleLogger.FriendlyName,
                 Uri = new Uri(ConsoleLogger.ExtensionUri)
             };
+
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
             var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(dummyConsoleLogger);
 
-            var consoleLogger = default(LoggerSettings);
+            // Update assemblyQualifiedName and codeBase of existing logger.
             if (existingLoggerIndex >= 0)
             {
-                // Update assemblyQualifiedName and codeBase of existing logger.
-                consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
+                var consoleLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
                 consoleLogger.AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName;
                 consoleLogger.CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location;
-            }
-            else
-            {
-                // Create new console logger if doesn't exists.
-                consoleLogger = new LoggerSettings
-                {
-                    FriendlyName = ConsoleLogger.FriendlyName,
-                    Uri = new Uri(ConsoleLogger.ExtensionUri),
-                    AssemblyQualifiedName = typeof(ConsoleLogger).AssemblyQualifiedName,
-                    CodeBase = typeof(ConsoleLogger).GetTypeInfo().Assembly.Location,
-                    IsEnabled = true
-                };
-
-                loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
+                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+                return true;
             }
 
-            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
+            return false;
         }
 
         private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)

@@ -65,5 +65,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="e"></param>
         void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e);
+
+        /// <summary>
+        /// Returns true if atleast one logger is initialized.
+        /// </summary>
+        /// <returns></returns>
+        bool AreLoggersInitialized();
     }
 }
