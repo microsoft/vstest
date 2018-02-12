@@ -889,6 +889,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void DisplayFullInformationShouldWriteStdMessageWithNewLine()
+        {
+            var count = 0;
+            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
+                (s, o) => { count++; });
+
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "detailed");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            var testresults = this.GetTestResultObject(TestOutcome.Passed);
+            testresults[0].Messages.Add(new TestResultMessage (TestResultMessage.StandardOutCategory, "Hello"));
+
+            foreach (var testResult in testresults)
+            {
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
+            }
+
+            // Added this for synchronization
+            SpinWait.SpinUntil(() => count == 4, 300);
+
+            this.mockOutput.Verify(o => o.WriteLine("Passed   TestName", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
         public void GetTestMessagesShouldWriteMessageAndStackTraceToConsole()
         {
             var count = 0;

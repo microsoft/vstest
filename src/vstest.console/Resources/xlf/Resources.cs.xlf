@@ -541,9 +541,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;Název souboru&gt;
-      Vypíše zjištěné testy z daného kontejneru testů.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Název souboru&gt;
+      Vypíše všechny zjištěné testy z daného kontejneru testů.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; název souboru &gt;
       Seznamy zjištěných z kontejneru dané zkušební testy.</target>
@@ -1562,8 +1562,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">Kolekce dat konfigurované prostřednictvím nastavení běhu nejsou podporované s vloženým nastavením testů. Další informace viz https://aka.ms/vstest-configure-datacollector. Nastavení běhu: {0}.</target>
-        <note></note>
+        <target state="translated">Kolekce dat jiné než Pokrytí kódu a Microsoft Fakes konfigurované prostřednictvím nastavení běhu nejsou podporované s vloženým nastavením testů. Další informace viz https://aka.ms/vstest-configure-datacollector. Nastavení běhu: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>

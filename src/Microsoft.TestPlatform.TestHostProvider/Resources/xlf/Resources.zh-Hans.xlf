@@ -3,9 +3,9 @@
   <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-1038642004">
     <body>
       <trans-unit id="NoTestHostFileExist">
-        <source>No test is available in {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} 中没有可用的测试。请确保测试项目具有包“Microsoft.NET.Test.Sdk”的 nuget 参考并确保框架版本设置适当，然后重试。</target>
-        <note />
+        <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
+        <target state="new">{0} 中没有可用的测试。请确保测试项目具有包“Microsoft.NET.Test.Sdk”的 nuget 参考并确保框架版本设置适当，然后重试。</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.

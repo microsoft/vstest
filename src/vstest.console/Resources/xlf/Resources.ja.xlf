@@ -541,9 +541,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
-      指定されたテスト コンテナーから探索されたテストを一覧表示します。</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
+      指定されたテスト コンテナーから探索されたすべてのテストを一覧表示します。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">強い |-ListTests |/lt |/ListTests: &lt; ファイル名 &gt;
       リストは、指定したテスト コンテナーからのテストを発見しました。</target>
@@ -1562,8 +1562,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">実行設定を経由して構成されているデータ コレクターは、埋め込まれたテストの設定ではサポートされていません。詳細については、https://aka.ms/vstest-configure-datacollector を参照してください。実行設定: {0}。</target>
-        <note></note>
+        <target state="translated">実行設定を経由して構成されているコード カバレッジと Microsoft Fakes 以外のデータ コレクターは、埋め込まれたテストの設定ではサポートされていません。詳細については、https://aka.ms/vstest-configure-datacollector をご覧ください。実行設定: {0}。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
