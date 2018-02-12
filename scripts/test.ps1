@@ -247,9 +247,11 @@ function Invoke-Test
                 Set-TestEnvironment
                 if($fx -eq $TPT_TargetFrameworkFullCLR)
                 {
-
-                    Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    $root = $env:TP_ROOT_DIR
+                    $vstestargs = "$testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
+                    Write-Verbose ".\DTAExecutionHost\dtaexec.ps1 $root $vstestConsolePath $vstestargs" & .\DTAExecutionHost\dtaexec.ps1 $root $vstestConsolePath $vstestargs
+                    # Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
+                    # & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
                 }
                 else
                 {
