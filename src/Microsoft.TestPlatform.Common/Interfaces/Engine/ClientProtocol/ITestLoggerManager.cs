@@ -14,6 +14,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface ITestLoggerManager : IDisposable
     {
         /// <summary>
+        /// Loggers initialized flag.
+        /// </summary>
+        bool LoggersInitialized
+        {
+            get;
+        }
+
+        /// <summary>
         /// Initialize loggers.
         /// </summary>
         void Initialize(string runSettings);
@@ -65,11 +73,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="e"></param>
         void HandleDiscoveryComplete(DiscoveryCompleteEventArgs e);
-
-        /// <summary>
-        /// Returns true if atleast one logger is initialized.
-        /// </summary>
-        /// <returns></returns>
-        bool AreLoggersInitialized();
     }
 }

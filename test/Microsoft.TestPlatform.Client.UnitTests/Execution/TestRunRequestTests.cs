@@ -322,43 +322,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void HandleRawMessageShouldInvokeHandleTestRunStatsChangeOfLoggerManager()
-        {
-            var mockStats = new Mock<ITestRunStatistics>();
-            var testResults = new List<ObjectModel.TestResult>
-            {
-                new ObjectModel.TestResult(
-                    new ObjectModel.TestCase(
-                        "A.C.M",
-                        new Uri("executor://dummy"),
-                        "A"))
-            };
-            var activeTestCases = new List<ObjectModel.TestCase>
-            {
-                new ObjectModel.TestCase(
-                    "A.C.M2",
-                    new Uri("executor://dummy"),
-                    "A")
-            };
-
-            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.TestRunStatsChange });
-
-            var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunChangedEventArgs>(It.IsAny<Message>()))
-                .Returns(testRunChangedEventArgs);
-
-            this.testRunRequest.ExecuteAsync();
-            this.testRunRequest.HandleRawMessage(string.Empty);
-
-            this.loggerManager.Verify(lm => lm.HandleTestRunStatsChange(testRunChangedEventArgs), Times.Once);
-        }
-
-        [TestMethod]
         public void HandleRawMessageShouldInvokeHandleTestRunCompleteOfLoggerManager()
         {
-            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
+            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
@@ -379,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         [TestMethod]
         public void HandleRawMessageShouldNotInvokeHandleTestRunCompleteOfLoggerManagerWhenNoLoggersInitiailized()
         {
-            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(false);
+            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(false);
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
@@ -418,7 +384,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
                     "A")
             };
 
-            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
+            this.loggerManager.Setup(x => x.LoggersInitialized).Returns(true);
             this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.ExecutionComplete });
 
@@ -441,22 +407,81 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void HandleRawMessageShouldInvokeHandleLogMessageOfLoggerManager()
+        public void HandleTestRunStatsChangeShouldInvokeHandleTestRunStatsChangeOfLoggerManager()
         {
-            this.loggerManager.Setup(x => x.AreLoggersInitialized()).Returns(true);
-            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>()))
-                .Returns(new Message() { MessageType = MessageType.TestMessage });
+            var mockStats = new Mock<ITestRunStatistics>();
 
-            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestMessagePayload>(It.IsAny<Message>()))
-                .Returns(new TestMessagePayload()
-                {
-                    MessageLevel = TestMessageLevel.Error,
-                    Message = "hello"
-                });
+            var testResults = new List<ObjectModel.TestResult>
+            {
+                new ObjectModel.TestResult(
+                    new ObjectModel.TestCase(
+                        "A.C.M",
+                        new Uri("executor://dummy"),
+                        "A"))
+            };
+            var activeTestCases = new List<ObjectModel.TestCase>
+            {
+                new ObjectModel.TestCase(
+                    "A.C.M2",
+                    new Uri("executor://dummy"),
+                    "A")
+            };
 
-            this.testRunRequest.HandleRawMessage(string.Empty);
+            var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
+            testRunRequest.HandleTestRunStatsChange(testRunChangedEventArgs);
 
-            this.loggerManager.Verify(lm => lm.HandleTestRunMessage(It.IsAny<TestRunMessageEventArgs>()), Times.Once);
+            loggerManager.Verify(lm => lm.HandleTestRunStatsChange(testRunChangedEventArgs), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldInvokeHandleTestRunStatsChangeOfLoggerManagerWhenLastChunkAvailable()
+        {
+            var mockStats = new Mock<ITestRunStatistics>();
+
+            var testResults = new List<ObjectModel.TestResult>
+            {
+                new ObjectModel.TestResult(
+                    new ObjectModel.TestCase(
+                        "A.C.M",
+                        new Uri("executor://dummy"),
+                        "A"))
+            };
+            var activeTestCases = new List<ObjectModel.TestCase>
+            {
+                new ObjectModel.TestCase(
+                    "A.C.M2",
+                    new Uri("executor://dummy"),
+                    "A")
+            };
+            var testRunChangedEventArgs = new TestRunChangedEventArgs(mockStats.Object, testResults, activeTestCases);
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+                null, TimeSpan.FromSeconds(0));
+
+            testRunRequest.ExecuteAsync();
+            testRunRequest.HandleTestRunComplete(testRunCompleteEvent, testRunChangedEventArgs, null, null);
+
+            loggerManager.Verify(lm => lm.HandleTestRunStatsChange(testRunChangedEventArgs), Times.Once);
+            loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldInvokeHandleTestRunCompleteOfLoggerManager()
+        {
+            var testRunCompleteEvent = new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null,
+                null, TimeSpan.FromSeconds(0));
+
+            testRunRequest.ExecuteAsync();
+            testRunRequest.HandleTestRunComplete(testRunCompleteEvent, null, null, null);
+
+            loggerManager.Verify(lm => lm.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleLogMessageShouldInvokeHandleLogMessageOfLoggerManager()
+        {
+            testRunRequest.HandleLogMessage(TestMessageLevel.Error, "hello");
+            loggerManager.Verify(lm => lm.HandleTestRunMessage(It.IsAny<TestRunMessageEventArgs>()), Times.Once);
+
         }
 
         [TestMethod]

@@ -270,9 +270,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     if (lastChunk != null && lastChunk.Count() > 0)
                     {
                         var discoveredTestsEvent = new DiscoveredTestsEventArgs(lastChunk);
+                        this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
                         this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
                     }
 
+                    this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
                     this.OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
                 }
                 finally
@@ -340,6 +342,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 var discoveredTestsEvent = new DiscoveredTestsEventArgs(discoveredTestCases);
+                this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
                 this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
             }
 
@@ -374,6 +377,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+                this.LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
                 this.OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
             }
 
@@ -391,57 +395,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         {
             // Note: Deserialize rawMessage only if required.
 
-            var message = this.LoggerManager.AreLoggersInitialized() || this.requestData.IsTelemetryOptedIn ?
+            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
                     this.dataSerializer.DeserializeMessage(rawMessage) : null;
 
-            switch (message?.MessageType)
+            if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
             {
-                case MessageType.DiscoveryComplete:
-                    var discoveryCompletePayload = this.LoggerManager.AreLoggersInitialized() || this.requestData.IsTelemetryOptedIn ?
-                        this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message) : default(DiscoveryCompletePayload);
-                    rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
-                    HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
-                    break;
-
-                case MessageType.TestCasesFound:
-                    var testCases = this.LoggerManager.AreLoggersInitialized() ?
-                        this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message) : default(IEnumerable<TestCase>);
-                    HandleLoggerManagerDiscoveredTests(testCases);
-                    break;
-
-                case MessageType.TestMessage:
-                    var testMessagePayload = this.LoggerManager.AreLoggersInitialized() ?
-                        this.dataSerializer.DeserializePayload<TestMessagePayload>(message) : default(TestMessagePayload);
-                    HandleLoggerManagerDiscoveryMessage(testMessagePayload);
-                    break;
+                var discoveryCompletePayload = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
+                    this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message) : default(DiscoveryCompletePayload);
+                rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
+                HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
             }
 
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
-        }
-
-        /// <summary>
-        /// Handles LoggerManager's DiscoveredTests.
-        /// </summary>
-        /// <param name="testCases">Discovered testCases.</param>
-        private void HandleLoggerManagerDiscoveredTests(IEnumerable<TestCase> testCases)
-        {
-            if (this.LoggerManager.AreLoggersInitialized() && testCases != null)
-            {
-                this.LoggerManager.HandleDiscoveredTests(new DiscoveredTestsEventArgs(testCases));
-            }
-        }
-
-        /// <summary>
-        /// Handles LoggerManager's DiscoveryMessage.
-        /// </summary>
-        /// <param name="testMessagePayload"></param>
-        private void HandleLoggerManagerDiscoveryMessage(TestMessagePayload testMessagePayload)
-        {
-            if (this.LoggerManager.AreLoggersInitialized() && testMessagePayload != null)
-            {
-                var testRunMessageEvent = new TestRunMessageEventArgs(testMessagePayload.MessageLevel, testMessagePayload.Message);
-                this.LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
-            }
         }
 
         /// <summary>
@@ -450,7 +415,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
         private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload discoveryCompletePayload)
         {
-            if (this.LoggerManager.AreLoggersInitialized() && discoveryCompletePayload != null)
+            if (this.LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
             {
                 // Send last chunk to logger manager.
                 if (discoveryCompletePayload.LastDiscoveredTests != null)

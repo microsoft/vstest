@@ -108,16 +108,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region Properties
 
         /// <summary>
-        /// Gets the initialized loggers.
+        /// Loggers initialized flag.
         /// </summary>
-        /// This property is added to assist in testing
-        protected HashSet<Type> InitializedLoggers
-        {
-            get
-            {
-                return this.initializedLoggers;
-            }
-        }
+        public bool LoggersInitialized => this.initializedLoggers.Any();
 
         private TestLoggerExtensionManager TestLoggerExtensionManager
         {
@@ -297,15 +290,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.Dispose();
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns true if atleast one logger is initialized.
-        /// </summary>
-        /// <returns></returns>
-        public bool AreLoggersInitialized()
-        {
-            return this.initializedLoggers.Any();
         }
 
         /// <summary>

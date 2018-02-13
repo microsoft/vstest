@@ -413,6 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     if (lastChunkArgs != null)
                     {
                         // Raised the changed event also
+                        this.LoggerManager.HandleTestRunStatsChange(lastChunkArgs);
                         this.OnRunStatsChange.SafeInvoke(this, lastChunkArgs, "TestRun.RunStatsChanged");
                     }
 
@@ -429,6 +430,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
                     // by either engines - as both calculate at different points
                     // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
+                    this.LoggerManager.HandleTestRunComplete(runCompletedEvent);
                     this.OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
                 }
                 finally
@@ -502,6 +504,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // TODO: Invoke this event in a separate thread. 
                     // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
+                    this.LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
                     this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
                 }
 
@@ -526,6 +529,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
 
                 var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
+                this.LoggerManager.HandleTestRunMessage(testRunMessageEvent);
                 this.TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
             }
 
@@ -540,57 +544,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             // Note: Deserialize rawMessage only if required.
 
-            var message = this.LoggerManager.AreLoggersInitialized() || this.requestData.IsTelemetryOptedIn ?
+            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
                 this.dataSerializer.DeserializeMessage(rawMessage) : null;
 
-            switch (message?.MessageType)
+            if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
             {
-                case MessageType.ExecutionComplete:
-                    var testRunCompletePayload = this.LoggerManager.AreLoggersInitialized() || this.requestData.IsTelemetryOptedIn ?
-                        this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message) : default(TestRunCompletePayload);
-                    rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
-                    HandleLoggerManagerTestRunComplete(testRunCompletePayload);
-                    break;
-
-                case MessageType.TestRunStatsChange:
-                    var testRunChangedEventArgs = this.LoggerManager.AreLoggersInitialized() ?
-                        this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message) : default(TestRunChangedEventArgs);
-                    HandleLoggerManagerTestRunStatsChange(testRunChangedEventArgs);
-                    break;
-
-                case MessageType.TestMessage:
-                    var testMessagePayload = this.LoggerManager.AreLoggersInitialized() ?
-                        this.dataSerializer.DeserializePayload<TestMessagePayload>(message) : default(TestMessagePayload);
-                    HandleLoggerManagerTestRunMessage(testMessagePayload);
-                    break;
+                var testRunCompletePayload = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
+                    this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message) : default(TestRunCompletePayload);
+                rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
+                HandleLoggerManagerTestRunComplete(testRunCompletePayload);
             }
 
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
-        }
-
-        /// <summary>
-        /// Handles LoggerManager's TestRunMessage.
-        /// </summary>
-        /// <param name="testMessagePayload">TestMessage payload.</param>
-        private void HandleLoggerManagerTestRunMessage(TestMessagePayload testMessagePayload)
-        {
-            if (this.LoggerManager.AreLoggersInitialized() && testMessagePayload != null)
-            {
-                var testRunMessageEvent = new TestRunMessageEventArgs(testMessagePayload.MessageLevel, testMessagePayload.Message);
-                this.LoggerManager.HandleTestRunMessage(testRunMessageEvent);
-            }
-        }
-
-        /// <summary>
-        /// Handles LoggerManager's TestRunStatsChange
-        /// </summary>
-        /// <param name="testRunChangedEventArgs">TestRun changed event args.</param>
-        private void HandleLoggerManagerTestRunStatsChange(TestRunChangedEventArgs testRunChangedEventArgs)
-        {
-            if (this.LoggerManager.AreLoggersInitialized() && testRunChangedEventArgs != null)
-            {
-                this.LoggerManager.HandleTestRunStatsChange(testRunChangedEventArgs);
-            }
         }
 
         /// <summary>
@@ -599,7 +564,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <param name="testRunCompletePayload">TestRun complete payload.</param>
         private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload testRunCompletePayload)
         {
-            if (this.LoggerManager.AreLoggersInitialized() && testRunCompletePayload != null)
+            if (this.LoggerManager.LoggersInitialized && testRunCompletePayload != null)
             {
                 // Send last chunk to logger manager.
                 if (testRunCompletePayload.LastRunTests != null)

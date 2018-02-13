@@ -976,7 +976,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
             testLoggerManager.Initialize(settingsXml);
 
-            Assert.IsTrue(testLoggerManager.AreLoggersInitialized());
+            Assert.IsTrue(testLoggerManager.LoggersInitialized);
         }
 
         [TestMethod]
@@ -1004,7 +1004,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
 
-            Assert.IsFalse(testLoggerManager.AreLoggersInitialized());
+            Assert.IsFalse(testLoggerManager.LoggersInitialized);
         }
 
         [TestMethod]
@@ -1030,7 +1030,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
             testLoggerManager.Initialize(settingsXml);
 
-            Assert.IsFalse(testLoggerManager.AreLoggersInitialized());
+            Assert.IsFalse(testLoggerManager.LoggersInitialized);
         }
 
         [TestMethod]
