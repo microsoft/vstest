@@ -56,9 +56,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">Name of the test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapter.</param>
         /// <param name="runSettings">Text of run settings.</param>
+        /// <param name="framework"></param>
         /// <param name="inIsolation"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string inIsolation = "")
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
+            string framework, string inIsolation = "")
         {
             var arguments = testAssembly.AddDoubleQuote();
 
@@ -99,15 +101,14 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// </summary>
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
-        /// <param name="runSettings">Run settings for execution.</param>
         /// <param name="framework">Dotnet Framework of test assembly.</param>
-        public void InvokeVsTestForExecution(
-            string testAssembly,
+        /// <param name="runSettings">Run settings for execution.</param>
+        public void InvokeVsTestForExecution(string testAssembly,
             string testAdapterPath,
-            string runSettings = "",
-            string framework = "")
+            string framework,
+            string runSettings = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue);
             this.InvokeVsTest(arguments);
         }
 
@@ -119,24 +120,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /listtests");
-            this.InvokeVsTest(arguments);
-        }
-
-        /// <summary>
-        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/ListFullyQualifiedTests /ListTestsTarget:'filename'"
-        /// is appended to the arguments.
-        /// </summary>
-        /// <param name="testAssembly">A test assembly.</param>
-        /// <param name="testAdapterPath">Path to test adapters.</param>
-        /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForFullyQualifiedDiscovery(string testAssembly, string testAdapterPath, string dummyFilePath, string runSettings = "")
-        {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, this.testEnvironment.InIsolationValue);
-            arguments = string.Concat(arguments, " /ListFullyQualifiedTests", " /ListTestsTargetPath:\"" + dummyFilePath + "\"");
-            
-            // arguments = string.Concat(arguments, " /Framework:" + targetFramework);
             this.InvokeVsTest(arguments);
         }
 
@@ -458,8 +443,8 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();
-                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data);
-                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data);
+                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
 
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);

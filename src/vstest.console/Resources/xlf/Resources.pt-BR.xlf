@@ -541,9 +541,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lista os testes descobertos do contêiner de testes fornecido.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Nome do Arquivo&gt;
+      Lista todos os testes descobertos do contêiner de testes fornecido.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; nome do arquivo &gt;
       Listas de descobertas testes do recipiente determinado teste.</target>
@@ -1562,8 +1562,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">Coletores de dados configurados por meio de configurações de execução não são compatíveis com configurações de teste integradas. Confira https://aka.ms/vstest-configure-datacollector para mais informações. Configurações de execução: {0}.</target>
-        <note></note>
+        <target state="translated">Coletores de dados que não sejam a Cobertura de Código e o Microsoft Fakes definidos por meio de configurações de execução não são compatíveis com configurações de teste inseridas. Consulte https://aka.ms/vstest-configure-datacollector para obter mais informações. Configurações de execução: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

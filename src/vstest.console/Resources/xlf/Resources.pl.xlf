@@ -536,9 +536,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;nazwa pliku&gt;
-      Wyświetla listę wykrytych testów z danego kontenera testów.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;nazwa pliku&gt;
+      Wyświetla listę wszystkich wykrytych testów z danego kontenera testów.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |--nazwa | / lt | / nazwa: &lt; nazwa pliku &gt;
       List znaleziony testy z kontenera danego badania.</target>
@@ -1557,8 +1557,8 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">Moduły zbierające dane skonfigurowane za pośrednictwem ustawień uruchamiania nie są obsługiwane przez osadzone ustawienia testów. Zobacz https://aka.ms/vstest-configure-datacollector w celu uzyskania dalszych informacji. Ustawienia uruchamiania: {0}.</target>
-        <note></note>
+        <target state="translated">Moduły zbierające dane inne niż Pokrycie kodu i Microsoft Fakes skonfigurowane za pośrednictwem ustawień uruchamiania nie są obsługiwane przez osadzone ustawienia testów. Zobacz https://aka.ms/vstest-configure-datacollector w celu uzyskania dalszych informacji. Ustawienia uruchamiania: {0}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

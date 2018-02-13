@@ -263,7 +263,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);
             if (stdOutMessagesCollection.Count > 0)
             {
-                addAdditionalNewLine = false;
+                addAdditionalNewLine = true;
                 var stdOutMessages = GetFormattedOutput(stdOutMessagesCollection);
 
                 if (!string.IsNullOrEmpty(stdOutMessages))
