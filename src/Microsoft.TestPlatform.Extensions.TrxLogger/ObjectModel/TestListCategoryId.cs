@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// Class to categorize the tests.
     /// </summary>
-    public sealed class TestListCategoryId
+    internal sealed class TestListCategoryId
     {
         private static TestListCategoryId emptyId = new TestListCategoryId(Guid.Empty);
 

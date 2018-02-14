@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// saved when 'MyClass.SaveDetails' parameter is set to 'true'.
     /// </example>
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-    public sealed class XmlTestStoreParameters : Dictionary<string, object>
+    internal sealed class XmlTestStoreParameters : Dictionary<string, object>
     {
         private XmlTestStoreParameters()
         {

@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// Class identifying test execution id.
     /// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
     /// </summary>
-    public sealed class TestExecId
+    internal sealed class TestExecId
     {
         private static TestExecId emptyId = new TestExecId(Guid.Empty);
 

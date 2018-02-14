@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// Interface used to define a data attachment.
     /// </summary>
-    public interface IDataAttachment
+    internal interface IDataAttachment
     {
         /// <summary>
         /// Gets the description for the attachment.
