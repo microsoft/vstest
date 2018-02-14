@@ -400,8 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
             {
-                var discoveryCompletePayload = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
-                    this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message) : default(DiscoveryCompletePayload);
+                var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
                 rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
                 HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
             }

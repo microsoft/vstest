@@ -549,8 +549,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
             {
-                var testRunCompletePayload = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
-                    this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message) : default(TestRunCompletePayload);
+                var testRunCompletePayload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
                 rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
                 HandleLoggerManagerTestRunComplete(testRunCompletePayload);
             }
@@ -572,6 +571,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     this.LoggerManager.HandleTestRunStatsChange(testRunCompletePayload.LastRunTests);
                 }
 
+                // Note: In HandleRawMessage attachments are considered from TestRunCompleteArgs, while in HandleTestRunComplete attachments are considered directly from testRunCompletePayload.
+                // Ideally we should have attachmentSets at one place only.
                 // Send test run complete to logger manager.
                 TestRunCompleteEventArgs testRunCompleteArgs =
                     new TestRunCompleteEventArgs(
@@ -579,8 +580,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
                         testRunCompletePayload.TestRunCompleteArgs.IsAborted,
                         testRunCompletePayload.TestRunCompleteArgs.Error,
-                        // This is required as TMI adapter is sending attachments as List which cannot be typecasted to Collection.
-                        testRunCompletePayload.RunAttachments != null ? new Collection<AttachmentSet>(testRunCompletePayload.RunAttachments.ToList()) : null,
+                        testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
                         this.runRequestTimeTracker.Elapsed);
                 this.LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
             }

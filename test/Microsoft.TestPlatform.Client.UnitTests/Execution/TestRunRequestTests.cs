@@ -567,12 +567,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void HandleTestRunCompleteShouldHandleNullAttachments()
+        public void HandleTestRunCompleteShouldHandleEmptyAttachments()
         {
             bool attachmentsFound = false;
             this.testRunRequest.OnRunCompletion += (s, e) =>
             {
-                attachmentsFound = e.AttachmentSets == null;
+                attachmentsFound = (e.AttachmentSets.Count == 0);
             };
 
             this.testRunRequest.ExecuteAsync();
