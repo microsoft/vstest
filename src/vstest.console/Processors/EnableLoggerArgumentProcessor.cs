@@ -110,7 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Gets the help content resource name.
         /// </summary>
+#if NET451
         public override string HelpContentResourceName => CommandLineResources.EnableLoggersArgumentHelp;
+#else
+        public override string HelpContentResourceName => CommandLineResources.EnableLoggerArgumentsInNetCore;
+#endif
 
         /// <summary>
         /// Gets the help priority.
@@ -125,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private readonly IRunSettingsProvider runSettingsManager;
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
@@ -136,9 +140,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.runSettingsManager = runSettingsManager;
         }
 
-        #endregion
+#endregion
 
-        #region IArgumentProcessor
+#region IArgumentProcessor
 
         /// <summary>
         /// Initializes with the argument that was provided with the command.
@@ -254,6 +258,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        #endregion
+#endregion
     }
 }
