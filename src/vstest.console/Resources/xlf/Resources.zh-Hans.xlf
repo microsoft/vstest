@@ -224,16 +224,7 @@
 
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</source>
+      More info on Console Logger here : https://aka.ms/console-logger</source>
         <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       为测试结果指定记录器。例如，若要将结果记录到
       Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx[;LogFileName=&lt;默认为唯一文件名&gt;]
@@ -1577,16 +1568,7 @@
 
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</source>
+      More info on Console Logger here : https://aka.ms/console-logger</source>
         <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
       Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
