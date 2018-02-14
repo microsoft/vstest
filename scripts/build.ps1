@@ -54,6 +54,7 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
+$env:TP_TEST_OUT_DIR = Join-Path $env:TP_ROOT_DIR "testArtifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
 # Set Version from scripts/build/TestPlatform.Settings.targets
@@ -231,7 +232,6 @@ function Publish-Package
 
     Write-Log "Package: Publish src\package\package\package.csproj"
 
-
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
@@ -394,6 +394,22 @@ function Publish-Package
     Copy-Item "$visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll" $testPlatformDirectory -Force
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Publish-Tests
+{
+    $dotnetExe = Get-DotNetPath
+    Write-Log "Publish-Tests: Started."
+
+    # Adding only Perf project for now
+    $fullCLRTestDir = $(Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework")
+    $fullCLRPerfTestAssetDir = $(Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets")
+    
+    $mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
+    Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
+
+    $testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
+    Publish-PackageInternal $testPerfProject $TPB_TargetFramework $fullCLRTestDir
 }
 
 function Publish-PackageInternal($packagename, $framework, $output)
@@ -796,6 +812,7 @@ Restore-Package
 Update-LocalizedResources
 Invoke-Build
 Publish-Package
+Publish-Tests
 Create-VsixPackage
 Create-NugetPackages
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"

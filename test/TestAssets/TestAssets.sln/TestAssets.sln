@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27106.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitAdapterPerfTestProject", "..\NUnitAdapterPerfTestProject\NUnitAdapterPerfTestProject.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitAdapterPerfTestProject", "..\PerfAssets\NUnitAdapterPerfTestProject\NUnitAdapterPerfTestProject.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitAdapterPerfTestProject", "..\XUnitAdapterPerfTestProject\XUnitAdapterPerfTestProject.csproj", "{C1A621CF-8FA8-437C-98E8-C6C6418FEBEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitAdapterPerfTestProject", "..\PerfAssets\XUnitAdapterPerfTestProject\XUnitAdapterPerfTestProject.csproj", "{C1A621CF-8FA8-437C-98E8-C6C6418FEBEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTestAdapterPerfTestProject", "..\MSTestAdapterPerfTestProject\MSTestAdapterPerfTestProject.csproj", "{52CAF89F-2309-4597-B531-79D6A96902BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSTestAdapterPerfTestProject", "..\PerfAssets\MSTestAdapterPerfTestProject\MSTestAdapterPerfTestProject.csproj", "{52CAF89F-2309-4597-B531-79D6A96902BE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUTestProject", "..\NUTestProject\NUTestProject.csproj", "{1ADE5795-2365-4790-8ACB-2EF0C2613D61}"
 EndProject
