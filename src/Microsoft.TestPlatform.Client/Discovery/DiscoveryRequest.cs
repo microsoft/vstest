@@ -87,8 +87,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                     // Invoke OnDiscoveryStart event
                     var discoveryStartEvent = new DiscoveryStartEventArgs(this.DiscoveryCriteria);
-                    this.OnDiscoveryStart.SafeInvoke(this, discoveryStartEvent, "DiscoveryRequest.DiscoveryStart");
                     this.LoggerManager.HandleDiscoveryStart(discoveryStartEvent);
+                    this.OnDiscoveryStart.SafeInvoke(this, discoveryStartEvent, "DiscoveryRequest.DiscoveryStart");
 
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
@@ -270,13 +270,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     if (lastChunk != null && lastChunk.Count() > 0)
                     {
                         var discoveredTestsEvent = new DiscoveredTestsEventArgs(lastChunk);
-                        this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
                         this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
+                        this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.DiscoveryComplete");
                     }
 
-                    this.OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
                     this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
-                    this.LoggerManager.Dispose();
+                    this.OnDiscoveryComplete.SafeInvoke(this, discoveryCompleteEventArgs, "DiscoveryRequest.DiscoveryComplete");
                 }
                 finally
                 {
@@ -343,8 +342,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 var discoveredTestsEvent = new DiscoveredTestsEventArgs(discoveredTestCases);
-                this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
                 this.LoggerManager.HandleDiscoveredTests(discoveredTestsEvent);
+                this.OnDiscoveredTests.SafeInvoke(this, discoveredTestsEvent, "DiscoveryRequest.OnDiscoveredTests");
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -378,8 +377,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
 
                 var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
-                this.OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
                 this.LoggerManager.HandleDiscoveryMessage(testRunMessageEvent);
+                this.OnDiscoveryMessage.SafeInvoke(this, testRunMessageEvent, "DiscoveryRequest.OnTestMessageRecieved");
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -394,54 +393,93 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="rawMessage">Raw message.</param>
         public void HandleRawMessage(string rawMessage)
         {
-            if (this.requestData.IsTelemetryOptedIn)
+            // Note: Deserialize rawMessage only if required.
+
+            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
+                    this.dataSerializer.DeserializeMessage(rawMessage) : null;
+
+            if (string.Equals(message?.MessageType, MessageType.DiscoveryComplete))
             {
-                var message = this.dataSerializer.DeserializeMessage(rawMessage);
-
-                if (string.Equals(message.MessageType, MessageType.DiscoveryComplete))
-                {
-                    var discoveryCompletePayload =
-                        this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
-
-                    if (discoveryCompletePayload != null)
-                    {
-                        if (discoveryCompletePayload.Metrics == null)
-                        {
-                            discoveryCompletePayload.Metrics = this.requestData.MetricsCollection.Metrics;
-                        }
-                        else
-                        {
-                            foreach (var kvp in this.requestData.MetricsCollection.Metrics)
-                            {
-                                discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
-                            }
-                        }
-
-                        var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - this.discoveryStartTime;
-
-                        // Collecting Total Time Taken
-                        discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
-                    }
-
-                    if (message is VersionedMessage)
-                    {
-                        var version = ((VersionedMessage)message).Version;
-
-                        rawMessage = this.dataSerializer.SerializePayload(
-                            MessageType.DiscoveryComplete,
-                            discoveryCompletePayload,
-                            version);
-                    }
-                    else
-                    {
-                        rawMessage = this.dataSerializer.SerializePayload(
-                            MessageType.DiscoveryComplete,
-                            discoveryCompletePayload);
-                    }
-                }
+                var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                rawMessage = UpdateRawMessageWithTelemetryInfo(discoveryCompletePayload, message) ?? rawMessage;
+                HandleLoggerManagerDiscoveryComplete(discoveryCompletePayload);
             }
 
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
+        }
+
+        /// <summary>
+        /// Handles LoggerManager's DiscoveryComplete.
+        /// </summary>
+        /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
+        private void HandleLoggerManagerDiscoveryComplete(DiscoveryCompletePayload discoveryCompletePayload)
+        {
+            if (this.LoggerManager.LoggersInitialized && discoveryCompletePayload != null)
+            {
+                // Send last chunk to logger manager.
+                if (discoveryCompletePayload.LastDiscoveredTests != null)
+                {
+                    var discoveredTestsEventArgs = new DiscoveredTestsEventArgs(discoveryCompletePayload.LastDiscoveredTests);
+                    this.LoggerManager.HandleDiscoveredTests(discoveredTestsEventArgs);
+                }
+
+                // Send discovery complete to logger manager.
+                var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(discoveryCompletePayload.TotalTests, discoveryCompletePayload.IsAborted);
+                discoveryCompleteEventArgs.Metrics = discoveryCompletePayload.Metrics;
+                this.LoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
+            }
+        }
+
+        /// <summary>
+        /// Update raw message with telemetry info.
+        /// </summary>
+        /// <param name="discoveryCompletePayload">Discovery complete payload.</param>
+        /// <param name="message">Message.</param>
+        /// <returns>Updated rawMessage.</returns>
+        private string UpdateRawMessageWithTelemetryInfo(DiscoveryCompletePayload discoveryCompletePayload, Message message)
+        {
+            var rawMessage = default(string);
+
+            if (this.requestData.IsTelemetryOptedIn)
+            {
+                if (discoveryCompletePayload != null)
+                {
+                    if (discoveryCompletePayload.Metrics == null)
+                    {
+                        discoveryCompletePayload.Metrics = this.requestData.MetricsCollection.Metrics;
+                    }
+                    else
+                    {
+                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        {
+                            discoveryCompletePayload.Metrics[kvp.Key] = kvp.Value;
+                        }
+                    }
+
+                    var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - this.discoveryStartTime;
+
+                    // Collecting Total Time Taken
+                    discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
+                }
+
+                if (message is VersionedMessage)
+                {
+                    var version = ((VersionedMessage)message).Version;
+
+                    rawMessage = this.dataSerializer.SerializePayload(
+                        MessageType.DiscoveryComplete,
+                        discoveryCompletePayload,
+                        version);
+                }
+                else
+                {
+                    rawMessage = this.dataSerializer.SerializePayload(
+                        MessageType.DiscoveryComplete,
+                        discoveryCompletePayload);
+                }
+            }
+
+            return rawMessage;
         }
 
         #endregion
