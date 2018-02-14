@@ -435,7 +435,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
                     else
                     {
-                        settingsUpdated = settingsUpdated || UpdateConsoleLoggerIfExists(document, runsettingsXml);
+                        settingsUpdated = UpdateConsoleLoggerIfExists(document, runsettingsXml) || settingsUpdated;
                     }
 
                     updatedRunSettingsXml = navigator.OuterXml;
@@ -489,14 +489,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <returns>True if updated console logger in runsettings successfully.</returns>
         private bool UpdateConsoleLoggerIfExists(XmlDocument document, string runsettingsXml)
         {
-            var dummyConsoleLogger = new LoggerSettings
+            var defaultConsoleLogger = new LoggerSettings
             {
                 FriendlyName = ConsoleLogger.FriendlyName,
                 Uri = new Uri(ConsoleLogger.ExtensionUri)
             };
 
             var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
-            var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(dummyConsoleLogger);
+            var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(defaultConsoleLogger);
 
             // Update assemblyQualifiedName and codeBase of existing logger.
             if (existingLoggerIndex >= 0)
