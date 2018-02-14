@@ -161,8 +161,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // Start the stop watch for calculating the test run time taken overall
                     this.runRequestTimeTracker.Start();
                     var testRunStartEvent = new TestRunStartEventArgs(this.testRunCriteria);
-                    this.OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
                     this.LoggerManager.HandleTestRunStart(testRunStartEvent);
+                    this.OnRunStart.SafeInvoke(this, testRunStartEvent, "TestRun.TestRunStart");
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
 
                     if (EqtTrace.IsInfoEnabled)
@@ -412,9 +412,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     if (lastChunkArgs != null)
                     {
-                        // Raised the changed event also                         
-                        this.OnRunStatsChange.SafeInvoke(this, lastChunkArgs, "TestRun.RunStatsChanged");
+                        // Raised the changed event also
                         this.LoggerManager.HandleTestRunStatsChange(lastChunkArgs);
+                        this.OnRunStatsChange.SafeInvoke(this, lastChunkArgs, "TestRun.RunStatsChanged");
                     }
 
                     TestRunCompleteEventArgs runCompletedEvent =
@@ -430,9 +430,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
                     // by either engines - as both calculate at different points
                     // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
-                    this.OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
                     this.LoggerManager.HandleTestRunComplete(runCompletedEvent);
-                    this.LoggerManager.Dispose();
+                    this.OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
                 }
                 finally
                 {
@@ -505,8 +504,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // TODO: Invoke this event in a separate thread. 
                     // For now, I am setting the ConcurrencyMode on the callback attribute to Multiple
-                    this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
                     this.LoggerManager.HandleTestRunStatsChange(testRunChangedArgs);
+                    this.OnRunStatsChange.SafeInvoke(this, testRunChangedArgs, "TestRun.RunStatsChanged");
                 }
 
                 EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
@@ -530,8 +529,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
 
                 var testRunMessageEvent = new TestRunMessageEventArgs(level, message);
-                this.TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
                 this.LoggerManager.HandleTestRunMessage(testRunMessageEvent);
+                this.TestRunMessage.SafeInvoke(this, testRunMessageEvent, "TestRun.LogMessages");
             }
 
             EqtTrace.Info("TestRunRequest:SendTestRunMessage: Completed.");
@@ -543,54 +542,98 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <param name="rawMessage"></param>
         public void HandleRawMessage(string rawMessage)
         {
-            if (this.requestData.IsTelemetryOptedIn)
+            // Note: Deserialize rawMessage only if required.
+
+            var message = this.LoggerManager.LoggersInitialized || this.requestData.IsTelemetryOptedIn ?
+                this.dataSerializer.DeserializeMessage(rawMessage) : null;
+
+            if (string.Equals(message?.MessageType, MessageType.ExecutionComplete))
             {
-                var message = this.dataSerializer.DeserializeMessage(rawMessage);
-
-                if (string.Equals(message.MessageType, MessageType.ExecutionComplete))
-                {
-                    var testRunCompletePayload =
-                        this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
-
-                    if (testRunCompletePayload != null)
-                    {
-                        if (testRunCompletePayload.TestRunCompleteArgs?.Metrics == null)
-                        {
-                            testRunCompletePayload.TestRunCompleteArgs.Metrics = this.requestData.MetricsCollection.Metrics;
-                        }
-                        else
-                        {
-                            foreach (var kvp in this.requestData.MetricsCollection.Metrics)
-                            {
-                                testRunCompletePayload.TestRunCompleteArgs.Metrics[kvp.Key] = kvp.Value;
-                            }
-                        }
-
-                        var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - this.executionStartTime;
-
-                        // Fill in the time taken to complete the run
-                        testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
-                    }
-
-                    if (message is VersionedMessage)
-                    {
-                        var version = ((VersionedMessage)message).Version;
-
-                        rawMessage = this.dataSerializer.SerializePayload(
-                            MessageType.ExecutionComplete,
-                            testRunCompletePayload,
-                            version);
-                    }
-                    else
-                    {
-                        rawMessage = this.dataSerializer.SerializePayload(
-                            MessageType.ExecutionComplete,
-                            testRunCompletePayload);
-                    }
-                }
+                var testRunCompletePayload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                rawMessage = UpdateRawMessageWithTelemetryInfo(testRunCompletePayload, message) ?? rawMessage;
+                HandleLoggerManagerTestRunComplete(testRunCompletePayload);
             }
 
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
+        }
+
+        /// <summary>
+        /// Handles LoggerManager's TestRunComplete.
+        /// </summary>
+        /// <param name="testRunCompletePayload">TestRun complete payload.</param>
+        private void HandleLoggerManagerTestRunComplete(TestRunCompletePayload testRunCompletePayload)
+        {
+            if (this.LoggerManager.LoggersInitialized && testRunCompletePayload != null)
+            {
+                // Send last chunk to logger manager.
+                if (testRunCompletePayload.LastRunTests != null)
+                {
+                    this.LoggerManager.HandleTestRunStatsChange(testRunCompletePayload.LastRunTests);
+                }
+
+                // Note: In HandleRawMessage attachments are considered from TestRunCompleteArgs, while in HandleTestRunComplete attachments are considered directly from testRunCompletePayload.
+                // Ideally we should have attachmentSets at one place only.
+                // Send test run complete to logger manager.
+                TestRunCompleteEventArgs testRunCompleteArgs =
+                    new TestRunCompleteEventArgs(
+                        testRunCompletePayload.TestRunCompleteArgs.TestRunStatistics,
+                        testRunCompletePayload.TestRunCompleteArgs.IsCanceled,
+                        testRunCompletePayload.TestRunCompleteArgs.IsAborted,
+                        testRunCompletePayload.TestRunCompleteArgs.Error,
+                        testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
+                        this.runRequestTimeTracker.Elapsed);
+                this.LoggerManager.HandleTestRunComplete(testRunCompleteArgs);
+            }
+        }
+
+        /// <summary>
+        /// Update raw message with telemetry info.
+        /// </summary>
+        /// <param name="testRunCompletePayload">Test run complete payload.</param>
+        /// <param name="message">Updated rawMessage.</param>
+        /// <returns></returns>
+        private string UpdateRawMessageWithTelemetryInfo(TestRunCompletePayload testRunCompletePayload, Message message)
+        {
+            var rawMessage = default(string);
+            if (this.requestData.IsTelemetryOptedIn)
+            {
+                if (testRunCompletePayload?.TestRunCompleteArgs != null)
+                {
+                    if (testRunCompletePayload.TestRunCompleteArgs.Metrics == null)
+                    {
+                        testRunCompletePayload.TestRunCompleteArgs.Metrics = this.requestData.MetricsCollection.Metrics;
+                    }
+                    else
+                    {
+                        foreach (var kvp in this.requestData.MetricsCollection.Metrics)
+                        {
+                            testRunCompletePayload.TestRunCompleteArgs.Metrics[kvp.Key] = kvp.Value;
+                        }
+                    }
+
+                    // Fill in the time taken to complete the run
+                    var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - this.executionStartTime;
+                    testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
+                }
+
+                if (message is VersionedMessage)
+                {
+                    var version = ((VersionedMessage)message).Version;
+
+                    rawMessage = this.dataSerializer.SerializePayload(
+                        MessageType.ExecutionComplete,
+                        testRunCompletePayload,
+                        version);
+                }
+                else
+                {
+                    rawMessage = this.dataSerializer.SerializePayload(
+                        MessageType.ExecutionComplete,
+                        testRunCompletePayload);
+                }
+            }
+
+            return rawMessage;
         }
 
         /// <summary>

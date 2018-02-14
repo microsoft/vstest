@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.IsCanceled = isCanceled;
             this.IsAborted = isAborted;
             this.Error = error;
-            this.AttachmentSets = attachmentSets;
+            this.AttachmentSets = attachmentSets ?? new Collection<AttachmentSet>(); // Ensuring attachmentSets are not null, so that new attachmentSets can be combined whenever required.
             this.ElapsedTimeInRunningTests = elapsedTime;
         }
 
