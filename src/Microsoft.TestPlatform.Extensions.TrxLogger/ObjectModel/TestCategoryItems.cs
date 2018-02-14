@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// Stores a string which categorizes the Test
     /// </summary>
-    public sealed class TestCategoryItem : IXmlTestStore
+    internal sealed class TestCategoryItem : IXmlTestStore
     {
         #region Fields
         [StoreXmlSimpleField(Location = "@TestCategory", DefaultValue = "")]
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// A collection of strings which categorize the test.
     /// </summary>
-    public sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
+    internal sealed class TestCategoryItemCollection : EqtBaseCollection<TestCategoryItem>
     {
         #region Constructors
         /// <summary>

@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// The test list category.
     /// </summary>
-    public class TestListCategory : IXmlTestStore
+    internal class TestListCategory : IXmlTestStore
     {
         #region Fields
 

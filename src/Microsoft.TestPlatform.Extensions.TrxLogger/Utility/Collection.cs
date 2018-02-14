@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     /// Base class for Eqt Collections. 
     /// Fast collection, default implementations (Add/Remove/etc) do not allow null items and ignore duplicates.
     /// </summary>
-    public class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
+    internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     {
         #region private classes
         /// <summary>
