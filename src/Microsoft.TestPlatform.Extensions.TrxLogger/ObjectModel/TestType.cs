@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// Class identifying test type.
     /// </summary>
-    public sealed class TestType : IXmlTestStore
+    internal sealed class TestType : IXmlTestStore
     {
         [StoreXmlSimpleField(".")]
         private Guid typeId;

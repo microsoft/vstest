@@ -10,22 +10,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     using System.IO;
     using System.Linq;
     using System.Xml;
-
+    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
-
-    using Utility;
-
     using VisualStudio.TestPlatform.ObjectModel;
     using VisualStudio.TestPlatform.ObjectModel.Client;
     using VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
-    using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
 
     [TestClass]
     public class TrxLoggerTests
@@ -44,7 +39,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger = new TestableTrxLogger();
             this.parameters = new Dictionary<string, string>(2);
             this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
-            this.parameters[TrxLogger.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue;
+            this.parameters[TrxLoggerConstants.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
@@ -294,6 +289,222 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldAddFlatResultsIfParentTestResultIsNotPresent()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase1);
+            result2.Outcome = ObjectModel.TestOutcome.Failed;
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 2, "TestResultHandler is not creating flat results when parent result is not present.");
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldAddHierarchicalResultsIfParentTestResultIsPresent()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase1);
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1);
+            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+            Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 1, "TestResultHandler is not creating hierarchical results when parent result is present.");
+            Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 3, "TestResultHandler is not adding all inner results in parent test result.");
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldAddSingleTestElementForDataDrivenTests()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase1);
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1);
+            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+            Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.UnitTestElementCount, 1, "TestResultHandler is adding multiple test elements for data driven tests.");
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldAddSingleTestEntryForDataDrivenTests()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase1);
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase1);
+            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+            Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.TestEntryCount, 1, "TestResultHandler is adding multiple test entries for data driven tests.");
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldAddHierarchicalResultsForOrderedTest()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
+            ObjectModel.TestCase testCase3 = CreateTestCase("TestCase3");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.TestTypeProperty, TrxLoggerConstants.OrderedTestTypeGuid);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
+            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+            Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 1, "TestResultHandler is not creating hierarchical results for ordered test.");
+            Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 3, "TestResultHandler is not adding all inner results in ordered test.");
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldAddMultipleTestElementsForOrderedTest()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
+            ObjectModel.TestCase testCase3 = CreateTestCase("TestCase3");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.TestTypeProperty, TrxLoggerConstants.OrderedTestTypeGuid);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
+            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+            Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.UnitTestElementCount, 3, "TestResultHandler is not adding multiple test elements for ordered test.");
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldAddSingleTestEntryForOrderedTest()
+        {
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
+            ObjectModel.TestCase testCase3 = CreateTestCase("TestCase3");
+
+            Guid parentExecutionId = Guid.NewGuid();
+
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+            result1.SetPropertyValue<Guid>(TrxLoggerConstants.TestTypeProperty, TrxLoggerConstants.OrderedTestTypeGuid);
+
+            ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result2.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
+            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            result3.SetPropertyValue<Guid>(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
+            Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
+
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
+
+            Assert.AreEqual(this.testableTrxLogger.TestEntryCount, 1, "TestResultHandler is adding multiple test entries for ordered test.");
+        }
+
+        [TestMethod]
         public void OutcomeOfRunWillBeFailIfAnyTestsFails()
         {
             ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
@@ -365,7 +576,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void TheDefaultTrxFileNameShouldNotHaveWhiteSpace()
         {
             // To create default trx file, log file parameter should be null.
-            this.parameters[TrxLogger.LogFileNameKey] = null;
+            this.parameters[TrxLoggerConstants.LogFileNameKey] = null;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
             this.MakeTestRunComplete();
@@ -378,7 +589,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void DefaultTrxFileShouldCreateIfLogFileNameParameterNotPassed()
         {
             // To create default trx file, If LogFileName parameter not passed
-            this.parameters.Remove(TrxLogger.LogFileNameKey);
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
             this.MakeTestRunComplete();
@@ -418,7 +629,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         /// Unit test for assigning or populating test categories read to the unit test element.
         /// </summary>
         [TestMethod]
-        public void GetQToolsTestElementFromTestCaseShouldAssignTestCategoryOfUnitTestElement()
+        public void ToTestElementShouldAssignTestCategoryOfUnitTestElement()
         {
             ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
@@ -426,7 +637,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
 
-            TrxLoggerObjectModel.UnitTestElement unitTestElement = Converter.GetQToolsTestElementFromTestCase(result);
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
             object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
 
@@ -437,12 +648,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         /// Unit test for regression when there's no test categories.
         /// </summary>
         [TestMethod]
-        public void GetQToolsTestElementFromTestCaseShouldNotFailWhenThereIsNoTestCategoreis()
+        public void ToTestElementShouldNotFailWhenThereIsNoTestCategoreis()
         {
             ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
 
-            TrxLoggerObjectModel.UnitTestElement unitTestElement = Converter.GetQToolsTestElementFromTestCase(result);
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
             object[] expected = Enumerable.Empty<Object>().ToArray();
 

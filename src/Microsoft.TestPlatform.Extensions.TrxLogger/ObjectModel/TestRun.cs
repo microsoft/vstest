@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// <summary>
     /// Class having information about a test run.
     /// </summary>
-    public sealed class TestRun
+    internal sealed class TestRun
     {
         #region Fields
 
@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <returns>
         /// Result directory.
         /// </returns>
-        internal string GetResultFilesDirectory(UnitTestResult result)
+        internal string GetResultFilesDirectory(TestResult result)
         {
             EqtAssert.ParameterNotNull(result, "result");
             return Path.Combine(this.GetResultsDirectory(), result.RelativeTestResultsDirectory);

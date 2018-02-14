@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// NOTE: the order is important and is used for computing outcome for aggregations. 
     ///       More important outcomes come first. See TestOutcomeHelper.GetAggregationOutcome.
     /// </summary>
-    public enum TestOutcome
+    internal enum TestOutcome
     {
         /// <summary>
         /// There was a system error while we were trying to execute a test.
