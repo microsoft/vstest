@@ -200,12 +200,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunMessage event args.</param>
         public void HandleTestRunMessage(TestRunMessageEventArgs e)
         {
-            var disposed = CheckAndRaiseWarningIfDisposed("TestLoggerManager.HandleTestRunMessage");
-
-            if (!disposed)
+            if (this.isDisposed)
             {
-                this.loggerEvents.RaiseTestRunMessage(e);
+                EqtTrace.Warning("TestLoggerManager.HandleTestRunMessage: Ignoring as the object is disposed.");
+                return;
             }
+
+            this.loggerEvents.RaiseTestRunMessage(e);
         }
 
         /// <summary>
@@ -214,14 +215,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunChanged event args.</param>
         public void HandleTestRunStatsChange(TestRunChangedEventArgs e)
         {
-            var disposed = CheckAndRaiseWarningIfDisposed("TestLoggerManager.HandleTestRunStatsChange");
-
-            if (!disposed)
+            if (this.isDisposed)
             {
-                foreach (TestResult result in e.NewTestResults)
-                {
-                    this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
-                }
+                EqtTrace.Warning("TestLoggerManager.HandleTestRunStatsChange: Ignoring as the object is disposed.");
+                return;
+            }
+
+            foreach (TestResult result in e.NewTestResults)
+            {
+                this.loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
             }
         }
 
@@ -231,12 +233,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunStart event args.</param>
         public void HandleTestRunStart(TestRunStartEventArgs e)
         {
-            var disposed = CheckAndRaiseWarningIfDisposed("TestLoggerManager.HandleTestRunStart");
-
-            if (!disposed)
+            if (this.isDisposed)
             {
-                this.loggerEvents.RaiseTestRunStart(e);
+                EqtTrace.Warning("TestLoggerManager.HandleTestRunStart: Ignoring as the object is disposed.");
+                return;
             }
+
+            this.loggerEvents.RaiseTestRunStart(e);
         }
 
         /// <summary>
@@ -270,12 +273,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">TestRunMessage event args.</param>
         public void HandleDiscoveryMessage(TestRunMessageEventArgs e)
         {
-            var disposed = CheckAndRaiseWarningIfDisposed("TestLoggerManager.HandleDiscoveryMessage");
-
-            if (!disposed)
+            if (this.isDisposed)
             {
-                this.loggerEvents.RaiseDiscoveryMessage(e);
+                EqtTrace.Warning("TestLoggerManager.HandleDiscoveryMessage: Ignoring as the object is disposed.");
+                return;
             }
+
+            this.loggerEvents.RaiseDiscoveryMessage(e);
         }
 
         /// <summary>
@@ -284,12 +288,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">DiscoveredTests event args.</param>
         public void HandleDiscoveredTests(DiscoveredTestsEventArgs e)
         {
-            var disposed = CheckAndRaiseWarningIfDisposed("TestLoggerManager.HandleDiscoveredTests");
-
-            if (!disposed)
+            if (this.isDisposed)
             {
-                this.loggerEvents.RaiseDiscoveredTests(e);
+                EqtTrace.Warning("TestLoggerManager.HandleDiscoveredTests: Ignoring as the object is disposed.");
+                return;
             }
+
+            this.loggerEvents.RaiseDiscoveredTests(e);
         }
 
         /// <summary>
@@ -322,12 +327,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="e">DiscoveryStart event args.</param>
         public void HandleDiscoveryStart(DiscoveryStartEventArgs e)
         {
-            var disposed = CheckAndRaiseWarningIfDisposed("TestLoggerManager.HandleDiscoveryStart");
-
-            if (!disposed)
+            if (this.isDisposed)
             {
-                this.loggerEvents.RaiseDiscoveryStart(e);
+                EqtTrace.Warning("TestLoggerManager.HandleDiscoveryStart: Ignoring as the object is disposed.");
+                return;
             }
+
+            this.loggerEvents.RaiseDiscoveryStart(e);
         }
 
         /// <summary>
