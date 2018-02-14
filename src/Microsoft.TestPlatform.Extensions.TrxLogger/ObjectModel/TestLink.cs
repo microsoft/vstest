@@ -22,8 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             if (id == Guid.Empty)
             {
-                Debug.Assert(id != Guid.Empty, "id == Guid.Empty!");
-                throw new ArgumentException("ID cant be empty"); // error resource?
+                throw new ArgumentException("ID cant be empty");
             }
 
             EqtAssert.StringNotNullOrEmpty(name, "name");

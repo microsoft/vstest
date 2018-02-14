@@ -560,7 +560,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testDisplayName">test case display name</param>
         /// <param name="rockSteadyTestCase">rockSteady Test Case</param>
         /// <returns>The <see cref="TestMethod"/></returns>
-        private static TestMethod GetTestMethod(string testDisplayName, string testCaseName)
+        private static TestMethod GetTestMethod(string testDisplayName, string testCaseName, string source)
         {
             string className = "DefaultClassName";
             if (testCaseName.Contains("."))
@@ -574,6 +574,22 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                 // rename for a consistent behaviour for all tests.
                 className = className.Replace("::", ".");
+            }
+            else
+            {
+                // Setting class name as source name if FQDn doesnt have . or :: [E.g. ordered test, web test]
+                try
+                {
+                    string testCaseSource = Path.GetFileNameWithoutExtension(source);
+                    if (!String.IsNullOrEmpty(testCaseSource))
+                    {
+                        className = testCaseSource;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    // If source is not valid file path, then className will continue to point default value.
+                }
             }
 
             return new TestMethod(testDisplayName, className);
@@ -601,7 +617,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             else
             {
                 var codeBase = source;
-                var testMethod = GetTestMethod(name, fullyQualifiedName);
+                var testMethod = GetTestMethod(name, fullyQualifiedName, source);
 
                 testElement = new UnitTestElement(testId, name, adapter, testMethod);
                 (testElement as UnitTestElement).CodeBase = codeBase;
