@@ -219,7 +219,7 @@
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Example: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
       Allowed values for verbosity: quiet, minimal and normal.
 
       Change the diagnostic level prefix for console logger as shown below
@@ -234,7 +234,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;로거 URI/FriendlyName&gt;
+        <target state="new">--logger|/logger:&lt;로거 URI/FriendlyName&gt;
       테스트 결과에 대해 로거를 지정합니다. 예를 들어 
       Visual Studio 테스트 결과 파일(TRX)에 결과를 기록하려면 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]를 사용합니다.
       TestResults 디렉터리에 LogFileName이 지정된 파일을 만듭니다.
@@ -255,7 +255,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-로 거 | / 거: &lt; 거 Uri/FriendlyName &gt;
       테스트 결과 대 한로 거를 지정 합니다.  예를 들어, 결과에 Visual Studio 테스트 결과 파일 (TRX) 기록 하려면 /logger:trx를 사용 합니다.

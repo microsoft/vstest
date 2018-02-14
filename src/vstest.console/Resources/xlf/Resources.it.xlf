@@ -219,7 +219,7 @@
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Example: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
       Allowed values for verbosity: quiet, minimal and normal.
 
       Change the diagnostic level prefix for console logger as shown below
@@ -234,7 +234,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
+        <target state="new">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
       Specifica un logger per i risultati dei test. Ad esempio, per registrare risultati in un 
       file di risultati dei test di Visual Studio (TRX), usare /logger:trx[;LogFileName=&lt;impostazione predefinita: nome file univoco&gt;]
       Crea nella directory TestResults il file con il valore specificato per LogFileName.
@@ -255,7 +255,7 @@
                 [;Platform=&lt;impostazione predefinita: "Any CPU"&gt;]
                 [;Flavor=&lt;impostazione predefinita: "Debug"&gt;]
                 [;RunTitle=&lt;titolo&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Logger Uri/FriendlyName &gt;
       Specificare un logger per risultati di test.  Ad esempio, per registrare i risultati in un Visual Studio Test risultati File (TRX) utilizzano /logger:trx.

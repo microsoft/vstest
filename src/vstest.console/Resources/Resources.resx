@@ -237,7 +237,7 @@
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Example: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
       Allowed values for verbosity: quiet, minimal and normal.
 
       Change the diagnostic level prefix for console logger as shown below
