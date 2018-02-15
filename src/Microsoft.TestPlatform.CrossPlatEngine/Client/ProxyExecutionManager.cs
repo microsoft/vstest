@@ -168,7 +168,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Cancels the test run.
         /// </summary>
-        public virtual void Cancel()
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        public virtual void Cancel(ITestRunEventsHandler eventHandler)
         {
             // Cancel fast, try to stop testhost deployment/launch
             this.cancellationTokenSource.Cancel();
@@ -187,7 +188,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Aborts the test run.
         /// </summary>
-        public void Abort()
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        public void Abort(ITestRunEventsHandler eventHandler)
         {
             this.RequestSender.SendTestRunAbort();
         }

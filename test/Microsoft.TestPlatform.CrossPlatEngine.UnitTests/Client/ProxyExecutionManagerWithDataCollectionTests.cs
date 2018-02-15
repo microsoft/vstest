@@ -115,7 +115,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void CancelShouldInvokeAfterTestCaseEnd()
         {
-            this.proxyExecutionManager.Cancel();
+            this.proxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             this.mockDataCollectionManager.Verify(x => x.AfterTestRunEnd(true, It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
@@ -127,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.ThrowsException<Exception>(() =>
             {
-                this.proxyExecutionManager.Cancel();
+                this.proxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
             });
         }
 
