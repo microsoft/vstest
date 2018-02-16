@@ -553,17 +553,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 Debug.Assert(collectorDataEntry != null, "'collectorDataEntry' is null");
                 Debug.Assert(!this.collectorDataEntries.Contains(collectorDataEntry), "The collector data entry already exists in the collection");
-#if DEBUG
-                // Verify that any URI data attachments in the entry have relative paths
-                foreach (IDataAttachment attachment in collectorDataEntry.Attachments)
-                {
-                    UriDataAttachment uriDataAttachment = attachment as UriDataAttachment;
-                    if (uriDataAttachment != null)
-                    {
-                        Debug.Assert(uriDataAttachment.Uri.IsAbsoluteUri, "'collectorDataEntry' contains a URI data attachment with a relative URI");
-                    }
-                }
-#endif
 
                 this.collectorDataEntries.Add(collectorDataEntry.Clone(testResultsDirectory, false));
             }

@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchTestPlatformExceptionAndReturnFail()
+        public void ExecutorExecuteShouldThrowTestPlatformException()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -150,12 +150,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<TestPlatformException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchSettingsExceptionAndReturnFail()
+        public void ExecutorExecuteShouldThrowSettingsException()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -167,12 +166,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<SettingsException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchInvalidOperationExceptionAndReturnFail()
+        public void ExecutorExecuteShouldThrowInvalidOperationException()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -184,8 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<InvalidOperationException>(() => executor.Execute());
         }
 
         [TestMethod]

@@ -190,26 +190,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
                 }
             }
-            catch (Exception ex)
+            finally
             {
-                if (ex is TestPlatformException ||
-                    ex is SettingsException ||
-                    ex is InvalidOperationException)
-                {
-                    ConsoleLogger.RaiseTestRunError(null, ex);
-                    success = false;
-                }
-                else
-                {
-                    throw;
-                }
+                EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
+                this.testPlatformEventSource.DiscoveryRequestStop();
+
+                // Posts the Discovery Complete event.
+                this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
             }
-
-            EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
-            this.testPlatformEventSource.DiscoveryRequestStop();
-
-            // Posts the Discovery Complete event.
-            this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
 
             return success;
         }
@@ -291,13 +279,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher);
             }
 
-            var success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
-            EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
-            this.testPlatformEventSource.ExecutionRequestStop();
+            // Run tests
+            var success = false;
+            try
+            {
+                success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
+            }
+            finally
+            {
+                EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
+                this.testPlatformEventSource.ExecutionRequestStop();
 
-            // Post the run complete event
-            this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
-
+                // Post the run complete event
+                this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+            }
             return success;
         }
 
@@ -393,7 +388,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
-                        ConsoleLogger.RaiseTestRunWarning(this.testRunResultAggregator, incompatibleSettingWarning);
+                        ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
                     }
 
                     if (EqtTrace.IsInfoEnabled)
@@ -519,8 +514,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // While this section is cleaning up, TranslationLayer can trigger run causing multiple threads to run the below section at the same time
             lock (syncobject)
             {
-                bool success = true;
-
                 try
                 {
                     this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
@@ -539,17 +532,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 catch (Exception ex)
                 {
                     EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
-                    if (ex is TestPlatformException ||
-                        ex is SettingsException ||
-                        ex is InvalidOperationException)
-                    {
-                        ConsoleLogger.RaiseTestRunError(this.testRunResultAggregator, ex);
-                        success = false;
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    testRunResultAggregator.MarkTestRunFailed();
+                    throw;
                 }
                 finally
                 {
@@ -563,7 +547,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
                 }
 
-                return success;
+                return true;
             }
         }
 

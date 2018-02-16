@@ -1234,177 +1234,54 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockMetricsPublisher.Verify(mp => mp.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, It.IsAny<IDictionary<string, object>>()), Times.Once);
         }
 
+        // TODO: add tests in design mode and executor that they are handling all the exceptions properly including printing inner exception.
+
         [TestMethod]
-        public void RunTestsIfThrowsTestPlatformExceptionShouldNotThrowOut()
+        public void RunTestsIfThrowsTestPlatformExceptionShouldThrowOut()
         {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
-
-            var createRunRequestCalled = 0;
-            TestRunCriteria observedCriteria = null;
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (IRequestData requestData, TestRunCriteria runCriteria) =>
-                {
-                    createRunRequestCalled++;
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
-
-            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new TestPlatformException("HelloWorld"));
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
-
-            Assert.IsFalse(success, "RunTests call must fail due to exception");
+            Assert.ThrowsException<TestPlatformException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new TestPlatformException("HelloWorld")));
         }
 
         [TestMethod]
-        public void RunTestsIfThrowsSettingsExceptionShouldNotThrowOut()
+        public void RunTestsIfThrowsSettingsExceptionShouldThrowOut()
         {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
-
-            var createRunRequestCalled = 0;
-            TestRunCriteria observedCriteria = null;
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (IRequestData requestData, TestRunCriteria runCriteria) =>
-                {
-                    createRunRequestCalled++;
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
-
-            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new SettingsException("HelloWorld"));
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
-
-            Assert.IsFalse(success, "RunTests call must fail due to exception");
+            Assert.ThrowsException<SettingsException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new SettingsException("HelloWorld")));
         }
 
         [TestMethod]
-        public void RunTestsShouldOutputErrorForInvalidOperationException()
+        public void RunTestsIfThrowsInvalidOperationExceptionShouldThrowOut()
         {
-            ConsoleLogger consoleLogger = new ConsoleLogger(mockOutput.Object);
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll", "b.dll" },
-                RunSettings = DefaultRunsettings
-            };
-
-            TestRunCriteria observedCriteria = null;
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (IRequestData requestData, TestRunCriteria runCriteria) =>
-                {
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
-
-            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new InvalidOperationException("HelloWorld"));
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
-
-            Assert.IsFalse(success, "RunTests call must fail due to exception");
-            mockOutput.Verify(ot => ot.WriteLine("HelloWorld", OutputLevel.Error));
+            Assert.ThrowsException<InvalidOperationException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new InvalidOperationException("HelloWorld")));
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldOutputErrorForInvalidOperationException()
-        {
-            ConsoleLogger consoleLogger = new ConsoleLogger(mockOutput.Object);
-            var payload = new DiscoveryRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll", "b.dll" },
-                RunSettings = DefaultRunsettings
-            };
-
-            DiscoveryCriteria observedCriteria = null;
-            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
-                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
-                {
-                    observedCriteria = discoveryCriteria;
-                }).Returns(mockDiscoveryRequest.Object);
-
-            mockDiscoveryRequest.Setup(mr => mr.DiscoverAsync()).Throws(new InvalidOperationException("HelloWorld"));
-
-            var mockDiscoveryEventsRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryEventsRegistrar.Object, this.protocolConfig);
-
-            Assert.IsFalse(success, "DiscoverTests call must fail due to exception");
-            mockOutput.Verify(ot => ot.WriteLine("HelloWorld", OutputLevel.Error));
-        }
-
-        [TestMethod]
-        public void RunTestsIfThrowsInvalidOperationExceptionShouldNotThrowOut()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll", "b.dll" },
-                RunSettings = DefaultRunsettings
-            };
-
-            var createRunRequestCalled = 0;
-            TestRunCriteria observedCriteria = null;
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (IRequestData requestData, TestRunCriteria runCriteria) =>
-                {
-                    createRunRequestCalled++;
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
-
-            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new InvalidOperationException("HelloWorld"));
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
-
-            Assert.IsFalse(success, "RunTests call must fail due to exception");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(NotImplementedException))]
         public void RunTestsIfThrowsExceptionShouldThrowOut()
         {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
+            Assert.ThrowsException<NotImplementedException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new NotImplementedException("HelloWorld")));
+        }
 
-            var createRunRequestCalled = 0;
-            TestRunCriteria observedCriteria = null;
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
-                (IRequestData requestData, TestRunCriteria runCriteria) =>
-                {
-                    createRunRequestCalled++;
-                    observedCriteria = runCriteria;
-                }).Returns(mockRunRequest.Object);
+        [TestMethod]
+        public void DiscoverTestsIfThrowsTestPlatformExceptionShouldThrowOut()
+        {
+            Assert.ThrowsException<TestPlatformException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new TestPlatformException("HelloWorld")));
+        }
 
-            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(new NotImplementedException("HelloWorld"));
+        [TestMethod]
+        public void DiscoverTestsIfThrowsSettingsExceptionShouldThrowOut()
+        {
+            Assert.ThrowsException<SettingsException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new SettingsException("HelloWorld")));
+        }
 
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+        [TestMethod]
+        public void DiscoverTestsIfThrowsInvalidOperationExceptionShouldThrowOut()
+        {
+            Assert.ThrowsException<InvalidOperationException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new InvalidOperationException("HelloWorld")));
+        }
 
-            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+        [TestMethod]
+        public void DiscoverTestsIfThrowsExceptionShouldThrowOut()
+        {
+            Assert.ThrowsException<NotImplementedException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new NotImplementedException("HelloWorld")));
         }
 
         [DataTestMethod]
@@ -2250,6 +2127,56 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 Sources = new[] { "c:\\testproject.dll" }
             };
             return discoveryPayload;
+        }
+
+        private void RunTestsIfThrowsExceptionShouldThrowOut(Exception exception)
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" },
+                RunSettings = DefaultRunsettings
+            };
+
+            var createRunRequestCalled = 0;
+            TestRunCriteria observedCriteria = null;
+            var mockRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria) =>
+                {
+                    createRunRequestCalled++;
+                    observedCriteria = runCriteria;
+                }).Returns(mockRunRequest.Object);
+
+            mockRunRequest.Setup(mr => mr.ExecuteAsync()).Throws(exception);
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+        }
+
+        private void DiscoverTestsIfThrowsExceptionShouldThrowOut(Exception exception)
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll", "b.dll" },
+                RunSettings = DefaultRunsettings
+            };
+
+            DiscoveryCriteria observedCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Callback(
+                (IRequestData requestData, DiscoveryCriteria discoveryCriteria) =>
+                {
+                    observedCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            mockDiscoveryRequest.Setup(mr => mr.DiscoverAsync()).Throws(exception);
+
+            var mockDiscoveryEventsRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryEventsRegistrar.Object, this.protocolConfig);
         }
     }
 }
