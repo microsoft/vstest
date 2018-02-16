@@ -309,8 +309,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 // In test run failure scenario, send failure message and completion event to transaltion layer.
                 if (!success)
                 {
-                    // TODO: check if we can pass null exception message and null exception to translation layer.
-                    // TODO: better exception message in case of null?
                     var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception?.ToString() ?? "Exception in StartTestRun." };
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 

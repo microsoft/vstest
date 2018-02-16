@@ -335,8 +335,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     this.Output.Error(false, ex.Message);
                     result = ArgumentProcessorResult.Fail;
 
-                    // TODO: we can skip this and directly use ex.ToString() which will include duplicate message also.
-
                     // Send inner exception only when its message is different to avoid duplicate.
                     if (ex is TestPlatformException &&
                         ex.InnerException != null &&

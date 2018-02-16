@@ -148,6 +148,81 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         }
 
         [TestMethod]
+        public void ExecuteShouldNotThrowSettingsExceptionButLogOutput()
+        {
+            var activeRunSetting = RunSettingsManager.Instance.ActiveRunSettings;
+            var runSettingsFile = Path.Combine(Path.GetTempPath(), "ExecutorShouldShowRightErrorMessage.runsettings");
+
+            try
+            {
+                if (File.Exists(runSettingsFile))
+                {
+                    File.Delete(runSettingsFile);
+                }
+
+                var fileContents = @"<RunSettings>
+                                    <LoggerRunSettings>
+                                        <Loggers>
+                                            <Logger invalidName=""trx"" />
+                                        </Loggers>
+                                    </LoggerRunSettings>
+                                </RunSettings>";
+
+                File.WriteAllText(runSettingsFile, fileContents);
+
+                string[] args = { "/settings:" + runSettingsFile };
+                var mockOutput = new MockOutput();
+
+                var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
+
+                var result = mockOutput.Messages.Any(o => o.Level == OutputLevel.Error && o.Message.Contains("Invalid settings 'Logger'. Unexpected XmlAttribute: 'invalidName'."));
+                Assert.IsTrue(result, "expecting error message : Invalid settings 'Logger'.Unexpected XmlAttribute: 'invalidName'.");
+            }
+            finally
+            {
+                File.Delete(runSettingsFile);
+                RunSettingsManager.Instance.SetActiveRunSettings(activeRunSetting);
+            }
+        }
+
+        [TestMethod]
+        public void ExecuteShouldReturnNonZeroExitCodeIfSettingsException()
+        {
+            var activeRunSetting = RunSettingsManager.Instance.ActiveRunSettings;
+            var runSettingsFile = Path.Combine(Path.GetTempPath(), "ExecutorShouldShowRightErrorMessage.runsettings");
+
+            try
+            {
+                if (File.Exists(runSettingsFile))
+                {
+                    File.Delete(runSettingsFile);
+                }
+
+                var fileContents = @"<RunSettings>
+                                    <LoggerRunSettings>
+                                        <Loggers>
+                                            <Logger invalidName=""trx"" />
+                                        </Loggers>
+                                    </LoggerRunSettings>
+                                </RunSettings>";
+
+                File.WriteAllText(runSettingsFile, fileContents);
+
+                string[] args = { "/settings:" + runSettingsFile };
+                var mockOutput = new MockOutput();
+
+                var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
+
+                Assert.AreEqual(1, exitCode, "Exit code should be one because it throws exception");
+            }
+            finally
+            {
+                File.Delete(runSettingsFile);
+                RunSettingsManager.Instance.SetActiveRunSettings(activeRunSetting);
+            }
+        }
+
+        [TestMethod]
         public void ExecutorShouldShowRightErrorMessage()
         {
             var activeRunSetting = RunSettingsManager.Instance.ActiveRunSettings;
