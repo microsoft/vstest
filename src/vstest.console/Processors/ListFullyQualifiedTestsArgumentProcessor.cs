@@ -215,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
-            var success = this.testRequestManager.DiscoverTests(
+            this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
                 this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
@@ -226,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             File.WriteAllLines(this.commandLineOptions.ListTestsTargetPath, this.discoveredTests);
-            return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
+            return ArgumentProcessorResult.Success;
         }
 
         #endregion

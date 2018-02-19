@@ -329,11 +329,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             catch (Exception ex)
             {
-                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
+                if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException || ex is InvalidOperationException)
                 {
                     EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
                     this.Output.Error(false, ex.Message);
                     result = ArgumentProcessorResult.Fail;
+
+                    // Send inner exception only when its message is different to avoid duplicate.
+                    if (ex is TestPlatformException &&
+                        ex.InnerException != null &&
+                        !string.Equals(ex.InnerException.Message, ex.Message, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        this.Output.Error(false, ex.InnerException.Message);
+                    }
                 }
                 else
                 {
