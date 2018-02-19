@@ -134,11 +134,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="discoveryEventsRegistrar">EventHandler for discovered tests</param>
         /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if successful</returns>
-        public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar, ProtocolConfig protocolConfig)
+        public void DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar, ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
-            bool success = false;
             var runsettings = discoveryPayload.RunSettings;
 
             if (discoveryPayload.TestPlatformOptions != null)
@@ -180,8 +179,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                         discoveryRequest.DiscoverAsync();
                         discoveryRequest.WaitForCompletion();
-
-                        success = true;
                     }
 
                     finally
@@ -192,14 +189,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
             finally
             {
-                EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
+                EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
                 this.testPlatformEventSource.DiscoveryRequestStop();
 
                 // Posts the Discovery Complete event.
                 this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
             }
-
-            return success;
         }
 
         /// <summary>
@@ -210,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="testRunEventsRegistrar">event registrar for run events</param>
         /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if successful</returns>
-        public bool RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
+        public void RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
@@ -280,20 +275,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             // Run tests
-            var success = false;
             try
             {
-                success = this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
+                this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
+                EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
             }
             finally
             {
-                EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
                 this.testPlatformEventSource.ExecutionRequestStop();
 
                 // Post the run complete event
                 this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
             }
-            return success;
         }
 
         /// <summary>
@@ -506,7 +499,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return false;
         }
 
-        private bool RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
+        private void RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -546,8 +539,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         this.currentTestRunRequest = null;
                     }
                 }
-
-                return true;
             }
         }
 

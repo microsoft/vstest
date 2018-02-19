@@ -167,7 +167,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualDiscoveryCriteria = discoveryCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
             Assert.AreEqual(15, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
         }
 
@@ -201,9 +201,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.inferHelper,
             this.mockMetricsPublisherTask);
 
-            var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
+            this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, this.protocolConfig);
 
-            Assert.IsTrue(success, "DiscoverTests call must succeed");
             Assert.AreEqual(testCaseFilterValue, actualDiscoveryCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
             Assert.AreEqual(createDiscoveryRequestCalled, 1, "CreateDiscoveryRequest must be invoked only once.");
@@ -679,7 +678,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualDiscoveryCriteria = discoveryCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
@@ -716,7 +715,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualDiscoveryCriteria = discoveryCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
@@ -751,7 +750,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualDiscoveryCriteria = discoveryCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
 
@@ -789,7 +788,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                         actualDiscoveryCriteria = discoveryCriteria;
                     }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload,
+            this.testRequestManager.DiscoverTests(payload,
                 new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
@@ -946,7 +945,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
             Assert.AreEqual(15, actualTestRunCriteria.FrequencyOfRunStatsChangeEvent);
         }
 
@@ -1114,9 +1113,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 this.inferHelper,
                 this.mockMetricsPublisherTask);
 
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
-
-            Assert.IsTrue(success, "RunTests call must succeed");
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
             Assert.AreEqual(testCaseFilterValue, observedCriteria.TestCaseFilter, "TestCaseFilter must be set");
 
@@ -1380,7 +1377,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
@@ -1419,7 +1416,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
@@ -1460,7 +1457,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
@@ -1495,7 +1492,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));
@@ -1533,7 +1530,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
@@ -1576,7 +1573,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockTestRunRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
 
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()));
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()));

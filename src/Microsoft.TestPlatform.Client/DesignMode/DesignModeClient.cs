@@ -287,8 +287,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
             delegate
             {
-                var success = false;
-                var exception = default(Exception);
                 try
                 {
                     testRequestManager.ResetOptions();
@@ -296,31 +294,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     var customLauncher = skipTestHostLaunch ?
                         DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
 
-                    success = testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                 }
                 catch (Exception ex)
                 {
                     EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
 
-                    success = false;
-                    exception = ex;
-                }
-
-                // In test run failure scenario, send failure message and completion event to transaltion layer.
-                if (!success)
-                {
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception?.ToString() ?? "Exception in StartTestRun." };
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString()};
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 
                     var runCompletePayload = new TestRunCompletePayload()
                     {
-                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.MinValue),
+                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
                         LastRunTests = null
                     };
 
                     // Send run complete to translation layer
                     this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
                 }
+
             });
         }
 
@@ -329,24 +321,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
                 delegate
                 {
-                    var success = false;
-                    var errorMessage = default(string);
                     try
                     {
                         testRequestManager.ResetOptions();
-                        success = testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                        testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
-                        success = false;
-                        errorMessage = ex.ToString();
-                    }
 
-                    // In test discovery failure scenario, send failure message and completion event to transaltion layer.
-                    if (!success)
-                    {
-                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = errorMessage ?? "Exception in StartDiscovery." };
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 
                         var payload = new DiscoveryCompletePayload()
