@@ -300,9 +300,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
 
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString()};
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
-
                     var runCompletePayload = new TestRunCompletePayload()
                     {
                         TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
@@ -312,7 +311,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     // Send run complete to translation layer
                     this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
                 }
-
             });
         }
 
