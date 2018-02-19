@@ -214,11 +214,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
-            var success = this.testRequestManager.DiscoverTests(
+            this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
                 this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
-            return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
+            return ArgumentProcessorResult.Success;
         }
 
         #endregion

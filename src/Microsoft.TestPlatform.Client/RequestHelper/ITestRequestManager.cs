@@ -33,8 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="discoveryPayload">Discovery payload</param>
         /// <param name="disoveryEventsRegistrar">Discovery events registrar - registers and unregisters discovery events</param>
         /// <param name="protocolConfig">Protocol related information</param>
-        /// <returns>True, if successful</returns>
-        bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar disoveryEventsRegistrar, ProtocolConfig protocolConfig);
+        void DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar disoveryEventsRegistrar, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Run Tests with given a test of sources
@@ -43,8 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="customTestHostLauncher">Custom testHostLauncher for the run</param>
         /// <param name="testRunEventsRegistrar">RunEvents registrar</param>
         /// <param name="protocolConfig">Protocol related information</param>
-        /// <returns>True, if sucessful</returns>
-        bool RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig);
+        void RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request

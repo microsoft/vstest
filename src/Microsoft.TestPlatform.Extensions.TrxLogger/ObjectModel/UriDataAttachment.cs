@@ -111,7 +111,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             Debug.Assert(!string.IsNullOrEmpty(baseDirectory), "'baseDirectory' is null or empty");
             Debug.Assert(baseDirectory == baseDirectory.Trim(), "'baseDirectory' contains whitespace at the ends");
-            Debug.Assert(Path.IsPathRooted(baseDirectory), "'baseDirectory' is not a rooted path");
 
             if (useAbsoluteUri != this.uri.IsAbsoluteUri)
             {
