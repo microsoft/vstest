@@ -387,7 +387,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-            this.testExecutionManager.Cancel();
+            this.testExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             this.mockRequestSender.Verify(s => s.SendTestRunCancel(), Times.Never);
         }

@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc/>
-        public override void Cancel()
+        public override void Cancel(ITestRunEventsHandler eventHandler)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             finally
             {
-                base.Cancel();
+                base.Cancel(eventHandler);
             }
         }
 

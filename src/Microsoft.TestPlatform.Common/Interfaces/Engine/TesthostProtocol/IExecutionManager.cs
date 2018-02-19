@@ -49,11 +49,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// <summary>
         /// Cancel the test execution.
         /// </summary>
-        void Cancel();
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        void Cancel(ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
         /// Aborts the test execution.
         /// </summary>
-        void Abort();
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        void Abort(ITestRunEventsHandler testRunEventsHandler);
     }
 }

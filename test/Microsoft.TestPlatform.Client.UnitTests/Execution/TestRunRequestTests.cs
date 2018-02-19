@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         {
             //ExecuteAsync has not been called, so State is not InProgress
             testRunRequest.Abort();
-            executionManager.Verify(dm => dm.Abort(), Times.Never);
+            executionManager.Verify(dm => dm.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Never);
         }
 
         [TestMethod]
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             testRunRequest.ExecuteAsync();
 
             testRunRequest.Abort();
-            executionManager.Verify(dm => dm.Abort(), Times.Once);
+            executionManager.Verify(dm => dm.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         public void CancelAsyncIfTestRunStateNotInProgressWillNotCallExecutionManagerCancel()
         {
             testRunRequest.CancelAsync();
-            executionManager.Verify(dm => dm.Cancel(), Times.Never);
+            executionManager.Verify(dm => dm.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Never);
         }
 
         [TestMethod]
@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         {
             testRunRequest.ExecuteAsync();
             testRunRequest.CancelAsync();
-            executionManager.Verify(dm => dm.Cancel(), Times.Once);
+            executionManager.Verify(dm => dm.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
 
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         {
             this.testRunRequest.ExecuteAsync();
             this.testRunRequest.OnTestSessionTimeout(null);
-            this.executionManager.Verify(o => o.Abort(), Times.Once);
+            this.executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
@@ -204,12 +204,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
             onTestSessionTimeoutCalled.Reset();
-            executionManager.Setup(o => o.Abort()).Callback(() => onTestSessionTimeoutCalled.Set());
+            executionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(() => onTestSessionTimeoutCalled.Set());
 
             testRunRequest.ExecuteAsync();
             onTestSessionTimeoutCalled.WaitOne(20 * 1000);
 
-            executionManager.Verify(o => o.Abort(), Times.Once);
+            executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             testRunRequest.ExecuteAsync();
 
-            executionManager.Verify(o => o.Abort(), Times.Never);
+            executionManager.Verify(o => o.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Never);
         }
 
         [TestMethod]
