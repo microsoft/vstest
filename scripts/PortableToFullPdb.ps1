@@ -37,21 +37,28 @@ function ConvertPortablePdbToWindowsPdb
 {
     $portablePdbs = Get-ChildItem -path $TP_OUT_DIR\$Configuration *.pdb -Recurse | % {$_.FullName}
     $pdbConverter = Locate-PdbConverterTool
-
-    #$portablePdbs = Get-ChildItem -path C:\Users\jagarg\Desktop\TestPlatform\TestPlatform\release *.pdb -Recurse | % {$_.FullName}
-    #$pdbConverter = "C:\Users\jagarg\Desktop\Pdb2Pdb.1.1.0-beta1-62316-01\tools\Pdb2Pdb.exe"
-
     
     foreach($portablePdb in $portablePdbs)
     {
-        $dll = $portablePdb -replace ".pdb",".dll"
+		# First check if corresponding dll exists
+        $dllOrExePath = $portablePdb -replace ".pdb",".dll"
+		
+		if(!(Test-Path -path $dllOrExePath))
+		{
+			# If no corresponding dll found, check if exe exists
+			$dllOrExePath = $portablePdb -replace ".pdb",".exe"
+			
+			if(!(Test-Path -path $dllOrExePath))
+			throw "Unable to locate dll/exe corresponding to $portablePdb"
+		}
+		
         $fullpdb = $portablePdb -replace ".pdb",".pdbfull"
 
         Write-Verbose "$pdbConverter $dll /pdb $portablePdb /out $fullpdb"
-        & $pdbConverter $dll /pdb $portablePdb /out $fullpdb
+        & $pdbConverter $dllOrExePath /pdb $portablePdb /out $fullpdb
     }
 }
 
-Write-Verbose "Converting Portable pdbs to Windows(Full) Pdbs"
+Write-Verbose "Converting Portable pdbs to Windows(Full) Pdbs..."
 ConvertPortablePdbToWindowsPdb
 
