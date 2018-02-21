@@ -143,6 +143,8 @@
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Fakes.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll" />
     <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.sxs.manifest" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.sxs.manifest" />
     <file src="net451\$Runtime$\msdia140typelib_clr0200.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\msdia140typelib_clr0200.dll" />
     <file src="net451\$Runtime$\Newtonsoft.Json.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Newtonsoft.Json.dll" />
     <file src="net451\$Runtime$\QTAgent.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\QTAgent.exe" />
@@ -388,5 +390,38 @@
     <file src="Intellitrace\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll"	target="tools\net451\Team Tools\Dynamic Code Coverage Tools\amd64\msdia140.dll" />
     <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Telemetry.dll" />
     <file src="Intellitrace\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Utilities.Internal.dll" />
+
+    <!-- CUIT -->
+    <file src="net451\$Runtime$\Interop.UIAutomationClient.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Interop.UIAutomationClient.dll" />
+    <file src="net451\$Runtime$\Microsoft.ShDocVw.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.ShDocVw.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.OLE.Interop.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.OLE.Interop.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.CodedUITestFramework.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Common.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Common.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.MSAA.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.ExtensionUtilities.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Framework.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Framework.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Logging.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Logging.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.WindowsStoreUtility.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITesting.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITesting.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Playback.Engine.dll" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.TestTools.UITest.Synchronization.dll" />
+    <file src="net451\$Runtime$\UIAComWrapper.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\UIAComWrapper.dll" />
+
+    <file src="net451\$Runtime$\CUITPlugins\IEPropertyConfiguration.xml"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\IEPropertyConfiguration.xml" />
+    <file src="net451\$Runtime$\CUITPlugins\IEPropertyConfiguration.xsd"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\IEPropertyConfiguration.xsd" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.CrossBrowser.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.EventHelper.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.Communication.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE64.EventHelper.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.IE.Communication.Interop.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.Uia.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.dll" />
+    <file src="net451\$Runtime$\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CUITPlugins\Microsoft.VisualStudio.TestTools.UITest.Extension.UiaWidget.UIAHtmlElementUtilities.dll" />
   </files>
 </package>
