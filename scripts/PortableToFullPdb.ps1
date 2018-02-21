@@ -49,7 +49,9 @@ function ConvertPortablePdbToWindowsPdb
 			$dllOrExePath = $portablePdb -replace ".pdb",".exe"
 			
 			if(!(Test-Path -path $dllOrExePath))
-			throw "Unable to locate dll/exe corresponding to $portablePdb"
+            {
+			    throw "Unable to locate dll/exe corresponding to $portablePdb"
+            }
 		}
 		
         $fullpdb = $portablePdb -replace ".pdb",".pdbfull"
