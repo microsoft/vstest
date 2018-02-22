@@ -160,6 +160,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // and the test host is lost as well.
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 this.HandleTestRunComplete(completeArgs, null, null, null);
+
+                // Ensure that this exception along with a test run complete flows through to the clients.
+                // The logic to send out a test run completion in case of failures here sits in DesignModeClient.
+                throw;
             }
 
             return 0;

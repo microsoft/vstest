@@ -109,12 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyDiscoveryManager.DiscoverTests: Failed to discover tests: {0}", exception);
-
-                // Log to vs ide test output
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
-                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-                this.HandleRawMessage(rawMessage);
-
+                
                 // Log to vstest.console
                 // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
                 // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
@@ -125,6 +120,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                 this.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
+
+                // Ensure that this exception along with a discovery complete flows through to the clients.
+                // The logic to send out a discovery completion in case of failures here sits in DesignModeClient.
+                throw;
             }
         }
 
