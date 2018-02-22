@@ -45,14 +45,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void WebTestRunAllTests(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            WebTestRunAllTests(runnerInfo.RunnerFramework);
-        }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
         public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
