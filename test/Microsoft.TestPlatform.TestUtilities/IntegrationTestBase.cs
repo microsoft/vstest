@@ -145,6 +145,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="passedTestsCount">Passed test count</param>
         /// <param name="failedTestsCount">Failed test count</param>
         /// <param name="skippedTestsCount">Skipped test count</param>
+        /// <param name="minExecutionTimeInSeconds">Minimum test execution time in seconds</param>
         public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount, int minExecutionTimeInSeconds=0)
         {
             var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
