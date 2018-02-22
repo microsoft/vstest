@@ -224,9 +224,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // discovery will not terminate
                         EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
+                        var handle = this.GetHandlerForGivenManager(proxyDiscoveryManager);
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+                        handle.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
+                        handle.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
 
                         // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
                         // Differences:
@@ -234,7 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
                         var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+                        handle.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
             }

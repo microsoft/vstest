@@ -386,7 +386,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void DesignModeClientConnectShouldSendExecutionCompleteOnExecutionFail()
         {
-            System.Diagnostics.Debugger.Launch();
             var payload = new TestRunRequestPayload();
             var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JToken.FromObject(payload) };
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);

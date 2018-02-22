@@ -338,9 +338,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // execution will not terminate
                     EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
 
+                    var handle = this.GetHandlerForGivenManager(proxyExecutionManager);
                     var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
-                    this.GetHandlerForGivenManager(proxyExecutionManager).HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                    this.GetHandlerForGivenManager(proxyExecutionManager).HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
+                    handle.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
+                    handle.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
 
                     // Send a run complete to caller. Similar logic is also used in ProxyExecutionManager.StartTestRun
                     // Differences:
@@ -348,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Ensure that the test run aggregator in parallel run events handler doesn't add these statistics
                     // (since the test run didn't even start)
                     var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero);
-                    this.GetHandlerForGivenManager(proxyExecutionManager).HandleTestRunComplete(completeArgs, null, null, null);
+                    handle.HandleTestRunComplete(completeArgs, null, null, null);
                 },
                 TaskContinuationOptions.OnlyOnFaulted);
             }
