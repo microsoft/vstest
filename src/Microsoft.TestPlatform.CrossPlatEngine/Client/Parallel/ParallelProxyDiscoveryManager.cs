@@ -8,15 +8,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// ParallelProxyDiscoveryManager that manages parallel discovery
     /// </summary>
     internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2>, IParallelProxyDiscoveryManager
     {
+        private IDataSerializer dataSerializer;
+
         #region DiscoverySpecificData
 
         private int discoveryCompletedClients = 0;
@@ -44,13 +50,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #endregion
         
         public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+            : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
+        {
+        }
+
+        internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
             this.requestData = requestData;
+            this.dataSerializer = dataSerializer;
         }
 
         #region IProxyDiscoveryManager
-        
+
         /// <inheritdoc/>
         public void Initialize()
         {
@@ -215,13 +227,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                             EqtTrace.Warning("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
                         }
 
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Warning, Message = t.Exception.ToString() };
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleLogMessage(TestMessageLevel.Warning, t.Exception.ToString());
+
                         // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
                         // Differences:
                         // Total tests must be zero here since parallel discovery events handler adds the count
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
                         var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
-
                         this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
