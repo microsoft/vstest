@@ -27,6 +27,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         public const string DesktopRunnerFramework = "net451";
         public const string CoreRunnerFramework = "netcoreapp2.0";
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
+        private const string TestExecutionTimeMessageFormat = "Test execution time: ";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
         private int runnerExitCode = -1;
@@ -145,7 +146,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="passedTestsCount">Passed test count</param>
         /// <param name="failedTestsCount">Failed test count</param>
         /// <param name="skippedTestsCount">Skipped test count</param>
-        public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
+        public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount, int minExecutionTimeInSeconds=0)
         {
             var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
             if (totalTestCount == 0)
@@ -183,6 +184,17 @@ namespace Microsoft.TestPlatform.TestUtilities
                     this.standardTestError,
                     Environment.NewLine,
                     this.arguments);
+
+                //validate the minimum test execution time if specified
+                if (minExecutionTimeInSeconds > 0)
+                {
+                    var m = Regex.Match(this.standardTestOutput, @"(Test execution time: )([0-9]+(?:\.[0-9]+)?) ([a-zA-Z]+)");
+                    Assert.IsTrue(m.Success, $"Unexpected test execution time format in the output");
+                    Assert.AreEqual(m.Groups.Count, 4, "Unexpected test execution time format in the output (unexpected groups in regex match)");
+                    var executionTime = Convert.ToDouble(m.Groups[2].Value);
+                    executionTime = m.Groups[3].Value.Equals("seconds", StringComparison.OrdinalIgnoreCase) ? executionTime: executionTime * 60;
+                    Assert.IsTrue(executionTime > minExecutionTimeInSeconds, $"Execution time {m.Groups[2].Value} {m.Groups[3].Value} is not greater than {minExecutionTimeInSeconds} seconds");
+                }
             }
         }
 
@@ -504,6 +516,30 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+            doc.Save(stream);
+            stream.Dispose();
+        }
+
+        /// <summary>
+        /// Create runsettings file at destinationRunsettingsPath with the content from xmlString
+        /// </summary>
+        /// <param name="destinationRunsettingsPath">
+        /// Destination runsettings path where resulted file saves
+        /// </param>
+        /// <param name="xmlString">
+        /// Xml string
+        /// </param>
+        public static void CreateRunSettingsFile(string destinationRunsettingsPath, string xmlString)
+        {
+            var doc = new XmlDocument();
+            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
+
+            doc.AppendChild(xmlDeclaration);
+            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
+            doc.AppendChild(runSettingsNode);
+            runSettingsNode.InnerXml = xmlString;
+
+            var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
             doc.Save(stream);
             stream.Dispose();
         }

@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -49,6 +49,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             WebTestRunAllTests(runnerInfo.RunnerFramework);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var runSettingsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".runsettings");
+
+            //test the simulateThinkTimes setting for WebTestRunConfiguration in run settings
+            var runSettingsXml = $@"<WebTestRunConfiguration simulateThinkTimes='true' />
+                                        <RunConfiguration>
+                                        <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
+                                        </RunConfiguration>";
+
+            IntegrationTestBase.CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
+
+            //minExecutionTimeInSeconds is set to 30 here as the web test has a request with think time equal to 30 seconds
+            //therefore, the test will at least run for 30 seconds
+            WebTestRunAllTests(runnerInfo.RunnerFramework, runSettingsFilePath, 30);
         }
 
         [TestMethod]
@@ -126,7 +146,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        private void WebTestRunAllTests(string runnerFramework)
+        private void WebTestRunAllTests(string runnerFramework, string runSettingsFilePath=null, int minExecutionTimeInSeconds=0)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
             {
@@ -136,14 +156,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             string assemblyRelativePath =
                 @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
+
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty, this.FrameworkArgValue);
+                runSettingsFilePath, this.FrameworkArgValue);
 
             this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
+            this.ValidateSummaryStatus(1, 0, 0, minExecutionTimeInSeconds);
         }
 
         private void CodedWebTestRunAllTests(string runnerFramework)
