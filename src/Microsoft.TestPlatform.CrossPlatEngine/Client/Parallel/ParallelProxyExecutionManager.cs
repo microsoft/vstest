@@ -336,14 +336,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Just in case, the actual execution couldn't start for an instance. Ensure that
                     // we call execution complete since we have already fetched a source. Otherwise
                     // execution will not terminate
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
-                    }
+                    EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
 
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Warning, Message = t.Exception.ToString() };
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
                     this.GetHandlerForGivenManager(proxyExecutionManager).HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                    this.GetHandlerForGivenManager(proxyExecutionManager).HandleLogMessage(TestMessageLevel.Warning, t.Exception.ToString());
+                    this.GetHandlerForGivenManager(proxyExecutionManager).HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
 
                     // Send a run complete to caller. Similar logic is also used in ProxyExecutionManager.StartTestRun
                     // Differences:

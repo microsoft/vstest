@@ -222,14 +222,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Just in case, the actual discovery couldn't start for an instance. Ensure that
                         // we call discovery complete since we have already fetched a source. Otherwise
                         // discovery will not terminate
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
-                        }
+                        EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
 
-                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Warning, Message = t.Exception.ToString() };
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
                         this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleLogMessage(TestMessageLevel.Warning, t.Exception.ToString());
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
 
                         // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
                         // Differences:
