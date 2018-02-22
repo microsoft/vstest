@@ -27,7 +27,6 @@ namespace Microsoft.TestPlatform.TestUtilities
         public const string DesktopRunnerFramework = "net451";
         public const string CoreRunnerFramework = "netcoreapp2.0";
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
-        private const string TestExecutionTimeMessageFormat = "Test execution time: ";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
         private int runnerExitCode = -1;
