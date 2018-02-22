@@ -166,6 +166,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var testRunCompletePayload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
                 this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, testRunCompletePayload));
                 this.HandleTestRunComplete(completeArgs, null, null, null);
+
+                // Ensure that this exception along with a test run complete flows through to the clients.
+                // The logic to send out a test run completion in case of failures here sits in DesignModeClient.
+                throw;
             }
 
             return 0;
