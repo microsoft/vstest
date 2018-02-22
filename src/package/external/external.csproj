@@ -45,6 +45,10 @@
       <Version>2.0.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+	<PackageReference Include="Pdb2Pdb">
+      <Version>1.1.0-beta1-62316-01</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <!-- Required for resolution of desktop dependencies in non windows environment.
          We've to set to net46 since the net451 and other packages have assemblies in wrong case.
          E.g. System.XML instead of System.Xml. -->
