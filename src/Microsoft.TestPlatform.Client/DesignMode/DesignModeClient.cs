@@ -287,6 +287,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
             delegate
             {
+                var success = false;
+                var exception = default(Exception);
                 try
                 {
                     testRequestManager.ResetOptions();
@@ -294,20 +296,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     var customLauncher = skipTestHostLaunch ?
                         DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
 
-                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                    success = testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                 }
                 catch (Exception ex)
                 {
                     EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+                    success = false;
+                    exception = ex;
 
                     // If there is an exception during test run request creation or some time during the process
                     // In such cases, TestPlatform will never send a TestRunComplete event and IDE need to be sent a run complete message
                     // We need recoverability in translationlayer-designmode scenarios
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                }
+
+                if (!success)
+                {
                     var runCompletePayload = new TestRunCompletePayload()
                     {
-                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
+                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.MinValue),
                         LastRunTests = null
                     };
 
@@ -322,21 +330,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
                 delegate
                 {
+                    var success = false;
                     try
                     {
                         testRequestManager.ResetOptions();
-                        testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                        success = testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                     }
                     catch (Exception ex)
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
+                        success = false;
 
                         // If there is an exception during test discovery request creation or some time during the process
                         // In such cases, TestPlatform will never send a DiscoveryComplete event and IDE need to be sent a discovery complete message
                         // We need recoverability in translationlayer-designmode scenarios
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+                    }
 
+                    if (!success)
+                    {
                         var payload = new DiscoveryCompletePayload()
                         {
                             IsAborted = true,
