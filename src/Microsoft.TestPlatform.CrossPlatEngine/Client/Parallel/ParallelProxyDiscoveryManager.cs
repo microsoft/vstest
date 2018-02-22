@@ -8,15 +8,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// ParallelProxyDiscoveryManager that manages parallel discovery
     /// </summary>
     internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler2>, IParallelProxyDiscoveryManager
     {
+        private IDataSerializer dataSerializer;
+
         #region DiscoverySpecificData
 
         private int discoveryCompletedClients = 0;
@@ -44,13 +50,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #endregion
         
         public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+            : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
+        {
+        }
+
+        internal ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
             this.requestData = requestData;
+            this.dataSerializer = dataSerializer;
         }
 
         #region IProxyDiscoveryManager
-        
+
         /// <inheritdoc/>
         public void Initialize()
         {
@@ -210,10 +222,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Just in case, the actual discovery couldn't start for an instance. Ensure that
                         // we call discovery complete since we have already fetched a source. Otherwise
                         // discovery will not terminate
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
-                        }
+                        EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
+
+                        var handle = this.GetHandlerForGivenManager(proxyDiscoveryManager);
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+                        handle.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
+                        handle.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
 
                         // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
                         // Differences:
@@ -221,8 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
                         var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
-
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
+                        handle.HandleDiscoveryComplete(discoveryCompleteEventsArgs, null);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
             }
