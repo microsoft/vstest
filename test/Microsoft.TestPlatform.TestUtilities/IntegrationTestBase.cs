@@ -525,19 +525,13 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="destinationRunsettingsPath">
         /// Destination runsettings path where resulted file saves
         /// </param>
-        /// <param name="xmlString">
+        /// <param name="runSettingsXml">
         /// Xml string
         /// </param>
-        public static void CreateRunSettingsFile(string destinationRunsettingsPath, string xmlString)
+        public static void CreateRunSettingsFile(string destinationRunsettingsPath, string runSettingsXml)
         {
             var doc = new XmlDocument();
-            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
-
-            doc.AppendChild(xmlDeclaration);
-            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
-            doc.AppendChild(runSettingsNode);
-            runSettingsNode.InnerXml = xmlString;
-
+            doc.LoadXml(runSettingsXml);
             var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
             doc.Save(stream);
             stream.Dispose();

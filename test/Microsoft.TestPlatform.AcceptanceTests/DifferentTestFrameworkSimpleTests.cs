@@ -51,10 +51,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var runSettingsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".runsettings");
 
             //test the simulateThinkTimes setting for WebTestRunConfiguration in run settings
-            var runSettingsXml = $@"<WebTestRunConfiguration simulateThinkTimes='true' />
-                                        <RunConfiguration>
+            var runSettingsXml = $@"<?xml version='1.0' encoding='utf-8'?>
+                                <RunSettings>
+                                    <WebTestRunConfiguration simulateThinkTimes='true' />
+                                    <RunConfiguration>
                                         <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
-                                        </RunConfiguration>";
+                                    </RunConfiguration>
+                                </RunSettings>";
 
             IntegrationTestBase.CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
 
