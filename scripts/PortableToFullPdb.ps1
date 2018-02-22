@@ -8,8 +8,6 @@ Param(
     [System.String] $Configuration = "Release"
 )
 
-$ErrorActionPreference = "Stop"
-
 #
 # Variables
 #
@@ -40,7 +38,7 @@ function ConvertPortablePdbToWindowsPdb
     
     foreach($portablePdb in $portablePdbs)
     {
-		# First check if corresponding dll exists
+	# First check if corresponding dll exists
         $dllOrExePath = $portablePdb -replace ".pdb",".dll"
 		
 		if(!(Test-Path -path $dllOrExePath))
@@ -49,9 +47,9 @@ function ConvertPortablePdbToWindowsPdb
 			$dllOrExePath = $portablePdb -replace ".pdb",".exe"
 			
 			if(!(Test-Path -path $dllOrExePath))
-            {
+            		{
 			    throw "Unable to locate dll/exe corresponding to $portablePdb"
-            }
+            		}
 		}
 		
         $fullpdb = $portablePdb -replace ".pdb",".pdbfull"
