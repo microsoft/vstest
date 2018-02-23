@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="inIsolation"></param>
         /// <returns>Command line arguments string.</returns>
         public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
-            string framework, string inIsolation = "")
+            string framework, string inIsolation = "", string resultsDirectory = null)
         {
             var arguments = testAssembly.AddDoubleQuote();
 
@@ -81,6 +81,12 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (!string.IsNullOrWhiteSpace(inIsolation))
             {
                 arguments = string.Concat(arguments, " ", inIsolation);
+            }
+
+            if (!string.IsNullOrWhiteSpace(resultsDirectory))
+            {
+                // Append results directory
+                arguments = string.Concat(arguments, " /ResultsDirectory:", resultsDirectory.AddDoubleQuote());
             }
 
             return arguments;
@@ -504,6 +510,24 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+            doc.Save(stream);
+            stream.Dispose();
+        }
+
+        /// <summary>
+        /// Create runsettings file at destinationRunsettingsPath with the content from xmlString
+        /// </summary>
+        /// <param name="destinationRunsettingsPath">
+        /// Destination runsettings path where resulted file is saved
+        /// </param>
+        /// <param name="runSettingsXml">
+        /// Run settings xml string
+        /// </param>
+        public static void CreateRunSettingsFile(string destinationRunsettingsPath, string runSettingsXml)
+        {
+            var doc = new XmlDocument();
+            doc.LoadXml(runSettingsXml);
+            var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
             doc.Save(stream);
             stream.Dispose();
         }
