@@ -151,7 +151,6 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="passedTestsCount">Passed test count</param>
         /// <param name="failedTestsCount">Failed test count</param>
         /// <param name="skippedTestsCount">Skipped test count</param>
-        /// <param name="minExecutionTimeInSeconds">Minimum test execution time in seconds</param>
         public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
         {
             var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
@@ -519,10 +518,10 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Create runsettings file at destinationRunsettingsPath with the content from xmlString
         /// </summary>
         /// <param name="destinationRunsettingsPath">
-        /// Destination runsettings path where resulted file saves
+        /// Destination runsettings path where resulted file is saved
         /// </param>
         /// <param name="runSettingsXml">
-        /// Xml string
+        /// Run settings xml string
         /// </param>
         public static void CreateRunSettingsFile(string destinationRunsettingsPath, string runSettingsXml)
         {
