@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="inIsolation"></param>
         /// <returns>Command line arguments string.</returns>
         public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings,
-            string framework, string inIsolation = "")
+            string framework, string inIsolation = "", string resultsDirectory = null)
         {
             var arguments = testAssembly.AddDoubleQuote();
 
@@ -81,6 +81,12 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (!string.IsNullOrWhiteSpace(inIsolation))
             {
                 arguments = string.Concat(arguments, " ", inIsolation);
+            }
+
+            if (!string.IsNullOrWhiteSpace(resultsDirectory))
+            {
+                // Append results directory
+                arguments = string.Concat(arguments, " /ResultsDirectory:", resultsDirectory.AddDoubleQuote());
             }
 
             return arguments;
@@ -146,7 +152,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="failedTestsCount">Failed test count</param>
         /// <param name="skippedTestsCount">Skipped test count</param>
         /// <param name="minExecutionTimeInSeconds">Minimum test execution time in seconds</param>
-        public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount, int minExecutionTimeInSeconds=0)
+        public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
         {
             var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
             if (totalTestCount == 0)
@@ -184,17 +190,6 @@ namespace Microsoft.TestPlatform.TestUtilities
                     this.standardTestError,
                     Environment.NewLine,
                     this.arguments);
-
-                //validate the minimum test execution time if specified
-                if (minExecutionTimeInSeconds > 0)
-                {
-                    var m = Regex.Match(this.standardTestOutput, @"(Test execution time: )([0-9]+(?:\.[0-9]+)?) ([a-zA-Z]+)");
-                    Assert.IsTrue(m.Success, $"Unexpected test execution time format in the output");
-                    Assert.AreEqual(m.Groups.Count, 4, "Unexpected test execution time format in the output (unexpected groups in regex match)");
-                    var executionTime = Convert.ToDouble(m.Groups[2].Value);
-                    executionTime = m.Groups[3].Value.Equals("seconds", StringComparison.OrdinalIgnoreCase) ? executionTime: executionTime * 60;
-                    Assert.IsTrue(executionTime > minExecutionTimeInSeconds, $"Execution time {m.Groups[2].Value} {m.Groups[3].Value} is not greater than {minExecutionTimeInSeconds} seconds");
-                }
             }
         }
 
