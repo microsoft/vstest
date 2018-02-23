@@ -170,6 +170,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(files.Length > 0, $"File {webtestResultFile} not found under results directory {resultsDirectory}");
 
                 var fileSizeInKB = files[0].Length / 1024;
+                Assert.IsTrue(fileSizeInKB > minWebTestResultFileSizeInKB, $"Size of the file {webtestResultFile} is {fileSizeInKB} KB. It is not greater than {minWebTestResultFileSizeInKB} KB indicating iterationCount in run settings not honored.");
             }
         }
 
