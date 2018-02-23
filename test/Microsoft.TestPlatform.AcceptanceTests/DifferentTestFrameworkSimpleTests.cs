@@ -62,6 +62,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             IntegrationTestBase.CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
 
             //minWebTestResultFileSizeInKB is set to 300 here as the web test has a iteration count set to 5
+            //therefore, the test will run for 5 iterations resulting in web test result file size of at least 300 KB
             WebTestRunAllTests(runnerInfo.RunnerFramework, runSettingsFilePath, 300);
         }
 
