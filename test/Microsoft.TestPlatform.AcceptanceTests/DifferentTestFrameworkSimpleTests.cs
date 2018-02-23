@@ -61,9 +61,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             IntegrationTestBase.CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
 
-            //minWebTestResultFileSizeInKB is set to 300 here as the web test has a iteration count set to 5
-            //therefore, the test will run for 5 iterations resulting in web test result file size of at least 300 KB
-            WebTestRunAllTests(runnerInfo.RunnerFramework, runSettingsFilePath, 300);
+            //minWebTestResultFileSizeInKB is set to 150 here as the web test has a iteration count set to 5
+            //therefore, the test will run for 5 iterations resulting in web test result file size of at least 150 KB
+            WebTestRunAllTests(runnerInfo.RunnerFramework, runSettingsFilePath, 150);
         }
 
         [TestMethod]
@@ -170,7 +170,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.IsTrue(files.Length > 0, $"File {webtestResultFile} not found under results directory {resultsDirectory}");
 
                 var fileSizeInKB = files[0].Length / 1024;
-                Assert.IsTrue(fileSizeInKB > 300, $"Size of the file {webtestResultFile} is not greater than 300 KB indicating iterationCount in run settings not honored.");
             }
         }
 
