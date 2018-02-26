@@ -12,6 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -19,6 +20,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -108,6 +110,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         [TestMethod]
         public void StartTestRunShouldProcessAllSources()
+        {
+            // Testcase filter should be passed to all parallel test run criteria.
+            this.testRunCriteriaWithSources.TestCaseFilter = "Name~Test";
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
+
+            parallelExecutionManager.StartTestRun(testRunCriteriaWithSources, this.mockHandler.Object);
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            Assert.AreEqual(this.sources.Count, processedSources.Count, "All Sources must be processed.");
+            AssertMissingAndDuplicateSources(processedSources);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldProcessAllSources1()
         {
             // Testcase filter should be passed to all parallel test run criteria.
             this.testRunCriteriaWithSources.TestCaseFilter = "Name~Test";
@@ -256,6 +272,39 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(1, this.processedSources.Count, "All Sources must be processed.");
         }
 
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndHandleLogMessageOfError()
+        {
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
+            this.createdMockManagers[1].Reset();
+            this.createdMockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+                .Throws<NotImplementedException>();
+
+            Task.Run(() =>
+            {
+                parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object);
+            });
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            mockHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndHandleRawMessageOfTestMessage()
+        {
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
+            this.createdMockManagers[1].Reset();
+            this.createdMockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+                .Throws<NotImplementedException>();
+
+            Task.Run(() =>
+            {
+                parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object);
+            });
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            mockHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
+        }
 
         [TestMethod]
         public void StartTestRunShouldAggregateRunData()
