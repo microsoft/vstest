@@ -130,6 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 };
                 this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, discoveryCompletePayload));
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
+
                 this.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
             }
         }
