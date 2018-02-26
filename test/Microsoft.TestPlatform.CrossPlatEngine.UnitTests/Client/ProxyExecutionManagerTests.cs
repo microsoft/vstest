@@ -368,9 +368,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), this.testExecutionManager))
                 .Callback(
                     (TestRunCriteriaWithSources criteria, ITestRunEventsHandler sink) =>
-                    {
-                        testRunCriteriaPassed = criteria;
-                    });
+                        {
+                            testRunCriteriaPassed = criteria;
+                        });
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
