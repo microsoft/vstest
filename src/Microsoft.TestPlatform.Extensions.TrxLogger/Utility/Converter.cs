@@ -387,13 +387,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                         TrxLoggerResources.FailureToAttach,
                         attachmentSet.DisplayName, 
                         e.GetType().ToString(), 
-                        e.Message);
+                        e);
 
                     StringBuilder stdErr = new StringBuilder(testResult.StdErr);
                     stdErr.AppendLine(errorMsg);
 
                     testResult.StdErr = stdErr.ToString();
-                    testResult.Outcome = TrxObjectModel.TestOutcome.Error;
                 }
             }
 
