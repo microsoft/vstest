@@ -92,7 +92,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
             this.baseTestRunEventsHandler = eventHandler;
-            int testHostProcessId = 0;
 
             try
             {
@@ -105,10 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                                                     // If the test execution is with a test filter, group them by sources
                                                     testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
-                testHostProcessId = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
-
-                // SetupChannel will return a process ID if connection was successfully established otherwise an exception is thrown
-                this.isCommunicationEstablished = testHostProcessId > 0 ? true : false;
+                this.isCommunicationEstablished = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
@@ -166,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
-            return testHostProcessId;
+            return 0;
         }
 
         /// <summary>

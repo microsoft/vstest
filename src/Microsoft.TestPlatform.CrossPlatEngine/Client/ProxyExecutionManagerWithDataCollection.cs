@@ -45,6 +45,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
             this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+
+            testHostManager.HostLaunched += this.TestHostLaunchedHandler;
+        }
+
+        private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+        {
+            this.ProxyDataCollectionManager.AfterTestHostInitialized(e.ProcessId);
         }
 
         /// <summary>
@@ -118,10 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.DataCollectionRunEventsHandler.Messages.Clear();
             }
 
-            var testHostProcessId = base.StartTestRun(testRunCriteria, currentEventHandler);
-            this.ProxyDataCollectionManager.AfterTestHostInitialized(testHostProcessId);
-
-            return testHostProcessId;
+            return base.StartTestRun(testRunCriteria, currentEventHandler);
         }
 
         /// <inheritdoc/>
