@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             this.eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(4);
 
+            this.eventArgsToEventInvokerMap[typeof(TestHostInitializedEventArgs)] = this.OnTestHostInitialized;
             this.eventArgsToEventInvokerMap[typeof(SessionStartEventArgs)] = this.OnSessionStart;
             this.eventArgsToEventInvokerMap[typeof(SessionEndEventArgs)] = this.OnSessionEnd;
             this.eventArgsToEventInvokerMap[typeof(TestCaseStartEventArgs)] = this.OnTestCaseStart;
@@ -41,6 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Contains the event data
         /// </param>
         private delegate void EventInvoker(DataCollectionEventArgs e);
+
+        /// <summary>
+        /// Raised when test host process has initialized
+        /// </summary>
+        public override event EventHandler<TestHostInitializedEventArgs> TestHostInitialized;
 
         /// <summary>
         /// Raised when a session is starting
@@ -119,6 +125,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
                 return valueOnFailure;
             }
+        }
+
+        /// <summary>
+        /// Raises the TestHostInitialized event
+        /// </summary>
+        /// <param name="e">
+        /// Contains the event data
+        /// </param>
+        private void OnTestHostInitialized(DataCollectionEventArgs e)
+        {
+            this.TestHostInitialized.SafeInvoke(this, e, "DataCollectionEvents.TestHostInitialized");
         }
 
         /// <summary>

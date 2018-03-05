@@ -118,7 +118,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.DataCollectionRunEventsHandler.Messages.Clear();
             }
 
-            return base.StartTestRun(testRunCriteria, currentEventHandler);
+            var testHostProcessId = base.StartTestRun(testRunCriteria, currentEventHandler);
+            this.ProxyDataCollectionManager.AfterTestHostInitialized(testHostProcessId);
+
+            return testHostProcessId;
         }
 
         /// <inheritdoc/>

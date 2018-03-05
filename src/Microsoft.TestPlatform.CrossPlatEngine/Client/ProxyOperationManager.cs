@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>
         /// Returns true if Communation is established b/w runner and host
         /// </returns>
-        public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
+        public virtual int SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
             var connTimeout = this.connectionTimeout;
 
@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.initialized = true;
             }
 
-            return true;
+            return this.testHostProcessId;
         }
 
         /// <summary>

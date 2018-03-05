@@ -282,6 +282,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         }
 
                         break;
+
+                    case MessageType.TestHostInitialized:
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Test host initialized.");
+                        }
+
+                        var processId = this.dataSerializer.DeserializePayload<int>(message);
+
+                        this.dataCollectionManager.TestHostInitialized(processId);
+
+                        break;
+
                     default:
                         if (EqtTrace.IsInfoEnabled)
                         {

@@ -102,6 +102,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
+        public void SendAfterTestHostInitialized(int processId)
+        {
+            this.communicationManager.SendMessage(MessageType.TestHostInitialized, JsonDataSerializer.Instance.Serialize(processId));
+        }
+
+        /// <inheritdoc/>
         public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
         {
             var isDataCollectionStarted = false;

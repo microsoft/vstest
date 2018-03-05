@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
+                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token) > 0 ? true : false;
 
                 if (this.isCommunicationEstablished)
                 {
