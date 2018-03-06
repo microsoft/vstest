@@ -405,7 +405,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                     testResult.StdErr = stdErr.ToString();
                     testResult.Outcome = TrxObjectModel.TestOutcome.Error;
-                    throw e;
                 }
             }
 
