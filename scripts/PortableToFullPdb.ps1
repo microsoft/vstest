@@ -69,6 +69,8 @@ function ConvertPortablePdbToWindowsPdb
 
         Write-Verbose "$pdbConverter $dll /pdb $portablePdb /out $fullpdb"
         & $pdbConverter $dllOrExePath /pdb $portablePdb /out $fullpdb
+
+        Remove-Item -Path $portablePdb 
     }
 }
 
