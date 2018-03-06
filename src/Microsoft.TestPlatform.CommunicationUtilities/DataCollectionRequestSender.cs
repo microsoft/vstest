@@ -102,9 +102,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public void SendAfterTestHostInitialized(int processId)
+        public void SendTestHostInitialized(int processId)
         {
-            this.communicationManager.SendMessage(MessageType.TestHostInitialized, JsonDataSerializer.Instance.Serialize(processId));
+            this.communicationManager.SendMessage(MessageType.TestHostInitialized, this.dataSerializer.SerializeMessage(processId.ToString()));
         }
 
         /// <inheritdoc/>

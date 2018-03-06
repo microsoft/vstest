@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <inheritdoc />
         public void AfterTestHostInitialized(int processId)
         {
-            this.dataCollectionRequestSender.SendAfterTestHostInitialized(processId);
+            this.dataCollectionRequestSender.SendTestHostInitialized(processId);
         }
 
         /// <summary>
