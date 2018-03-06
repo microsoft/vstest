@@ -32,8 +32,21 @@ function Locate-PdbConverterTool
 }
 
 function ConvertPortablePdbToWindowsPdb
-{
-    $portablePdbs = Get-ChildItem -path $TP_OUT_DIR\$Configuration *.pdb -Recurse | % {$_.FullName}
+{	
+    $allPdbs = Get-ChildItem -path $TP_OUT_DIR\$Configuration *.pdb -Recurse | % {$_.FullName}
+    $portablePdbs = New-Object System.Collections.Generic.List[System.Object]
+	
+    foreach($pdb in $allPdbs)
+    {
+	# First four bytes should be 'BSJB' for portable pdb
+	$bytes = [char[]](Get-Content $pdb -Encoding byte -TotalCount 4) -join ''
+	
+	if( $bytes -eq "BSJB")
+	{
+		$portablePdbs.Add($pdb)
+	}
+    }
+	
     $pdbConverter = Locate-PdbConverterTool
     
     foreach($portablePdb in $portablePdbs)
