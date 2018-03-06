@@ -61,7 +61,7 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CLIRunSettingsArgumentProcessorCapabilities();
 
             Assert.AreEqual("--", capabilities.CommandName);
-            Assert.AreEqual("RunSettings arguments:\n      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after \"-- \". Note the space after --. \n      Use a space to separate multiple [name]=[value].\n      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments", capabilities.HelpContentResourceName);
+            Assert.AreEqual("RunSettings arguments:" + Environment.NewLine + "      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after \"-- \". Note the space after --. " + Environment.NewLine + "      Use a space to separate multiple [name]=[value]." + Environment.NewLine + "      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.CLIRunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
