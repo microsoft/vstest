@@ -194,9 +194,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                         if (ObjectModel.EqtTrace.IsErrorEnabled)
                         {
-                            ObjectModel.EqtTrace.Error(errorMsg);
+                            ObjectModel.EqtTrace.Error("Converter: ToResultFiles: " + errorMsg);
                         }
-                        
+
                         errorMessages.Add(errorMsg);
                     }
                 }
@@ -397,7 +397,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                     if (ObjectModel.EqtTrace.IsErrorEnabled)
                     {
-                        ObjectModel.EqtTrace.Error(errorMsg);
+                        ObjectModel.EqtTrace.Error("Converter: UpdateTestResultAttachments: " + errorMsg);
                     }
 
                     StringBuilder stdErr = new StringBuilder(testResult.StdErr);
