@@ -4,13 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using vstest.console.UnitTests.TestDoubles;
-
-    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common;
-    using Moq;
+    using System.Globalization;
 
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
@@ -41,9 +37,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             EnableLoggerArgumentProcessorCapabilities capabilities = new EnableLoggerArgumentProcessorCapabilities();
             Assert.AreEqual("/Logger", capabilities.CommandName);
 #if NET451
-            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>\n      Specify a logger for test results. For example, to log results into a \n      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]\n      Creates file in TestResults directory with given LogFileName.\n\n      Change the verbosity level in log messages for console logger as shown below\n      Example: /logger:console;verbosity=<Defaults to \"normal\">\n      Allowed values for verbosity: quiet, minimal, normal and detailed.\n\n      Change the diagnostic level prefix for console logger as shown below\n      Example: /logger:console;prefix=<Defaults to \"false\">\n      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--logger|/logger:<Logger Uri/FriendlyName>      Specify a logger for test results. For example, to log results into a       Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]      Creates file in TestResults directory with given LogFileName.      Change the verbosity level in log messages for console logger as shown below      Example: /logger:console;verbosity=<Defaults to \"normal\">      Allowed values for verbosity: quiet, minimal, normal and detailed.      Change the diagnostic level prefix for console logger as shown below      Example: /logger:console;prefix=<Defaults to \"false\">      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 #else
-            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>\n      Specify a logger for test results. For example, to log results into a \n      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]\n      Creates file in TestResults directory with given LogFileName.\n\n      Change the verbosity level in log messages for console logger as shown below\n      Example: /logger:console;verbosity=<Defaults to \"minimal\">\n      Allowed values for verbosity: quiet, minimal, normal and detailed.\n\n      Change the diagnostic level prefix for console logger as shown below\n      Example: /logger:console;prefix=<Defaults to \"false\">\n      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--logger|/logger:<Logger Uri/FriendlyName>      Specify a logger for test results. For example, to log results into a       Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]      Creates file in TestResults directory with given LogFileName.      Change the verbosity level in log messages for console logger as shown below      Example: /logger:console;verbosity=<Defaults to \"minimal\">      Allowed values for verbosity: quiet, minimal, normal and detailed.      Change the diagnostic level prefix for console logger as shown below      Example: /logger:console;prefix=<Defaults to \"false\">      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 #endif
 
             Assert.AreEqual(HelpContentPriority.EnableLoggerArgumentProcessorHelpPriority, capabilities.HelpPriority);

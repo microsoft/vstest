@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Globalization;
+
     [TestClass]
     public class ParentProcessIdArgumentProcessorTests
     {
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ParentProcessIdArgumentProcessorCapabilities();
             Assert.AreEqual("/ParentProcessId", capabilities.CommandName);
-            Assert.AreEqual("--ParentProcessId|/ParentProcessId:<ParentProcessId>\n      Process Id of the Parent Process responsible for launching current process.", capabilities.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--ParentProcessId|/ParentProcessId:<ParentProcessId>      Process Id of the Parent Process responsible for launching current process.", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 
             Assert.AreEqual(HelpContentPriority.ParentProcessIdArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

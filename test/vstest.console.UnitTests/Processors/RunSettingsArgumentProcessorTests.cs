@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     using Moq;
     using System.Text;
+    using System.Globalization;
 
     [TestClass]
     public class RunSettingsArgumentProcessorTests
@@ -58,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new RunSettingsArgumentProcessorCapabilities();
             Assert.AreEqual("/Settings", capabilities.CommandName);
-            Assert.AreEqual("--Settings|/Settings:<Settings File>\n      Settings to use when running tests.", capabilities.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--Settings|/Settings:<Settings File>     Settings to use when running tests.", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 
             Assert.AreEqual(HelpContentPriority.RunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

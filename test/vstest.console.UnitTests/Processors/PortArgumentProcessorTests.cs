@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Moq;
     using System;
     using System.Diagnostics;
+    using System.Globalization;
 
     [TestClass]
     public class PortArgumentProcessorTests
@@ -50,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new PortArgumentProcessorCapabilities();
             Assert.AreEqual("/Port", capabilities.CommandName);
-            Assert.AreEqual("--Port|/Port:<Port>\n      The Port for socket connection and receiving the event messages.", capabilities.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--Port|/Port:<Port>      The Port for socket connection and receiving the event messages.", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 
             Assert.AreEqual(HelpContentPriority.PortArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
