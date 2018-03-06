@@ -161,9 +161,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             message.MessageType = MessageType.BeforeTestRunStart;
             message.Payload = "settingsXml";
 
-            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message)
+                                                                                .Returns(new Message() { MessageType = MessageType.TestHostInitialized, Payload = "1234" })
+                                                                                .Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.TestHostInitialized(It.IsAny<int>()));
 
             this.requestHandler.ProcessRequests();
 
@@ -171,9 +174,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Once);
 
+            // Verify SessionStarted events
             this.mockDataCollectionManager.Verify(x => x.SessionStarted(), Times.Once);
-
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
+
+            // Verify TestHostInitialized events
+            this.mockDataCollectionManager.Verify(x => x.TestHostInitialized(It.IsAny<int>()), Times.Once);
 
             // Verify AfterTestRun events.
             this.mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
