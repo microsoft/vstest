@@ -190,7 +190,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                             TrxLoggerResources.FailureToAttach,
                             attachmentSet.DisplayName, 
                             e.GetType().ToString(), 
-                            e.Message);
+                            e);
+
+                        if (ObjectModel.EqtTrace.IsErrorEnabled)
+                        {
+                            ObjectModel.EqtTrace.Error(errorMsg);
+                        }
+                        
                         errorMessages.Add(errorMsg);
                     }
                 }
@@ -389,10 +395,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                         e.GetType().ToString(), 
                         e);
 
+                    if (ObjectModel.EqtTrace.IsErrorEnabled)
+                    {
+                        ObjectModel.EqtTrace.Error(errorMsg);
+                    }
+
                     StringBuilder stdErr = new StringBuilder(testResult.StdErr);
                     stdErr.AppendLine(errorMsg);
 
                     testResult.StdErr = stdErr.ToString();
+                    testResult.Outcome = TrxObjectModel.TestOutcome.Error;
+                    throw e;
                 }
             }
 
