@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Runtime.Versioning;
     using System.Threading.Tasks;
 
@@ -85,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunSpecificTestsArgumentProcessorCapabilities capabilities = new RunSpecificTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/Tests", capabilities.CommandName);
-            StringAssert.Contains(capabilities.HelpContentResourceName, "/Tests:<Test Names>\n      Run tests with names that match the provided values.");
+            Assert.AreEqual(0, string.Compare("--Tests|/Tests:<Test Names>      Run tests with names that match the provided values. To provide multiple      values, separate them by commas.      Examples: /Tests:TestMethod1                /Tests:TestMethod1,testMethod2", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 
             Assert.AreEqual(HelpContentPriority.RunSpecificTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(true, capabilities.IsAction);

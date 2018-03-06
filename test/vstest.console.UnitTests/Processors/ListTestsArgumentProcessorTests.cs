@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Runtime.Versioning;
     using System.Threading.Tasks;
@@ -102,8 +103,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var capabilities = new ListTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/ListTests", capabilities.CommandName);
             Assert.AreEqual("/lt", capabilities.ShortCommandName);
-            Assert.AreEqual("-lt|--ListTests|/lt|/ListTests:<File Name>\n      Lists all discovered tests from the given test container.", capabilities.HelpContentResourceName);
-
+            Assert.AreEqual(0, string.Compare("-lt|--ListTests|/lt|/ListTests:<File Name>      Lists all discovered tests from the given test container.", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
+            
             Assert.AreEqual(HelpContentPriority.ListTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(true, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);

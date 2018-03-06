@@ -4,7 +4,7 @@
 namespace vstest.console.UnitTests.Processors
 {
     using System;
-
+    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -47,7 +47,7 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CollectArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Collect", capabilities.CommandName);
-            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--Collect|/Collect:<DataCollector FriendlyName> Enables data collector for the test run. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
 
             Assert.AreEqual(HelpContentPriority.CollectArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

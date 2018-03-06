@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 
     using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
+    using System.Globalization;
 
     [TestClass]
     public class ParallelArgumentProcessorTests
@@ -49,8 +50,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ParallelArgumentProcessorCapabilities();
             Assert.AreEqual("/Parallel", capabilities.CommandName);
-            Assert.AreEqual("--Parallel|/Parallel\n      Specifies that the tests be executed in parallel. By default up\n      to all available cores on the machine may be used.\n      The number of cores to use may be configured using a settings file.", capabilities.HelpContentResourceName);
-
+            Assert.AreEqual(0, string.Compare("--Parallel|/Parallel      Specifies that the tests be executed in parallel. By default up      to all available cores on the machine may be used.      The number of cores to use may be configured using a settings file.", capabilities.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
+            
             Assert.AreEqual(HelpContentPriority.ParallelArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);

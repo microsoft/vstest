@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Globalization;
     using vstest.console.UnitTests.Processors;
 
     using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
@@ -55,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(null, isolationProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, isolationProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.InIsolationArgumentProcessorHelpPriority, isolationProcessor.Metadata.Value.HelpPriority);
-            Assert.AreEqual("--InIsolation|/InIsolation\n      Runs the tests in an isolated process. This makes vstest.console.exe \n      process less likely to be stopped on an error in the tests, but tests \n      may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName);
+            Assert.AreEqual(0, string.Compare("--InIsolation|/InIsolation      Runs the tests in an isolated process. This makes vstest.console.exe       process less likely to be stopped on an error in the tests, but tests       may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName, CultureInfo.InvariantCulture, CompareOptions.IgnoreSymbols));
         }
 
         [TestMethod]
