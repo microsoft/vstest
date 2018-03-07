@@ -8,8 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using vstest.console.UnitTests.TestDoubles;
 
+    using System;
     using System.Linq;
-
+    
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
     {
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             EnableLoggerArgumentProcessorCapabilities capabilities = new EnableLoggerArgumentProcessorCapabilities();
             Assert.AreEqual("/Logger", capabilities.CommandName);
-            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>\n      Specify a logger for test results. For example, to log results into a \n      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]\n      Creates file in TestResults directory with given LogFileName.\n\n      Change the verbosity level in log messages for console logger as shown below\n      Example: /logger:console;verbosity=<Defaults to \"minimal\">\n      Allowed values for verbosity: quiet, minimal and normal.\n\n      Change the diagnostic level prefix for console logger as shown below\n      Example: /logger:console;prefix=<Defaults to \"false\">\n      More info on Console Logger here : https://aka.ms/console-logger\n\n      To publish test results to Team Foundation Server, use TfsPublisher as shown below\n      Example: /logger:TfsPublisher;\n                Collection=<team project collection url>;\n                BuildName=<build name>;\n                TeamProject=<team project name>\n                [;Platform=<Defaults to \"Any CPU\">]\n                [;Flavor=<Defaults to \"Debug\">]\n                [;RunTitle=<title>]", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>" + Environment.NewLine + "      Specify a logger for test results. For example, to log results into a " + Environment.NewLine + "      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]" + Environment.NewLine + "      Creates file in TestResults directory with given LogFileName." + Environment.NewLine + Environment.NewLine + "      Change the verbosity level in log messages for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;verbosity=<Defaults to \"minimal\">" + Environment.NewLine + "      Allowed values for verbosity: quiet, minimal and normal." + Environment.NewLine + Environment.NewLine + "      Change the diagnostic level prefix for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;prefix=<Defaults to \"false\">" + Environment.NewLine + "      More info on Console Logger here : https://aka.ms/console-logger" + Environment.NewLine + Environment.NewLine + "      To publish test results to Team Foundation Server, use TfsPublisher as shown below" + Environment.NewLine + "      Example: /logger:TfsPublisher;" + Environment.NewLine + "                Collection=<team project collection url>;" + Environment.NewLine + "                BuildName=<build name>;" + Environment.NewLine + "                TeamProject=<team project name>" + Environment.NewLine + "                [;Platform=<Defaults to \"Any CPU\">]" + Environment.NewLine + "                [;Flavor=<Defaults to \"Debug\">]" + Environment.NewLine + "                [;RunTitle=<title>]", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.EnableLoggerArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
