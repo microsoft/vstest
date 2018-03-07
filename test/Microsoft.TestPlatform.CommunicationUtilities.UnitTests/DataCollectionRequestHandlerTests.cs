@@ -15,10 +15,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Newtonsoft.Json.Linq;
 
     [TestClass]
     public class DataCollectionRequestHandlerTests
@@ -162,11 +164,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             message.Payload = "settingsXml";
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message)
-                                                                                .Returns(new Message() { MessageType = MessageType.TestHostInitialized, Payload = "1234" })
+                                                                                .Returns(new Message() { MessageType = MessageType.TestHostInitialized, Payload = JToken.FromObject(new TestHostInitializedEventArgs(1234)) })
                                                                                 .Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
-            this.mockDataCollectionManager.Setup(x => x.TestHostInitialized(It.IsAny<int>()));
+            this.mockDataCollectionManager.Setup(x => x.TestHostInitialized(It.IsAny<TestHostInitializedEventArgs>()));
 
             this.requestHandler.ProcessRequests();
 
@@ -179,7 +181,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
 
             // Verify TestHostInitialized events
-            this.mockDataCollectionManager.Verify(x => x.TestHostInitialized(It.IsAny<int>()), Times.Once);
+            this.mockDataCollectionManager.Verify(x => x.TestHostInitialized(It.IsAny<TestHostInitializedEventArgs>()), Times.Once);
 
             // Verify AfterTestRun events.
             this.mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);

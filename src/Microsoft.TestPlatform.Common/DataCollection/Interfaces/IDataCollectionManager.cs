@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <param name="processId">
         /// Process ID of test host.
         /// </param>
-        void TestHostInitialized(int processId);
+        void TestHostInitialized(TestHostInitializedEventArgs testHostInitializedEventArgs);
 
         /// <summary>
         /// Raises SessionStart event to all data collectors configured for run.

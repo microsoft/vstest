@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
@@ -104,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <inheritdoc/>
         public void SendTestHostInitialized(int processId)
         {
-            this.communicationManager.SendMessage(MessageType.TestHostInitialized, processId.ToString());
+            this.communicationManager.SendMessage(MessageType.TestHostInitialized, new TestHostInitializedEventArgs(processId));
         }
 
         /// <inheritdoc/>
