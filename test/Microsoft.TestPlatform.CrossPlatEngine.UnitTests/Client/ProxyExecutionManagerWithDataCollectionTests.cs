@@ -216,6 +216,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
             }
         }
+
+        [TestMethod]
+        public void TestHostManagerHostLaunchedTriggerShoouldSendTestHostInitializedEvent()
+        {
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+
+            this.mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
+
+            this.mockDataCollectionManager.Verify(x => x.AfterTestHostInitialized(It.IsAny<int>()));
+        }
     }
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection

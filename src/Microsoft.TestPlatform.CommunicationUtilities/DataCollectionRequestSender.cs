@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <inheritdoc/>
         public void SendTestHostInitialized(int processId)
         {
-            this.communicationManager.SendMessage(MessageType.TestHostInitialized, this.dataSerializer.SerializeMessage(processId.ToString()));
+            this.communicationManager.SendMessage(MessageType.TestHostInitialized, processId.ToString());
         }
 
         /// <inheritdoc/>
