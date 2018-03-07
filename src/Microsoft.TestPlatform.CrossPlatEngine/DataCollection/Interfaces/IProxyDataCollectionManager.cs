@@ -60,6 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// <param name="processId">
         /// Process ID of test host
         /// </param>
-        void AfterTestHostInitialized(int processId);
+        void TestHostInitialized(int processId);
     }
 }

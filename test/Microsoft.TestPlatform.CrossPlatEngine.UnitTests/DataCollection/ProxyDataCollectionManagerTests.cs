@@ -135,7 +135,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
 
-            this.proxyDataCollectionManager.AfterTestHostInitialized(1234);
+            this.proxyDataCollectionManager.TestHostInitialized(1234);
 
             this.mockDataCollectionRequestSender.Verify(x => x.SendTestHostInitialized(1234));
         }

@@ -224,7 +224,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
 
-            this.mockDataCollectionManager.Verify(x => x.AfterTestHostInitialized(It.IsAny<int>()));
+            this.mockDataCollectionManager.Verify(x => x.TestHostInitialized(It.IsAny<int>()));
         }
     }
 
