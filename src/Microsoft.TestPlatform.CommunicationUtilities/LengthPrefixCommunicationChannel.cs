@@ -21,6 +21,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private readonly BinaryWriter writer;
 
+        /// <summary>
+        /// Sync object for sending messages
+        /// Write for binarywriter is NOT thread-safe
+        /// </summary>
+        private object writeSyncObject = new object();
+
         public LengthPrefixCommunicationChannel(Stream stream)
         {
             this.reader = new BinaryReader(stream, Encoding.UTF8, true);
@@ -37,8 +43,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.writer.Write(data);
-                this.writer.Flush();
+                // Writing Message on binarywriter is not Thread-Safe
+                // Need to sync one by one to avoid buffer corruption
+                lock (this.writeSyncObject)
+                {
+                    this.writer.Write(data);
+                    this.writer.Flush();
+                }
             }
             catch (Exception ex)
             {
