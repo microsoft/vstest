@@ -235,8 +235,8 @@
 
     <VsixSourceItem Include="$(VsixInputFileLocation)\*.*" Exclude="$(VsixInputFileLocation)\*.pdb" />
 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="1" /> 
-    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="1" />
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="1" NgenApplication="$(VsixInputFileLocation)\testhost.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="1" NgenApplication="$(VsixInputFileLocation)\testhost.x86.exe" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License.rtf">
