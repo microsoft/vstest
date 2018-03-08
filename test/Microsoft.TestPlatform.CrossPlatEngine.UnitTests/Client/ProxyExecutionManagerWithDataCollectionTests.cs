@@ -218,13 +218,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void TestHostManagerHostLaunchedTriggerShoouldSendTestHostInitializedEvent()
+        public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
         {
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
 
             this.mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
 
-            this.mockDataCollectionManager.Verify(x => x.TestHostInitialized(It.IsAny<int>()));
+            this.mockDataCollectionManager.Verify(x => x.TestHostLaunched(It.IsAny<int>()));
         }
     }
 
