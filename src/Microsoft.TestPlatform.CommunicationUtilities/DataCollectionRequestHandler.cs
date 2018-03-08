@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
@@ -282,6 +283,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         }
 
                         break;
+
+                    case MessageType.TestHostInitialized:
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Test host initialized.");
+                        }
+
+                        var testHostInitializedEventArgs = this.dataSerializer.DeserializePayload<TestHostInitializedEventArgs>(message);
+
+                        this.dataCollectionManager.TestHostInitialized(testHostInitializedEventArgs);
+
+                        break;
+
                     default:
                         if (EqtTrace.IsInfoEnabled)
                         {

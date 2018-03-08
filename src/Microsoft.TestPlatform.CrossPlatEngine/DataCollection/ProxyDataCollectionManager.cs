@@ -170,6 +170,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                             dataCollectionEventsPort);
         }
 
+        /// <inheritdoc />
+        public void TestHostInitialized(int processId)
+        {
+            this.dataCollectionRequestSender.SendTestHostInitialized(processId);
+        }
+
         /// <summary>
         /// The dispose.
         /// </summary>
