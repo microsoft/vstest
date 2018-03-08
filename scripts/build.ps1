@@ -786,12 +786,21 @@ function Acquire-ProcdumpExe
 {
     function GetProcdump($zip, $dir)
     {
+        
         (New-Object System.Net.WebClient).DownloadFile("https://download.sysinternals.com/files/Procdump.zip", $zip)
-        Expand-Archive -Path $zip -DestinationPath $dir -Force
+        
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+        try {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($zip, $dir);
+        }
+        catch {
+            # Already exists error on overwrite
+        }
+
         Remove-Item $zip
     }
 
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
     $procdump_dir = Join-Path $env:TP_TOOLS_DIR "Procdump"
     
     if (-not (Test-Path $procdump_dir)) {
