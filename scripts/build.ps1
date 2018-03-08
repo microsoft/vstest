@@ -393,6 +393,11 @@ function Publish-Package
     Copy-Item "$visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll" $testPlatformDirectory -Force
     Copy-Item "$visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll" $testPlatformDirectory -Force
 
+    
+    # Copy procdump form tools folder
+    $procDumpDirectory = Join-Path $env:TP_TOOLS_DIR "procdump"
+    Copy-Item $procDumpDirectory $fullCLRPackageDir -Recurse -Force
+
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -777,6 +782,34 @@ function Build-SpecificProjects
     }
 }
 
+function Acquire-ProcdumpExe
+{
+    function GetProcdump($zip, $dir)
+    {
+        (New-Object System.Net.WebClient).DownloadFile("https://download.sysinternals.com/files/Procdump.zip", $zip)
+        Expand-Archive -Path $zip -DestinationPath $dir -Force
+        Remove-Item $zip
+    }
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $procdump_dir = Join-Path $env:TP_TOOLS_DIR "Procdump"
+    
+    if (-not (Test-Path $procdump_dir)) {
+        New-Item $procdump_dir -Type Directory | Out-Null
+    }
+
+    $procdump_zip = Join-Path $procdump_dir "procdump.zip"
+
+    try {
+        Write-Log ".. .. Acquire-ProcdumpExe"
+        & GetProcdump $procdump_zip $procdump_dir 
+        Write-Log ".. .. Acquire-ProcdumpExe: Complete."
+    }
+    catch {
+        Write-Error $_.Exception.Message
+    }
+}
+
 if ($ProjectNamePatterns.Count -ne 0)
 {
     # Build Specific projects.
@@ -793,6 +826,7 @@ Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 Install-DotNetCli
 Restore-Package
+Acquire-ProcdumpExe
 Update-LocalizedResources
 Invoke-Build
 Publish-Package

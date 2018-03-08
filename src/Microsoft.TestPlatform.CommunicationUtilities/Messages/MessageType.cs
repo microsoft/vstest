@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// <summary>
         /// Event message type sent to datacollector process right after test host process has started.
         /// </summary>
-        public const string TestHostInitialized = "DataCollection.TestHostInitialized";
+        public const string TestHostLaunched = "DataCollection.TestHostLaunched";
 
         /// <summary>
         /// Event message type send to datacollector process before test run starts.

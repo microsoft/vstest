@@ -11,6 +11,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -80,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Initialize Blame Logger
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            this.blameLogger.Initialize(loggerEvents, null);
+            this.blameLogger.Initialize(loggerEvents, (string)null);
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
@@ -103,7 +105,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Initialize Blame Logger
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            this.blameLogger.Initialize(loggerEvents, null);
+            this.blameLogger.Initialize(loggerEvents, (string)null);
 
             // Setup and Raise event
             loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
@@ -134,7 +136,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Initialize Blame Logger
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
-            this.blameLogger.Initialize(loggerEvents, null);
+            this.blameLogger.Initialize(loggerEvents, (string)null);
 
             var testCaseList =
                     new List<TestCase>

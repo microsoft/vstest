@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// Session End event arguments
     /// </summary>
     [DataContract]
-    public sealed class TestHostInitializedEventArgs : DataCollectionEventArgs
+    public sealed class TestHostLaunchedEventArgs : DataCollectionEventArgs
     {
         #region Private members
 
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Default constructor with default DataCollectionContext.
         /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
         /// </remarks>
-        public TestHostInitializedEventArgs(int processId)
+        public TestHostLaunchedEventArgs(int processId)
         {
             this.processId = processId;
         }

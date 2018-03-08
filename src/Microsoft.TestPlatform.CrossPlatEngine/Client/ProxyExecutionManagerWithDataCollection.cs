@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
         {
-            this.ProxyDataCollectionManager.TestHostInitialized(e.ProcessId);
+            this.ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
         }
 
         /// <summary>

@@ -103,9 +103,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public void SendTestHostInitialized(int processId)
+        public void SendTestHostLaunched(int processId)
         {
-            this.communicationManager.SendMessage(MessageType.TestHostInitialized, new TestHostInitializedEventArgs(processId));
+            this.communicationManager.SendMessage(MessageType.TestHostLaunched, new TestHostLaunchedEventArgs(processId));
         }
 
         /// <inheritdoc/>

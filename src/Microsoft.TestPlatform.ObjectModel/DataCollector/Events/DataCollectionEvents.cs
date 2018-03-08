@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Raised when test host initialized
         /// </summary>
-        public abstract event EventHandler<TestHostInitializedEventArgs> TestHostInitialized;
+        public abstract event EventHandler<TestHostLaunchedEventArgs> TestHostLaunched;
 
         /// <summary>
         /// Raised when a session is starting
