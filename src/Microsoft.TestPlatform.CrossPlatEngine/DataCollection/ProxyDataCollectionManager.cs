@@ -171,9 +171,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <inheritdoc />
-        public void TestHostInitialized(int processId)
+        public void TestHostLaunched(int processId)
         {
-            this.dataCollectionRequestSender.SendTestHostInitialized(processId);
+            this.dataCollectionRequestSender.SendTestHostLaunched(processId);
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     /// </summary>
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
-    public class BlameLogger : ITestLogger
+    public class BlameLogger : ITestLoggerWithParameters
     {
         #region Constants
 
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Initializes a new instance of the <see cref="BlameLogger"/> class.
         /// </summary>
         public BlameLogger()
-            : this(ConsoleOutput.Instance, new XmlReaderWriter())
+             : this(ConsoleOutput.Instance, new XmlReaderWriter())
         {
         }
 
@@ -74,6 +74,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="events">Events that can be registered for.</param>
         /// <param name="testRunDictionary">Test Run Directory</param>
         public void Initialize(TestLoggerEvents events, string testRunDictionary)
+        {
+            if (events == null)
+            {
+                throw new ArgumentNullException(nameof(events));
+            }
+
+            events.TestRunComplete += this.TestRunCompleteHandler;
+        }
+
+        /// <summary>
+        /// Initializes the Logger.
+        /// </summary>
+        /// <param name="events">Events that can be registered for.</param>
+        /// <param name="testRunDictionary">Test Run Directory</param>
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> testRunDictionary)
         {
             if (events == null)
             {
@@ -143,7 +158,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
                 {
-                    var uriDataAttachment = attachmentSet.Attachments.LastOrDefault();
+                    // Process only Sequence_<GUID>.xml attachments
+                    var uriDataAttachment = attachmentSet.Attachments.LastOrDefault((attachment) => attachment.Uri.ToString().EndsWith(".xml"));
+
                     if (uriDataAttachment != null)
                     {
                         var filepath = uriDataAttachment.Uri.LocalPath;

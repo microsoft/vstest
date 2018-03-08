@@ -192,5 +192,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
             return Path.Combine(this.GetCurrentProcessLocation(), this.GetCurrentProcessArchitecture().ToString().ToLower());
         }
+
+        /// <inheritdoc/>
+        public void WaitForProcessExit(object process)
+        {
+            var proc = process as Process;
+            if (!proc.HasExited)
+            {
+                proc.WaitForExit();
+            }
+        }
     }
 }
