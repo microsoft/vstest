@@ -394,7 +394,7 @@ function Publish-Package
     Copy-Item "$visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll" $testPlatformDirectory -Force
 
     
-    # Copy procdump form tools folder
+    # Copy procdump from tools folder
     $procDumpDirectory = Join-Path $env:TP_TOOLS_DIR "procdump"
     Copy-Item $procDumpDirectory $fullCLRPackageDir -Recurse -Force
 
@@ -801,9 +801,9 @@ function Acquire-ProcdumpExe
     $procdump_zip = Join-Path $procdump_dir "procdump.zip"
 
     try {
-        Write-Log ".. .. Acquire-ProcdumpExe"
+        Write-Log "Acquire-ProcdumpExe"
         & GetProcdump $procdump_zip $procdump_dir 
-        Write-Log ".. .. Acquire-ProcdumpExe: Complete."
+        Write-Log "Acquire-ProcdumpExe: Complete."
     }
     catch {
         Write-Error $_.Exception.Message
