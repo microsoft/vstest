@@ -157,8 +157,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.processDumpEnabled)
             {
-                var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, this.processDumpUtility.GetDumpFile(), true);
-                this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                var dumpFile = this.processDumpUtility.GetDumpFile();
+                if (!dumpFile.Equals(string.Empty))
+                {
+                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, this.processDumpUtility.GetDumpFile(), true);
+                    this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                }
+                else
+                {
+                    if (EqtTrace.IsWarningEnabled)
+                    {
+                        EqtTrace.Warning("blame:CollectDump was enabled but dump file was not generated.");
+                    }
+                }
             }
 
             this.DeregisterEvents();
