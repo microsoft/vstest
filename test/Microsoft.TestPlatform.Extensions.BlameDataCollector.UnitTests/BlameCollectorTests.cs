@@ -221,7 +221,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             /// The blame reader writer.
             /// </param>
             /// <param name="processDumpUtility">
-            /// Lazy ProcessDumpUtility instance.
+            /// ProcessDumpUtility instance.
             /// </param>
             internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
                 : base(blameReaderWriter, processDumpUtility)

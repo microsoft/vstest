@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// BlameReaderWriter instance.
         /// </param>
         /// <param name="processDumpUtility">
-        /// Lazy ProcessDumpUtility instance.
+        /// ProcessDumpUtility instance.
         /// </param>
         protected BlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
         {

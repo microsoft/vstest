@@ -23,8 +23,5 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
