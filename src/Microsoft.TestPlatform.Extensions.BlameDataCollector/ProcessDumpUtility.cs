@@ -3,10 +3,10 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -17,20 +17,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     {
         private IProcessHelper processHelper;
         private IFileHelper fileHelper;
+        private IEnvironment environment;
         private Process procDumpProcess;
         private string testResultsDirectory;
         private string dumpFileName;
 
         public ProcessDumpUtility()
-            : this(new ProcessHelper(), new FileHelper())
+            : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment())
         {
         }
 
-        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper)
+        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.procDumpProcess = null;
+            this.environment = environment;
         }
 
         /// <inheritdoc/>
@@ -60,26 +62,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory)
         {
-            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{dumpFileGuid}.dmp";
+            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}.dmp";
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
-                                            ProcessDumpUtility.GetProcDumpExecutable(),
+                                            this.GetProcDumpExecutable(),
                                             ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName),
                                             testResultsDirectory,
                                             null,
                                             null,
                                             null) as Process;
-        }
-
-        /// <summary>
-        /// Get procdump executable path
-        /// </summary>
-        /// <returns>procdump executable path</returns>
-        private static string GetProcDumpExecutable()
-        {
-            var procDumpExe = Path.Combine(Path.GetDirectoryName(typeof(BlameCollector).GetTypeInfo().Assembly.GetAssemblyLocation()), "Extensions", "procdump64.exe");
-            return procDumpExe;
         }
 
         /// <summary>
@@ -95,6 +87,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private static string BuildProcDumpArgs(int processId, string filename)
         {
             return "-t -g -ma " + processId + " " + filename;
+        }
+
+        /// <summary>
+        /// Get procdump executable path
+        /// </summary>
+        /// <returns>procdump executable path</returns>
+        private string GetProcDumpExecutable()
+        {
+            var procdumpPath = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
+            if (!string.IsNullOrEmpty(procdumpPath))
+            {
+                string filename = string.Empty;
+
+                if (this.environment.Architecture == PlatformArchitecture.X64)
+                {
+                    filename = "procdump64.exe";
+                }
+                else if (this.environment.Architecture == PlatformArchitecture.X86)
+                {
+                    filename = "procdump.exe";
+                }
+
+                var procDumpExe = Path.Combine(procdumpPath, "Extensions", filename);
+                return procDumpExe;
+            }
+            else
+            {
+                throw new Exception(Resources.Resources.ProcDumpEnvVarEmpty);
+            }
         }
     }
 }

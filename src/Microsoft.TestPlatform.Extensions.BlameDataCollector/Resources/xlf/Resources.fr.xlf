@@ -25,6 +25,11 @@
         <target state="translated">La série de tests active a été abandonnée, car le processus hôte s'est arrêté de manière inattendue durant l'exécution du ou des tests suivants :</target>
         <note />
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

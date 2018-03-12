@@ -120,4 +120,7 @@
   <data name="AbortedTestRun" xml:space="preserve">
     <value>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</value>
   </data>
+  <data name="ProcDumpEnvVarEmpty" xml:space="preserve">
+    <value>Required environment variable PROCDUMP_PATH was null or empty.</value>
+  </data>
 </root>

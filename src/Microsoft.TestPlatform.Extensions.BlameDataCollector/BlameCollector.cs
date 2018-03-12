@@ -22,6 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
         private DataCollectionEvents events;
+        private DataCollectionLogger logger;
         private IProcessDumpUtility processDumpUtility;
         private List<TestCase> testSequence;
         private IBlameReaderWriter blameReaderWriter;
@@ -86,6 +87,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.context = environmentContext;
             this.configurationElement = configurationElement;
             this.testSequence = new List<TestCase>();
+            this.logger = logger;
 
             // Subscribing to events
             this.events.TestHostLaunched += this.TestHostLaunched_Handler;
@@ -160,7 +162,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 var dumpFile = this.processDumpUtility.GetDumpFile();
                 if (!dumpFile.Equals(string.Empty))
                 {
-                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, this.processDumpUtility.GetDumpFile(), true);
+                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
                     this.dataCollectionSink.SendFileAsync(fileTranferInformation);
                 }
                 else
@@ -197,6 +199,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     EqtTrace.Warning(string.Format(CultureInfo.InvariantCulture, "BlameCollector: TestHostLaunched_Handler: Could not start process dump. {0}", e.Message));
                 }
+
+                this.logger.LogException(args.Context, e, DataCollectorMessageLevel.Error);
             }
         }
 

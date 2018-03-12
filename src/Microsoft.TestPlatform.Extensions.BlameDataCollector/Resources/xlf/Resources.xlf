@@ -7,6 +7,11 @@
         <target state="new">The active Test Run was aborted because the host process exited unexpectedly while executing test </target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

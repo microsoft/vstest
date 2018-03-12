@@ -25,6 +25,11 @@
         <target state="translated">Активный тестовый запуск прерван, так как хост-процесс завершил работу непредвиденным образом при выполнении следующих тестов:</target>
         <note />
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

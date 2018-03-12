@@ -25,6 +25,11 @@
         <target state="translated">Aşağıdaki testler yürütülürken konak işleminden beklenmedik bir şekilde çıkıldığından etkin Test Çalıştırması iptal edildi:</target>
         <note />
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

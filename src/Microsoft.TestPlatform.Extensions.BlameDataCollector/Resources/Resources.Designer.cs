@@ -68,5 +68,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
                 return ResourceManager.GetString("AbortedTestRun", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string ProcDumpEnvVarEmpty
+        /// </summary>
+        internal static string ProcDumpEnvVarEmpty
+        {
+            get
+            {
+                return ResourceManager.GetString("ProcDumpEnvVarEmpty", resourceCulture);
+            }
+        }
     }
 }

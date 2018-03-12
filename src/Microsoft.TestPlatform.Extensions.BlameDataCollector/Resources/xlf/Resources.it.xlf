@@ -25,6 +25,11 @@
         <target state="translated">L'esecuzione dei test attiva è stata interrotta perché il processo host è stato terminato in modo imprevisto durante l'esecuzione del test o dei test seguenti:</target>
         <note />
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

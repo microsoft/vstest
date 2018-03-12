@@ -25,6 +25,11 @@
         <target state="translated">以下のテストの実行中にホスト プロセスが予期せず終了したため、アクティブなテスト実行が中止されました:</target>
         <note />
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
