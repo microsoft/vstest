@@ -50,7 +50,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="processDumpUtility">
         /// ProcessDumpUtility instance.
         /// </param>
-        protected BlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
+        internal BlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
         {
             this.blameReaderWriter = blameReaderWriter;
             this.processDumpUtility = processDumpUtility;
@@ -169,7 +169,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
-                        EqtTrace.Warning("blame:CollectDump was enabled but dump file was not generated.");
+                        EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
                     }
                 }
             }
@@ -197,7 +197,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 if (EqtTrace.IsWarningEnabled)
                 {
-                    EqtTrace.Warning(string.Format(CultureInfo.InvariantCulture, "BlameCollector: TestHostLaunched_Handler: Could not start process dump. {0}", e.Message));
+                    EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
                 this.logger.LogException(args.Context, e, DataCollectorMessageLevel.Error);

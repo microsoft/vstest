@@ -51,9 +51,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return dumpFile;
             }
 
-            if (EqtTrace.IsInfoEnabled)
+            if (EqtTrace.IsErrorEnabled)
             {
-                EqtTrace.Verbose(string.Format(CultureInfo.InvariantCulture, "ProcessDumpUtility: GetCrashDumpFile: No dump file generated."));
+                EqtTrace.Error("ProcessDumpUtility.GetCrashDumpFile: No dump file generated.");
             }
 
             return string.Empty;
@@ -109,7 +109,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     filename = "procdump.exe";
                 }
 
-                var procDumpExe = Path.Combine(procdumpPath, "Extensions", filename);
+                var procDumpExe = Path.Combine(procdumpPath, filename);
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("Using procdump at: {0}", procDumpExe);
+                }
+
                 return procDumpExe;
             }
             else

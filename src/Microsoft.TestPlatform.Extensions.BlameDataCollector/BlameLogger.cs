@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     /// </summary>
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
-    public class BlameLogger : ITestLoggerWithParameters
+    public class BlameLogger : ITestLogger
     {
         #region Constants
 
@@ -74,21 +74,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="events">Events that can be registered for.</param>
         /// <param name="testRunDictionary">Test Run Directory</param>
         public void Initialize(TestLoggerEvents events, string testRunDictionary)
-        {
-            if (events == null)
-            {
-                throw new ArgumentNullException(nameof(events));
-            }
-
-            events.TestRunComplete += this.TestRunCompleteHandler;
-        }
-
-        /// <summary>
-        /// Initializes the Logger.
-        /// </summary>
-        /// <param name="events">Events that can be registered for.</param>
-        /// <param name="testRunDictionary">Test Run Directory</param>
-        public void Initialize(TestLoggerEvents events, Dictionary<string, string> testRunDictionary)
         {
             if (events == null)
             {
