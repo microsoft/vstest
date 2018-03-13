@@ -210,14 +210,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Make StartProcessDump throw exception
+            var ex = new Exception("start process failed");
+            var tpex = new TestPlatformException("env var exception");
             this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
-                                       .Throws(new Exception("start process failed"));
+                                       .Throws(ex);
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                                       .Throws(tpex);
 
             // Raise TestHostLaunched
-            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1));
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 2));
 
             // Verify
-            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(ex => ex.Contains("start process failed"))), Times.Once);
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == ex.ToString())), Times.Once);
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == tpex.Message)), Times.Once);
         }
 
         [TestCleanup]

@@ -35,14 +35,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #endregion
 
         #region Constructor
-
+        
         /// <summary>
-        /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class. 
+        /// Initializes a new instance of the <see cref="TestHostLaunchedEventArgs"/> class. 
         /// </summary>
-        /// <remarks>
-        /// Default constructor with default DataCollectionContext.
-        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
-        /// </remarks>
+        /// <param name="context">
+        /// Data collection context
+        /// </param>
+        /// <param name="processId">
+        /// Process id of test host
+        /// </param>
         public TestHostLaunchedEventArgs(DataCollectionContext context, int processId)
             : base(context)
         {

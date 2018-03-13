@@ -4,6 +4,7 @@
 namespace vstest.console.UnitTests.Processors
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -85,19 +86,24 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(DefaultRunSettings);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.mockEnvronment.SetupSequence(x => x.OperatingSystem)
-                               .Returns(PlatformOperatingSystem.Unix)
-                               .Returns(PlatformOperatingSystem.Windows)
-                               .Returns(PlatformOperatingSystem.Windows);
 
-            this.mockEnvronment.SetupSequence(x => x.Architecture)
-                               .Returns(PlatformArchitecture.ARM)
-                               .Returns(PlatformArchitecture.ARM64);
-
-            for (var i = 0; i < 3; i++)
+            var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
             {
+                Tuple.Create(PlatformOperatingSystem.Unix, PlatformArchitecture.X64),
+                Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM),
+                Tuple.Create(PlatformOperatingSystem.Windows, PlatformArchitecture.ARM64)
+            };
+            
+            foreach (var tuple in unsupportedPlatforms)
+            {
+                this.mockEnvronment.SetupGet(s => s.OperatingSystem).Returns(tuple.Item1);
+                this.mockEnvronment.SetupGet(s => s.Architecture).Returns(tuple.Item2);
+
                 this.executor.Initialize("collectdump");
                 this.mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameCollectDumpNotSupportedForPlatform, OutputLevel.Warning));
+
+                Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+                Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
             }
         }
 

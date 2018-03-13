@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Sends the TestHostLaunched event
         /// </summary>
         /// <param name="testHostLaunchedPayload">
-        /// payload
+        /// Test host launched payload
         /// </param>
         void SendTestHostLaunched(TestHostLaunchedPayload testHostLaunchedPayload);
 
