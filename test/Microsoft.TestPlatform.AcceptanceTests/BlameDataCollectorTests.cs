@@ -47,12 +47,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             bool isAttachmentReceived = false;
             bool isValid = false;
             this.StdErrorContains("BlameUnitTestProject.UnitTest1.TestMethod2");
-            this.StdOutputContains("Sequence.xml");
+            this.StdOutputContains("Sequence_");
             var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
 
             foreach(var file in resultFiles)
             {
-                if(file.Contains("Sequence.xml"))
+                if(file.Contains("Sequence_"))
                 {
                     isAttachmentReceived = true;
                     isValid = IsValidXml(file);

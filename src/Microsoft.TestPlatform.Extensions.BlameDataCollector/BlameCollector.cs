@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Xml;
@@ -21,18 +22,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
         private DataCollectionEvents events;
+        private DataCollectionLogger logger;
+        private IProcessDumpUtility processDumpUtility;
         private List<TestCase> testSequence;
         private IBlameReaderWriter blameReaderWriter;
         private XmlElement configurationElement;
         private int testStartCount;
         private int testEndCount;
+        private bool processDumpEnabled;
+        private string attachmentGuid;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
         /// Using XmlReaderWriter by default
         /// </summary>
         public BlameCollector()
-            : this(new XmlReaderWriter())
+            : this(new XmlReaderWriter(), new ProcessDumpUtility())
         {
         }
 
@@ -42,9 +47,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="blameReaderWriter">
         /// BlameReaderWriter instance.
         /// </param>
-        protected BlameCollector(IBlameReaderWriter blameReaderWriter)
+        /// <param name="processDumpUtility">
+        /// ProcessDumpUtility instance.
+        /// </param>
+        internal BlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
         {
             this.blameReaderWriter = blameReaderWriter;
+            this.processDumpUtility = processDumpUtility;
         }
 
         /// <summary>
@@ -78,11 +87,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.context = environmentContext;
             this.configurationElement = configurationElement;
             this.testSequence = new List<TestCase>();
+            this.logger = logger;
 
             // Subscribing to events
+            this.events.TestHostLaunched += this.TestHostLaunched_Handler;
             this.events.SessionEnd += this.SessionEnded_Handler;
             this.events.TestCaseStart += this.EventsTestCaseStart;
             this.events.TestCaseEnd += this.EventsTestCaseEnd;
+
+            if (this.configurationElement != null)
+            {
+                this.processDumpEnabled = this.configurationElement[Constants.DumpModeKey] != null;
+            }
+
+            this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
         }
 
         /// <summary>
@@ -133,13 +151,61 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // And send the attachment
             if (this.testStartCount > this.testEndCount)
             {
-                var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName);
+                var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
                 filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
                 var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
                 this.dataCollectionSink.SendFileAsync(fileTranferInformation);
             }
 
+            if (this.processDumpEnabled)
+            {
+                try
+                {
+                    var dumpFile = this.processDumpUtility.GetDumpFile();
+                    if (!string.IsNullOrEmpty(dumpFile))
+                    {
+                        var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                        this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                    }
+                    else
+                    {
+                        EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                    }
+                }
+                catch (FileNotFoundException ex)
+                {
+                    this.logger.LogError(args.Context, ex.Message);
+                }
+            }
+
             this.DeregisterEvents();
+        }
+
+        /// <summary>
+        /// Called when Test Host Initialized is invoked
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="args">TestHostLaunchedEventArgs</param>
+        private void TestHostLaunched_Handler(object sender, TestHostLaunchedEventArgs args)
+        {
+            if (!this.processDumpEnabled)
+            {
+                return;
+            }
+
+            try
+            {
+                this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory());
+            }
+            catch (Exception e)
+            {
+                if (EqtTrace.IsWarningEnabled)
+                {
+                    EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
+                }
+
+                this.logger.LogError(args.Context, e.ToString());
+            }
         }
 
         /// <summary>
