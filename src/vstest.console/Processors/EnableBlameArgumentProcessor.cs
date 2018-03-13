@@ -15,6 +15,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using System.Globalization;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
     {
@@ -56,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableBlameArgumentExecutor(RunSettingsManager.Instance, new PlatformEnvironment()));
                 }
 
                 return this.executor;
@@ -101,12 +105,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private IRunSettingsProvider runSettingsManager;
 
+        /// <summary>
+        /// Platform environment
+        /// </summary>
+        private IEnvironment environment;
+
         #region Constructor
 
-        internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment)
         {
             this.runSettingsManager = runSettingsManager;
+            this.environment = environment;
+            this.Output = ConsoleOutput.Instance;
         }
+
+        #endregion
+
+        #region Properties
+
+        internal IOutput Output { get; set; }
+
         #endregion
 
         #region IArgumentExecutor
@@ -117,6 +135,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
+            bool isDumpEnabled = false;
+
+            if (!string.IsNullOrWhiteSpace(argument) && argument.Equals("CollectDump", StringComparison.OrdinalIgnoreCase))
+            {
+                if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
+                    this.environment.Architecture != PlatformArchitecture.ARM64 &&
+                    this.environment.Architecture != PlatformArchitecture.ARM)
+                {
+                    isDumpEnabled = true;
+                }
+                else
+                {
+                    Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
+                }
+
+            }
+
             // Add Blame Logger
             EnableLoggerArgumentExecutor.AddLoggerToRunSettings(BlameFriendlyName, this.runSettingsManager);
 
@@ -162,7 +197,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             outernode.AppendChild(node);
             node.InnerText = resultsDirectory;
 
-            foreach(var item in dataCollectionRunSettings.DataCollectorSettingsList)
+            if (isDumpEnabled)
+            {
+                var dumpNode = XmlDocument.CreateElement("CollectDump");
+                outernode.AppendChild(dumpNode);
+                dumpNode.InnerText = "true";
+            }
+
+            foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
             {
                 if( item.FriendlyName.Equals(BlameFriendlyName))
                 {

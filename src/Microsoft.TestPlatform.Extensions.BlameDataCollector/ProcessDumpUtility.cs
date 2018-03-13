@@ -91,9 +91,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private static string BuildProcDumpArgs(int processId, string filename)
         {
             // -t: Write a dump when the process terminates.
-            // -g: Run as a native debugger in a managed process (no interop).
             // -ma: Write a dump file with all process memory. The default dump format only includes thread and handle information.
-            return "-t -g -ma " + processId + " " + filename;
+            return "-t -ma " + processId + " " + filename;
         }
 
         /// <summary>

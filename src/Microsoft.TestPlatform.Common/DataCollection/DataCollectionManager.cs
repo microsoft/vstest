@@ -252,12 +252,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public void TestHostLaunched(TestHostLaunchedEventArgs testHostLaunchedEventArgs)
+        public void TestHostLaunched(int processId)
         {
             if (!this.isDataCollectionEnabled)
             {
                 return;
             }
+
+            var testHostLaunchedEventArgs = new TestHostLaunchedEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, processId);
 
             this.SendEvent(testHostLaunchedEventArgs);
         }

@@ -161,6 +161,9 @@
   <data name="BatchSizeRequired" xml:space="preserve">
     <value>The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10</value>
   </data>
+  <data name="BlameCollectDumpNotSupportedForPlatform" xml:space="preserve">
+    <value>CollectDump option for Blame is not supported for this platform.</value>
+  </data>
   <data name="BuildBasePathArgumentHelp" xml:space="preserve">
     <value>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</value>

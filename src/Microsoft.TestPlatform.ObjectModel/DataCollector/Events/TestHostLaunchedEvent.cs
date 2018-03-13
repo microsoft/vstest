@@ -43,7 +43,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Default constructor with default DataCollectionContext.
         /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
         /// </remarks>
-        public TestHostLaunchedEventArgs(int processId)
+        public TestHostLaunchedEventArgs(DataCollectionContext context, int processId)
+            : base(context)
         {
             this.processId = processId;
         }

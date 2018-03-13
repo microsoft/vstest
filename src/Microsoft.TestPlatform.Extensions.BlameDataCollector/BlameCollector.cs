@@ -204,7 +204,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogError(args.Context, e.ToString());
+                this.logger.LogError(args.Context, e.Message);
             }
         }
 

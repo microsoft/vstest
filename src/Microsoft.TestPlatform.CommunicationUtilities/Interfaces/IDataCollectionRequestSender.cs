@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -35,10 +36,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <summary>
         /// Sends the TestHostLaunched event
         /// </summary>
-        /// <param name="processId">
-        /// Process ID of the test host.
+        /// <param name="testHostLaunchedPayload">
+        /// payload
         /// </param>
-        void SendTestHostLaunched(int processId);
+        void SendTestHostLaunched(TestHostLaunchedPayload testHostLaunchedPayload);
 
         /// <summary>
         /// Sends the BeforeTestRunStart event and waits for result
