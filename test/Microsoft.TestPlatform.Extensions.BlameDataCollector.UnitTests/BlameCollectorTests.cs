@@ -212,9 +212,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             // Make StartProcessDump throw exception
             var ex = new Exception("start process failed");
             var tpex = new TestPlatformException("env var exception");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1, It.IsAny<string>(), It.IsAny<string>()))
                                        .Throws(ex);
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(2, It.IsAny<string>(), It.IsAny<string>()))
                                        .Throws(tpex);
 
             // Raise TestHostLaunched
