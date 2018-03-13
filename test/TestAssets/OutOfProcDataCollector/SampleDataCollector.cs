@@ -27,7 +27,7 @@ namespace OutOfProcDataCollector
             DataCollectionEnvironmentContext environmentContext)
         {
 
-            events.TestHostInitialized += this.TestHostInitialized_Handler;
+            events.TestHostLaunched += this.TestHostLaunched_Handler;
             events.SessionStart += this.SessionStarted_Handler;
             events.SessionEnd += this.SessionEnded_Handler;
             events.TestCaseStart += this.Events_TestCaseStart;
@@ -68,9 +68,9 @@ namespace OutOfProcDataCollector
             this.logger.LogWarning(this.context.SessionDataCollectionContext, "SessionEnded");
         }
 
-        private void TestHostInitialized_Handler(object sender, TestHostInitializedEventArgs e)
+        private void TestHostLaunched_Handler(object sender, TestHostLaunchedEventArgs e)
         {
-            this.logger.LogWarning(this.context.SessionDataCollectionContext, "TestHostInitialized " + e.TestHostProcessId);
+            this.logger.LogWarning(this.context.SessionDataCollectionContext, "TestHostLaunched " + e.TestHostProcessId);
         }
 
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()

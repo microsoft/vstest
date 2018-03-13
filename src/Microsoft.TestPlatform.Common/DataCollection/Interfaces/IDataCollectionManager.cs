@@ -40,12 +40,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         Collection<AttachmentSet> TestCaseEnded(TestCaseEndEventArgs testCaseEndEventArgs);
 
         /// <summary>
-        /// Raises TestHostInitialized event to all data collectors configured for run.
+        /// Raises TestHostLaunched event to all data collectors configured for run.
         /// </summary>
         /// <param name="processId">
         /// Process ID of test host.
         /// </param>
-        void TestHostInitialized(TestHostInitializedEventArgs testHostInitializedEventArgs);
+        void TestHostLaunched(TestHostLaunchedEventArgs testHostLaunchedEventArgs);
 
         /// <summary>
         /// Raises SessionStart event to all data collectors configured for run.

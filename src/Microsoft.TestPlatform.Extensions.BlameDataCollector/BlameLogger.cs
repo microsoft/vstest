@@ -143,7 +143,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
                 {
-                    var uriDataAttachment = attachmentSet.Attachments.LastOrDefault();
+                    // Process only Sequence_<GUID>.xml attachments
+                    var uriDataAttachment = attachmentSet.Attachments.LastOrDefault((attachment) => attachment.Uri.ToString().EndsWith(".xml"));
+
                     if (uriDataAttachment != null)
                     {
                         var filepath = uriDataAttachment.Uri.LocalPath;

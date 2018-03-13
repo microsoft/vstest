@@ -33,12 +33,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         void Close();
 
         /// <summary>
-        /// Sends the TestHostInitialized event
+        /// Sends the TestHostLaunched event
         /// </summary>
         /// <param name="processId">
         /// Process ID of the test host.
         /// </param>
-        void SendTestHostInitialized(int processId);
+        void SendTestHostLaunched(int processId);
 
         /// <summary>
         /// Sends the BeforeTestRunStart event and waits for result
