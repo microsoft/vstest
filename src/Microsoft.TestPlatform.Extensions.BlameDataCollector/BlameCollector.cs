@@ -169,10 +169,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     }
                     else
                     {
-                        if (EqtTrace.IsWarningEnabled)
-                        {
-                            EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
-                        }
+                        EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
                     }
                 }
                 catch (FileNotFoundException ex)
