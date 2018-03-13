@@ -120,7 +120,10 @@
   <data name="AbortedTestRun" xml:space="preserve">
     <value>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</value>
   </data>
+  <data name="DumpFileNotGeneratedErrorMessage" xml:space="preserve">
+    <value>Collect dump was enabled but no dump file was generated.</value>
+  </data>
   <data name="ProcDumpEnvVarEmpty" xml:space="preserve">
-    <value>Required environment variable PROCDUMP_PATH was null or empty.</value>
+    <value>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</value>
   </data>
 </root>

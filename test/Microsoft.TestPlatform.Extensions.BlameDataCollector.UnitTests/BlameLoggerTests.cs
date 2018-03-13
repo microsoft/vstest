@@ -117,8 +117,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private AttachmentSet GetAttachmentSet()
         {
             var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
-            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
-            attachmentSet.Attachments.Add(uriDataAttachment);
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description"));
+            attachmentSet.Attachments.Add(new UriDataAttachment(new Uri("C:/folder1/dump.dmp"), "description"));
 
             return attachmentSet;
         }
@@ -150,7 +150,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             loggerEvents.CompleteTestRun(null, false, true, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Verify Call
-            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Exactly(count));
+            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.Is<string>(str => str.EndsWith(".xml"))), Times.Exactly(count));
         }
 
         /// <summary>

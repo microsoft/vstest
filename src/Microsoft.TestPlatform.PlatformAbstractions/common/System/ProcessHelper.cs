@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         public void WaitForProcessExit(object process)
         {
             var proc = process as Process;
-            if (!proc.HasExited)
+            if (proc != null || !proc.HasExited)
             {
                 proc.WaitForExit();
             }

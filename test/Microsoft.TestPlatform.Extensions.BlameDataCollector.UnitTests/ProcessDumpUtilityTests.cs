@@ -4,10 +4,13 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
 
     using Microsoft.TestPlatform.Extensions.BlameDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,14 +38,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcDumpProcess = new Mock<Process>();
             this.mockPlatformEnvironment = new Mock<IEnvironment>();
 
-            Environment.SetEnvironmentVariable("PROCDUMP_PATH", "procdump_folder");
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", "D:\\procdump");
         }
 
         /// <summary>
         /// GetDumpFile will return empty list of strings if no dump files found
         /// </summary>
         [TestMethod]
-        public void GetDumpFileWillReturnEmptyIfNoDumpFile()
+        public void GetDumpFileWillThrowExceptionIfNoDumpfile()
         {
             this.mockFileHelper.Setup(x => x.Exists(It.IsAny<string>()))
                                .Returns(false);
@@ -53,7 +56,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
             processDumpUtility.StartProcessDump(12345, "guid", "D:\\TestResults");
 
-            Assert.AreEqual(string.Empty, processDumpUtility.GetDumpFile());
+            Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
         }
 
         /// <summary>
@@ -118,6 +121,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
         }
 
+        /// <summary>
+        /// Start process dump will throw error if PROCDUMP_PATH env variable is not set
+        /// </summary>
         [TestMethod]
         public void StartProcessDumpWillThrowErrorIfProcdumpEnvVarNotSet()
         {
@@ -125,7 +131,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
 
-            Assert.ThrowsException<Exception>(() => processDumpUtility.StartProcessDump(1234, "guid", "D:\\"));
+            var ex = Assert.ThrowsException<TestPlatformException>(() => processDumpUtility.StartProcessDump(1234, "guid", "D:\\"));
+            Assert.AreEqual(ex.Message, Resources.Resources.ProcDumpEnvVarEmpty);
+        }
+
+        public void StartProcessDumpWillStartExeCorrespondingToPlatformArchitecture()
+        {
+            PlatformArchitecture[] platformArchitecture = { PlatformArchitecture.X64, PlatformArchitecture.X86 };
+
+            Dictionary<PlatformArchitecture, string> architectureExeMap = new Dictionary<PlatformArchitecture, string>()
+            {
+                { PlatformArchitecture.X86, "procdump.exe" },
+                { PlatformArchitecture.X64, "procdump64.exe" }
+            };
+
+            foreach (var architecture in architectureExeMap)
+            {
+                this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(architecture.Key);
+
+                var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+                processDumpUtility.StartProcessDump(1234, "guid", "D:\\");
+
+                this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", architecture.Value), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+            }
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
         }
     }
 }

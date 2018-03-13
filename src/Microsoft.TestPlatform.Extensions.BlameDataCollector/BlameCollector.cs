@@ -159,18 +159,25 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.processDumpEnabled)
             {
-                var dumpFile = this.processDumpUtility.GetDumpFile();
-                if (!dumpFile.Equals(string.Empty))
+                try
                 {
-                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                    this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-                }
-                else
-                {
-                    if (EqtTrace.IsWarningEnabled)
+                    var dumpFile = this.processDumpUtility.GetDumpFile();
+                    if (!string.IsNullOrEmpty(dumpFile))
                     {
-                        EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                        var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                        this.dataCollectionSink.SendFileAsync(fileTranferInformation);
                     }
+                    else
+                    {
+                        if (EqtTrace.IsWarningEnabled)
+                        {
+                            EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                        }
+                    }
+                }
+                catch (FileNotFoundException)
+                {
+                    this.logger.LogError(args.Context, Resources.Resources.DumpFileNotGeneratedErrorMessage);
                 }
             }
 
@@ -200,7 +207,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogException(args.Context, e, DataCollectorMessageLevel.Error);
+                this.logger.LogError(args.Context, e.ToString());
             }
         }
 

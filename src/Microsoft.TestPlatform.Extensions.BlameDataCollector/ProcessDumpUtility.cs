@@ -31,7 +31,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
-            this.procDumpProcess = null;
             this.environment = environment;
         }
 
@@ -53,10 +52,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (EqtTrace.IsErrorEnabled)
             {
-                EqtTrace.Error("ProcessDumpUtility.GetCrashDumpFile: No dump file generated.");
+                int exitCode;
+                EqtTrace.Error("ProcessDumpUtility.GetDumpFile: No dump file generated.");
+                if (this.processHelper.TryGetExitCode(this.procDumpProcess, out exitCode))
+                {
+                    EqtTrace.Error("ProcessDumpUtility.GetDumpFile: Procdump exited with code: {0}", exitCode);
+                }
             }
 
-            return string.Empty;
+            throw new FileNotFoundException();
         }
 
         /// <inheritdoc/>
@@ -86,6 +90,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Arguments</returns>
         private static string BuildProcDumpArgs(int processId, string filename)
         {
+            // -t: Write a dump when the process terminates.
+            // -g: Run as a native debugger in a managed process (no interop).
+            // -ma: Write a dump file with all process memory. The default dump format only includes thread and handle information.
             return "-t -g -ma " + processId + " " + filename;
         }
 
@@ -96,7 +103,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private string GetProcDumpExecutable()
         {
             var procdumpPath = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
-            if (!string.IsNullOrEmpty(procdumpPath))
+            if (!string.IsNullOrWhiteSpace(procdumpPath))
             {
                 string filename = string.Empty;
 
@@ -120,7 +127,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
             else
             {
-                throw new Exception(Resources.Resources.ProcDumpEnvVarEmpty);
+                throw new TestPlatformException(Resources.Resources.ProcDumpEnvVarEmpty);
             }
         }
     }

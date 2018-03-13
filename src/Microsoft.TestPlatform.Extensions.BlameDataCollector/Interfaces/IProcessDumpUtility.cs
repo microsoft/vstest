@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Process ID of test host
         /// </param>
         /// <param name="dumpFileGuid">
-        /// Posfix for dump file, testhost.exe_<postfix>.dmp</guid>
+        /// Guid as postfix for dump file, testhost.exe_&lt;guid&gt;.dmp
         /// </param>
         /// <param name="testResultsDirectory">
         /// Path to TestResults directory

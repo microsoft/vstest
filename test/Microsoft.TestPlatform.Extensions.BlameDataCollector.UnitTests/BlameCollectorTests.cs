@@ -140,13 +140,38 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockLogger.Object,
                 this.context);
 
-            // Setup and raise events
+            // Setup
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
+
+            // Raise
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
             this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger session ended handler should log exception if GetDumpfile throws FileNotFound Exception
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldLogErrorIfGetDumpFileThrowsFileNotFound()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Setup and raise events
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Throws(new FileNotFoundException());
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify GetDumpFiles Call
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), Resources.Resources.DumpFileNotGeneratedErrorMessage), Times.Once);
         }
 
         /// <summary>
@@ -171,10 +196,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The trigger test host launcehd handler should start process dump utility if proc dump was enabled
+        /// The trigger test host launcehd handler should not break if start process dump throws
         /// </summary>
         [TestMethod]
-        public void TriggerTestHostLaunchedHandlerShouldCatchException()
+        public void TriggerTestHostLaunchedHandlerShouldCatchAllExceptions()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(
@@ -186,10 +211,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
-                                       .Throws(new Exception());
+                                       .Throws(new Exception("start process failed"));
 
             // Raise TestHostLaunched
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(ex => ex.Contains("start process failed"))), Times.Once);
         }
 
         [TestCleanup]

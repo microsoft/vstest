@@ -69,15 +69,25 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
             }
         }
 
-
         /// <summary>
-        ///   Looks up a localized string ProcDumpEnvVarEmpty
+        ///   Looks up a localized string similar to Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.
         /// </summary>
         internal static string ProcDumpEnvVarEmpty
         {
             get
             {
                 return ResourceManager.GetString("ProcDumpEnvVarEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Collect dump was enabled but no dump file was generated.
+        /// </summary>
+        internal static string DumpFileNotGeneratedErrorMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("DumpFileNotGeneratedErrorMessage", resourceCulture);
             }
         }
     }
