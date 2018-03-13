@@ -175,9 +175,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         }
                     }
                 }
-                catch (FileNotFoundException)
+                catch (FileNotFoundException ex)
                 {
-                    this.logger.LogError(args.Context, Resources.Resources.DumpFileNotGeneratedErrorMessage);
+                    this.logger.LogError(args.Context, ex.Message);
                 }
             }
 

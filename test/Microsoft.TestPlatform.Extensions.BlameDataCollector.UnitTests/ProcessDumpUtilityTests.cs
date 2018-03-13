@@ -56,7 +56,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
             processDumpUtility.StartProcessDump(12345, "guid", "D:\\TestResults");
 
-            Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
+            var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
+            Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);
         }
 
         /// <summary>
@@ -135,6 +136,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             Assert.AreEqual(ex.Message, Resources.Resources.ProcDumpEnvVarEmpty);
         }
 
+        /// <summary>
+        /// Start process dump will start exe corresponding to platform architecture
+        /// </summary>
+        [TestMethod]
         public void StartProcessDumpWillStartExeCorrespondingToPlatformArchitecture()
         {
             PlatformArchitecture[] platformArchitecture = { PlatformArchitecture.X64, PlatformArchitecture.X86 };

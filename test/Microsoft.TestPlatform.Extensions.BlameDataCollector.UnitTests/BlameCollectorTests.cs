@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
-            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), Resources.Resources.DumpFileNotGeneratedErrorMessage), Times.Once);
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>()), Times.Once);
         }
 
         /// <summary>

@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
-            throw new FileNotFoundException();
+            throw new FileNotFoundException(Resources.Resources.DumpFileNotGeneratedErrorMessage);
         }
 
         /// <inheritdoc/>
