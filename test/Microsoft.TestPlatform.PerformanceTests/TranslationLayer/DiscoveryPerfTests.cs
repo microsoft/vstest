@@ -40,7 +40,6 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
           
             TelemetryClient client = new TelemetryClient();
             TelemetryConfiguration.Active.InstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
-            //client.InstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
             Dictionary<string, string> properties = new Dictionary<string, string>();
             Dictionary<string, double> metrics = new Dictionary<string, double>();
 
@@ -60,6 +59,76 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
             client.TrackEvent("DiscoveryMsTest10K", properties, metrics);
             client.Flush();
         }
+
+
+        [TestMethod]
+        public void Discover10KXunitTests()
+        {
+            var testAssemblies = new List<string>
+                                     {
+                                         this.GetPerfAssetFullPath("XunitAdapterPerfTestProject.dll"),
+                                     };
+
+            this.Setup();
+            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+
+            TelemetryClient client = new TelemetryClient();
+            TelemetryConfiguration.Active.InstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
+            Dictionary<string, string> properties = new Dictionary<string, string>();
+            Dictionary<string, double> metrics = new Dictionary<string, double>();
+
+            foreach (var entry in this.discoveryEventHandler2.Metrics)
+            {
+                var stringValue = entry.Value.ToString();
+                if (double.TryParse(stringValue, out var doubleValue))
+                {
+                    metrics.Add(entry.Key, doubleValue);
+                }
+                else
+                {
+                    properties.Add(entry.Key, stringValue);
+                }
+            }
+
+            client.TrackEvent("DiscoveryXunit10K", properties, metrics);
+            client.Flush();
+        }
+
+
+        [TestMethod]
+        public void Discover10KNunitTests()
+        {
+            var testAssemblies = new List<string>
+                                     {
+                                         this.GetPerfAssetFullPath("NunitAdapterPerfTestProject.dll"),
+                                     };
+
+            this.Setup();
+            this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
+
+            TelemetryClient client = new TelemetryClient();
+            TelemetryConfiguration.Active.InstrumentationKey = "76b373ba-8a55-45dd-b6db-7f1a83288691";
+            Dictionary<string, string> properties = new Dictionary<string, string>();
+            Dictionary<string, double> metrics = new Dictionary<string, double>();
+
+            foreach (var entry in this.discoveryEventHandler2.Metrics)
+            {
+                var stringValue = entry.Value.ToString();
+                if (double.TryParse(stringValue, out var doubleValue))
+                {
+                    metrics.Add(entry.Key, doubleValue);
+                }
+                else
+                {
+                    properties.Add(entry.Key, stringValue);
+                }
+            }
+
+            client.TrackEvent("DiscoveryNunit10K", properties, metrics);
+            client.Flush();
+        }
+
+
 
         private string GetPerfAssetFullPath(string dllName)
         {

@@ -408,6 +408,12 @@ function Publish-Tests
     $mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
     Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
 
+	$nunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\NUnitAdapterPerfTestProject"
+    Publish-PackageInternal $nunittest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
+
+	$xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
+    Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
+
     $testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
     Publish-PackageInternal $testPerfProject $TPB_TargetFramework $fullCLRTestDir
 }
