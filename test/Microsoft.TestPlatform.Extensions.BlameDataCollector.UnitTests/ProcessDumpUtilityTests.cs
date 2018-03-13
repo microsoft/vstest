@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var process = "process";
             var processId = 12345;
             var filename = $"{process}_{processId}_{guid}.dmp";
-            var args = $"-t -ma {processId} {filename}";
+            var args = $"-accepteula -t -ma {processId} {filename}";
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
