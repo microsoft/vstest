@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public const string InProcDataCollectorsSettingName = "InProcDataCollectors";
 
-
         /// <summary>
         /// Name of collect dump option for blame.
         /// </summary>

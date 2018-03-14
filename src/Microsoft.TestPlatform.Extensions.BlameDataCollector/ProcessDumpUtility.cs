@@ -44,10 +44,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.processHelper.WaitForProcessExit(this.procDumpProcess);
 
-            var dumpFile = Path.Combine(this.testResultsDirectory, this.dumpFileName);
-            if (this.fileHelper.Exists(dumpFile))
+            var dumpFiles = this.fileHelper.GetFiles(this.testResultsDirectory, this.dumpFileName + "*", SearchOption.TopDirectoryOnly);
+            if (dumpFiles.Length > 0)
             {
-                return dumpFile;
+                // Dump files can never be more than 1 because procdump will generate single file, but GetFiles function returns an array
+                return dumpFiles[0];
             }
 
             if (EqtTrace.IsErrorEnabled)
@@ -66,7 +67,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory)
         {
-            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}.dmp";
+            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -92,8 +93,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             // -accepteula: Auto accept end-user license agreement
             // -t: Write a dump when the process terminates.
-            // -ma: Write a dump file with all process memory. The default dump format only includes thread and handle information.
-            return "-accepteula -t -ma " + processId + " " + filename;
+            return "-accepteula -t " + processId + " " + filename + ".dmp";
         }
 
         /// <summary>
