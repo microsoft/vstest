@@ -90,7 +90,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Arguments</returns>
         private static string BuildProcDumpArgs(int processId, string filename)
         {
-            // -accepteula: Accept EULA
+            // -accepteula: Auto accept end-user license agreement
             // -t: Write a dump when the process terminates.
             // -ma: Write a dump file with all process memory. The default dump format only includes thread and handle information.
             return "-accepteula -t -ma " + processId + " " + filename;

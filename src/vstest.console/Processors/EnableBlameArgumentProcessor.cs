@@ -4,20 +4,16 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.Diagnostics.Contracts;
-
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using System.Xml;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
@@ -137,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             bool isDumpEnabled = false;
 
-            if (!string.IsNullOrWhiteSpace(argument) && argument.Equals("CollectDump", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(argument) && argument.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase))
             {
                 if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
                     this.environment.Architecture != PlatformArchitecture.ARM64 &&
@@ -149,7 +145,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
                 }
-
             }
 
             // Add Blame Logger
@@ -199,9 +194,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (isDumpEnabled)
             {
-                var dumpNode = XmlDocument.CreateElement("CollectDump");
+                var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
                 outernode.AppendChild(dumpNode);
-                dumpNode.InnerText = "true";
             }
 
             foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
