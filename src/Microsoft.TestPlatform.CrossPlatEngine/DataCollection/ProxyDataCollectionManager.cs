@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -173,7 +174,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <inheritdoc />
         public void TestHostLaunched(int processId)
         {
-            this.dataCollectionRequestSender.SendTestHostLaunched(processId);
+            var payload = new TestHostLaunchedPayload();
+            payload.ProcessId = processId;
+
+            this.dataCollectionRequestSender.SendTestHostLaunched(payload);
         }
 
         /// <summary>

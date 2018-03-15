@@ -1587,6 +1587,11 @@
                 [;RunTitle=&lt;title&gt;]</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
+        <source>CollectDump option for Blame is not supported for this platform.</source>
+        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

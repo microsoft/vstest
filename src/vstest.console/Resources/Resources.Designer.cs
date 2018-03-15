@@ -225,6 +225,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to CollectDump option for Blame is not supported for this platform.
+        /// </summary>
+        public static string BlameCollectDumpNotSupportedForPlatform
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameCollectDumpNotSupportedForPlatform", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///      The directory containing the temporary outputs..
         /// </summary>

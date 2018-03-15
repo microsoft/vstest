@@ -290,9 +290,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Test host initialized.");
                         }
 
-                        var testHostLaunchedEventArgs = this.dataSerializer.DeserializePayload<TestHostLaunchedEventArgs>(message);
+                        var testHostLaunchedPayload = this.dataSerializer.DeserializePayload<TestHostLaunchedPayload>(message);
 
-                        this.dataCollectionManager.TestHostLaunched(testHostLaunchedEventArgs);
+                        this.dataCollectionManager.TestHostLaunched(testHostLaunchedPayload.ProcessId);
 
                         break;
 
