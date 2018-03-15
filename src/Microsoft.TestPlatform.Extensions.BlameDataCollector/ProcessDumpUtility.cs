@@ -44,10 +44,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.processHelper.WaitForProcessExit(this.procDumpProcess);
 
-            var dumpFile = Path.Combine(this.testResultsDirectory, this.dumpFileName);
-            if (this.fileHelper.Exists(dumpFile))
+            // Dump files can never be more than 1 because procdump will generate single file, but GetFiles function returns an array
+            var dumpFiles = this.fileHelper.GetFiles(this.testResultsDirectory, this.dumpFileName + "*", SearchOption.TopDirectoryOnly);
+            if (dumpFiles.Length > 0)
             {
-                return dumpFile;
+                // Log to diagnostics if multiple files just in case
+                if (dumpFiles.Length != 1)
+                {
+                    EqtTrace.Warning("ProcessDumpUtility.GetDumpFile: Multiple dump files found.");
+                }
+
+                return dumpFiles[0];
             }
 
             if (EqtTrace.IsErrorEnabled)
@@ -66,7 +73,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <inheritdoc/>
         public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory)
         {
-            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}.dmp";
+            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
@@ -90,10 +97,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Arguments</returns>
         private static string BuildProcDumpArgs(int processId, string filename)
         {
+            // -accepteula: Auto accept end-user license agreement
             // -t: Write a dump when the process terminates.
-            // -g: Run as a native debugger in a managed process (no interop).
-            // -ma: Write a dump file with all process memory. The default dump format only includes thread and handle information.
-            return "-t -g -ma " + processId + " " + filename;
+            // This will create a minidump of the process with specified filename
+            return "-accepteula -t " + processId + " " + filename + ".dmp";
         }
 
         /// <summary>

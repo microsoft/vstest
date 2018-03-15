@@ -197,6 +197,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory());
             }
+            catch (TestPlatformException e)
+            {
+                if (EqtTrace.IsWarningEnabled)
+                {
+                    EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
+                }
+
+                this.logger.LogError(args.Context, e.Message);
+            }
             catch (Exception e)
             {
                 if (EqtTrace.IsWarningEnabled)

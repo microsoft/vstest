@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
 
             // Raise
-            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
@@ -167,7 +167,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup and raise events
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Throws(new FileNotFoundException());
-            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
@@ -189,17 +189,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Raise TestHostLaunched
-            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()));
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()));
         }
 
         /// <summary>
-        /// The trigger test host launcehd handler should not break if start process dump throws
+        /// The trigger test host launcehd handler should not break if start process dump throws TestPlatFormExceptions and log error message
         /// </summary>
         [TestMethod]
-        public void TriggerTestHostLaunchedHandlerShouldCatchAllExceptions()
+        public void TriggerTestHostLaunchedHandlerShouldCatchTestPlatFormExceptionsAndReportMessage()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(
@@ -210,12 +210,41 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Make StartProcessDump throw exception
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
-                                       .Throws(new Exception("start process failed"));
+            var tpex = new TestPlatformException("env var exception");
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()))
+                                       .Throws(tpex);
 
             // Raise TestHostLaunched
-            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(0));
-            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(ex => ex.Contains("start process failed"))), Times.Once);
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == tpex.Message)), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger test host launcehd handler should not break if start process dump throws unknown exceptions and report message with stack trace
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldCatchAllUnexpectedExceptionsAndReportMessageWithStackTrace()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Make StartProcessDump throw exception
+            var ex = new Exception("start process failed");
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()))
+                                       .Throws(ex);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == ex.ToString())), Times.Once);
         }
 
         [TestCleanup]
