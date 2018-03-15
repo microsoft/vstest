@@ -405,14 +405,17 @@ function Publish-Tests
     $fullCLRTestDir = $(Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework")
     $fullCLRPerfTestAssetDir = $(Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets")
     
+	$mstest10kPerfProjectDir = $(Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject")
     $mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
-    Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
+    Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $mstest10kPerfProjectDir
 
+	$nunittest10kPerfProjectDir = $(Join-Path $fullCLRPerfTestAssetDir "NUnitAdapterPerfTestProject")
 	$nunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\NUnitAdapterPerfTestProject"
-    Publish-PackageInternal $nunittest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
+    Publish-PackageInternal $nunittest10kPerfProject $TPB_TargetFramework $nunittest10kPerfProjectDir
 
+	$xunittest10kPerfProjectDir = $(Join-Path $fullCLRPerfTestAssetDir "XUnitAdapterPerfTestProject")
 	$xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
-    Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $fullCLRPerfTestAssetDir
+    Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $xunittest10kPerfProjectDir
 
     $testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
     Publish-PackageInternal $testPerfProject $TPB_TargetFramework $fullCLRTestDir
