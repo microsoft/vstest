@@ -748,12 +748,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework Sürümü&gt;
+      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;Framework Sürümü&gt;
       Test yürütmesi için kullanılacak hedef .NET Framework sürümü. 
       Geçerli değerler ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" vb.
       Framework35, Framework40, Framework45 ve FrameworkCore10 desteklenen diğer değerlerdir.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework sürüm &gt;
       Hedef .net Framework sürümünü test yürütmesi için kullanılacak. 
@@ -772,9 +772,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">Geçersiz .NET Framework sürümü: {0}. Lütfen TargetFramework tam adını belirtin. Desteklenen diğer .NET Framework sürümleri Framework35, Framework40, Framework45 ve FrameworkCore10’dur.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">Geçersiz .NET Framework sürümü: {0}. Lütfen TargetFramework tam adını belirtin. Desteklenen diğer .NET Framework sürümleri Framework35, Framework40, Framework45 ve FrameworkCore10’dur.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz .net Framework sürümü: {0}. Lütfen fullname in TargetFramework verin. Diğer desteklenen .net Framework sürümleri şunlardır: Framework35, Framework40 ve Framework45.</target>
         </alt-trans>

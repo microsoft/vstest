@@ -742,12 +742,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;wersja struktury&gt;
+      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;wersja struktury&gt;
       Docelowa wersja programu .NET Framework, która zostanie użyta na potrzeby wykonania testu. 
       Prawidłowe wartości to ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" itp.
       Inne obsługiwane wartości to Framework35, Framework40, Framework45 i FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework w wersji &gt;
       Cel systemu .net Framework w wersji używanego do wykonania testu. 
@@ -766,9 +766,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">Nieprawidłowa wersja programu .NET Framework: {0}. Podaj pełną nazwę struktury docelowej. Inne obsługiwane wersje programu .NET Framework to Framework35, Framework40, Framework45 i FrameworkCore10.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">Nieprawidłowa wersja programu .NET Framework: {0}. Podaj pełną nazwę struktury docelowej. Inne obsługiwane wersje programu .NET Framework to Framework35, Framework40, Framework45 i FrameworkCore10.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nieprawidłowy .net Framework w wersji: {0}. Proszę podać imię i nazwisko z TargetFramework. Inne obsługiwane platformy .net Framework w wersji są Framework35, Framework40 i Framework45.</target>
         </alt-trans>

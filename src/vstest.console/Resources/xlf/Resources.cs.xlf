@@ -747,12 +747,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Verze rozhraní&gt;
+      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;Verze rozhraní&gt;
       Cílová verze rozhraní .NET Framework, která se použije k provedení testu. 
       Platné hodnoty jsou ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" atd.
       Dalšími podporovanými hodnotami jsou Framework35, Framework40, Framework45 a FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework verze &gt;
       Cílové rozhraní .net Framework verze pro spuštění testu. 
@@ -771,9 +771,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">Neplatná verze rozhraní .NET Framework: {0}. Zadejte prosím úplný název cílového rozhraní. Dalšími podporovanými verzemi jsou Framework35, Framework40, Framework45 a FrameworkCore10.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">Neplatná verze rozhraní .NET Framework: {0}. Zadejte prosím úplný název cílového rozhraní. Dalšími podporovanými verzemi jsou Framework35, Framework40, Framework45 a FrameworkCore10.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatné rozhraní .net Framework verze: {0}. uveďte, prosím, fullname TargetFramework. Ostatní podporované rozhraní .net Framework verze jsou Framework35, Framework40 a Framework45.</target>
         </alt-trans>
