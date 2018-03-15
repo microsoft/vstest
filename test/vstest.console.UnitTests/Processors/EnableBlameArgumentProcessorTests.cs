@@ -86,7 +86,6 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(DefaultRunSettings);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-
             var unsupportedPlatforms = new List<Tuple<PlatformOperatingSystem, PlatformArchitecture>>()
             {
                 Tuple.Create(PlatformOperatingSystem.Unix, PlatformArchitecture.X64),

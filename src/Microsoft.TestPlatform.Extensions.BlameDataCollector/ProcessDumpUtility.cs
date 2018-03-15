@@ -44,10 +44,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.processHelper.WaitForProcessExit(this.procDumpProcess);
 
+            // Dump files can never be more than 1 because procdump will generate single file, but GetFiles function returns an array
             var dumpFiles = this.fileHelper.GetFiles(this.testResultsDirectory, this.dumpFileName + "*", SearchOption.TopDirectoryOnly);
             if (dumpFiles.Length > 0)
             {
-                // Dump files can never be more than 1 because procdump will generate single file, but GetFiles function returns an array
+                // Log to diagnostics if multiple files just in case
+                if (dumpFiles.Length != 1)
+                {
+                    EqtTrace.Warning("ProcessDumpUtility.GetDumpFile: Multiple dump files found.");
+                }
+
                 return dumpFiles[0];
             }
 
@@ -93,6 +99,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             // -accepteula: Auto accept end-user license agreement
             // -t: Write a dump when the process terminates.
+            // This will create a minidump of the process with specified filename
             return "-accepteula -t " + processId + " " + filename + ".dmp";
         }
 
