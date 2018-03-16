@@ -70,5 +70,10 @@ namespace OutOfProcDataCollector
         {
             return new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("key", "value") };
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            this.logger.LogWarning(this.context.SessionDataCollectionContext, "Dispose called.");
+        }
     }
 }
