@@ -28,6 +28,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private Mock<DataCollectionEvents> mockDataColectionEvents;
         private Mock<DataCollectionSink> mockDataCollectionSink;
         private Mock<IBlameReaderWriter> mockBlameReaderWriter;
+        private Mock<IProcessDumpUtility> mockProcessDumpUtility;
         private XmlElement configurationElement;
         private string filepath;
 
@@ -41,7 +42,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents = new Mock<DataCollectionEvents>();
             this.mockDataCollectionSink = new Mock<DataCollectionSink>();
             this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
-            this.blameDataCollector = new TestableBlameCollector(this.mockBlameReaderWriter.Object);
+            this.mockProcessDumpUtility = new Mock<IProcessDumpUtility>();
+            this.blameDataCollector = new TestableBlameCollector(this.mockBlameReaderWriter.Object, this.mockProcessDumpUtility.Object);
 
             // Initializing members
             TestCase testcase = new TestCase { Id = Guid.NewGuid() };
@@ -124,10 +126,142 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), this.filepath), Times.Never);
         }
 
+        /// <summary>
+        /// The trigger session ended handler should get dump files if proc dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldGetDumpFileIfProcDumpEnabled()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Setup
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
+
+            // Raise
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify GetDumpFiles Call
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger session ended handler should log exception if GetDumpfile throws FileNotFound Exception
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldLogErrorIfGetDumpFileThrowsFileNotFound()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Setup and raise events
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Throws(new FileNotFoundException());
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify GetDumpFiles Call
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>()), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger test host launched handler should start process dump utility if proc dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityIfProcDumpEnabled()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify StartProcessDumpCall
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()));
+        }
+
+        /// <summary>
+        /// The trigger test host launcehd handler should not break if start process dump throws TestPlatFormExceptions and log error message
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldCatchTestPlatFormExceptionsAndReportMessage()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Make StartProcessDump throw exception
+            var tpex = new TestPlatformException("env var exception");
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()))
+                                       .Throws(tpex);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == tpex.Message)), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger test host launcehd handler should not break if start process dump throws unknown exceptions and report message with stack trace
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldCatchAllUnexpectedExceptionsAndReportMessageWithStackTrace()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Make StartProcessDump throw exception
+            var ex = new Exception("start process failed");
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()))
+                                       .Throws(ex);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == ex.ToString())), Times.Once);
+        }
+
         [TestCleanup]
         public void CleanUp()
         {
             File.Delete(this.filepath);
+        }
+
+        private XmlElement GetDumpConfigurationElement()
+        {
+            var xmldoc = new XmlDocument();
+            var outernode = xmldoc.CreateElement("Configuration");
+            var node = xmldoc.CreateElement(BlameDataCollector.Constants.DumpModeKey);
+            outernode.AppendChild(node);
+            node.InnerText = "Text";
+
+            return outernode;
         }
 
         /// <summary>
@@ -141,8 +275,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             /// <param name="blameReaderWriter">
             /// The blame reader writer.
             /// </param>
-            internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter)
-                : base(blameReaderWriter)
+            /// <param name="processDumpUtility">
+            /// ProcessDumpUtility instance.
+            /// </param>
+            internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
+                : base(blameReaderWriter, processDumpUtility)
             {
             }
         }

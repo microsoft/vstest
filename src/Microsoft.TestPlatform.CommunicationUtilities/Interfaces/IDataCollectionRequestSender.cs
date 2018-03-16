@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -31,6 +32,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Close the Sender
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Sends the TestHostLaunched event
+        /// </summary>
+        /// <param name="testHostLaunchedPayload">
+        /// Test host launched payload
+        /// </param>
+        void SendTestHostLaunched(TestHostLaunchedPayload testHostLaunchedPayload);
 
         /// <summary>
         /// Sends the BeforeTestRunStart event and waits for result

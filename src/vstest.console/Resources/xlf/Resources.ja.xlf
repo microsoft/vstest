@@ -747,12 +747,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework のバージョン&gt;
+      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;Framework のバージョン&gt;
       テストの実行に使用する対象の .Net Framework バージョンです。
      有効な値は ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" などです。
       その他のサポートされる値は Framework35、Framework40、Framework45、FrameworkCore10 です。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--フレームワーク |/フレームワーク: &lt; フレームワーク バージョン &gt;
       対象の .Net Framework のバージョンをテストの実行に使用します。
@@ -771,9 +771,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">.Net Framework バージョンが無効です: {0}。TargetFramework の完全な名前を指定してください。その他のサポートされる .Net Framework バージョンは Framework35、Framework40、Framework45、FrameworkCore10 です。</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">.Net Framework バージョンが無効です: {0}。TargetFramework の完全な名前を指定してください。その他のサポートされる .Net Framework バージョンは Framework35、Framework40、Framework45、FrameworkCore10 です。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">無効な .Net Framework のバージョン: {0}.、TargetFramework のフルネームを指定してください。サポートされているその他の .Net Framework のバージョンは、Framework35、Framework40 および Framework45。</target>
         </alt-trans>
@@ -1590,6 +1590,11 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
+        <source>CollectDump option for Blame is not supported for this platform.</source>
+        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
         <note></note>
       </trans-unit>
     </body>

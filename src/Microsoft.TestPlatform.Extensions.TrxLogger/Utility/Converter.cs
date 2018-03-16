@@ -190,7 +190,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                             TrxLoggerResources.FailureToAttach,
                             attachmentSet.DisplayName, 
                             e.GetType().ToString(), 
-                            e.Message);
+                            e);
+
+                        if (ObjectModel.EqtTrace.IsErrorEnabled)
+                        {
+                            ObjectModel.EqtTrace.Error("Converter: ToResultFiles: " + errorMsg);
+                        }
+
                         errorMessages.Add(errorMsg);
                     }
                 }
@@ -387,7 +393,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                         TrxLoggerResources.FailureToAttach,
                         attachmentSet.DisplayName, 
                         e.GetType().ToString(), 
-                        e.Message);
+                        e);
+
+                    if (ObjectModel.EqtTrace.IsErrorEnabled)
+                    {
+                        ObjectModel.EqtTrace.Error("Converter: UpdateTestResultAttachments: " + errorMsg);
+                    }
 
                     StringBuilder stdErr = new StringBuilder(testResult.StdErr);
                     stdErr.AppendLine(errorMsg);

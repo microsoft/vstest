@@ -21,6 +21,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCleanup]
         public void Cleanup()
         {
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
+
             if (Directory.Exists(this.resultsDir))
             {
                 Directory.Delete(this.resultsDir, true);
@@ -42,24 +44,47 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.VaildateOutput();
         }
 
-        private void VaildateOutput()
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
         {
-            bool isAttachmentReceived = false;
+            Environment.SetEnvironmentVariable("PROCDUMP_PATH", Path.Combine(this.testEnvironment.PackageDirectory, @"procdump\0.0.1\bin"));
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /Blame:CollectDump");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            this.InvokeVsTest(arguments);
+
+            this.VaildateOutput(true);
+        }
+
+        private void VaildateOutput(bool validateDumpFile = false)
+        {
+            bool isSequenceAttachmentReceived = false;
+            bool isDumpAttachmentReceived = false;
             bool isValid = false;
             this.StdErrorContains("BlameUnitTestProject.UnitTest1.TestMethod2");
-            this.StdOutputContains("Sequence.xml");
+            this.StdOutputContains("Sequence_");
             var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
 
             foreach(var file in resultFiles)
             {
-                if(file.Contains("Sequence.xml"))
+                if (file.Contains("Sequence_"))
                 {
-                    isAttachmentReceived = true;
+                    isSequenceAttachmentReceived = true;
                     isValid = IsValidXml(file);
-                    break;
+                }
+                else if (validateDumpFile && file.Contains(".dmp"))
+                {
+                    isDumpAttachmentReceived = true;
                 }
             }
-            Assert.IsTrue(isAttachmentReceived);
+
+            Assert.IsTrue(isSequenceAttachmentReceived);
+            Assert.IsTrue(!validateDumpFile || isDumpAttachmentReceived);
             Assert.IsTrue(isValid);
         }
 

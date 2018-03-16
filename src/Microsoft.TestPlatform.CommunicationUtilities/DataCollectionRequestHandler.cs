@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
@@ -183,12 +184,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         isSessionEnded = true;
                         break;
 
-                    default:
-                        if (EqtTrace.IsInfoEnabled)
-                        {
-                            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Invalid Message types");
-                        }
+                    case MessageType.TestHostLaunched:
+                        var testHostLaunchedPayload = this.dataSerializer.DeserializePayload<TestHostLaunchedPayload>(message);
+                        this.dataCollectionManager.TestHostLaunched(testHostLaunchedPayload.ProcessId);
+                        break;
 
+                    default:
+                        EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : Invalid Message types: {0}", message.MessageType);
                         break;
                 }
             }

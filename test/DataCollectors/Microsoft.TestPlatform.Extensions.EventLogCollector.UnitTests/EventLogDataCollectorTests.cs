@@ -202,6 +202,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         {
             var testableDataCollectionEvents = new TestableDataCollectionEvents();
             this.eventLogDataCollector.Initialize(null, testableDataCollectionEvents, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            Assert.AreEqual(1, testableDataCollectionEvents.GetTestHostLaunchedInvocationList().Length);
             Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseStartInvocationList().Length);
             Assert.AreEqual(1, testableDataCollectionEvents.GetTestCaseEndInvocationList().Length);
             Assert.AreEqual(1, testableDataCollectionEvents.GetTestSessionEndInvocationList().Length);
@@ -424,6 +425,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     /// </summary>
     public class TestableDataCollectionEvents : DataCollectionEvents
     {
+        public override event EventHandler<TestHostLaunchedEventArgs> TestHostLaunched;
+
         public override event EventHandler<SessionStartEventArgs> SessionStart;
 
         public override event EventHandler<SessionEndEventArgs> SessionEnd;
@@ -431,6 +434,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         public override event EventHandler<TestCaseStartEventArgs> TestCaseStart;
 
         public override event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+
+        public Delegate[] GetTestHostLaunchedInvocationList()
+        {
+            return this.TestHostLaunched.GetInvocationList();
+        }
 
         public Delegate[] GetTestCaseStartInvocationList()
         {

@@ -25,6 +25,16 @@
         <target state="translated">执行以下测试时主机进程意外退出，活动的测试运行已中止:</target>
         <note />
       </trans-unit>
+      <trans-unit id="ProcDumpEnvVarEmpty">
+        <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
+        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DumpFileNotGeneratedErrorMessage">
+        <source>Collect dump was enabled but no dump file was generated.</source>
+        <target state="new">Collect dump was enabled but no dump file was generated.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
