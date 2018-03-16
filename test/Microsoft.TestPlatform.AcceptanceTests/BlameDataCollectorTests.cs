@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput();
+            this.ValidateSequenceFileOutput();
         }
 
         [TestMethod]
@@ -58,34 +58,44 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
             this.InvokeVsTest(arguments);
 
-            this.VaildateOutput(true);
+            this.ValidateDumpFileOutput();
         }
 
-        private void VaildateOutput(bool validateDumpFile = false)
+        private void ValidateSequenceFileOutput()
         {
-            bool isSequenceAttachmentReceived = false;
-            bool isDumpAttachmentReceived = false;
+            bool isAttachmentReceived = false;
             bool isValid = false;
             this.StdErrorContains("BlameUnitTestProject.UnitTest1.TestMethod2");
             this.StdOutputContains("Sequence_");
             var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
 
-            foreach(var file in resultFiles)
+            foreach (var file in resultFiles)
             {
                 if (file.Contains("Sequence_"))
                 {
-                    isSequenceAttachmentReceived = true;
+                    isAttachmentReceived = true;
                     isValid = IsValidXml(file);
-                }
-                else if (validateDumpFile && file.Contains(".dmp"))
-                {
-                    isDumpAttachmentReceived = true;
                 }
             }
 
-            Assert.IsTrue(isSequenceAttachmentReceived);
-            Assert.IsTrue(!validateDumpFile || isDumpAttachmentReceived);
+            Assert.IsTrue(isAttachmentReceived);
             Assert.IsTrue(isValid);
+        }
+
+        private void ValidateDumpFileOutput()
+        {
+            bool isAttachmentReceived = false;
+            var resultFiles = Directory.GetFiles(this.resultsDir, "*", SearchOption.AllDirectories);
+
+            foreach(var file in resultFiles)
+            {
+                if (file.Contains(".dmp"))
+                {
+                    isAttachmentReceived = true;
+                }
+            }
+
+            Assert.IsTrue(isAttachmentReceived);
         }
 
         private bool IsValidXml(string xmlFilePath)
