@@ -599,8 +599,8 @@
       </trans-unit>
       <trans-unit id="InvalidDataCollectorUriInSettings">
         <source>Invalid URI in data collector settings '{0}'.</source>
-        <target state="new">Invalid URI in data collector settings '{0}'.</target>
-        <note></note>
+        <target state="translated">URI non valide dans les paramètres de collecteur de données '{0}'.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidUriInSettings">
         <source>Invalid URI '{0}' in settings '{1}'.</source>

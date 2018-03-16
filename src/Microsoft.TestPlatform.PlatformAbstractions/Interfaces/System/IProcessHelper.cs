@@ -97,5 +97,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// </summary>
         /// <param name="process">Reference of process to terminate.</param>
         void TerminateProcess(object process);
+
+        /// <summary>
+        /// Wait for process to exit
+        /// </summary>
+        /// <param name="process">Reference to process</param>
+        void WaitForProcessExit(object process);
     }
 }

@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
-
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -45,10 +45,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void WebTestRunAllTests(RunnerInfo runnerInfo)
+        public void WebTestRunAllTestsWithRunSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            WebTestRunAllTests(runnerInfo.RunnerFramework);
+            var runSettingsFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".runsettings");
+
+            //test the iterationCount setting for WebTestRunConfiguration in run settings
+            var runSettingsXml = $@"<?xml version='1.0' encoding='utf-8'?>
+                                <RunSettings>
+                                    <WebTestRunConfiguration iterationCount='5' />
+                                    <RunConfiguration>
+                                        <TargetFrameworkVersion>{FrameworkArgValue}</TargetFrameworkVersion>
+                                    </RunConfiguration>
+                                </RunSettings>";
+
+            IntegrationTestBase.CreateRunSettingsFile(runSettingsFilePath, runSettingsXml);
+
+            //minWebTestResultFileSizeInKB is set to 150 here as the web test has a iteration count set to 5
+            //therefore, the test will run for 5 iterations resulting in web test result file size of at least 150 KB
+            WebTestRunAllTests(runnerInfo.RunnerFramework, runSettingsFilePath, 150);
         }
 
         [TestMethod]
@@ -126,7 +141,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        private void WebTestRunAllTests(string runnerFramework)
+        private void WebTestRunAllTests(string runnerFramework, string runSettingsFilePath=null, int minWebTestResultFileSizeInKB=0)
         {
             if (runnerFramework.StartsWith("netcoreapp"))
             {
@@ -136,14 +151,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             string assemblyRelativePath =
                 @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
+
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty, this.FrameworkArgValue);
+                runSettingsFilePath, this.FrameworkArgValue, string.Empty, resultsDirectory);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
+
+            if (minWebTestResultFileSizeInKB > 0)
+            {
+                var dirInfo = new DirectoryInfo(resultsDirectory);
+                var webtestResultFile = "WebTest1.webtestResult";
+                var files = dirInfo.GetFiles(webtestResultFile, SearchOption.AllDirectories);
+                Assert.IsTrue(files.Length > 0, $"File {webtestResultFile} not found under results directory {resultsDirectory}");
+
+                var fileSizeInKB = files[0].Length / 1024;
+                Assert.IsTrue(fileSizeInKB > minWebTestResultFileSizeInKB, $"Size of the file {webtestResultFile} is {fileSizeInKB} KB. It is not greater than {minWebTestResultFileSizeInKB} KB indicating iterationCount in run settings not honored.");
+            }
         }
 
         private void CodedWebTestRunAllTests(string runnerFramework)

@@ -109,17 +109,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Aborts the test operation.
         /// </summary>
-        public void Abort()
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        public void Abort(ITestRunEventsHandler eventHandler)
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Abort());
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Abort(eventHandler));
         }
 
         /// <summary>
         /// Cancels the test run.
         /// </summary>
-        public void Cancel()
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        public void Cancel(ITestRunEventsHandler eventHandler)
         {
-            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Cancel());
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Cancel(eventHandler));
         }
 
         /// <summary>

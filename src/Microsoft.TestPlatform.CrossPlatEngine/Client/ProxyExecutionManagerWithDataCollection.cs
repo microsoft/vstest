@@ -45,6 +45,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
             this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+
+            testHostManager.HostLaunched += this.TestHostLaunchedHandler;
+        }
+
+        private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+        {
+            this.ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
         }
 
         /// <summary>
@@ -122,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc/>
-        public override void Cancel()
+        public override void Cancel(ITestRunEventsHandler eventHandler)
         {
             try
             {
@@ -130,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             finally
             {
-                base.Cancel();
+                base.Cancel(eventHandler);
             }
         }
 

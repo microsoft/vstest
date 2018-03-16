@@ -219,22 +219,13 @@
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal and normal.
+      Example: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
+      Allowed values for verbosity: quiet, minimal, normal and detailed.
 
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
+      More info on Console Logger here : https://aka.ms/console-logger</source>
+        <target state="new">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
       Specifica un logger per i risultati dei test. Ad esempio, per registrare risultati in un 
       file di risultati dei test di Visual Studio (TRX), usare /logger:trx[;LogFileName=&lt;impostazione predefinita: nome file univoco&gt;]
       Crea nella directory TestResults il file con il valore specificato per LogFileName.
@@ -255,7 +246,7 @@
                 [;Platform=&lt;impostazione predefinita: "Any CPU"&gt;]
                 [;Flavor=&lt;impostazione predefinita: "Debug"&gt;]
                 [;RunTitle=&lt;titolo&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Logger Uri/FriendlyName &gt;
       Specificare un logger per risultati di test.  Ad esempio, per registrare i risultati in un Visual Studio Test risultati File (TRX) utilizzano /logger:trx.
@@ -541,9 +532,9 @@
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;Nome file&gt;
-      Elenca i test individuati dal contenitore di test specificato.</target>
-        <note></note>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Nome file&gt;
+      Elenca tutti i test individuati dal contenitore di test specificato.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; nome File &gt;
       Elenchi individuati test dal contenitore del test specificato.</target>
@@ -1562,7 +1553,48 @@
       </trans-unit>
       <trans-unit id="RunsettingsWithDCErrorMessage">
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
-        <target state="new">Gli agenti di raccolta dati configurati tramite le impostazioni esecuzione test non sono supportati con impostazioni di test incorporate. Per altre informazioni, vedere https://aka.ms/vstest-configure-datacollector. Impostazioni esecuzione test: {0}.</target>
+        <target state="translated">Gli agenti di raccolta dati diversi da Code Coverage e Microsoft Fakes configurati tramite le impostazioni esecuzione test non sono supportati con impostazioni di test incorporate. Per altre informazioni, vedere https://aka.ms/vstest-configure-datacollector. Impostazioni esecuzione test: {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="EnableLoggerArgumentsInNetCore">
+        <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Creates file in TestResults directory with given LogFileName.
+
+      Change the verbosity level in log messages for console logger as shown below
+      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal, normal and detailed.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger</source>
+        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Creates file in TestResults directory with given LogFileName.
+
+      Change the verbosity level in log messages for console logger as shown below
+      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal, normal and detailed.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
+
+      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+      Example: /logger:TfsPublisher;
+                Collection=&lt;team project collection url&gt;;
+                BuildName=&lt;build name&gt;;
+                TeamProject=&lt;team project name&gt;
+                [;Platform=&lt;Defaults to "Any CPU"&gt;]
+                [;Flavor=&lt;Defaults to "Debug"&gt;]
+                [;RunTitle=&lt;title&gt;]</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
+        <source>CollectDump option for Blame is not supported for this platform.</source>
+        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     /// Class that provides a basic implementation of IUriAttachment, which can be used by plugin
     /// writers to send any resource accessible by a URI as an attachment.
     /// </summary>
-    public class UriDataAttachment : IDataAttachment, IXmlTestStore
+    internal class UriDataAttachment : IDataAttachment, IXmlTestStore
     {
         #region Private fields
 
@@ -111,7 +111,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             Debug.Assert(!string.IsNullOrEmpty(baseDirectory), "'baseDirectory' is null or empty");
             Debug.Assert(baseDirectory == baseDirectory.Trim(), "'baseDirectory' contains whitespace at the ends");
-            Debug.Assert(Path.IsPathRooted(baseDirectory), "'baseDirectory' is not a rooted path");
 
             if (useAbsoluteUri != this.uri.IsAbsoluteUri)
             {

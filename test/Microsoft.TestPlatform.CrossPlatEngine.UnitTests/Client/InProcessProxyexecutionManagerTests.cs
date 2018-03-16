@@ -179,10 +179,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.Abort()).Callback(
+            this.mockExecutionManager.Setup(o => o.Abort(It.IsAny<ITestRunEventsHandler>())).Callback(
                 () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.Abort();
+            this.inProcessProxyExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
         }
@@ -192,10 +192,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var manualResetEvent = new ManualResetEvent(true);
 
-            this.mockExecutionManager.Setup(o => o.Cancel()).Callback(
+            this.mockExecutionManager.Setup(o => o.Cancel(It.IsAny<ITestRunEventsHandler>())).Callback(
                 () => manualResetEvent.Set());
 
-            this.inProcessProxyExecutionManager.Cancel();
+            this.inProcessProxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IExecutionManager.Abort should get called");
         }

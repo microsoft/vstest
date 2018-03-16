@@ -193,8 +193,8 @@
       </trans-unit>
       <trans-unit id="FailedToConnectDataCollector">
         <source>Failed to connect to datacollector process.</source>
-        <target state="new">Failed to connect datacollector.</target>
-        <note></note>
+        <target state="translated">datacollector 프로세스에 연결하지 못했습니다.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

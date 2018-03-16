@@ -225,6 +225,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to CollectDump option for Blame is not supported for this platform.
+        /// </summary>
+        public static string BlameCollectDumpNotSupportedForPlatform
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameCollectDumpNotSupportedForPlatform", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///      The directory containing the temporary outputs..
         /// </summary>
@@ -515,6 +526,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("EnableLoggersArgumentHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        ///      Specify a logger for test results.  For example, to log results into a 
+        ///      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+        ///      Creates file in TestResults directory with given LogFileName.
+        ///
+        ///      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
+        ///      Example: /logger:console;verbosity=&lt;Defaults to &quot;minimal&quot;&gt;
+        ///
+        ///      To publish test results to Team Foun [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string EnableLoggerArgumentsInNetCore
+        {
+            get
+            {
+                return ResourceManager.GetString("EnableLoggerArgumentsInNetCore", resourceCulture);
             }
         }
 
