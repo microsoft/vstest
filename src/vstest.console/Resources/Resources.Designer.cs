@@ -632,7 +632,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         ///   Looks up a localized string similar to --Framework|/Framework:&lt;Framework Version&gt;
         ///      Target .Net Framework version to be used for test execution. 
         ///      Valid values are &quot;.NETFramework,Version=v4.5.1&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
-        ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10..
+        ///      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10..
         /// </summary>
         public static string FrameworkArgumentHelp
         {
@@ -768,7 +768,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45..
+        ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10..
         /// </summary>
         public static string InvalidFrameworkVersion
         {
@@ -1369,10 +1369,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
 
         /// <summary>
         ///   Looks up a localized string similar to --Tests|/Tests:&lt;Test Names&gt;
-        ///      Run tests with names that match the provided values. To provide multiple
+        ///      Run tests with names that contain the provided values. To provide multiple
         ///      values, separate them by commas.
         ///      Examples: /Tests:TestMethod1
-        ///                /Tests:TestMethod1,testMethod2.
+        ///                /Tests:TestMethod1,TestMethod2.
         /// </summary>
         public static string RunSpecificTestsHelp
         {
