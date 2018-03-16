@@ -122,6 +122,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // and the test host is lost as well.
                 this.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
+                var discoveryCompletePayload = new DiscoveryCompletePayload()
+                {
+                    IsAborted = true,
+                    LastDiscoveredTests = null,
+                    TotalTests = -1
+                };
+                this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, discoveryCompletePayload));
                 var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(-1, true);
 
                 this.HandleDiscoveryComplete(discoveryCompleteEventsArgs, new List<ObjectModel.TestCase>());
