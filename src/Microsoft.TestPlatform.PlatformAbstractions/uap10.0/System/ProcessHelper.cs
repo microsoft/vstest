@@ -95,5 +95,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             // For UWP the native dll's are to be kept in same directory
             return this.GetCurrentProcessLocation();
         }
+
+        /// <inheritdoc/>
+        public void WaitForProcessExit(object process)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -40,6 +40,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         Collection<AttachmentSet> TestCaseEnded(TestCaseEndEventArgs testCaseEndEventArgs);
 
         /// <summary>
+        /// Raises TestHostLaunched event to all data collectors configured for run.
+        /// </summary>
+        /// <param name="processId">
+        /// Process ID of test host.
+        /// </param>
+        void TestHostLaunched(int processId);
+
+        /// <summary>
         /// Raises SessionStart event to all data collectors configured for run.
         /// </summary>
         /// <returns>bolean value specifying whether test case events are subscribed by datacollectors. Based on this execution process will decide whether to send TestCaseStart and TestCaseEnd events to dataCollector process.</returns>

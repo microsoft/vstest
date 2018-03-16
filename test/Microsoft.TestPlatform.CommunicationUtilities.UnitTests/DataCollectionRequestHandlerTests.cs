@@ -15,10 +15,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Newtonsoft.Json.Linq;
 
     [TestClass]
     public class DataCollectionRequestHandlerTests
@@ -161,9 +163,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             message.MessageType = MessageType.BeforeTestRunStart;
             message.Payload = "settingsXml";
 
-            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
+            var testHostLaunchedPayload = new TestHostLaunchedPayload();
+            testHostLaunchedPayload.ProcessId = 1234;
+
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message)
+                                                                                .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
+                                                                                .Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestHostLaunchedPayload>(It.Is<Message>(y => y.MessageType == MessageType.TestHostLaunched)))
+                                   .Returns(testHostLaunchedPayload);
 
             this.requestHandler.ProcessRequests();
 
@@ -171,9 +181,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Once);
 
+            // Verify SessionStarted events
             this.mockDataCollectionManager.Verify(x => x.SessionStarted(), Times.Once);
-
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
+
+            // Verify TestHostLaunched events
+            this.mockDataCollectionManager.Verify(x => x.TestHostLaunched(1234), Times.Once);
 
             // Verify AfterTestRun events.
             this.mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
