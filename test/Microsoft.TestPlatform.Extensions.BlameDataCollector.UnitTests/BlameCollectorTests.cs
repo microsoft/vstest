@@ -155,7 +155,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         /// The trigger session ended handler should log exception if GetDumpfile throws FileNotFound Exception
         /// </summary>
         [TestMethod]
-        public void TriggerSessionEndedHandlerShouldLogErrorIfGetDumpFileThrowsFileNotFound()
+        public void TriggerSessionEndedHandlerShouldLogWarningIfGetDumpFileThrowsFileNotFound()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
-            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>()), Times.Once);
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.IsAny<string>()), Times.Once);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify
-            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == tpex.Message)), Times.Once);
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == tpex.Message)), Times.Once);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify
-            this.mockLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == ex.ToString())), Times.Once);
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == ex.ToString())), Times.Once);
         }
 
         [TestCleanup]
