@@ -199,6 +199,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         }
 
         [TestMethod]
+        public void AutoDetectFrameworkShouldReturnFrameworkUap10ForAppxrecipeFiles()
+        {
+            var fx = Framework.FromString(Constants.DotNetFrameworkUap10);
+            var assemblyName = "uwp10.appxrecipe";
+            SetupAndValidateForSingleAssembly(assemblyName, fx, false);
+        }
+
+        [TestMethod]
         public void AutoDetectFrameworkShouldReturnDefaultFullFrameworkForJsFiles()
         {
             var fx = Framework.FromString(Constants.DotNetFramework40);
