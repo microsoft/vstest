@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Initializes test discovery. Create the test host, setup channel and initialize extensions.
         /// </summary>
-        void Initialize();
+        void Initialize(bool skipDefaultExtensions);
 
         /// <summary>
         /// Discovers tests

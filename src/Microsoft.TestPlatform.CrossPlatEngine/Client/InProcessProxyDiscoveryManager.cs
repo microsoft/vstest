@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes test discovery.
         /// </summary>
-        public void Initialize()
+        public void Initialize(bool skipDefaultExtensions)
         {
         }
 

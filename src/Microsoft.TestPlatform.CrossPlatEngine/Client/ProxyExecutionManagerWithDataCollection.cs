@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
         /// </summary>
-        public override void Initialize()
+        public override void Initialize(bool skipDefaultExtensions)
         {
             this.ProxyDataCollectionManager.Initialize();
 
@@ -97,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 throw;
             }
 
-            base.Initialize();
+            base.Initialize(skipDefaultExtensions);
         }
 
         /// <summary>

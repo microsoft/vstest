@@ -34,5 +34,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public bool CollectMetrics { get; set; }
+
+        /// <summary>
+        ///  Gets or sets whether default extensions should be skipped or not.
+        /// </summary>
+        [DataMember]
+        public bool SkipDefaultExtensions { get; set; }
     }
 }

@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
+        private bool skipDefaultExtensions;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -78,8 +79,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
         /// </summary>
-        public virtual void Initialize()
+        public virtual void Initialize(bool skipDefaultExtensions)
         {
+            this.skipDefaultExtensions = skipDefaultExtensions;
             this.IsInitialized = true;
         }
 
@@ -257,7 +259,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultExtensions);
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 

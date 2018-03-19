@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="discoveryCriteria"> The discovery criteria. </param>
         /// <returns> The <see cref="IDiscoveryRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria)
+        public IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria, bool skipDefaultExtensions = false)
         {
             if (discoveryCriteria == null)
             {
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
-            discoveryManager.Initialize();
+            discoveryManager.Initialize(skipDefaultExtensions);
 
             return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
         }
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="protocolConfig"> Protocol related information.  </param>
         /// <returns> The <see cref="ITestRunRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria)
+        public ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, bool skipDefaultExtensions = false)
         {
             if (testRunCriteria == null)
             {
@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
-            executionManager.Initialize();
+            executionManager.Initialize(skipDefaultExtensions);
 
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }

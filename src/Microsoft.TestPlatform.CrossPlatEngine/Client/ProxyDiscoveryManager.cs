@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
+        private bool skipDefaultExtensions;
 
         #region Constructors
 
@@ -82,8 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the discovery component of engine is ready for discovery usually by loading extensions.
         /// </summary>
-        public void Initialize()
+        public void Initialize(bool skipDefaultExtensions)
         {
+            this.skipDefaultExtensions = skipDefaultExtensions;
         }
 
         /// <summary>
@@ -175,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultExtensions);
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
