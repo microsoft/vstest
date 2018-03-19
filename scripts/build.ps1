@@ -54,7 +54,7 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
-$env:TP_TEST_OUT_DIR = Join-Path $env:TP_ROOT_DIR "testArtifacts"
+$env:TP_TEST_OUT_DIR = Join-Path $env:TP_OUT_DIR "testArtifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 
 # Set Version from scripts/build/TestPlatform.Settings.targets
@@ -402,18 +402,18 @@ function Publish-Tests
     Write-Log "Publish-Tests: Started."
 
     # Adding only Perf project for now
-    $fullCLRTestDir = $(Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework")
-    $fullCLRPerfTestAssetDir = $(Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets")
+    $fullCLRTestDir = Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework"
+    $fullCLRPerfTestAssetDir = Join-Path $env:TP_TEST_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\TestAssets\PerfAssets"
     
-	$mstest10kPerfProjectDir = $(Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject")
+	$mstest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject"
     $mstest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\MSTestAdapterPerfTestProject"
     Publish-PackageInternal $mstest10kPerfProject $TPB_TargetFramework $mstest10kPerfProjectDir
 
-	$nunittest10kPerfProjectDir = $(Join-Path $fullCLRPerfTestAssetDir "NUnitAdapterPerfTestProject")
+	$nunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "NUnitAdapterPerfTestProject"
 	$nunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\NUnitAdapterPerfTestProject"
     Publish-PackageInternal $nunittest10kPerfProject $TPB_TargetFramework $nunittest10kPerfProjectDir
 
-	$xunittest10kPerfProjectDir = $(Join-Path $fullCLRPerfTestAssetDir "XUnitAdapterPerfTestProject")
+	$xunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "XUnitAdapterPerfTestProject"
 	$xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
     Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $xunittest10kPerfProjectDir
 
