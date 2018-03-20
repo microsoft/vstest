@@ -9,6 +9,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public partial interface IPlatformEqtTrace
     {
+        // This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
+        bool DoNotInitialize
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Adds the message to the trace log.
         /// The line becomes:

@@ -72,6 +72,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        [System.ComponentModel.DefaultValue(false)]
+        public static bool DoNotInitailize
+        {
+            get
+            {
+                return traceImpl.DoNotInitialize;
+            }
+            set
+            {
+                traceImpl.DoNotInitialize = value;
+            }
+        }
+
         public static string ErrorOnInitialization
         {
             get;
