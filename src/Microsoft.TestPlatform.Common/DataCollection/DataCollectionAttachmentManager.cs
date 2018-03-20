@@ -24,6 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     /// </summary>
     internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManager
     {
+        private static object attachmentTaskLock = new object();
+
         #region Fields
 
         /// <summary>
@@ -312,9 +314,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     {
                         if (t.Exception == null)
                         {
-                        // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
-                        var attachmentUri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
-                            this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(attachmentUri, fileTransferInfo.Description));
+                            // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
+                            var attachmentUri = new UriBuilder() { Scheme = "file", Host = "", Path = localFilePath }.Uri;
+                            lock (attachmentTaskLock)
+                            {
+                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(attachmentUri, fileTransferInfo.Description));
+                            }
                         }
 
                         if (sendFileCompletedCallback != null)
