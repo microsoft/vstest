@@ -143,7 +143,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         // possible for js files. So using default .NET Full framework version.
                         fx = new FrameworkName(Constants.DotNetFramework40);
                     }
-                    else if (extension.Equals(".appx", StringComparison.OrdinalIgnoreCase))
+                    else if (extension.Equals(".appx", StringComparison.OrdinalIgnoreCase)
+                        || extension.Equals(".appxrecipe", StringComparison.OrdinalIgnoreCase))
                     {
                         fx = new FrameworkName(Constants.DotNetFrameworkUap10);
                     }

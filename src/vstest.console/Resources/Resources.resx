@@ -276,7 +276,7 @@
     <value>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
+      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</value>
   </data>
   <data name="FrameworkVersionRequired" xml:space="preserve">
     <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</value>
@@ -317,7 +317,7 @@
     <value>Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</value>
   </data>
   <data name="InvalidFrameworkVersion" xml:space="preserve">
-    <value>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
+    <value>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</value>
   </data>
   <data name="InvalidInIsolationCommand" xml:space="preserve">
     <value>Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</value>
