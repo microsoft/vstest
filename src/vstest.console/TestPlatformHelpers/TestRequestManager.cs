@@ -139,12 +139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
             var runsettings = discoveryPayload.RunSettings;
-            var skipDefaultExtensions = false;
 
             if (discoveryPayload.TestPlatformOptions != null)
             {
                 this.telemetryOptedIn = discoveryPayload.TestPlatformOptions.CollectMetrics;
-                skipDefaultExtensions = discoveryPayload.TestPlatformOptions.SkipDefaultExtensions;
             }
 
             var requestData = this.GetRequestData(protocolConfig);
@@ -171,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             try
             {
-                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, skipDefaultExtensions))
+                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, discoveryPayload.TestPlatformOptions))
                 {
                     try
                     {
@@ -213,12 +211,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
-            var skipDefaultExtensions = false;
 
             if (testRunRequestPayload.TestPlatformOptions != null)
             {
                 this.telemetryOptedIn = testRunRequestPayload.TestPlatformOptions.CollectMetrics;
-                skipDefaultExtensions = testRunRequestPayload.TestPlatformOptions.SkipDefaultExtensions;
             }
 
             var requestData = this.GetRequestData(protocolConfig);
@@ -281,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Run tests
             try
             {
-                this.RunTests(requestData, runCriteria, testRunEventsRegistrar, skipDefaultExtensions);
+                this.RunTests(requestData, runCriteria, testRunEventsRegistrar, testRunRequestPayload.TestPlatformOptions);
                 EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
             }
             finally
@@ -503,7 +499,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return false;
         }
 
-        private void RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, bool skipDefaultExtensions)
+        private void RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, TestPlatformOptions options)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -513,7 +509,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 try
                 {
-                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria, skipDefaultExtensions);
+                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria, options);
 
                     this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);

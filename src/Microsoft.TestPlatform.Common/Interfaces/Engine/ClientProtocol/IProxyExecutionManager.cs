@@ -17,8 +17,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 
         /// <summary>
         /// Initializes test execution. Create the test host, setup channel and initialize extensions.
+        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
         /// </summary>
-        void Initialize(bool skipDefaultExtensions);
+        void Initialize(bool skipDefaultAdapters);
 
         /// <summary>
         /// Starts the test run.

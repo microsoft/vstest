@@ -64,9 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #region IProxyDiscoveryManager
 
         /// <inheritdoc/>
-        public void Initialize(bool skipDefaultExtensions)
+        public void Initialize(bool skipDefaultAdapters)
         {
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultExtensions), doActionsInParallel: true);
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultAdapters), doActionsInParallel: true);
         }
 
         /// <inheritdoc/>

@@ -80,10 +80,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, 3);
 
-            parallelExecutionManager.Initialize();
+            parallelExecutionManager.Initialize(false);
 
             Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Initialize(), Times.Once));
+            createdMockManagers.ForEach(em => em.Verify(m => m.Initialize(false), Times.Once));
         }
 
         [TestMethod]

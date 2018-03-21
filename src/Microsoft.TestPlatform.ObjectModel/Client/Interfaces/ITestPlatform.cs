@@ -29,17 +29,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         /// <param name="requestData">Providing common services and data for Discovery</param>
         /// <param name="discoveryCriteria">Specifies the discovery parameters</param>
-        /// <param name="skipDefaultExtensions">Skip default extensions flag</param>
+        /// <param name="options">Test platform options.</param>
         /// <returns>DiscoveryRequest object</returns>
-        IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria, bool skipDefaultExtensions = false);
+        IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options);
 
         /// <summary>
         /// Creates a test run request.
         /// </summary>
         /// <param name="requestData">Providing common services and data for Execution</param>
         /// <param name="testRunCriteria">Specifies the test run criteria</param>
-        /// <param name="skipDefaultExtensions">Skip default extensions flag</param>
+        /// <param name="options">Test platform options.</param>
         /// <returns>RunRequest object</returns>
-        ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, bool skipDefaultExtensions = false);
+        ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options);
     }
 }

@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateDiscoveryRequestShouldInitializeManagersAndCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
         {
-            this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.discoveryManager.Setup(dm => dm.Initialize(false)).Verifiable();
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
             this.hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
                 .Returns(discoveryCriteria.Sources);
@@ -60,10 +60,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
 
-            var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+            var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, new TestPlatformOptions());
 
             this.hostManager.Verify(hm => hm.Initialize(It.IsAny<TestSessionMessageLogger>(), It.IsAny<string>()), Times.Once);
-            this.discoveryManager.Verify(dm => dm.Initialize(), Times.Once);
+            this.discoveryManager.Verify(dm => dm.Initialize(false), Times.Once);
             Assert.AreEqual(discoveryCriteria, discoveryRequest.DiscoveryCriteria);
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         {
             TestPlatform tp = new TestPlatform();
 
-            Assert.ThrowsException<ArgumentNullException>(() => tp.CreateDiscoveryRequest(this.mockRequestData.Object, null));
+            Assert.ThrowsException<ArgumentNullException>(() => tp.CreateDiscoveryRequest(this.mockRequestData.Object, null, new TestPlatformOptions()));
         }
 
         [TestMethod]
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             try
             {
-                tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+                tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
             }
             catch(TestPlatformException ex)
             {
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(additionalExtensions);
-            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
 
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
-            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(additionalExtensions);
 
-            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
 
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
-            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
         }
 
@@ -194,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(additionalExtensions);
 
-            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
 
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
-            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
             this.hostManager.Verify(hm => hm.GetTestSources(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateTestRunRequestShouldInitializeManagersAndCreateTestRunRequestWithSpecifiedCriteria()
         {
-            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
             this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
@@ -232,12 +232,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
                 .Returns(testRunCriteria.Sources);
 
-            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
 
             var actualTestRunRequest = testRunRequest as TestRunRequest;
 
             this.hostManager.Verify(hm => hm.Initialize(It.IsAny<TestSessionMessageLogger>(), It.IsAny<string>()), Times.Once);
-            this.executionManager.Verify(em => em.Initialize(), Times.Once);
+            this.executionManager.Verify(em => em.Initialize(false), Times.Once);
             Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
         }
 
@@ -245,7 +245,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
-            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
             this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
@@ -255,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
                 .Returns(testRunCriteria.Sources);
 
-            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            var testRunRequest = tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
 
             var actualTestRunRequest = testRunRequest as TestRunRequest;
             Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
@@ -267,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         {
             var tp = new TestPlatform();
 
-            Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(this.mockRequestData.Object, null));
+            Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(this.mockRequestData.Object, null, new TestPlatformOptions()));
         }
 
 
@@ -291,7 +291,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             try
             {
-                tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+                tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, new TestPlatformOptions());
             }
             catch (TestPlatformException ex)
             {
@@ -312,7 +312,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(additionalExtensions);
 
-            this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.discoveryManager.Setup(dm => dm.Initialize(false)).Verifiable();
 
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -332,7 +332,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             // Action
-            var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+            var discoveryRequest = tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, new TestPlatformOptions());
 
             // Verify
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, false));
@@ -357,7 +357,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
-            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
 
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
         }
@@ -381,7 +381,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, settingsXml);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
-            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, new TestPlatformOptions());
 
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
         }
@@ -405,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, settingsXml);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
-            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria);
+            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, new TestPlatformOptions());
 
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
         }
@@ -429,7 +429,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 10, settingsXml);
 
             var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
-            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria);
+            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, new TestPlatformOptions());
 
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
         }

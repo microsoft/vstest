@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private ParallelRunDataAggregator currentRunDataAggregator;
 
         private IRequestData requestData;
-        private bool skipDefaultExtensions;
+        private bool skipDefaultAdapters;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -85,10 +85,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #region IProxyExecutionManager
 
-        public void Initialize(bool skipDefaultExtensions)
+        public void Initialize(bool skipDefaultAdapters)
         {
-            this.skipDefaultExtensions = skipDefaultExtensions;
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultExtensions), doActionsInParallel: true);
+            this.skipDefaultAdapters = skipDefaultAdapters;
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultAdapters), doActionsInParallel: true);
             this.IsInitialized = true;
         }
 
@@ -320,7 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 if (!proxyExecutionManager.IsInitialized)
                 {
-                    proxyExecutionManager.Initialize(skipDefaultExtensions);
+                    proxyExecutionManager.Initialize(skipDefaultAdapters);
                 }
 
                 Task.Run(() =>

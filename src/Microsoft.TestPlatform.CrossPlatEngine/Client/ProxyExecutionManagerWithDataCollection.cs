@@ -72,8 +72,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
+        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
         /// </summary>
-        public override void Initialize(bool skipDefaultExtensions)
+        public override void Initialize(bool skipDefaultAdapters)
         {
             this.ProxyDataCollectionManager.Initialize();
 
@@ -97,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 throw;
             }
 
-            base.Initialize(skipDefaultExtensions);
+            base.Initialize(skipDefaultAdapters);
         }
 
         /// <summary>

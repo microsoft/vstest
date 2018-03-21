@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     /// <summary>
     /// Implementation for TestPlatform
     /// </summary>
-    public class TestPlatform : ITestPlatform
+    internal class TestPlatform : ITestPlatform
     {
         private readonly TestRuntimeProviderManager testHostProviderManager;
 
@@ -79,11 +79,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// The create discovery request.
         /// </summary>
-        /// <param name="requestData"></param>
+        /// <param name="requestData">Request data.</param>
         /// <param name="discoveryCriteria"> The discovery criteria. </param>
+        /// <param name="options">Test platform options.</param>
         /// <returns> The <see cref="IDiscoveryRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria, bool skipDefaultExtensions = false)
+        public IDiscoveryRequest CreateDiscoveryRequest(IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options)
         {
             if (discoveryCriteria == null)
             {
@@ -110,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
             var discoveryManager = this.TestEngine.GetDiscoveryManager(requestData, testHostManager, discoveryCriteria);
-            discoveryManager.Initialize(skipDefaultExtensions);
+            discoveryManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
             return new DiscoveryRequest(requestData, discoveryCriteria, discoveryManager, loggerManager);
         }
@@ -118,11 +119,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// The create test run request.
         /// </summary>
+        /// <param name="requestData">Request data.</param>
         /// <param name="testRunCriteria"> The test run criteria.  </param>
-        /// <param name="protocolConfig"> Protocol related information.  </param>
+        /// <param name="options">Test platform options.</param>
         /// <returns> The <see cref="ITestRunRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, bool skipDefaultExtensions = false)
+        public ITestRunRequest CreateTestRunRequest(IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options)
         {
             if (testRunCriteria == null)
             {
@@ -154,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var executionManager = this.TestEngine.GetExecutionManager(requestData, testHostManager, testRunCriteria);
-            executionManager.Initialize(skipDefaultExtensions);
+            executionManager.Initialize(options?.SkipDefaultAdapters ?? false);
 
             return new TestRunRequest(requestData, testRunCriteria, executionManager, loggerManager);
         }

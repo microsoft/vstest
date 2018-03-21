@@ -428,7 +428,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
         }
 
-        protected override List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        protected override IEnumerable<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
         {
             this.Action?.Invoke();
             return extensions;

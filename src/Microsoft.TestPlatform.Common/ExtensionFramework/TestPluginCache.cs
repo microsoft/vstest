@@ -93,11 +93,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets a list of all extension paths filtered by input string.
         /// </summary>
         /// <param name="endsWithPattern">Pattern to filter extension paths.</param>
-        public List<string> GetExtensionPaths(string endsWithPattern, bool skipDefaultExtensions = false)
+        public List<string> GetExtensionPaths(string endsWithPattern, bool skipDefaultAdapters = false)
         {
             var extensions = this.GetFilteredExtensions(this.filterableExtensionPaths, endsWithPattern);
 
-            if (!skipDefaultExtensions)
+            if (!skipDefaultAdapters)
             {
                 extensions = extensions.Concat(this.defaultExtensionPaths);
             }
