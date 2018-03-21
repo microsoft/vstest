@@ -102,7 +102,6 @@ ehthumbs.db
 # ===========================
 packages
 artifacts
-testArtifacts
 [tT]ools
 
 *.nupkg
