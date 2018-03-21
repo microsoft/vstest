@@ -45,6 +45,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private string settingsXml;
         private int connectionTimeout;
         private IRequestData requestData;
+        private int dataCollectionPort;
+        private int dataCollectionProcessId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
@@ -126,6 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
            () =>
            {
+               EqtTrace.Verbose("ProxyDataCollectionManager.AfterTestRunEnd: Get attachment set for datacollector processId: {0} port: {1}", dataCollectionProcessId, dataCollectionPort);
                attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunStartAndGetResult(runEventsHandler, isCanceled);
            },
                 runEventsHandler);
@@ -159,9 +162,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
             () =>
             {
+                EqtTrace.Verbose("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
                 var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
+
+                EqtTrace.Verbose(
+                    "ProxyDataCollectionManager.BeforeTestRunStart: SendBeforeTestRunStartAndGetResult successful, env variable from datacollector: {0}  and testhost port: {1}",
+                    string.Join(";", environmentVariables),
+                    dataCollectionEventsPort);
             },
                 runEventsHandler);
             return new DataCollectionParameters(
@@ -175,21 +184,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public void Dispose()
         {
+            EqtTrace.Verbose("ProxyDataCollectionManager.Dispose: calling dospose for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
             this.dataCollectionRequestSender.Close();
         }
 
         /// <inheritdoc />
         public void Initialize()
         {
-            var port = this.dataCollectionRequestSender.InitializeCommunication();
+            this.dataCollectionPort = this.dataCollectionRequestSender.InitializeCommunication();
 
             // Warn the user that execution will wait for debugger attach.
-            var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
+            this.dataCollectionProcessId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(this.dataCollectionPort));
+            EqtTrace.Verbose("ProxyDataCollectionManager.Initialize: Launched datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
 
-            ChangeConnectionTimeoutIfRequired(processId);
+            ChangeConnectionTimeoutIfRequired(dataCollectionProcessId);
+
+            EqtTrace.Verbose("ProxyDataCollectionManager.Initialize: waiting for connection with timeout: {0}", this.connectionTimeout);
+
             var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
             if (connected == false)
             {
+                EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process.");
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToConnectDataCollector));
             }
         }
