@@ -29,9 +29,9 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         /// <summary>
         /// Used for posting the telemtery to AppInsights
         /// </summary>
-        /// <param name="testCaseName"></param>
+        /// <param name="perfScenario"></param>
         /// <param name="handlerMetrics"></param>
-        public void PostTelemetry(string testCaseName, IDictionary<string,object> handlerMetrics)
+        public void PostTelemetry(string perfScenario, IDictionary<string,object> handlerMetrics)
         {
             var properties = new Dictionary<string, string>();
             var metrics = new Dictionary<string, double>();
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
                     properties.Add(entry.Key, stringValue);
                 }
             }
-            this.client.TrackEvent(testCaseName, properties, metrics);
+            this.client.TrackEvent(perfScenario, properties, metrics);
             this.client.Flush();
         }
 
