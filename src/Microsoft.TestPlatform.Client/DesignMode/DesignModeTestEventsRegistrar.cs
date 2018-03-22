@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using System;
     using System.Collections.Generic;
@@ -57,6 +58,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="rawMessage">RawMessage from the testhost</param>
         private void OnRawMessageReceived(object sender, string rawMessage)
         {
+            if(EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("DesignModeClient HandleRawMessage: " + rawMessage);
+            }
+
             // Directly send the data to translation layer instead of deserializing it here
             this.designModeClient.SendRawMessage(rawMessage);
         }

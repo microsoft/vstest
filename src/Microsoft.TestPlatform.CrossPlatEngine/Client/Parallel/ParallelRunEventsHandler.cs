@@ -155,6 +155,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Do not deserialize further - just send if not execution complete
             if(!string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
+                if(EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("ParallelRunEventHandler RawMessage: " + message.Payload);
+                }
+
                 this.actualRunEventsHandler.HandleRawMessage(rawMessage);
             }
         }
@@ -177,6 +182,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private void ConvertToRawMessageAndSend(string messageType, object payload)
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("ParallelRunEventHandler ConvertToRawMessageAndSend: " + rawMessage);
+            }
             this.actualRunEventsHandler.HandleRawMessage(rawMessage);
         }
     }
