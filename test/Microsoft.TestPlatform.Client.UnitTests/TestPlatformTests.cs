@@ -68,6 +68,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
+        public void CreateDiscoveryRequestShouldInitializeManagersWithFalseFlagWhenSkipDefaultAdaptersIsFalse()
+        {
+            var options = new TestPlatformOptions()
+            {
+                SkipDefaultAdapters = false
+            };
+
+            InvokeCreateDiscoveryRequest(options);
+
+            this.discoveryManager.Verify(dm => dm.Initialize(false), Times.Once);
+        }
+
+        [TestMethod]
+        public void CreateDiscoveryRequestShouldInitializeManagersWithTrueFlagWhenSkipDefaultAdaptersIsTrue()
+        {
+            var options = new TestPlatformOptions()
+            {
+                SkipDefaultAdapters = true
+            };
+
+            InvokeCreateDiscoveryRequest(options);
+
+            this.discoveryManager.Verify(dm => dm.Initialize(true), Times.Once);
+        }
+
+        [TestMethod]
+        public void CreateDiscoveryRequestShouldInitializeManagersWithFalseFlagWhenTestPlatformOptionsIsNull()
+        {
+            InvokeCreateDiscoveryRequest();
+
+            this.discoveryManager.Verify(dm => dm.Initialize(false), Times.Once);
+        }
+
+        [TestMethod]
         public void CreateDiscoveryRequestThrowsIfDiscoveryCriteriaIsNull()
         {
             TestPlatform tp = new TestPlatform();
@@ -239,6 +273,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.hostManager.Verify(hm => hm.Initialize(It.IsAny<TestSessionMessageLogger>(), It.IsAny<string>()), Times.Once);
             this.executionManager.Verify(em => em.Initialize(false), Times.Once);
             Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
+        }
+
+        [TestMethod]
+        public void CreateTestRunRequestShouldInitializeManagersWithFalseFlagWhenSkipDefaultAdaptersIsFalse()
+        {
+            var options = new TestPlatformOptions()
+            {
+                SkipDefaultAdapters = false
+            };
+
+            InvokeCreateTestRunRequest(options);
+
+            this.executionManager.Verify(dm => dm.Initialize(false), Times.Once);
+        }
+
+        [TestMethod]
+        public void CreateTestRunRequestShouldInitializeManagersWithTrueFlagWhenSkipDefaultAdaptersIsTrue()
+        {
+            var options = new TestPlatformOptions()
+            {
+                SkipDefaultAdapters = true
+            };
+
+            InvokeCreateTestRunRequest(options);
+
+            this.executionManager.Verify(dm => dm.Initialize(true), Times.Once);
+        }
+
+        [TestMethod]
+        public void CreateTestRunRequestShouldInitializeManagersWithFalseFlagWhenTestPlatformOptionsIsNull()
+        {
+            InvokeCreateTestRunRequest();
+
+            this.executionManager.Verify(dm => dm.Initialize(false), Times.Once);
         }
 
         [TestMethod]
@@ -432,6 +500,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, new TestPlatformOptions());
 
             this.loggerManager.Verify(lm => lm.Initialize(settingsXml));
+        }
+
+        private void InvokeCreateDiscoveryRequest(TestPlatformOptions options = null)
+        {
+            this.discoveryManager.Setup(dm => dm.Initialize(false)).Verifiable();
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
+            this.hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
+                .Returns(discoveryCriteria.Sources);
+
+            this.testEngine.Setup(te => te.GetDiscoveryManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+
+            tp.CreateDiscoveryRequest(this.mockRequestData.Object, discoveryCriteria, options);
+        }
+
+        private void InvokeCreateTestRunRequest(TestPlatformOptions options = null)
+        {
+            this.executionManager.Setup(dm => dm.Initialize(false)).Verifiable();
+            this.testEngine.Setup(te => te.GetExecutionManager(this.mockRequestData.Object, this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            this.testEngine.Setup(te => te.GetLoggerManager(this.mockRequestData.Object)).Returns(this.loggerManager.Object);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
+            this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
+                .Returns(testRunCriteria.Sources);
+
+            tp.CreateTestRunRequest(this.mockRequestData.Object, testRunCriteria, options);
         }
 
         private class TestableTestPlatform : TestPlatform
