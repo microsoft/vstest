@@ -373,6 +373,26 @@
                Type="$(SignType)" />               
   </Target>
 
+  <Target Name="SignNugetPackages">
+    <PropertyGroup>
+      <NugetOutDir>$(ArtifactsBaseDirectory)\packages</NugetOutDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <FilesToSign Include="$(NugetOutDir)/*.nupkg">
+      
+        <Authenticode>NuGet</Authenticode>
+    
+      </FilesToSign>
+    </ItemGroup>
+
+    <Message Text="Signing using authenticode certificate '%(Nuget.Authenticode)' for @(FilesToSign)"/>
+    <SignFiles Files="@(FilesToSign)"
+               BinariesDirectory="$(NugetOutDir)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+  </Target>
+
   <Target Name="SignVsix">
     <PropertyGroup>
       <VsixOutDir>$(ArtifactsBaseDirectory)VSIX\</VsixOutDir>
