@@ -1,20 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Package dependency versions -->
-  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+  <Import Project="..\..\..\..\scripts\build\TestPlatform.Dependencies.props" />
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.1;net452</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.1;net451</TargetFrameworks>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(NETTestSdkPreviousVersion)" />
-    <PackageReference Include="NUnit" Version="$(NUnit3FrameworkVersion)" />
-    <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3AdapterVersion)" />
+    <PackageReference Include="xunit" Version="$(XUnitFrameworkVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XUnitAdapterVersion)" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="NunitTests.tt">
+    <None Update="XunitTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>NunitTests.cs</LastGenOutput>
+      <LastGenOutput>XunitTests.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
@@ -23,11 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="NunitTests.cs">
+    <Compile Update="XunitTests.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>NunitTests.tt</DependentUpon>
+      <DependentUpon>XunitTests.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
 </Project>
