@@ -68,6 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // connection is closed.
             if (this.MessageReceived != null)
             {
+                EqtTrace.Verbose("LengthPrefixCommunicationChannel.NotifyDataAvailable: Start reading data. ");
                 var data = this.reader.ReadString();
                 EqtTrace.Verbose("LengthPrefixCommunicationChannel.NotifyDataAvailable: received data: {0}", data);
                 this.MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
