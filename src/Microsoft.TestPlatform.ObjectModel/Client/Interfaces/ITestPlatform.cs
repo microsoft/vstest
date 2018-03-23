@@ -23,7 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         void ClearExtensions();
 
-
         /// <summary>
         /// Creates a discovery request
         /// </summary>

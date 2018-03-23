@@ -320,7 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 if (!proxyExecutionManager.IsInitialized)
                 {
-                    proxyExecutionManager.Initialize(skipDefaultAdapters);
+                    proxyExecutionManager.Initialize(this.skipDefaultAdapters);
                 }
 
                 Task.Run(() =>
