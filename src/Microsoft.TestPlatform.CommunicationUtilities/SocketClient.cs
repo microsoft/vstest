@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly Func<Stream, ICommunicationChannel> channelFactory;
         private ICommunicationChannel channel;
         private bool stopped;
+        private string endPoint;
 
         public SocketClient()
             : this(stream => new LengthPrefixCommunicationChannel(stream))
@@ -49,11 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public string Start(string endPoint)
         {
+            this.endPoint = endPoint;
             var ipEndPoint = endPoint.GetIPEndPoint();
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("Waiting for connecting to server");
+                EqtTrace.Verbose("SocketClient.Start: connecting to server endpoint: {0}", endPoint);
             }
 
             // Don't start if the endPoint port is zero
@@ -64,6 +66,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Stop()
         {
+            EqtTrace.Verbose("SocketClient.Stop: connecting to server endpoint: {0}", this.endPoint);
+
             if (!this.stopped)
             {
                 EqtTrace.Info("SocketClient: Stop: Cancellation requested. Stopping message loop.");
@@ -73,6 +77,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnServerConnected(Task connectAsyncTask)
         {
+            EqtTrace.Verbose("SocketClient.OnServerConnected: connected to server endpoint: {0}", this.endPoint);
+
             if (this.Connected != null)
             {
                 if (connectAsyncTask.IsFaulted)
@@ -105,6 +111,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void Stop(Exception error)
         {
+            EqtTrace.Verbose("SocketClient.Stop: connected to server endpoint: {0}, error:{1}", this.endPoint, error);
+
             if (!this.stopped)
             {
                 // Do not allow stop to be called multiple times.

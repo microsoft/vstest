@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception ex)
             {
-                EqtTrace.Verbose("LengthPrefixCommunicationChannel: Error sending data: {0}.", ex);
+                EqtTrace.Verbose("LengthPrefixCommunicationChannel.Send: Error sending data: {0}.", ex);
                 throw new CommunicationException("Unable to send data over channel.", ex);
             }
 
@@ -69,6 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (this.MessageReceived != null)
             {
                 var data = this.reader.ReadString();
+                EqtTrace.Verbose("LengthPrefixCommunicationChannel.NotifyDataAvailable: received data: {0}", data);
                 this.MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
             }
 
@@ -78,6 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Dispose()
         {
+            EqtTrace.Verbose("LengthPrefixCommunicationChannel.Dispose: Dispose reader and writer.");
             this.reader.Dispose();
             this.writer.Dispose();
         }

@@ -31,6 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private bool stopped;
 
+        private string endPoint;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SocketServer"/> class.
         /// </summary>
@@ -60,12 +62,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public string Start(string endPoint)
         {
-            this.tcpListener = new TcpListener(endPoint.GetIPEndPoint());
+            this.endPoint = endPoint;
+            this.tcpListener = new TcpListener(this.endPoint.GetIPEndPoint());
 
             this.tcpListener.Start();
 
             var connectionInfo = ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
-            EqtTrace.Info("SocketServer: Listening on end point : {0}", connectionInfo);
+            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", connectionInfo);
 
             // Serves a single client at the moment. An error in connection, or message loop just
             // terminates the entire server.
@@ -76,9 +79,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Stop()
         {
+            EqtTrace.Info("SocketServer.Stop: Stopping server endpoint: {0}", this.endPoint);
             if (!this.stopped)
             {
-                EqtTrace.Info("SocketServer: Stop: Cancellation requested. Stopping message loop.");
+                EqtTrace.Info("SocketServer.Stop: Cancellation requested. Stopping message loop.");
                 this.cancellation.Cancel();
             }
         }
@@ -95,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("Client connected, and starting MessageLoopAsync");
+                    EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endpoint: {0}, starting MessageLoopAsync:", this.endPoint);
                 }
 
                 // Start the message loop
@@ -105,6 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void Stop(Exception error)
         {
+            EqtTrace.Info("SocketServer.Stop: Stopping server endpoint: {0} error: {1}", this.endPoint, error);
+
             if (!this.stopped)
             {
                 // Do not allow stop to be called multiple times.

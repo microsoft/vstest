@@ -388,7 +388,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 if (this.IsOperationComplete())
                 {
                     EqtTrace.Verbose("TestRequestSender: OnExecutionMessageReceived: Operation is already complete. Skip additional messages. message: {0}", rawMessage);
-                    return;
+
+                    // return;
                 }
 
                 if (EqtTrace.IsVerboseEnabled)
@@ -454,7 +455,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 if (this.IsOperationComplete())
                 {
                     EqtTrace.Verbose("TestRequestSender: OnDiscoveryMessageReceived: Operation is already complete. Skip additional messages. message: {0}", rawMessage);
-                    return;
+
+                    // return;
                 }
 
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.

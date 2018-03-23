@@ -41,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 {
                     try
                     {
+                        EqtTrace.Verbose("MulticastDelegateUtilities.SafeInvoke: {0}", handler);
                         handler.DynamicInvoke(sender, args);
                     }
                     catch (TargetInvocationException e)
