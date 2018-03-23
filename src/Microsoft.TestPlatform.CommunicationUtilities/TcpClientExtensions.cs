@@ -67,8 +67,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 catch (Exception exception)
                 {
                     EqtTrace.Error(
-                            "Socket: Message loop: failed to receive message {0}",
-                            exception);
+                            "Socket: Message loop: failed to receive message {0}, remoteendPoint: {1} localEndPoint: {2}",
+                            exception,
+                        remoteEndPoint,
+                        localEndPoint);
                     error = exception;
                     break;
                 }
