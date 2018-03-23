@@ -46,21 +46,16 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private const string TelemetryOptedIn = "--telemetryoptedin";
 
-        private const string InitializeTrace = "--initializetrace";
-
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
-            string initializeTrace = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, InitializeTrace);
-
-            if(!string.IsNullOrWhiteSpace(initializeTrace) && initializeTrace.Equals("false", StringComparison.OrdinalIgnoreCase))
-            {
-                EqtTrace.DoNotInitailize = true;
-            }
-
             // Setup logging if enabled
-            if (!EqtTrace.DoNotInitailize && argsDictionary.TryGetValue(LogFileArgument, out string logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
             {
                 EqtTrace.InitializeVerboseTrace(logFile);
+            }
+            else
+            {
+                EqtTrace.DoNotInitailize = true;
             }
 #if NET451
             if (EqtTrace.IsInfoEnabled)
