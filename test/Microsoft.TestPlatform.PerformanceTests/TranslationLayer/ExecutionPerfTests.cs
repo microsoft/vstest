@@ -21,6 +21,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         [TestMethod]
+        [TestCategory("MSTest")]
         public void RunMsTest10K()
         {
             var testAssemblies = new List<string>
@@ -34,6 +35,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         [TestMethod]
+        [TestCategory("XunitTest")]
         public void RunXunit10K()
         {
             var testAssemblies = new List<string>
@@ -47,6 +49,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         [TestMethod]
+        [TestCategory("NunitTest")]
         public void RunNunit10K()
         {
             var testAssemblies = new List<string>
