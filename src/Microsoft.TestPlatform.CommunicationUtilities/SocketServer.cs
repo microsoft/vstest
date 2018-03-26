@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -31,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private bool stopped;
 
-        private string connectionInfo;
+        private string endPoint;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SocketServer"/> class.
@@ -62,24 +61,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public string Start(string endPoint)
         {
-            this.connectionInfo = endPoint;
-            this.tcpListener = new TcpListener(this.connectionInfo.GetIPEndPoint());
+            this.tcpListener = new TcpListener(endPoint.GetIPEndPoint());
 
             this.tcpListener.Start();
 
-            this.connectionInfo = ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
-            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", this.connectionInfo);
+            this.endPoint = ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
+            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", this.endPoint);
 
             // Serves a single client at the moment. An error in connection, or message loop just
             // terminates the entire server.
             this.tcpListener.AcceptTcpClientAsync().ContinueWith(t => this.OnClientConnected(t.Result));
-            return this.connectionInfo;
+            return this.endPoint;
         }
 
         /// <inheritdoc />
         public void Stop()
         {
-            EqtTrace.Info("SocketServer.Stop: Stopping server connectionInfo: {0}", this.connectionInfo);
+            EqtTrace.Info("SocketServer.Stop: Stop server endPoint: {0}", this.endPoint);
             if (!this.stopped)
             {
                 EqtTrace.Info("SocketServer.Stop: Cancellation requested. Stopping message loop.");
@@ -99,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for connectionInfo: {0}, starting MessageLoopAsync:", this.connectionInfo);
+                    EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", this.endPoint);
                 }
 
                 // Start the message loop
@@ -109,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void Stop(Exception error)
         {
-            EqtTrace.Info("SocketServer.Stop: Stopping server connectionInfo: {0} error: {1}", this.connectionInfo, error);
+            EqtTrace.Info("SocketServer.PrivateStop: Stopp server endPoint: {0} error: {1}", this.endPoint, error);
 
             if (!this.stopped)
             {
@@ -130,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Dispose();
                 this.cancellation.Dispose();
 
-                EqtTrace.Info("SocketServer.Stop: Raise disconnected event connectionInfo: {0} error: {1}", this.connectionInfo, error);
+                EqtTrace.Info("SocketServer.Stop: Raise disconnected event endPoint: {0} error: {1}", this.endPoint, error);
                 this.Disconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
             }
         }

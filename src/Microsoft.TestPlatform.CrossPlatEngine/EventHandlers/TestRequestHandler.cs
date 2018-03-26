@@ -389,11 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void SendData(string data)
         {
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestRequestHandler.SendData:  sending data from testhost: {0}", data);
-            }
-
+            EqtTrace.Verbose("TestRequestHandler.SendData:  sending data from testhost: {0}", data);
             this.channel.Send(data);
         }
     }

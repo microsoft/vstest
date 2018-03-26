@@ -53,10 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.endPoint = endPoint;
             var ipEndPoint = endPoint.GetIPEndPoint();
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("SocketClient.Start: connecting to server endpoint: {0}", endPoint);
-            }
+            EqtTrace.Info("SocketClient.Start: connecting to server endpoint: {0}", endPoint);
 
             // Don't start if the endPoint port is zero
             this.tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port).ContinueWith(this.OnServerConnected);
@@ -66,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Stop()
         {
-            EqtTrace.Verbose("SocketClient.Stop: connecting to server endpoint: {0}", this.endPoint);
+            EqtTrace.Info("SocketClient.Stop: Stop communication from server endpoint: {0}", this.endPoint);
 
             if (!this.stopped)
             {
@@ -77,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnServerConnected(Task connectAsyncTask)
         {
-            EqtTrace.Verbose("SocketClient.OnServerConnected: connected to server endpoint: {0}", this.endPoint);
+            EqtTrace.Info("SocketClient.OnServerConnected: connected to server endpoint: {0}", this.endPoint);
 
             if (this.Connected != null)
             {
@@ -111,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void Stop(Exception error)
         {
-            EqtTrace.Verbose("SocketClient.Stop: connected to server endpoint: {0}, error:{1}", this.endPoint, error);
+            EqtTrace.Info("SocketClient.PrivateStop: Stop communication from server endpoint: {0}, error:{1}", this.endPoint, error);
 
             if (!this.stopped)
             {
