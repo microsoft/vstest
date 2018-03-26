@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception ex)
             {
-                EqtTrace.Verbose("LengthPrefixCommunicationChannel: Error sending data: {0}.", ex);
+                EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error sending data: {0}.", ex);
                 throw new CommunicationException("Unable to send data over channel.", ex);
             }
 
@@ -78,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Dispose()
         {
+            EqtTrace.Verbose("LengthPrefixCommunicationChannel.Dispose: Dispose reader and writer.");
             this.reader.Dispose();
             this.writer.Dispose();
         }
