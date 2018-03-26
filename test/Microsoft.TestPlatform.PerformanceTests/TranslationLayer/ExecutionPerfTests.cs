@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
             this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.runEventHandler);
 
-            this.PostTelemetry("RunMsTest10K", this.runEventHandler.Metrics);
+            this.PostTelemetry("RunMsTest10KWithDefaultAdaptersSkipped", this.runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -87,7 +87,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
             this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.runEventHandler);
 
-            this.PostTelemetry("RunXunit10K", this.runEventHandler.Metrics);
+            this.PostTelemetry("RunXunit10KWithDefaultAdaptersSkipped", this.runEventHandler.Metrics);
         }
 
         [TestMethod]
@@ -101,7 +101,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
             this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true, SkipDefaultAdapters = true }, this.runEventHandler);
 
-            this.PostTelemetry("DiscoverNunit10K", this.runEventHandler.Metrics);
+            this.PostTelemetry("RunNunit10KWithDefaultAdaptersSkipped", this.runEventHandler.Metrics);
         }
     }
 }
