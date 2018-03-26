@@ -49,12 +49,14 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
             // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
             {
                 EqtTrace.InitializeVerboseTrace(logFile);
             }
-
+            else
+            {
+                EqtTrace.DoNotInitailize = true;
+            }
 #if NET451
             if (EqtTrace.IsInfoEnabled)
             {
