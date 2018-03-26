@@ -19,6 +19,8 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [ClassInitialize]
         public static void Init(TestContext testContext)
         {
+            // Set DoNotInitailize to false.
+            EqtTrace.DoNotInitailize = false;
             dirPath = Path.Combine(Path.GetTempPath(), "TraceUT");
             try
             {
