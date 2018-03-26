@@ -120,6 +120,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: my warning");
             this.StdErrorContains("Data collector 'SampleDataCollector' message: Data collector caught an exception of type 'System.Exception': 'my exception'. More details:");
+            this.StdOutputContains("Data collector 'SampleDataCollector' message: Dispose called.");
 
             // Verify attachments
             var isTestRunLevelAttachmentFound = false;
