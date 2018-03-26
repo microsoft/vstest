@@ -596,6 +596,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
             }
 
+            this.communicationEndpoint.Stop();
             Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
         }
 
