@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
-    <TPVersionPrefix>15.6.1</TPVersionPrefix>
+    <TPVersionPrefix>15.6.2</TPVersionPrefix>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
