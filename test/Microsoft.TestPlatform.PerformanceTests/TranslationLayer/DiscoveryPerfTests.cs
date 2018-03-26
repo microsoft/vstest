@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         [TestMethod]
-        [TestCategory("MsTest")]
+        [TestCategory("TelemetryPerf")]
         public void DiscoverMsTest10K()
         {
             var testAssemblies = new List<string>
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         [TestMethod]
-        [TestCategory("XunitTest")]
+        [TestCategory("TelemetryPerf")]
         public void DiscoverXunit10K()
         {
             var testAssemblies = new List<string>
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
         }
 
         [TestMethod]
-        [TestCategory("NunitTest")]
+        [TestCategory("TelemetryPerf")]
         public void DiscoverNunit10K()
         {
             var testAssemblies = new List<string>
