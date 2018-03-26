@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
                 catch (FileNotFoundException ex)
                 {
-                    this.logger.LogError(args.Context, ex.Message);
+                    this.logger.LogWarning(args.Context, ex.Message);
                 }
             }
 
@@ -204,7 +204,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogError(args.Context, e.Message);
+                this.logger.LogWarning(args.Context, e.Message);
             }
             catch (Exception e)
             {
@@ -213,7 +213,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogError(args.Context, e.ToString());
+                this.logger.LogWarning(args.Context, e.ToString());
             }
         }
 

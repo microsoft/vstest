@@ -45,8 +45,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         /// <summary>
         /// Initialize adapters.
+        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
         /// </summary>
-        public void Initialize()
+        public void Initialize(bool skipDefaultAdapters)
         {
         }
 
