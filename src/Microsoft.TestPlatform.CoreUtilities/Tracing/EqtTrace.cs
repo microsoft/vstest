@@ -72,7 +72,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        [System.ComponentModel.DefaultValue(false)]
         public static bool DoNotInitailize
         {
             get

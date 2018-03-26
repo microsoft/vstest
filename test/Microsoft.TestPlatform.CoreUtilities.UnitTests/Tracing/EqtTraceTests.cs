@@ -121,6 +121,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
             EqtTrace.Verbose("Dummy Verbose Message");
             Assert.IsTrue(ReadLogFile().Contains("Dummy Verbose Message"), "Expected Verbose message");
         }
+
         [TestMethod]
         public void TraceShouldWriteInfo()
         {
@@ -131,6 +132,19 @@ namespace TestPlatform.CoreUtilities.UnitTests
 #endif
             EqtTrace.Info("Dummy Info Message");
             Assert.IsTrue(ReadLogFile().Contains("Dummy Info Message"), "Expected Info message");
+        }
+
+        [TestMethod]
+        public void TraceShouldNotWriteIfDoNotInitializationIsSetToTrue()
+        {
+            EqtTrace.DoNotInitailize = true;
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Info;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Info;
+#endif
+            EqtTrace.Info("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue");
+            Assert.IsTrue(!ReadLogFile().Contains("Dummy Info Message: TraceShouldNotWriteIfDoNotInitializationIsSetToTrue"), "Did not expect Dummy Info message");
         }
 
         private string ReadLogFile()
