@@ -64,7 +64,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
         [TestMethod]
         [TestCategory("TelemetryPerf")]
-        public void DiscoverMsTest10KWhenDefaultAdaptersSkipped()
+        public void DiscoverMsTest10KWithDefaultAdaptersSkipped()
         {
             var testAssemblies = new List<string>
                                      {
@@ -78,7 +78,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
         [TestMethod]
         [TestCategory("TelemetryPerf")]
-        public void DiscoverXunit10KWhenDefaultAdaptersSkipped()
+        public void DiscoverXunit10KWithDefaultAdaptersSkipped()
         {
             var testAssemblies = new List<string>
                                      {
@@ -92,7 +92,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
         [TestMethod]
         [TestCategory("TelemetryPerf")]
-        public void DiscoverNunit10KWhenDefaultAdaptersSkipped()
+        public void DiscoverNunit10KWithDefaultAdaptersSkipped()
         {
             var testAssemblies = new List<string>
                                      {
