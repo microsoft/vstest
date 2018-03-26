@@ -204,7 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
             if (connected == false)
             {
-                EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process.");
+                EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToConnectDataCollector));
             }
         }
