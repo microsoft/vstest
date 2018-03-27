@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
             this.vstestConsoleWrapper.RunTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.runEventHandler);
 
-            this.PostTelemetry("DiscoverNunit10K", this.runEventHandler.Metrics);
+            this.PostTelemetry("RunNunit10K", this.runEventHandler.Metrics);
         }
 
         [TestMethod]

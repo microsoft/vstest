@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.PerformanceTests.TranslationLayer
 
             this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
 
-            this.PostTelemetry("DiscoveryMsTest10K", this.discoveryEventHandler2.Metrics);
+            this.PostTelemetry("DiscoverMsTest10K", this.discoveryEventHandler2.Metrics);
         }
 
         [TestMethod]
