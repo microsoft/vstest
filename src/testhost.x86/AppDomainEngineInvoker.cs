@@ -54,7 +54,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     if(appDomain != null)
                     {
-                        AppDomain.Unload(appDomain);
+                        // Donot unload appdomain as there are lot is issues reported against appdomain unload
+                        // any ways the process is going to die off.
+                        // AppDomain.Unload(appDomain);
                     }
 
                     if (!string.IsNullOrWhiteSpace(this.mergedTempConfigFile) && File.Exists(mergedTempConfigFile))
