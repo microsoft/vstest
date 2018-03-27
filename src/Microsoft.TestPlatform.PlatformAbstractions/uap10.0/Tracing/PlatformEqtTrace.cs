@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 logFileName = Guid.NewGuid().ToString();
             }
 
-            LogFile = Path.GetTempPath() + logFileName + ".TpTrace.log";
+            LogFile = Path.Combine(Path.GetTempPath(), logFileName, ".TpTrace.log");
             TraceLevel = PlatformTraceLevel.Verbose;
 
             return this.TraceInitialized();
