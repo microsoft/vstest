@@ -23,6 +23,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         public static string ErrorOnInitialization { get; set; }
 
+        public bool DoNotInitialize
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
         public void WriteLine(PlatformTraceLevel level, string message)
         {
             throw new NotImplementedException();
