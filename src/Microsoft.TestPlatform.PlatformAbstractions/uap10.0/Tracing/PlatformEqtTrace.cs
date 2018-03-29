@@ -30,6 +30,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static string LogFile { get; set; }
 
+        public bool DoNotInitialize
+        {
+            get;
+            set;
+        }
+
         private static PlatformTraceLevel TraceLevel { get; set; }
 
         /// <inheritdoc/>
