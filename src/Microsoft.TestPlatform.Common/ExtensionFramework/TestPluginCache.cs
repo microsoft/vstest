@@ -93,12 +93,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets a list of all extension paths filtered by input string.
         /// </summary>
         /// <param name="endsWithPattern">Pattern to filter extension paths.</param>
-        public List<string> GetExtensionPaths(string endsWithPattern)
+        public List<string> GetExtensionPaths(string endsWithPattern, bool skipDefaultExtensions = false)
         {
-            return this.GetFilteredExtensions(this.filterableExtensionPaths, endsWithPattern)
-                       .Concat(this.defaultExtensionPaths)
-                       .Concat(this.unfilterableExtensionPaths)
-                       .ToList();
+            var extensions = this.GetFilteredExtensions(this.filterableExtensionPaths, endsWithPattern);
+
+            if (!skipDefaultExtensions)
+            {
+                extensions = extensions.Concat(this.defaultExtensionPaths);
+            }
+
+            return extensions.Concat(this.unfilterableExtensionPaths).ToList();
         }
 
         /// <summary>
@@ -390,14 +394,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <returns>
         /// The list of files which match the regex pattern
         /// </returns>
-        protected virtual List<string> GetFilteredExtensions(List<string> extensions, string endsWithPattern)
+        protected virtual IEnumerable<string> GetFilteredExtensions(List<string> extensions, string endsWithPattern)
         {
             if (string.IsNullOrEmpty(endsWithPattern))
             {
                 return extensions;
             }
 
-            return extensions.Where(ext => ext.EndsWith(endsWithPattern, StringComparison.OrdinalIgnoreCase)).ToList();
+            return extensions.Where(ext => ext.EndsWith(endsWithPattern, StringComparison.OrdinalIgnoreCase));
         }
 
         private static bool TryMergeExtensionPaths(List<string> extensionsList, List<string> additionalExtensions, out List<string> mergedExtensionsList)

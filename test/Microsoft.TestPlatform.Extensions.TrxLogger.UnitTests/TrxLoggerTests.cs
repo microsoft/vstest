@@ -43,6 +43,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (!string.IsNullOrEmpty(this.testableTrxLogger?.trxFile) && File.Exists(this.testableTrxLogger.trxFile))
+            {
+                File.Delete(this.testableTrxLogger.trxFile);
+            }
+        }
+
         [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
@@ -660,6 +669,46 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray());
         }
 
+        [TestMethod]
+        public void CRLFCharactersShouldGetRetainedInTrx()
+        {
+            // To create default trx file, If LogFileName parameter not passed
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            string message = $"one line{ Environment.NewLine }second line\r\nthird line";
+            var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock("Pass1", new List<TestResultMessage> { new TestResultMessage(TestResultMessage.StandardOutCategory, message) });
+            
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
+
+            var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+            Assert.IsTrue(File.Exists(this.testableTrxLogger.trxFile), string.Format("TRX file: {0}, should have got created.", this.testableTrxLogger.trxFile));
+
+            string actualMessage = GetElementValueFromTrx(this.testableTrxLogger.trxFile, "StdOut");
+
+            Assert.IsNotNull(actualMessage);
+            Assert.IsTrue(string.Equals(message, actualMessage), string.Format("StdOut messages do not match. Expected:{0}, Actual:{1}", message, actualMessage));
+        }
+
+        private string GetElementValueFromTrx(string trxFileName, string fieldName)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            using (XmlReader reader = XmlReader.Create(file))
+            {
+                while(reader.Read())
+                {
+                    if(reader.Name.Equals(fieldName) && reader.NodeType == XmlNodeType.Element)
+                    {
+                        return reader.ReadElementContentAsString();
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private static TestCase CreateTestCase(string testCaseName)
         {
             return new ObjectModel.TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
@@ -672,10 +721,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             return testRunCompleteEventArgs;
         }
 
-        private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock()
+        private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock(string testCaseName = "Pass1", List<TestResultMessage> testResultMessages = null)
         {
-            TestCase passTestCase = CreateTestCase("Pass1");
+            TestCase passTestCase = CreateTestCase(testCaseName);
             var passResult = new ObjectModel.TestResult(passTestCase);
+
+            if (testResultMessages != null && testResultMessages.Any())
+            {
+                foreach (var message in testResultMessages)
+                {
+                    passResult.Messages.Add(message);
+                }
+            }
+
             return new Mock<TestResultEventArgs>(passResult);
         }
 
@@ -694,6 +752,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         internal override void PopulateTrxFile(string trxFileName, XmlElement rootElement)
         {
             this.trxFile = trxFileName;
+            base.PopulateTrxFile(trxFile, rootElement);
         }
     }
 }

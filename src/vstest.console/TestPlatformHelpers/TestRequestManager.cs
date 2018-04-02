@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             try
             {
-                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria))
+                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, discoveryPayload.TestPlatformOptions))
                 {
                     try
                     {
@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Run tests
             try
             {
-                this.RunTests(requestData, runCriteria, testRunEventsRegistrar);
+                this.RunTests(requestData, runCriteria, testRunEventsRegistrar, testRunRequestPayload.TestPlatformOptions);
                 EqtTrace.Info("TestRequestManager.RunTests: run tests completed.");
             }
             finally
@@ -499,7 +499,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return false;
         }
 
-        private void RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
+        private void RunTests(IRequestData requestData, TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, TestPlatformOptions options)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -509,7 +509,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 try
                 {
-                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria);
+                    this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(requestData, testRunCriteria, options);
 
                     this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);

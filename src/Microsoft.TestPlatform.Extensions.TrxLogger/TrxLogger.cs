@@ -379,8 +379,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                 using (var fs = File.Open(trxFileName, FileMode.Create))
                 {
-                    rootElement.OwnerDocument.Save(fs);
+                    using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize }))
+                    {
+                        rootElement.OwnerDocument.Save(writer);
+                        writer.Flush();
+                    }
                 }
+
                 String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
                 ConsoleOutput.Instance.Information(false, resultsFileMessage);
                 EqtTrace.Info(resultsFileMessage);
