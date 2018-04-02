@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             this.tcpListener.Start();
 
-            this.endPoint = ((IPEndPoint)this.tcpListener.LocalEndpoint).ToString();
+            this.endPoint = this.tcpListener.LocalEndpoint.ToString();
             EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", this.endPoint);
 
             // Serves a single client at the moment. An error in connection, or message loop just
