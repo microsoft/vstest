@@ -30,6 +30,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static string LogFile { get; set; }
 
+        public bool DoNotInitialize
+        {
+            get;
+            set;
+        }
+
         private static PlatformTraceLevel TraceLevel { get; set; }
 
         /// <inheritdoc/>
@@ -74,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 logFileName = Guid.NewGuid().ToString();
             }
 
-            LogFile = Path.Combine(Path.GetTempPath(), logFileName, ".TpTrace.log");
+            LogFile = Path.Combine(Path.GetTempPath(), logFileName + ".TpTrace.log");
             TraceLevel = PlatformTraceLevel.Verbose;
 
             return this.TraceInitialized();

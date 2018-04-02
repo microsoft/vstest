@@ -78,12 +78,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, 3);
+            InvokeAndVerifyInitialize(3);
+        }
 
-            parallelExecutionManager.Initialize();
+        [TestMethod]
+        public void InitializeShouldCallAllConcurrentManagersWithFalseFlagIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyInitialize(3, false);
+        }
 
-            Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Initialize(), Times.Once));
+        [TestMethod]
+        public void InitializeShouldCallAllConcurrentManagersWithTrueFlagIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyInitialize(3, true);
         }
 
         [TestMethod]
@@ -539,6 +546,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null, null);
                         });
             }
+        }
+
+        private void InvokeAndVerifyInitialize(int concurrentManagersCount, bool skipDefaultAdapters = false)
+        {
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, concurrentManagersCount);
+
+            parallelExecutionManager.Initialize(skipDefaultAdapters);
+
+            Assert.AreEqual(concurrentManagersCount, createdMockManagers.Count, $"Number of Concurrent Managers created should be {concurrentManagersCount}");
+            createdMockManagers.ForEach(em => em.Verify(m => m.Initialize(skipDefaultAdapters), Times.Once));
         }
     }
 }

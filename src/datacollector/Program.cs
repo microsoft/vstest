@@ -72,6 +72,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 EqtTrace.InitializeVerboseTrace(logFile);
             }
+            else
+            {
+                EqtTrace.DoNotInitailize = true;
+            }
 
             // Attach to exit of parent process
             var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
