@@ -65,7 +65,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldInitializeDataCollectionProcessIfDataCollectionIsEnabled()
         {
-            this.proxyExecutionManager.Initialize();
+            this.proxyExecutionManager.Initialize(false);
 
             mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
@@ -77,7 +77,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.ThrowsException<Exception>(() =>
             {
-                this.proxyExecutionManager.Initialize();
+                this.proxyExecutionManager.Initialize(false);
             });
         }
 
@@ -88,7 +88,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.ThrowsException<Exception>(() =>
             {
-                this.proxyExecutionManager.Initialize();
+                this.proxyExecutionManager.Initialize(false);
             });
 
             mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
@@ -106,7 +106,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
-            proxyExecutionManager.Initialize();
+            proxyExecutionManager.Initialize(false);
             Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
             Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
             StringAssert.Contains(proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2, "MyException");
@@ -115,7 +115,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void CancelShouldInvokeAfterTestCaseEnd()
         {
-            this.proxyExecutionManager.Cancel();
+            this.proxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             this.mockDataCollectionManager.Verify(x => x.AfterTestRunEnd(true, It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
@@ -127,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.ThrowsException<Exception>(() =>
             {
-                this.proxyExecutionManager.Cancel();
+                this.proxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
             });
         }
 
@@ -215,6 +215,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             {
                 Assert.AreEqual(envVaribale.Value, launchedStartInfo.EnvironmentVariables[envVaribale.Key], $"Expected environment variable {envVaribale.Key} : {envVaribale.Value} not found");
             }
+        }
+
+        [TestMethod]
+        public void TestHostManagerHostLaunchedTriggerShouldSendTestHostLaunchedEvent()
+        {
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+
+            this.mockTestHostManager.Raise(x => x.HostLaunched += null, new HostProviderEventArgs("launched", 0, 1234));
+
+            this.mockDataCollectionManager.Verify(x => x.TestHostLaunched(It.IsAny<int>()));
         }
     }
 

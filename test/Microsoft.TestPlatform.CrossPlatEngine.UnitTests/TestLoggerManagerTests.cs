@@ -172,6 +172,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         }
 
         [TestMethod]
+        public void HandleTestRunCompleteShouldDisposeLoggerManager()
+        {
+            counter = 0;
+            waitHandle.Reset();
+            // setup TestLogger
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
+
+            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan()));
+            testLoggerManager.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan())); // count should not increase because of second call.
+
+            Assert.AreEqual(counter, 1);
+        }
+
+        [TestMethod]
         public void HandleTestRunStatsChangeShouldInvokeTestRunChangedHandlerOfLoggers()
         {
             counter = 0;
@@ -508,7 +524,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            DiscoveryCompleteEventArgs discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
 
             // setup TestLogger
             var testLoggerManager = new DummyTestLoggerManager();
@@ -520,6 +536,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             // Assertions when discovery events registered
             Assert.AreEqual(counter, 0);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldDisposeLoggerManager()
+        {
+            counter = 0;
+            waitHandle.Reset();
+            // setup TestLogger
+            var testLoggerManager = new DummyTestLoggerManager();
+            testLoggerManager.InitializeLoggerByUri(new Uri(loggerUri), new Dictionary<string, string>());
+            testLoggerManager.EnableLogging();
+
+            var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(2, false);
+            testLoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs);
+            testLoggerManager.HandleDiscoveryComplete(discoveryCompleteEventArgs); // count should not increase because of second call.
+
+            Assert.AreEqual(counter, 1);
         }
 
         /// <summary>
@@ -915,6 +948,89 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
             mockMetricsCollection.Verify(
                 rd => rd.Add(TelemetryDataConstants.LoggerUsed, "TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLogger2,TestPlatform.CrossPlatEngine.UnitTests.TestLoggerManagerTests+ValidLoggerWithParameters"));
+        }
+
+        [TestMethod]
+        public void AreLoggersInitializedShouldReturnTrueWhenLoggersInitialized()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
+            var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerExtension"" />
+                      <Logger uri=""testlogger://logger2""></Logger>
+                      <Logger assemblyQualifiedName=""" + assemblyQualifiedName + @""" codeBase=""" + codeBase + @"""></Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
+            Assert.IsTrue(testLoggerManager.LoggersInitialized);
+        }
+
+        [TestMethod]
+        public void AreLoggersInitializedShouldReturnFalseWhenLoggersNotInitialized()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
+            var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerExtension"" />
+                      <Logger uri=""testlogger://logger2""></Logger>
+                      <Logger assemblyQualifiedName=""" + assemblyQualifiedName + @""" codeBase=""" + codeBase + @"""></Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+
+            Assert.IsFalse(testLoggerManager.LoggersInitialized);
+        }
+
+        [TestMethod]
+        public void AreLoggersInitializedShouldReturnFalseWhenNoLoggersPresent()
+        {
+            ValidLoggerWithParameters.Reset();
+            var mockRequestData = new Mock<IRequestData>();
+            var mockMetricsCollection = new Mock<IMetricsCollection>();
+            mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+            var assemblyQualifiedName = typeof(ValidLoggerWithParameters).AssemblyQualifiedName;
+            var codeBase = typeof(TestLoggerManagerTests).GetTypeInfo().Assembly.Location;
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+            var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+            testLoggerManager.Initialize(settingsXml);
+
+            Assert.IsFalse(testLoggerManager.LoggersInitialized);
         }
 
         [TestMethod]

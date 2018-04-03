@@ -219,22 +219,13 @@
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal and normal.
+      Example: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
+      Allowed values for verbosity: quiet, minimal, normal and detailed.
 
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      More info on Console Logger here : https://aka.ms/console-logger</source>
+        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Especifique un registrador para los resultados de pruebas. Por ejemplo, para registrar los resultados en un 
       archivo de resultados de pruebas (TRX) de Visual Studio, use /logger:trx[;LogFileName=&lt;Adopta como predeterminado un nombre de archivo único&gt;]
       Crea el archivo en el directorio TestResults con el valor dado de LogFileName.
@@ -255,7 +246,7 @@
                 [;Platform=&lt;Adopta como predeterminado "Cualquier CPU"&gt;]
                 [;Flavor=&lt;Adopta como predeterminado "Depurar"&gt;]
                 [;RunTitle=&lt;título&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--registrador | / registrador: &lt; Logger Uri/FriendlyName &gt;
       Especifique un registrador para los resultados de la prueba.  Por ejemplo, para registrar los resultados en un archivo de resultados de prueba (TRANS) de Visual Studio use /logger:trx.
@@ -758,12 +749,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;VersiónDeMarco&gt;
+      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;VersiónDeMarco&gt;
       Versión de .Net Framework de destino que debe usarse para la ejecución de pruebas. 
       Los valores válidos son: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0", etc.
       Otros valores admitidos son: Framework35, Framework40, Framework45 y FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; versión de Framework &gt;
       Trabajar en .net Framework versión que se utilizará para la ejecución de la prueba. 
@@ -782,9 +773,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">Versión de .Net Framework no válida ({0}). Proporcione el nombre completo de la plataforma de destino. Otras versiones de .Net Framework admitidas son Framework35, Framework40, Framework45 y FrameworkCore10.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">Versión de .Net Framework no válida ({0}). Proporcione el nombre completo de la plataforma de destino. Otras versiones de .Net Framework admitidas son Framework35, Framework40, Framework45 y FrameworkCore10.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Válido .net Framework versión: {0}. proporcione el nombre completo de la TargetFramework. Sí admite .net Framework versiones son Framework35, Framework40 y Framework45.</target>
         </alt-trans>
@@ -1569,6 +1560,47 @@
         <source>Data collectors other than Code Coverage and Microsoft Fakes configured via run settings are not supported with embedded test settings. Please see https://aka.ms/vstest-configure-datacollector for more information. Run settings: {0}.</source>
         <target state="translated">Los recopiladores de datos diferentes de Cobertura de código y Microsoft Fakes configurados a través de la configuración de ejecución no se admiten con la configuración de pruebas integrada. Consulte https://aka.ms/vstest-configure-datacollector para obtener más información. Configuración de ejecución: {0}.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="EnableLoggerArgumentsInNetCore">
+        <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Creates file in TestResults directory with given LogFileName.
+
+      Change the verbosity level in log messages for console logger as shown below
+      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal, normal and detailed.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger</source>
+        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Specify a logger for test results. For example, to log results into a 
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Creates file in TestResults directory with given LogFileName.
+
+      Change the verbosity level in log messages for console logger as shown below
+      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      Allowed values for verbosity: quiet, minimal, normal and detailed.
+
+      Change the diagnostic level prefix for console logger as shown below
+      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      More info on Console Logger here : https://aka.ms/console-logger
+
+      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+      Example: /logger:TfsPublisher;
+                Collection=&lt;team project collection url&gt;;
+                BuildName=&lt;build name&gt;;
+                TeamProject=&lt;team project name&gt;
+                [;Platform=&lt;Defaults to "Any CPU"&gt;]
+                [;Flavor=&lt;Defaults to "Debug"&gt;]
+                [;RunTitle=&lt;title&gt;]</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
+        <source>CollectDump option for Blame is not supported for this platform.</source>
+        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

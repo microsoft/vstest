@@ -285,7 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
 
-            mockExecutionManager.Verify(e => e.Cancel());
+            mockExecutionManager.Verify(e => e.Cancel(It.IsAny<ITestRunEventsHandler>()));
             this.SendSessionEnd();
         }
 
@@ -313,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
 
-            mockExecutionManager.Verify(e => e.Abort());
+            mockExecutionManager.Verify(e => e.Abort(It.IsAny<ITestRunEventsHandler>()));
             this.SendSessionEnd();
         }
 

@@ -300,9 +300,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 {
                     EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
 
-                    // If there is an exception during test run request creation or some time during the process
-                    // In such cases, TestPlatform will never send a TestRunComplete event and IDE need to be sent a run complete message
-                    // We need recoverability in translationlayer-designmode scenarios
                     var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
                     var runCompletePayload = new TestRunCompletePayload()
@@ -331,9 +328,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     {
                         EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
 
-                        // If there is an exception during test discovery request creation or some time during the process
-                        // In such cases, TestPlatform will never send a DiscoveryComplete event and IDE need to be sent a discovery complete message
-                        // We need recoverability in translationlayer-designmode scenarios
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 

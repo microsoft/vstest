@@ -252,6 +252,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
+        public void TestHostLaunched(int processId)
+        {
+            if (!this.isDataCollectionEnabled)
+            {
+                return;
+            }
+
+            var testHostLaunchedEventArgs = new TestHostLaunchedEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, processId);
+
+            this.SendEvent(testHostLaunchedEventArgs);
+        }
+
+        /// <inheritdoc/>
         public bool SessionStarted()
         {
             // If datacollectors are not configured or datacollection is not enabled, return false.
@@ -327,10 +340,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (disposing)
                 {
+                    CleanupPlugins();
                 }
 
                 this.disposed = true;
             }
+        }
+
+        private void CleanupPlugins()
+        {
+            EqtTrace.Info("DataCollectionManager.CleanupPlugins: CleanupPlugins called");
+
+            if (!this.isDataCollectionEnabled)
+            {
+                return;
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DataCollectionManager.CleanupPlugins: Cleaning up {0} plugins", this.RunDataCollectors.Count);
+            }
+
+            RemoveDataCollectors(new List<DataCollectorInformation>(this.RunDataCollectors.Values));
+
+            EqtTrace.Info("DataCollectionManager.CleanupPlugins: CleanupPlugins finished");
         }
 
         #region Load and Initialize DataCollectors

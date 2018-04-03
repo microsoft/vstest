@@ -11,16 +11,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
     /// </summary>
     internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyExecutionManager, ITestRunEventsHandler>, IParallelProxyExecutionManager
     {
+        private IDataSerializer dataSerializer;
+
         #region TestRunSpecificData
 
         // This variable id to differentiate between implicit (abort requested by testPlatform) and explicit (test host aborted) abort.
@@ -43,6 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private ParallelRunDataAggregator currentRunDataAggregator;
 
         private IRequestData requestData;
+        private bool skipDefaultAdapters;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -60,22 +67,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         #endregion
 
         public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel)
-            : base(actualProxyManagerCreator, parallelLevel, true)
+            : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, true)
         {
-            this.requestData = requestData;
         }
 
         public ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+            : this(requestData, actualProxyManagerCreator, JsonDataSerializer.Instance, parallelLevel, sharedHosts)
+        {
+        }
+
+        internal ParallelProxyExecutionManager(IRequestData requestData, Func<IProxyExecutionManager> actualProxyManagerCreator, IDataSerializer dataSerializer, int parallelLevel, bool sharedHosts)
             : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
             this.requestData = requestData;
+            this.dataSerializer = dataSerializer;
         }
 
         #region IProxyExecutionManager
 
-        public void Initialize()
+        public void Initialize(bool skipDefaultAdapters)
         {
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(), doActionsInParallel: true);
+            this.skipDefaultAdapters = skipDefaultAdapters;
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(skipDefaultAdapters), doActionsInParallel: true);
             this.IsInitialized = true;
         }
 
@@ -120,16 +133,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             return this.StartTestRunPrivate(eventHandler);
         }
 
-        public void Abort()
+        public void Abort(ITestRunEventsHandler runEventsHandler)
         {
             // Test platform initiated abort.
             abortRequested = true;
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(), doActionsInParallel: true);
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Abort(runEventsHandler), doActionsInParallel: true);
         }
 
-        public void Cancel()
+        public void Cancel(ITestRunEventsHandler runEventsHandler)
         {
-            this.DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(), doActionsInParallel: true);
+            this.DoActionOnAllManagers((proxyManager) => proxyManager.Cancel(runEventsHandler), doActionsInParallel: true);
         }
 
         public void Close()
@@ -307,7 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 if (!proxyExecutionManager.IsInitialized)
                 {
-                    proxyExecutionManager.Initialize();
+                    proxyExecutionManager.Initialize(this.skipDefaultAdapters);
                 }
 
                 Task.Run(() =>
@@ -325,10 +338,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Just in case, the actual execution couldn't start for an instance. Ensure that
                     // we call execution complete since we have already fetched a source. Otherwise
                     // execution will not terminate
-                    if (EqtTrace.IsWarningEnabled)
+                    if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Warning("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
+                        EqtTrace.Error("ParallelProxyExecutionManager: Failed to trigger execution. Exception: " + t.Exception);
                     }
+
+                    var handler = this.GetHandlerForGivenManager(proxyExecutionManager);
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = t.Exception.ToString() };
+                    handler.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
+                    handler.HandleLogMessage(TestMessageLevel.Error, t.Exception.ToString());
 
                     // Send a run complete to caller. Similar logic is also used in ProxyExecutionManager.StartTestRun
                     // Differences:
@@ -336,7 +354,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Ensure that the test run aggregator in parallel run events handler doesn't add these statistics
                     // (since the test run didn't even start)
                     var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero);
-                    this.GetHandlerForGivenManager(proxyExecutionManager).HandleTestRunComplete(completeArgs, null, null, null);
+                    handler.HandleTestRunComplete(completeArgs, null, null, null);
                 },
                 TaskContinuationOptions.OnlyOnFaulted);
             }

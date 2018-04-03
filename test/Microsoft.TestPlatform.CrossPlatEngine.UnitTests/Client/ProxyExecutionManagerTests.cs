@@ -23,6 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Moq;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     [TestClass]
     public class ProxyExecutionManagerTests : ProxyBaseManagerTests
@@ -211,6 +212,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunShouldNotInitializeDefaultAdaptersIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyStartTestRun(true);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldInitializeDefaultAdaptersIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyStartTestRun(false);
+        }
+
+        [TestMethod]
         public void StartTestRunShouldIntializeTestHost()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
@@ -277,6 +290,73 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
             mockTestRunEventsHandler.Verify(s => s.HandleTestRunComplete(It.Is<TestRunCompleteEventArgs>(t => t.IsAborted == true), null, null, null));
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndCallHandleRawMessageOfTestRunComplete()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>())).Returns(MessageType.ExecutionComplete);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            {
+                var messageType = rawMessage.Contains(MessageType.ExecutionComplete) ? MessageType.ExecutionComplete : MessageType.TestMessage;
+                var message = new Message
+                {
+                    MessageType = messageType
+                };
+
+                return message;
+            });
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            mockTestRunEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.ExecutionComplete))), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndCallHandleRawMessageOfTestMessage()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>())).Returns(MessageType.ExecutionComplete);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            {
+                var messageType = rawMessage.Contains(MessageType.ExecutionComplete) ? MessageType.ExecutionComplete : MessageType.TestMessage;
+                var message = new Message
+                {
+                    MessageType = messageType
+                };
+
+                return message;
+            });
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            mockTestRunEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndCallHandleLogMessageOfError()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            mockTestRunEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -387,7 +467,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-            this.testExecutionManager.Cancel();
+            this.testExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             this.mockRequestSender.Verify(s => s.SendTestRunCancel(), Times.Never);
         }
@@ -399,11 +479,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>())).Returns(MessageType.ExecutionComplete);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
             {
+                var messageType = rawMessage.Contains(MessageType.ExecutionComplete) ? MessageType.ExecutionComplete : MessageType.TestMessage;
                 var message = new Message
                 {
-                    MessageType = MessageType.ExecutionComplete
+                    MessageType = messageType
                 };
 
                 return message;
@@ -560,6 +644,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Task.Delay(200).Wait();
 
             manualResetEvent.Set();
+        }
+
+        private void InvokeAndVerifyStartTestRun(bool skipDefaultAdapters)
+        {
+            TestPluginCache.Instance = null;
+            TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
+
+            try
+            {
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
+
+                this.testExecutionManager.Initialize(skipDefaultAdapters);
+                this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
+
+                this.mockRequestSender.Verify(s => s.InitializeExecution(expectedResult), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
         }
 
         //private void SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize()

@@ -3,6 +3,7 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -240,6 +241,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldNotInitializeDefaultAdaptersIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyDiscoverTests(true);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldInitializeDefaultAdaptersIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyDiscoverTests(false);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldNotIntializeTestHost()
         {
             // Setup mocks.
@@ -269,6 +282,76 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldCatchExceptionAndCallHandleRawMessageOfDiscoveryComplete()
+        {
+            // Setup mocks.
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            {
+                var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
+                var message = new Message
+                {
+                    MessageType = messageType
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.DiscoveryComplete))), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCatchExceptionAndCallHandleRawMessageOfTestMessage()
+        {
+            // Setup mocks.
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
+
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            {
+                var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
+                var message = new Message
+                {
+                    MessageType = messageType
+                };
+
+                return message;
+            });
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldCatchExceptionAndCallHandleLogMessageOfError()
+        {
+            // Setup mocks.
+            Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
+
+            // Act.
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldInitiateServerDiscoveryLoop()
         {
             // Setup mocks.
@@ -286,15 +369,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             Mock<ITestDiscoveryEventsHandler2> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
 
-            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns(() =>
-           {
-               var message = new Message
-               {
-                   MessageType = MessageType.DiscoveryComplete
-               };
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.TestMessage, It.IsAny<TestMessagePayload>())).Returns(MessageType.TestMessage);
+            this.mockDataSerializer.Setup(ds => ds.SerializePayload(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>())).Returns(MessageType.DiscoveryComplete);
 
-               return message;
-           });
+            this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>())).Returns((string rawMessage) =>
+            {
+                var messageType = rawMessage.Contains(MessageType.DiscoveryComplete) ? MessageType.DiscoveryComplete : MessageType.TestMessage;
+                var message = new Message
+                {
+                    MessageType = messageType
+                };
+
+                return message;
+            });
 
             // Act.
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
@@ -375,6 +462,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once);
+        }
+
+        private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)
+        {
+            TestPluginCache.Instance = null;
+            TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
+
+            try
+            {
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
+
+                this.testDiscoveryManager.Initialize(skipDefaultAdapters);
+                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(expectedResult), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
         }
 
         //private void SetupAndInitializeTestRequestSender()

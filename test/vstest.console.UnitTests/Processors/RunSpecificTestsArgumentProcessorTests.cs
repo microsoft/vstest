@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading.Tasks;
     using System.Runtime.Versioning;
+    using System.Threading.Tasks;
 
     using CommandLineUtilities;
     using CoreUtilities.Tracing.Interfaces;
@@ -18,16 +17,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Publisher;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
-
     using vstest.console.UnitTests.Processors;
 
     [TestClass]
@@ -89,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunSpecificTestsArgumentProcessorCapabilities capabilities = new RunSpecificTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/Tests", capabilities.CommandName);
-            StringAssert.Contains(capabilities.HelpContentResourceName, "/Tests:<Test Names>\n      Run tests with names that match the provided values.");
+            StringAssert.Contains(capabilities.HelpContentResourceName, "/Tests:<Test Names>" + Environment.NewLine + "      Run tests with names that match the provided values.");
 
             Assert.AreEqual(HelpContentPriority.RunSpecificTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(true, capabilities.IsAction);
@@ -108,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(null); });
@@ -119,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(String.Empty); });
@@ -130,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(" "); });
@@ -141,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
             Assert.ThrowsException<CommandLineException>(() => { executor.Initialize(" , "); });
@@ -152,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
@@ -163,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
@@ -173,71 +169,68 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorExecuteForValidSourceWithTestCaseFilterShouldThrowCommandLineException()
         {
             this.ResetAndAddSourceToCommandLineOptions();
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
             CommandLineOptions.Instance.TestCaseFilterValue = "Filter";
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchTestPlatformExceptionThrownDuringDiscoveryAndReturnFail()
+        public void ExecutorExecuteShouldThrowTestPlatformExceptionThrownDuringDiscovery()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<TestPlatformException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchInvalidOperationExceptionThrownDuringDiscoveryAndReturnFail()
+        public void ExecutorExecuteShouldThrowInvalidOperationExceptionThrownDuringDiscovery()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new InvalidOperationException("DummyInvalidOperationException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<InvalidOperationException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchSettingsExceptionThrownDuringDiscoveryAndReturnFail()
+        public void ExecutorExecuteShouldThrowSettingsExceptionThrownDuringDiscovery()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
 
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Throws(new SettingsException("DummySettingsException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<SettingsException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchTestPlatformExceptionThrownDuringExecutionAndReturnFail()
+        public void ExecutorExecuteShouldThrowTestPlatformExceptionThrownDuringExecution()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -249,8 +242,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
             mockTestRunRequest.Setup(dr => dr.ExecuteAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
@@ -258,12 +251,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("Test1");
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<TestPlatformException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchSettingsExceptionThrownDuringExecutionAndReturnFail()
+        public void ExecutorExecuteShouldThrowSettingsExceptionThrownDuringExecution()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -275,8 +267,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
             mockTestRunRequest.Setup(dr => dr.ExecuteAsync()).Throws(new SettingsException("DummySettingsException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
@@ -284,12 +276,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("Test1");
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<SettingsException>(() => executor.Execute());
         }
 
         [TestMethod]
-        public void ExecutorExecuteShouldCatchInvalidOperationExceptionThrownDuringExecutionAndReturnFail()
+        public void ExecutorExecuteShouldThrowInvalidOperationExceptionThrownDuringExecution()
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
@@ -300,9 +291,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-            mockTestRunRequest.Setup(dr => dr.ExecuteAsync()).Throws(new SettingsException("DummySettingsException"));
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestRunRequest.Setup(dr => dr.ExecuteAsync()).Throws(new InvalidOperationException("DummySettingsException"));
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             this.ResetAndAddSourceToCommandLineOptions();
 
@@ -311,8 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("Test1");
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<InvalidOperationException>(() => executor.Execute());
         }
 
         [TestMethod]
@@ -327,7 +317,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             CommandLineOptions.Instance.TestAdapterPath = @"C:\Foo";
 
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(new List<TestCase>()));
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
@@ -348,7 +338,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.ResetAndAddSourceToCommandLineOptions();
 
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(new List<TestCase>()));
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
 
@@ -373,8 +363,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
@@ -399,8 +389,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri1"), "Source1"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
@@ -426,8 +416,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri1"), "Source1"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
@@ -452,8 +442,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2", new Uri("http://FooTestUri1"), "Source1"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);
@@ -479,8 +469,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             list.Add(new TestCase("Test2(c,d)", new Uri("http://FooTestUri1"), "Source1"));
             mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager);

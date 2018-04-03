@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -168,16 +167,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            var success = true;
             if (this.commandLineOptions.Sources.Any())
             {
-                success = this.RunTests(this.commandLineOptions.Sources);
+                this.RunTests(this.commandLineOptions.Sources);
             }
 
-            return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
+            return ArgumentProcessorResult.Success;
         }
 
-        private bool RunTests(IEnumerable<string> sources)
+        private void RunTests(IEnumerable<string> sources)
         {
             // create/start test run
             if (EqtTrace.IsInfoEnabled)
@@ -197,14 +195,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var keepAlive = false;
 
             var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive, TestPlatformOptions= new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue } };
-            var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
+            this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is completed.");
             }
-
-            return result;
         }
 
         private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar

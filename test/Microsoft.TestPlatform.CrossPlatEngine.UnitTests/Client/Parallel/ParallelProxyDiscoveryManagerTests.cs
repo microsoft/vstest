@@ -10,12 +10,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -55,12 +57,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, 3, false);
+            InvokeAndVerifyInitialize(3);
+        }
 
-            parallelDiscoveryManager.Initialize();
+        [TestMethod]
+        public void InitializeShouldCallAllConcurrentManagersWithFalseFlagIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyInitialize(3, false);
+        }
 
-            Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
-            createdMockManagers.ForEach(dm => dm.Verify(m => m.Initialize(), Times.Once));
+
+        [TestMethod]
+        public void InitializeShouldCallAllConcurrentManagersWithTrueFlagIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyInitialize(3, true);
         }
 
         [TestMethod]
@@ -135,6 +145,50 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void DiscoveryTestsShouldCatchExceptionAndHandleLogMessageOfError()
+        {
+            // Ensure that second discovery manager never starts. Expect 10 total tests.
+            // Override DiscoveryComplete since overall aborted should be true
+            var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false, totalTests: 10);
+            this.createdMockManagers[1].Reset();
+            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
+                .Throws<NotImplementedException>();
+            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => { this.discoveryCompleted.Set(); });
+
+            Task.Run(() =>
+            {
+                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
+            });
+
+            // Processed sources should be 1 since the 2nd source is never discovered
+            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            mockHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoveryTestsShouldCatchExceptionAndHandleRawMessageOfTestMessage()
+        {
+            // Ensure that second discovery manager never starts. Expect 10 total tests.
+            // Override DiscoveryComplete since overall aborted should be true
+            var parallelDiscoveryManager = this.SetupDiscoveryManager(this.proxyManagerFunc, 2, false, totalTests: 10);
+            this.createdMockManagers[1].Reset();
+            this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
+                .Throws<NotImplementedException>();
+            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+                .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>>((t, l) => { this.discoveryCompleted.Set(); });
+
+            Task.Run(() =>
+            {
+                parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
+            });
+
+            // Processed sources should be 1 since the 2nd source is never discovered
+            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            mockHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
+        }
+
+        [TestMethod]
         public void HandlePartialDiscoveryCompleteShouldCreateANewProxyDiscoveryManagerIfIsAbortedIsTrue()
         {
             this.proxyManagerFuncCalled = false;
@@ -202,6 +256,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
             }
+        }
+
+        private void InvokeAndVerifyInitialize(int concurrentManagersCount, bool skipDefaultAdapters = false)
+        {
+            var parallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.mockRequestData.Object, this.proxyManagerFunc, concurrentManagersCount, false);
+
+            // Action
+            parallelDiscoveryManager.Initialize(skipDefaultAdapters);
+
+            // Verify
+            Assert.AreEqual(concurrentManagersCount, createdMockManagers.Count, $"Number of Concurrent Managers created should be {concurrentManagersCount}");
+            createdMockManagers.ForEach(dm => dm.Verify(m => m.Initialize(skipDefaultAdapters), Times.Once));
         }
     }
 }

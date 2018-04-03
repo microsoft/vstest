@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -20,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
     public class TestRequestHandler : IDisposable, ITestRequestHandler
     {
@@ -131,14 +129,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
             var data = this.dataSerializer.SerializePayload(MessageType.TestCasesFound, discoveredTestCases, this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
             var data = this.dataSerializer.SerializePayload(MessageType.TestRunStatsChange, testRunChangedArgs, this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -148,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     MessageType.TestMessage,
                     new TestMessagePayload { MessageLevel = messageLevel, Message = message },
                     this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -168,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         ExecutorUris = executorUris
                     },
                     this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -184,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         Metrics = discoveryCompleteEventArgs.Metrics
                     },
                     this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -201,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var data = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttached,
                 testProcessStartInfo, protocolVersion);
 
-            this.channel.Send(data);
+            this.SendData(data);
 
             EqtTrace.Verbose("Waiting for LaunchAdapterProcessWithDebuggerAttached ack");
             waitHandle.Wait();
@@ -321,7 +319,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case MessageType.CancelTestRun:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();
-                    testHostManagerFactory.GetExecutionManager().Cancel();
+                    testHostManagerFactory.GetExecutionManager().Cancel(new TestRunEventsHandler(this));
                     break;
 
                 case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
@@ -331,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 case MessageType.AbortTestRun:
                     jobQueue.Pause();
                     this.testHostManagerFactoryReady.Wait();
-                    testHostManagerFactory.GetExecutionManager().Abort();
+                    testHostManagerFactory.GetExecutionManager().Abort(new TestRunEventsHandler(this));
                     break;
 
                 case MessageType.SessionEnd:
@@ -389,5 +387,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
         }
 
+        private void SendData(string data)
+        {
+            EqtTrace.Verbose("TestRequestHandler.SendData:  sending data from testhost: {0}", data);
+            this.channel.Send(data);
+        }
     }
 }

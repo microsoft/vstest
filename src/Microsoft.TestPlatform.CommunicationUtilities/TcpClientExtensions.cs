@@ -25,14 +25,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 CancellationToken cancellationToken)
         {
             Exception error = null;
+            var remoteEndPoint = client.Client.RemoteEndPoint.ToString();
+            var localEndPoint = client.Client.LocalEndPoint.ToString();
 
             // Set read timeout to avoid blocking receive raw message
             while (channel != null && !cancellationToken.IsCancellationRequested)
             {
+                EqtTrace.Verbose("TcpClientExtensions.MessageLoopAsync: Polling on remoteEndPoint: {0} localEndPoint: {1}", remoteEndPoint, localEndPoint);
+
                 try
                 {
                     if (client.Client.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
                     {
+                        EqtTrace.Verbose("TcpClientExtensions.MessageLoopAsync: NotifyDataAvailable remoteEndPoint: {0} localEndPoint: {1}", remoteEndPoint, localEndPoint);
                         channel.NotifyDataAvailable();
                     }
                 }
@@ -43,14 +48,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             && socketException.SocketErrorCode == SocketError.TimedOut)
                     {
                         EqtTrace.Info(
-                                "Socket: Message loop: failed to receive message due to read timeout {0}",
-                                ioException);
+                                "Socket: Message loop: failed to receive message due to read timeout {0}, remoteEndPoint: {1} localEndPoint: {2}",
+                                ioException,
+                                remoteEndPoint,
+                                localEndPoint);
                     }
                     else
                     {
                         EqtTrace.Error(
-                                "Socket: Message loop: failed to receive message due to socket error {0}",
-                                ioException);
+                                "Socket: Message loop: failed to receive message due to socket error {0}, remoteEndPoint: {1} localEndPoint: {2}",
+                                ioException,
+                                remoteEndPoint,
+                                localEndPoint);
                         error = ioException;
                         break;
                     }
@@ -58,8 +67,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 catch (Exception exception)
                 {
                     EqtTrace.Error(
-                            "Socket: Message loop: failed to receive message {0}",
-                            exception);
+                            "Socket: Message loop: failed to receive message {0}, remoteEndPoint: {1} localEndPoint: {2}",
+                            exception,
+                        remoteEndPoint,
+                        localEndPoint);
                     error = exception;
                     break;
                 }
@@ -67,6 +78,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // Try clean up and raise client disconnected events
             errorHandler(error);
+
+            EqtTrace.Verbose("TcpClientExtensions.MessageLoopAsync: exiting MessageLoopAsync remoteEndPoint: {0} localEndPoint: {1}", remoteEndPoint, localEndPoint);
 
             return Task.FromResult(0);
         }

@@ -45,6 +45,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
             this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
+
+            testHostManager.HostLaunched += this.TestHostLaunchedHandler;
+        }
+
+        private void TestHostLaunchedHandler(object sender, HostProviderEventArgs e)
+        {
+            this.ProxyDataCollectionManager.TestHostLaunched(e.ProcessId);
         }
 
         /// <summary>
@@ -65,8 +72,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
+        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
         /// </summary>
-        public override void Initialize()
+        public override void Initialize(bool skipDefaultAdapters)
         {
             this.ProxyDataCollectionManager.Initialize();
 
@@ -90,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 throw;
             }
 
-            base.Initialize();
+            base.Initialize(skipDefaultAdapters);
         }
 
         /// <summary>
@@ -122,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc/>
-        public override void Cancel()
+        public override void Cancel(ITestRunEventsHandler eventHandler)
         {
             try
             {
@@ -130,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             finally
             {
-                base.Cancel();
+                base.Cancel(eventHandler);
             }
         }
 

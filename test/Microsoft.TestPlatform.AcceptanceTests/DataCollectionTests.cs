@@ -117,9 +117,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("SampleUnitTestProject2.UnitTest1.PassingTest2");
             this.StdOutputContains("SampleUnitTestProject2.UnitTest1.FailingTest2");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
+            this.StdOutputContains("Data collector 'SampleDataCollector' message: TestHostLaunched");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: my warning");
             this.StdErrorContains("Data collector 'SampleDataCollector' message: Data collector caught an exception of type 'System.Exception': 'my exception'. More details:");
+            this.StdOutputContains("Data collector 'SampleDataCollector' message: Dispose called.");
 
             // Verify attachments
             var isTestRunLevelAttachmentFound = false;

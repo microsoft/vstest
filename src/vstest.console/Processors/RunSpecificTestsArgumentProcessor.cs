@@ -12,8 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -210,17 +208,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidTestCaseFilterValueForSpecificTests));
             }
 
-            bool result = false;
-
             this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             // Discover tests from sources and filter on every discovery reported.
-            result = this.DiscoverTestsAndSelectSpecified(this.commandLineOptions.Sources);
+            this.DiscoverTestsAndSelectSpecified(this.commandLineOptions.Sources);
 
             // Now that tests are discovered and filtered, we run only those selected tests.
-            result = result && this.ExecuteSelectedTests();
+            this.ExecuteSelectedTests();
 
-            return result ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
+            return ArgumentProcessorResult.Success;
         }
 
         #endregion
@@ -231,7 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// Discovers tests from the given sources and selects only specified tests.
         /// </summary>
         /// <param name="sources"> Test source assemblies paths. </param>
-        private bool DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
+        private void DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
         {
             this.output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
@@ -239,16 +235,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
-            return this.testRequestManager.DiscoverTests(
+            this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = sources, RunSettings = this.effectiveRunSettings }, this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
         }
 
         /// <summary>
         ///  Executes the selected tests
         /// </summary>
-        private bool ExecuteSelectedTests()
+        private void ExecuteSelectedTests()
         {
-            bool result = true;
             if (this.selectedTestCases.Count > 0)
             {
                 if (this.undiscoveredFilters.Count() != 0)
@@ -263,7 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
                 var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue }};
-                result &= this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
+                this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
             }
             else
             {
@@ -286,8 +281,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 this.output.Warning(false, warningMessage);
             }
-
-            return result;
         }
 
         /// <summary>

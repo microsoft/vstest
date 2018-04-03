@@ -196,12 +196,12 @@
       <VSIXSubPath>Extensions\TestImpact\ComComponents\x86</VSIXSubPath>
     </VsixSourceItem>
 
-   <!-- CUIT -->
+    <!-- CUIT -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\CUITPlugins\*.*" Exclude="$(VsixInputFileLocation)\CUITPlugins\*.pdb">
       <VSIXSubPath>CUITPlugins</VSIXSubPath>
     </VsixSourceItem>
 
-   <!-- V1 Data Collectors -->
+    <!-- V1 Data Collectors -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\V1\*.*" Exclude="$(VsixInputFileLocation)\Extensions\V1\*.pdb">
       <VSIXSubPath>Extensions\V1</VSIXSubPath>
     </VsixSourceItem>
@@ -234,6 +234,9 @@
     </VsixSourceItem>
 
     <VsixSourceItem Include="$(VsixInputFileLocation)\*.*" Exclude="$(VsixInputFileLocation)\*.pdb" />
+
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.exe" Ngen="true" NgenArchitecture="X64" NgenPriority="1" NgenApplication="$(VsixInputFileLocation)\testhost.exe" /> 
+    <VsixSourceItem Update="$(VsixInputFileLocation)\testhost.x86.exe" Ngen="true" NgenArchitecture="X86" NgenPriority="1" NgenApplication="$(VsixInputFileLocation)\testhost.x86.exe" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License.rtf">

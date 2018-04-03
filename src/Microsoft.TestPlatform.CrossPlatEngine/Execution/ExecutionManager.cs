@@ -22,8 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     /// </summary>
     public class ExecutionManager : IExecutionManager
     {
-        private ITestRunEventsHandler testRunEventsHandler;
-
         private readonly ITestPlatformEventSource testPlatformEventSource;
 
         private BaseRunTests activeTestRun;
@@ -85,7 +83,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler runEventsHandler)
         {
-            this.testRunEventsHandler = runEventsHandler;
             try
             {
                 this.activeTestRun = new RunTestsWithSources(this.requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
@@ -94,8 +91,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
             catch(Exception e)
             {
-                this.testRunEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
-                this.Abort();
+                runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
+                this.Abort(runEventsHandler);
             }
             finally
             {
@@ -120,8 +117,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler runEventsHandler)
         {
-            this.testRunEventsHandler = runEventsHandler;
-
             try
             {
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
@@ -130,8 +125,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
             catch(Exception e)
             {
-                this.testRunEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
-                this.Abort();
+                runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
+                this.Abort(runEventsHandler);
             }
             finally
             {
@@ -142,12 +137,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Cancel the test execution.
         /// </summary>
-        public void Cancel()
+        public void Cancel(ITestRunEventsHandler testRunEventsHandler)
         {
             if (this.activeTestRun == null)
             {
                 var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, true, false, null, null, TimeSpan.Zero);
-                this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
+                testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else
             {
@@ -158,12 +153,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Aborts the test execution.
         /// </summary>
-        public void Abort()
+        public void Abort(ITestRunEventsHandler testRunEventsHandler)
         {
             if (this.activeTestRun == null)
             {
                 var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero);
-                this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
+                testRunEventsHandler.HandleTestRunComplete(testRunCompleteEventArgs, null, null, null);
             }
             else
             {

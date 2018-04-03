@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
+        private bool skipDefaultAdapters;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -77,9 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
+        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
         /// </summary>
-        public virtual void Initialize()
+        public virtual void Initialize(bool skipDefaultAdapters)
         {
+            this.skipDefaultAdapters = skipDefaultAdapters;
             this.IsInitialized = true;
         }
 
@@ -152,13 +155,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
+
+                // Log error message to design mode and CLI.
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
+                this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
                 this.LogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
                 // created to replace the current one. This will help if the current execution manager is aborted due to irreparable error
                 // and the test host is lost as well.
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, null, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                var testRunCompletePayload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
+                this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, testRunCompletePayload));
                 this.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
@@ -168,8 +177,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Cancels the test run.
         /// </summary>
-        public virtual void Cancel()
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        public virtual void Cancel(ITestRunEventsHandler eventHandler)
         {
+            // Just in case ExecuteAsync isn't called yet, set the eventhandler
+            if(this.baseTestRunEventsHandler == null)
+            {
+                this.baseTestRunEventsHandler = eventHandler;
+            }
+
             // Cancel fast, try to stop testhost deployment/launch
             this.cancellationTokenSource.Cancel();
             if (this.isCommunicationEstablished)
@@ -187,8 +203,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Aborts the test run.
         /// </summary>
-        public void Abort()
+        /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
+        public void Abort(ITestRunEventsHandler eventHandler)
         {
+            // Just in case ExecuteAsync isn't called yet, set the eventhandler
+            if(this.baseTestRunEventsHandler == null)
+            {
+                this.baseTestRunEventsHandler = eventHandler;
+            }
+
             this.RequestSender.SendTestRunAbort();
         }
 
@@ -237,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 

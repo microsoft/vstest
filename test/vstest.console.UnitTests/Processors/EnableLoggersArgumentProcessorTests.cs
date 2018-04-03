@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Moq;
+    using System;
 
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
@@ -40,7 +41,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             EnableLoggerArgumentProcessorCapabilities capabilities = new EnableLoggerArgumentProcessorCapabilities();
             Assert.AreEqual("/Logger", capabilities.CommandName);
-            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>\n      Specify a logger for test results. For example, to log results into a \n      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]\n      Creates file in TestResults directory with given LogFileName.\n\n      Change the verbosity level in log messages for console logger as shown below\n      Example: /logger:console;verbosity=<Defaults to \"minimal\">\n      Allowed values for verbosity: quiet, minimal and normal.\n\n      Change the diagnostic level prefix for console logger as shown below\n      Example: /logger:console;prefix=<Defaults to \"false\">\n      More info on Console Logger here : https://aka.ms/console-logger\n\n      To publish test results to Team Foundation Server, use TfsPublisher as shown below\n      Example: /logger:TfsPublisher;\n                Collection=<team project collection url>;\n                BuildName=<build name>;\n                TeamProject=<team project name>\n                [;Platform=<Defaults to \"Any CPU\">]\n                [;Flavor=<Defaults to \"Debug\">]\n                [;RunTitle=<title>]", capabilities.HelpContentResourceName);
+#if NET451
+            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>" + Environment.NewLine + "      Specify a logger for test results. For example, to log results into a " + Environment.NewLine + "      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]" + Environment.NewLine + "      Creates file in TestResults directory with given LogFileName." + Environment.NewLine + "" + Environment.NewLine + "      Change the verbosity level in log messages for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;verbosity=<Defaults to \"normal\">" + Environment.NewLine + "      Allowed values for verbosity: quiet, minimal, normal and detailed." + Environment.NewLine + "" + Environment.NewLine + "      Change the diagnostic level prefix for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;prefix=<Defaults to \"false\">" + Environment.NewLine + "      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName);
+#else
+            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>" + Environment.NewLine + "      Specify a logger for test results. For example, to log results into a " + Environment.NewLine + "      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=<Defaults to unique file name>]" + Environment.NewLine + "      Creates file in TestResults directory with given LogFileName." + Environment.NewLine + "" + Environment.NewLine + "      Change the verbosity level in log messages for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;verbosity=<Defaults to \"minimal\">" + Environment.NewLine + "      Allowed values for verbosity: quiet, minimal, normal and detailed." + Environment.NewLine + "" + Environment.NewLine + "      Change the diagnostic level prefix for console logger as shown below" + Environment.NewLine + "      Example: /logger:console;prefix=<Defaults to \"false\">" + Environment.NewLine + "      More info on Console Logger here : https://aka.ms/console-logger", capabilities.HelpContentResourceName);
+#endif
 
             Assert.AreEqual(HelpContentPriority.EnableLoggerArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

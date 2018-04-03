@@ -290,6 +290,20 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldStopServerOnCompleteMessageReceived()
+        {
+            var completePayload = new DiscoveryCompletePayload { TotalTests = 10, IsAborted = false };
+            this.SetupDeserializeMessage(MessageType.DiscoveryComplete, completePayload);
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
+
+            this.RaiseMessageReceivedEvent();
+
+            this.mockServer.Verify(ms => ms.Stop());
+        }
+
+        [TestMethod]
         public void DiscoverTestShouldNotifyLogMessageOnTestMessageReceived()
         {
             var message = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = "Message1" };
@@ -503,6 +517,25 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                     testRunCompletePayload.RunAttachments,
                     It.IsAny<ICollection<string>>()),
                 Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldStopServerOnRunCompleteMessageReceived()
+        {
+            var testRunCompletePayload = new TestRunCompletePayload
+            {
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                LastRunTests = new TestRunChangedEventArgs(null, null, null),
+                RunAttachments = new List<AttachmentSet>()
+            };
+            this.SetupDeserializeMessage(MessageType.ExecutionComplete, testRunCompletePayload);
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
+
+            this.RaiseMessageReceivedEvent();
+
+            this.mockServer.Verify(ms => ms.Stop());
         }
 
         [TestMethod]

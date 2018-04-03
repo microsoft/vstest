@@ -1,28 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.ComponentModel;
-using System.Xml;
-using Microsoft.VisualStudio.TestPlatform.Common;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-    using Microsoft.VisualStudio.TestPlatform.Client;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.Collections.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
@@ -110,7 +103,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Gets the help content resource name.
         /// </summary>
+#if NET451
         public override string HelpContentResourceName => CommandLineResources.EnableLoggersArgumentHelp;
+#else
+        public override string HelpContentResourceName => CommandLineResources.EnableLoggerArgumentsInNetCore;
+#endif
 
         /// <summary>
         /// Gets the help priority.
@@ -125,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private readonly IRunSettingsProvider runSettingsManager;
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
@@ -136,9 +133,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.runSettingsManager = runSettingsManager;
         }
 
-        #endregion
+#endregion
 
-        #region IArgumentProcessor
+#region IArgumentProcessor
 
         /// <summary>
         /// Initializes with the argument that was provided with the command.
@@ -214,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 // Remove existing logger.
                 var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
-                if (existingLoggerIndex > 0)
+                if (existingLoggerIndex >= 0)
                 {
                     loggerRunSettings.LoggerSettingsList.RemoveAt(existingLoggerIndex);
                 }
@@ -254,6 +251,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        #endregion
+#endregion
     }
 }

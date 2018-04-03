@@ -12,6 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -19,6 +20,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -76,12 +78,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, 3);
+            InvokeAndVerifyInitialize(3);
+        }
 
-            parallelExecutionManager.Initialize();
+        [TestMethod]
+        public void InitializeShouldCallAllConcurrentManagersWithFalseFlagIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyInitialize(3, false);
+        }
 
-            Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Initialize(), Times.Once));
+        [TestMethod]
+        public void InitializeShouldCallAllConcurrentManagersWithTrueFlagIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyInitialize(3, true);
         }
 
         [TestMethod]
@@ -89,10 +98,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 4);
 
-            parallelExecutionManager.Abort();
+            parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Abort(), Times.Once));
+            createdMockManagers.ForEach(em => em.Verify(m => m.Abort(It.IsAny<ITestRunEventsHandler>()), Times.Once));
         }
 
         [TestMethod]
@@ -100,14 +109,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, this.proxyManagerFunc, 4);
 
-            parallelExecutionManager.Cancel();
+            parallelExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
-            createdMockManagers.ForEach(em => em.Verify(m => m.Cancel(), Times.Once));
+            createdMockManagers.ForEach(em => em.Verify(m => m.Cancel(It.IsAny<ITestRunEventsHandler>()), Times.Once));
         }
 
         [TestMethod]
         public void StartTestRunShouldProcessAllSources()
+        {
+            // Testcase filter should be passed to all parallel test run criteria.
+            this.testRunCriteriaWithSources.TestCaseFilter = "Name~Test";
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
+
+            parallelExecutionManager.StartTestRun(testRunCriteriaWithSources, this.mockHandler.Object);
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            Assert.AreEqual(this.sources.Count, processedSources.Count, "All Sources must be processed.");
+            AssertMissingAndDuplicateSources(processedSources);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldProcessAllSources1()
         {
             // Testcase filter should be passed to all parallel test run criteria.
             this.testRunCriteriaWithSources.TestCaseFilter = "Name~Test";
@@ -215,7 +238,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.SetupMockManagers(this.processedSources, isCanceled: false, isAborted: false);
             SetupHandleTestRunComplete(this.executionCompleted);
 
-            parallelExecutionManager.Abort();
+            parallelExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
             Task.Run(() => { parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object); });
 
             Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
@@ -256,6 +279,39 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(1, this.processedSources.Count, "All Sources must be processed.");
         }
 
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndHandleLogMessageOfError()
+        {
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
+            this.createdMockManagers[1].Reset();
+            this.createdMockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+                .Throws<NotImplementedException>();
+
+            Task.Run(() =>
+            {
+                parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object);
+            });
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            mockHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndHandleRawMessageOfTestMessage()
+        {
+            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
+            this.createdMockManagers[1].Reset();
+            this.createdMockManagers[1].Setup(em => em.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>()))
+                .Throws<NotImplementedException>();
+
+            Task.Run(() =>
+            {
+                parallelExecutionManager.StartTestRun(this.testRunCriteriaWithSources, this.mockHandler.Object);
+            });
+
+            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
+            mockHandler.Verify(s => s.HandleRawMessage(It.Is<string>(str => str.Contains(MessageType.TestMessage))));
+        }
 
         [TestMethod]
         public void StartTestRunShouldAggregateRunData()
@@ -490,6 +546,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null, null);
                         });
             }
+        }
+
+        private void InvokeAndVerifyInitialize(int concurrentManagersCount, bool skipDefaultAdapters = false)
+        {
+            var parallelExecutionManager = new ParallelProxyExecutionManager(this.mockRequestData.Object, proxyManagerFunc, concurrentManagersCount);
+
+            parallelExecutionManager.Initialize(skipDefaultAdapters);
+
+            Assert.AreEqual(concurrentManagersCount, createdMockManagers.Count, $"Number of Concurrent Managers created should be {concurrentManagersCount}");
+            createdMockManagers.ForEach(em => em.Verify(m => m.Initialize(skipDefaultAdapters), Times.Once));
         }
     }
 }

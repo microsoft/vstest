@@ -44,6 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             finally
             {
                 TestPlatformEventSource.Instance.TestHostStop();
+                EqtTrace.Info("Testhost process exiting.");
             }
         }
 

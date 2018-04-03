@@ -255,6 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             // Act. Raise an event on mock object
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
+            loggerEvents.WaitForEventCompletion();
 
             // Verify
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
@@ -382,10 +383,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestResultHandlerShouldShowStdErrMessagesBannerIfStdErrIsNotEmpty()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -402,9 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             testresult.Messages.Add(testResultMessage);
 
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
@@ -437,10 +432,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestResultHandlerShouldShowAdditionalInfoBannerIfAdditionalInfoIsNotEmpty()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -457,9 +448,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             testresult.Messages.Add(testResultMessage);
 
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
@@ -494,10 +483,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestResultHandlerShouldWriteToConsoleShouldShowPassedTestsForNormalVebosity()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -508,9 +493,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 5, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
@@ -521,10 +504,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestResultHandlerShouldNotShowNotStdOutMsgOfPassedTestIfVerbosityIsNormal()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -541,9 +520,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             testresult.Messages.Add(testResultMessage);
 
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
             this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
@@ -552,10 +529,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestResultHandlerShouldNotShowDbgTrcMsg()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -572,9 +545,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             testresult.Messages.Add(testResultMessage);
 
             loggerEvents.RaiseTestResult(new TestResultEventArgs(testresult));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.DbgTrcMessagesBanner, OutputLevel.Information), Times.Never());
             this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Never());
@@ -583,10 +554,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestResultHandlerShouldWriteToConsoleButSkipPassedTestsForMinimalVerbosity()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -597,9 +564,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
+            loggerEvents.WaitForEventCompletion();
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 4, 300);
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Never);
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Once());
@@ -629,10 +595,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsPass()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -645,9 +607,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(1, 0, 0, 0));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
-
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 1, 0, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
         }
@@ -655,10 +614,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsFail()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -671,9 +626,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(1, 0, 0, 0));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
-
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
         }
@@ -681,10 +633,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsCanceled()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>
@@ -699,9 +647,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.CompleteTestRun(null, true, false, null, null, new TimeSpan(1, 0, 0, 0));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
-
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
         }
@@ -709,10 +654,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsCanceledWithoutRunningAnyTest()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -721,19 +662,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             loggerEvents.CompleteTestRun(null, true, false, null, null, new TimeSpan(1, 0, 0, 0));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 1, 300);
-
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
         public void TestRunCompleteHandlerShouldNotWriteTolatTestToConsoleIfTestsCanceled()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -745,9 +679,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.CompleteTestRun(null, true, false, null, null, new TimeSpan(1, 0, 0, 0));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
@@ -756,10 +687,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldNotWriteTolatTestToConsoleIfTestsAborted()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -771,9 +698,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
             loggerEvents.CompleteTestRun(null, false, true, null, null, new TimeSpan(1, 0, 0, 0));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
@@ -782,10 +706,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsAborted()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -798,9 +718,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             }
             loggerEvents.CompleteTestRun(null, false, true, null, null, new TimeSpan(1, 0, 0, 0));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
-
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
         }
@@ -808,10 +725,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsAbortedWithoutRunningAnyTest()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -820,19 +733,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             loggerEvents.CompleteTestRun(null, false, true, null, null, new TimeSpan(1, 0, 0, 0));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 1, 300);
-
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
         public void PrintTimeHandlerShouldPrintElapsedTimeOnConsole()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -848,9 +754,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(0, 0, 1, 0));
             loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan(0, 0, 0, 1));
 
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 4, 300);
-
             // Verify PrintTimeSpan with different formats
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Days), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Hours), OutputLevel.Information), Times.Once());
@@ -861,10 +764,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void DisplayFullInformationShouldWriteErrorMessageAndStackTraceToConsole()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -878,9 +777,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 4, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}", " ErrorMessage"), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}", "ErrorStackTrace"), OutputLevel.Information), Times.Once());
@@ -891,10 +788,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void DisplayFullInformationShouldWriteStdMessageWithNewLine()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -908,9 +801,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 4, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine("Passed   TestName", OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
@@ -920,10 +811,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void GetTestMessagesShouldWriteMessageAndStackTraceToConsole()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -940,9 +827,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             {
                 loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
             }
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 6, 300);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(" StandardOutCategory", OutputLevel.Information), Times.Once());
@@ -957,10 +842,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void AttachmentInformationShouldBeWrittenToConsoleIfAttachmentsArePresent()
         {
-            var count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
             loggerEvents.EnableEvents();
             var parameters = new Dictionary<string, string>();
@@ -977,9 +858,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
                 attachmentSet
             };
             loggerEvents.CompleteTestRun(null, false, false, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 2, 300);
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());

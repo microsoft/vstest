@@ -14,6 +14,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface ITestLoggerManager : IDisposable
     {
         /// <summary>
+        /// Loggers initialized flag.
+        /// </summary>
+        bool LoggersInitialized
+        {
+            get;
+        }
+
+        /// <summary>
         /// Initialize loggers.
         /// </summary>
         void Initialize(string runSettings);
