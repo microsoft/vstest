@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.messageLogger = logger;
             this.architecture = runConfiguration.TargetPlatform;
             this.testHostProcess = null;
-            this.useLimitedAdapters = runConfiguration.UseSpecifedAdapterLocations;
+            this.useLimitedAdapters = runConfiguration.UseSpecifiedAdapterLocations;
             this.Shared = !runConfiguration.DisableAppDomain;
             this.projectOutputExtensionsRequired = !(runConfiguration.TestAdaptersPaths?.Length > 0);
             this.hostExitedEventRaised = false;

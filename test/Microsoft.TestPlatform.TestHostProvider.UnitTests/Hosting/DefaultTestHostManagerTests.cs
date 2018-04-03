@@ -274,7 +274,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
 
-            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifedAdapterLocations>true</UseSpecifedAdapterLocations></RunConfiguration> </RunSettings>");
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifiedAdapterLocations>true</UseSpecifiedAdapterLocations></RunConfiguration> </RunSettings>");
             List<string> currentList = new List<string> { @"FooExtension.dll" };
 
             // Act
@@ -302,7 +302,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
 
-            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifedAdapterLocations>false</UseSpecifedAdapterLocations></RunConfiguration> </RunSettings>");
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifiedAdapterLocations>false</UseSpecifiedAdapterLocations></RunConfiguration> </RunSettings>");
             List<string> currentList = new List<string> { @"FooExtension.dll" };
 
             // Act
@@ -316,7 +316,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestPlatformExtensionsShouldReturnExtensionsListFromExternalIfNoAdapterPresentNearSourceAndUseSpecifedAdapterLocationsIsTrue()
         {
-            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifedAdapterLocations>true</UseSpecifedAdapterLocations></RunConfiguration> </RunSettings>");
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifiedAdapterLocations>true</UseSpecifiedAdapterLocations></RunConfiguration> </RunSettings>");
             List<string> currentList = new List<string> { @"FooExtension.dll" };
 
             // Act
