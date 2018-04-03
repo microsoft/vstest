@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Xml.Linq;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -59,6 +61,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private IMessageLogger messageLogger;
         private bool hostExitedEventRaised;
         private bool projectOutputExtensionsRequired;
+        private bool useLimitedAdapters;
+        private string runSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
@@ -192,9 +196,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
         {
-            if (sources != null && sources.Any() && this.projectOutputExtensionsRequired)
+            if (sources != null && sources.Any())
             {
-                extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
+                IEnumerable<string> adapters = Enumerable.Empty<string>();
+                adapters = sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern));
+
+                if (this.useLimitedAdapters)
+                {
+                    adapters.Concat(this.AddExtensionAssemblies(this.runSettings));
+
+                    if (adapters.Any())
+                    {
+                        // If we find any adapter in sources, & adapterpaths, return immediately
+                        return this.FilterExtensionsBasedOnVersion(adapters);
+                    }
+                }
+
+                // If we did not find any adapter in sources, & adapterpaths, implicitly fall back to old method
+                if (this.projectOutputExtensionsRequired)
+                {
+                    extensions = extensions.Concat(adapters);
+                }
             }
 
             extensions = this.FilterExtensionsBasedOnVersion(extensions);
@@ -246,10 +268,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.messageLogger = logger;
             this.architecture = runConfiguration.TargetPlatform;
             this.testHostProcess = null;
-
+            this.useLimitedAdapters = runConfiguration.UseSpecifedAdapterLocations;
             this.Shared = !runConfiguration.DisableAppDomain;
             this.projectOutputExtensionsRequired = !(runConfiguration.TestAdaptersPaths?.Length > 0);
             this.hostExitedEventRaised = false;
+            this.runSettings = runsettingsXml;
         }
 
         /// <inheritdoc/>
@@ -415,6 +438,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             return AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
+        }
+
+        private IEnumerable<string> AddExtensionAssemblies(string runSettings)
+        {
+            IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
+            IEnumerable<string> adapterPaths = Enumerable.Empty<string>();
+
+            if (customTestAdaptersPaths != null)
+            {
+                foreach (string customTestAdaptersPath in customTestAdaptersPaths)
+                {
+                    var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
+                    if (!Directory.Exists(adapterPath))
+                    {
+                        if (EqtTrace.IsWarningEnabled)
+                        {
+                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        }
+
+                        continue;
+                    }
+
+                    adapterPaths = this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestAdapterEndsWithPattern);
+                }
+            }
+
+            return adapterPaths;
         }
     }
 }

@@ -84,6 +84,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private string targetDevice;
 
+        /// <summary>
+        /// False indicates that the test runner will use all possible adapters it can find(Nuget / Vsix / DefaultExtensions)
+        /// </summary>
+        private bool useSpecifedAdapterLocations;
+
         #endregion
 
         #region Constructor
@@ -110,6 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.inIsolation = false;
             this.shouldCollectSourceInformation = false;
             this.targetDevice = null;
+            this.useSpecifedAdapterLocations = false;
             this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         }
 
@@ -357,6 +363,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets the value indicating whether we want to limit adapter look up model to only few locations.
+        /// </summary>
+        public bool UseSpecifedAdapterLocations
+        {
+            get
+            {
+                return this.useSpecifedAdapterLocations;
+            }
+
+            set
+            {
+                this.useSpecifedAdapterLocations = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the paths used for test adapters lookup in test platform.
         /// </summary>
         public string TestAdaptersPaths
@@ -570,6 +592,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 targetDevice.InnerXml = this.TargetDevice;
                 root.AppendChild(targetDevice);
             }
+
+            XmlElement useSpecifedAdapterLocations = doc.CreateElement("UseSpecifedAdapterLocations");
+            useSpecifedAdapterLocations.InnerXml = this.UseSpecifedAdapterLocations.ToString();
+            root.AppendChild(useSpecifedAdapterLocations);
 
             return root;
         }
@@ -852,6 +878,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "TargetDevice":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.TargetDevice = reader.ReadElementContentAsString();
+                            break;
+
+                        case "UseSpecifedAdapterLocations":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            string useUserSpecifiedAdaptersString = reader.ReadElementContentAsString();
+                            bool useSpecifedAdapterLocations;
+                            if (!bool.TryParse(useUserSpecifiedAdaptersString, out useSpecifedAdapterLocations))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, useUserSpecifiedAdaptersString, elementName));
+                            }
+                            runConfiguration.UseSpecifedAdapterLocations = useSpecifedAdapterLocations;
                             break;
 
                         default:

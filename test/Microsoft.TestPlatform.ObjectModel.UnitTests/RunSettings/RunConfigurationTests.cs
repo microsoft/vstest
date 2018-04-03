@@ -289,6 +289,40 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<DesignMode>True</DesignMode>");
         }
 
+        [TestMethod]
+        public void RunConfigurationShouldUseSpecifedAdapterLocationsAsFalseByDefault()
+        {
+            string settingsXml =
+              @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetPlatform>x64</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+
+            Assert.IsFalse(runConfiguration.UseSpecifedAdapterLocations);
+        }
+
+        [DataRow(true)]
+        [DataRow(false)]
+        [DataTestMethod]
+        public void RunConfigurationShouldReadValueForUseSpecifedAdapterLocations(bool val)
+        {
+            string settingsXml = string.Format(
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <UseSpecifedAdapterLocations>{0}</UseSpecifedAdapterLocations>
+                     </RunConfiguration>
+                </RunSettings>", val);
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+
+            Assert.AreEqual(val, runConfiguration.UseSpecifedAdapterLocations);
+        }
+
         [DataRow(true)]
         [DataRow(false)]
         [DataTestMethod]
