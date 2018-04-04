@@ -86,8 +86,10 @@ function Verify-NugetPackages
         New-Item -ItemType Directory -Force -Path $nugetInstallDir
         Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/v4.6.1/nuget.exe -OutFile $nugetInstallPath
     }
+    
+	Write-Log "Using nuget.exe installed at $nugetInstallPath"
 
-    $artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+	$artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packagesDirectory = Join-Path $artifactsDirectory "packages"
     Get-ChildItem -Filter *.nupkg  $packagesDirectory | % {
     & $nugetInstallPath verify -signature -CertificateFingerprint 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE $_.FullName
