@@ -198,7 +198,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Send(data);
 
                 // Wait for negotiation response
-                if (!protocolNegotiated.WaitOne(60 * 1000))
+                if (!protocolNegotiated.WaitOne(600 * 1000))
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout));
                 }
