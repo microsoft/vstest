@@ -412,6 +412,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.IsTrue(receivedTestProcessInfo.Arguments.Contains("--telemetryoptedin false"));
         }
 
+        [TestMethod]
+        public void SetUpChannelShouldFailIfConnectionToServerCouldNotHappen()
+        {
+            var connectionInfo = new TestHostConnectionInfo
+            {
+                Endpoint = IPAddress.Loopback + ":124",
+                Role = ConnectionRole.Client,
+                Transport = Transport.Sockets
+            };
+
+            var mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
+            mockCommunicationEndpoint.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(connectionInfo.Endpoint).Callback(() =>
+            {
+                mockCommunicationEndpoint.Raise(
+                    s => s.Disconnected += null,
+                    mockCommunicationEndpoint.Object,
+                    new DisconnectedEventArgs());
+            });
+
+            var testRequestSender = new TestRequestSender(mockCommunicationEndpoint.Object, connectionInfo, mockDataSerializer.Object, new ProtocolConfig { Version = 2 }, CLIENTPROCESSEXITWAIT);
+            this.mockTestHostManager.Setup(thm => thm.GetTestHostConnectionInfo()).Returns(connectionInfo);
+
+            //Act
+            var localTestOperationManager = new TestableProxyOperationManager(this.mockRequestData.Object, testRequestSender, this.mockTestHostManager.Object, 1);
+
+            //Assert
+            Assert.ThrowsException<TestPlatformException>(() => localTestOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None));
+            mockCommunicationEndpoint.Verify(s => s.Start(It.IsAny<string>()), Times.Once);
+        }
+
         private void SetUpMocksForDotNetTestHost()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
