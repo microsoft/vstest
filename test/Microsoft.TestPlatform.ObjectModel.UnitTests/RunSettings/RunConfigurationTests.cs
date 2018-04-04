@@ -302,7 +302,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.IsFalse(runConfiguration.UseSpecifedAdapterLocations);
+            Assert.IsFalse(runConfiguration.UseSpecifiedAdapterLocations);
         }
 
         [DataRow(true)]
@@ -320,7 +320,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.AreEqual(val, runConfiguration.UseSpecifedAdapterLocations);
+            Assert.AreEqual(val, runConfiguration.UseSpecifiedAdapterLocations);
         }
 
         [DataRow(true)]
