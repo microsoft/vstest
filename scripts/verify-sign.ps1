@@ -10,11 +10,7 @@ Param(
 
     [Parameter(Mandatory=$true)]
     [Alias("cert")]
-    [System.String] $Certificate,
-
-    [Parameter(Mandatory=$false)]
-    [Alias("nupkg")]
-    [Switch] $NugetPackages = $false
+    [System.String] $Certificate
 )
 
 $ErrorActionPreference = "Continue"
@@ -94,26 +90,10 @@ function Verify-NugetPackages
     $artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packagesDirectory = Join-Path $artifactsDirectory "packages"
     Get-ChildItem -Filter *.nupkg  $packagesDirectory | % {
-    & $nugetInstallPath verify -signature -CertificateFingerprint $TPB_SignCertificate $_.FullName
+    & $nugetInstallPath verify -signature -CertificateFingerprint 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE $_.FullName
     }
     
     Write-Log "Verify-NugetPackages: Complete"
-}
-
-function Verify-Signature
-{
-    Write-Log "Verify-Signature: Start"
-
-    if(!$NugetPackages)
-    {
-        Verify-Assemblies   
-    }
-    else
-    {
-        Verify-NugetPackages
-    }
-
-    Write-Log "Verify-Signature: Complete"
 }
 
 function Write-Log ([string] $message)
@@ -135,4 +115,5 @@ function Write-FailLog ([string] $message)
     }
 }
 
-Verify-Signature
+Verify-Assemblies
+Verify-NugetPackages
