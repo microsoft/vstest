@@ -314,7 +314,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
-                       <UseSpecifedAdapterLocations>{0}</UseSpecifedAdapterLocations>
+                       <UseSpecifiedAdapterLocations>{0}</UseSpecifiedAdapterLocations>
                      </RunConfiguration>
                 </RunSettings>", val);
 
