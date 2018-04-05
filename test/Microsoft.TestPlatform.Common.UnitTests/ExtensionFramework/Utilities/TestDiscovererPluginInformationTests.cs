@@ -55,10 +55,24 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         }
 
         [TestMethod]
-        public void AssemblyTypeShouldReturnNativeAndManagedIfDiscovererHasNoCategory()
+        public void AssemblyTypeShouldReturnNoneIfDiscovererHasNoCategory()
         {
             this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNoCategory));
-            Assert.AreEqual(AssemblyType.NativeAndManaged, this.testPluginInformation.AssemblyType);
+            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
+        public void AssemblyTypeShouldReturnNoneIfDiscovererHasCategoryWithNoValue()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithCategoryHavingNoValue));
+            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
+        public void AssemblyTypeShouldReturnNoneIfDiscovererHasCategoryWithEmptyValue()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithCategoryHavingEmptyValue));
+            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
@@ -76,10 +90,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         }
 
         [TestMethod]
-        public void AssemblyTypeShouldReturnNativeAndManagedIfDiscovererHasUnknownCategory()
+        public void AssemblyTypeShouldReturnNoneIfDiscovererHasUnknownCategory()
         {
             this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithUnknownCategory));
-            Assert.AreEqual(AssemblyType.NativeAndManaged, this.testPluginInformation.AssemblyType);
+            Assert.AreEqual(AssemblyType.None, this.testPluginInformation.AssemblyType);
         }
 
         [TestMethod]
@@ -126,6 +140,18 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 
     [FileExtension(".dll")]
     public class DummyTestDiscovereWithNoCategory
+    {
+    }
+
+    [FileExtension(".dll")]
+    [Category]
+    public class DummyTestDiscovereWithCategoryHavingNoValue
+    {
+    }
+
+    [FileExtension(".dll")]
+    [Category]
+    public class DummyTestDiscovereWithCategoryHavingEmptyValue
     {
     }
 

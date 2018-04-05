@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
     public enum AssemblyType
     {
-        NativeAndManaged,
+        None,
         Native,
         Managed
     }

@@ -128,10 +128,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             var assemblyType = default(AssemblyType);
 
             // Get Category
-            var attributes = testDiscovererType.GetTypeInfo().GetCustomAttributes(typeof(CategoryAttribute), false).ToArray();
-            var category = attributes != null && attributes.Length > 0 ?
-                ((CategoryAttribute)attributes[0]).Category :
-                default(string);
+            var attribute = testDiscovererType.GetTypeInfo().GetCustomAttribute(typeof(CategoryAttribute));
+            var category = (attribute as CategoryAttribute)?.Category;
 
             // Get assembly type from category.
             Enum.TryParse(category, true, out assemblyType);
