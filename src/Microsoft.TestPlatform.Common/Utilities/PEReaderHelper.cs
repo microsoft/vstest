@@ -8,15 +8,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Reflection.PortableExecutable;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     public class PEReaderHelper
     {
-        private static PEReaderHelper instance;
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
-        /// Gets the PEReaderHelper instance.
+        /// Initializes a new instance of the <see cref="PEReaderHelper"/> class.
         /// </summary>
-        internal static PEReaderHelper Instance => instance ?? (instance = new PEReaderHelper());
+        public PEReaderHelper() : this(new FileHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PEReaderHelper"/> class.
+        /// </summary>
+        /// <param name="fileHelper">File helper.</param>
+        public PEReaderHelper(FileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
 
         /// <summary>
         /// Determines assembly type from file.
@@ -27,9 +40,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             try
             {
-                using (var assemblyStream = File.Open(filePath, FileMode.Open, FileAccess.Read))
-                using (var peReader = new PEReader(assemblyStream))
+                using (var fileStream = fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var peReader = new PEReader(fileStream))
                 {
+                    // Resources for PEReader:
+                    // 1. https://msdn.microsoft.com/library/windows/desktop/ms680547(v=vs.85).aspx?id=19509
+                    // 2. https://github.com/dotnet/corefx/tree/master/src/System.Reflection.Metadata
+
                     var peHeaders = peReader.PEHeaders;
                     var corHeader = peHeaders.CorHeader;
                     var corHeaderStartOffset = peHeaders.CorHeaderStartOffset;
