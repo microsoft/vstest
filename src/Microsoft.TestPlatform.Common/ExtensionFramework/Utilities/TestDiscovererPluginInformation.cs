@@ -5,9 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using ObjectModel;
 
     /// <summary>
@@ -26,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             {
                 this.FileExtensions = GetFileExtensions(testDiscovererType);
                 this.DefaultExecutorUri = GetDefaultExecutorUri(testDiscovererType);
+                this.AssemblyType = GetAssemblyType(testDiscovererType);
             }
         }
 
@@ -36,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         {
             get
             {
-                return new object[] { this.FileExtensions, this.DefaultExecutorUri };
+                return new object[] { this.FileExtensions, this.DefaultExecutorUri, this.AssemblyType };
             }
         }
 
@@ -53,6 +56,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// Gets the Uri identifying the executor
         /// </summary>
         public string DefaultExecutorUri
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the assembly type supported by discoverer plugin.
+        /// </summary>
+        public AssemblyType AssemblyType
         {
             get;
             private set;
@@ -104,6 +116,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Helper to get the supported assembly type from the CategoryAttribute on the discover plugin.
+        /// </summary>
+        /// <param name="testDiscovererType"> The test discoverer Type. </param>
+        /// <returns> Supported assembly type. </returns>
+        private AssemblyType GetAssemblyType(Type testDiscovererType)
+        {
+            var assemblyType = default(AssemblyType);
+
+            // Get Category
+            var attributes = testDiscovererType.GetTypeInfo().GetCustomAttributes(typeof(CategoryAttribute), false).ToArray();
+            var category = attributes != null && attributes.Length > 0 ?
+                ((CategoryAttribute)attributes[0]).Category :
+                default(string);
+
+            // Get assembly type from category.
+            Enum.TryParse(category, true, out assemblyType);
+            return assemblyType;
         }
     }
 }

@@ -4,13 +4,15 @@
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class TestDiscovererPluginInformationTests
     {
@@ -53,6 +55,41 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         }
 
         [TestMethod]
+        public void AssemblyTypeShouldReturnNativeAndManagedIfDiscovererHasNoCategory()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNoCategory));
+            Assert.AreEqual(AssemblyType.NativeAndManaged, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
+        public void AssemblyTypeShouldReturnNativeIfDiscovererHasNativeCategory()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithNativeCategory));
+            Assert.AreEqual(AssemblyType.Native, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
+        public void AssemblyTypeShouldReturnManagedIfDiscovererHasManagedCategory()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithManagedCategory));
+            Assert.AreEqual(AssemblyType.Managed, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
+        public void AssemblyTypeShouldReturnNativeAndManagedIfDiscovererHasUnknownCategory()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithUnknownCategory));
+            Assert.AreEqual(AssemblyType.NativeAndManaged, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
+        public void AssemblyTypeShouldReturnAssemblyTypeIfDiscovererHasCategoryInArbitCasing()
+        {
+            this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovereWithArbitCasedCategory));
+            Assert.AreEqual(AssemblyType.Native, this.testPluginInformation.AssemblyType);
+        }
+
+        [TestMethod]
         public void DefaultExecutorUriShouldReturnEmptyListIfADiscovererDoesNotHaveOne()
         {
             this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithNoFileExtensions));
@@ -68,7 +105,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         }
 
         [TestMethod]
-        public void MetadataShouldReturnFileExtensionsAndDefaultExecutorUri()
+        public void MetadataShouldReturnFileExtensionsAndDefaultExecutorUriAndAssemblyType()
         {
             this.testPluginInformation = new TestDiscovererPluginInformation(typeof(DummyTestDiscovererWithTwoFileExtensions));
 
@@ -77,12 +114,42 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 
             CollectionAssert.AreEqual(expectedFileExtensions, (testPluginMetada[0] as List<string>).ToArray());
             Assert.AreEqual("csvexecutor", testPluginMetada[1] as string);
+            Assert.AreEqual(AssemblyType.Managed, Enum.Parse(typeof(AssemblyType), testPluginMetada[2].ToString()));
         }
     }
 
     #region Implementation
     
     public class DummyTestDiscovererWithNoFileExtensions
+    {
+    }
+
+    [FileExtension(".dll")]
+    public class DummyTestDiscovereWithNoCategory
+    {
+    }
+
+    [FileExtension(".js")]
+    [Category("native")]
+    public class DummyTestDiscovereWithNativeCategory
+    {
+    }
+
+    [FileExtension(".dll")]
+    [Category("managed")]
+    public class DummyTestDiscovereWithManagedCategory
+    {
+    }
+
+    [FileExtension(".dll")]
+    [Category("arbitValue")]
+    public class DummyTestDiscovereWithUnknownCategory
+    {
+    }
+
+    [FileExtension(".dll")]
+    [Category("NatIVe")]
+    public class DummyTestDiscovereWithArbitCasedCategory
     {
     }
 
@@ -94,6 +161,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 
     [FileExtension("csv")]
     [FileExtension("docx")]
+    [Category("managed")]
     [DefaultExecutorUri("csvexecutor")]
     public class DummyTestDiscovererWithTwoFileExtensions
     {
