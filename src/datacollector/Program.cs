@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// The timeout for the client to connect to the server.
         /// </summary>
-        private const int ClientListenTimeOut = 5 * 1000;
+        private const int ClientListenTimeOut = 60 * 1000;
 
         /// <summary>
         /// Port number used to communicate with test runner process.
