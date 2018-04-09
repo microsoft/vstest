@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// Initializes a new instance of the <see cref="PEReaderHelper"/> class.
         /// </summary>
         /// <param name="fileHelper">File helper.</param>
-        public PEReaderHelper(FileHelper fileHelper)
+        public PEReaderHelper(IFileHelper fileHelper)
         {
             this.fileHelper = fileHelper;
         }
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             try
             {
-                using (var fileStream = fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var fileStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (var peReader = new PEReader(fileStream))
                 {
                     // Resources for PEReader:
@@ -58,12 +58,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
             catch (Exception ex)
             {
-                EqtTrace.Warning("GetAssemblyTypeFromAssemblyMetadata: failed to determine assembly type: {0} for assembly: {1}", ex, filePath);
+                EqtTrace.Warning("PEReaderHelper.GetAssemblyType: failed to determine assembly type: {0} for assembly: {1}", ex, filePath);
             }
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("AssemblyMetadataProvider.GetAssemblyType: Determined assemblyType:'{0}' for source: '{1}'", assemblyType, filePath);
+                EqtTrace.Info("PEReaderHelper.GetAssemblyType: Determined assemblyType:'{0}' for source: '{1}'", assemblyType, filePath);
             }
 
             return assemblyType;
