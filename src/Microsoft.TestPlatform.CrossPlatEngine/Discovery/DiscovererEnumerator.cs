@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -237,14 +238,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return null;
             }
 
+            IDictionary<AssemblyType, IEnumerable<string>> assemblyTypeToSoucesMap = null;
             var result = new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
             var sourcesForWhichNoDiscovererIsAvailable = new List<string>(sources);
 
             foreach (var discoverer in allDiscoverers)
             {
+                var sourcesToCheck = sources;
+
+                if (discoverer.Metadata.AssemblyType == AssemblyType.Native ||
+                    discoverer.Metadata.AssemblyType == AssemblyType.Managed)
+                {
+                    assemblyTypeToSoucesMap = assemblyTypeToSoucesMap ?? GetAssemblyTypeToSoucesMap(sources);
+                    sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
+                }
+
                 // Find the sources which this discoverer can look at. 
                 // Based on whether it is registered for a matching file extension or no file extensions at all.
-                var matchingSources = (from source in sources
+                var matchingSources = (from source in sourcesToCheck
                                        where
                                            (discoverer.Metadata.FileExtension == null
                                             || discoverer.Metadata.FileExtension.Contains(
@@ -275,6 +286,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Get assembly type to sources map.
+        /// </summary>
+        /// <param name="sources">Sources.</param>
+        /// <param name="assemblyType">Assembly type.</param>
+        /// <returns>Sources with mathcing assembly type.</returns>
+        private static IDictionary<AssemblyType, IEnumerable<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources)
+        {
+            var assemblyTypeToSoucesMap = new Dictionary<AssemblyType, IEnumerable<string>>()
+            {
+                { AssemblyType.Native, new List<string>()},
+                { AssemblyType.Managed, new List<string>()},
+                { AssemblyType.None, new List<string>()}
+            };
+
+            if (sources != null && sources.Any())
+            {
+                foreach (string source in sources)
+                {
+                    var sourcesList = IsAssembly(source) ?
+                        assemblyTypeToSoucesMap[new PEReaderHelper().GetAssemblyType(source)] :
+                        assemblyTypeToSoucesMap[AssemblyType.None];
+
+                    ((List<string>)sourcesList).Add(source);
+                }
+            }
+
+            return assemblyTypeToSoucesMap;
+        }
+
+        /// <summary>
+        /// Finds if a file is an assembly or not.
+        /// </summary>
+        /// <param name="filePath">File path.</param>
+        /// <returns>True if file is an assembly.</returns>
+        private static bool IsAssembly(string filePath)
+        {
+            var fileExtension = Path.GetExtension(filePath);
+
+            return ".dll".Equals(fileExtension, StringComparison.OrdinalIgnoreCase) ||
+                ".exe".Equals(fileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
