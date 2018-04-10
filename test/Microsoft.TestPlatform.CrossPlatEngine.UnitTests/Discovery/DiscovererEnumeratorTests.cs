@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -33,7 +34,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         private DiscoveryResultCache discoveryResultCache;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
-        private Mock<PEReaderHelper> mockPEReaderHelper;
+        private Mock<IAssemblyProperties> mockPEReaderHelper;
 
         [TestInitialize]
         public void TestInit()
@@ -42,9 +43,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockPEReaderHelper = new Mock<PEReaderHelper>();
+            this.mockPEReaderHelper = new Mock<IAssemblyProperties>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object);
+            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockPEReaderHelper.Object);
 
             TestDiscoveryExtensionManager.Destroy();
         }
@@ -87,6 +88,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             Assert.IsFalse(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
             Assert.IsFalse(NativeDllTestDiscoverer.IsNativeDiscoverTestCalled);
+
+            this.ResetDiscoverers();
         }
 
         [TestMethod]
@@ -199,41 +202,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 Assert.IsTrue(NativeDllTestDiscoverer.IsNativeDiscoverTestCalled);
                 CollectionAssert.AreEqual(nativeSources, NativeDllTestDiscoverer.Sources.ToList());
 
-                Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
-            }
-            finally
-            {
-                this.ResetDiscoverers();
-            }
-        }
-
-        [TestMethod]
-        public void LoadTestsShouldNotCallNativeDiscovererIfOnlyManagedAssembliesPassed()
-        {
-            try
-            {
-                TestPluginCacheTests.SetupMockExtensions(
-                    new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
-                    () => { });
-
-                mockPEReaderHelper.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Native);
-
-                var sources = new List<string>
-                                  {
-                                      "managed.dll"
-                                  };
-
-                var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-                extensionSourceMap.Add("_none_", sources);
-
-                var settings = new Mock<IRunSettings>().Object;
-                var logger = new Mock<IMessageLogger>().Object;
-                string testCaseFilter = "TestFilter";
-
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, testCaseFilter, logger);
-
-                Assert.IsFalse(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
-                Assert.IsTrue(NativeDllTestDiscoverer.IsNativeDiscoverTestCalled);
                 Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
             }
             finally
@@ -459,8 +427,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, It.IsAny<object>()), Times.Once);
                 mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, It.IsAny<object>()), Times.Once);
                 mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, It.IsAny<object>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsByAdapter + ".discoverer://dlldiscoverer/", It.IsAny<object>()), Times.Once);
-                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + ".discoverer://dlldiscoverer/", It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsByAdapter + ".discoverer://manageddlldiscoverer/", It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + ".discoverer://manageddlldiscoverer/", It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsByAdapter + ".discoverer://nativedlldiscoverer/", It.IsAny<object>()), Times.Once);
+                mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter + ".discoverer://nativedlldiscoverer/", It.IsAny<object>()), Times.Once);
                 mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, It.IsAny<object>()), Times.Once);
             }
             finally
@@ -477,7 +447,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 this.InvokeLoadTestWithMockSetup();
 
                 Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
-                Assert.AreEqual(1, this.discoveryResultCache.Tests.Count);
+                Assert.AreEqual(2, this.discoveryResultCache.Tests.Count);
             }
             finally
             {
@@ -596,6 +566,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         private void ResetDiscoverers()
         {
             ManagedDllTestDiscoverer.Reset();
+            NativeDllTestDiscoverer.Reset();
             JsonTestDiscoverer.Reset();
             NotImplementedTestDiscoverer.Reset();
         }
@@ -672,10 +643,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             public static bool IsManagedDiscoverTestCalled { get; private set; }
 
+            public static IEnumerable<string> Sources { get; set; }
+
+
             public override void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
+                Sources = sources;
                 IsManagedDiscoverTestCalled = true;
                 base.DiscoverTests(sources, discoveryContext, logger, discoverySink);
+            }
+
+            public static void Reset()
+            {
+                IsManagedDiscoverTestCalled = false;
+                Sources = null;
             }
         }
 
@@ -686,19 +667,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             public static bool IsNativeDiscoverTestCalled { get; private set; }
 
+            public static IEnumerable<string> Sources { get; set; }
+
             public override void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
+                Sources = sources;
                 IsNativeDiscoverTestCalled = true;
                 base.DiscoverTests(sources, discoveryContext, logger, discoverySink);
+            }
+
+            public static void Reset()
+            {
+                IsNativeDiscoverTestCalled = false;
+                Sources = null;
             }
         }
 
         private class DllTestDiscoverer : ITestDiscoverer
         {
-            public static bool IsDiscoverTestCalled { get; private set; }
-
-            public static IEnumerable<string> Sources { get; private set; }
-
             public static IDiscoveryContext DiscoveryContext { get; private set; }
 
             public static IMessageLogger MessageLogger { get; private set; }
@@ -707,19 +693,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             public virtual void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
-                IsDiscoverTestCalled = true;
-                Sources = sources;
                 DiscoveryContext = discoveryContext;
                 MessageLogger = logger;
                 DiscoverySink = discoverySink;
 
                 var testCase = new TestCase("A.C.M", new Uri("executor://dllexecutor"), "A");
                 discoverySink.SendTestCase(testCase);
-            }
-
-            public static void Reset()
-            {
-                IsDiscoverTestCalled = false;
             }
         }
 

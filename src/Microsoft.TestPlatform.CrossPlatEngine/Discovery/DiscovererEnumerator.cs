@@ -34,6 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private DiscoveryResultCache discoveryResultCache;
         private ITestPlatformEventSource testPlatformEventSource;
         private IRequestData requestData;
+        private IAssemblyProperties assemblyProperties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
@@ -52,7 +53,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.discoveryResultCache = discoveryResultCache;
             this.testPlatformEventSource = testPlatformEventSource;
             this.requestData = requestData;
+            this.assemblyProperties = new AssemblyProperties();
         }
+
+        // Added this to make class testable, needed a PEHeader mocked Instance
+        internal DiscovererEnumerator(IRequestData requestData,
+            DiscoveryResultCache discoveryResultCache,
+            ITestPlatformEventSource testPlatformEventSource,
+            IAssemblyProperties assemblyProperties)
+        {
+            this.discoveryResultCache = discoveryResultCache;
+            this.testPlatformEventSource = testPlatformEventSource;
+            this.requestData = requestData;
+            this.assemblyProperties = assemblyProperties;
+        }
+
 
         /// <summary>
         /// Discovers tests from the sources.
@@ -90,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
 
-            var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger);
+            var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
             // Collecting Data Point for TimeTaken to Load Adapters
@@ -223,7 +238,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         internal static Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> GetDiscovererToSourcesMap(
             string extensionAssembly,
             IEnumerable<string> sources,
-            IMessageLogger logger)
+            IMessageLogger logger,
+            IAssemblyProperties assemblyProperties)
         {
             var allDiscoverers = GetDiscoverers(extensionAssembly, throwOnError: true);
 
@@ -249,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 if (discoverer.Metadata.AssemblyType == AssemblyType.Native ||
                     discoverer.Metadata.AssemblyType == AssemblyType.Managed)
                 {
-                    assemblyTypeToSoucesMap = assemblyTypeToSoucesMap ?? GetAssemblyTypeToSoucesMap(sources);
+                    assemblyTypeToSoucesMap = assemblyTypeToSoucesMap ?? GetAssemblyTypeToSoucesMap(sources, assemblyProperties);
                     sourcesToCheck = assemblyTypeToSoucesMap[AssemblyType.None].Concat(assemblyTypeToSoucesMap[discoverer.Metadata.AssemblyType]);
                 }
 
@@ -294,7 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="sources">Sources.</param>
         /// <param name="assemblyType">Assembly type.</param>
         /// <returns>Sources with mathcing assembly type.</returns>
-        private static IDictionary<AssemblyType, IEnumerable<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources)
+        private static IDictionary<AssemblyType, IEnumerable<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources, IAssemblyProperties assemblyProperties)
         {
             var assemblyTypeToSoucesMap = new Dictionary<AssemblyType, IEnumerable<string>>()
             {
@@ -308,7 +324,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 foreach (string source in sources)
                 {
                     var sourcesList = IsAssembly(source) ?
-                        assemblyTypeToSoucesMap[new PEReaderHelper().GetAssemblyType(source)] :
+                        assemblyTypeToSoucesMap[assemblyProperties.GetAssemblyType(source)] :
                         assemblyTypeToSoucesMap[AssemblyType.None];
 
                     ((List<string>)sourcesList).Add(source);
