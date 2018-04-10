@@ -34,7 +34,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         private DiscoveryResultCache discoveryResultCache;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
-        private Mock<IAssemblyProperties> mockPEReaderHelper;
+        private Mock<IAssemblyProperties> mockAssemblyProperties;
 
         [TestInitialize]
         public void TestInit()
@@ -43,9 +43,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
-            this.mockPEReaderHelper = new Mock<IAssemblyProperties>();
+            this.mockAssemblyProperties = new Mock<IAssemblyProperties>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockPEReaderHelper.Object);
+            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockAssemblyProperties.Object);
 
             TestDiscoveryExtensionManager.Destroy();
         }
@@ -101,7 +101,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                     new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                     () => { });
 
-                mockPEReaderHelper.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
+                mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
 
                 var sources = new List<string>
                                   {
@@ -138,7 +138,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                     new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                     () => { });
 
-                mockPEReaderHelper.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
+                mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
 
                 var sources = new List<string>
                                   {
@@ -175,8 +175,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                     new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
                     () => { });
 
-                mockPEReaderHelper.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
-                mockPEReaderHelper.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
+                mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("native.dll")).Returns(AssemblyType.Native);
+                mockAssemblyProperties.Setup(pe => pe.GetAssemblyType("managed.dll")).Returns(AssemblyType.Managed);
 
                 var nativeSources = new List<string>
                                   {
