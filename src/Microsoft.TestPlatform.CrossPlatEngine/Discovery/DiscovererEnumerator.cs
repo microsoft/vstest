@@ -254,7 +254,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return null;
             }
 
-            IDictionary<AssemblyType, IEnumerable<string>> assemblyTypeToSoucesMap = null;
+            IDictionary<AssemblyType, IList<string>> assemblyTypeToSoucesMap = null;
             var result = new Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>>();
             var sourcesForWhichNoDiscovererIsAvailable = new List<string>(sources);
 
@@ -310,9 +310,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="sources">Sources.</param>
         /// <param name="assemblyType">Assembly type.</param>
         /// <returns>Sources with mathcing assembly type.</returns>
-        private static IDictionary<AssemblyType, IEnumerable<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources, IAssemblyProperties assemblyProperties)
+        private static IDictionary<AssemblyType, IList<string>> GetAssemblyTypeToSoucesMap(IEnumerable<string> sources, IAssemblyProperties assemblyProperties)
         {
-            var assemblyTypeToSoucesMap = new Dictionary<AssemblyType, IEnumerable<string>>()
+            var assemblyTypeToSoucesMap = new Dictionary<AssemblyType, IList<string>>()
             {
                 { AssemblyType.Native, new List<string>()},
                 { AssemblyType.Managed, new List<string>()},
@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         assemblyTypeToSoucesMap[assemblyProperties.GetAssemblyType(source)] :
                         assemblyTypeToSoucesMap[AssemblyType.None];
 
-                    ((List<string>)sourcesList).Add(source);
+                    sourcesList.Add(source);
                 }
             }
 
