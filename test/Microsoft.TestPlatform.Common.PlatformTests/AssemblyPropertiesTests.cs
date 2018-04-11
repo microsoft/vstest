@@ -4,17 +4,18 @@
 namespace TestPlatform.Common.UnitTests.Utilities
 {
     using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class PEReaderHelperTests : IntegrationTestBase
+    public class AssemblyPropertiesTests : IntegrationTestBase
     {
-        private PEReaderHelper peReaderHelper;
+        private IAssemblyProperties assemblyProperties;
 
-        public PEReaderHelperTests()
+        public AssemblyPropertiesTests()
         {
-            this.peReaderHelper = new PEReaderHelper();
+            this.assemblyProperties = new AssemblyProperties();
         }
 
         [TestMethod]
@@ -24,7 +25,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         public void GetAssemblyTypeForManagedDll(string framework)
         {
             var assemblyPath = this.testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
-            var assemblyType = this.peReaderHelper.GetAssemblyType(assemblyPath);
+            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
 
             Assert.AreEqual(AssemblyType.Managed, assemblyType);
         }
@@ -33,7 +34,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         public void GetAssemblyTypeForNativeDll()
         {
             var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            var assemblyType = this.peReaderHelper.GetAssemblyType(assemblyPath);
+            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
 
             Assert.AreEqual(AssemblyType.Native, assemblyType);
         }
@@ -42,7 +43,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         public void GetAssemblyTypeForManagedExe()
         {
             var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.exe", "net451");
-            var assemblyType = this.peReaderHelper.GetAssemblyType(assemblyPath);
+            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
 
             Assert.AreEqual(AssemblyType.Managed, assemblyType);
         }
@@ -53,7 +54,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         public void GetAssemblyTypeForNetCoreManagedExe(string framework)
         {
             var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);
-            var assemblyType = this.peReaderHelper.GetAssemblyType(assemblyPath);
+            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
 
             Assert.AreEqual(AssemblyType.Managed, assemblyType);
         }
@@ -62,7 +63,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         public void GetAssemblyTypeForNativeExe()
         {
             var assemblyPath = $@"{this.testEnvironment.PackageDirectory}\microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe";
-            var assemblyType = this.peReaderHelper.GetAssemblyType(assemblyPath);
+            var assemblyType = this.assemblyProperties.GetAssemblyType(assemblyPath);
 
             Assert.AreEqual(AssemblyType.Native, assemblyType);
         }
@@ -70,7 +71,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         public void GetAssemblyTypeShouldReturnNoneInCaseOfError()
         {
-            var assemblyType = this.peReaderHelper.GetAssemblyType("invalidFile.dll");
+            var assemblyType = this.assemblyProperties.GetAssemblyType("invalidFile.dll");
 
             Assert.AreEqual(AssemblyType.None, assemblyType);
         }

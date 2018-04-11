@@ -7,18 +7,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.IO;
     using System.Reflection.PortableExecutable;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
-    public class PEReaderHelper
+    
+    public class AssemblyProperties : IAssemblyProperties
     {
         private readonly IFileHelper fileHelper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PEReaderHelper"/> class.
+        /// Initializes a new instance of the <see cref="AssemblyProperties"/> class.
         /// </summary>
-        public PEReaderHelper() : this(new FileHelper())
+        public AssemblyProperties() : this(new FileHelper())
         {
         }
 
@@ -26,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// Initializes a new instance of the <see cref="PEReaderHelper"/> class.
         /// </summary>
         /// <param name="fileHelper">File helper.</param>
-        public PEReaderHelper(IFileHelper fileHelper)
+        public AssemblyProperties(IFileHelper fileHelper)
         {
             this.fileHelper = fileHelper;
         }
