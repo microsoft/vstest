@@ -4,19 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Net.Sockets;
-    using System.Threading.Tasks;
-
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The program.
@@ -42,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
             finally
             {
-                EqtTrace.Error("Program.Main: exiting datacollector process.");
+                EqtTrace.Info("Program.Main: exiting datacollector process.");
             }
         }
     }

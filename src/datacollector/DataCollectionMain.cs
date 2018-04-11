@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                     throw new TestPlatformException(
                         string.Format(
                             CultureInfo.CurrentUICulture,
-                            Resources.DataCollectorFailedToConnetToVSTestConsole,
+                            Resources.Resources.DataCollectorFailedToConnetToVSTestConsole,
                             timeout,
                             Constants.VstestTimeoutIncreaseByTimes)
                     );
