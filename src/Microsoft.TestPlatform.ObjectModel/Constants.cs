@@ -163,6 +163,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string ResultsDirectoryName = "TestResults";
 
         /// <summary>
+        /// Environment variable name to increase communication timeouts between processes.
+        /// </summary>
+        public const string VstestTimeoutIncreaseByTimes = "VSTEST_TIMEOUT_INCREASE_BY_TIMES";
+
+        /// <summary>
         /// Default results directory.
         /// </summary>
         public static readonly string DefaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);

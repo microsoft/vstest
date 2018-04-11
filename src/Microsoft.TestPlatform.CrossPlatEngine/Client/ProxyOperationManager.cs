@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-
+    using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -43,6 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private string testHostProcessStdError;
         private bool testHostLaunched;
         private IRequestData requestData;
+        private IEnvironment environment;
 
         #region Constructors
 
@@ -53,16 +54,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
         protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
+        :this(requestData, requestSender, testHostManager, clientConnectionTimeout, new ProcessHelper(), new PlatformEnvironment())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class
+        /// </summary>
+        /// <param name="requestSender">Request Sender instance.</param>
+        /// <param name="testHostManager">Test host manager instance.</param>
+        /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
+        /// <param name="processHelper">IProcessHelper implementation. </param>
+        /// <param name="environment">IEnvironment implementation.</param>
+        internal ProxyOperationManager(
+            IRequestData requestData,
+            ITestRequestSender requestSender,
+            ITestRuntimeProvider testHostManager,
+            int clientConnectionTimeout,
+            IProcessHelper processHelper,
+            IEnvironment environment)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
-            this.processHelper = new ProcessHelper();
+            this.processHelper = processHelper;
+            this.environment = environment;
             this.initialized = false;
             this.testHostLaunched = false;
             this.testHostProcessId = -1;
             this.requestData = requestData;
         }
+
+
 
         #endregion
 
@@ -93,14 +116,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
-            var connTimeout = this.connectionTimeout;
+            var connTimeout = EnvironmentHelper.GetConnectionTimeout(this.environment, Constants.VstestTimeoutIncreaseByTimes, this.connectionTimeout);
 
-            var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
-            if(!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
-            {
-                connTimeout = result * 1000;
-            }
-            
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;

@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc />
-        public bool GetEnviromentVariable(string envVar, ref int value)
+        public bool GetEnviromentVariable(string envVar, ref double value)
         {
             throw new NotImplementedException();
         }

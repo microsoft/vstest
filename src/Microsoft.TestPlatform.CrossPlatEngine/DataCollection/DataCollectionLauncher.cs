@@ -59,12 +59,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (exitCode != 0)
             {
-                EqtTrace.Error("Data collector exited with error: '{0}'", processStdErrorStr);
+                EqtTrace.Error("DataCollectionLauncher.ExitCallBack: Data collector exited with exitcode:{0} error: '{1}'", exitCode, processStdErrorStr);
 
                 if (!string.IsNullOrWhiteSpace(processStdErrorStr))
                 {
                     this.messageLogger.SendMessage(TestMessageLevel.Error, processStdErrorStr);
                 }
+            }
+            else
+            {
+                EqtTrace.Info("DataCollectionLauncher.ExitCallBack: Data collector exited with exitcode: 0 error: '{0}'", processStdErrorStr);
             }
         };
 
@@ -77,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 {
                     // Log all standard error message because on too much data we ignore starting part.
                     // This is helpful in abnormal failure of process.
-                    EqtTrace.Warning("Data collector standard error line: {0}", data);
+                    EqtTrace.Warning("DataCollectionLauncher.ErrorReceivedCallback: Data collector standard error line: {0}", data);
 
                     // Add newline for readbility.
                     data += Environment.NewLine;

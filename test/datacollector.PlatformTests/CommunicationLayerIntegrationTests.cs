@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         private IDataCollectionLauncher dataCollectionLauncher;
         private IProcessHelper processHelper;
         private Mock<IRequestData> mockRequestData;
+        private Mock<IEnvironment> mockEnvironment;
         private Mock<IMetricsCollection> mockMetricsCollection;
 
         public CommunicationLayerIntegrationTests()
@@ -38,6 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             this.dataCollectorSettings = string.Format("<DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"{0}\" codebase=\"{1}\" />", typeof(CustomDataCollector).AssemblyQualifiedName, typeof(CustomDataCollector).GetTypeInfo().Assembly.Location);
             this.runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
             this.processHelper = new ProcessHelper();
+            this.mockEnvironment = new Mock<IEnvironment>();
             this.dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper, this.runSettings);
         }
 
@@ -46,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher, this.mockEnvironment.Object))
             {
                 proxyDataCollectionManager.Initialize();
 
@@ -61,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher, this.mockEnvironment.Object))
             {
                 proxyDataCollectionManager.Initialize();
 
@@ -82,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             var dataCollectionRequestSender = new DataCollectionRequestSender(socketCommManager, JsonDataSerializer.Instance);
             var dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper, this.runSettings);
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher, this.mockEnvironment.Object))
             {
                 proxyDataCollectionManager.Initialize();
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);

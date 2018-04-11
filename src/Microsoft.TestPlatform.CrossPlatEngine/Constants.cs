@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         internal const string ParentProcessIdOption = "--parentprocessid";
 
         /// <summary>
-        /// The connection timeout for clients in milliseconds.
+        /// The connection timeout for clients in seconds.
         /// </summary>
-        internal const int ClientConnectionTimeout = 60 * 1000;
+        internal const int ClientConnectionTimeout = 90;
     }
 }

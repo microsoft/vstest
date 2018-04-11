@@ -192,9 +192,9 @@
         <note />
       </trans-unit>
       <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process.</source>
-        <target state="translated">Non è stato possibile connettere l'agente di raccolta dati.</target>
-        <note />
+        <source>Failed to connect to datacollector process within {0} milliseconds, Set enviroment variable {1} to increase timeout.</source>
+        <target state="new">Non è stato possibile connettere l'agente di raccolta dati.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     internal class TestHostManagerCallbacks
@@ -19,7 +18,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
             {
                 // Log all standard error message because on too much data we ignore starting part.
                 // This is helpful in abnormal failure of testhost.
-                EqtTrace.Warning("Test host standard error line: {0}", data);
+                EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
 
                 // Add newline for readbility.
                 data += Environment.NewLine;
@@ -56,11 +55,6 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
 
             processHelper.TryGetExitCode(process, out exitCode);
 
-            if (exitCode != 0)
-            {
-                EqtTrace.Error("Test host exited with error: '{0}'", testHostProcessStdErrorStr);
-            }
-
             int procId = -1;
             try
             {
@@ -68,6 +62,15 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
             }
             catch (InvalidOperationException)
             {
+            }
+
+            if (exitCode != 0)
+            {
+                EqtTrace.Error("TestHostManagerCallbacks.ExitCallBack: Testhost processId: {0} exited with exitcode: {1} error: '{2}'", procId, exitCode, testHostProcessStdErrorStr);
+            }
+            else
+            {
+                EqtTrace.Info("TestHostManagerCallbacks.ExitCallBack: Testhost processId: {0} exited with exitcode: 0 error: '{1}'", procId, testHostProcessStdErrorStr);
             }
 
             onHostExited(new HostProviderEventArgs(testHostProcessStdErrorStr, exitCode, procId));

@@ -67,9 +67,9 @@
         <note />
       </trans-unit>
       <trans-unit id="VersionCheckTimedout">
-        <source>Failed to negotiate protocol. Wait for response timed out.</source>
-        <target state="translated">프로토콜을 협상하지 못했습니다. 응답 시간이 초과될 때까지 기다려 주세요.</target>
-        <note />
+        <source>Failed to negotiate protocol, Timeout: {0} milliseconds occured while waiting for response, Set enviroment variable {1} to increase timeout.</source>
+        <target state="new">프로토콜을 협상하지 못했습니다. 응답 시간이 초과될 때까지 기다려 주세요.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

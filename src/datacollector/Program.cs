@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Resources;
 
     /// <summary>
     /// The program.

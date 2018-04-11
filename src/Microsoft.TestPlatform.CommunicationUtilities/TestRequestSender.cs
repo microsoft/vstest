@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Collections.Generic;
     using System.Globalization;
     using System.Threading;
-
+    using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -205,11 +205,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Send(data);
 
                 // Wait for negotiation response
-                var timeout = 90;
-                this.environment.GetEnviromentVariable("VSTEST_PROTOCOL_VERSION_TIMEOUT", ref timeout);
-                if (!protocolNegotiated.WaitOne(timeout * 1000))
+                var timeout = EnvironmentHelper.GetConnectionTimeout(this.environment, Constants.VstestTimeoutIncreaseByTimes, 90);
+                if (!protocolNegotiated.WaitOne(timeout))
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout));
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, Constants.VstestTimeoutIncreaseByTimes));
                 }
             }
             finally

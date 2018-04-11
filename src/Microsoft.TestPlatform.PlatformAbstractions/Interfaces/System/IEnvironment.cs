@@ -41,6 +41,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <param name="envVar"> Name of enviroment variable. </param>
         /// <param name="value"> Value of enviroment variable. </param>
         /// <returns cref="bool">Returns true if enviroment variable is set, false otherwise. </returns>
-        bool GetEnviromentVariable(string envVar, ref int value);
+        bool GetEnviromentVariable(string envVar, ref double value);
     }
 }

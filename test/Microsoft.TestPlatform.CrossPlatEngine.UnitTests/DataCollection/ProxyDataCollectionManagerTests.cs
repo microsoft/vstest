@@ -33,6 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
+        private Mock<IEnvironment> mockEnvironment;
 
         [TestInitialize]
         public void Initialize()
@@ -42,8 +43,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockEnvironment = new Mock<IEnvironment>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object, this.mockEnvironment.Object);
         }
 
         [TestMethod]
@@ -65,29 +67,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
-        public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
+        public void InitializeShouldSetTimeoutBasedOnEnvVariableValue()
         {
-
-            var timeout = 10;
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, timeout.ToString());
-            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(timeout * 1000)).Returns(true);
+            var defaultTimes = 1.0;
+            this.mockEnvironment.Setup(e => e.GetEnviromentVariable(Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.VstestTimeoutIncreaseByTimes, ref defaultTimes)).Callback(
+                () => { defaultTimes = 5.0; });
 
             this.proxyDataCollectionManager.Initialize();
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, string.Empty);
 
-            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(timeout * 1000), Times.Once);
+            this.mockEnvironment.Verify(e => e.GetEnviromentVariable(Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.VstestTimeoutIncreaseByTimes, ref defaultTimes));
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5 * 1000), Times.Once);
         }
 
         [TestMethod]
-        public void InitializeShouldSetTimeoutBasedOnDebugEnvironmentVaribleName()
+        public void InitializeShouldSetDefaultTimeoutIfEnvVariableNotSet()
         {
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, "1");
-            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5)).Returns(true);
+            var defaultTimes = 1.0;
 
             this.proxyDataCollectionManager.Initialize();
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
 
-            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5), Times.Once);
+            this.mockEnvironment.Verify(e => e.GetEnviromentVariable(Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.VstestTimeoutIncreaseByTimes, ref defaultTimes));
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 1000), Times.Once);
         }
 
         [TestMethod]
@@ -134,7 +134,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void SendTestHostInitiazliedShouldPassProcessIdToRequestSender()
         {
             string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object, this.mockEnvironment.Object);
 
             this.proxyDataCollectionManager.TestHostLaunched(1234);
 
@@ -145,7 +145,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void BeforeTestRunStartShouldPassRunSettingsWithExtensionsFolderUpdatedAsTestAdapterPath()
         {
             string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object, this.mockEnvironment.Object);
 
             BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
             this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
@@ -237,7 +237,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
 
-            var proxyExecutionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, settings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            var proxyExecutionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, settings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object, this.mockEnvironment.Object);
 
             var resultString = "{ FriendlyName = Code Coverage, Uri = datacollector://microsoft/CodeCoverage/2.0 }";
             this.mockMetricsCollection.Verify(rd => rd.Add(TelemetryDataConstants.DataCollectorsEnabled, resultString), Times.Once);

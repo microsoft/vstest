@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to connect to datacollector process..
+        ///   Looks up a localized string similar to Failed to connect to datacollector process within {0} milliseconds, Set enviroment variable {1} to increase timeout..
         /// </summary>
         internal static string FailedToConnectDataCollector {
             get {

@@ -53,6 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.mockRequestData = new Mock<IRequestData>();
+            this.mockEnvironment = new Mock<IEnvironment>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
         }
@@ -132,7 +133,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockCommunicationServer.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(IPAddress.Loopback + ":123").Callback(
                 () => { mockCommunicationServer.Raise(s=>s.Connected += null, mockCommunicationServer.Object, new ConnectedEventArgs(this.mockChannel.Object)); });
 
-            var testRequestSender = new TestRequestSender(mockCommunicationServer.Object, connectionInfo, mockDataSerializer.Object, protocolConfig, CLIENTPROCESSEXITWAIT);
+            var testRequestSender = new TestRequestSender(mockCommunicationServer.Object, connectionInfo, mockDataSerializer.Object, protocolConfig, CLIENTPROCESSEXITWAIT, this.mockEnvironment.Object);
             this.SetupChannelMessage(MessageType.VersionCheck, MessageType.VersionCheck, protocolConfig.Version);
 
             this.mockTestHostManager.Setup(thm => thm.GetTestHostConnectionInfo()).Returns(connectionInfo);
@@ -164,7 +165,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             this.SetupChannelMessage(MessageType.VersionCheck, MessageType.VersionCheck, protocolConfig.Version);
-            var testRequestSender = new TestRequestSender(mockCommunicationEndpoint.Object, connectionInfo, mockDataSerializer.Object, new ProtocolConfig { Version = 2 }, CLIENTPROCESSEXITWAIT);
+            var testRequestSender = new TestRequestSender(mockCommunicationEndpoint.Object, connectionInfo, mockDataSerializer.Object, new ProtocolConfig { Version = 2 }, CLIENTPROCESSEXITWAIT, this.mockEnvironment.Object);
 
             this.mockTestHostManager.Setup(thm => thm.GetTestHostConnectionInfo()).Returns(connectionInfo);
 

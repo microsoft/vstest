@@ -190,6 +190,6 @@
     <value>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</value>
   </data>
   <data name="FailedToConnectDataCollector" xml:space="preserve">
-    <value>Failed to connect to datacollector process.</value>
+    <value>Failed to connect to datacollector process within {0} milliseconds, Set enviroment variable {1} to increase timeout.</value>
   </data>
 </root>

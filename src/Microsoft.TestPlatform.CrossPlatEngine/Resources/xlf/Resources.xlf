@@ -103,7 +103,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process.</source>
+        <source>Failed to connect to datacollector process within {0} milliseconds, Set enviroment variable {1} to increase timeout.</source>
         <target state="new">Failed to connect datacollector.</target>
         <note></note>
       </trans-unit>
