@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
@@ -127,7 +128,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     discovererToSourcesMap = DiscovererEnumerator.GetDiscovererToSourcesMap(
                         kvp.Key,
                         kvp.Value,
-                        logger);
+                        logger,
+                        new AssemblyProperties());
 
                 // Warning is logged by the inner layer
                 if (discovererToSourcesMap == null || discovererToSourcesMap.Count == 0)

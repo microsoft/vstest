@@ -8,6 +8,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -123,6 +124,14 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var metadata = new TestDiscovererMetadata(null, "executor://helloworld");
 
             Assert.AreEqual("executor://helloworld/", metadata.DefaultExecutorUri.AbsoluteUri);
+        }
+
+        [TestMethod]
+        public void TestDiscovererMetadataCtorSetsAssemblyType()
+        {
+            var metadata = new TestDiscovererMetadata(null, "executor://helloworld", AssemblyType.Native);
+
+            Assert.AreEqual(AssemblyType.Native, metadata.AssemblyType);
         }
     }
 }
