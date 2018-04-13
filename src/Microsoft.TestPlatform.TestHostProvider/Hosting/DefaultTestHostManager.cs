@@ -205,14 +205,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 {
                     adapters.Concat(this.AddExtensionAssemblies(this.runSettings));
 
-                    if (adapters.Any())
-                    {
-                        // If we find any adapter in sources, & adapterpaths, return immediately
-                        return this.FilterExtensionsBasedOnVersion(adapters);
-                    }
+                    // return even if no adapters found close to source, or in adapterpath(s)
+                    return this.FilterExtensionsBasedOnVersion(adapters);
                 }
 
-                // If we did not find any adapter in sources, & adapterpaths, implicitly fall back to old method
                 if (this.projectOutputExtensionsRequired)
                 {
                     extensions = extensions.Concat(adapters);
