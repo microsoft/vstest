@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
             launcher.LaunchTestHost(testProcessStartInfo);
 
-            mockDesignModeClient.Verify(md => md.LaunchCustomHost(testProcessStartInfo), Times.Once);
+            mockDesignModeClient.Verify(md => md.LaunchCustomHost(testProcessStartInfo, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
             launcher.LaunchTestHost(testProcessStartInfo);
 
-            mockDesignModeClient.Verify(md => md.LaunchCustomHost(testProcessStartInfo), Times.Once);
+            mockDesignModeClient.Verify(md => md.LaunchCustomHost(testProcessStartInfo, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

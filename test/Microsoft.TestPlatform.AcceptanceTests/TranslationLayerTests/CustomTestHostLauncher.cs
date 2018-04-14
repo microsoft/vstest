@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
     using System.Diagnostics;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public bool IsDebug => true;
 
         /// <inheritdoc
-        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken))
         {
             var processInfo = new ProcessStartInfo(
                                       defaultTestHostStartInfo.FileName,

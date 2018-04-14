@@ -383,7 +383,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
                 else
                 {
-                    int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
+                    int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo, cancellationToken);
                     this.testHostProcess = Process.GetProcessById(processId);
                     this.processHelper.SetExitCallback(processId, this.ExitCallBack);
                 }

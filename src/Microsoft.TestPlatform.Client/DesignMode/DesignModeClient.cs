@@ -238,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo)
+        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken = default(CancellationToken))
         {
             lock (ackLockObject)
             {
@@ -249,6 +249,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     ackMessage = ackRawMessage;
                     waitHandle.Set();
                 };
+
+                // TODO: unresgiter it also.
+
+                // Resgitering cancellationToken to set waitHandle whenever token is cancelled.
+                cancellationToken.Register(() => waitHandle.Set());
 
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 

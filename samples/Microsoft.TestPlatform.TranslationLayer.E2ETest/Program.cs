@@ -168,7 +168,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
         public bool IsDebug => false;
 
-        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken))
         {
             var processInfo = new ProcessStartInfo(
                                   defaultTestHostStartInfo.FileName,
