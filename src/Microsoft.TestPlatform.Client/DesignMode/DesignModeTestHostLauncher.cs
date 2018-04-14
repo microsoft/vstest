@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using System.Threading;
 
     /// <summary>
     /// DesignMode TestHost Launcher for hosting of test process
@@ -26,9 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public virtual bool IsDebug => false;
 
         /// <inheritdoc/>
-        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo);
+            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, cancellationToken);
         }
     }
 
