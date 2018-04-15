@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var currentEventHandler = eventHandler;
             if (this.ProxyDataCollectionManager != null)
             {
-                currentEventHandler = new DataCollectionTestRunEventsHandler(eventHandler, this.ProxyDataCollectionManager);
+                currentEventHandler = new DataCollectionTestRunEventsHandler(eventHandler, this.ProxyDataCollectionManager, this.CancellationTokenSource.Token);
             }
 
             // Log all the messages that are reported while initializing DataCollectionClient
@@ -127,19 +127,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             return base.StartTestRun(testRunCriteria, currentEventHandler);
-        }
-
-        /// <inheritdoc/>
-        public override void Cancel(ITestRunEventsHandler eventHandler)
-        {
-            try
-            {
-                this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
-            }
-            finally
-            {
-                base.Cancel(eventHandler);
-            }
         }
 
         public override int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
