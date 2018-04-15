@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -31,6 +32,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>
         bool WaitForRequestHandlerConnection(int connectionTimeout);
+
+        /// <summary>
+        /// Waits for Request Handler to be connected
+        /// </summary>
+        /// <param name="connectionTimeout">Time to wait for connection</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>True, if Handler is connected</returns>
+        bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken);
 
         /// <summary>
         /// Close the Sender
@@ -64,11 +73,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler);
 
         /// <summary>
+        /// Starts the TestRun with given sources and criteria
+        /// </summary>
+        /// <param name="runCriteria">RunCriteria for test run</param>
+        /// <param name="eventHandler">EventHandler for test run events</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Starts the TestRun with given test cases and criteria
         /// </summary>
         /// <param name="runCriteria">RunCriteria for test run</param>
         /// <param name="eventHandler">EventHandler for test run events</param>
         void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler);
+
+        /// <summary>
+        /// Starts the TestRun with given test cases and criteria
+        /// </summary>
+        /// <param name="runCriteria">RunCriteria for test run</param>
+        /// <param name="eventHandler">EventHandler for test run events</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler, CancellationToken cancellationToken);
 
         /// <summary>
         /// Ends the Session

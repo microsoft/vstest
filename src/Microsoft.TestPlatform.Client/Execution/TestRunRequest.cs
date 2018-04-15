@@ -47,6 +47,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         private object cancelSyncObject = new Object();
 
         /// <summary>
+        /// Sync object for abort operation
+        /// </summary>
+        private object abortSyncObject = new Object();
+
+        /// <summary>
         /// The run completion event which will be signalled on completion of test run.
         /// </summary>
         private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
@@ -241,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.CancelAsync: Canceling.");
 
-            lock (this.syncObject)
+            lock (this.cancelSyncObject)
             {
                 if (this.disposed)
                 {
@@ -270,7 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             EqtTrace.Verbose("TestRunRequest.Abort: Aborting.");
 
-            lock (this.syncObject)
+            lock (this.abortSyncObject)
             {
                 if (this.disposed)
                 {

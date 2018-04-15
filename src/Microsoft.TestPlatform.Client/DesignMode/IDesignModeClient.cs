@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="defaultTestHostStartInfo">Default TestHost Start Info</param>
         /// <param name="cancellationToken">The cancellation Token.</param>
         /// <returns>Process id of the launched test host.</returns>
-        int LaunchCustomHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken));
+        int LaunchCustomHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>
         /// Handles parent process exit

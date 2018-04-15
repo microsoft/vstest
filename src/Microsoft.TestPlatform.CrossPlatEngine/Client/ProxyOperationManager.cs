@@ -55,6 +55,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
+            this.CancellationTokenSource = new CancellationTokenSource();
+
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
@@ -75,6 +77,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         protected ITestRequestSender RequestSender { get; set; }
 
+        /// <summary>
+        /// Gets or sets the cancellation token source.
+        /// </summary>
+        protected CancellationTokenSource CancellationTokenSource { get; set; }
+
         #endregion
 
         #region IProxyOperationManager implementation.
@@ -91,8 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>
         /// Returns true if Communation is established b/w runner and host
         /// </returns>
-        public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
+        public virtual bool SetupChannel(IEnumerable<string> sources)
         {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
             var connTimeout = this.connectionTimeout;
 
             var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
@@ -114,7 +122,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 var processId = this.processHelper.GetCurrentProcessId();
-
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Subscribe to TestHost Event
@@ -126,8 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     // Launch the test host.
-                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
-                    this.testHostLaunched = hostLaunchedTask.Result;
+                    var testHostLaunched = this.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
 
                     if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                     {
@@ -155,10 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // Wait for a timeout for the client to connect.
-                if (!this.testHostLaunched || !this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
+                if (!this.testHostLaunched || !this.WaitForRequestHandlerConnection(connTimeout))
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
                     if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
                     {
                         // Testhost failed with error
@@ -175,13 +180,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (this.versionCheckRequired)
                 {
-                    this.RequestSender.CheckVersionWithTestHost();
+                    this.CheckVersionWithTestHost();
                 }
 
                 this.initialized = true;
             }
 
             return true;
+        }
+
+        private bool LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken token)
+        {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            return this.testHostManager.LaunchTestHostAsync(testHostStartInfo, token).Result;
+        }
+
+        private bool WaitForRequestHandlerConnection(int connTimeout)
+        {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            return this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token);
+        }
+
+        private void CheckVersionWithTestHost()
+        {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            this.RequestSender.CheckVersionWithTestHost();
         }
 
         /// <summary>

@@ -235,10 +235,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="testProcessStartInfo">
         /// The test Process Start Info.
         /// </param>
+        /// <param name="cancellationToken">
+        /// The cancellation token.
+        /// </param>
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken = default(CancellationToken))
+        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
             lock (ackLockObject)
             {
@@ -250,10 +253,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     waitHandle.Set();
                 };
 
-                // TODO: unresgiter it also.
-
-                // Resgitering cancellationToken to set waitHandle whenever token is cancelled.
-                cancellationToken.Register(() => waitHandle.Set());
+                // Registering cancellationToken to set waitHandle (whenever request is cancelled).
+                var cancellationTokenRegistration = cancellationToken.Register(() => waitHandle.Set());
 
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 
@@ -263,6 +264,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
                 // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
                 waitHandle.WaitOne();
+
+                cancellationTokenRegistration.Dispose();
+                cancellationToken.ThrowIfCancellationRequested();
+
                 this.onAckMessageReceived = null;
 
                 var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
