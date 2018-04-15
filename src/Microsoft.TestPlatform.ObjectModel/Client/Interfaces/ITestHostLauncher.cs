@@ -19,8 +19,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces
         /// Launches custom test host using the default test process start info
         /// </summary>
         /// <param name="defaultTestHostStartInfo">Default TestHost Process Info</param>
+        /// <returns>Process id of the launched test host</returns>
+        int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo);
+
+        /// <summary>
+        /// Launches custom test host using the default test process start info
+        /// </summary>
+        /// <param name="defaultTestHostStartInfo">Default TestHost Process Info</param>
         /// <param name="cancellationToken">The cancellation Token.</param>
         /// <returns>Process id of the launched test host</returns>
-        int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken)); // TODO: check if we can remove default value from interface.
+        int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken);
     }
 }

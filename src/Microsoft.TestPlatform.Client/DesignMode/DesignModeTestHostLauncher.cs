@@ -27,7 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public virtual bool IsDebug => false;
 
         /// <inheritdoc/>
-        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken))
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        {
+            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, CancellationToken.None);
+        }
+
+        /// <inheritdoc/>
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
         {
             return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, cancellationToken);
         }
