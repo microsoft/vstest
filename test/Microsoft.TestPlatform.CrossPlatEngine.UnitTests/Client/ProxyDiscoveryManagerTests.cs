@@ -41,10 +41,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IMetricsCollection> mockMetricsCollection;
 
-        /// <summary>
-        /// The client connection timeout in milliseconds for unit tests.
-        /// </summary>
-        private int testableClientConnectionTimeout = 400;
 
         public ProxyDiscoveryManagerTests()
         {
@@ -56,8 +52,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                                             this.mockRequestData.Object,
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
-                                            this.mockDataSerializer.Object,
-                                            this.testableClientConnectionTimeout);
+                                            this.mockDataSerializer.Object);
             this.discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
         }
 

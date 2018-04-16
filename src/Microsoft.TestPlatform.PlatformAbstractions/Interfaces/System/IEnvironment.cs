@@ -34,13 +34,5 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// </summary>
         /// <returns>Returns the thread Id</returns>
         int GetCurrentManagedThreadId();
-
-        /// <summary>
-        /// Get value of given enviroment variable.
-        /// </summary>
-        /// <param name="envVar"> Name of enviroment variable. </param>
-        /// <param name="value"> Value of enviroment variable. </param>
-        /// <returns cref="bool">Returns true if enviroment variable is set, false otherwise. </returns>
-        bool GetEnviromentVariable(string envVar, ref double value);
     }
 }

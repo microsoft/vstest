@@ -131,9 +131,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             return Task.Run(() =>
             {
-                var timeout = EnvironmentHelper.GetConnectionTimeout(this.environment, Constants.VstestTimeoutIncreaseByTimes, ClientListenTimeOut);
+                var timeout = EnvironmentHelper.GetConnectionTimeout();
                 // Wait for the connection to the sender and start processing requests from sender
-                if (this.requestHandler.WaitForRequestSenderConnection(timeout))
+                if (this.requestHandler.WaitForRequestSenderConnection(timeout * 1000))
                 {
                     this.requestHandler.ProcessRequests();
                 }

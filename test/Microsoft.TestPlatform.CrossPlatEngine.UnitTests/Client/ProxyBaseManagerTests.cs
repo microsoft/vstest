@@ -16,13 +16,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     [TestClass]
     public class ProxyBaseManagerTests
     {
         private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
-        private int clientConnectionTimeout = 400;
         private Mock<ICommunicationEndPoint> mockCommunicationEndpoint;
         private ITestRequestSender testRequestSender;
 
@@ -31,8 +29,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         protected readonly Mock<ITestRuntimeProvider> mockTestHostManager;
         protected Mock<IDataSerializer> mockDataSerializer;
         protected Mock<ICommunicationChannel> mockChannel;
-        private Mock<IEnvironment> mockEnvironment;
-
 
         public ProxyBaseManagerTests()
         {
@@ -40,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockChannel = new Mock<ICommunicationChannel>();
-            this.mockEnvironment = new Mock<IEnvironment>();
+
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
@@ -70,7 +66,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             };
             this.mockCommunicationEndpoint = new Mock<ICommunicationEndPoint>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRequestSender = new TestRequestSender(this.mockCommunicationEndpoint.Object, connectionInfo, this.mockDataSerializer.Object, this.protocolConfig, CLIENTPROCESSEXITWAIT, this.mockEnvironment.Object);
+            this.testRequestSender = new TestRequestSender(this.mockCommunicationEndpoint.Object, connectionInfo, this.mockDataSerializer.Object, this.protocolConfig, CLIENTPROCESSEXITWAIT);
             this.mockCommunicationEndpoint.Setup(mc => mc.Start(connectionInfo.Endpoint)).Returns(connectionInfo.Endpoint).Callback(() =>
             {
                 this.mockCommunicationEndpoint.Raise(
@@ -107,8 +103,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 mockRequestData.Object,
                 testRequestSender,
                 mockTestHostManager.Object,
-                mockDataSerializer.Object,
-                clientConnectionTimeout);
+                mockDataSerializer.Object);
 
             return testDiscoveryManager;
         }
@@ -117,7 +112,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.SetupAndInitializeTestRequestSender();
             var testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, testRequestSender,
-                mockTestHostManager.Object, mockDataSerializer.Object, clientConnectionTimeout);
+                mockTestHostManager.Object, mockDataSerializer.Object);
 
             return testExecutionManager;
         }

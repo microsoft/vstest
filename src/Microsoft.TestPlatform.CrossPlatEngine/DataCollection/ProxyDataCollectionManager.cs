@@ -36,18 +36,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private const string PortOption = "--port";
         private const string DiagOption = "--diag";
         private const string ParentProcessIdOption = "--parentprocessid";
-        public const int DataCollectorConnectionTimeout = 60;  // In seconds.
         public const string DebugEnvironmentVaribleName = "VSTEST_DATACOLLECTOR_DEBUG";
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
         private IProcessHelper processHelper;
         private string settingsXml;
-        private int connectionTimeout;
         private IRequestData requestData;
         private int dataCollectionPort;
         private int dataCollectionProcessId;
-        private IEnvironment environment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
@@ -59,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         ///     Runsettings that contains the datacollector related configuration.
         /// </param>
         public ProxyDataCollectionManager(IRequestData requestData, string settingsXml)
-            : this(requestData, settingsXml, new ProcessHelper(), new PlatformEnvironment())
+            : this(requestData, settingsXml, new ProcessHelper())
         {
         }
 
@@ -75,9 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="processHelper">
         ///     The process helper.
         /// </param>
-        /// <param name="environment"></param>
-        internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IProcessHelper processHelper,
-            IEnvironment environment) : this(requestData, settingsXml, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml), environment)
+        internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IProcessHelper processHelper) : this(requestData, settingsXml, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
         {
         }
 
@@ -99,10 +94,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionLauncher">
         ///     Launches datacollector process.
         /// </param>
-        /// <param name="environment"></param>
         internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml,
             IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper,
-            IDataCollectionLauncher dataCollectionLauncher, IEnvironment environment)
+            IDataCollectionLauncher dataCollectionLauncher)
         {
             // DataCollector process needs the information of the Extensions folder
             // Add the Extensions folder path to runsettings.
@@ -112,8 +106,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
-            this.environment = environment;
-            this.connectionTimeout = ProxyDataCollectionManager.DataCollectorConnectionTimeout;
             this.LogEnabledDataCollectors();
 
         }
@@ -214,20 +206,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionProcessId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(this.dataCollectionPort));
             EqtTrace.Info("ProxyDataCollectionManager.Initialize: Launched datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
 
-            ChangeConnectionTimeoutIfRequired(dataCollectionProcessId);
+            var connectionTimeout = GetConnectionTimeout(dataCollectionProcessId);
 
-            EqtTrace.Info("ProxyDataCollectionManager.Initialize: waiting for connection with timeout: {0} ms", this.connectionTimeout);
+            EqtTrace.Info("ProxyDataCollectionManager.Initialize: waiting for connection with timeout: {0} seconds", connectionTimeout);
 
-            var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
+            var connected = this.dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout * 1000);
             if (connected == false)
             {
                 EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToConnectDataCollector));
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToConnectDataCollector, connectionTimeout, EnvironmentHelper.VstestConnectionTimeout));
             }
         }
 
-        private void ChangeConnectionTimeoutIfRequired(int processId)
+        private int GetConnectionTimeout(int processId)
         {
+            var connectionTimeout = EnvironmentHelper.GetConnectionTimeout();
+
             // Increase connection timeout when debugging is enabled.
             var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable(DebugEnvironmentVaribleName);
             if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) &&
@@ -237,10 +231,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 ConsoleOutput.Instance.WriteLine(
                     string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(processId)),
                     OutputLevel.Information);
-                this.connectionTimeout = 5 * this.connectionTimeout;
+
+                // Increase connection timeout when debugging is enabled.
+                connectionTimeout *= 5;
             }
 
-            this.connectionTimeout = EnvironmentHelper.GetConnectionTimeout(this.environment, ObjectModel.Constants.VstestTimeoutIncreaseByTimes, this.connectionTimeout);
+            return connectionTimeout;
         }
 
         private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)

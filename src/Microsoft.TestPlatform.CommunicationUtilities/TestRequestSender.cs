@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -26,8 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private const int ClientProcessExitWaitTimeout = 10 * 1000;
 
         private readonly IDataSerializer dataSerializer;
-
-        private readonly IEnvironment environment;
 
         private readonly ManualResetEventSlim connected;
 
@@ -63,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="protocolConfig">Protocol configuration.</param>
         /// <param name="connectionInfo">Transport layer to set up connection</param>
         public TestRequestSender(ProtocolConfig protocolConfig, TestHostConnectionInfo connectionInfo)
-            : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, ClientProcessExitWaitTimeout, new PlatformEnvironment())
+            : this(connectionInfo, JsonDataSerializer.Instance, protocolConfig, ClientProcessExitWaitTimeout)
         {
             this.SetCommunicationEndPoint();
         }
@@ -72,11 +69,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             TestHostConnectionInfo connectionInfo,
             IDataSerializer serializer,
             ProtocolConfig protocolConfig,
-            int clientExitedWaitTime,
-            IEnvironment environment)
+            int clientExitedWaitTime)
         {
             this.dataSerializer = serializer;
-            this.environment = environment;
             this.connected = new ManualResetEventSlim(false);
             this.clientExited = new ManualResetEventSlim(false);
             this.clientExitedWaitTime = clientExitedWaitTime;
@@ -100,15 +95,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="serializer">Serializer implementation.</param>
         /// <param name="protocolConfig">Protocol configuration.</param>
         /// <param name="clientExitedWaitTime">Time to wait for client process exit.</param>
-        /// <param name="environment"> Environment implementation.</param>
         internal TestRequestSender(
-                ICommunicationEndPoint communicationEndPoint,
-                TestHostConnectionInfo connectionInfo,
-                IDataSerializer serializer,
-                ProtocolConfig protocolConfig,
-                int clientExitedWaitTime,
-                IEnvironment environment)
-            : this(connectionInfo, serializer, protocolConfig, clientExitedWaitTime, environment)
+            ICommunicationEndPoint communicationEndPoint,
+            TestHostConnectionInfo connectionInfo,
+            IDataSerializer serializer,
+            ProtocolConfig protocolConfig,
+            int clientExitedWaitTime)
+            : this(connectionInfo, serializer, protocolConfig, clientExitedWaitTime)
         {
             this.communicationEndpoint = communicationEndPoint;
         }
@@ -205,8 +198,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Send(data);
 
                 // Wait for negotiation response
-                var timeout = EnvironmentHelper.GetConnectionTimeout(this.environment, Constants.VstestTimeoutIncreaseByTimes, 90);
-                if (!protocolNegotiated.WaitOne(timeout))
+                var timeout = EnvironmentHelper.GetConnectionTimeout();
+                if (!protocolNegotiated.WaitOne(timeout * 1000))
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, Constants.VstestTimeoutIncreaseByTimes));
                 }

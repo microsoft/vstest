@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private readonly IProcessHelper processHelper;
-        private readonly int connectionTimeout;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
         private bool versionCheckRequired = true;
@@ -43,42 +42,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private string testHostProcessStdError;
         private bool testHostLaunched;
         private IRequestData requestData;
-        private IEnvironment environment;
 
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
         /// </summary>
+        /// <param name="requestData"></param>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
-        :this(requestData, requestSender, testHostManager, clientConnectionTimeout, new ProcessHelper(), new PlatformEnvironment())
+        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender,
+            ITestRuntimeProvider testHostManager)
+        :this(requestData, requestSender, testHostManager, new ProcessHelper())
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class
         /// </summary>
+        /// <param name="requestData"></param>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
         /// <param name="processHelper">IProcessHelper implementation. </param>
-        /// <param name="environment">IEnvironment implementation.</param>
-        internal ProxyOperationManager(
-            IRequestData requestData,
+        internal ProxyOperationManager(IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
-            int clientConnectionTimeout,
-            IProcessHelper processHelper,
-            IEnvironment environment)
+            IProcessHelper processHelper)
         {
             this.RequestSender = requestSender;
-            this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
             this.processHelper = processHelper;
-            this.environment = environment;
             this.initialized = false;
             this.testHostLaunched = false;
             this.testHostProcessId = -1;
@@ -116,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
-            var connTimeout = EnvironmentHelper.GetConnectionTimeout(this.environment, Constants.VstestTimeoutIncreaseByTimes, this.connectionTimeout);
+            var connTimeout = EnvironmentHelper.GetConnectionTimeout();
 
             if (!this.initialized)
             {
@@ -168,11 +161,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         OutputLevel.Information);
 
                     // Increase connection timeout when debugging is enabled.
-                    connTimeout = 5 * this.connectionTimeout;
+                    connTimeout *= 5;
                 }
 
                 // Wait for a timeout for the client to connect.
-                if (!this.testHostLaunched || !this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
+                if (!this.testHostLaunched || !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000))
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
 

@@ -5,22 +5,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
 {
     using System;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using ObjectModel;
 
     public class EnvironmentHelper
     {
+        public const string VstestConnectionTimeout = "VSTEST_CONNECTION_TIMEOUT";
+        public const int DefaultConnectionTimeout = 90; // seconds
+
         /// <summary>
-        /// Caluclate timeout based on environment and default value.
+        /// Get timeout based on environment variable VSTEST_CONNECTION_TIMEOUT.
         /// </summary>
-        /// <param name="environment">IEnvironment implementation. </param>
-        /// <param name="envVar"> Environment variable. </param>
-        /// <param name="defaultValue"> Default value in seconds. </param>
-        /// <returns cref="int"> Return value in milliseconds. </returns>
-        public static int GetConnectionTimeout(IEnvironment environment, string envVar, int defaultValue)
+        public static int GetConnectionTimeout()
         {
-            var increaseTimeoutByTimes = 1.0;
-            environment.GetEnviromentVariable(envVar, ref increaseTimeoutByTimes);
-            var timeout = increaseTimeoutByTimes * defaultValue * 1000;
-            return Convert.ToInt32(Math.Round(timeout));
+            var envVarValue = Environment.GetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout);
+            if (!string.IsNullOrEmpty(envVarValue) && int.TryParse(envVarValue, out int value))
+            {
+                EqtTrace.Info("EnvironmentHelper.GetConnectionTimeout: {0} value set to {1}.", EnvironmentHelper.VstestConnectionTimeout, value);
+            }
+            else
+            {
+                value = EnvironmentHelper.DefaultConnectionTimeout;
+            }
+
+            return value;
         }
     }
 }

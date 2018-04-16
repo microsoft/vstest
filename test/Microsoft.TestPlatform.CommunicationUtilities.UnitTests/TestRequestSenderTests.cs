@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     [TestClass]
@@ -37,7 +36,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private readonly List<string> pathToAdditionalExtensions = new List<string> { "Hello", "World" };
         private readonly Mock<ITestDiscoveryEventsHandler2> mockDiscoveryEventsHandler;
         private readonly Mock<ITestRunEventsHandler> mockExecutionEventsHandler;
-        private readonly Mock<IEnvironment> mockEnvironment;
         private readonly TestRunCriteriaWithSources testRunCriteriaWithSources;
         private TestHostConnectionInfo connectionInfo;
         private ITestRequestSender testRequestSender;
@@ -54,8 +52,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockChannel = new Mock<ICommunicationChannel>();
             this.mockServer = new Mock<ICommunicationEndPoint>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.mockEnvironment = new Mock<IEnvironment>();
-            this.testRequestSender = new TestableTestRequestSender(this.mockServer.Object, this.connectionInfo, this.mockDataSerializer.Object, new ProtocolConfig { Version = DUMMYPROTOCOLVERSION }, this.mockEnvironment.Object);
+            this.testRequestSender = new TestableTestRequestSender(this.mockServer.Object, this.connectionInfo, this.mockDataSerializer.Object, new ProtocolConfig { Version = DUMMYPROTOCOLVERSION });
 
             this.connectedEventArgs = new ConnectedEventArgs(this.mockChannel.Object);
             this.mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
@@ -792,8 +789,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
         private class TestableTestRequestSender : TestRequestSender
         {
-            public TestableTestRequestSender(ICommunicationEndPoint commEndpoint, TestHostConnectionInfo connectionInfo, IDataSerializer serializer, ProtocolConfig protocolConfig, IEnvironment environment)
-                : base(commEndpoint, connectionInfo, serializer, protocolConfig, 0, environment)
+            public TestableTestRequestSender(ICommunicationEndPoint commEndpoint, TestHostConnectionInfo connectionInfo, IDataSerializer serializer, ProtocolConfig protocolConfig)
+                : base(commEndpoint, connectionInfo, serializer, protocolConfig, 0)
             {
             }
         }
