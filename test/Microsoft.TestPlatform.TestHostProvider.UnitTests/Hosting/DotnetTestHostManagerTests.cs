@@ -211,7 +211,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
         {
             var expectedProcessId = Process.GetCurrentProcess().Id;
-            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
             this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
@@ -229,7 +229,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void LaunchTestHostAsyncShouldNotStartHostProcessIfCancellationTokenIsSet()
         {
             var expectedProcessId = Process.GetCurrentProcess().Id;
-            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
 
@@ -252,7 +252,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             processId.Wait();
 
             Assert.IsTrue(processId.Result);
-            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables)), It.IsAny<CancellationToken>()), Times.Once);
+            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables))), Times.Once);
         }
 
         [TestMethod]
@@ -366,14 +366,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
 
-            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs)), It.IsAny<CancellationToken>()), Times.Once);
+            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
         }
 
         [TestMethod]
         public void LaunchTestHostShouldSetExitCallBackInCaseCustomHost()
         {
             var expectedProcessId = Process.GetCurrentProcess().Id;
-            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
             var startInfo = this.GetDefaultStartInfo();

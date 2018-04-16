@@ -6,7 +6,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -33,7 +33,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
             this.baseTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             this.proxyDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, this.mockDataSerializer.Object);
+            this.testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, CancellationToken.None, this.mockDataSerializer.Object);
         }
 
         [TestMethod]
