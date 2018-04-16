@@ -617,7 +617,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testProcessStartInfo = new TestProcessStartInfo();
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-            mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Never);
         }
 
         [TestMethod]
@@ -633,7 +633,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testProcessStartInfo = new TestProcessStartInfo();
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-            mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Never);
+            mockCustomLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Never);
         }
 
         [TestMethod]
@@ -650,7 +650,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             mockCustomLauncher.Setup(ml => ml.IsDebug).Returns(true);
             testRunRequest.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
-            mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo, It.IsAny<CancellationToken>()), Times.Once);
+            mockCustomLauncher.Verify(ml => ml.LaunchTestHost(testProcessStartInfo), Times.Once);
         }
 
         /// <summary>

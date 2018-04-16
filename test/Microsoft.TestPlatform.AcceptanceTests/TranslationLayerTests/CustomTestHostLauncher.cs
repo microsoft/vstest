@@ -19,11 +19,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             private set;
         }
 
-        /// <inheritdoc
+        /// <inheritdoc />
         public bool IsDebug => true;
 
-        /// <inheritdoc
-        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken = default(CancellationToken))
+        /// <inheritdoc />
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        {
+            return this.LaunchTestHost(defaultTestHostStartInfo, CancellationToken.None);
+        }
+
+        /// <inheritdoc />
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
         {
             var processInfo = new ProcessStartInfo(
                                       defaultTestHostStartInfo.FileName,

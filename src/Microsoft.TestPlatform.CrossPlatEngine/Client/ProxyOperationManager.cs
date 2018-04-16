@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     // Launch the test host.
-                    var testHostLaunched = this.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
+                    this.testHostLaunched = this.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
 
                     if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                     {

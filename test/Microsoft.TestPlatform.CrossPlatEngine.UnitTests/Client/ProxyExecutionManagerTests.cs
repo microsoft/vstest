@@ -276,7 +276,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None));
+            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }));
         }
 
         [TestMethod]
@@ -430,7 +430,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
-            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None);
+            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" });
 
             this.testExecutionManager.Close();
 
@@ -450,7 +450,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
-            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None);
+            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" });
 
             this.testExecutionManager.Close();
             this.testExecutionManager.Close();
