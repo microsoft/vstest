@@ -53,34 +53,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestData"></param>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender,
-            ITestRuntimeProvider testHostManager)
-        :this(requestData, requestSender, testHostManager, new ProcessHelper())
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class
-        /// </summary>
-        /// <param name="requestData"></param>
-        /// <param name="requestSender">Request Sender instance.</param>
-        /// <param name="testHostManager">Test host manager instance.</param>
-        /// <param name="processHelper">IProcessHelper implementation. </param>
-        internal ProxyOperationManager(IRequestData requestData,
-            ITestRequestSender requestSender,
-            ITestRuntimeProvider testHostManager,
-            IProcessHelper processHelper)
+        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager)
         {
             this.RequestSender = requestSender;
             this.testHostManager = testHostManager;
-            this.processHelper = processHelper;
+            this.processHelper = new ProcessHelper();
             this.initialized = false;
             this.testHostLaunched = false;
             this.testHostProcessId = -1;
             this.requestData = requestData;
         }
-
-
 
         #endregion
 

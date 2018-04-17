@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionProcessId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(this.dataCollectionPort));
             EqtTrace.Info("ProxyDataCollectionManager.Initialize: Launched datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
 
-            var connectionTimeout = GetConnectionTimeout(dataCollectionProcessId);
+            var connectionTimeout = ProxyDataCollectionManager.GetConnectionTimeout(dataCollectionProcessId);
 
             EqtTrace.Info("ProxyDataCollectionManager.Initialize: waiting for connection with timeout: {0} seconds", connectionTimeout);
 
@@ -228,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
         }
 
-        private int GetConnectionTimeout(int processId)
+        private static int GetConnectionTimeout(int processId)
         {
             var connectionTimeout = EnvironmentHelper.GetConnectionTimeout();
 

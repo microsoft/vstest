@@ -26,7 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private Mock<IDataCollectionRequestHandler> mockDataCollectionRequestHandler;
         private DataCollectorMain dataCollectorMain;
 
-
         public DataCollectorMainTests()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
@@ -43,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void RunShouldTimeoutBasedOneEnvVariable()
+        public void RunShouldTimeoutBasedOnEnvVariable()
         {
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "10");
             this.dataCollectorMain.Run(args);

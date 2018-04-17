@@ -217,8 +217,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
 
             this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(100000), Times.Exactly(1));
-
-            this.connectionTimeout = EnvironmentHelper.DefaultConnectionTimeout;
         }
 
         [TestMethod]
@@ -228,7 +226,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
 
-            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout));
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Once);
         }
 
         [TestMethod]

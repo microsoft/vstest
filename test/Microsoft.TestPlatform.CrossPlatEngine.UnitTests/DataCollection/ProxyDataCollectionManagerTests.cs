@@ -51,6 +51,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
         }
 
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
+        }
+
         [TestMethod]
         public void InitializeShouldInitializeCommunication()
         {
@@ -80,13 +87,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
         {
-
             var timeout = 10;
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
             this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(timeout * 1000)).Returns(true);
 
             this.proxyDataCollectionManager.Initialize();
-            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
 
             this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(timeout * 1000), Times.Once);
         }
@@ -99,7 +104,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(expectedTimeout)).Returns(true);
 
             this.proxyDataCollectionManager.Initialize();
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
 
             this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(expectedTimeout), Times.Once);
         }
