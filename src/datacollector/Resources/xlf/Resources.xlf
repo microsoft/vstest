@@ -3,7 +3,7 @@
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
       <trans-unit id="DataCollectorFailedToConnetToVSTestConsole">
-        <source>Datacollector process failed to connect to vstest.console in {0} milliseconds, Set enviroment variable {1} to increase timeout.</source>
+        <source>Datacollector process failed to connect to vstest.console after {0} seconds,  This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
         <target state="new">Datacollector process failed to connect to vstest.console in {0} milliseconds, Set enviroment variable {1} to increase timeout.</target>
         <note></note>
       </trans-unit>

@@ -165,10 +165,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // Wait for a timeout for the client to connect.
-                if (!this.testHostLaunched || !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000))
+                var connected = true;
+
+                if (!this.testHostLaunched ||
+                    !(connected = this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000)))
                 {
+                    // Failed to launch testhost process.
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
+                    // Timeout occured due to machine slowness.
+                    if (!connected)
+                    {
+                        errorMsg = string.Format(CrossPlatEngineResources.TestHostConnectionTimeout, connTimeout, EnvironmentHelper.VstestConnectionTimeout);
+                    }
+
+                    // After testhost process launched failed with error.
                     if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
                     {
                         // Testhost failed with error

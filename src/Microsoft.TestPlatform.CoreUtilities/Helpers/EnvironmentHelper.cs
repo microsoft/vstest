@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using ObjectModel;
 
     public class EnvironmentHelper

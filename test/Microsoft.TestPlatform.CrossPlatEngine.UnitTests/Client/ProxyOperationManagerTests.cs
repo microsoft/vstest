@@ -6,6 +6,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Threading;
@@ -236,7 +237,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object);
 
-            Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None));
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None)).Message;
+            Assert.AreEqual(message, string.Format(CultureInfo.CurrentUICulture, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources.TestHostConnectionTimeout, EnvironmentHelper.DefaultConnectionTimeout, EnvironmentHelper.VstestConnectionTimeout));
         }
 
         [TestMethod]
@@ -247,7 +249,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object);
 
-            Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None));
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None)).Message;
+            Assert.AreEqual(message, string.Format(CultureInfo.CurrentUICulture, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources.InitializationFailed));
         }
 
         [TestMethod]

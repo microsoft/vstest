@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             try
             {
-                new DataCollectionMain().Run(args);
+                new DataCollectorMain().Run(args);
             }
             catch (Exception ex)
             {

@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Datacollector process failed to connect to vstest.console in {0} milliseconds, Set enviroment variable {1} to increase timeout..
+        ///   Looks up a localized string similar to Datacollector process failed to connect to vstest.console after {0} seconds,  This may occur due to machine slowness, please set environment variable {1} to increase timeout..
         /// </summary>
         internal static string DataCollectorFailedToConnetToVSTestConsole {
             get {

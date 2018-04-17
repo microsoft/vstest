@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
     using System.Threading;
@@ -18,6 +19,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     [TestClass]
@@ -58,6 +60,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.mockExecutionEventsHandler = new Mock<ITestRunEventsHandler>();
             this.testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
         }
 
         [TestMethod]
@@ -201,6 +209,24 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.SetupFakeCommunicationChannel();
 
             Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+        }
+
+        [TestMethod]
+        public void CheckVersionWithTestHostShouldThrowIfProtocolNegotiationTimeouts()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "0");
+
+            this.SetupFakeCommunicationChannel();
+
+            var message = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost()).Message;
+
+            Assert.AreEqual(
+                message,
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CommunicationUtilitiesResources.VersionCheckTimedout,
+                    0,
+                    EnvironmentHelper.VstestConnectionTimeout));
         }
 
         #endregion

@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var timeout = EnvironmentHelper.GetConnectionTimeout();
                 if (!protocolNegotiated.WaitOne(timeout * 1000))
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, Constants.VstestTimeoutIncreaseByTimes));
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, EnvironmentHelper.VstestConnectionTimeout));
                 }
             }
             finally

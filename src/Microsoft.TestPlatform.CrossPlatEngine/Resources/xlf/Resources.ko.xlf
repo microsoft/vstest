@@ -192,8 +192,13 @@
         <note />
       </trans-unit>
       <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process within {0} milliseconds, Set enviroment variable {1} to increase timeout.</source>
+        <source>Failed to connect to datacollector process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
         <target state="new">datacollector 프로세스에 연결하지 못했습니다.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestHostConnectionTimeout">
+        <source>Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
+        <target state="new">Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
         <note></note>
       </trans-unit>
     </body>

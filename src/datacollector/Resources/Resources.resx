@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DataCollectorFailedToConnetToVSTestConsole" xml:space="preserve">
-    <value>Datacollector process failed to connect to vstest.console in {0} milliseconds, Set enviroment variable {1} to increase timeout.</value>
+    <value>Datacollector process failed to connect to vstest.console after {0} seconds,  This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
   </data>
 </root>

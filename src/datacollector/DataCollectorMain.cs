@@ -17,13 +17,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using PlatformAbstractions.Interfaces;
 
-    public class DataCollectionMain
+    public class DataCollectorMain
     {
-        /// <summary>
-        /// The timeout for the client to connect to the server.
-        /// </summary>
-        private const int ClientListenTimeOut = 60; // in seconds.
-
         /// <summary>
         /// Port number used to communicate with test runner process.
         /// </summary>
@@ -44,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private IEnvironment environment;
         private IDataCollectionRequestHandler requestHandler;
 
-        public DataCollectionMain():
+        public DataCollectorMain():
             this(
                 new ProcessHelper(),
                 new PlatformEnvironment(),
@@ -53,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
         }
 
-        internal DataCollectionMain(IProcessHelper processHelper, IEnvironment environment, IDataCollectionRequestHandler requestHandler)
+        internal DataCollectorMain(IProcessHelper processHelper, IEnvironment environment, IDataCollectionRequestHandler requestHandler)
         {
             this.processHelper = processHelper;
             this.environment = environment;
@@ -75,6 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 EqtTrace.DoNotInitailize = true;
             }
+
+            EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", string.Join(",", args));
 
             // Attach to exit of parent process
             var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
@@ -107,10 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             // Start processing async in a different task
             EqtTrace.Info("DataCollector: Start Request Processing.");
-            var processingTask = StartProcessingAsync();
-
-            // Wait for processing to complete.
-            Task.WaitAny(processingTask);
+            StartProcessing();
         }
 
         private void WaitForDebuggerIfEnabled()
@@ -127,29 +121,31 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
         }
 
-        private Task StartProcessingAsync()
+        private void StartProcessing()
         {
-            return Task.Run(() =>
+            var timeout = EnvironmentHelper.GetConnectionTimeout();
+
+            // Wait for the connection to the sender and start processing requests from sender
+            if (this.requestHandler.WaitForRequestSenderConnection(timeout * 1000))
             {
-                var timeout = EnvironmentHelper.GetConnectionTimeout();
-                // Wait for the connection to the sender and start processing requests from sender
-                if (this.requestHandler.WaitForRequestSenderConnection(timeout * 1000))
-                {
-                    this.requestHandler.ProcessRequests();
-                }
-                else
-                {
-                    EqtTrace.Error("DataCollectionMain.StartProcessingAsync: RequestHandler timed out while connecting to the Sender, timeout: {0} ms", timeout);
-                    this.requestHandler.Close();
-                    throw new TestPlatformException(
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            Resources.Resources.DataCollectorFailedToConnetToVSTestConsole,
-                            timeout,
-                            Constants.VstestTimeoutIncreaseByTimes)
-                    );
-                }
-            });
+                this.requestHandler.ProcessRequests();
+            }
+            else
+            {
+                EqtTrace.Error(
+                    "DataCollectorMain.StartProcessing: RequestHandler timed out while connecting to the Sender, timeout: {0} seconds.",
+                    timeout);
+
+                this.requestHandler.Close();
+
+                throw new TestPlatformException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        Resources.Resources.DataCollectorFailedToConnetToVSTestConsole,
+                        timeout,
+                        EnvironmentHelper.VstestConnectionTimeout)
+                );
+            }
         }
     }
 }
