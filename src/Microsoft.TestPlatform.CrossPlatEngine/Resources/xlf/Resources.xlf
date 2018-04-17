@@ -102,16 +102,6 @@
         <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Failed to connect datacollector.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="TestHostConnectionTimeout">
-        <source>Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

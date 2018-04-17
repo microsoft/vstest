@@ -71,6 +71,11 @@
         <target state="new">프로토콜을 협상하지 못했습니다. 응답 시간이 초과될 때까지 기다려 주세요.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

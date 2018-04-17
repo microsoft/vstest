@@ -191,16 +191,6 @@
         <target state="translated">Używamy starszej wersji zestawu Microsoft.NET.Test.Sdk. Przejdź na wersję 15.3.0 lub nowszą.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Nie można połączyć z procesem modułu zbierającego dane.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="TestHostConnectionTimeout">
-        <source>Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

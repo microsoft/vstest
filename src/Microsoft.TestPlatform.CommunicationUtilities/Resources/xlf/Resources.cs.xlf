@@ -71,6 +71,11 @@
         <target state="new">Nepovedlo se vyjednat protokol. Při čekání na odpověď vypršel časový limit.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ConnectionTimeoutErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
+        <target state="new">{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
