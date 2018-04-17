@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System;
     using System.Diagnostics;
     using System.Globalization;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
@@ -16,6 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using PlatformAbstractions.Interfaces;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     public class DataCollectorMain
     {
@@ -141,10 +142,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 throw new TestPlatformException(
                     string.Format(
                         CultureInfo.CurrentUICulture,
-                        Resources.Resources.DataCollectorFailedToConnetToVSTestConsole,
+                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                        CoreUtilitiesConstants.DatacollectorProcessName,
+                        CoreUtilitiesConstants.VstestConsoleProcessName,
                         timeout,
                         EnvironmentHelper.VstestConnectionTimeout)
-                );
+                    );
             }
         }
     }

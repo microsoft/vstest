@@ -5,11 +5,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
@@ -25,15 +26,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
+
     /// <summary>
     /// Handles test session events received from vstest console process.
     /// </summary>
     internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDisposable
     {
-        // On Slower Machines(hosted agents) with Profiling enabled 15secs is not enough for testhost to get started(weird right!!),
-        // hence increasing this timeout
-        private const int DataCollectionCommTimeOut = 60 * 1000;
-
         private static readonly object SyncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
@@ -294,21 +294,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     {
                         try
                         {
+                            var timeout = EnvironmentHelper.GetConnectionTimeout();
                             if (this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(
-                                    DataCollectionCommTimeOut))
+                                    timeout * 1000))
                             {
                                 this.dataCollectionTestCaseEventHandler.ProcessRequests();
                             }
                             else
                             {
-                                EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests: TestCaseEventHandler timed out while connecting to the Sender.");
+                                EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart: TestCaseEventHandler timed out while connecting to the Sender.");
                                 this.dataCollectionTestCaseEventHandler.Close();
-                                throw new TimeoutException();
+                                throw new TestPlatformException(
+                                    string.Format(
+                                        CultureInfo.CurrentUICulture,
+                                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                                        CoreUtilitiesConstants.DatacollectorProcessName,
+                                        CoreUtilitiesConstants.TesthostProcessName,
+                                        timeout,
+                                        EnvironmentHelper.VstestConnectionTimeout));
                             }
                         }
                         catch (Exception e)
                         {
-                            EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : Error occured during initialization of TestHost : {0}", e);
+                            EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occured during initialization of TestHost : {0}", e);
+                            throw;
                         }
                     },
                     this.cancellationTokenSource.Token);
@@ -333,11 +342,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             try
             {
                 this.testCaseEventMonitorTask?.Wait(this.cancellationTokenSource.Token);
-                this.dataCollectionTestCaseEventHandler.Close();
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : {0}", ex.ToString());
+                EqtTrace.Error("DataCollectionRequestHandler.HandleAfterTestRunEnd : {0}", ex.ToString());
+                throw;
+            }
+            finally
+            {
+                this.dataCollectionTestCaseEventHandler.Close();
             }
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);

@@ -134,15 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to connect to datacollector process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout..
-        /// </summary>
-        internal static string FailedToConnectDataCollector {
-            get {
-                return ResourceManager.GetString("FailedToConnectDataCollector", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to launch testhost with error: {0}.
         /// </summary>
         internal static string FailedToLaunchTestHost {
@@ -238,15 +229,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string StringSeperator {
             get {
                 return ResourceManager.GetString("StringSeperator", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout..
-        /// </summary>
-        internal static string TestHostConnectionTimeout {
-            get {
-                return ResourceManager.GetString("TestHostConnectionTimeout", resourceCulture);
             }
         }
         

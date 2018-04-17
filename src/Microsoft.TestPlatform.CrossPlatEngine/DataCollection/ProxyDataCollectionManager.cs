@@ -27,6 +27,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     /// <summary>
     /// Managed datacollector interaction from runner process.
@@ -214,7 +216,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             if (connected == false)
             {
                 EqtTrace.Error("ProxyDataCollectionManager.Initialize: failed to connect to datacollector process, processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToConnectDataCollector, connectionTimeout, EnvironmentHelper.VstestConnectionTimeout));
+                throw new TestPlatformException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                        CoreUtilitiesConstants.VstestConsoleProcessName,
+                        CoreUtilitiesConstants.DatacollectorProcessName,
+                        connectionTimeout,
+                        EnvironmentHelper.VstestConnectionTimeout)
+                    );
             }
         }
 

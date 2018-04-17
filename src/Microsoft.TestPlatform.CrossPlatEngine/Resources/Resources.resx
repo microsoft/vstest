@@ -189,10 +189,4 @@
   <data name="OldTestHostIsGettingUsed" xml:space="preserve">
     <value>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</value>
   </data>
-  <data name="FailedToConnectDataCollector" xml:space="preserve">
-    <value>Failed to connect to datacollector process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
-  </data>
-  <data name="TestHostConnectionTimeout" xml:space="preserve">
-    <value>Failed to connect to testhost process after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
-  </data>
 </root>

@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Reflection;
 
@@ -22,6 +23,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     using Moq;
 
@@ -62,7 +66,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             this.mockDataCollectionRequestSender.Setup( x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize());
+            var message = Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize()).Message;
+            Assert.AreEqual(message,
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                    CoreUtilitiesConstants.VstestConsoleProcessName,
+                    CoreUtilitiesConstants.DatacollectorProcessName,
+                    EnvironmentHelper.DefaultConnectionTimeout,
+                    EnvironmentHelper.VstestConnectionTimeout));
         }
 
         [TestMethod]

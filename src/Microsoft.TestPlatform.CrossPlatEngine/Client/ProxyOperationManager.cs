@@ -22,6 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -170,23 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (!this.testHostLaunched ||
                     !(connected = this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000)))
                 {
-                    // Failed to launch testhost process.
-                    var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
-                    // Timeout occured due to machine slowness.
-                    if (!connected)
-                    {
-                        errorMsg = string.Format(CrossPlatEngineResources.TestHostConnectionTimeout, connTimeout, EnvironmentHelper.VstestConnectionTimeout);
-                    }
-
-                    // After testhost process launched failed with error.
-                    if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
-                    {
-                        // Testhost failed with error
-                        errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
-                    }
-
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+                    this.HandleConnectionFailure(connected, connTimeout);
                 }
 
                 // Handling special case for dotnet core projects with older test hosts
@@ -330,6 +316,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
+        }
+
+        private void HandleConnectionFailure(bool connected, int connTimeout)
+        {
+            // Failed to launch testhost process.
+            var errorMsg = CrossPlatEngineResources.InitializationFailed;
+
+            // Timeout occured due to machine slowness.
+            if (!connected)
+            {
+                errorMsg = string.Format(
+                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                    CoreUtilitiesConstants.VstestConsoleProcessName,
+                    CoreUtilitiesConstants.TesthostProcessName,
+                    connTimeout,
+                    EnvironmentHelper.VstestConnectionTimeout);
+            }
+
+            // After testhost process launched failed with error.
+            if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
+            {
+                // Testhost failed with error
+                errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+            }
+
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
         }
     }
 }

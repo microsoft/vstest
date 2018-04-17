@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
+    using System.Globalization;
     using CommunicationUtilities.DataCollection.Interfaces;
     using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -12,6 +13,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using Moq;
     using PlatformAbstractions.Interfaces;
     using TestPlatform.DataCollector;
+
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     [TestClass]
     public class DataCollectorMainTests
@@ -61,7 +65,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var message = Assert.ThrowsException<TestPlatformException>(() => this.dataCollectorMain.Run(args)).Message;
             Assert.AreEqual(message,
                 string.Format(
-                    TestPlatform.DataCollector.Resources .Resources.DataCollectorFailedToConnetToVSTestConsole,
+                    CultureInfo.CurrentUICulture,
+                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                    CoreUtilitiesConstants.DatacollectorProcessName,
+                    CoreUtilitiesConstants.VstestConsoleProcessName,
                     EnvironmentHelper.DefaultConnectionTimeout,
                     EnvironmentHelper.VstestConnectionTimeout)
                 );

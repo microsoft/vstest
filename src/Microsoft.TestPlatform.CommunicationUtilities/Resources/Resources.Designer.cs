@@ -20,10 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -62,18 +62,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Discovery was aborted. Due to {0}.
+        ///   Looks up a localized string similar to The active test discovery was aborted. Reason: {0}.
         /// </summary>
-        internal static string AbortedTestDiscovery {
+        public static string AbortedTestDiscovery {
             get {
                 return ResourceManager.GetString("AbortedTestDiscovery", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Run was aborted. Due to {0}.
+        ///   Looks up a localized string similar to The active test run was aborted. Reason: {0}.
         /// </summary>
-        internal static string AbortedTestRun {
+        public static string AbortedTestRun {
             get {
                 return ResourceManager.GetString("AbortedTestRun", resourceCulture);
             }
@@ -82,16 +82,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         /// <summary>
         ///   Looks up a localized string similar to An existing connection was forcibly closed by the remote host..
         /// </summary>
-        internal static string ConnectionClosed {
+        public static string ConnectionClosed {
             get {
                 return ResourceManager.GetString("ConnectionClosed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to communicate with test execution process..
+        ///   Looks up a localized string similar to {0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout..
         /// </summary>
-        internal static string UnableToCommunicateToTestHost {
+        public static string ConnectionTimeoutErrorMessage {
+            get {
+                return ResourceManager.GetString("ConnectionTimeoutErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to communicate with test host process..
+        /// </summary>
+        public static string UnableToCommunicateToTestHost {
             get {
                 return ResourceManager.GetString("UnableToCommunicateToTestHost", resourceCulture);
             }
@@ -100,32 +109,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}.
         /// </summary>
-        internal static string UnexpectedMessage
-        {
-            get
-            {
+        public static string UnexpectedMessage {
+            get {
                 return ResourceManager.GetString("UnexpectedMessage", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Protocol version check failed. Make sure test runner and host are compatible..
         /// </summary>
-        internal static string VersionCheckFailed
-        {
-            get
-            {
+        public static string VersionCheckFailed {
+            get {
                 return ResourceManager.GetString("VersionCheckFailed", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Failed to negotiate protocol. Wait for response timed out.
+        ///   Looks up a localized string similar to Failed to negotiate protocol, waiting for response timed out after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout..
         /// </summary>
-        internal static string VersionCheckTimedout
-        {
-            get
-            {
+        public static string VersionCheckTimedout {
+            get {
                 return ResourceManager.GetString("VersionCheckTimedout", resourceCulture);
             }
         }

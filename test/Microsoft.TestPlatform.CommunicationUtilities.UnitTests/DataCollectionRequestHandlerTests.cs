@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.Net;
 
     using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
@@ -21,6 +22,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
     using Moq;
     using Newtonsoft.Json.Linq;
+    using VisualStudio.TestPlatform.CoreUtilities.Helpers;
+
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     [TestClass]
     public class DataCollectionRequestHandlerTests
@@ -31,6 +36,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private Mock<IDataCollectionTestCaseEventHandler> mockDataCollectionTestCaseEventHandler;
         private TestableDataCollectionRequestHandler requestHandler;
         private Mock<IDataSerializer> mockDataSerializer;
+        private Message afterTestRunEnd = new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" };
+        private Message beforeTestRunStart = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = "settingsXml" };
 
         public DataCollectionRequestHandlerTests()
         {
@@ -41,6 +48,16 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler = new Mock<IDataCollectionTestCaseEventHandler>();
             this.mockDataCollectionTestCaseEventHandler.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object, this.mockDataSerializer.Object);
+
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart).Returns(this.afterTestRunEnd);
+
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
         }
 
         [TestMethod]
@@ -159,16 +176,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldProcessRequests()
         {
-            var message = new Message();
-            message.MessageType = MessageType.BeforeTestRunStart;
-            message.Payload = "settingsXml";
-
             var testHostLaunchedPayload = new TestHostLaunchedPayload();
             testHostLaunchedPayload.ProcessId = 1234;
 
-            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message)
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart)
                                                                                 .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
-                                                                                .Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
+                                                                                .Returns(this.afterTestRunEnd);
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
             this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
@@ -214,14 +227,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldInitializeTestCaseEventHandlerIfTestCaseLevelEventsAreEnabled()
         {
-            var message = new Message();
-            message.MessageType = MessageType.BeforeTestRunStart;
-            message.Payload = "settingsXml";
-
-            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
-
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
-
             this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Once);
@@ -230,14 +235,46 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void ProcessRequestsShouldSetDefaultTimeoutIfNoEnvVarialbeSet()
+        {
+            this.requestHandler.ProcessRequests();
+
+            this.mockDataCollectionTestCaseEventHandler.Verify(h => h.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
+        }
+
+        [TestMethod]
+        public void ProcessRequestsShouldSetTimeoutBasedOnEnvVariable()
+        {
+            var timeout = 10;
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
+
+            this.requestHandler.ProcessRequests();
+
+            this.mockDataCollectionTestCaseEventHandler.Verify(h => h.WaitForRequestHandlerConnection(timeout * 1000));
+        }
+
+        [TestMethod]
+        public void ProcessRequestsShouldThrowExceptionIFTestCaseEventHandlerConnectionTimeouts()
+        {
+            this.mockDataCollectionTestCaseEventHandler.Setup(h => h.WaitForRequestHandlerConnection(It.IsAny<int>()))
+                .Returns(false);
+
+            var exMessage = Assert.ThrowsException<AggregateException>(() => this.requestHandler.ProcessRequests()).InnerExceptions[0].Message;
+
+            Assert.AreEqual(
+                exMessage,
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                    CoreUtilitiesConstants.DatacollectorProcessName,
+                    CoreUtilitiesConstants.TesthostProcessName,
+                    EnvironmentHelper.DefaultConnectionTimeout,
+                    EnvironmentHelper.VstestConnectionTimeout));
+        }
+
+        [TestMethod]
         public void ProcessRequestsShouldNotInitializeTestCaseEventHandlerIfTestCaseLevelEventsAreNotEnabled()
         {
-            var message = new Message();
-            message.MessageType = MessageType.BeforeTestRunStart;
-            message.Payload = "settingsXml";
-
-            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
-
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(false);
 
             this.requestHandler.ProcessRequests();
