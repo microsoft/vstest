@@ -3,9 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using System.Threading;
 
     /// <summary>
     /// DesignMode TestHost Launcher for hosting of test process

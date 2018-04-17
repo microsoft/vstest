@@ -135,12 +135,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public bool WaitForRequestHandlerConnection(int connectionTimeout)
-        {
-            return this.WaitForRequestHandlerConnection(connectionTimeout, CancellationToken.None);
-        }
-
-        /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
         {
             var cancellationTokenRegistration = cancellationToken.Register(() => this.connected.Set());
@@ -269,12 +263,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
-        {
-            this.StartTestRun(runCriteria, eventHandler, CancellationToken.None);
-        }
-
-        /// <inheritdoc />
         public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler, CancellationToken cancellationToken)
         {
             this.messageEventHandler = eventHandler;
@@ -296,12 +284,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             this.channel.Send(message);
-        }
-
-        /// <inheritdoc />
-        public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
-        {
-            this.StartTestRun(runCriteria, eventHandler, CancellationToken.None);
         }
 
         /// <inheritdoc />

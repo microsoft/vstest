@@ -3,10 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.Threading;
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The interface for design mode client.

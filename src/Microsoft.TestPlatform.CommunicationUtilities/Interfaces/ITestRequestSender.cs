@@ -30,13 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
-        /// <returns>True, if Handler is connected</returns>
-        bool WaitForRequestHandlerConnection(int connectionTimeout);
-
-        /// <summary>
-        /// Waits for Request Handler to be connected
-        /// </summary>
-        /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True, if Handler is connected</returns>
         bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken);
@@ -70,22 +63,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         /// <param name="runCriteria">RunCriteria for test run</param>
         /// <param name="eventHandler">EventHandler for test run events</param>
-        void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler);
-
-        /// <summary>
-        /// Starts the TestRun with given sources and criteria
-        /// </summary>
-        /// <param name="runCriteria">RunCriteria for test run</param>
-        /// <param name="eventHandler">EventHandler for test run events</param>
         /// <param name="cancellationToken">Cancellation token</param>
         void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Starts the TestRun with given test cases and criteria
-        /// </summary>
-        /// <param name="runCriteria">RunCriteria for test run</param>
-        /// <param name="eventHandler">EventHandler for test run events</param>
-        void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler);
 
         /// <summary>
         /// Starts the TestRun with given test cases and criteria

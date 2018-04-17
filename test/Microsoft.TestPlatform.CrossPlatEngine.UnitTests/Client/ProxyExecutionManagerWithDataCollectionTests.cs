@@ -113,25 +113,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void CancelShouldInvokeAfterTestCaseEnd()
-        {
-            this.proxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
-
-            this.mockDataCollectionManager.Verify(x => x.AfterTestRunEnd(true, It.IsAny<ITestMessageEventHandler>()), Times.Once);
-        }
-
-        [TestMethod]
-        public void CancelShouldThrowExceptionIfThrownByProxyDataCollectionManager()
-        {
-            this.mockDataCollectionManager.Setup(x => x.AfterTestRunEnd(true, It.IsAny<ITestMessageEventHandler>())).Throws<Exception>();
-
-            Assert.ThrowsException<Exception>(() =>
-            {
-                this.proxyExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
-            });
-        }
-
-        [TestMethod]
         public void UpdateTestProcessStartInfoShouldUpdateDataCollectionPortArg()
         {
             this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
