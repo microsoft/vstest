@@ -220,16 +220,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void SetupChannelShouldNotHonorGarbageTimeOutSetByUser()
-        {
-            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "garbage");
-
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
-
-            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Once);
-        }
-
-        [TestMethod]
         public void SetupChannelShouldThrowIfWaitForTestHostConnectionTimesOut()
         {
             SetupTestHostLaunched(true);

@@ -85,10 +85,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             this.SetParentProcessExitCallback(argsDictionary);
 
             this.requestHandler.ConnectionInfo =
-                DefaultEngineInvoker.GetConnectionInfo(out var endpoint, argsDictionary);
+                DefaultEngineInvoker.GetConnectionInfo(argsDictionary);
 
             // Initialize Communication with vstest.console
-            EqtTrace.Info("DefaultEngineInvoker.Invoke: Initialize communication on endpoint address: '{0}'", endpoint);
             this.requestHandler.InitializeCommunication();
 
             // Initialize DataCollection Communication if data collection port is provided.
@@ -193,17 +192,18 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private static TestHostConnectionInfo GetConnectionInfo(out string endpoint,
-            IDictionary<string, string> argsDictionary)
+        private static TestHostConnectionInfo GetConnectionInfo(IDictionary<string, string> argsDictionary)
         {
             // vstest.console < 15.5 won't send endpoint and role arguments.
             // So derive endpoint from port argument and Make connectionRole as Client.
-            endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
+            var endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
             if (string.IsNullOrWhiteSpace(endpoint))
             {
                 var port = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
                 endpoint = IPAddress.Loopback + ":" + port;
             }
+
+            EqtTrace.Info("DefaultEngineInvoker.GetConnectionInfo: Initialize communication on endpoint address: '{0}'", endpoint);
 
             var connectionRole = ConnectionRole.Client;
             string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
