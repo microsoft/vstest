@@ -20,6 +20,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         }
 
+        // Fails randomly https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release_prtest/2084/console
+        // https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug_prtest/2085/console
+        [Ignore]
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
