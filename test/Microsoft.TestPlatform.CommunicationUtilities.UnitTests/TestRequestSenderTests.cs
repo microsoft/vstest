@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private const int DUMMYPROTOCOLVERSION = 42;
         private const int DEFAULTPROTOCOLVERSION = 1;
         private const int DUMMYNEGOTIATEDPROTOCOLVERSION = 41;
-        private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
+        private static readonly string TimoutErrorMessage = "Failed to negotiate protocol, waiting for response timed out after 0 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         private readonly Mock<ICommunicationEndPoint> mockServer;
         private readonly Mock<IDataSerializer> mockDataSerializer;
@@ -41,7 +41,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private readonly TestRunCriteriaWithSources testRunCriteriaWithSources;
         private TestHostConnectionInfo connectionInfo;
         private ITestRequestSender testRequestSender;
-        private ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
 
         public TestRequestSenderTests()
         {
@@ -220,13 +219,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             var message = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost()).Message;
 
-            Assert.AreEqual(
-                message,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommunicationUtilitiesResources.VersionCheckTimedout,
-                    0,
-                    EnvironmentHelper.VstestConnectionTimeout));
+            Assert.AreEqual(message, TestRequestSenderTests.TimoutErrorMessage);
         }
 
         #endregion

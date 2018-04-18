@@ -21,6 +21,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     public class DataCollectorMainTests
     {
         private readonly string[] args = {"--port", "1025", "--parentprocessid", "100" };
+
+        private static readonly string TimoutErrorMessage =
+            "datacollector process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<IEnvironment> mockEnvironment;
         private Mock<IDataCollectionRequestHandler> mockDataCollectionRequestHandler;
@@ -62,15 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             this.mockDataCollectionRequestHandler.Setup(rh => rh.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
             var message = Assert.ThrowsException<TestPlatformException>(() => this.dataCollectorMain.Run(args)).Message;
-            Assert.AreEqual(message,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
-                    CoreUtilitiesConstants.DatacollectorProcessName,
-                    CoreUtilitiesConstants.VstestConsoleProcessName,
-                    EnvironmentHelper.DefaultConnectionTimeout,
-                    EnvironmentHelper.VstestConnectionTimeout)
-                );
+            Assert.AreEqual(message, DataCollectorMainTests.TimoutErrorMessage);
         }
 
     }

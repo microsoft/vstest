@@ -32,6 +32,8 @@ namespace testhost.UnitTests
             { "--telemetryoptedin", "false"},
             { "--datacollectionport", "21290"}
         };
+        private static readonly string TimoutErrorMessage =
+            "testhost process failed to connect to datacollector process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         private Mock<ITestRequestHandler> mockTestRequestHandler;
         private Mock<IDataCollectionTestCaseEventSender> mockDataCollectionTestCaseEventSender;
@@ -81,14 +83,7 @@ namespace testhost.UnitTests
             this.mockDataCollectionTestCaseEventSender.Setup(s => s.WaitForRequestSenderConnection(It.IsAny<int>())).Returns(false);
             var message = Assert.ThrowsException<TestPlatformException>(() => this.engineInvoker.Invoke(argsDictionary)).Message;
 
-            Assert.AreEqual(message,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
-                    CoreUtilitiesConstants.TesthostProcessName,
-                    CoreUtilitiesConstants.DatacollectorProcessName,
-                    EnvironmentHelper.DefaultConnectionTimeout,
-                    EnvironmentHelper.VstestConnectionTimeout));
+            Assert.AreEqual(message, DefaultEngineInvokerTests.TimoutErrorMessage);
         }
 
         [TestMethod]

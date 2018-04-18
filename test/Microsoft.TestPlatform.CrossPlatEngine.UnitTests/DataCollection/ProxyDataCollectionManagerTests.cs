@@ -38,6 +38,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
+        private static readonly string TimoutErrorMessage =
+            "vstest.console process failed to connect to datacollector process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         [TestInitialize]
         public void Initialize()
@@ -74,14 +76,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.mockDataCollectionRequestSender.Setup( x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
             var message = Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize()).Message;
-            Assert.AreEqual(message,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
-                    CoreUtilitiesConstants.VstestConsoleProcessName,
-                    CoreUtilitiesConstants.DatacollectorProcessName,
-                    EnvironmentHelper.DefaultConnectionTimeout,
-                    EnvironmentHelper.VstestConnectionTimeout));
+            Assert.AreEqual(message, ProxyDataCollectionManagerTests.TimoutErrorMessage);
         }
 
         [TestMethod]

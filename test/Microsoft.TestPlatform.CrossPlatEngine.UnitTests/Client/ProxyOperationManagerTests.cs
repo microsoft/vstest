@@ -49,6 +49,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private int connectionTimeout = EnvironmentHelper.DefaultConnectionTimeout * 1000;
 
+        private static readonly string TimoutErrorMessage =
+            "vstest.console process failed to connect to testhost process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
+
         public ProxyOperationManagerTests()
         {
             this.mockRequestSender = new Mock<ITestRequestSender>();
@@ -228,14 +231,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object);
 
             var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None)).Message;
-            Assert.AreEqual(message,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    Resources.ConnectionTimeoutErrorMessage,
-                    Constants.VstestConsoleProcessName,
-                    Constants.TesthostProcessName,
-                    EnvironmentHelper.DefaultConnectionTimeout,
-                    EnvironmentHelper.VstestConnectionTimeout));
+            Assert.AreEqual(message, ProxyOperationManagerTests.TimoutErrorMessage);
         }
 
         [TestMethod]
