@@ -3,18 +3,11 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    using System;
-    using System.IO;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
-    /// Communication server implementation over sockets.
+    /// Implements ICommunicationEndpointFactory.
     /// </summary>
     public class CommunicationEndpointFactory : ICommunicationEndpointFactory
     {

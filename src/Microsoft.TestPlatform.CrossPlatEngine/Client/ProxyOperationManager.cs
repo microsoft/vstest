@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (!this.testHostLaunched ||
                     !(connected = this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000)))
                 {
-                    this.HandleConnectionFailure(connected, connTimeout);
+                    this.ThrowExceptionForConnectionFailure(connected, connTimeout);
                 }
 
                 // Handling special case for dotnet core projects with older test hosts
@@ -300,7 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostExited.Set();
         }
 
-        private void HandleConnectionFailure(bool connected, int connTimeout)
+        private void ThrowExceptionForConnectionFailure(bool connected, int connTimeout)
         {
             // Failed to launch testhost process.
             var errorMsg = CrossPlatEngineResources.InitializationFailed;
