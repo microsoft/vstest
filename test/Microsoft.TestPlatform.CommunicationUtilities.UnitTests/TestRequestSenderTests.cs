@@ -79,6 +79,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void WaitForRequestHandlerConnectionWithInfiniteTimeoutShouldReturnImmediatelyWhenCancellationRequested()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(-1, cancellationTokenSource.Token);
+
+            Assert.IsFalse(connected);
+        }
+
+        [TestMethod]
         public void CloseShouldCallStopServerOnCommunicationManager()
         {
             this.testRequestSender.Close();

@@ -172,6 +172,60 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunShouldNotInvokeRequestSenderMethodsIfRequestCancelled()
+        {
+            // Make sure TestPlugincache is refreshed.
+            TestPluginCache.Instance = null;
+
+            try
+            {
+                var extensions = new List<string>() { "C:\\foo.dll" };
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                this.mockTestHostManager.Setup(x => x.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
+                    .Returns(extensions);
+                var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+                this.testExecutionManager.Cancel(null);
+                this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldThrowIfRequestAborted()
+        {
+            // Make sure TestPlugincache is refreshed.
+            TestPluginCache.Instance = null;
+
+            try
+            {
+                var extensions = new List<string>() { "C:\\foo.dll" };
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                this.mockTestHostManager.Setup(x => x.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
+                    .Returns(extensions);
+                var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+                this.testExecutionManager.Abort(null);
+                this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
+        }
+
+        [TestMethod]
         public void StartTestRunShouldQueryTestHostManagerForExtensions()
         {
             TestPluginCache.Instance = null;
@@ -470,6 +524,34 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.Cancel(It.IsAny<ITestRunEventsHandler>());
 
             this.mockRequestSender.Verify(s => s.SendTestRunCancel(), Times.Never);
+        }
+
+        [TestMethod]
+        public void AbortShouldSendTestRunAbortIfCommunicationSuccessful()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            this.testExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+
+            this.mockRequestSender.Verify(s => s.SendTestRunAbort(), Times.Once);
+        }
+
+        [TestMethod]
+        public void AbortShouldNotSendTestRunAbortIfCommunicationFails()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            this.testExecutionManager.Abort(It.IsAny<ITestRunEventsHandler>());
+
+            this.mockRequestSender.Verify(s => s.SendTestRunAbort(), Times.Never);
         }
 
         [TestMethod]
