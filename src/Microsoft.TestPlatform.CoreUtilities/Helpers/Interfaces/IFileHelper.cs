@@ -50,6 +50,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         Stream GetStream(string filePath, FileMode mode, FileAccess access = FileAccess.ReadWrite);
 
         /// <summary>
+        /// Gets a stream for the file.
+        /// </summary>
+        /// <param name="filePath">Path to the file.</param>
+        /// <param name="mode"><see cref="FileMode"/> for file operations.</param>
+        /// <param name="access"><see cref="FileAccess"/> for file operations.</param>
+        /// <param name="share"><see cref="FileShare"/> for file operations.</param>
+        /// <returns>A <see cref="Stream"/> that supports read/write on the file.</returns>
+        Stream GetStream(string filePath, FileMode mode, FileAccess access, FileShare share);
+
+        /// <summary>
         /// Enumerates files which match a pattern (case insensitive) in a directory.
         /// </summary>
         /// <param name="directory">Parent directory to search.</param>

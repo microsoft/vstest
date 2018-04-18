@@ -19,5 +19,7 @@
   <files>
     <file src="CPPSimpleProj\Release\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\" />
     <file src="CPPSimpleProj\x64\Release\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\x64" />
+    <file src="ConsoleNativeApp\Release\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe" target="contentFiles\any\any\" />
+    <file src="ConsoleNativeApp\x64\Release\Microsoft.TestPlatform.TestAsset.ConsoleNativeApp.exe" target="contentFiles\any\any\x64" />
   </files>
 </package>

@@ -4,16 +4,18 @@
 namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
 {
     using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Moq;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Collections.Generic;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
 
     [TestClass]
     public class LazyExtensionTests
@@ -96,6 +98,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
             Assert.AreEqual(typeof(DummyDiscovererCapability), metadata.GetType());
             CollectionAssert.AreEqual(new List<string> { "csv" }, (metadata as ITestDiscovererCapabilities).FileExtension.ToArray());
             Assert.AreEqual("executor://unittestexecutor/", (metadata as ITestDiscovererCapabilities).DefaultExecutorUri.AbsoluteUri);
+            Assert.AreEqual(AssemblyType.Native, (metadata as ITestDiscovererCapabilities).AssemblyType);
         }
 
         #endregion
@@ -116,16 +119,24 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
                 private set;
             }
 
-            public DummyDiscovererCapability(List<string> fileExtensions, string executorURI)
+            public AssemblyType AssemblyType
+            {
+                get;
+                private set;
+            }
+
+            public DummyDiscovererCapability(List<string> fileExtensions, string executorURI, AssemblyType assemblyType)
             {
                 this.FileExtension = fileExtensions;
                 this.DefaultExecutorUri = new Uri(executorURI);
+                this.AssemblyType = assemblyType;
             }
         }
 
 
         [FileExtension("csv")]
         [DefaultExecutorUri("executor://unittestexecutor")]
+        [Category("native")]
         private class DummyExtension : ITestDiscoverer
         {
             public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)

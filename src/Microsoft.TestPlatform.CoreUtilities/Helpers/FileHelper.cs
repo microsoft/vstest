@@ -49,6 +49,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
+        public Stream GetStream(string filePath, FileMode mode, FileAccess access, FileShare share)
+        {
+            return new FileStream(filePath, mode, access, share);
+        }
+
+
+        /// <inheritdoc/>
         public IEnumerable<string> EnumerateFiles(
             string directory,
             SearchOption searchOption,
