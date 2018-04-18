@@ -254,25 +254,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void ProcessRequestsShouldThrowExceptionIFTestCaseEventHandlerConnectionTimeouts()
-        {
-            this.mockDataCollectionTestCaseEventHandler.Setup(h => h.WaitForRequestHandlerConnection(It.IsAny<int>()))
-                .Returns(false);
-
-            var exMessage = Assert.ThrowsException<AggregateException>(() => this.requestHandler.ProcessRequests()).InnerExceptions[0].Message;
-
-            Assert.AreEqual(
-                exMessage,
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
-                    CoreUtilitiesConstants.DatacollectorProcessName,
-                    CoreUtilitiesConstants.TesthostProcessName,
-                    EnvironmentHelper.DefaultConnectionTimeout,
-                    EnvironmentHelper.VstestConnectionTimeout));
-        }
-
-        [TestMethod]
         public void ProcessRequestsShouldNotInitializeTestCaseEventHandlerIfTestCaseLevelEventsAreNotEnabled()
         {
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(false);

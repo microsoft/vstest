@@ -296,13 +296,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         {
                             var timeout = EnvironmentHelper.GetConnectionTimeout();
                             if (this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(
-                                    timeout * 1000))
+                                timeout * 1000))
                             {
                                 this.dataCollectionTestCaseEventHandler.ProcessRequests();
                             }
                             else
                             {
-                                EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart: TestCaseEventHandler timed out while connecting to the Sender.");
+                                EqtTrace.Error(
+                                    "DataCollectionRequestHandler.HandleBeforeTestRunStart: TestCaseEventHandler timed out while connecting to the Sender.");
                                 this.dataCollectionTestCaseEventHandler.Close();
                                 throw new TestPlatformException(
                                     string.Format(
@@ -317,7 +318,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         catch (Exception e)
                         {
                             EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occured during initialization of TestHost : {0}", e);
-                            throw;
                         }
                     },
                     this.cancellationTokenSource.Token);
@@ -342,15 +342,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             try
             {
                 this.testCaseEventMonitorTask?.Wait(this.cancellationTokenSource.Token);
+                this.dataCollectionTestCaseEventHandler.Close();
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("DataCollectionRequestHandler.HandleAfterTestRunEnd : {0}", ex.ToString());
-                throw;
-            }
-            finally
-            {
-                this.dataCollectionTestCaseEventHandler.Close();
+                EqtTrace.Error("DataCollectionRequestHandler.HandleAfterTestRunEnd : Error while processing event from testhost: {0}", ex.ToString());
             }
 
             var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
