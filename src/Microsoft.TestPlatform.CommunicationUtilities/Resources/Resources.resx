@@ -136,6 +136,9 @@
     <value>Protocol version check failed. Make sure test runner and host are compatible.</value>
   </data>
   <data name="VersionCheckTimedout" xml:space="preserve">
-    <value>Failed to negotiate protocol. Wait for response timed out.</value>
+    <value>Failed to negotiate protocol, waiting for response timed out after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
+  </data>
+  <data name="ConnectionTimeoutErrorMessage" xml:space="preserve">
+    <value>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</value>
   </data>
 </root>

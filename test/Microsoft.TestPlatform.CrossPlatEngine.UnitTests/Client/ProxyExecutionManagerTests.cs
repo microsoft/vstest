@@ -40,10 +40,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         //private Mock<IDataSerializer> mockDataSerializer;
 
-        /// <summary>
-        /// The client connection timeout in milliseconds for unit tests.
-        /// </summary>
-        private int clientConnectionTimeout = 400;
         public ProxyExecutionManagerTests()
         {
             this.mockRequestSender = new Mock<ITestRequestSender>();
@@ -53,7 +49,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object);
 
             //this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
             //this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());

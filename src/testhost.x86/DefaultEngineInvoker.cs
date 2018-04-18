@@ -5,10 +5,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -19,6 +19,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using PlatformAbstractions.Interfaces;
+    using CommunicationUtilitiesResources =
+        Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     internal class DefaultEngineInvoker :
 #if NET451
@@ -32,8 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = Timeout.Infinite;
 
-        private const int DataConnectionClientListenTimeOut = 60 * 1000;
-
         private const string EndpointArgument = "--endpoint";
 
         private const string RoleArgument = "--role";
@@ -46,7 +48,182 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private const string TelemetryOptedIn = "--telemetryoptedin";
 
+        private ITestRequestHandler requestHandler;
+
+        private IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
+
+        private IProcessHelper processHelper;
+
+
+        public DefaultEngineInvoker() : this(new TestRequestHandler(), DataCollectionTestCaseEventSender.Create(), new ProcessHelper())
+        {
+        }
+
+        internal DefaultEngineInvoker(ITestRequestHandler requestHandler,
+            IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, IProcessHelper processHelper)
+        {
+            this.processHelper = processHelper;
+            this.requestHandler = requestHandler;
+            this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
+        }
+
         public void Invoke(IDictionary<string, string> argsDictionary)
+        {
+            DefaultEngineInvoker.InitializeEqtTrace(argsDictionary);
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("DefaultEngineInvoker.Invoke: Testhost process started with args :{0}",
+                    string.Join(",", argsDictionary));
+#if NET451
+                var appConfigText =
+ System.IO.File.ReadAllText(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                EqtTrace.Info("DefaultEngineInvoker: Using Application Configuration: '{0}'", appConfigText);
+#endif
+            }
+
+            this.SetParentProcessExitCallback(argsDictionary);
+
+            this.requestHandler.ConnectionInfo =
+                DefaultEngineInvoker.GetConnectionInfo(argsDictionary);
+
+            // Initialize Communication with vstest.console
+            this.requestHandler.InitializeCommunication();
+
+            // Initialize DataCollection Communication if data collection port is provided.
+            var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
+            if (dcPort > 0)
+            {
+                this.ConnectToDatacollector(dcPort);
+            }
+
+            var requestData = DefaultEngineInvoker.GetRequestData(argsDictionary);
+
+            // Start processing async in a different task
+            EqtTrace.Info("DefaultEngineInvoker.Invoke: Start Request Processing.");
+            try
+            {
+                this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData)).Wait();
+            }
+            finally
+            {
+                if (dcPort > 0)
+                {
+                    // Close datacollector communication.
+                    this.dataCollectionTestCaseEventSender.Close();
+                }
+
+                this.requestHandler.Dispose();
+            }
+        }
+
+        private static RequestData GetRequestData(IDictionary<string, string> argsDictionary)
+        {
+            // Checks for Telemetry Opted in or not from Command line Arguments.
+            // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
+            var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
+            var telemetryOptedIn = false;
+            if (!string.IsNullOrWhiteSpace(telemetryStatus))
+            {
+                if (telemetryStatus.Equals("true", StringComparison.Ordinal))
+                {
+                    telemetryOptedIn = true;
+                }
+            }
+
+            var requestData = new RequestData
+            {
+                MetricsCollection =
+                    telemetryOptedIn
+                        ? (IMetricsCollection) new MetricsCollection()
+                        : new NoOpMetricsCollection(),
+                IsTelemetryOptedIn = telemetryOptedIn
+            };
+            return requestData;
+        }
+
+        private void ConnectToDatacollector(int dcPort)
+        {
+            EqtTrace.Info("DefaultEngineInvoker.ConnectToDatacollector: Connecting to datacollector, port: {0}",
+                dcPort);
+            this.dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
+
+            // It's possible that connection to vstest.console happens, but to datacollector fails, why?
+            // DataCollector keeps the server alive for testhost only for 15secs(increased to 90 now),
+            // if somehow(on slower machines, with Profiler Enabled) testhost can take considerable time to launch,
+            // in such scenario dc.exe would have killed the server, but testhost will wait infinitely to connect to it,
+            // hence do not wait to connect to datacollector process infinitely, as it will cause process hang.
+            var timeout = EnvironmentHelper.GetConnectionTimeout();
+            if (!this.dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(timeout * 1000))
+            {
+                EqtTrace.Error(
+                    "DefaultEngineInvoker.ConnectToDatacollector: Connection to DataCollector failed: '{0}', DataCollection will not happen in this session",
+                    dcPort);
+                throw new TestPlatformException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                        CoreUtilitiesConstants.TesthostProcessName,
+                        CoreUtilitiesConstants.DatacollectorProcessName,
+                        timeout,
+                        EnvironmentHelper.VstestConnectionTimeout)
+                );
+            }
+        }
+
+        private void SetParentProcessExitCallback(IDictionary<string, string> argsDictionary)
+        {
+            // Attach to exit of parent process
+            var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
+            EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: Monitoring parent process with id: '{0}'",
+                parentProcessId);
+
+            // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
+            if (parentProcessId != -1)
+            {
+                this.processHelper.SetExitCallback(
+                    parentProcessId,
+                    (obj) =>
+                    {
+                        EqtTrace.Info("DefaultEngineInvoker.SetParentProcessExitCallback: ParentProcess '{0}' Exited.",
+                            parentProcessId);
+                        new PlatformEnvironment().Exit(1);
+                    });
+            }
+        }
+
+        private static TestHostConnectionInfo GetConnectionInfo(IDictionary<string, string> argsDictionary)
+        {
+            // vstest.console < 15.5 won't send endpoint and role arguments.
+            // So derive endpoint from port argument and Make connectionRole as Client.
+            var endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
+            if (string.IsNullOrWhiteSpace(endpoint))
+            {
+                var port = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
+                endpoint = IPAddress.Loopback + ":" + port;
+            }
+
+            EqtTrace.Info("DefaultEngineInvoker.GetConnectionInfo: Initialize communication on endpoint address: '{0}'", endpoint);
+
+            var connectionRole = ConnectionRole.Client;
+            string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
+            if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+            {
+                connectionRole = ConnectionRole.Host;
+            }
+
+            // Start Processing of requests
+            var connectionInfo = new TestHostConnectionInfo
+            {
+                Endpoint = endpoint,
+                Role = connectionRole,
+                Transport = Transport.Sockets
+            };
+
+            return connectionInfo;
+        }
+
+        private static void InitializeEqtTrace(IDictionary<string, string> argsDictionary)
         {
             // Setup logging if enabled
             if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
@@ -57,131 +234,33 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 EqtTrace.DoNotInitailize = true;
             }
-#if NET451
-            if (EqtTrace.IsInfoEnabled)
-            {
-                var appConfigText = System.IO.File.ReadAllText(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-                EqtTrace.Info("DefaultEngineInvoker: Using Application Configuration: '{0}'", appConfigText);
-            }
-#endif
-
-            // vstest.console < 15.5 won't send endpoint and role arguments.
-            // So derive endpoint from port argument and Make connectionRole as Client.
-            string endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
-            if (string.IsNullOrWhiteSpace(endpoint))
-            {
-                var port = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
-                endpoint = IPAddress.Loopback + ":" + port;
-            }
-
-            var connectionRole = ConnectionRole.Client;
-            string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
-            if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
-            {
-                connectionRole = ConnectionRole.Host;
-            }
-
-            // Start Processing of requests
-            using (var requestHandler = new TestRequestHandler(new TestHostConnectionInfo { Endpoint = endpoint, Role = connectionRole, Transport = Transport.Sockets }))
-            {
-                // Attach to exit of parent process
-                var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
-                EqtTrace.Info("DefaultEngineInvoker: Monitoring parent process with id: '{0}'", parentProcessId);
-
-                // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
-                if (parentProcessId != -1)
-                {
-                    var processHelper = new ProcessHelper();
-                    processHelper.SetExitCallback(
-                        parentProcessId,
-                        (obj) =>
-                            {
-                                EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
-                                new PlatformEnvironment().Exit(1);
-                            });
-                }
-
-                // Initialize Communication
-                EqtTrace.Info("DefaultEngineInvoker: Initialize communication on endpoint address: '{0}'", endpoint);
-                requestHandler.InitializeCommunication();
-
-                // Initialize DataCollection Communication if data collection port is provided.
-                var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
-                if (dcPort > 0)
-                {
-                    var dataCollectionTestCaseEventSender = DataCollectionTestCaseEventSender.Create();
-                    dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
-
-                    // It's possible that connection to vstest.console happens, but to datacollector fails, why?
-                    // DataCollector keeps the server alive for testhost only for 15secs(increased to 60 now), 
-                    // if somehow(on slower machines, with Profiler Enabled) testhost can take considerable time to launch,
-                    // in such scenario dc.exe would have killed the server, but testhost will wait infinitely to connect to it,
-                    // hence do not wait to connect to datacollector process infinitely, as it will cause process hang.
-                    if(!dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(DataConnectionClientListenTimeOut))
-                    {
-                        EqtTrace.Info("DefaultEngineInvoker: Connection to DataCollector failed: '{0}', DataCollection will not happen in this session", dcPort);
-                    }
-                }
-
-                // Checks for Telemetry Opted in or not from Command line Arguments.
-                // By Default opting out in Test Host to handle scenario when user running old version of vstest.console
-                var telemetryStatus = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, TelemetryOptedIn);
-                var telemetryOptedIn = false;
-                if (!string.IsNullOrWhiteSpace(telemetryStatus))
-                {
-                    if (telemetryStatus.Equals("true", StringComparison.Ordinal))
-                    {
-                        telemetryOptedIn = true;
-                    }
-                }
-
-                var requestData = new RequestData
-                                      {
-                                          MetricsCollection =
-                                              telemetryOptedIn
-                                                  ? (IMetricsCollection)new MetricsCollection()
-                                                  : new NoOpMetricsCollection(),
-                                          IsTelemetryOptedIn = telemetryOptedIn
-                };
-
-                // Start processing async in a different task
-                EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory(requestData));
-
-                // Wait for processing to complete.
-                Task.WaitAny(processingTask);
-
-                if (dcPort > 0)
-                {
-                    // Close socket communication connection.
-                    DataCollectionTestCaseEventSender.Instance.Close();
-                }
-            }
         }
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
             var task = new Task(
                 () =>
+                {
+                    // Wait for the connection to the sender and start processing requests from sender
+                    // Note that we are waiting here infinitely to connect to vstest.console, but at the same time vstest.console doesn't wait infinitely.
+                    // It has a default timeout of 60secs(which is configurable), & then it kills testhost.exe
+                    // The reason to wait infinitely, was remote debugging scenarios of UWP app,
+                    // in such cases after the app gets launched, VS debugger takes control of it, & causes a lot of delay, which frequently causes timeout with vstest.console.
+                    // One fix would be just double this timeout, but there is no telling how much time it can actually take.
+                    // Hence we are waiting here indefinelty, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
+                    // In other cases if vstest.console's timeout exceeds it will definitelty such down the app.
+                    if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                     {
-                        // Wait for the connection to the sender and start processing requests from sender
-                        // Note that we are waiting here infinitely to connect to vstest.console, but at the same time vstest.console doesn't wait infinitely.
-                        // It has a default timeout of 60secs(which is configurable), & then it kills testhost.exe
-                        // The reason to wait infinitely, was remote debugging scenarios of UWP app,
-                        // in such cases after the app gets launched, VS debugger takes control of it, & causes a lot of delay, which frequently causes timeout with vstest.console.
-                        // One fix would be just double this timeout, but there is no telling how much time it can actually take.
-                        // Hence we are waiting here indefinelty, to avoid such guessed timeouts, & letting user kill the debugging if they feel it is taking too much time.
-                        // In other cases if vstest.console's timeout exceeds it will definitelty such down the app.
-                if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
-                {
-                    requestHandler.ProcessRequests(managerFactory);
-                }
-                else
-                {
-                    EqtTrace.Info("DefaultEngineInvoker: RequestHandler timed out while connecting to the Sender.");
-                    throw new TimeoutException();
-                        }
-                    },
+                        EqtTrace.Info("DefaultEngineInvoker.StartProcessingAsync: Connected to vstest.console, Starting process requests.");
+                        requestHandler.ProcessRequests(managerFactory);
+                    }
+                    else
+                    {
+                        EqtTrace.Info(
+                            "DefaultEngineInvoker.StartProcessingAsync: RequestHandler timed out while connecting to the Sender.");
+                        throw new TimeoutException();
+                    }
+                },
                 TaskCreationOptions.LongRunning);
 
             task.Start();
