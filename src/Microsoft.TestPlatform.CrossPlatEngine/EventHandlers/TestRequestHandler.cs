@@ -20,14 +20,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
-    public class TestRequestHandler : IDisposable, ITestRequestHandler
+    public class TestRequestHandler : ITestRequestHandler
     {
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
         private ICommunicationEndPoint communicationEndPoint;
+        private ICommunicationEndpointFactory communicationEndpointFactory;
         private int protocolVersion = 1;
 
-        private TestHostConnectionInfo connectionInfo;
+        public TestHostConnectionInfo ConnectionInfo { get; set; }
 
         private int highestSupportedVersion = 2;
         private JobQueue<Action> jobQueue;
@@ -41,16 +42,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private Action<Message> onAckMessageRecieved;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRequestHandler2" />.
+        /// Initializes a new instance of the <see cref="TestRequestHandler" />.
         /// </summary>
-        public TestRequestHandler(TestHostConnectionInfo connectionInfo) : this(connectionInfo, JsonDataSerializer.Instance)
+        public TestRequestHandler() : this(JsonDataSerializer.Instance, new CommunicationEndpointFactory())
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
         {
-            this.communicationEndPoint = communicationEndpoint;
-            this.connectionInfo = connectionInfo;
+            this.communicationEndpointFactory = communicationEndpointFactory;
+            this.ConnectionInfo = connectionInfo;
             this.dataSerializer = dataSerializer;
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
@@ -59,16 +60,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.jobQueue = jobQueue;
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
+        protected TestRequestHandler(IDataSerializer dataSerializer, ICommunicationEndpointFactory communicationEndpointFactory)
         {
-            this.connectionInfo = connectionInfo;
             this.dataSerializer = dataSerializer;
+            this.communicationEndpointFactory = communicationEndpointFactory;
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
-
-            this.SetCommunicationEndPoint();
 
             this.jobQueue = new JobQueue<Action>(
                 (action) => { action(); },
@@ -82,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public virtual void InitializeCommunication()
         {
+            this.communicationEndPoint = this.communicationEndpointFactory.Create(this.ConnectionInfo.Role);
             this.communicationEndPoint.Connected += (sender, connectedArgs) =>
             {
                 if (!connectedArgs.Connected)
@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 requestSenderConnected.Set();
             };
 
-            this.communicationEndPoint.Start(connectionInfo.Endpoint);
+            this.communicationEndPoint.Start(this.ConnectionInfo.Endpoint);
         }
 
         /// <inheritdoc />
@@ -365,26 +365,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             return testCaseEventsHandler;
-        }
-
-        private void SetCommunicationEndPoint()
-        {
-            if (this.connectionInfo.Role == ConnectionRole.Host)
-            {
-                this.communicationEndPoint = new SocketServer();
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("TestRequestHanlder is acting as server");
-                }
-            }
-            else
-            {
-                this.communicationEndPoint = new SocketClient();
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("TestRequestHanlder is acting as client");
-                }
-            }
         }
 
         private void SendData(string data)

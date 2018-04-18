@@ -191,11 +191,6 @@
         <target state="translated">Microsoft.NET.Test.Sdk の古いバージョンを使用しています。15.3.0 以降のバージョンに移行することをお勧めします。</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process.</source>
-        <target state="translated">datacollector プロセスに接続できませんでした。</target>
-        <note />
-      </trans-unit>
     </body>
   </file>
 </xliff>

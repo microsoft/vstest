@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Reflection;
 
@@ -14,6 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -21,6 +23,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     using Moq;
 
@@ -33,6 +38,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
+        private static readonly string TimoutErrorMessage =
+            "vstest.console process failed to connect to datacollector process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         [TestInitialize]
         public void Initialize()
@@ -46,34 +53,40 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
         }
 
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
+            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
+        }
+
         [TestMethod]
         public void InitializeShouldInitializeCommunication()
         {
-            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000)).Returns(true);
             this.proxyDataCollectionManager.Initialize();
 
             this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string>>(), It.IsAny<IList<string>>()), Times.Once);
-            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout), Times.Once);
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfConnectionTimeouts()
         {
-            this.mockDataCollectionRequestSender.Setup( x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(false);
+            this.mockDataCollectionRequestSender.Setup( x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize());
+            var message = Assert.ThrowsException<TestPlatformException>(() => this.proxyDataCollectionManager.Initialize()).Message;
+            Assert.AreEqual(message, ProxyDataCollectionManagerTests.TimoutErrorMessage);
         }
 
         [TestMethod]
         public void InitializeShouldSetTimeoutBasedOnTimeoutEnvironmentVarible()
         {
-
             var timeout = 10;
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, timeout.ToString());
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
             this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(timeout * 1000)).Returns(true);
 
             this.proxyDataCollectionManager.Initialize();
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.TimeoutEnvironmentVaribleName, string.Empty);
 
             this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(timeout * 1000), Times.Once);
         }
@@ -82,12 +95,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void InitializeShouldSetTimeoutBasedOnDebugEnvironmentVaribleName()
         {
             Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, "1");
-            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5)).Returns(true);
+            var expectedTimeout = EnvironmentHelper.DefaultConnectionTimeout * 1000 * 5;
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(expectedTimeout)).Returns(true);
 
             this.proxyDataCollectionManager.Initialize();
-            Environment.SetEnvironmentVariable(ProxyDataCollectionManager.DebugEnvironmentVaribleName, string.Empty);
 
-            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout * 5), Times.Once);
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(expectedTimeout), Times.Once);
         }
 
         [TestMethod]
@@ -106,7 +119,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             try
             {
                 EqtTrace.InitializeVerboseTrace("mylog.txt");
-                this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout)).Returns(true);
+                this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
                 this.proxyDataCollectionManager.Initialize();
 
@@ -116,7 +129,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                             It.IsAny<IDictionary<string, string>>(),
                             It.Is<IList<string>>(list => list.Contains("--diag"))),
                     Times.Once);
-                this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(ProxyDataCollectionManager.DataCollectorConnectionTimeout), Times.Once);
             }
             finally
             {
