@@ -97,22 +97,34 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
-        /// Create the TestRunCriteria for a test run
         /// </summary>
         /// <param name="sources">
         /// Sources which contains tests that should be executed
         /// </param>
-        /// <param name="baseTestRunCriteria">
-        /// The BaseTestRunCriteria
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
         /// </param>
-        public TestRunCriteria(IEnumerable<string> sources, BaseTestRunCriteria baseTestRunCriteria)
-            : base(baseTestRunCriteria)
+        /// <param name="keepAlive">
+        /// Whether the execution process should be kept alive after the run is finished or not.
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout that triggers sending results regardless of cache size.
+        /// </param>
+        /// <param name="testHostLauncher">
+        /// Test host launcher. If null then default will be used.
+        /// </param>
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout,
+            ITestHostLauncher testHostLauncher)
+            : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher, null, null)
         {
-            var testSources = sources as IList<string> ?? sources.ToArray();
-            ValidateArg.NotNullOrEmpty(testSources, "sources");
-
-            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
         }
 
         /// <summary>
@@ -142,7 +154,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             bool keepAlive,
             string testSettings,
             TimeSpan runStatsChangeEventTimeout,
-            ITestHostLauncher testHostLauncher)
+            ITestHostLauncher testHostLauncher,
+            string testCaseFilter,
+            FilterOptions filterOptions)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
             var testSources = sources as IList<string> ?? sources.ToList();
@@ -150,6 +164,33 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
+
+            this.TestCaseFilter = testCaseFilter;
+            this.FilterOptions = filterOptions;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
+        /// Create the TestRunCriteria for a test run
+        /// </summary>
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="baseTestRunCriteria">
+        /// The BaseTestRunCriteria
+        /// </param>
+        public TestRunCriteria(IEnumerable<string> sources, TestRunCriteria testRunCriteria)
+            : base(testRunCriteria)
+        {
+            var testSources = sources as IList<string> ?? sources.ToArray();
+            ValidateArg.NotNullOrEmpty(testSources, "sources");
+
+            this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
+
+            this.TestCaseFilter = testRunCriteria.testCaseFilter;
+            this.FilterOptions = testRunCriteria.filterOptions;
+
         }
 
         /// <summary>
@@ -350,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 return this.testCaseFilter;
             }
 
-            set
+            private set
             {
                 if (value != null && !this.HasSpecificSources)
                 {
@@ -373,7 +414,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 return this.filterOptions;
             }
 
-            set
+            private set
             {
                 if (value != null && !this.HasSpecificSources)
                 {

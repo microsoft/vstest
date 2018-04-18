@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void ConstructorForSourcesWithBaseTestRunCriteriaShouldInitializeAdapterSourceMap()
         {
             var sources = new List<string> { "s1.dll", "s2.dll" };
-            var testRunCriteria = new TestRunCriteria(sources, new BaseTestRunCriteria(10));
+            var testRunCriteria = new TestRunCriteria(sources, new TestRunCriteria(new List<String> { }, 10));
 
             Assert.IsNotNull(testRunCriteria.AdapterSourceMap);
             CollectionAssert.AreEqual(new List<string> { "_none_" }, testRunCriteria.AdapterSourceMap.Keys);
@@ -140,36 +140,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         #region TestCaseFilter tests
 
         [TestMethod]
-        public void TestCaseFilterSetterShouldThrowIftestCriteriaIsBasedOnTests()
-        {
-            var testRunCriteria =
-                new TestRunCriteria(
-                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
-                    frequencyOfRunStatsChangeEvent: 10);
-
-            var isExceptionthrown = false;
-            try
-            {
-                testRunCriteria.TestCaseFilter = "foo";
-            }
-            catch (InvalidOperationException ex)
-            {
-                isExceptionthrown = true;
-                Assert.AreEqual(
-                    "Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.",
-                    ex.Message);
-            }
-
-            Assert.IsTrue(isExceptionthrown);
-        }
-
-        [TestMethod]
         public void TestCaseFilterSetterShouldSetFilterCriteriaForSources()
         {
             var sources = new List<string> { "s1.dll", "s2.dll" };
-            var testRunCriteria = new TestRunCriteria(sources, frequencyOfRunStatsChangeEvent: 10);
-
-            testRunCriteria.TestCaseFilter = "foo";
+            var testRunCriteria = new TestRunCriteria(sources, 10, false, string.Empty, TimeSpan.MaxValue, null, "foo", null);
 
             Assert.AreEqual("foo", testRunCriteria.TestCaseFilter);
         }
