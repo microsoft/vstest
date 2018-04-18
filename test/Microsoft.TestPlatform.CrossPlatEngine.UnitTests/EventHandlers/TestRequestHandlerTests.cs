@@ -29,25 +29,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public class TestRequestHandlerTests
     {
         private readonly Mock<ICommunicationEndPoint> mockCommunicationClient;
+        private readonly Mock<ICommunicationEndpointFactory> mockCommunicationEndpointFactory;
         private readonly Mock<ICommunicationChannel> mockChannel;
         private readonly Mock<ITestHostManagerFactory> mockTestHostManagerFactory;
         private readonly Mock<IDiscoveryManager> mockDiscoveryManager;
         private readonly Mock<IExecutionManager> mockExecutionManager;
 
         private readonly JsonDataSerializer dataSerializer;
-        private readonly ITestRequestHandler requestHandler;
+        private ITestRequestHandler requestHandler;
         private readonly TestHostConnectionInfo testHostConnectionInfo;
         private readonly JobQueue<Action> jobQueue;
 
         public TestRequestHandlerTests()
         {
             this.mockCommunicationClient = new Mock<ICommunicationEndPoint>();
+            this.mockCommunicationEndpointFactory = new Mock<ICommunicationEndpointFactory>();
             this.mockChannel = new Mock<ICommunicationChannel>();
             this.dataSerializer = JsonDataSerializer.Instance;
             this.testHostConnectionInfo = new TestHostConnectionInfo
             {
                 Endpoint = IPAddress.Loopback + ":123",
-                Role = ConnectionRole.Host
+                Role = ConnectionRole.Client
             };
 
             this.jobQueue = new JobQueue<Action>(
@@ -64,19 +66,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.mockExecutionManager = new Mock<IExecutionManager>();
             this.mockTestHostManagerFactory.Setup(mf => mf.GetDiscoveryManager()).Returns(this.mockDiscoveryManager.Object);
             this.mockTestHostManagerFactory.Setup(mf => mf.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
+            this.mockCommunicationEndpointFactory.Setup(f => f.Create(ConnectionRole.Client))
+                .Returns(this.mockCommunicationClient.Object);
 
             this.requestHandler = new TestableTestRequestHandler(
                 this.testHostConnectionInfo,
-                this.mockCommunicationClient.Object,
+                this.mockCommunicationEndpointFactory.Object,
                 JsonDataSerializer.Instance,
                 jobQueue);
+            this.requestHandler.InitializeCommunication();
+            this.mockCommunicationClient.Raise(e => e.Connected += null, new ConnectedEventArgs(this.mockChannel.Object));
         }
 
         [TestMethod]
         public void InitializeCommunicationShouldConnectToServerAsynchronously()
         {
-            this.requestHandler.InitializeCommunication();
-
             this.mockCommunicationClient.Verify(c => c.Start(this.testHostConnectionInfo.Endpoint), Times.Once);
         }
 
@@ -86,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var connectionInfo = new TestHostConnectionInfo
             {
                 Endpoint = IPAddress.Loopback + ":123",
-                Role = ConnectionRole.Host
+                Role = ConnectionRole.Client
             };
             var socketClient = new SocketClient();
             socketClient.Connected += (sender, connectedEventArgs) =>
@@ -94,7 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 Assert.IsFalse(connectedEventArgs.Connected);
                 Assert.AreEqual(typeof(SocketException), connectedEventArgs.Fault.InnerException.GetType());
             };
-            var rh = new TestableTestRequestHandler(connectionInfo, socketClient, this.dataSerializer, this.jobQueue);
+            this.mockCommunicationEndpointFactory.Setup(f => f.Create(ConnectionRole.Client))
+                .Returns(socketClient);
+            var rh = new TestableTestRequestHandler(connectionInfo, this.mockCommunicationEndpointFactory.Object, this.dataSerializer, this.jobQueue);
 
             rh.InitializeCommunication();
             this.requestHandler.WaitForRequestSenderConnection(1000);
@@ -103,14 +109,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         [TestMethod]
         public void WaitForRequestSenderConnectionShouldWaitUntilConnectionIsSetup()
         {
-            this.SetupChannel();
-
             Assert.IsTrue(this.requestHandler.WaitForRequestSenderConnection(1000));
         }
 
         [TestMethod]
         public void WaitForRequestSenderConnectionShouldReturnFalseIfConnectionSetupTimesout()
         {
+            this.requestHandler = new TestableTestRequestHandler(
+                this.testHostConnectionInfo,
+                this.mockCommunicationEndpointFactory.Object,
+                JsonDataSerializer.Instance,
+                jobQueue);
             this.requestHandler.InitializeCommunication();
 
             Assert.IsFalse(this.requestHandler.WaitForRequestSenderConnection(1));
@@ -119,8 +128,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         [TestMethod]
         public void ProcessRequestsShouldProcessMessagesUntilSessionCompleted()
         {
-            this.SetupChannel();
-
             var task = this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendSessionEnd();
@@ -133,7 +140,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsVersionCheckShouldAckMinimumOfGivenAndHighestSupportedVersion()
         {
             var message = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
-            this.SetupChannel();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
@@ -152,7 +158,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             EqtTrace.ErrorOnInitialization = "non-existent-error";
             var message = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
-            this.SetupChannel();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
@@ -169,7 +174,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsDiscoveryInitializeShouldSetExtensionPaths()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.DiscoveryInitialize, new[] { "testadapter.dll" });
-            this.SetupChannel();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
@@ -183,7 +187,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsDiscoveryStartShouldStartDiscoveryWithGivenCriteria()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.StartDiscovery, new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty));
-            this.SetupChannel();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
@@ -198,7 +201,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var discoveryComplete = new DiscoveryCompletePayload { TotalTests = 1, LastDiscoveredTests = Enumerable.Empty<TestCase>(), IsAborted = false };
             var message = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, discoveryComplete);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
@@ -216,7 +218,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsExecutionInitializeShouldSetExtensionPaths()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.ExecutionInitialize, new[] { "testadapter.dll" });
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
@@ -234,7 +235,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             asm["mstestv2"] = new[] {"test1.dll", "test2.dll"};
             var testRunCriteriaWithSources = new TestRunCriteriaWithSources(asm, "runsettings", null, null);
             var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithSources, testRunCriteriaWithSources);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
@@ -258,7 +258,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var testCases = new [] { t1, t2 };
             var testRunCriteriaWithTests = new TestRunCriteriaWithTests(testCases, "runsettings", null, null);
             var message = this.dataSerializer.SerializePayload(MessageType.StartTestExecutionWithTests, testRunCriteriaWithTests);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
@@ -280,7 +279,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsExecutionCancelShouldCancelTestRun()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.CancelTestRun, string.Empty);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
@@ -295,7 +293,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsExecutionLaunchAdapterProcessWithDebuggerShouldSendAckMessage()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, string.Empty);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
@@ -308,7 +305,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsExecutionAbortShouldStopTestRun()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.AbortTestRun, string.Empty);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
@@ -334,7 +330,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 this.requestHandler.SendExecutionComplete(It.IsAny<TestRunCompleteEventArgs>(), It.IsAny<TestRunChangedEventArgs>(), It.IsAny<ICollection<AttachmentSet>>(), It.IsAny<ICollection<string>>());
             });
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.ExecutionComplete))))
@@ -363,7 +358,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void LaunchProcessWithDebuggerAttachedShouldSendProcessInformationOnChannel()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, "123");
-            this.SetupChannel();
 
             this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.LaunchAdapterProcessWithDebuggerAttached))))
                 .Callback<string>(
@@ -383,7 +377,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void LaunchProcessWithDebuggerAttachedShouldWaitForProcessIdFromRunner()
         {
             var message = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, "123");
-            this.SetupChannel();
 
             this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.LaunchAdapterProcessWithDebuggerAttached))))
                 .Callback<string>(
@@ -407,7 +400,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendLogShouldSendTestMessageWithLevelOnChannel()
         {
             var logMsg = "Testing log message on channel";
-            this.SetupChannel();
 
             this.mockChannel.Setup(mc => mc.Send(It.Is<string>(d => d.Contains(MessageType.TestMessage))))
                 .Callback<string>(
@@ -428,7 +420,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         [TestMethod]
         public void ProcessRequestsEndSessionShouldCloseRequestHandler()
         {
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendSessionEnd();
@@ -440,7 +431,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsAbortSessionShouldBeNoOp()
         {
             var message = dataSerializer.SerializePayload(MessageType.SessionAbort, string.Empty);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
@@ -453,7 +443,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsInvalidMessageTypeShouldNotThrow()
         {
             var message = dataSerializer.SerializePayload("DummyMessage", string.Empty);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
@@ -465,7 +454,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsInvalidMessageTypeShouldProcessFutureMessages()
         {
             var message = dataSerializer.SerializePayload("DummyMessage", string.Empty);
-            this.SetupChannel();
 
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
             this.SendMessageOnChannel(message);
@@ -484,12 +472,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             testRequestHandler.Dispose();
 
             this.mockCommunicationClient.Verify(mc => mc.Stop(), Times.Once);
-        }
-
-        private void SetupChannel()
-        {
-            this.requestHandler.InitializeCommunication();
-            this.mockCommunicationClient.Raise(e => e.Connected += null, new ConnectedEventArgs(this.mockChannel.Object));
         }
 
         private void SendMessageOnChannel(Message message)
@@ -537,8 +519,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class TestableTestRequestHandler : TestRequestHandler
     {
-        public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndPoint communicationClient, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
-            : base(testHostConnectionInfo, communicationClient, dataSerializer, jobQueue, OnAckMessageReceived)
+        public TestableTestRequestHandler(TestHostConnectionInfo testHostConnectionInfo,ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue)
+            : base(testHostConnectionInfo, communicationEndpointFactory, dataSerializer, jobQueue, OnAckMessageReceived)
         {
         }
 
