@@ -236,6 +236,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void SetupChannelShouldThrowIfRequestCancelled()
+        {
+            SetupTestHostLaunched(true);
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout, cancellationTokenSource);
+
+            cancellationTokenSource.Cancel();
+
+            Assert.ThrowsException<OperationCanceledException>(() => operationManager.SetupChannel(Enumerable.Empty<string>()));
+        }
+
+        [TestMethod]
         public void SetupChannelShouldThrowIfLaunchTestHostFails()
         {
             SetupTestHostLaunched(false);
@@ -458,6 +472,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 ITestRuntimeProvider testHostManager,
                 int clientConnectionTimeout) : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
             {
+            }
+
+            public TestableProxyOperationManager(
+                IRequestData requestData,
+                ITestRequestSender requestSender,
+                ITestRuntimeProvider testHostManager,
+                int clientConnectionTimeout,
+                CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
+            {
+                this.CancellationTokenSource = cancellationTokenSource;
             }
         }
 

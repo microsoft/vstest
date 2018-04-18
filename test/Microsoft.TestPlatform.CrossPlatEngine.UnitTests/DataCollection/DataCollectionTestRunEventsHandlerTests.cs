@@ -66,6 +66,45 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
                 Times.Once);
         }
 
+        [TestMethod]
+        public void HandleRawMessageShouldInvokeAfterTestRunEndPassingFalseIfRequestNotCancelled()
+        {
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan());
+
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+                .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, cancellationTokenSource.Token, this.mockDataSerializer.Object);
+
+            testRunEventHandler.HandleRawMessage(string.Empty);
+
+            this.proxyDataCollectionManager.Verify(
+                dcm => dcm.AfterTestRunEnd(false, It.IsAny<ITestRunEventsHandler>()),
+                Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleRawMessageShouldInvokeAfterTestRunEndPassingTrueIfRequestCancelled()
+        {
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan());
+
+            this.mockDataSerializer.Setup(x => x.DeserializeMessage(It.IsAny<string>())).Returns(new Message() { MessageType = MessageType.ExecutionComplete });
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestRunCompletePayload>(It.IsAny<Message>()))
+                .Returns(new TestRunCompletePayload() { TestRunCompleteArgs = testRunCompleteEventArgs });
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            testRunEventHandler = new DataCollectionTestRunEventsHandler(this.baseTestRunEventsHandler.Object, this.proxyDataCollectionManager.Object, cancellationTokenSource.Token, this.mockDataSerializer.Object);
+            cancellationTokenSource.Cancel();
+
+            testRunEventHandler.HandleRawMessage(string.Empty);
+
+            this.proxyDataCollectionManager.Verify(
+                dcm => dcm.AfterTestRunEnd(true, It.IsAny<ITestRunEventsHandler>()),
+                Times.Once);
+        }
+
         #region Get Combined Attachments
         [TestMethod]
         public void GetCombinedAttachmentSetsShouldReturnCombinedAttachments()
