@@ -453,7 +453,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
             TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
 
             // setup TestLogger
@@ -477,7 +477,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             counter = 0;
             waitHandle.Reset();
 
-            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
             TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
 
             // setup TestLogger

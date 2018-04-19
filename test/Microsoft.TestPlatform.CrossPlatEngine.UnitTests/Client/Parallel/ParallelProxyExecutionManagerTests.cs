@@ -65,7 +65,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Configure sources
             this.sources = new List<string>() { "1.dll", "2.dll" };
             this.processedSources = new List<string>();
-            this.testRunCriteriaWithSources = new TestRunCriteria(sources, 100);
+            this.testRunCriteriaWithSources = new TestRunCriteria(sources, 100, false, string.Empty, TimeSpan.MaxValue, null, "Name~Test", null);
 
             // Configure testcases
             this.testCases = CreateTestCases();
@@ -118,8 +118,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartTestRunShouldProcessAllSources()
         {
-            // Testcase filter should be passed to all parallel test run criteria.
-            this.testRunCriteriaWithSources.TestCaseFilter = "Name~Test";
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
 
             parallelExecutionManager.StartTestRun(testRunCriteriaWithSources, this.mockHandler.Object);
@@ -132,8 +130,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartTestRunShouldProcessAllSources1()
         {
-            // Testcase filter should be passed to all parallel test run criteria.
-            this.testRunCriteriaWithSources.TestCaseFilter = "Name~Test";
             var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
 
             parallelExecutionManager.StartTestRun(testRunCriteriaWithSources, this.mockHandler.Object);

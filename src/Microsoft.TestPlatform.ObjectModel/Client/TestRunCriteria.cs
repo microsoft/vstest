@@ -148,6 +148,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="testHostLauncher">
         /// Test host launcher. If null then default will be used.
         /// </param>
+        /// <param name="testCaseFilter">
+        /// Test case filter.
+        /// </param>
+        /// <param name="filterOptions">
+        /// Filter options.
+        /// </param>
         public TestRunCriteria(
             IEnumerable<string> sources,
             long frequencyOfRunStatsChangeEvent,
@@ -176,8 +182,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="sources">
         /// Sources which contains tests that should be executed
         /// </param>
-        /// <param name="baseTestRunCriteria">
-        /// The BaseTestRunCriteria
+        /// <param name="testRunCriteria">
+        /// The TestRunCriteria
         /// </param>
         public TestRunCriteria(IEnumerable<string> sources, TestRunCriteria testRunCriteria)
             : base(testRunCriteria)

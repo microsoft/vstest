@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void ConstructorForSourcesWithBaseTestRunCriteriaShouldInitializeAdapterSourceMap()
         {
             var sources = new List<string> { "s1.dll", "s2.dll" };
-            var testRunCriteria = new TestRunCriteria(sources, new TestRunCriteria(new List<String> { }, 10));
+            var testRunCriteria = new TestRunCriteria(sources, new TestRunCriteria(new List<String> { "temp.dll" }, 10));
 
             Assert.IsNotNull(testRunCriteria.AdapterSourceMap);
             CollectionAssert.AreEqual(new List<string> { "_none_" }, testRunCriteria.AdapterSourceMap.Keys);
