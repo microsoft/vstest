@@ -253,9 +253,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     waitHandle.Set();
                 };
 
-                // Registering cancellationToken to set waitHandle (whenever request is cancelled).
-                var cancellationTokenRegistration = cancellationToken.Register(() => waitHandle.Set());
-
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 
                 // LifeCycle of the TP through DesignModeClient is maintained by the IDEs or user-facing-clients like LUTs, who call TestPlatform
@@ -263,9 +260,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
                 // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
                 // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
-                waitHandle.WaitOne();
+                WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
-                cancellationTokenRegistration.Dispose();
                 cancellationToken.ThrowIfCancellationRequested();
 
                 this.onAckMessageReceived = null;

@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private IFileHelper fileHelper;
 
-        private ITestHostLauncher testHostLauncher;
+        private ITestHostLauncher customTestHostLauncher;
 
         private Process testHostProcess;
 
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
-            this.testHostLauncher = customLauncher;
+            this.customTestHostLauncher = customLauncher;
         }
 
         /// <inheritdoc/>
@@ -329,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             try
             {
                 this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-                if (this.testHostLauncher == null)
+                if (this.customTestHostLauncher == null)
                 {
                     EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
@@ -338,7 +338,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
                 else
                 {
-                    var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+                    var processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo, cancellationToken);
                     this.testHostProcess = Process.GetProcessById(processId);
                     this.processHelper.SetExitCallback(processId, this.ExitCallBack);
                 }
