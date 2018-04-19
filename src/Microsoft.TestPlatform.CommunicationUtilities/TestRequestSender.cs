@@ -137,14 +137,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
         {
-            var cancellationTokenRegistration = cancellationToken.Register(() => this.connected.Set());
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
             }
 
-            var waitSuccess = this.connected.Wait(connectionTimeout) && !cancellationToken.IsCancellationRequested;
-            cancellationTokenRegistration.Dispose();
+            var waitSuccess = this.connected.Wait(connectionTimeout, cancellationToken) && !cancellationToken.IsCancellationRequested;
 
             return waitSuccess;
         }
@@ -547,7 +545,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private string GetAbortErrorMessage(Exception exception, bool getClientError, CancellationToken cancellationToken)
         {
-            var cancellationTokenRegistration = cancellationToken.Register(() => this.clientExited.Set());
             EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
 
             // It is also possible for an operation to abort even if client has not
@@ -560,7 +557,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 // Set a default message and wait for test host to exit for a moment
                 reason = CommonResources.UnableToCommunicateToTestHost;
-                if (this.clientExited.Wait(this.clientExitedWaitTime) && !cancellationToken.IsCancellationRequested)
+                if (this.clientExited.Wait(this.clientExitedWaitTime, cancellationToken) && !cancellationToken.IsCancellationRequested)
                 {
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                     reason = this.clientExitErrorMessage;
@@ -571,7 +568,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
 
-            cancellationTokenRegistration.Dispose();
             return reason;
         }
 

@@ -52,6 +52,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private static readonly string TimoutErrorMessage =
             "vstest.console process failed to connect to testhost process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
+        private static readonly string OperationCanceledMessage =
+            @"System.OperationCanceledException: The operation was canceled";
+
         public ProxyOperationManagerTests()
         {
             this.mockRequestSender = new Mock<ITestRequestSender>();
@@ -232,6 +235,35 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
             Assert.AreEqual(message, ProxyOperationManagerTests.TimoutErrorMessage);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldThrowIfRequestCancelled()
+        {
+            SetupTestHostLaunched(true);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
+
+            cancellationTokenSource.Cancel();
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
+            Assert.IsTrue(message.Contains(ProxyOperationManagerTests.OperationCanceledMessage));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldNotCallRequestSenderMethodsIfRequestCancelled()
+        {
+            SetupTestHostLaunched(true);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
+
+            cancellationTokenSource.Cancel();
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
+
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+            this.mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Never);
+            this.mockTestHostManager.Verify(thm => thm.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [TestMethod]
@@ -436,19 +468,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             exitCallback(process);
                         }).Returns(Process.GetCurrentProcess());
         }
-
-        //private void SetupChannelMessage<TPayload>(string messageType, string returnMessageType, TPayload returnPayload)
-        //{
-        //    this.mockChannel.Setup(mc => mc.Send(It.Is<string>(s => s.Contains(messageType))))
-        //                    .Callback(() => this.mockChannel.Raise(c => c.MessageReceived += null, this.mockChannel.Object, new MessageReceivedEventArgs { Data = messageType }));
-
-        //    this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>())).Returns(messageType);
-        //    this.mockDataSerializer.Setup(ds => ds.SerializePayload(It.Is<string>(s => s.Equals(messageType)), It.IsAny<object>(), It.IsAny<int>())).Returns(messageType);
-        //    this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.Is<string>(s => s.Equals(messageType))))
-        //        .Returns(new Message { MessageType = returnMessageType });
-        //    this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TPayload>(It.Is<Message>(m => m.MessageType.Equals(messageType))))
-        //    .Returns(returnPayload);
-        //}
 
         private class TestableProxyOperationManager : ProxyOperationManager
         {

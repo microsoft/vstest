@@ -99,7 +99,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources)
         {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
             var connTimeout = EnvironmentHelper.GetConnectionTimeout();
 
             if (!this.initialized)
@@ -126,7 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     // Launch the test host.
-                    this.testHostLaunched = this.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
+                    this.testHostLaunched = this.LaunchTestHost(testHostStartInfo, this.CancellationTokenSource.Token);
 
                     if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                     {
@@ -174,24 +173,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             return true;
-        }
-
-        private bool LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken token)
-        {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            return this.testHostManager.LaunchTestHostAsync(testHostStartInfo, token).Result;
-        }
-
-        private bool WaitForRequestHandlerConnection(int connTimeout)
-        {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            return this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token);
-        }
-
-        private void CheckVersionWithTestHost()
-        {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            this.RequestSender.CheckVersionWithTestHost();
         }
 
         /// <summary>
@@ -345,6 +326,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+        }
+
+        private bool LaunchTestHost(TestProcessStartInfo testHostStartInfo, CancellationToken token)
+        {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            return this.testHostManager.LaunchTestHostAsync(testHostStartInfo, token).Result;
+        }
+
+        private bool WaitForRequestHandlerConnection(int connTimeout)
+        {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            return this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token);
+        }
+
+        private void CheckVersionWithTestHost()
+        {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            this.RequestSender.CheckVersionWithTestHost();
         }
     }
 }
