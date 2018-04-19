@@ -481,8 +481,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 IRequestData requestData,
                 ITestRequestSender requestSender,
                 ITestRuntimeProvider testHostManager,
-                int clientConnectionTimeout,
-                CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
+                CancellationTokenSource cancellationTokenSource) : base(requestData, requestSender, testHostManager)
             {
                 this.CancellationTokenSource = cancellationTokenSource;
             }
