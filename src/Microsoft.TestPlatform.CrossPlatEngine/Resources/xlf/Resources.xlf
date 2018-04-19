@@ -104,7 +104,7 @@
       </trans-unit>
       <trans-unit id="DeprecatedAdapterPath">
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/pull/125 for more details.</source>
-        <target state="new">Path "{0}" for adapters is deprecated. For adapters mentioned below {1} please provide TestAdapterPath either via RunSettings or in CLI</target>
+        <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/pull/125 for more details.</target>
         <note></note>
       </trans-unit>
     </body>
