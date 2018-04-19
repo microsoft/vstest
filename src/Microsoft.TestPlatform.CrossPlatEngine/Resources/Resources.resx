@@ -189,4 +189,7 @@
   <data name="OldTestHostIsGettingUsed" xml:space="preserve">
     <value>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</value>
   </data>
+  <data name="DeprecatedAdapterPath" xml:space="preserve">
+    <value>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/pull/125 for more details.</value>
+  </data>
 </root>

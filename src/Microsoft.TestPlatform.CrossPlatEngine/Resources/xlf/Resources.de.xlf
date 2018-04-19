@@ -191,6 +191,11 @@
         <target state="translated">Sie verwenden eine ältere Version von Microsoft.NET.Test.Sdk. Wechseln Sie zu Version 15.3.0 oder höher.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DeprecatedAdapterPath">
+        <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/pull/125 for more details.</source>
+        <target state="new">Path "{0}" for adapters is deprecated. For adapters mentioned below {1} please provide TestAdapterPath either via RunSettings or in CLI</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

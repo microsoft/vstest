@@ -80,6 +80,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/pull/125 for more details..
+        /// </summary>
+        internal static string DeprecatedAdapterPath {
+            get {
+                return ResourceManager.GetString("DeprecatedAdapterPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exception occurred while instantiating discoverer : {0}.
         /// </summary>
         internal static string DiscovererInstantiationException {
