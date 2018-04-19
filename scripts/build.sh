@@ -118,6 +118,7 @@ DOTNET_CLI_VERSION="LATEST"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
+TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
 TPB_TargetFramework="net451"
 TPB_TargetFrameworkCore="netcoreapp2.0"
 TPB_TargetFrameworkCore10="netcoreapp1.0"
@@ -240,7 +241,11 @@ function invoke_build()
     export FrameworkPathOverride=$TP_PACKAGES_DIR/microsoft.targetingpack.netframework.v4.6/1.0.1/lib/net46/
     if [ -z "$PROJECT_NAME_PATTERNS" ]
     then
-        $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
+        if [[ $TP_USE_REPO_API = 0 ]]; then
+            $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
+        else
+            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
+       fi
     else
         find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     fi
@@ -265,10 +270,15 @@ function publish_package()
     local packageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFramework/$TPB_TargetRuntime
     local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
     local frameworkPackageDirMap=( \
-        $TPB_TargetFrameworkCore:$coreCLRPackageDir \
-        $TPB_TargetFramework:$packageDir
+        $TPB_TargetFrameworkCore:$coreCLRPackageDir
     )
-    
+
+    if [[ $DOTNET_BUILD_FROM_SOURCE = 0 ]]; then
+       frameworkPackageDirMap+=( \
+           $TPB_TargetFramework:$packageDir
+       )
+    fi
+
     for fxpkg in "${frameworkPackageDirMap[@]}" ;
     do
         local framework="${fxpkg%%:*}"
