@@ -21,7 +21,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     public class ProxyBaseManagerTests
     {
         private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
-        private int clientConnectionTimeout = 400;
         private Mock<ICommunicationEndPoint> mockCommunicationEndpoint;
         private ITestRequestSender testRequestSender;
 
@@ -104,8 +103,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 mockRequestData.Object,
                 testRequestSender,
                 mockTestHostManager.Object,
-                mockDataSerializer.Object,
-                clientConnectionTimeout);
+                mockDataSerializer.Object);
 
             return testDiscoveryManager;
         }
@@ -114,7 +112,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.SetupAndInitializeTestRequestSender();
             var testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, testRequestSender,
-                mockTestHostManager.Object, mockDataSerializer.Object, clientConnectionTimeout);
+                mockTestHostManager.Object, mockDataSerializer.Object);
 
             return testExecutionManager;
         }

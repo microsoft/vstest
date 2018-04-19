@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-
+    using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -22,6 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -30,7 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private readonly IProcessHelper processHelper;
-        private readonly int connectionTimeout;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
         private bool versionCheckRequired = true;
@@ -49,13 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
         /// </summary>
+        /// <param name="requestData"></param>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
-        /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
+        protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager)
         {
             this.RequestSender = requestSender;
-            this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
             this.initialized = false;
@@ -93,14 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
-            var connTimeout = this.connectionTimeout;
+            var connTimeout = EnvironmentHelper.GetConnectionTimeout();
 
-            var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
-            if(!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
-            {
-                connTimeout = result * 1000;
-            }
-            
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
@@ -151,21 +145,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         OutputLevel.Information);
 
                     // Increase connection timeout when debugging is enabled.
-                    connTimeout = 5 * this.connectionTimeout;
+                    connTimeout *= 5;
                 }
 
                 // Wait for a timeout for the client to connect.
-                if (!this.testHostLaunched || !this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
+                if (!this.testHostLaunched ||
+                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000))
                 {
-                    var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
-                    if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
-                    {
-                        // Testhost failed with error
-                        errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
-                    }
-
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+                    this.ThrowExceptionOnConnectionFailure(connTimeout);
                 }
 
                 // Handling special case for dotnet core projects with older test hosts
@@ -309,6 +296,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
+        }
+
+        private void ThrowExceptionOnConnectionFailure(int connTimeout)
+        {
+            // Failed to launch testhost process.
+            var errorMsg = CrossPlatEngineResources.InitializationFailed;
+
+            // Testhost launched but Timeout occured due to machine slowness.
+            if (this.testHostLaunched)
+            {
+                errorMsg = string.Format(
+                    CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                    CoreUtilitiesConstants.VstestConsoleProcessName,
+                    CoreUtilitiesConstants.TesthostProcessName,
+                    connTimeout,
+                    EnvironmentHelper.VstestConnectionTimeout);
+            }
+
+            // After testhost process launched failed with error.
+            if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
+            {
+                // Testhost failed with error
+                errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+            }
+
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
         }
     }
 }

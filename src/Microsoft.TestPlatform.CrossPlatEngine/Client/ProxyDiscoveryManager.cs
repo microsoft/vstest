@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
+            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance)
         {
             this.testHostManager = testHostManager;
         }
@@ -51,23 +51,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
+        /// <param name="requestData"></param>
         /// <param name="requestSender">
-        /// The request Sender.
+        ///     The request Sender.
         /// </param>
         /// <param name="testHostManager">
-        /// Test host Manager instance
+        ///     Test host Manager instance
         /// </param>
         /// <param name="dataSerializer"></param>
-        /// <param name="clientConnectionTimeout">
-        /// The client Connection Timeout
-        /// </param>
-        internal ProxyDiscoveryManager(
-            IRequestData requestData,
+        internal ProxyDiscoveryManager(IRequestData requestData,
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
-            IDataSerializer dataSerializer,
-            int clientConnectionTimeout)
-            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
+            IDataSerializer dataSerializer)
+            : base(requestData, requestSender, testHostManager)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
