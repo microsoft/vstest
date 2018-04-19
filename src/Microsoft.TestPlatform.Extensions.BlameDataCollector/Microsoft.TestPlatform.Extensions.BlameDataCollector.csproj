@@ -10,6 +10,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Extensions.BlameDataCollector</AssemblyName>
     <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.4</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
