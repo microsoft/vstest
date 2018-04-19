@@ -422,10 +422,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             {
                                 var executorLocation = executor.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
 
-                                if (Path.GetDirectoryName(executorLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation))
-                                {
-                                    executorsFromDeprecatedLocations = true;
-                                }
+                                executorsFromDeprecatedLocations |= Path.GetDirectoryName(executorLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation);
                             }
 
                             totalTests = this.testRunCache.TotalExecutedTests;

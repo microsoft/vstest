@@ -182,10 +182,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(), StringComparer.OrdinalIgnoreCase))
                         {
                             var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
-                            if (Path.GetDirectoryName(discovererLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase))
-                            {
-                                discoverersFromDeprecatedLocations = true;
-                            }
+
+                            discoverersFromDeprecatedLocations |= Path.GetDirectoryName(discovererLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
                         }
                         totalAdaptersUsed++;
                     }
