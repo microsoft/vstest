@@ -7,7 +7,6 @@
     using System.Reflection;
 
     [TestClass]
-    [NetFullTargetFrameworkDataSource]
     public class DeprecateExtensionsPathWarningTests : AcceptanceTestBase
     {
         private IList<string> adapterDependencies;
@@ -64,7 +63,7 @@
         }
 
         [TestMethod]
-        public void VerifyWarning()
+        public void VerifyDeprecatedWarningIsThrownWhenAdaptersPickedFromExtensionDirectory()
         {
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
