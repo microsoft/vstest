@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
 
-            IList<string> discoveredsFromDeprecatedLocations = new List<string>();
+            bool discoverersFromDeprecatedLocations = false;
 
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
                             if (Path.GetDirectoryName(discovererLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase))
                             {
-                                discoveredsFromDeprecatedLocations.Add(Path.GetFileName(discovererLocation));
+                                discoverersFromDeprecatedLocations = true;
                             }
                         }
                         totalAdaptersUsed++;
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
             }
 
-            if (discoveredsFromDeprecatedLocations.Any())
+            if (discoverersFromDeprecatedLocations)
             {
                 logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
             }

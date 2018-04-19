@@ -359,7 +359,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             double totalTimeTakenByAdapters = 0;
 
-            IList<string> executorsFromDeprecatedLocations = new List<string>();
+            bool executorsFromDeprecatedLocations = false;
 
             // Call the executor for each group of tests.
             var exceptionsHitDuringRunTests = false;
@@ -424,7 +424,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                                 if (Path.GetDirectoryName(executorLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation))
                                 {
-                                    executorsFromDeprecatedLocations.Add(Path.GetFileName(executorLocation));
+                                    executorsFromDeprecatedLocations = true;
                                 }
                             }
 
@@ -482,7 +482,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Collecting Total Time Taken by Adapters
             this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters);
 
-            if (executorsFromDeprecatedLocations.Any())
+            if (executorsFromDeprecatedLocations)
             {
                 this.TestRunEventsHandler?.HandleLogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
             }
