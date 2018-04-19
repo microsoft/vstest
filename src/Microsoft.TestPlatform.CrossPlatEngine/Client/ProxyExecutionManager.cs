@@ -22,8 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
-
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
     /// </summary>
@@ -48,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
         public ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : 
-            this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
+            this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance)
         {
         }
 
@@ -60,9 +58,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
         /// <param name="dataSerializer"></param>
-        /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
-        internal ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
-            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
+        internal ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender,
+            ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer)
+            : base(requestData, requestSender, testHostManager)
         {
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;

@@ -7,13 +7,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Collections.Generic;
     using System.Globalization;
     using System.Threading;
-
+    using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -96,11 +96,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="protocolConfig">Protocol configuration.</param>
         /// <param name="clientExitedWaitTime">Time to wait for client process exit.</param>
         internal TestRequestSender(
-                ICommunicationEndPoint communicationEndPoint,
-                TestHostConnectionInfo connectionInfo,
-                IDataSerializer serializer,
-                ProtocolConfig protocolConfig,
-                int clientExitedWaitTime)
+            ICommunicationEndPoint communicationEndPoint,
+            TestHostConnectionInfo connectionInfo,
+            IDataSerializer serializer,
+            ProtocolConfig protocolConfig,
+            int clientExitedWaitTime)
             : this(connectionInfo, serializer, protocolConfig, clientExitedWaitTime)
         {
             this.communicationEndpoint = communicationEndPoint;
@@ -202,9 +202,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Send(data);
 
                 // Wait for negotiation response
-                if (!protocolNegotiated.WaitOne(60 * 1000))
+                var timeout = EnvironmentHelper.GetConnectionTimeout();
+                if (!protocolNegotiated.WaitOne(timeout * 1000))
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout));
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, EnvironmentHelper.VstestConnectionTimeout));
                 }
             }
             finally
