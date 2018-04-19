@@ -469,7 +469,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         protected bool Equals(TestRunCriteria other)
         {
             return base.Equals(other)
-                && string.Equals(this.testCaseFilter, other.testCaseFilter);
+                && string.Equals(this.TestCaseFilter, other.TestCaseFilter)
+                && string.Equals(this.FilterOptions, other.FilterOptions);
         }
 
         /// <inheritdoc/>

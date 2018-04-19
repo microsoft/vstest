@@ -65,7 +65,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Configure sources
             this.sources = new List<string>() { "1.dll", "2.dll" };
             this.processedSources = new List<string>();
-            this.testRunCriteriaWithSources = new TestRunCriteria(sources, 100, false, string.Empty, TimeSpan.MaxValue, null, "Name~Test", null);
+            this.testRunCriteriaWithSources = new TestRunCriteria(sources, 100, false, string.Empty, TimeSpan.MaxValue, null, "Name~Test", new FilterOptions() { FilterRegEx = @"^[^\s\(]+" });
 
             // Configure testcases
             this.testCases = CreateTestCases();
@@ -127,17 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             AssertMissingAndDuplicateSources(processedSources);
         }
 
-        [TestMethod]
-        public void StartTestRunShouldProcessAllSources1()
-        {
-            var parallelExecutionManager = this.SetupExecutionManager(this.proxyManagerFunc, 2);
 
-            parallelExecutionManager.StartTestRun(testRunCriteriaWithSources, this.mockHandler.Object);
-
-            Assert.IsTrue(this.executionCompleted.Wait(taskTimeout), "Test run not completed.");
-            Assert.AreEqual(this.sources.Count, processedSources.Count, "All Sources must be processed.");
-            AssertMissingAndDuplicateSources(processedSources);
-        }
 
         [TestMethod]
         public void StartTestRunShouldProcessAllTestCases()
