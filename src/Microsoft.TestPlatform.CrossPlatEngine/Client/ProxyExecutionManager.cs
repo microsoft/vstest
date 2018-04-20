@@ -265,13 +265,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void StartTestRunWithTests(TestRunCriteriaWithTests runRequest, ProxyExecutionManager proxyExecutionManager)
         {
             this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            this.RequestSender.StartTestRun(runRequest, this, this.CancellationTokenSource.Token);
+            this.RequestSender.StartTestRun(runRequest, this);
         }
 
         private void StartTestRunWithSources(TestRunCriteriaWithSources runRequest, ProxyExecutionManager proxyExecutionManager)
         {
             this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            this.RequestSender.StartTestRun(runRequest, this, this.CancellationTokenSource.Token);
+            this.RequestSender.StartTestRun(runRequest, this);
         }
     }
 }

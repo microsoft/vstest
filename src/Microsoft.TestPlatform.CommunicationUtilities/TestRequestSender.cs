@@ -142,9 +142,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
             }
 
-            var waitSuccess = this.connected.Wait(connectionTimeout, cancellationToken) && !cancellationToken.IsCancellationRequested;
+            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle }, connectionTimeout);
 
-            return waitSuccess;
+            // Return true if wait is not because of cancellation or connection timeout.
+            return waitIndex != 1 && waitIndex != WaitHandle.WaitTimeout;
         }
 
         /// <inheritdoc />
@@ -262,14 +263,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler, CancellationToken cancellationToken)
+        public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
         {
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
-                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true, cancellationToken);
+                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
                 };
-            this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler, cancellationToken);
+            this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
 
             var message = this.dataSerializer.SerializePayload(
@@ -286,14 +287,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler, CancellationToken cancellationToken)
+        public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
         {
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
-                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true, cancellationToken);
+                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
                 };
-            this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler, cancellationToken);
+            this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
 
             var message = this.dataSerializer.SerializePayload(
@@ -382,7 +383,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationEndpoint.Stop();
         }
 
-        private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler, CancellationToken cancellationToken)
+        private void OnExecutionMessageReceived(object sender, MessageReceivedEventArgs messageReceived, ITestRunEventsHandler testRunEventsHandler)
         {
             try
             {
@@ -437,7 +438,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception exception)
             {
-                this.OnTestRunAbort(testRunEventsHandler, exception, false, cancellationToken);
+                this.OnTestRunAbort(testRunEventsHandler, exception, false);
             }
         }
 
@@ -488,7 +489,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
         }
 
-        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError, CancellationToken cancellationToken)
+        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
         {
             if (this.IsOperationComplete())
             {
@@ -499,7 +500,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Set operation complete.");
             this.SetOperationComplete();
 
-            var reason = this.GetAbortErrorMessage(exception, getClientError, cancellationToken);
+            var reason = this.GetAbortErrorMessage(exception, getClientError);
             EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
             this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
 
@@ -525,7 +526,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.SetOperationComplete();
 
             var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
-            var reason = this.GetAbortErrorMessage(exception, getClientError, CancellationToken.None);
+            var reason = this.GetAbortErrorMessage(exception, getClientError);
             EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}", reason);
             this.LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, reason));
 
@@ -543,7 +544,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
         }
 
-        private string GetAbortErrorMessage(Exception exception, bool getClientError, CancellationToken cancellationToken)
+        private string GetAbortErrorMessage(Exception exception, bool getClientError)
         {
             EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
 
@@ -557,7 +558,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 // Set a default message and wait for test host to exit for a moment
                 reason = CommonResources.UnableToCommunicateToTestHost;
-                if (this.clientExited.Wait(this.clientExitedWaitTime, cancellationToken) && !cancellationToken.IsCancellationRequested)
+                if (this.clientExited.Wait(this.clientExitedWaitTime))
                 {
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                     reason = this.clientExitErrorMessage;
