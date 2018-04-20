@@ -259,9 +259,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testRunRequestPayload.KeepAlive,
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
-                                  testHostLauncher);
-                runCriteria.TestCaseFilter = testRunRequestPayload.TestPlatformOptions?.TestCaseFilter;
-                runCriteria.FilterOptions = testRunRequestPayload.TestPlatformOptions?.FilterOptions;
+                                  testHostLauncher,
+                                  testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
+                                  testRunRequestPayload.TestPlatformOptions?.FilterOptions);
             }
             else
             {
