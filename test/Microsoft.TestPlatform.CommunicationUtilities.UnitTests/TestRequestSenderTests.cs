@@ -73,9 +73,20 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeCommunicationChannel();
 
-            var connected = this.testRequestSender.WaitForRequestHandlerConnection(1);
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(1, It.IsAny<CancellationToken>());
 
             Assert.IsTrue(connected);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionWithInfiniteTimeoutShouldReturnImmediatelyWhenCancellationRequested()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(-1, cancellationTokenSource.Token);
+
+            Assert.IsFalse(connected);
         }
 
         [TestMethod]

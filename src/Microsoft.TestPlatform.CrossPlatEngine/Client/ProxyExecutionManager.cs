@@ -33,7 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
-        private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
@@ -70,7 +69,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;
-            this.cancellationTokenSource = new CancellationTokenSource();
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
             this.fileHelper = fileHelper;
@@ -106,16 +104,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
                 }
-
                 var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
                                                     // If the test execution is with a test filter, group them by sources
                                                     testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
-                this.isCommunicationEstablished = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
+                this.isCommunicationEstablished = this.SetupChannel(testPackages);
 
                 if (this.isCommunicationEstablished)
                 {
-                    if (this.cancellationTokenSource.IsCancellationRequested)
+                    if (this.CancellationTokenSource.IsCancellationRequested)
                     {
                         if (EqtTrace.IsVerboseEnabled)
                         {
@@ -145,13 +142,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     if (testRunCriteria.HasSpecificSources)
                     {
                         var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, runsettings, executionContext, testPackages);
-
                         this.RequestSender.StartTestRun(runRequest, this);
                     }
                     else
                     {
                         var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, runsettings, executionContext, testPackages);
-
                         this.RequestSender.StartTestRun(runRequest, this);
                     }
                 }
@@ -191,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // Cancel fast, try to stop testhost deployment/launch
-            this.cancellationTokenSource.Cancel();
+            this.CancellationTokenSource.Cancel();
             if (this.isCommunicationEstablished)
             {
                 this.RequestSender.SendTestRunCancel();
@@ -216,7 +211,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestRunEventsHandler = eventHandler;
             }
 
-            this.RequestSender.SendTestRunAbort();
+            // Cancel fast, try to stop testhost deployment/launch
+            this.CancellationTokenSource.Cancel();
+
+            if (this.isCommunicationEstablished)
+            {
+                this.RequestSender.SendTestRunAbort();
+            }
         }
 
         /// <inheritdoc/>

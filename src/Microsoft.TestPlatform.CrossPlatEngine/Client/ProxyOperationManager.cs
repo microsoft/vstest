@@ -55,6 +55,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected ProxyOperationManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
+            this.CancellationTokenSource = new CancellationTokenSource();
+
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
@@ -75,6 +77,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         protected ITestRequestSender RequestSender { get; set; }
 
+        /// <summary>
+        /// Gets or sets the cancellation token source.
+        /// </summary>
+        protected CancellationTokenSource CancellationTokenSource { get; set; }
+
         #endregion
 
         #region IProxyOperationManager implementation.
@@ -91,16 +98,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>
         /// Returns true if Communation is established b/w runner and host
         /// </returns>
-        public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
+        public virtual bool SetupChannel(IEnumerable<string> sources)
         {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
             var connTimeout = this.connectionTimeout;
 
             var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
-            if(!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
+            if (!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
             {
                 connTimeout = result * 1000;
             }
-            
+
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
@@ -114,7 +122,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 var processId = this.processHelper.GetCurrentProcessId();
-
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Subscribe to TestHost Event
@@ -126,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     // Launch the test host.
-                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
+                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
                     this.testHostLaunched = hostLaunchedTask.Result;
 
                     if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
@@ -155,10 +162,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // Wait for a timeout for the client to connect.
-                if (!this.testHostLaunched || !this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
+                if (!this.testHostLaunched ||
+                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token))
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
                     if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
                     {
                         // Testhost failed with error

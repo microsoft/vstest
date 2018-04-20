@@ -29,7 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
-        private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
@@ -75,7 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
-            this.cancellationTokenSource = new CancellationTokenSource();
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
             this.fileHelper = fileHelper;
@@ -104,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
+                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources);
 
                 if (this.isCommunicationEstablished)
                 {
