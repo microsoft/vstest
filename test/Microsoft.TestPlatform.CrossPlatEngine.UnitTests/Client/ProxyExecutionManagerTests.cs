@@ -189,8 +189,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
                 this.mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Never);
-                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
-                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>()), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), It.IsAny<ITestRunEventsHandler>()), Times.Never);
             }
             finally
             {
@@ -216,8 +216,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
                 this.mockRequestSender.Verify(s => s.InitializeExecution(extensions), Times.Never);
-                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
-                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>()), Times.Never);
+                this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), It.IsAny<ITestRunEventsHandler>()), Times.Never);
             }
             finally
             {
@@ -308,7 +308,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
 
-            this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+            this.mockRequestSender.Verify(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), It.IsAny<ITestRunEventsHandler>()), Times.Never);
         }
 
         [TestMethod]
@@ -432,9 +432,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             TestRunCriteriaWithSources testRunCriteriaPassed = null;
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), this.testExecutionManager, It.IsAny<CancellationToken>()))
+            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), this.testExecutionManager))
                 .Callback(
-                    (TestRunCriteriaWithSources criteria, ITestRunEventsHandler sink, CancellationToken cancellationToken) =>
+                    (TestRunCriteriaWithSources criteria, ITestRunEventsHandler sink) =>
                         {
                             testRunCriteriaPassed = criteria;
                         });
@@ -454,9 +454,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             TestRunCriteriaWithTests testRunCriteriaPassed = null;
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), this.testExecutionManager, It.IsAny<CancellationToken>()))
+            this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), this.testExecutionManager))
                 .Callback(
-                    (TestRunCriteriaWithTests criteria, ITestRunEventsHandler sink, CancellationToken cancellationToken) =>
+                    (TestRunCriteriaWithTests criteria, ITestRunEventsHandler sink) =>
                     {
                         testRunCriteriaPassed = criteria;
                     });
