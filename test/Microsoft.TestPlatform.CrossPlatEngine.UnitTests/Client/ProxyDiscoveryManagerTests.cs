@@ -3,6 +3,14 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -14,14 +22,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Threading;
-    using System.Threading.Tasks;
     using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
@@ -40,6 +43,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<IRequestData> mockRequestData;
 
         private Mock<IMetricsCollection> mockMetricsCollection;
+        private Mock<IFileHelper> mockFileHelper;
 
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
@@ -51,13 +55,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockFileHelper = new Mock<IFileHelper>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestData.Object,
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
                                             this.mockDataSerializer.Object,
-                                            this.testableClientConnectionTimeout);
+                                            this.testableClientConnectionTimeout,
+                                            this.mockFileHelper.Object);
             this.discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
         }
 
@@ -200,6 +206,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldInitializeExtensionsWithExistingExtensionsOnly()
+        {
+            var inputExtensions = new[] { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" };
+            var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
+
+            TestPluginCacheTests.SetupMockAdditionalPathExtensions(inputExtensions);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) =>
+            {
+                return extensions.Select(extension => { return Path.GetFileName(extension); });
+            });
+
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns((string extensionPath) =>
+            {
+                return !extensionPath.Contains("def.TestAdapter.dll");
+            });
+
+            this.mockFileHelper.Setup(fh => fh.Exists("def.TestAdapter.dll")).Returns(false);
+            this.mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
+
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+
+            this.mockRequestSender.Verify(s => s.InitializeDiscovery(expectedOutputPaths), Times.Once);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldQueryTestHostManagerForExtensions()
         {
             TestPluginCache.Instance = null;
@@ -227,7 +259,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
             try
             {
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
                 this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
@@ -473,6 +506,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
+                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
                 this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);

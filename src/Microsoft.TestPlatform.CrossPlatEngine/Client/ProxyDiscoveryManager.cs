@@ -19,6 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
@@ -31,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IRequestData requestData;
         private ITestDiscoveryEventsHandler2 baseTestDiscoveryEventsHandler;
         private bool skipDefaultAdapters;
+        private readonly IFileHelper fileHelper;
 
         #region Constructors
 
@@ -41,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(IRequestData requestData, ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
+            : this(requestData, testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout, new FileHelper())
         {
             this.testHostManager = testHostManager;
         }
@@ -65,13 +68,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
             IDataSerializer dataSerializer,
-            int clientConnectionTimeout)
+            int clientConnectionTimeout,
+            IFileHelper fileHelper)
             : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -177,8 +182,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
+
+            // Filter non existing extensions
+            var filteredExtensions = extensions.Where(extension => this.fileHelper.Exists(extension));
+
             var sourceList = sources.ToList();
-            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
+            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, filteredExtensions);
 
             // Only send this if needed.
             if (platformExtensions.Any())
