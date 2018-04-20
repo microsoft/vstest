@@ -239,25 +239,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldThrowIfRequestCancelled()
         {
             SetupTestHostLaunched(true);
-            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
 
             var cancellationTokenSource = new CancellationTokenSource();
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout, cancellationTokenSource);
 
             cancellationTokenSource.Cancel();
 
-            Assert.ThrowsException<OperationCanceledException>(() => operationManager.SetupChannel(Enumerable.Empty<string>()));
-        }
-
-        [TestMethod]
-        public void SetupChannelShouldThrowIfRequestCancelled()
-        {
-            SetupTestHostLaunched(true);
-
-            var cancellationTokenSource = new CancellationTokenSource();
-            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
-
-            cancellationTokenSource.Cancel();
             Assert.ThrowsException<OperationCanceledException>(() => operationManager.SetupChannel(Enumerable.Empty<string>()));
         }
 
