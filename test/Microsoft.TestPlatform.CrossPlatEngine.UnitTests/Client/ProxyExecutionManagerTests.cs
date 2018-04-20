@@ -202,7 +202,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             try
             {
                 this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
-                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
@@ -281,7 +281,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
 
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) =>
             {
                 return extensions.Select(extension => { return Path.GetFileName(extension); });

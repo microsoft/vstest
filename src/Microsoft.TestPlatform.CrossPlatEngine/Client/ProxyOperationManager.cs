@@ -103,6 +103,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
             var connTimeout = this.connectionTimeout;
 
+            var userSpecifiedTimeout = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
+            if (!string.IsNullOrEmpty(userSpecifiedTimeout) && Int32.TryParse(userSpecifiedTimeout, out int result))
+            {
+                connTimeout = result * 1000;
+            }
+
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
@@ -157,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Wait for a timeout for the client to connect.
                 if (!this.testHostLaunched ||
-                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
+                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token))
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
                     if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
