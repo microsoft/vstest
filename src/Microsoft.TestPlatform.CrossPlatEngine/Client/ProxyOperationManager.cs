@@ -100,6 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources)
         {
+            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
             var connTimeout = this.connectionTimeout;
 
             if (!this.initialized)
@@ -126,7 +127,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     // Launch the test host.
-                    this.testHostLaunched = this.LaunchTestHost(testHostStartInfo, this.CancellationTokenSource.Token);
+                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, this.CancellationTokenSource.Token);
+                    this.testHostLaunched = hostLaunchedTask.Result;
 
                     if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
                     {
@@ -154,7 +156,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // Wait for a timeout for the client to connect.
-                if (!this.testHostLaunched || !this.WaitForRequestHandlerConnection(connTimeout))
+                if (!this.testHostLaunched ||
+                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token))
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
                     if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
@@ -173,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (this.versionCheckRequired)
                 {
-                    this.CheckVersionWithTestHost();
+                    this.RequestSender.CheckVersionWithTestHost();
                 }
 
                 this.initialized = true;
@@ -307,24 +310,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
-        }
-
-        private bool LaunchTestHost(TestProcessStartInfo testHostStartInfo, CancellationToken token)
-        {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            return this.testHostManager.LaunchTestHostAsync(testHostStartInfo, token).Result;
-        }
-
-        private bool WaitForRequestHandlerConnection(int connTimeout)
-        {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            return this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token);
-        }
-
-        private void CheckVersionWithTestHost()
-        {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
-            this.RequestSender.CheckVersionWithTestHost();
         }
     }
 }
