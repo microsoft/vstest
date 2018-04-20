@@ -144,8 +144,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle }, connectionTimeout);
 
-            // Return true if wait is not because of cancellation or connection timeout.
-            return waitIndex != 1 && waitIndex != WaitHandle.WaitTimeout;
+            // Return true if wait is because of waitHandle.
+            return waitIndex == 0;
         }
 
         /// <inheritdoc />
