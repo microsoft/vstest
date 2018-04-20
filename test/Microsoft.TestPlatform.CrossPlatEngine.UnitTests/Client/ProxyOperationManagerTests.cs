@@ -48,9 +48,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         /// </summary>
         private int connectionTimeout = 400;
 
-        private static readonly string OperationCanceledMessage =
-            @"System.OperationCanceledException: The operation was canceled";
-
         public ProxyOperationManagerTests()
         {
             this.mockRequestSender = new Mock<ITestRequestSender>();
@@ -261,8 +258,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
 
             cancellationTokenSource.Cancel();
-            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
-            Assert.IsTrue(message.Contains(ProxyOperationManagerTests.OperationCanceledMessage));
+            Assert.ThrowsException<OperationCanceledException>(() => operationManager.SetupChannel(Enumerable.Empty<string>()));
         }
 
         [TestMethod]
