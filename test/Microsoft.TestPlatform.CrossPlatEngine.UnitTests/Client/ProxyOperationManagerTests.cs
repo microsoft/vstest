@@ -52,9 +52,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private static readonly string TimoutErrorMessage =
             "vstest.console process failed to connect to testhost process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
-        private static readonly string OperationCanceledMessage =
-            @"System.OperationCanceledException: The operation was canceled";
-
         public ProxyOperationManagerTests()
         {
             this.mockRequestSender = new Mock<ITestRequestSender>();
@@ -246,8 +243,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
 
             cancellationTokenSource.Cancel();
-            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
-            Assert.IsTrue(message.Contains(ProxyOperationManagerTests.OperationCanceledMessage));
+            Assert.ThrowsException<OperationCanceledException>(() => operationManager.SetupChannel(Enumerable.Empty<string>()));
         }
 
         [TestMethod]
