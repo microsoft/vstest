@@ -287,17 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (this.TryFetchNextSource(this.sourceEnumerator, out string nextSource))
                 {
                     EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", nextSource);
-
-                    testRunCriteria = new TestRunCriteria(
-                                          new[] { nextSource },
-                                          this.actualTestRunCriteria.FrequencyOfRunStatsChangeEvent,
-                                          this.actualTestRunCriteria.KeepAlive,
-                                          this.actualTestRunCriteria.TestRunSettings,
-                                          this.actualTestRunCriteria.RunStatsChangeEventTimeout,
-                                          this.actualTestRunCriteria.TestHostLauncher)
-                                          {
-                                              TestCaseFilter = this.actualTestRunCriteria.TestCaseFilter
-                                          };
+                    testRunCriteria = new TestRunCriteria(new[] { nextSource }, this.actualTestRunCriteria);
                 }
             }
             else
@@ -305,14 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 if (this.TryFetchNextSource(this.testCaseListEnumerator, out List<TestCase> nextSetOfTests))
                 {
                     EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", nextSetOfTests?.FirstOrDefault()?.Source);
-
-                    testRunCriteria = new TestRunCriteria(
-                                          nextSetOfTests,
-                                          this.actualTestRunCriteria.FrequencyOfRunStatsChangeEvent,
-                                          this.actualTestRunCriteria.KeepAlive,
-                                          this.actualTestRunCriteria.TestRunSettings,
-                                          this.actualTestRunCriteria.RunStatsChangeEventTimeout,
-                                          this.actualTestRunCriteria.TestHostLauncher);
+                    testRunCriteria = new TestRunCriteria(nextSetOfTests, this.actualTestRunCriteria);
                 }
             }
 
