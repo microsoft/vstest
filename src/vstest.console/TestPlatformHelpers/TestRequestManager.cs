@@ -31,8 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -54,8 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private const int runRequestTimeout = 5000;
 
         private bool telemetryOptedIn;
-
-        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -80,11 +76,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
                   new InferHelper(new AssemblyMetadataProvider()),
-                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode), new FileHelper())
+                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IFileHelper fileHelper)
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
@@ -92,7 +88,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testPlatformEventSource = testPlatformEventSource;
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
-            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -120,11 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // requests.
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
             this.testPlatform.ClearExtensions();
-
-            // Filter non existing extensions.
-            var extensions = pathToAdditionalExtensions.Where(extension => this.fileHelper.Exists(extension));
-
-            this.testPlatform.UpdateExtensions(extensions, skipExtensionFilters);
+            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, skipExtensionFilters);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
