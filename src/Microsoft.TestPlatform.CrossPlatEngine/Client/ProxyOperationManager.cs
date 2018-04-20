@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Wait for a timeout for the client to connect.
                 if (!this.testHostLaunched ||
-                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout, this.CancellationTokenSource.Token))
+                    !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
                     this.ThrowExceptionOnConnectionFailure(connTimeout);
                 }
