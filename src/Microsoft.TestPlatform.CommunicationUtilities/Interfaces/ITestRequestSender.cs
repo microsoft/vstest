@@ -63,7 +63,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         /// <param name="runCriteria">RunCriteria for test run</param>
         /// <param name="eventHandler">EventHandler for test run events</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler);
 
         /// <summary>
@@ -71,7 +70,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         /// <param name="runCriteria">RunCriteria for test run</param>
         /// <param name="eventHandler">EventHandler for test run events</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler);
 
         /// <summary>
