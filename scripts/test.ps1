@@ -91,6 +91,8 @@ $Script:TPT_Parallel = $Parallel
 $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
 $Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
+$Script:TPT_RunSettingsFile = Join-Path (Get-Item (Split-Path $MyInvocation.MyCommand.Path)) "vstest.runsettings"
+$Script:TPT_NSTraceDataCollectorPath = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$Script:TPT_Configuration\netstandard2.0"
 
 #
 # Capture error state in any step globally to modify return code
@@ -254,8 +256,8 @@ function Invoke-Test
                 else
                 {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter /settings:$Script:TPT_RunSettingsFile /testadapterpath:$Script:TPT_NSTraceDataCollectorPath"
+                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter /settings:"$Script:TPT_RunSettingsFile" /testadapterpath:"$Script:TPT_NSTraceDataCollectorPath"
                 }
 
                 Reset-TestEnvironment

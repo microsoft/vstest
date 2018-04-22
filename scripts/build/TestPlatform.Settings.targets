@@ -97,6 +97,9 @@
         <PackageReference Include="MSTest.Assert.Extensions">
           <Version>$(MSTestAssertExtensionVersion)</Version>
         </PackageReference>
+        <PackageReference Include="Microsoft.CodeCoverage">
+          <Version>1.0.3</Version>
+        </PackageReference>
       </ItemGroup>
     </When>
   </Choose>

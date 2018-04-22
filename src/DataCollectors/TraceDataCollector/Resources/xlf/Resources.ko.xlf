@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="-415414323">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">119</count>
+        <count count-type="x-adjWordCount">101.15</count>
+        <count count-type="x-curAdjWordCount">101.15</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">119</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
+    <body>
+      <trans-unit id="CodeCoverageCollectorDescription">
+        <source>Use to collect code coverage data for ASP.NET applications running on IIS. Choose 'Configure' to provide location of symbol files.</source>
+        <target state="new">Use to collect code coverage data for ASP.NET applications running on IIS. Choose 'Configure' to provide location of symbol files.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CodeCoverageCollectorFriendlyName">
+        <source>Code Coverage</source>
+        <target state="new">Code Coverage</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorLaunchVanguard">
+        <source>Failed to launch CodeCoverage.exe with the following error. No code coverage data will be collected: {0}</source>
+        <target state="new">Failed to launch CodeCoverage.exe with the following error. No code coverage data will be collected: {0}</target>
+        <note>Cannot start CodeCoverage.exe. {0} is the detailed error message from CodeCoverage.exe.</note>
+      </trans-unit>
+      <trans-unit id="ErrorNoEntryPoint">
+        <source>No application under test is specified.</source>
+        <target state="new">No application under test is specified.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorNoVanguard">
+        <source>Cannot find CodeCoverage.exe.</source>
+        <target state="new">Cannot find CodeCoverage.exe.</target>
+        <note>Cannot find CodeCoverage.exe installed with VS.</note>
+      </trans-unit>
+      <trans-unit id="ErrorRegisterExecutable">
+        <source>The adapter 'Code Coverage' will not be used for this test run as Microsoft Test Manager is not running as administrator. To collect code coverage, re-start Microsoft Test Manager by choosing to 'Run as Administrator' and then start the test run.</source>
+        <target state="new">The adapter 'Code Coverage' will not be used for this test run as Microsoft Test Manager is not running as administrator. To collect code coverage, re-start Microsoft Test Manager by choosing to 'Run as Administrator' and then start the test run.</target>
+        <note>In MTM, we need to register the process name using IFEO. This will requires administrator privilege. If user run MTM using a non-admin account, they will see this error.</note>
+      </trans-unit>
+      <trans-unit id="GeneralErrorLaunchVanguard">
+        <source>Failed to launch CodeCoverage.exe. No code coverage will be collected.</source>
+        <target state="new">Failed to launch CodeCoverage.exe. No code coverage will be collected.</target>
+        <note>Similar to ErrorLaunchVanguard, CodeCoverage.exe cannot be launched. But we cannot know the exact reason.</note>
+      </trans-unit>
+      <trans-unit id="LabAgentTaskExecutionFailed">
+        <source>Failed to execute command {0} on Lab Agent.</source>
+        <target state="new">Failed to execute command {0} on Lab Agent.</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
