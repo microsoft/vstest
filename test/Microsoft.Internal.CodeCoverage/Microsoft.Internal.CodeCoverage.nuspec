@@ -19,6 +19,6 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="**\*.*" target="contentFiles\any\any" />   
+    <file src="**\*.*" target="contentFiles\any\any" />
   </files>
 </package>
