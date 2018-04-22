@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestTools.Diagnostics;
+    using TestPlatform.ObjectModel;
 
     /// <summary>
     /// Data collector implementation for unit test (Rocksteady and MSTest)

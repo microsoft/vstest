@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TraceCollector
 {
     using System;
     using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestTools.Diagnostics;
+    using TestPlatform.ObjectModel;
 
     /// <summary>
     /// Helper class used to add a child process to a job object so that it terminates when

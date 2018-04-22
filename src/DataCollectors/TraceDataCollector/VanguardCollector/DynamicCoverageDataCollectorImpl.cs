@@ -13,8 +13,8 @@ namespace Microsoft.VisualStudio.Coverage
     using Microsoft.VisualStudio.Enterprise.WebInstrument;
 #endif*/
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestTools.Diagnostics;
     using Microsoft.VisualStudio.TraceCollector;
+    using TestPlatform.ObjectModel;
     using TraceDataCollector;
     using TraceDataCollector.Resources;
 

@@ -18,9 +18,9 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestTools.Diagnostics;
     using Microsoft.VisualStudio.TraceCollector;
     using Microsoft.VisualStudio.Collector;
+    using TestPlatform.ObjectModel;
     using TraceDataCollector;
     using TraceDataCollector.Resources;
 

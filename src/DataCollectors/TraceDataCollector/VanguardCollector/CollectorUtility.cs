@@ -8,10 +8,6 @@ namespace Microsoft.VisualStudio.Collector
     using System.Reflection;
     using System.Xml;
     using Coverage;
-/* #if !NETSTANDARD
-    using Microsoft.VisualStudio.Setup.Interop;
-#endif */
-    using Microsoft.VisualStudio.TestTools.Diagnostics;
     using TraceDataCollector.Resources;
 
     public static class CollectorUtility
@@ -42,39 +38,6 @@ namespace Microsoft.VisualStudio.Collector
             /// The x 64.
             /// </summary>
             x64 = 0x8664
-        }
-
-        public static string GetVSInstallPath()
-        {
-            string toolsPath = null;
-
-            // TODO For netstandard find toolPath relative to dotnet.exe.
-/* #if !NETSTANDARD
-            try
-            {
-                // Use the Setup API to find the installation folder for currently running VS instance.
-                var setupConfiguration = new SetupConfiguration() as ISetupConfiguration;
-                if (setupConfiguration != null)
-                {
-                    var currentConfiguration = setupConfiguration.GetInstanceForCurrentProcess();
-                    var currentInstallationPath = currentConfiguration.GetInstallationPath();
-                    toolsPath = Path.Combine(currentInstallationPath, @"Common7\IDE");
-                    return toolsPath;
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-            catch
-            {
-                // SetupConfiguration won't work in xcopy scenario.
-                // So ignore all exception from it.
-            }
-
-            toolsPath = GetVSIDEPathRelativeToTraceDataCollector();
-#endif */
-            return toolsPath;
         }
 
         public static void RemoveChildNodeAndReturnValue(ref XmlElement owner, string elementName,
@@ -125,30 +88,6 @@ namespace Microsoft.VisualStudio.Collector
 
             throw new FileNotFoundException(errorMessage);
         }
-
-/*        /// <summary>
-        /// Returns the VS Install Path relative to location of TraceDataCollector dll. 
-        /// </summary>
-        /// <returns>vs install path</returns>
-        private static string GetVSIDEPathRelativeToTraceDataCollector()
-        {
-            string installDir = string.Empty;
-            try
-            {
-// TODO: netstandard 1.5 doesn't have Assembly.GetExecutingAssembly, find alternative if required.
-#if !NETSTANDARD
-                string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                installDir = Path.Combine(currentDirectory, "..", "..", "..");
-#endif 
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Error("VS Install Dir Not found", ex.Message);
-            }
-
-            return installDir;
-        }*/
-
 
         /// <summary>
         /// Get path to vanguard.exe

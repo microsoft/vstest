@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System.IO;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestTools.Diagnostics;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using TestPlatform.ObjectModel;
 
     /// <summary>
     /// Implements the base event hooking logic for data collectors.
@@ -34,6 +34,7 @@ namespace Microsoft.VisualStudio.TraceCollector
         /// </summary>
         internal BaseDataCollector()
         {
+            EqtTrace.Info("BaseDataCollector.ctor: adding datacollector: {0}", this);
             _collectors.Add(this);
         }
 
@@ -77,6 +78,7 @@ namespace Microsoft.VisualStudio.TraceCollector
 
         void InternalConstruct(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
         {
+            EqtTrace.Info("BaseDataCollector.InternalConstruct: Enabling datacollector with configuration: {0}", configurationElement?.InnerXml);
             Events = events;
             DataSink = dataSink;
             Logger = logger;
@@ -91,7 +93,6 @@ namespace Microsoft.VisualStudio.TraceCollector
             OnInitialize(configurationElement);
 
             SubscribeToEvents();
-            EnableLogging(configurationElement);
         }
 
         protected abstract void OnInitialize(XmlElement configurationElement);
@@ -210,32 +211,6 @@ namespace Microsoft.VisualStudio.TraceCollector
                 UnsubscribeFromEvents();
                 IsDisposed = true;
             }
-        }
-
-        private void EnableLogging(XmlElement configurationElement)
-        {
-            // Enable Eqt trace logging if specified in settings.
-            if (configurationElement != null)
-            {
-                XmlElement logFileElement = configurationElement[LogFile];
-                var logFile = logFileElement != null ? logFileElement.InnerText : string.Empty;
-
-                if (!string.IsNullOrWhiteSpace(logFile))
-                {
-                    EqtTrace.InitializeVerboseTrace(GetTimestampedLogFile(logFile));
-                }
-            }
-        }
-
-        private string GetTimestampedLogFile(string logFile)
-        {
-            return Path.ChangeExtension(
-                logFile,
-                string.Format(
-                    "{0}_{1}{2}",
-                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
-                    Process.GetCurrentProcess().Id,
-                    Path.GetExtension(logFile)));
         }
 
         protected bool IsDisposed { get; private set; }
