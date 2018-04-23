@@ -119,7 +119,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
         private void UpdateConfigurationElement()
         {
-            var frameWork = XmlRunSettingsUtilities.GetRunConfigurationNode(this.SettingsXml).TargetFramework;
+            var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(this.SettingsXml);
+            var frameWork = runConfig.TargetFramework;
+            var platform = runConfig.TargetPlatform;
 
             if (this.ConfigurationElement == null)
             {
@@ -140,6 +142,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", string.Empty, frameWork.Name);
             }
+
+            // Add TargetPlatform element, This can be used by DataCollector. E.g Code Coverage datacollector to determine
+            // which platform profiler(covrun32.dll/covrun64.dll) to use.
+            AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "TargetPlatform", string.Empty, platform.ToString());
         }
 
         private static void AppendChildNodeOrInnerText(XmlDocument doc, XmlElement owner, string elementName, string nameSpaceUri, string innerText)
