@@ -168,7 +168,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
         public bool IsDebug => false;
 
-        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
         {
             var processInfo = new ProcessStartInfo(
                                   defaultTestHostStartInfo.FileName,
@@ -191,6 +191,11 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
             }
 
             throw new Exception("Process in invalid state.");
+        }
+
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        {
+            return this.LaunchTestHost(defaultTestHostStartInfo, CancellationToken.None);
         }
     }
 

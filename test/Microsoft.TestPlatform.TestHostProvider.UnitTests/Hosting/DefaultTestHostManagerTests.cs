@@ -368,13 +368,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
             var currentProcess = Process.GetCurrentProcess();
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
 
             this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
 
             Task<bool> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None);
             pid.Wait();
-            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsTrue(pid.Result);
             Assert.AreEqual(currentProcess.Id, this.testHostId);
@@ -386,7 +386,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
             var currentProcess = Process.GetCurrentProcess();
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
             this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None).Wait();
 
             this.mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object>>()));
