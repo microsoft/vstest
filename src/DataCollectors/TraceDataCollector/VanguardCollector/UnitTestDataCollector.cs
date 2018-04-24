@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.Coverage
 {
     using System;
     using System.Collections.Generic;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using TestPlatform.ObjectModel;
 
@@ -57,7 +56,10 @@ namespace Microsoft.VisualStudio.Coverage
                     }
 
                     this.activeIISSessions.Add(e.Context.SessionId);
-                    EqtTrace.Verbose("UnitTestDataCollector:SessionStart called for session {0} - Active IIS session count = {1}", e.Context.SessionId, this.activeIISSessions.Count);
+                    EqtTrace.Verbose(
+                        "UnitTestDataCollector:SessionStart called for session {0} - Active IIS session count = {1}",
+                        e.Context.SessionId,
+                        this.activeIISSessions.Count);
 
                     if (this.maxNumberOfSessions < this.activeIISSessions.Count)
                     {
@@ -89,7 +91,10 @@ namespace Microsoft.VisualStudio.Coverage
                     if (this.activeIISSessions.Contains(e.Context.SessionId))
                     {
                         this.activeIISSessions.Remove(e.Context.SessionId);
-                        EqtTrace.Verbose("UnitTestDataCollector:SessionEnd called for session {0}. Active session count  = {1}", e.Context.SessionId, this.activeIISSessions.Count);
+                        EqtTrace.Verbose(
+                            "UnitTestDataCollector:SessionEnd called for session {0}. Active session count  = {1}",
+                            e.Context.SessionId,
+                            this.activeIISSessions.Count);
 
                         if (this.activeIISSessions.Count == 0)
                         {

@@ -40,7 +40,10 @@ namespace Microsoft.VisualStudio.Collector
             X64 = 0x8664
         }
 
-        public static void RemoveChildNodeAndReturnValue(ref XmlElement owner, string elementName, out string elementValue)
+        public static void RemoveChildNodeAndReturnValue(
+            ref XmlElement owner,
+            string elementName,
+            out string elementValue)
         {
             var node = owner.SelectSingleNode(elementName);
             elementValue = string.Empty;

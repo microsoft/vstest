@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TraceCollector
 {
     using System;
     using System.ComponentModel;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -144,7 +143,11 @@ namespace Microsoft.VisualStudio.TraceCollector
             this.wrapped.SendFileAsync(context, path, deleteFile);
         }
 
-        void IDataCollectionSink.SendFileAsync(DataCollectionContext context, string path, string description, bool deleteFile)
+        void IDataCollectionSink.SendFileAsync(
+            DataCollectionContext context,
+            string path,
+            string description,
+            bool deleteFile)
         {
             this.wrapped.SendFileAsync(context, path, description, deleteFile);
         }
@@ -264,5 +267,6 @@ namespace Microsoft.VisualStudio.TraceCollector
     }
 
     #endregion
+
 #pragma warning restore SA1402 // File may only contain a single class
 }

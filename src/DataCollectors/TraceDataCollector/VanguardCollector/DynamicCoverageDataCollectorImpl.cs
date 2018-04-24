@@ -38,79 +38,84 @@ namespace Microsoft.VisualStudio.Coverage
 
         // Default CodeCoverage Configuration as specified here : https://msdn.microsoft.com/en-us/library/jj635153.aspx
         private static readonly string DefaultCodeCoverageSettings =
-@"        <Configuration>" + Environment.NewLine +
-@"          <CodeCoverage>" + Environment.NewLine +
-@"            <ModulePaths>" + Environment.NewLine +
-@"              <Exclude>" + Environment.NewLine +
-@"                 <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*testhost.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*datacollector.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*qtagent32.*</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*msvcr.*dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*msvcp.*dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*clr.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*clr.ni.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*clrjit.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*clrjit.ni.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*mscoree.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*mscoreei.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*mscoreei.ni.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*mscorlib.dll$</ModulePath>" + Environment.NewLine +
-@"                 <ModulePath>.*mscorlib.ni.dll$</ModulePath>" + Environment.NewLine +
-@"               </Exclude>" + Environment.NewLine +
-@"            </ModulePaths>" + Environment.NewLine +
-@"            <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>" + Environment.NewLine +
-@"            <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>" + Environment.NewLine +
-@"            <CollectFromChildProcesses>True</CollectFromChildProcesses>" + Environment.NewLine +
-@"            <CollectAspDotNet>false</CollectAspDotNet>" + Environment.NewLine +
-@"            <SymbolSearchPaths />" + Environment.NewLine +
-@"            <Functions>" + Environment.NewLine +
-@"              <Exclude>" + Environment.NewLine +
-@"                <Function>^std::.*</Function>" + Environment.NewLine +
-@"                <Function>^ATL::.*</Function>" + Environment.NewLine +
-@"                <Function>.*::__GetTestMethodInfo.*</Function>" + Environment.NewLine +
-@"                <Function>.*__CxxPureMSILEntry.*</Function>" + Environment.NewLine +
-@"                <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>" + Environment.NewLine +
-@"                <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>" + Environment.NewLine +
-@"                <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>" + Environment.NewLine +
-@"                <Function>^__.*</Function>" + Environment.NewLine +
-@"                <Function>.*::__.*</Function>" + Environment.NewLine +
-@"              </Exclude>" + Environment.NewLine +
-@"            </Functions>" + Environment.NewLine +
-@"            <Attributes>" + Environment.NewLine +
-@"              <Exclude>" + Environment.NewLine +
-@"                <Attribute>^System.Diagnostics.DebuggerHidden.*</Attribute>" + Environment.NewLine +
-@"                <Attribute>^System.Diagnostics.DebuggerNonUserCode.*</Attribute>" + Environment.NewLine +
-@"                <Attribute>^System.Runtime.CompilerServices.CompilerGenerated.*</Attribute>" + Environment.NewLine +
-@"                <Attribute>^System.CodeDom.Compiler.GeneratedCode.*</Attribute>" + Environment.NewLine +
-@"                <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage.*</Attribute>" + Environment.NewLine +
-@"              </Exclude>" + Environment.NewLine +
-@"            </Attributes>" + Environment.NewLine +
-@"            <Sources>" + Environment.NewLine +
-@"              <Exclude>" + Environment.NewLine +
-@"                <Source>.*\\atlmfc\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\vctools\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\public\\sdk\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\externalapis\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\microsoft sdks\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\vc\\include\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\msclr\\.*</Source>" + Environment.NewLine +
-@"                <Source>.*\\ucrt\\.*</Source>" + Environment.NewLine +
-@"              </Exclude>" + Environment.NewLine +
-@"            </Sources>" + Environment.NewLine +
-@"            <CompanyNames/>" + Environment.NewLine +
-@"            <PublicKeyTokens/>" + Environment.NewLine +
-@"          </CodeCoverage>" + Environment.NewLine +
-@"        </Configuration>";
+            @"        <Configuration>" + Environment.NewLine +
+            @"          <CodeCoverage>" + Environment.NewLine +
+            @"            <ModulePaths>" + Environment.NewLine +
+            @"              <Exclude>" + Environment.NewLine +
+            @"                 <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*testhost.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*datacollector.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>" +
+            Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*qtagent32.*</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*msvcr.*dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*msvcp.*dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*clr.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*clr.ni.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*clrjit.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*clrjit.ni.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*mscoree.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*mscoreei.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*mscoreei.ni.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*mscorlib.dll$</ModulePath>" + Environment.NewLine +
+            @"                 <ModulePath>.*mscorlib.ni.dll$</ModulePath>" + Environment.NewLine +
+            @"               </Exclude>" + Environment.NewLine +
+            @"            </ModulePaths>" + Environment.NewLine +
+            @"            <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>" + Environment.NewLine +
+            @"            <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>" + Environment.NewLine +
+            @"            <CollectFromChildProcesses>True</CollectFromChildProcesses>" + Environment.NewLine +
+            @"            <CollectAspDotNet>false</CollectAspDotNet>" + Environment.NewLine +
+            @"            <SymbolSearchPaths />" + Environment.NewLine +
+            @"            <Functions>" + Environment.NewLine +
+            @"              <Exclude>" + Environment.NewLine +
+            @"                <Function>^std::.*</Function>" + Environment.NewLine +
+            @"                <Function>^ATL::.*</Function>" + Environment.NewLine +
+            @"                <Function>.*::__GetTestMethodInfo.*</Function>" + Environment.NewLine +
+            @"                <Function>.*__CxxPureMSILEntry.*</Function>" + Environment.NewLine +
+            @"                <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>" +
+            Environment.NewLine +
+            @"                <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>" +
+            Environment.NewLine +
+            @"                <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>" + Environment.NewLine +
+            @"                <Function>^__.*</Function>" + Environment.NewLine +
+            @"                <Function>.*::__.*</Function>" + Environment.NewLine +
+            @"              </Exclude>" + Environment.NewLine +
+            @"            </Functions>" + Environment.NewLine +
+            @"            <Attributes>" + Environment.NewLine +
+            @"              <Exclude>" + Environment.NewLine +
+            @"                <Attribute>^System.Diagnostics.DebuggerHidden.*</Attribute>" + Environment.NewLine +
+            @"                <Attribute>^System.Diagnostics.DebuggerNonUserCode.*</Attribute>" + Environment.NewLine +
+            @"                <Attribute>^System.Runtime.CompilerServices.CompilerGenerated.*</Attribute>" +
+            Environment.NewLine +
+            @"                <Attribute>^System.CodeDom.Compiler.GeneratedCode.*</Attribute>" + Environment.NewLine +
+            @"                <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage.*</Attribute>" +
+            Environment.NewLine +
+            @"              </Exclude>" + Environment.NewLine +
+            @"            </Attributes>" + Environment.NewLine +
+            @"            <Sources>" + Environment.NewLine +
+            @"              <Exclude>" + Environment.NewLine +
+            @"                <Source>.*\\atlmfc\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\vctools\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\public\\sdk\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\externalapis\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\microsoft sdks\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\vc\\include\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\msclr\\.*</Source>" + Environment.NewLine +
+            @"                <Source>.*\\ucrt\\.*</Source>" + Environment.NewLine +
+            @"              </Exclude>" + Environment.NewLine +
+            @"            </Sources>" + Environment.NewLine +
+            @"            <CompanyNames/>" + Environment.NewLine +
+            @"            <PublicKeyTokens/>" + Environment.NewLine +
+            @"          </CodeCoverage>" + Environment.NewLine +
+            @"        </Configuration>";
 
         /// <summary>
         /// Coverage file name
@@ -172,21 +177,14 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Gets session name
         /// </summary>
-        public string SessionName
-        {
-            get;
-            private set;
-        }
+        public string SessionName { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether whether to collect ASP.Net
         /// </summary>
         internal bool CollectAspDotNet
         {
-            get
-            {
-                return this.collectAspDotNet;
-            }
+            get { return this.collectAspDotNet; }
         }
 
         /// <summary>
@@ -194,10 +192,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         protected Vanguard Vanguard
         {
-            get
-            {
-                return this.vanguard;
-            }
+            get { return this.vanguard; }
         }
 
         /// <summary>
@@ -216,7 +211,10 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="configurationElement">Configuration element</param>
         /// <param name="dataSink">Data sink</param>
         /// <param name="logger">Logger</param>
-        public virtual void Initialize(XmlElement configurationElement, Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink, IDataCollectionLogger logger)
+        public virtual void Initialize(
+            XmlElement configurationElement,
+            Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink,
+            IDataCollectionLogger logger)
         {
             if (configurationElement == null || string.IsNullOrEmpty(configurationElement.InnerXml))
             {
@@ -449,7 +447,12 @@ namespace Microsoft.VisualStudio.Coverage
                 return Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER");
             }
 
-            return string.Format(CultureInfo.InvariantCulture, "{0}_{1}_{2}.coverage", GetUserName(), Environment.MachineName, DateTime.Now.ToString("yyyy-MM-dd.HH_mm_ss", CultureInfo.InvariantCulture));
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}_{1}_{2}.coverage",
+                GetUserName(),
+                Environment.MachineName,
+                DateTime.Now.ToString("yyyy-MM-dd.HH_mm_ss", CultureInfo.InvariantCulture));
         }
 
         private bool CreateSessionDirectory()
@@ -474,7 +477,9 @@ namespace Microsoft.VisualStudio.Coverage
         {
             string configurationFileName = Path.Combine(this.tempPath, VanguardConfigFileName);
             XmlElement coverageFileNameElement = this.configurationElement[CoverageFileSettingName];
-            this.coverageFileName = coverageFileNameElement != null ? coverageFileNameElement.InnerText : GenerateCoverageFileName();
+            this.coverageFileName = coverageFileNameElement != null
+                ? coverageFileNameElement.InnerText
+                : GenerateCoverageFileName();
             XmlElement config = this.configurationElement[RootName];
             DynamicCoverageModuleSettings settings = new DynamicCoverageModuleSettings(config, false);
             this.collectAspDotNet = settings.CollectAspDotNet;

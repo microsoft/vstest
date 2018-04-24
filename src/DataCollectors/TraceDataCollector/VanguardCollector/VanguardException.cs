@@ -25,10 +25,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// Gets a value indicating whether whether it's a critical exception. Critical exception cannot be caught and will stop the data collector from running.
         /// Non-critical exception will be caught and be logged as a warning message.
         /// </summary>
-        public bool IsCritical
-        {
-            get;
-            private set;
-        }
+        public bool IsCritical { get; private set; }
     }
 }

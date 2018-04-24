@@ -101,7 +101,13 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="configurationFileName">Configuration file name</param>
         /// <param name="configuration">Configuration XML element</param>
         /// <param name="entryPoints">Entry points</param>
-        public Vanguard(string sessionName, string configurationFileName, XmlElement configuration, IEnumerable<string> entryPoints, IDataCollectionLogger logger)
+        /// <param name="logger">Data collection logger.</param>
+        public Vanguard(
+            string sessionName,
+            string configurationFileName,
+            XmlElement configuration,
+            IEnumerable<string> entryPoints,
+            IDataCollectionLogger logger)
         {
             this.sessionName = sessionName;
             this.configurationFileName = configurationFileName;
@@ -112,7 +118,11 @@ namespace Microsoft.VisualStudio.Coverage
             this.CreateProcessJobObject();
         }
 
-        public Vanguard(string sessionName, string configurationFileName, XmlElement configuration, IEnumerable<string> entryPoints)
+        public Vanguard(
+            string sessionName,
+            string configurationFileName,
+            XmlElement configuration,
+            IEnumerable<string> entryPoints)
             : this(sessionName, configurationFileName, configuration, entryPoints, null)
         {
         }
@@ -122,7 +132,13 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         protected enum Command
         {
-            Collect, Shutdown, Register, Unregister, UnregisterAll, GetCoverageData, StartIISCollection
+            Collect,
+            Shutdown,
+            Register,
+            Unregister,
+            UnregisterAll,
+            GetCoverageData,
+            StartIISCollection
         }
 
         /// <summary>
@@ -130,10 +146,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public string OutputName
         {
-            get
-            {
-                return this.outputName;
-            }
+            get { return this.outputName; }
         }
 
         /// <summary>
@@ -141,10 +154,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public List<string> EntryPoints
         {
-            get
-            {
-                return this.entryPoints;
-            }
+            get { return this.entryPoints; }
         }
 
         /// <summary>
@@ -152,10 +162,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public bool IsRunning
         {
-            get
-            {
-                return this.vanguardProcess != null && !this.vanguardProcess.HasExited;
-            }
+            get { return this.vanguardProcess != null && !this.vanguardProcess.HasExited; }
         }
 
         /// <summary>
@@ -173,6 +180,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// Start a vanguard logger
         /// </summary>
         /// <param name="outputName">Output file name</param>
+        /// <param name="context">Data collection context. </param>
         public virtual void Start(string outputName, DataCollectionContext context)
         {
             this.UnregisterAll();
@@ -185,7 +193,15 @@ namespace Microsoft.VisualStudio.Coverage
             this.vanguardProcessExitEvent = new ManualResetEvent(false);
             this.outputName = outputName;
             this.context = context;
-            this.vanguardProcess = this.StartVanguardProcess(GenerateCommandLine(Command.Collect, this.sessionName, this.outputName, this.configurationFileName, null), false, true);
+            this.vanguardProcess = this.StartVanguardProcess(
+                GenerateCommandLine(
+                    Command.Collect,
+                    this.sessionName,
+                    this.outputName,
+                    this.configurationFileName,
+                    null),
+                false,
+                true);
             this.Wait();
         }
 
@@ -201,7 +217,10 @@ namespace Microsoft.VisualStudio.Coverage
                     this.Unregister(entryPoint);
                 }
 
-                Process stopper = this.StartVanguardProcess(GenerateCommandLine(Command.Shutdown, this.sessionName, null, null, null), true);
+                Process stopper =
+                    this.StartVanguardProcess(
+                        GenerateCommandLine(Command.Shutdown, this.sessionName, null, null, null),
+                        true);
 
                 // BugFix#1237649 We need to wait for completion of process exited event
                 this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit);
@@ -220,7 +239,8 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="outputName">Output file to write coverage data to</param>
         public void GetCoverageData(string outputName)
         {
-            using (Process process = this.StartVanguardProcess(GenerateCommandLine(Command.GetCoverageData, this.sessionName, outputName, null, null), true, false))
+            using (Process process = this.StartVanguardProcess(
+                GenerateCommandLine(Command.GetCoverageData, this.sessionName, outputName, null, null), true, false))
             {
                 if (process.ExitCode != 0)
                 {
@@ -233,9 +253,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// Register an entry point
         /// </summary>
         /// <param name="entryPoint">Entry point</param>
+        /// <param name="configFileName">Config file name.</param>
         public virtual void Register(string entryPoint, string configFileName)
         {
-            Process process = this.StartVanguardProcess(GenerateCommandLine(Command.Register, this.sessionName, null, configFileName, entryPoint), true);
+            Process process = this.StartVanguardProcess(
+                GenerateCommandLine(Command.Register, this.sessionName, null, configFileName, entryPoint), true);
             if (process.ExitCode != 0)
             {
                 throw new VanguardException(process.StandardError.ReadToEnd(), true);
@@ -250,7 +272,9 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="entryPoint">Entry point</param>
         public virtual void Unregister(string entryPoint)
         {
-            Process process = this.StartVanguardProcess(GenerateCommandLine(Command.Unregister, this.sessionName, null, null, entryPoint), true);
+            Process process =
+                this.StartVanguardProcess(
+                    GenerateCommandLine(Command.Unregister, this.sessionName, null, null, entryPoint), true);
             if (process.ExitCode != 0)
             {
                 throw new VanguardException(process.StandardError.ReadToEnd(), true);
@@ -264,7 +288,14 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public virtual void UnregisterAll()
         {
-            Process process = this.StartVanguardProcess(GenerateCommandLine(Command.UnregisterAll, DynamicCoverageDataCollectorImpl.MagicMtmSessionPrefix + "*", null, null, null), true);
+            Process process = this.StartVanguardProcess(
+                GenerateCommandLine(
+                    Command.UnregisterAll,
+                    DynamicCoverageDataCollectorImpl.MagicMtmSessionPrefix + "*",
+                    null,
+                    null,
+                    null),
+                true);
             if (process.ExitCode != 0)
             {
                 // nothrow
@@ -294,13 +325,22 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="configurationFileName">Configuration file name</param>
         /// <param name="entryPoint">Entry point name for register/unregister</param>
         /// <returns>Command line string</returns>
-        protected static string GenerateCommandLine(Command command, string sessionName, string outputName, string configurationFileName, string entryPoint)
+        protected static string GenerateCommandLine(
+            Command command,
+            string sessionName,
+            string outputName,
+            string configurationFileName,
+            string entryPoint)
         {
             StringBuilder builder = new StringBuilder();
             switch (command)
             {
                 case Command.Collect:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "collect /session:{0}  /output:\"{1}\"", sessionName, outputName);
+                    builder.AppendFormat(
+                        CultureInfo.InvariantCulture,
+                        "collect /session:{0}  /output:\"{1}\"",
+                        sessionName,
+                        outputName);
                     if (!string.IsNullOrEmpty(configurationFileName))
                     {
                         builder.AppendFormat(CultureInfo.InvariantCulture, " /config:\"{0}\"", configurationFileName);
@@ -308,7 +348,11 @@ namespace Microsoft.VisualStudio.Coverage
 
                     break;
                 case Command.StartIISCollection:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "collect /IIS /session:{0} /output:\"{1}\"", sessionName, outputName);
+                    builder.AppendFormat(
+                        CultureInfo.InvariantCulture,
+                        "collect /IIS /session:{0} /output:\"{1}\"",
+                        sessionName,
+                        outputName);
                     if (!string.IsNullOrEmpty(configurationFileName))
                     {
                         builder.AppendFormat(CultureInfo.InvariantCulture, " /config:\"{0}\"", configurationFileName);
@@ -329,13 +373,24 @@ namespace Microsoft.VisualStudio.Coverage
                     builder.AppendFormat("\"{0}\"", entryPoint);
                     break;
                 case Command.Unregister:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "unregister /force /session:{0} \"{1}\"", sessionName, entryPoint);
+                    builder.AppendFormat(
+                        CultureInfo.InvariantCulture,
+                        "unregister /force /session:{0} \"{1}\"",
+                        sessionName,
+                        entryPoint);
                     break;
                 case Command.UnregisterAll:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "unregister /wildcard /session:{0}", sessionName);
+                    builder.AppendFormat(
+                        CultureInfo.InvariantCulture,
+                        "unregister /wildcard /session:{0}",
+                        sessionName);
                     break;
                 case Command.GetCoverageData:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "getcoverageData /session:{0} /output:\"{1}\"", sessionName, outputName);
+                    builder.AppendFormat(
+                        CultureInfo.InvariantCulture,
+                        "getcoverageData /session:{0} /output:\"{1}\"",
+                        sessionName,
+                        outputName);
                     break;
             }
 
@@ -367,7 +422,10 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="wait">Whether to wait until the process exits</param>
         /// <param name="standardErrorAsynchronousCall">The standardErrorAsynchronousCall. </param>
         /// <returns>Process instance of vanguard</returns>
-        protected Process StartVanguardProcess(string commandLine, bool wait, bool standardErrorAsynchronousCall = false)
+        protected Process StartVanguardProcess(
+            string commandLine,
+            bool wait,
+            bool standardErrorAsynchronousCall = false)
         {
             string vanguardPath = CollectorUtility.GetVanguardPath();
             ProcessStartInfo info = new ProcessStartInfo(vanguardPath, commandLine);
@@ -416,7 +474,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="lpName">Name of the event</param>
         /// <returns>Event handle</returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr CreateEvent(IntPtr lpEventAttributes, bool bManualReset, bool bInitialState, string lpName);
+        private static extern IntPtr CreateEvent(
+            IntPtr lpEventAttributes,
+            bool bManualReset,
+            bool bInitialState,
+            string lpName);
 
         /// <summary>
         /// Waits until one or all of the specified objects are in the signaled state or the time-out interval elapses.
@@ -427,7 +489,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="dwMilliseconds">Time-out interval</param>
         /// <returns>Wait result</returns>
         [DllImport("kernel32.dll")]
-        private static extern uint WaitForMultipleObjects(uint nCount, IntPtr[] lpHandles, bool bWaitAll, uint dwMilliseconds);
+        private static extern uint WaitForMultipleObjects(
+            uint nCount,
+            IntPtr[] lpHandles,
+            bool bWaitAll,
+            uint dwMilliseconds);
 
         /// <summary>
         /// Waitd until the object is in signaled state or the time-out interval elapses.
@@ -452,7 +518,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private void Wait()
         {
-            IntPtr runningEvent = CreateEvent(IntPtr.Zero, true, false, GlobalEventNamePrefix + this.sessionName + "_RUNNING");
+            IntPtr runningEvent = CreateEvent(
+                IntPtr.Zero,
+                true,
+                false,
+                GlobalEventNamePrefix + this.sessionName + "_RUNNING");
             if (runningEvent != IntPtr.Zero)
             {
                 IntPtr[] handles = new IntPtr[] { runningEvent, this.vanguardProcess.SafeHandle.DangerousGetHandle() };

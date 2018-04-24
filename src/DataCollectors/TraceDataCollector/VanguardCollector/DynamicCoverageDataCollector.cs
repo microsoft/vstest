@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.Coverage
     /// </summary>
     [DataCollectorTypeUri("datacollector://Microsoft/CodeCoverage/2.0")]
     [DataCollectorFriendlyName("Code Coverage")]
-
     public class DynamicCoverageDataCollector : BaseDataCollector
     {
         private const string VanguardX86ProfilerPath = @"covrun32.dll";
@@ -117,14 +116,20 @@ namespace Microsoft.VisualStudio.Coverage
 
             var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), profilerPath);
             List<KeyValuePair<string, string>> vars = new List<KeyValuePair<string, string>>();
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrEnableProfilingVariable, "1"));
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerPathVariable, vanguardProfilerPath));
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerVariable, VanguardProfilerGuid));
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CodeCoverageSessionNameVariable, this.implementation.SessionName));
+            vars.Add(new KeyValuePair<string, string>(
+                DynamicCoverageDataCollector.CoreclrEnableProfilingVariable, "1"));
+            vars.Add(new KeyValuePair<string, string>(
+                DynamicCoverageDataCollector.CoreclrProfilerPathVariable, vanguardProfilerPath));
+            vars.Add(new KeyValuePair<string, string>(
+                DynamicCoverageDataCollector.CoreclrProfilerVariable, VanguardProfilerGuid));
+            vars.Add(new KeyValuePair<string, string>(
+                DynamicCoverageDataCollector.CodeCoverageSessionNameVariable, this.implementation.SessionName));
 
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable, vanguardProfilerPath));
+            vars.Add(new KeyValuePair<string, string>(
+                DynamicCoverageDataCollector.CorProfilerPathVariable, vanguardProfilerPath));
             vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorEnableProfilingVariable, "1"));
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FullCorProfiler, VanguardProfilerGuid));
+            vars.Add(new KeyValuePair<string, string>(
+                DynamicCoverageDataCollector.FullCorProfiler, VanguardProfilerGuid));
             return vars.AsReadOnly();
         }
 
@@ -189,8 +194,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event arguments</param>
         private void SessionStart(object sender, SessionStartEventArgs e)
         {
-            System.Diagnostics.Debug.Assert(this.testcaseEventsUnsubscribed == false, "testcaseEventsUnsubscribed is false");
-
             // If DynamicCodeCoverage is the only collector loaded, then we can safely unsubscribe from test case events.
             // The events are not sent - which improves performance.
             // If other collectors are present and code coverage data collector owns collection plan, we do not want to

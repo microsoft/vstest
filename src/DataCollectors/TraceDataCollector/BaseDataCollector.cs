@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Xml;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using TestPlatform.ObjectModel;
 
@@ -47,28 +46,44 @@ namespace Microsoft.VisualStudio.TraceCollector
 
         protected static ReadOnlyCollection<BaseDataCollector> Collectors
         {
-            get
-            {
-                return collectors.AsReadOnly();
-            }
+            get { return collectors.AsReadOnly(); }
         }
 
         protected bool IsDisposed { get; private set; }
 
         #region Interface entry points
-        public override void Initialize(XmlElement configurationElement, DataCollectionEvents events, DataCollectionSink dataSink, DataCollectionLogger logger, DataCollectionEnvironmentContext environmentContext)
+
+        public override void Initialize(
+            XmlElement configurationElement,
+            DataCollectionEvents events,
+            DataCollectionSink dataSink,
+            DataCollectionLogger logger,
+            DataCollectionEnvironmentContext environmentContext)
         {
-            this.InternalConstruct(configurationElement, new DataCollectionEventsWrapper(events), new DataCollectionSinkWrapper(dataSink), new DataCollectionLoggerWrapper(logger), new DataCollectionEnvironmentContextWrapper(environmentContext));
+            this.InternalConstruct(
+                configurationElement,
+                new DataCollectionEventsWrapper(events),
+                new DataCollectionSinkWrapper(dataSink),
+                new DataCollectionLoggerWrapper(logger),
+                new DataCollectionEnvironmentContextWrapper(environmentContext));
         }
 
-        IEnumerable<KeyValuePair<string, string>> ITestExecutionEnvironmentSpecifier.GetTestExecutionEnvironmentVariables()
+        IEnumerable<KeyValuePair<string, string>> ITestExecutionEnvironmentSpecifier.
+            GetTestExecutionEnvironmentVariables()
         {
             return this.GetEnvironmentVariables();
         }
+
         #endregion
 
         #region Test entry point
-        internal void Initialize(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
+
+        internal void Initialize(
+            XmlElement configurationElement,
+            IDataCollectionEvents events,
+            IDataCollectionSink dataSink,
+            IDataCollectionLogger logger,
+            IDataCollectionAgentContext agentContext)
         {
             this.InternalConstruct(configurationElement, events, dataSink, logger, agentContext);
         }
@@ -79,6 +94,7 @@ namespace Microsoft.VisualStudio.TraceCollector
         }
 
         #endregion
+
         internal abstract void SetCollectionPerProcess(Dictionary<string, XmlElement> processCPMap);
 
         protected abstract void OnInitialize(XmlElement configurationElement);
@@ -169,7 +185,8 @@ namespace Microsoft.VisualStudio.TraceCollector
             {
                 if (this.DataSink != null)
                 {
-                    this.DataSink.SendFileCompleted -= new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
+                    this.DataSink.SendFileCompleted -=
+                        new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
                 }
 
                 collectors.Remove(this);
@@ -187,9 +204,16 @@ namespace Microsoft.VisualStudio.TraceCollector
             }
         }
 
-        private void InternalConstruct(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
+        private void InternalConstruct(
+            XmlElement configurationElement,
+            IDataCollectionEvents events,
+            IDataCollectionSink dataSink,
+            IDataCollectionLogger logger,
+            IDataCollectionAgentContext agentContext)
         {
-            EqtTrace.Info("BaseDataCollector.InternalConstruct: Enabling datacollector with configuration: {0}", configurationElement?.InnerXml);
+            EqtTrace.Info(
+                "BaseDataCollector.InternalConstruct: Enabling datacollector with configuration: {0}",
+                configurationElement?.InnerXml);
             this.Events = events;
             this.DataSink = dataSink;
             this.Logger = logger;
@@ -198,7 +222,8 @@ namespace Microsoft.VisualStudio.TraceCollector
             // Add to the SendFileCompleted event here since the data sink will persist for all derived classes.
             if (this.DataSink != null)
             {
-                this.DataSink.SendFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
+                this.DataSink.SendFileCompleted +=
+                    new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
             }
 
             this.OnInitialize(configurationElement);
