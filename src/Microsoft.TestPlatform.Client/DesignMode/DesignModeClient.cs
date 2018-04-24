@@ -235,10 +235,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="testProcessStartInfo">
         /// The test Process Start Info.
         /// </param>
+        /// <param name="cancellationToken">
+        /// The cancellation token.
+        /// </param>
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo)
+        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
             lock (ackLockObject)
             {
@@ -257,7 +260,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
                 // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
                 // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
-                waitHandle.WaitOne();
+                WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
+
+                cancellationToken.ThrowIfCancellationRequested();
+
                 this.onAckMessageReceived = null;
 
                 var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);

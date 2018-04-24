@@ -289,6 +289,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         internal void Cancel()
         {
+            // Note: Test host delegates the cancellation to active executor and doesn't call HandleTestRunComplete in cancel request.
+            // Its expected from active executor to respect the cancel request and thus return from RunTests quickly (cancelling the tests).
+
             isCancellationRequested = true;
 
             if (this.activeExecutor == null)
