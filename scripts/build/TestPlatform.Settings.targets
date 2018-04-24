@@ -49,6 +49,11 @@
     </AdditionalFiles>
   </ItemGroup>
 
+  <!-- Enables "dotnet watch" command. -->
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.1" />
+  </ItemGroup>
+
   <!-- Test project settings -->
   <Choose>
     <When Condition="$(TestProject) == 'true'"> 
