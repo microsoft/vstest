@@ -4,14 +4,14 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Xml;
 
     using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+#if NET451
+    using VisualStudio.Coverage.Analysis;
+#endif
 
     [TestClass]
     public class CodeCoverageTests : AcceptanceTestBase
@@ -23,15 +23,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            if (Directory.Exists(this.resultsDirectory))
-            {
-                Directory.Delete(this.resultsDirectory, true);
-            }
-        }
-
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
@@ -41,7 +32,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (runnerInfo.RunnerFramework.Equals(IntegrationTestBase.DesktopRunnerFramework))
             {
-                Assert.Inconclusive("Skip Collect Code coverage with Desktop runner.");
+                Assert.Inconclusive("Skip CollectCodeCoverage test for Desktop runner.");
             }
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject.dll");
             string runSettings = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
@@ -57,7 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDirectory}", $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}", " /Collect:\"Code Coverage\"");
-            var trxFilePath = Path.GetTempFileName();
+            var trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             this.InvokeVsTest(arguments);
@@ -65,11 +56,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 1);
 
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
+            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
-            // TODO validate coverage file content,  which required using Microsoft.VisualStudio.Coverage.Analysis lib.
 
-            Directory.Delete(resultsDirectory, true);
-            File.Delete(trxFilePath);
+            this.ValidateCoverageFile(actualCoverageFile);
+
+            Directory.Delete(this.resultsDirectory, true);
+        }
+
+
+        private void ValidateCoverageFile(string coverageFile)
+        {
+#if NET451
+            using (var converageInfo = CoverageInfo.CreateFromFile(coverageFile))
+            {
+                CoverageDS coverageDS = converageInfo.BuildDataSet();
+
+                Assert.AreEqual(2, coverageDS.GetSourceFiles().Count);
+                Assert.AreEqual("UnitTest1.cs", Path.GetFileName(coverageDS.GetSourceFiles()[1]));
+            }
+#endif
         }
 
         private static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)

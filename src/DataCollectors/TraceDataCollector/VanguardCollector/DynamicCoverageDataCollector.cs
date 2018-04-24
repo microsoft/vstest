@@ -251,6 +251,7 @@ namespace Microsoft.VisualStudio.Coverage
                 var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVSInstallPath(), "..", "..", profilerPath);
 #else*/
                 var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), profilerPath);
+                //var vanguardProfilerPath = @"C:\Users\samadala\Desktop\CustomProfiler\CLRProfiler.dll";
 //#endif
                 List<KeyValuePair<string, string>> vars = new List<KeyValuePair<string, string>>();
                 vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_ENABLE_PROFILING_VARIABLE, "1"));
@@ -258,12 +259,15 @@ namespace Microsoft.VisualStudio.Coverage
                 vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_PROFILER_VARIABLE, VANGUARD_PROFILER_GUID));
                 vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CODE_COVERAGE_SESSION_NAME_VARIABLE, this.implementation.sessionName));
 
-                /*vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_ENABLE_PROFILING_VARIABLE, "1"));
+
+                /* vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FULL_COR_PROFILER, "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}"));
+                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_ENABLE_PROFILING_VARIABLE, "1")); */
                 vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_PROFILER_PATH_VARIABLE, vanguardProfilerPath));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FULL_COR_PROFILER, VANGUARD_PROFILER_GUID));*/
-/*#if !NETSTANDARD
-                base.SetEnvironmentVariableRequested(true);
-#endif*/
+                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_ENABLE_PROFILING_VARIABLE, "1"));
+                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FULL_COR_PROFILER, VANGUARD_PROFILER_GUID));
+                /*#if !NETSTANDARD
+                                base.SetEnvironmentVariableRequested(true);
+                #endif*/
                 return vars.AsReadOnly();
             }
 /*#if !NETSTANDARD

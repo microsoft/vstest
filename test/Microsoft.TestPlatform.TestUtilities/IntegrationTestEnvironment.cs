@@ -44,14 +44,14 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 // Get root directory from test assembly output directory
                 TestPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
-                this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
             }
             else
             {
                 // Running in command line/CI
                 this.runningInCli = true;
-                this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
             }
+
+            this.TestAssetsPath = Path.Combine(TestPlatformRootDirectory, @"test\TestAssets");
 
             // There is an assumption that integration tests will always run from a source enlistment.
             // Need to remove this assumption when we move to a CDP.

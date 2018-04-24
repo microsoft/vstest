@@ -30,5 +30,8 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Reflection" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(MSInternalCodeCoverageVersion)" />
+  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
