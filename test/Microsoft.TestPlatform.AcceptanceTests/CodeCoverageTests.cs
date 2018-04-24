@@ -5,8 +5,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Xml;
-
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 #if NET451
@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class CodeCoverageTests : AcceptanceTestBase
     {
         private readonly string resultsDirectory;
-
+        private readonly string assemblyName = "SimpleTestProject.dll";
         public CodeCoverageTests()
         {
             this.resultsDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -34,7 +34,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 Assert.Inconclusive("Skip CollectCodeCoverage test for Desktop runner.");
             }
-            var assemblyPaths = this.GetAssetFullPath("SimpleTestProject.dll");
+
+            var assemblyPaths = this.GetAssetFullPath(assemblyName);
             string runSettings = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 @"scripts\vstest.runsettings");
 
@@ -58,25 +59,51 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
-
-            this.ValidateCoverageFile(actualCoverageFile);
-
+#if NET451
+            this.ValidateCoverageData(actualCoverageFile);
+#endif
             Directory.Delete(this.resultsDirectory, true);
         }
 
-
-        private void ValidateCoverageFile(string coverageFile)
-        {
 #if NET451
+        private void ValidateCoverageData(string coverageFile)
+        {
             using (var converageInfo = CoverageInfo.CreateFromFile(coverageFile))
             {
-                CoverageDS coverageDS = converageInfo.BuildDataSet();
-
-                Assert.AreEqual(2, coverageDS.GetSourceFiles().Count);
-                Assert.AreEqual("UnitTest1.cs", Path.GetFileName(coverageDS.GetSourceFiles()[1]));
+                CoverageDS coverageDs = converageInfo.BuildDataSet();
+                AssertModuleCoverageCollected(coverageDs);
+                AssertSourceFileName(coverageDs);
             }
-#endif
+
         }
+
+        private static void AssertSourceFileName(CoverageDS coverageDS)
+        {
+            var sourceFileNames = from sourceFilePath in coverageDS.GetSourceFiles()
+                select Path.GetFileName(sourceFilePath);
+            var expectedFileName = "UnitTest1.cs";
+            CollectionAssert.Contains(
+                sourceFileNames.ToArray(),
+                expectedFileName,
+                $"Code Coverage not collected for file: {expectedFileName}");
+        }
+
+        private void AssertModuleCoverageCollected(CoverageDS coverageDS)
+        {
+            var moduleFound = false;
+            for (int i = 0; i < coverageDS.Module.Count; i++)
+            {
+                var module = coverageDS.Module[i];
+                if (module.ModuleName.Equals(assemblyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    moduleFound = true;
+                    break;
+                }
+            }
+
+            Assert.IsTrue(moduleFound, $"Code coverage not collected for module: {assemblyName}");
+        }
+#endif
 
         private static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
         {
