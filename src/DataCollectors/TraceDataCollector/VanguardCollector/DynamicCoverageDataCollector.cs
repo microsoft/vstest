@@ -11,9 +11,6 @@ namespace Microsoft.VisualStudio.Coverage
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
-/*#if !NETSTANDARD
-    using Microsoft.VisualStudio.TraceLog;
-#endif*/
     using Microsoft.VisualStudio.Collector;
     using TestPlatform.ObjectModel;
 
@@ -23,13 +20,7 @@ namespace Microsoft.VisualStudio.Coverage
     [DataCollectorTypeUri("datacollector://Microsoft/CodeCoverage/2.0")]
     [DataCollectorFriendlyName("Code Coverage")]
 
-// CommonDataCollector not required for .NET Standard because currently we don't support fakes and test impact with .NET Core SDK.
-/*#if !NETSTANDARD
-    public class DynamicCoverageDataCollector : CommonDataCollector
-#else */
     public class DynamicCoverageDataCollector : BaseDataCollector
-
-// #endif
     {
         /// <summary>
         /// Data collector implementation
@@ -62,51 +53,6 @@ namespace Microsoft.VisualStudio.Coverage
         {
         }
 
-/* #if !NETSTANDARD
-        /// <summary>
-        /// Called when the the collector is the first collector to initialize.
-        /// </summary>
-        /// <param name="configurationElement">The configuration element of the collector.</param>
-        /// <returns>Returns the collection plan to use.</returns>
-        internal override ConfigMessagePacker._CollectionPlan OnFirstCollectorToInitialize(XmlElement configurationElement)
-        {            
-            ConfigMessagePacker._CollectionPlan plan = new ConfigMessagePacker._CollectionPlan(true);
-            Initialize(configurationElement, plan, isFirstCollectorToInitialize:true);
-            return plan;
-        }
-
-        /// <summary>
-        /// Called when the collector is the second collector to initialize
-        /// </summary>
-        /// <param name="plan">The collection plan returned from the first collector.</param>
-        /// <param name="configurationElement">The configuration element of this collector.</param>
-        /// <returns>Returns the collection plan to use.</returns>
-        internal override ConfigMessagePacker._CollectionPlan OnSecondCollectorToInitialize(ConfigMessagePacker._CollectionPlan plan, XmlElement configurationElement)
-        {            
-            Initialize(configurationElement, plan, isFirstCollectorToInitialize:false);
-            return plan;
-        }
-
-        /// <summary>
-        /// Adds information about code coverage in the intellitrace collection plan
-        /// </summary>
-        /// <param name="plan"></param>
-        /// <returns></returns>
-        /// If Vanguard is the only collector then we don't want to use the collection plan because
-        /// Intellitrace requires Admin privileges for collecting data from IIS but if any other 
-        /// intellitrace based collector is enabled along with Vanguard we still want to follow the old path. 
-        /// For this we need to check if code coverage is the only collector enabled in the test settings. 
-        /// If that is the case we will not add Vanguard to the collection plan.
-        /// If vanguard is the first collector to initialize, we don't know whether there are other 
-        /// collectors also. In that case, we want to get notified before any other collector is initialized 
-        /// so that we can update the collection plan with vanguard info.
-        /// We don't need to call this in the case where OnSecondCollectorToInitialize is called because 
-        /// there we definitely know that there are other collectors enabled for the run
-        internal override ConfigMessagePacker._CollectionPlan BeforeSecondCollectorInitialize(ConfigMessagePacker._CollectionPlan plan)
-        {
-            return this.implementation.UpdateCollectionPlanWithVanguardInfo(plan);
-        }
-#else */
         protected override void OnInitialize(XmlElement configurationElement)
         {
             if (configurationElement == null)
@@ -135,28 +81,19 @@ namespace Microsoft.VisualStudio.Coverage
             // No-op for .NET Core
         }
 
- // #endif
         /// <summary>
         /// Initialize
         /// </summary>
         /// <param name="configurationElement">Configuration element</param>
         /// <param name="plan">Collection plan</param>
         /// <param name="isFirstCollectorToInitialize">Whether this is the first collector to get initialized</param>
-/* #if !NETSTANDARD
-        private void Initialize(XmlElement configurationElement, ConfigMessagePacker._CollectionPlan plan, bool isFirstCollectorToInitialize)
-#else        */
         private void Initialize(XmlElement configurationElement)
-// #endif
         {
             CollectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "Framework", out this.framework);
             CollectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "TargetPlatform", out this.targetPlatform);
 
             this.implementation = DynamicCoverageDataCollectorImpl.Create(this.AgentContext);
-/* #if !NETSTANDARD
-            this.implementation.Initialize(configurationElement, plan, this.DataSink, this.Logger, isFirstCollectorToInitialize);
-#else */
             this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
-// #endif
             this.Events.SessionStart += SessionStart;
             this.Events.SessionEnd += SessionEnd;
         }
@@ -212,11 +149,7 @@ namespace Microsoft.VisualStudio.Coverage
             }
 
             this.implementation.InitializeBeforeSessionStart();
-/*#if !NETSTANDARD
-            this.implementation.InitializeConfiguration(this.IISInjector);
-#else*/
             this.implementation.InitializeConfiguration();
-//#endif
             this.implementation.SessionStart(sender, e);
         }
 
@@ -231,50 +164,30 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns></returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
-            if ( IsDotnetCoreTargetFramework()
-                || IsDataCollectorLaunchedByDotnet())
+            string profilerPath = string.Empty;
+
+            if (IsDotnetCoreTargetFramework())
             {
-                // netcore scenario, dont call base EnvironmentVars
-
-                string profilerPath = string.Empty;
-                if (IsDotnetCoreTargetFramework())
-                {
-                    profilerPath = GetProfilerPathBasedOnDotnet();
-                }
-
-                else if (IsDataCollectorLaunchedByDotnet())
-                {
-                    profilerPath = GetProfilerPathBasedOnTargetPlatform();
-                }
-
-/*#if !NETSTANDARD
-                var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVSInstallPath(), "..", "..", profilerPath);
-#else*/
-                var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), profilerPath);
-                //var vanguardProfilerPath = @"C:\Users\samadala\Desktop\CustomProfiler\CLRProfiler.dll";
-//#endif
-                List<KeyValuePair<string, string>> vars = new List<KeyValuePair<string, string>>();
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_ENABLE_PROFILING_VARIABLE, "1"));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_PROFILER_PATH_VARIABLE, vanguardProfilerPath));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_PROFILER_VARIABLE, VANGUARD_PROFILER_GUID));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CODE_COVERAGE_SESSION_NAME_VARIABLE, this.implementation.sessionName));
-
-
-                /* vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FULL_COR_PROFILER, "{9317ae81-bcd8-47b7-aaa1-a28062e41c71}"));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_ENABLE_PROFILING_VARIABLE, "1")); */
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_PROFILER_PATH_VARIABLE, vanguardProfilerPath));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_ENABLE_PROFILING_VARIABLE, "1"));
-                vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FULL_COR_PROFILER, VANGUARD_PROFILER_GUID));
-                /*#if !NETSTANDARD
-                                base.SetEnvironmentVariableRequested(true);
-                #endif*/
-                return vars.AsReadOnly();
+                // Currently TestPlatform doesn't honor the TargetPlatform(architecture - x86, x64) option for .NET Core tests.
+                // Set the profiler path based on dotnet process architecture.
+                profilerPath = GetProfilerPathBasedOnDotnet();
             }
-/*#if !NETSTANDARD
-            return base.GetEnvironmentVariables();
-#else*/
-            return new List<KeyValuePair<string, string>>();
-// #endif
+            else
+            {
+                profilerPath = GetProfilerPathBasedOnTargetPlatform();
+            }
+
+            var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), profilerPath);
+            List<KeyValuePair<string, string>> vars = new List<KeyValuePair<string, string>>();
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_ENABLE_PROFILING_VARIABLE, "1"));
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_PROFILER_PATH_VARIABLE, vanguardProfilerPath));
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CORECLR_PROFILER_VARIABLE, VANGUARD_PROFILER_GUID));
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CODE_COVERAGE_SESSION_NAME_VARIABLE, this.implementation.sessionName));
+
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_PROFILER_PATH_VARIABLE, vanguardProfilerPath));
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.COR_ENABLE_PROFILING_VARIABLE, "1"));
+            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.FULL_COR_PROFILER, VANGUARD_PROFILER_GUID));
+            return vars.AsReadOnly();
         }
 
         private static string GetProfilerPathBasedOnDotnet()
@@ -322,14 +235,6 @@ namespace Microsoft.VisualStudio.Coverage
             }
 
             return profilerPath;
-        }
-
-        private bool IsDataCollectorLaunchedByDotnet()
-        {
-            var currentProcessPath = Process.GetCurrentProcess().MainModule.FileName;
-
-            return currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase) ||
-                   currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsDotnetCoreTargetFramework()

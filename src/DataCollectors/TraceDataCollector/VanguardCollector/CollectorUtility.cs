@@ -109,15 +109,6 @@ namespace Microsoft.VisualStudio.Collector
         /// <returns>Vanguard path</returns>
         public static string GetVanguardDirectory()
         {
-            /*#if !NETSTANDARD
-                        string toolsPath = CollectorUtility.GetVSInstallPath();
-
-                        if (!string.IsNullOrWhiteSpace(toolsPath))
-                        {
-                            string path = Path.Combine(toolsPath, "..", "..");
-                            
-                        }
-            #else*/
             return Path.GetDirectoryName(typeof(CollectorUtility).GetTypeInfo().Assembly.Location);
         }
     }

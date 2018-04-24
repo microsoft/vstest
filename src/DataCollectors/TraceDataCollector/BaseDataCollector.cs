@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics;
-    using System.IO;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -163,26 +161,6 @@ namespace Microsoft.VisualStudio.TraceCollector
         ~BaseDataCollector()
         {
             Dispose(false);
-        }
-
-        /// <summary>
-        /// Route the request to write a file to the correct collector.
-        /// </summary>
-        protected void SendFileAsync(DataCollectionContext context, string displayName, string logFilePath, bool sinkOwnsFile, object userToken, bool writeTraceLog)
-        {
-// TestImpactDataCollector specific code in BaseDataCollector. Currently TestImpactDataCollector not required for netstandard.
-/*#if !NETSTANDARD
-            foreach (BaseDataCollector collector in _collectors)
-            {
-                CommonDataCollector cdc = null;
-                cdc = collector as TestImpactDataCollector;
-
-                if (cdc != null)
-                {
-                    cdc.WriteFile(context, displayName, logFilePath, sinkOwnsFile, userToken);
-                }
-            }
-#endif*/
         }
 
         /// <summary>

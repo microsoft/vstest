@@ -9,18 +9,11 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Globalization;
     using System.IO;
     using System.Xml;
-/*#if !NETSTANDARD
-    using Microsoft.VisualStudio.Enterprise.WebInstrument;
-#endif*/
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
-    using TraceDataCollector;
     using TraceDataCollector.Resources;
 
-/*#if !NETSTANDARD
-    using Microsoft.VisualStudio.TraceLog;
-#endif*/
 
     /// <summary>
     /// Implementation class of dynamic code coverage data collector
@@ -140,13 +133,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink;
 
-/*#if !NETSTANDARD
-        /// <summary>
-        /// IIS injector
-        /// </summary>
-        private IISEnvironmentInjector injector;
-#endif*/
-
         /// <summary>
         /// Whether it's running a manual test
         /// </summary>
@@ -156,18 +142,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// Whether the collector is running on a remote machine (environment flow)
         /// </summary>
         private bool isExecutedRemotely;
-
-/*#if !NETSTANDARD
-        /// <summary>
-        /// True if only no intellitrace based collector other than code coverage is enabled
-        /// </summary>
-        private bool onlyVanguardCollectorEnabledForRemoteRole;
-
-        /// <summary>
-        /// Indicates whether collection plan has been populated atleast once
-        /// </summary>
-        private bool collectionPlanPopulated;
-#endif*/
 
         /// <summary>
         /// Whether to collect ASP.Net
@@ -203,19 +177,6 @@ namespace Microsoft.VisualStudio.Coverage
                 return this.vanguard;
             }
         }
-
-/*#if !NETSTANDARD
-        /// <summary>
-        /// True if only no intellitrace based collector other than code coverage is enabled
-        /// </summary>
-        internal bool OnlyVanguardEnabledForRemoteRole
-        {
-            get
-            {
-                return this.onlyVanguardCollectorEnabledForRemoteRole;
-            }
-        }
-#endif*/
 
         /// <summary>
         /// Whether to collect ASP.Net
@@ -408,11 +369,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="dataSink">Data sink</param>
         /// <param name="logger">Logger</param>
         /// <param name="isFirstCollectorToInitalize">Whether it is the first collector to get initialized</param>        
-/* #if !NETSTANDARD
-        public virtual void Initialize(XmlElement configurationElement, ConfigMessagePacker._CollectionPlan plan, Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink, IDataCollectionLogger logger, bool isFirstCollectorToInitalize)
-#else */
         public virtual void Initialize(XmlElement configurationElement, Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink, IDataCollectionLogger logger)
-// #endif
         {
             if (configurationElement == null || string.IsNullOrEmpty(configurationElement.InnerXml))
             {
@@ -442,50 +399,7 @@ namespace Microsoft.VisualStudio.Coverage
                 return;
 
             PrepareVanguardProcess();
-
-/*#if !NETSTANDARD
-            // For manual testing on test agent if Vanguard is the only collector
-            // then we do not want to use the Intellitrace flow as it requires test
-            // agent to run as elevated process.            
-            if (isFirstCollectorToInitalize
-                && this.collectAspDotNet
-                && isExecutedRemotely
-                && isManualTest)
-            {
-                this.onlyVanguardCollectorEnabledForRemoteRole = true;
-
-                if (plan.collectorInfo == null)
-                {
-                    plan.collectorInfo = new ConfigMessagePacker._CollectorConfiguration(true);
-                }
-
-                plan.collectorInfo.instrumentIIS = plan.collectorInfo.remoteInstrumentIIS = false;
-            }
-            else
-            {
-                this.onlyVanguardCollectorEnabledForRemoteRole = false;
-                PopulateCollectionPlan(plan, sessionName, this.collectAspDotNet);
-            }
-#endif*/
         }
-
-/*#if !NETSTANDARD
-        /// <summary>
-        /// Adds information about code coverage in the intellitrace collection plan
-        /// </summary>
-        /// <param name="plan"></param>
-        /// <returns></returns>
-        internal ConfigMessagePacker._CollectionPlan UpdateCollectionPlanWithVanguardInfo(ConfigMessagePacker._CollectionPlan plan)
-        {
-            if (!collectionPlanPopulated)
-            {
-                PopulateCollectionPlan(plan, this.sessionName, this.collectAspDotNet);
-                this.onlyVanguardCollectorEnabledForRemoteRole = false;
-            }
-
-            return plan;
-        }
-#endif*/
 
         internal void InitializeBeforeSessionStart()
         {
@@ -556,45 +470,10 @@ namespace Microsoft.VisualStudio.Coverage
         /// Initialize vanguard configuration
         /// </summary>
         /// <param name="injector">IIS injector</param>
-/*#if !NETSTANDARD
-        internal virtual void InitializeConfiguration(IISEnvironmentInjector injector)
-#else*/
         internal virtual void InitializeConfiguration()
-// #endif
         {
-/*#if !NETSTANDARD
-            this.Vanguard.InitializeConfiguration(injector != null ? injector.Users : null);
-            this.injector = injector;
-#else*/
             this.Vanguard.InitializeConfiguration();
-// #endif
         }
-
-/*#if !NETSTANDARD
-        /// <summary>
-        /// Generate the collection plan for vanguard
-        /// </summary>
-        /// <param name="plan">Collect plan</param>
-        /// <param name="sessionName">Session name</param>
-        /// <param name="collectAspDotNet">Whether to colect ASP.Net</param>
-        private void PopulateCollectionPlan(ConfigMessagePacker._CollectionPlan plan, string sessionName, bool collectAspDotNet)
-        {
-            plan.dynamicCodeCoverageInstrumentation = new ConfigMessagePacker._DynamicCodeCoverageInstrumentation(true);
-            plan.dynamicCodeCoverageInstrumentation.enabled = true;
-
-            // The process list is required for any instrumentation method. We don't support process filter, so return an empty exclusion list to enable all processes.
-            plan.dynamicCodeCoverageInstrumentation.processList = new ConfigMessagePacker._NameList(true);
-            plan.dynamicCodeCoverageInstrumentation.sessionName = sessionName;
-
-            if (plan.collectorInfo == null)
-            {
-                plan.collectorInfo = new ConfigMessagePacker._CollectorConfiguration(true);
-            }
-
-            plan.collectorInfo.instrumentIIS = plan.collectorInfo.remoteInstrumentIIS = collectAspDotNet;
-            collectionPlanPopulated = true;
-        }
-#endif*/
 
         /// <summary>
         /// Cleanup temp folder

@@ -10,9 +10,6 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Globalization;
     using System.IO;
     using System.Runtime.InteropServices;
-/*#if !NETSTANDARD
-    using System.Security.Principal;
-#endif*/
     using System.Text;
     using System.Threading;
     using System.Xml;
@@ -222,26 +219,8 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Update the configuration and save it to a temp folder
         /// </summary>
-        /// <param name="allowedUsers">Allowed users</param>
-/*#if !NETSTANDARD
-        public void InitializeConfiguration(IEnumerable<SecurityIdentifier> allowedUsers)
-#else*/
         public void InitializeConfiguration()
-// #endif
         {
-/*#if !NETSTANDARD
-            List<SecurityIdentifier> allowedUserList = new List<SecurityIdentifier>();
-
-            if (allowedUsers != null)
-            {
-                allowedUserList.AddRange(allowedUsers);
-            }
-
-            //Add current user to the list of allowed users
-            allowedUserList.Add(WindowsIdentity.GetCurrent().User);
-
-            AddAllowedUser(this.configuration, allowedUserList);
-#endif*/
             using (var writer = new StreamWriter(new FileStream(this.configurationFileName, FileMode.Create)))
             {
                 writer.WriteLine(this.configuration.OuterXml);
@@ -521,41 +500,6 @@ namespace Microsoft.VisualStudio.Coverage
 
             return builder.ToString();
         }
-
-/*#if !NETSTANDARD
-        /// <summary>
-        /// Add users to allowed list in vanguard config
-        /// </summary>
-        /// <param name="config">Config XML</param>
-        /// <param name="users">User list</param>
-        public static void AddAllowedUser(XmlElement config, IEnumerable<SecurityIdentifier> users)
-        {
-            if (users == null)
-            {
-                return;
-            }
-
-            if (config == null)
-            {
-                throw new ArgumentNullException("config");
-            }
-
-            XmlElement allowedUser = config[AllowedUsersKey];
-            if (allowedUser == null)
-            {
-                allowedUser = config.OwnerDocument.CreateElement(AllowedUsersKey);
-                config.AppendChild(allowedUser);
-            }
-
-            foreach (var user in users)
-            {
-                var userElement = config.OwnerDocument.CreateElement(AllowedUsersItemKey);
-                NTAccount account = user.Translate(typeof(NTAccount)) as NTAccount;
-                userElement.InnerText = account.Value;
-                allowedUser.AppendChild(userElement);
-            }
-        }
-#endif*/
 
         /// <summary>
         /// Register an entry point
