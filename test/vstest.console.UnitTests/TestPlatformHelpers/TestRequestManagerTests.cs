@@ -815,44 +815,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void CancelTestRunShouldWaitForCreateTestRunRequest()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
-
-            bool createTestRunRequestCalled = false;
-            bool cancelCalledPostTestRunRequest = false;
-
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
-               (IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options) =>
-               {
-                   createTestRunRequestCalled = true;
-               }).Returns(mockRunRequest.Object);
-
-            // Run request should not complete before the abort
-            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
-
-            mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
-            {
-                cancelCalledPostTestRunRequest = createTestRunRequestCalled;
-            });
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var cancelTask = Task.Run(() => this.testRequestManager.CancelTestRun());
-            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig));
-
-            Task.WaitAll(cancelTask, runTask);
-
-            Assert.IsTrue(cancelCalledPostTestRunRequest, "CancelRequest must execute after create run request");
-        }
-
-        [TestMethod]
         public void CancelShouldNotThrowExceptionIfTestRunRequestHasBeenDisposed()
         {
             var payload = new TestRunRequestPayload()
@@ -882,44 +844,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
             this.testRequestManager.AbortTestRun();
-        }
-
-        [TestMethod]
-        public void AbortTestRunShouldWaitForCreateTestRunRequest()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
-            
-            bool createTestRunRequestCalled = false;
-            bool abortCalledPostTestRunRequest = false;
-
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
-                (IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options) =>
-                {
-                    createTestRunRequestCalled = true;
-                }).Returns(mockRunRequest.Object);
-
-            // Run request should not complete before the abort
-            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
-
-            mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
-            {
-                abortCalledPostTestRunRequest = createTestRunRequestCalled;
-            });
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var cancelTask = Task.Run(() => this.testRequestManager.AbortTestRun());
-            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig));
-
-            Task.WaitAll(cancelTask, runTask);
-
-            Assert.IsTrue(abortCalledPostTestRunRequest, "Abort Request must execute after create run request");
         }
 
         [TestMethod]

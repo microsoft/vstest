@@ -464,7 +464,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
         public void RaiseTestRunStartShouldThrowExceptionIfAlreadyDisposed()
         {
             var loggerEvents = GetDisposedLoggerEvents();
-            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
             TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
 
             Assert.ThrowsException<ObjectDisposedException>(() =>
@@ -499,7 +499,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Logging
             TestRunStartEventArgs receivedEventArgs = null;
             EventWaitHandle waitHandle = new AutoResetEvent(false);
 
-            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10) { TestCaseFilter = "Name=Test1" };
+            TestRunCriteria testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, string.Empty, TimeSpan.MaxValue, null, "Name=Test1", null);
             TestRunStartEventArgs testRunStartEventArgs = new TestRunStartEventArgs(testRunCriteria);
 
             // Register for the test run start event.
