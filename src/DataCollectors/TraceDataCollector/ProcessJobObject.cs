@@ -14,84 +14,15 @@ namespace Microsoft.VisualStudio.TraceCollector
     /// <summary>An interface to the Windows Job Objects API.</summary>
     internal class ProcessJobObject : IDisposable
     {
-        /// <summary>
-        /// Creates a job object
-        /// </summary>
-        /// <returns>Handle to the job object created</returns>
-        public ProcessJobObject()
-        {
-            CreateJobObject();
-        }
+        #region Native 32/64 Bit Switching Flag
 
         /// <summary>
-        /// Helper function to add a process to the job object
+        /// The structures returned by Windows are different sizes depending on whether
+        /// the operating system is running in 32bit or 64bit mode.
         /// </summary>
-        /// <param name="handle">Handle of the process to be added</param>
-        public void AddProcess(IntPtr handle)
-        {
-            if (this.jobHandle != IntPtr.Zero)
-            {
-                if (!WinAPI.AssignProcessToJobObject(this.jobHandle, handle))
-                {
-                    EqtTrace.Warning("AddProcess : Failed to AddProcess {0}", Marshal.GetLastWin32Error());
-                }
-            }
-            else
-            {
-                EqtTrace.Warning("AddProcess : Ignoring as job object is not created");
-            }
-        }
+        private static readonly bool Is32Bit = IntPtr.Size == 4;
 
-        #region Private Members
-
-        /// <summary>
-        /// Helper function to create job object
-        /// </summary>
-        private void CreateJobObject()
-        {
-            this.jobHandle = WinAPI.CreateJobObject(IntPtr.Zero, null);
-            if (this.jobHandle == IntPtr.Zero)
-            {
-                EqtTrace.Warning("CreateJobObject : Failed {0}", Marshal.GetLastWin32Error());
-            }
-
-            if (ProcessJobObject.Is32Bit)
-            {
-                BasicLimits32 basicInfo = new BasicLimits32();
-                basicInfo.LimitFlags = LimitFlags.LimitKillOnJobClose;
-
-                ExtendedLimits32 extendedInfo = new ExtendedLimits32();
-                extendedInfo.BasicLimits = basicInfo;
-
-                JobObjectInfo info = new JobObjectInfo();
-                info.basicLimits32 = basicInfo;
-                info.extendedLimits32 = extendedInfo;
-
-                if (!WinAPI.SetInformationJobObject(jobHandle, JobObjectInfoClass.ExtendedLimitInformation, ref info,
-                    Marshal.SizeOf <ExtendedLimits32>()))
-                {
-                    EqtTrace.Warning("CreateJobObject [32] : Failed to setInformation {0}", Marshal.GetLastWin32Error());
-                }
-            }
-            else
-            {
-                BasicLimits64 basicInfo = new BasicLimits64();
-                basicInfo.LimitFlags = LimitFlags.LimitKillOnJobClose;
-
-                ExtendedLimits64 extendedInfo = new ExtendedLimits64();
-                extendedInfo.BasicLimits = basicInfo;
-
-                JobObjectInfo info = new JobObjectInfo();
-                info.basicLimits64 = basicInfo;
-                info.extendedLimits64 = extendedInfo;
-
-                if (!WinAPI.SetInformationJobObject(jobHandle, JobObjectInfoClass.ExtendedLimitInformation, ref info,
-                    Marshal.SizeOf<ExtendedLimits64>()))
-                {
-                    EqtTrace.Warning("CreateJobObject [64] : Failed to setInformation {0}", Marshal.GetLastWin32Error());
-                }
-            }
-        }
+        #endregion
 
         /// <summary>
         /// Job handle created by the CreateJobObject
@@ -103,17 +34,23 @@ namespace Microsoft.VisualStudio.TraceCollector
         /// </summary>
         private volatile bool disposed;
 
-        #endregion
-
-        #region Native 32/64 Bit Switching Flag
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessJobObject"/> class.
+        /// Creates a job object
+        /// </summary>
+        /// <returns>Handle to the job object created</returns>
+        public ProcessJobObject()
+        {
+            this.CreateJobObject();
+        }
 
         /// <summary>
-        /// The structures returned by Windows are different sizes depending on whether
-        /// the operating system is running in 32bit or 64bit mode.
+        /// Finalizes an instance of the <see cref="ProcessJobObject"/> class.
         /// </summary>
-        private static readonly bool Is32Bit = (IntPtr.Size == 4);
-
-        #endregion
+        ~ProcessJobObject()
+        {
+            this.Dispose(false);
+        }
 
         #region JobObjectInfoClass Enumeration
 
@@ -302,6 +239,115 @@ namespace Microsoft.VisualStudio.TraceCollector
 
         #endregion
 
+        /// <summary>
+        /// Helper function to add a process to the job object
+        /// </summary>
+        /// <param name="handle">Handle of the process to be added</param>
+        public void AddProcess(IntPtr handle)
+        {
+            if (this.jobHandle != IntPtr.Zero)
+            {
+                if (!WinAPI.AssignProcessToJobObject(this.jobHandle, handle))
+                {
+                    EqtTrace.Warning("AddProcess : Failed to AddProcess {0}", Marshal.GetLastWin32Error());
+                }
+            }
+            else
+            {
+                EqtTrace.Warning("AddProcess : Ignoring as job object is not created");
+            }
+        }
+
+        /// <summary>
+        /// Dispose the resources
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #region Private Members
+
+        /// <summary>
+        /// Helper function to create job object
+        /// </summary>
+        private void CreateJobObject()
+        {
+            this.jobHandle = WinAPI.CreateJobObject(IntPtr.Zero, null);
+            if (this.jobHandle == IntPtr.Zero)
+            {
+                EqtTrace.Warning("CreateJobObject : Failed {0}", Marshal.GetLastWin32Error());
+            }
+
+            if (ProcessJobObject.Is32Bit)
+            {
+                BasicLimits32 basicInfo = default(BasicLimits32);
+                basicInfo.LimitFlags = LimitFlags.LimitKillOnJobClose;
+
+                ExtendedLimits32 extendedInfo = default(ExtendedLimits32);
+                extendedInfo.BasicLimits = basicInfo;
+
+                JobObjectInfo info = default(JobObjectInfo);
+                info.basicLimits32 = basicInfo;
+                info.extendedLimits32 = extendedInfo;
+
+                if (!WinAPI.SetInformationJobObject(
+                    this.jobHandle,
+                    JobObjectInfoClass.ExtendedLimitInformation,
+                    ref info,
+                    Marshal.SizeOf<ExtendedLimits32>()))
+                {
+                    EqtTrace.Warning("CreateJobObject [32] : Failed to setInformation {0}", Marshal.GetLastWin32Error());
+                }
+            }
+            else
+            {
+                BasicLimits64 basicInfo = default(BasicLimits64);
+                basicInfo.LimitFlags = LimitFlags.LimitKillOnJobClose;
+
+                ExtendedLimits64 extendedInfo = default(ExtendedLimits64);
+                extendedInfo.BasicLimits = basicInfo;
+
+                JobObjectInfo info = default(JobObjectInfo);
+                info.basicLimits64 = basicInfo;
+                info.extendedLimits64 = extendedInfo;
+
+                if (!WinAPI.SetInformationJobObject(
+                    this.jobHandle,
+                    JobObjectInfoClass.ExtendedLimitInformation,
+                    ref info,
+                    Marshal.SizeOf<ExtendedLimits64>()))
+                {
+                    EqtTrace.Warning("CreateJobObject [64] : Failed to setInformation {0}", Marshal.GetLastWin32Error());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper function to dispose managed and unmanaged resources
+        /// </summary>
+        /// <param name="disposing">The disposing.</param>
+        private void Dispose(bool disposing)
+        {
+            bool isDisposed = this.disposed;
+            if (!isDisposed)
+            {
+                this.disposed = true;
+                if (disposing)
+                {
+                    // Managed resources
+                }
+
+                if (this.jobHandle != IntPtr.Zero)
+                {
+                    WinAPI.CloseHandle(this.jobHandle);
+                }
+            }
+        }
+
+        #endregion
+
         #region IoCounters Structures
 
         /// <summary>
@@ -348,7 +394,7 @@ namespace Microsoft.VisualStudio.TraceCollector
         }
 
         /// <summary>
-        /// Various counters for different types of IO operations. 
+        /// Various counters for different types of IO operations.
         /// </summary>
         [StructLayout(LayoutKind.Explicit)]
         private struct IoCounters64
@@ -710,6 +756,8 @@ namespace Microsoft.VisualStudio.TraceCollector
 
         #region JobObjectInfo Union
 
+#pragma warning disable SA1307 // Accessible fields must begin with upper-case letter
+
         /// <summary>
         /// Union of different limit data structures that may be passed
         /// to SetInformationJobObject / from QueryInformationJobObject.
@@ -733,6 +781,7 @@ namespace Microsoft.VisualStudio.TraceCollector
             /// for a job object on a 32bit platform.
             /// </summary>
             [FieldOffset(0)]
+
             public ExtendedLimits32 extendedLimits32;
 
             #endregion
@@ -758,6 +807,12 @@ namespace Microsoft.VisualStudio.TraceCollector
 
         #endregion
 
+#pragma warning restore SA1307 // Accessible fields must begin with upper-case letter
+
+        #region IDisposable implementation
+
+        #endregion
+
         #region WinAPI Class
 
         /// <summary>
@@ -768,7 +823,7 @@ namespace Microsoft.VisualStudio.TraceCollector
             /// <summary>
             /// The CreateJobObject function creates or opens a job object.
             /// </summary>
-            /// <param name="jobAttributes">Pointer to a SECURITY_ATTRIBUTES structure</param> 
+            /// <param name="jobAttributes">Pointer to a SECURITY_ATTRIBUTES structure</param>
             /// <param name="name"> Pointer to a null-terminated string specifying the name of the job. </param>
             /// <returns>If the function succeeds, the return value is a handle to the job object</returns>
             [DllImport("kernel32.dll", SetLastError = true)]
@@ -812,49 +867,6 @@ namespace Microsoft.VisualStudio.TraceCollector
             /// call GetLastError.</returns>
             [DllImport("kernel32.dll", SetLastError = true)]
             public static extern bool CloseHandle([In] IntPtr jobHandle);
-        }
-
-        #endregion
-
-        #region IDisposable implementation
-
-        /// <summary>
-        /// Cleanup
-        /// </summary>
-        ~ProcessJobObject()
-        {
-            this.Dispose(false);
-        }
-
-        /// <summary>
-        /// Helper function to dispose managed and unmanaged resources
-        /// </summary>
-        /// <param name="disposing"></param>
-        private void Dispose(bool disposing)
-        {
-            bool isDisposed = this.disposed;
-            if (!isDisposed)
-            {
-                this.disposed = true;
-                if (disposing)
-                {
-                    // Managed resources
-                }
-
-                if (this.jobHandle != IntPtr.Zero)
-                {
-                    WinAPI.CloseHandle(this.jobHandle);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Dispose the resources
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         #endregion

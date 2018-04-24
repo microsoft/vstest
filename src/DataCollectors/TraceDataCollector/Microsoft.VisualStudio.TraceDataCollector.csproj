@@ -7,8 +7,8 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TraceDataCollector</AssemblyName>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <!--<WarningsAsErrors>true</WarningsAsErrors>
-    <EnableCodeAnalysis>true</EnableCodeAnalysis> -->
+    <WarningsAsErrors>true</WarningsAsErrors>
+    <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
@@ -23,9 +23,6 @@
       <Version>$(MSInternalCodeCoverageVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <!--<ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.1" />
-  </ItemGroup>-->
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>

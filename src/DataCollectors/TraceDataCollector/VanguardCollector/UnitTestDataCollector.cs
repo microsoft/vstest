@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.Coverage
     internal class UnitTestDataCollector : DynamicCoverageDataCollectorImpl
     {
         // Lock for controlling access to activeIISSessionsList
-        private object m_lock = new object();       
+        private readonly object mLock = new object();
 
         // List of currently active IIS sessions
         private List<SessionId> activeIISSessions = new List<SessionId>();
@@ -24,12 +24,12 @@ namespace Microsoft.VisualStudio.Coverage
         private DateTime firstSessionStart;
 
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="UnitTestDataCollector"/> class.
         /// </summary>
         /// <param name="isManualTest">Whether it's running a manual test</param>
         /// <param name="isExecutedRemotely">Whether it's running inside a remote device</param>
         /// <param name="isConnectedDevice">Whether it's running inside RTR</param>
-        public UnitTestDataCollector(bool isManualTest, bool isExecutedRemotely) 
+        public UnitTestDataCollector(bool isManualTest, bool isExecutedRemotely)
             : base(isManualTest, isExecutedRemotely)
         {
         }
@@ -43,25 +43,25 @@ namespace Microsoft.VisualStudio.Coverage
         {
             base.SessionStart(sender, e);
 
-            if (this.collectAspDotNet)
+            if (this.CollectAspDotNet)
             {
-                lock (m_lock)
+                lock (this.mLock)
                 {
                     // Start vanguard only if this is the first run
                     // If another user starts run against the same environment
                     // just increase the count of active sessions
-                    if (activeIISSessions.Count == 0)
+                    if (this.activeIISSessions.Count == 0)
                     {
-                        firstSessionStart = DateTime.Now;
+                        this.firstSessionStart = DateTime.Now;
                         this.StartVanguard(e.Context);
                     }
-                    
-                    activeIISSessions.Add(e.Context.SessionId);                    
-                    EqtTrace.Verbose("UnitTestDataCollector:SessionStart called for session {0} - Active IIS session count = {1}",e.Context.SessionId, activeIISSessions.Count);
 
-                    if (maxNumberOfSessions < activeIISSessions.Count)
+                    this.activeIISSessions.Add(e.Context.SessionId);
+                    EqtTrace.Verbose("UnitTestDataCollector:SessionStart called for session {0} - Active IIS session count = {1}", e.Context.SessionId, this.activeIISSessions.Count);
+
+                    if (this.maxNumberOfSessions < this.activeIISSessions.Count)
                     {
-                        maxNumberOfSessions = activeIISSessions.Count;
+                        this.maxNumberOfSessions = this.activeIISSessions.Count;
                     }
                 }
             }
@@ -77,28 +77,28 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="sender">Sender</param>
         /// <param name="e">Event arguments</param>
         internal override void SessionEnd(object sender, SessionEndEventArgs e)
-        {                        
-            if (this.collectAspDotNet)
+        {
+            if (this.CollectAspDotNet)
             {
-                lock (m_lock)
+                lock (this.mLock)
                 {
                     // Its possible that session end is called multiple times for a test run.
                     // Check if the session exists in the list of active IIS runs.
                     // If it does not then that means SessionEnd has been called more than once
                     // for that run
-                    if (activeIISSessions.Contains(e.Context.SessionId))
-                    {                        
-                        activeIISSessions.Remove(e.Context.SessionId);
-                        EqtTrace.Verbose("UnitTestDataCollector:SessionEnd called for session {0}. Active session count  = {1}", e.Context.SessionId, activeIISSessions.Count);
+                    if (this.activeIISSessions.Contains(e.Context.SessionId))
+                    {
+                        this.activeIISSessions.Remove(e.Context.SessionId);
+                        EqtTrace.Verbose("UnitTestDataCollector:SessionEnd called for session {0}. Active session count  = {1}", e.Context.SessionId, this.activeIISSessions.Count);
 
-                        if (activeIISSessions.Count == 0)
+                        if (this.activeIISSessions.Count == 0)
                         {
                             this.StopVanguard(e.Context);
                         }
                         else
                         {
-                            this.GetCoverageData(e.Context);                            
-                        }                        
+                            this.GetCoverageData(e.Context);
+                        }
                     }
                 }
             }

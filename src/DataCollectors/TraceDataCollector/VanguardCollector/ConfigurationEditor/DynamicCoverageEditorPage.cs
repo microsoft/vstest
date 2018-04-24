@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         /// <param name="serviceProvider">Service Provider</param>
         /// <param name="settings">Data Collector Settings</param>
-        public void Initialize(IServiceProvider serviceProvider, DataCollectorSettings settings) 
+        public void Initialize(IServiceProvider serviceProvider, DataCollectorSettings settings)
         {
             this.AutoSize = true;
             this.BorderStyle = BorderStyle.None;
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.Coverage
                     settingControls[setting] = control;
                 }
             }
-          
+
             ElementHost host = new ElementHost();
             layoutManager = new ConfigEditorLayoutManager(host, tabControl);
             this.Controls.Add(layoutManager.RootPanel);
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// Save current setting changes
         /// </summary>
         /// <returns>Data Collector Settings</returns>
-        public DataCollectorSettings SaveData() 
+        public DataCollectorSettings SaveData()
         {
             foreach (var control in settingControls.Values)
             {
@@ -125,7 +125,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// Verify data
         /// </summary>
         /// <returns></returns>
-        public bool VerifyData() 
+        public bool VerifyData()
         {
             return true;
         }
@@ -180,9 +180,9 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Root panel
         /// </summary>
-        public System.Windows.Forms.Panel RootPanel 
-        { 
-            get { return panel; } 
+        public System.Windows.Forms.Panel RootPanel
+        {
+            get { return panel; }
         }
 
         /// <summary>

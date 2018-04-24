@@ -20,107 +20,93 @@ namespace Microsoft.VisualStudio.TraceCollector
     /// </remarks>
     public abstract class BaseDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
-        static List<BaseDataCollector> _collectors = new List<BaseDataCollector>();
+        private static List<BaseDataCollector> collectors = new List<BaseDataCollector>();
 
         /// <summary>
-        /// The setting name for coverage file name
-        /// </summary>
-        private const string LogFile = "LogFile";
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseDataCollector"/> class.
         /// Internal constructor to prevent outside construction.
         /// </summary>
         internal BaseDataCollector()
         {
             EqtTrace.Info("BaseDataCollector.ctor: adding datacollector: {0}", this);
-            _collectors.Add(this);
+            collectors.Add(this);
+        }
+
+        ~BaseDataCollector()
+        {
+            this.Dispose(false);
         }
 
         internal IDataCollectionEvents Events { get; private set; }
+
         internal IDataCollectionLogger Logger { get; private set; }
+
         internal IDataCollectionSink DataSink { get; private set; }
+
         internal IDataCollectionAgentContext AgentContext { get; private set; }
 
-        static protected ReadOnlyCollection<BaseDataCollector> Collectors
+        protected static ReadOnlyCollection<BaseDataCollector> Collectors
         {
             get
             {
-                return _collectors.AsReadOnly();
+                return collectors.AsReadOnly();
             }
         }
 
-        #region Test entry point
-        internal void Initialize(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
-        {
-            InternalConstruct(configurationElement, events, dataSink, logger, agentContext);
-        }
-
-        internal IEnumerable<KeyValuePair<string, string>> RequestEnvironmentVariables()
-        {
-            return GetEnvironmentVariables();
-        }
-
-        #endregion
+        protected bool IsDisposed { get; private set; }
 
         #region Interface entry points
         public override void Initialize(XmlElement configurationElement, DataCollectionEvents events, DataCollectionSink dataSink, DataCollectionLogger logger, DataCollectionEnvironmentContext environmentContext)
         {
-            InternalConstruct(configurationElement, new DataCollectionEventsWrapper(events), new DataCollectionSinkWrapper(dataSink), new DataCollectionLoggerWrapper(logger), new DataCollectionEnvironmentContextWrapper(environmentContext));
+            this.InternalConstruct(configurationElement, new DataCollectionEventsWrapper(events), new DataCollectionSinkWrapper(dataSink), new DataCollectionLoggerWrapper(logger), new DataCollectionEnvironmentContextWrapper(environmentContext));
         }
 
         IEnumerable<KeyValuePair<string, string>> ITestExecutionEnvironmentSpecifier.GetTestExecutionEnvironmentVariables()
         {
-            return GetEnvironmentVariables();
+            return this.GetEnvironmentVariables();
         }
         #endregion
 
-        void InternalConstruct(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
+        #region Test entry point
+        internal void Initialize(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
         {
-            EqtTrace.Info("BaseDataCollector.InternalConstruct: Enabling datacollector with configuration: {0}", configurationElement?.InnerXml);
-            Events = events;
-            DataSink = dataSink;
-            Logger = logger;
-            AgentContext = agentContext;
-
-            // Add to the SendFileCompleted event here since the data sink will persist for all derived classes.
-            if (DataSink != null)
-            {
-                DataSink.SendFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(OnSendFileCompleted);
-            }
-
-            OnInitialize(configurationElement);
-
-            SubscribeToEvents();
+            this.InternalConstruct(configurationElement, events, dataSink, logger, agentContext);
         }
+
+        internal IEnumerable<KeyValuePair<string, string>> RequestEnvironmentVariables()
+        {
+            return this.GetEnvironmentVariables();
+        }
+
+        #endregion
+        internal abstract void SetCollectionPerProcess(Dictionary<string, XmlElement> processCPMap);
 
         protected abstract void OnInitialize(XmlElement configurationElement);
 
-        ///Provide required environment variables for test execution through this method.
+        // Provide required environment variables for test execution through this method.
         protected abstract IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables();
-
-        internal abstract void SetCollectionPerProcess(Dictionary<string, XmlElement> processCPMap);
 
         protected void SubscribeToEvents()
         {
-            if (Events != null)
+            if (this.Events != null)
             {
-                Events.SessionStart += new EventHandler<SessionStartEventArgs>(OnSessionStart);
-                Events.SessionEnd += new EventHandler<SessionEndEventArgs>(OnSessionEnd);
+                this.Events.SessionStart += new EventHandler<SessionStartEventArgs>(this.OnSessionStart);
+                this.Events.SessionEnd += new EventHandler<SessionEndEventArgs>(this.OnSessionEnd);
 
-                SubscribeToTestCaseEvents();
+                this.SubscribeToTestCaseEvents();
             }
         }
 
         protected void UnsubscribeFromEvents()
         {
-            if (Events != null)
+            if (this.Events != null)
             {
-                Events.SessionStart -= new EventHandler<SessionStartEventArgs>(OnSessionStart);
-                Events.SessionEnd -= new EventHandler<SessionEndEventArgs>(OnSessionEnd);
+                this.Events.SessionStart -= new EventHandler<SessionStartEventArgs>(this.OnSessionStart);
+                this.Events.SessionEnd -= new EventHandler<SessionEndEventArgs>(this.OnSessionEnd);
 
-                UnsubscribeFromTestCaseEvents();
+                this.UnsubscribeFromTestCaseEvents();
 
-                Events = null;
+                this.Events = null;
             }
         }
 
@@ -133,10 +119,10 @@ namespace Microsoft.VisualStudio.TraceCollector
         /// </summary>
         protected void UnsubscribeFromTestCaseEvents()
         {
-            if (Events != null)
+            if (this.Events != null)
             {
-                Events.TestCaseStart -= new EventHandler<TestCaseStartEventArgs>(OnTestCaseStart);
-                Events.TestCaseEnd -= new EventHandler<TestCaseEndEventArgs>(OnTestCaseEnd);
+                this.Events.TestCaseStart -= new EventHandler<TestCaseStartEventArgs>(this.OnTestCaseStart);
+                this.Events.TestCaseEnd -= new EventHandler<TestCaseEndEventArgs>(this.OnTestCaseEnd);
             }
         }
 
@@ -145,54 +131,79 @@ namespace Microsoft.VisualStudio.TraceCollector
         /// </summary>
         protected void SubscribeToTestCaseEvents()
         {
-            if (Events != null)
+            if (this.Events != null)
             {
-                Events.TestCaseStart += new EventHandler<TestCaseStartEventArgs>(OnTestCaseStart);
-                Events.TestCaseEnd += new EventHandler<TestCaseEndEventArgs>(OnTestCaseEnd);
+                this.Events.TestCaseStart += new EventHandler<TestCaseStartEventArgs>(this.OnTestCaseStart);
+                this.Events.TestCaseEnd += new EventHandler<TestCaseEndEventArgs>(this.OnTestCaseEnd);
             }
         }
 
-        protected virtual void OnSendFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e) { AssertNotDisposed(); }
-        protected virtual void OnSessionEnd(object sender, SessionEndEventArgs e) { AssertNotDisposed(); }
-        protected virtual void OnSessionStart(object sender, SessionStartEventArgs e) { AssertNotDisposed(); }
-        protected virtual void OnTestCaseStart(object sender, TestCaseStartEventArgs e) { AssertNotDisposed(); }
-        protected virtual void OnTestCaseEnd(object sender, TestCaseEndEventArgs e) { AssertNotDisposed(); }
-
-        ~BaseDataCollector()
+        protected virtual void OnSendFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-            Dispose(false);
+            this.AssertNotDisposed();
         }
 
-        /// <summary>
-        /// Called when a file needs to be written to this data collector's data sink.
-        /// </summary>
-        protected void WriteFile(DataCollectionContext context, string description, string logFilePath, bool deleteFile, object userToken)
+        protected virtual void OnSessionEnd(object sender, SessionEndEventArgs e)
         {
-            var fileInfo = new FileTransferInformation(context, logFilePath, deleteFile);
-            fileInfo.Description = description;
-            fileInfo.UserToken = userToken;
+            this.AssertNotDisposed();
+        }
 
-            DataSink.SendFileAsync(fileInfo);
+        protected virtual void OnSessionStart(object sender, SessionStartEventArgs e)
+        {
+            this.AssertNotDisposed();
+        }
+
+        protected virtual void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
+        {
+            this.AssertNotDisposed();
+        }
+
+        protected virtual void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
+        {
+            this.AssertNotDisposed();
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && !IsDisposed)
+            if (disposing && !this.IsDisposed)
             {
-                if (DataSink != null)
+                if (this.DataSink != null)
                 {
-                    DataSink.SendFileCompleted -= new System.ComponentModel.AsyncCompletedEventHandler(OnSendFileCompleted);
+                    this.DataSink.SendFileCompleted -= new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
                 }
 
-                _collectors.Remove(this);
+                collectors.Remove(this);
 
-                UnsubscribeFromEvents();
-                IsDisposed = true;
+                this.UnsubscribeFromEvents();
+                this.IsDisposed = true;
             }
         }
 
-        protected bool IsDisposed { get; private set; }
+        private void AssertNotDisposed()
+        {
+            if (this.IsDisposed)
+            {
+                throw new ObjectDisposedException(this.GetType().ToString());
+            }
+        }
 
-        private void AssertNotDisposed() { if (IsDisposed) throw new ObjectDisposedException(this.GetType().ToString()); }
+        private void InternalConstruct(XmlElement configurationElement, IDataCollectionEvents events, IDataCollectionSink dataSink, IDataCollectionLogger logger, IDataCollectionAgentContext agentContext)
+        {
+            EqtTrace.Info("BaseDataCollector.InternalConstruct: Enabling datacollector with configuration: {0}", configurationElement?.InnerXml);
+            this.Events = events;
+            this.DataSink = dataSink;
+            this.Logger = logger;
+            this.AgentContext = agentContext;
+
+            // Add to the SendFileCompleted event here since the data sink will persist for all derived classes.
+            if (this.DataSink != null)
+            {
+                this.DataSink.SendFileCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
+            }
+
+            this.OnInitialize(configurationElement);
+
+            this.SubscribeToEvents();
+        }
     }
 }

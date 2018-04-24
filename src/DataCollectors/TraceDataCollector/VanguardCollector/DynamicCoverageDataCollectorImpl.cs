@@ -14,12 +14,18 @@ namespace Microsoft.VisualStudio.Coverage
     using TestPlatform.ObjectModel;
     using TraceDataCollector.Resources;
 
-
     /// <summary>
     /// Implementation class of dynamic code coverage data collector
     /// </summary>
     internal abstract class DynamicCoverageDataCollectorImpl
     {
+        /// <summary>
+        /// A magic prefix used to differentiate MTM registered sessions from manually registered sessions
+        /// </summary>
+        public const string MagicMtmSessionPrefix = "MTM_";
+
+        internal const string RootName = "CodeCoverage";
+
         /// <summary>
         /// File name for vanguard config file
         /// </summary>
@@ -30,15 +36,8 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private const string CoverageFileSettingName = "CoverageFileName";
 
-        /// <summary>
-        /// A magic prefix used to differentiate MTM registered sessions from manually registered sessions
-        /// </summary>
-        public const string MagicMtmSessionPrefix = "MTM_";
-
-        internal const string RootName = "CodeCoverage";
-
         // Default CodeCoverage Configuration as specified here : https://msdn.microsoft.com/en-us/library/jj635153.aspx
-        private static string DefaultCodeCoverageSettings =
+        private static readonly string DefaultCodeCoverageSettings =
 @"        <Configuration>" + Environment.NewLine +
 @"          <CodeCoverage>" + Environment.NewLine +
 @"            <ModulePaths>" + Environment.NewLine +
@@ -146,7 +145,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Whether to collect ASP.Net
         /// </summary>
-        protected bool collectAspDotNet;
+        private bool collectAspDotNet;
 
         /// <summary>
         /// Folder to store temporary files
@@ -154,42 +153,12 @@ namespace Microsoft.VisualStudio.Coverage
         private string tempPath;
 
         /// <summary>
-        /// Session name
-        /// </summary>
-        public string sessionName
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
         /// Cached configuration data
         /// </summary>
         private XmlElement configurationElement;
 
         /// <summary>
-        /// Vanguard instance
-        /// </summary>
-        protected Vanguard Vanguard
-        {
-            get
-            {
-                return this.vanguard;
-            }
-        }
-
-        /// <summary>
-        /// Whether to collect ASP.Net
-        /// </summary>
-        internal bool CollectAspDotNet
-        {
-            get
-            {
-                return this.collectAspDotNet;
-            }
-        }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="DynamicCoverageDataCollectorImpl"/> class.
         /// Constructor
         /// </summary>
         /// <param name="isManualTest">Whether it's running a manual test</param>
@@ -201,6 +170,37 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
+        /// Gets session name
+        /// </summary>
+        public string SessionName
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether whether to collect ASP.Net
+        /// </summary>
+        internal bool CollectAspDotNet
+        {
+            get
+            {
+                return this.collectAspDotNet;
+            }
+        }
+
+        /// <summary>
+        /// Gets vanguard instance
+        /// </summary>
+        protected Vanguard Vanguard
+        {
+            get
+            {
+                return this.vanguard;
+            }
+        }
+
+        /// <summary>
         /// Create a data collector implementation instance
         /// </summary>
         /// <param name="context">Context</param>
@@ -208,6 +208,102 @@ namespace Microsoft.VisualStudio.Coverage
         public static DynamicCoverageDataCollectorImpl Create(IDataCollectionAgentContext context)
         {
             return new UnitTestDataCollector(false, false);
+        }
+
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="configurationElement">Configuration element</param>
+        /// <param name="dataSink">Data sink</param>
+        /// <param name="logger">Logger</param>
+        public virtual void Initialize(XmlElement configurationElement, Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink, IDataCollectionLogger logger)
+        {
+            if (configurationElement == null || string.IsNullOrEmpty(configurationElement.InnerXml))
+            {
+                // Add default configuration specific to CodeCoverage.
+                var doc = new XmlDocument();
+                using (
+                    var xmlReader = XmlReader.Create(
+                        new StringReader(DefaultCodeCoverageSettings),
+                        new XmlReaderSettings() { /*XmlResolver = null,*/ CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
+                {
+                    doc.Load(xmlReader);
+                }
+
+                configurationElement = doc.DocumentElement;
+            }
+
+            this.configurationElement = configurationElement;
+            this.logger = logger;
+            this.dataSink = dataSink;
+
+            this.dataSink.SendFileCompleted += this.OnSendFileCompletedEvent;
+
+            // the magic prefix is used by UnregisterAll to tell MTM registered from manually registered entries
+            this.SessionName = MagicMtmSessionPrefix + Guid.NewGuid().ToString();
+            this.tempPath = Path.Combine(Path.GetTempPath(), this.SessionName);
+            if (!this.CreateSessionDirectory())
+            {
+                return;
+            }
+
+            this.PrepareVanguardProcess();
+        }
+
+        /// <summary>
+        /// Cleanup temp folder
+        /// </summary>
+        public virtual void Dispose()
+        {
+            // Make sure vanguard is shut down
+            if (this.vanguard != null)
+            {
+                this.vanguard.Stop();
+                this.vanguard.Dispose();
+            }
+
+            if (this.dataSink != null)
+            {
+                this.dataSink.SendFileCompleted -= this.OnSendFileCompletedEvent;
+            }
+
+            this.CleanupDirectory();
+        }
+
+        /// <summary>
+        /// Session start
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event arguments</param>
+        internal virtual void SessionStart(object sender, SessionStartEventArgs e)
+        {
+        }
+
+        /// <summary>
+        /// Session end
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">Event arguments</param>
+        internal virtual void SessionEnd(object sender, SessionEndEventArgs e)
+        {
+        }
+
+        internal void InitializeBeforeSessionStart()
+        {
+            if (!this.CreateSessionDirectory())
+            {
+                return;
+            }
+
+            this.PrepareVanguardProcess();
+        }
+
+        /// <summary>
+        /// Initialize vanguard configuration
+        /// </summary>
+        internal virtual void InitializeConfiguration()
+        {
+            this.Vanguard.InitializeConfiguration();
         }
 
         /// <summary>
@@ -229,7 +325,7 @@ namespace Microsoft.VisualStudio.Coverage
                     }
                 }
 
-                string folder = Path.Combine(tempPath, Guid.NewGuid().ToString());
+                string folder = Path.Combine(this.tempPath, Guid.NewGuid().ToString());
                 try
                 {
                     Directory.CreateDirectory(folder);
@@ -245,7 +341,7 @@ namespace Microsoft.VisualStudio.Coverage
                     return;
                 }
 
-                string outputName = Path.Combine(folder, coverageFileName);
+                string outputName = Path.Combine(folder, this.coverageFileName);
                 try
                 {
                     this.vanguard.Start(outputName, context);
@@ -281,14 +377,14 @@ namespace Microsoft.VisualStudio.Coverage
                     this.dataSink.SendFileAsync(context, this.vanguard.OutputName, false);
                 }
 
-                vanguard = null;
+                this.vanguard = null;
             }
         }
 
         /// <summary>
         /// Sends intermediate coverage data to the client
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The context.</param>
         protected void GetCoverageData(DataCollectionContext context)
         {
             if (this.vanguard != null)
@@ -298,7 +394,7 @@ namespace Microsoft.VisualStudio.Coverage
                 try
                 {
                     // Create unique path for the output file
-                    string folder = Path.Combine(tempPath, Guid.NewGuid().ToString());
+                    string folder = Path.Combine(this.tempPath, Guid.NewGuid().ToString());
 
                     Directory.CreateDirectory(folder);
 
@@ -330,7 +426,6 @@ namespace Microsoft.VisualStudio.Coverage
                     this.dataSink.SendFileAsync(context, outputName, false);
                 }
             }
-
         }
 
         protected void OnSendFileCompletedEvent(object sender, AsyncCompletedEventArgs e)
@@ -339,81 +434,29 @@ namespace Microsoft.VisualStudio.Coverage
             // are not collecting CC for asp.net
             if (!this.collectAspDotNet)
             {
-                CleanupDirectory();
+                this.CleanupDirectory();
             }
         }
 
         /// <summary>
-        /// Session start
+        /// Generate the file name for coverage file.
         /// </summary>
-        /// <param name="sender">Sender</param>
-        /// <param name="e">Event arguments</param>
-        internal virtual void SessionStart(object sender, SessionStartEventArgs e)
+        /// <returns>Returns code coverage file name.</returns>
+        private static string GenerateCoverageFileName()
         {
-        }
-
-        /// <summary>
-        /// Session end
-        /// </summary>
-        /// <param name="sender">Sender</param>
-        /// <param name="e">Event arguments</param>
-        internal virtual void SessionEnd(object sender, SessionEndEventArgs e)
-        {
-        }
-
-        /// <summary>
-        /// Initialize
-        /// </summary>
-        /// <param name="configurationElement">Configuration element</param>
-        /// <param name="plan">Collection plan</param>
-        /// <param name="dataSink">Data sink</param>
-        /// <param name="logger">Logger</param>
-        /// <param name="isFirstCollectorToInitalize">Whether it is the first collector to get initialized</param>        
-        public virtual void Initialize(XmlElement configurationElement, Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink, IDataCollectionLogger logger)
-        {
-            if (configurationElement == null || string.IsNullOrEmpty(configurationElement.InnerXml))
+            string GetUserName()
             {
-                //  Add default configuration specific to CodeCoverage.
-                var doc = new XmlDocument();
-                using (
-                    var xmlReader = XmlReader.Create(
-                        new StringReader(DefaultCodeCoverageSettings),
-                        new XmlReaderSettings() { /*XmlResolver = null,*/ CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                {
-                    doc.Load(xmlReader);
-                }
-
-                configurationElement = doc.DocumentElement;
+                return Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER");
             }
 
-            this.configurationElement = configurationElement;
-            this.logger = logger;
-            this.dataSink = dataSink;
-
-            this.dataSink.SendFileCompleted += OnSendFileCompletedEvent;
-
-            // the magic prefix is used by UnregisterAll to tell MTM registered from manually registered entries
-            sessionName = MagicMtmSessionPrefix + Guid.NewGuid().ToString();
-            tempPath = Path.Combine(Path.GetTempPath(), sessionName);
-            if (!CreateSessionDirectory())
-                return;
-
-            PrepareVanguardProcess();
-        }
-
-        internal void InitializeBeforeSessionStart()
-        {
-            if (!CreateSessionDirectory())
-                return;
-
-            PrepareVanguardProcess();
+            return string.Format(CultureInfo.InvariantCulture, "{0}_{1}_{2}.coverage", GetUserName(), Environment.MachineName, DateTime.Now.ToString("yyyy-MM-dd.HH_mm_ss", CultureInfo.InvariantCulture));
         }
 
         private bool CreateSessionDirectory()
         {
             try
             {
-                Directory.CreateDirectory(tempPath);
+                Directory.CreateDirectory(this.tempPath);
             }
             catch (IOException)
             {
@@ -427,27 +470,12 @@ namespace Microsoft.VisualStudio.Coverage
             return true;
         }
 
-        /// <summary>
-        /// Generate the file name for coverage file.
-        /// Copied from vset\QTools\Vanguard\src\AnalyzeCodeCoverageExtension\Settings\CodeCoverageDataCollectorSettingsService.cs
-        /// </summary>
-        /// <returns></returns>
-        private static string GenerateCoverageFileName()
-        {
-            string GetUserName()
-            {
-                return Environment.GetEnvironmentVariable("USERNAME") ?? Environment.GetEnvironmentVariable("USER");
-            }
-
-            return string.Format(CultureInfo.InvariantCulture, "{0}_{1}_{2}.coverage", GetUserName(), Environment.MachineName, DateTime.Now.ToString("yyyy-MM-dd.HH_mm_ss", CultureInfo.InvariantCulture));
-        }
-
         private void PrepareVanguardProcess()
         {
-            string configurationFileName = Path.Combine(tempPath, VanguardConfigFileName);
-            XmlElement coverageFileNameElement = configurationElement[CoverageFileSettingName];
+            string configurationFileName = Path.Combine(this.tempPath, VanguardConfigFileName);
+            XmlElement coverageFileNameElement = this.configurationElement[CoverageFileSettingName];
             this.coverageFileName = coverageFileNameElement != null ? coverageFileNameElement.InnerText : GenerateCoverageFileName();
-            XmlElement config = configurationElement[RootName];
+            XmlElement config = this.configurationElement[RootName];
             DynamicCoverageModuleSettings settings = new DynamicCoverageModuleSettings(config, false);
             this.collectAspDotNet = settings.CollectAspDotNet;
             List<string> entryPoints = new List<string>();
@@ -463,36 +491,7 @@ namespace Microsoft.VisualStudio.Coverage
                 }
             }
 
-            this.vanguard = new Vanguard(sessionName, configurationFileName, config, entryPoints, logger);
-        }
-
-        /// <summary>
-        /// Initialize vanguard configuration
-        /// </summary>
-        /// <param name="injector">IIS injector</param>
-        internal virtual void InitializeConfiguration()
-        {
-            this.Vanguard.InitializeConfiguration();
-        }
-
-        /// <summary>
-        /// Cleanup temp folder
-        /// </summary>
-        public virtual void Dispose()
-        {
-            // Make sure vanguard is shut down
-            if (this.vanguard != null)
-            {
-                this.vanguard.Stop();
-                this.vanguard.Dispose();
-            }
-
-            if (dataSink != null)
-            {
-                dataSink.SendFileCompleted -= OnSendFileCompletedEvent;
-            }
-
-            CleanupDirectory();
+            this.vanguard = new Vanguard(this.SessionName, configurationFileName, config, entryPoints, this.logger);
         }
 
         private void CleanupDirectory()

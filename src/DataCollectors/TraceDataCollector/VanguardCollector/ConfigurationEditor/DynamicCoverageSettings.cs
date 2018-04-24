@@ -11,10 +11,13 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Text.RegularExpressions;
     using System.Xml;
 
+#pragma warning disable SA1649 // File name must match first type name
+
     /// <summary>
     /// Interface for all DynamicCoverageSetting
     /// </summary>
     internal interface IDynamicCoverageSettings
+#pragma warning restore SA1649 // File name must match first type name
     {
         /// <summary>
         /// Convert DynamicCoverageSettings to xml
@@ -34,12 +37,12 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Semicolon
         /// </summary>
-        private const char semicolon = ';';
+        private const char Semicolon = ';';
 
         /// <summary>
         /// Quote
         /// </summary>
-        private const char quote = '"';
+        private const char Quote = '"';
 
         /// <summary>
         /// XmlNode.SelectSingleNode and XmlNode.SelectNodes is too heavy when element has xmlns
@@ -47,6 +50,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         /// <param name="parent">parent node</param>
         /// <param name="name">element name to search</param>
+        /// <param name="verify">verify</param>
         /// <returns>xml elements</returns>
         internal static IEnumerable<XmlNode> FindChildrenByName(XmlNode parent, string name, bool verify = false)
         {
@@ -75,11 +79,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="list">list of string</param>
         /// <param name="str">string to search</param>
         /// <returns>whether contains the given string</returns>
-        internal static bool ContainsStringIgnoreCase(IEnumerable<string> list, string str) 
+        internal static bool ContainsStringIgnoreCase(IEnumerable<string> list, string str)
         {
             foreach (string item in list)
             {
-                if (String.Compare(item, str, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(item, str, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     return true;
                 }
@@ -106,11 +110,11 @@ namespace Microsoft.VisualStudio.Coverage
             int begin = 0;
             for (int i = 0; i <= str.Length; i++)
             {
-                if (i == str.Length || str[i] == semicolon)
+                if (i == str.Length || str[i] == Semicolon)
                 {
                     if (!insideQuote)
                     {
-                        string item = str.Substring(begin, i - begin).Trim().Replace("\"", "");
+                        string item = str.Substring(begin, i - begin).Trim().Replace("\"", string.Empty);
                         if (!string.IsNullOrEmpty(item))
                         {
                             yield return item;
@@ -119,7 +123,7 @@ namespace Microsoft.VisualStudio.Coverage
                         begin = i + 1;
                     }
                 }
-                else if (str[i] == quote)
+                else if (str[i] == Quote)
                 {
                     insideQuote = !insideQuote;
                 }
@@ -154,19 +158,20 @@ namespace Microsoft.VisualStudio.Coverage
 
                 if (!first)
                 {
-                    builder.Append(semicolon);
+                    builder.Append(Semicolon);
                 }
 
                 first = false;
-                if (str.Contains(quote))
+                if (str.Contains(Quote))
                 {
                     // Quotes are not allowed in input strings.
                     throw new ArgumentException(null, "list");
                 }
-                if (str.Contains(semicolon))
+
+                if (str.Contains(Semicolon))
                 {
                     // If string contains semicolon, surround it with quotes.
-                    builder.Append(quote).Append(str).Append(quote);
+                    builder.Append(Quote).Append(str).Append(Quote);
                 }
                 else
                 {
@@ -178,19 +183,17 @@ namespace Microsoft.VisualStudio.Coverage
         }
     }
 
+#pragma warning disable SA1402 // File may only contain a single class
+
     /// <summary>
     /// DynamicCoverageAdvancedSettings
     /// </summary>
     internal class DynamicCoverageAdvancedSettings : IDynamicCoverageSettings
+#pragma warning restore SA1402 // File may only contain a single class
     {
-        Dictionary<string, object> generalSettings = new Dictionary<string, object> 
-                                                        { 
-                                                            { CollectChildProcessStr, true },
-                                                            { UseVerifiableInstrumentationStr, true },
-                                                            { AllowLowIntegrityProcessStr, true },
-                                                            { ExcludeCompilerAutoGeneratedModulesStr, true},
-                                                        };
-        private XmlDocument ownerDoc = new XmlDocument();
+        internal const string AllowedUserListName = "AllowedUsers";
+        internal const string AllowedUserElementName = "User";
+        internal const string Everyone = "Everyone";
 
         private const string CollectAspDotNetStr = "CollectAspDotNet";
         private const string CollectChildProcessStr = "CollectFromChildProcesses";
@@ -200,11 +203,6 @@ namespace Microsoft.VisualStudio.Coverage
         // We do not want to show code coverage for modules which are auto-generated by the compiler
         // Modules generated by ASP.NET for web pages(.aspx) come under this category.
         private const string ExcludeCompilerAutoGeneratedModulesStr = "ExcludeCompilerAutoGeneratedModules";
-
-        internal const string AllowedUserListName = "AllowedUsers";
-        internal const string AllowedUserElementName = "User";
-        internal const string Everyone = "Everyone";
-
         private const string SymbolPathListName = "SymbolSearchPaths";
         private const string SymbolPathElementName = "Path";
 
@@ -215,102 +213,94 @@ namespace Microsoft.VisualStudio.Coverage
         private const string PublicKeyTokenElementName = "PublicKeyToken";
         private const string PublickeyTokenSample = "^1234$";
 
+        private Dictionary<string, object> generalSettings = new Dictionary<string, object>
+        {
+            { CollectChildProcessStr, true },
+            { UseVerifiableInstrumentationStr, true },
+            { AllowLowIntegrityProcessStr, true },
+            { ExcludeCompilerAutoGeneratedModulesStr, true },
+        };
+
+        private XmlDocument ownerDoc = new XmlDocument();
+
+        internal DynamicCoverageAdvancedSettings(XmlElement settings)
+        {
+            this.SymbolPathList = new SimpleListSettings(settings, SymbolPathListName, SymbolPathElementName);
+            this.AllowedUserList = new SimpleListSettings(settings, AllowedUserListName, AllowedUserElementName);
+
+            this.CompanyNameList = new FilteringListSettings(
+                settings,
+                CompanyNameListName,
+                CompanyNameElementName,
+                FilteringListSettings.FilterType.Exclusion,
+                CompanyNameSample,
+                true);
+
+            this.PublicKeyTokenList = new FilteringListSettings(
+                settings,
+                PublicKeyTokenListName,
+                PublicKeyTokenElementName,
+                FilteringListSettings.FilterType.Exclusion,
+                PublickeyTokenSample,
+                true);
+
+            LoadGeneralSettingFromXml(settings, ref this.generalSettings, ref this.ownerDoc);
+        }
+
         /// <summary>
-        /// UseVerifiableInstrumentation setting
+        /// Gets or sets a value indicating whether useVerifiableInstrumentation setting
         /// </summary>
         internal bool UseVerifiableInstrumentation
         {
-            get
-            {
-                return GetSetting<bool>(UseVerifiableInstrumentationStr, generalSettings);
-            }
+            get { return GetSetting<bool>(UseVerifiableInstrumentationStr, this.generalSettings); }
 
-            set
-            {
-                UpdateSetting(UseVerifiableInstrumentationStr, value, generalSettings);
-            }
+            set { UpdateSetting(UseVerifiableInstrumentationStr, value, this.generalSettings); }
         }
 
         /// <summary>
-        /// AllowLowIntegrityProcess setting
+        /// Gets or sets a value indicating whether allowLowIntegrityProcess setting
         /// </summary>
         internal bool AllowLowIntegrityProcess
         {
-            get
-            {
-                return GetSetting<bool>(AllowLowIntegrityProcessStr, generalSettings);
-            }
+            get { return GetSetting<bool>(AllowLowIntegrityProcessStr, this.generalSettings); }
 
-            set
-            {
-                UpdateSetting(AllowLowIntegrityProcessStr, value, generalSettings);
-            }
+            set { UpdateSetting(AllowLowIntegrityProcessStr, value, this.generalSettings); }
         }
 
         /// <summary>
-        /// CollectChildProcess setting
+        /// Gets or sets a value indicating whether collectChildProcess setting
         /// </summary>
         internal bool CollectChildProcess
         {
-            get
-            {
-                return GetSetting<bool>(CollectChildProcessStr, generalSettings);
-            }
+            get { return GetSetting<bool>(CollectChildProcessStr, this.generalSettings); }
 
-            set
-            {
-                UpdateSetting(CollectChildProcessStr, value, generalSettings);
-            }
+            set { UpdateSetting(CollectChildProcessStr, value, this.generalSettings); }
         }
 
         /// <summary>
-        /// Allowed user setting
+        /// Gets allowed user setting
         /// </summary>
-        internal SimpleListSettings AllowedUserList
-        {
-            get;
-            private set;
-        }
+        internal SimpleListSettings AllowedUserList { get; private set; }
 
         /// <summary>
-        /// SymbolPathList setting
+        /// Gets symbolPathList setting
         /// </summary>
-        internal SimpleListSettings SymbolPathList
-        {
-            get;
-            private set;
-        }
+        internal SimpleListSettings SymbolPathList { get; private set; }
 
         /// <summary>
-        /// CompanyNameList setting
+        /// Gets or sets companyNameList setting
         /// </summary>
         internal FilteringListSettings CompanyNameList { get; set; }
 
         /// <summary>
-        /// PublicKeyTokenList setting
+        /// Gets or sets publicKeyTokenList setting
         /// </summary>
         internal FilteringListSettings PublicKeyTokenList { get; set; }
-
-        internal DynamicCoverageAdvancedSettings(XmlElement settings)
-        {
-            Debug.Assert(settings != null);
-
-            SymbolPathList = new SimpleListSettings(settings, SymbolPathListName, SymbolPathElementName);
-            AllowedUserList = new SimpleListSettings(settings, AllowedUserListName, AllowedUserElementName);
-
-            CompanyNameList = new FilteringListSettings(settings, CompanyNameListName, CompanyNameElementName,
-                                                       FilteringListSettings.FilterType.Exclusion, CompanyNameSample, true);
-
-            PublicKeyTokenList = new FilteringListSettings(settings, PublicKeyTokenListName, PublicKeyTokenElementName,
-                                                       FilteringListSettings.FilterType.Exclusion, PublickeyTokenSample, true);
-
-            LoadGeneralSettingFromXml(settings, ref generalSettings, ref ownerDoc);
-        }
 
         /// <summary>
         /// Load DynamicCoverageAdvancedSettings from xml
         /// </summary>
-        /// <param name="element">setting xml element</param>
+        /// <param name="settings">settings xml.</param>
         public void LoadFromXml(XmlElement settings)
         {
             if (settings == null)
@@ -318,11 +308,11 @@ namespace Microsoft.VisualStudio.Coverage
                 throw new ArgumentNullException();
             }
 
-            LoadGeneralSettingFromXml(settings, ref generalSettings, ref ownerDoc);
-            SymbolPathList.LoadFromXml(settings);
-            AllowedUserList.LoadFromXml(settings);
-            CompanyNameList.LoadFromXml(settings);
-            PublicKeyTokenList.LoadFromXml(settings);
+            LoadGeneralSettingFromXml(settings, ref this.generalSettings, ref this.ownerDoc);
+            this.SymbolPathList.LoadFromXml(settings);
+            this.AllowedUserList.LoadFromXml(settings);
+            this.CompanyNameList.LoadFromXml(settings);
+            this.PublicKeyTokenList.LoadFromXml(settings);
         }
 
         /// <summary>
@@ -331,35 +321,37 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>xml</returns>
         public IEnumerable<XmlElement> ToXml()
         {
-            foreach (string settingName in generalSettings.Keys)
+            foreach (string settingName in this.generalSettings.Keys)
             {
-                XmlElement settingElement = ownerDoc.CreateElement(settingName);
-                settingElement.InnerText = generalSettings[settingName].ToString();
+                XmlElement settingElement = this.ownerDoc.CreateElement(settingName);
+                settingElement.InnerText = this.generalSettings[settingName].ToString();
                 yield return settingElement;
             }
 
-            foreach (XmlElement element in SymbolPathList.ToXml())
+            foreach (XmlElement element in this.SymbolPathList.ToXml())
             {
                 yield return element;
             }
 
-            foreach (XmlElement element in AllowedUserList.ToXml())
+            foreach (XmlElement element in this.AllowedUserList.ToXml())
             {
                 yield return element;
             }
 
-            foreach (XmlElement element in CompanyNameList.ToXml())
+            foreach (XmlElement element in this.CompanyNameList.ToXml())
             {
                 yield return element;
             }
 
-            foreach (XmlElement element in PublicKeyTokenList.ToXml())
+            foreach (XmlElement element in this.PublicKeyTokenList.ToXml())
             {
                 yield return element;
             }
         }
-        
-        internal static void LoadGeneralSettingFromXml(XmlElement settings, ref Dictionary<string, object> generalSettings, 
+
+        internal static void LoadGeneralSettingFromXml(
+            XmlElement settings,
+            ref Dictionary<string, object> generalSettings,
             ref XmlDocument ownerDoc)
         {
             ownerDoc = settings.OwnerDocument;
@@ -382,7 +374,7 @@ namespace Microsoft.VisualStudio.Coverage
                 }
             }
         }
-       
+
         internal static T GetSetting<T>(string settingName, Dictionary<string, object> generalSettings)
         {
             object setting = null;
@@ -396,7 +388,7 @@ namespace Microsoft.VisualStudio.Coverage
 
         internal static bool HasSetting(string settingName, Dictionary<string, object> generalSettings)
         {
-            return (generalSettings.ContainsKey(settingName));
+            return generalSettings.ContainsKey(settingName);
         }
 
         internal static void UpdateSetting<T>(string settingName, T value, Dictionary<string, object> generalSettings)
@@ -405,66 +397,66 @@ namespace Microsoft.VisualStudio.Coverage
         }
     }
 
+#pragma warning disable SA1402 // File may only contain a single class
+
     /// <summary>
     /// DynamicCoverageModuleSettings
     /// </summary>
     internal class DynamicCoverageModuleSettings : IDynamicCoverageSettings
+#pragma warning restore SA1402 // File may only contain a single class
     {
-        Dictionary<string, object> generalSettings = new Dictionary<string, object> { { CollectAspDotNetStr, false } };
-        XmlDocument ownerDoc = new XmlDocument();
-
-        private const string ModulePathListName = "ModulePaths";
-        internal const string ModulePathElementName = "ModulePath";
-        private const string ModulePathSample = @"*\VC\redist\*";
         internal const string EntryPointListName = "EntryPoints";
         internal const string EntryPointElementName = "EntryPoint";
         internal const string EntryPointSample = "sample.exe";
+        internal const string ModulePathElementName = "ModulePath";
+
+        private const string ModulePathListName = "ModulePaths";
+        private const string ModulePathSample = @"*\VC\redist\*";
         private const string CollectAspDotNetStr = "CollectAspDotNet";
 
-        /// <summary>
-        /// ModulePathList setting
-        /// </summary>
-        internal FilteringListSettings ModulePathList
-        {
-            get;
-            private set;
-        }
+        private Dictionary<string, object> generalSettings =
+            new Dictionary<string, object> { { CollectAspDotNetStr, false } };
 
-        /// <summary>
-        /// Entry point setting
-        /// </summary>
-        internal SimpleListSettings EntryPointList
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// CollectAspDotNet setting
-        /// </summary>
-        internal bool CollectAspDotNet
-        {
-            get
-            {
-                return DynamicCoverageAdvancedSettings.GetSetting<bool>(CollectAspDotNetStr, generalSettings);
-            }
-            set
-            {
-                DynamicCoverageAdvancedSettings.UpdateSetting(CollectAspDotNetStr, value, generalSettings);
-            }
-        }
+        private XmlDocument ownerDoc = new XmlDocument();
 
         internal DynamicCoverageModuleSettings(XmlElement settings, bool loadAll = true)
         {
-            Debug.Assert(settings != null);
             if (loadAll)
             {
-                ModulePathList = new FilteringListSettings(settings, ModulePathListName, ModulePathElementName,
-                                                           FilteringListSettings.FilterType.Inclusion, ModulePathSample, true);
-                EntryPointList = new SimpleListSettings(settings, EntryPointListName, EntryPointElementName);
+                this.ModulePathList = new FilteringListSettings(
+                    settings,
+                    ModulePathListName,
+                    ModulePathElementName,
+                    FilteringListSettings.FilterType.Inclusion,
+                    ModulePathSample,
+                    true);
+                this.EntryPointList = new SimpleListSettings(settings, EntryPointListName, EntryPointElementName);
             }
 
-            DynamicCoverageAdvancedSettings.LoadGeneralSettingFromXml(settings, ref generalSettings, ref ownerDoc);
+            DynamicCoverageAdvancedSettings.LoadGeneralSettingFromXml(
+                settings,
+                ref this.generalSettings,
+                ref this.ownerDoc);
+        }
+
+        /// <summary>
+        /// Gets modulePathList setting
+        /// </summary>
+        internal FilteringListSettings ModulePathList { get; private set; }
+
+        /// <summary>
+        /// Gets entry point setting
+        /// </summary>
+        internal SimpleListSettings EntryPointList { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether collectAspDotNet setting
+        /// </summary>
+        internal bool CollectAspDotNet
+        {
+            get { return DynamicCoverageAdvancedSettings.GetSetting<bool>(CollectAspDotNetStr, this.generalSettings); }
+
+            set { DynamicCoverageAdvancedSettings.UpdateSetting(CollectAspDotNetStr, value, this.generalSettings); }
         }
 
         /// <summary>
@@ -478,9 +470,12 @@ namespace Microsoft.VisualStudio.Coverage
                 throw new ArgumentNullException();
             }
 
-            DynamicCoverageAdvancedSettings.LoadGeneralSettingFromXml(settings, ref generalSettings, ref ownerDoc);
-            ModulePathList.LoadFromXml(settings);
-            EntryPointList.LoadFromXml(settings);
+            DynamicCoverageAdvancedSettings.LoadGeneralSettingFromXml(
+                settings,
+                ref this.generalSettings,
+                ref this.ownerDoc);
+            this.ModulePathList.LoadFromXml(settings);
+            this.EntryPointList.LoadFromXml(settings);
         }
 
         /// <summary>
@@ -489,29 +484,32 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>xml</returns>
         public IEnumerable<XmlElement> ToXml()
         {
-            foreach (string settingName in generalSettings.Keys)
+            foreach (string settingName in this.generalSettings.Keys)
             {
-                XmlElement settingElement = ownerDoc.CreateElement(settingName);
-                settingElement.InnerText = generalSettings[settingName].ToString();
+                XmlElement settingElement = this.ownerDoc.CreateElement(settingName);
+                settingElement.InnerText = this.generalSettings[settingName].ToString();
                 yield return settingElement;
             }
 
-            foreach (XmlElement element in ModulePathList.ToXml())
+            foreach (XmlElement element in this.ModulePathList.ToXml())
             {
                 yield return element;
             }
 
-            foreach (XmlElement element in EntryPointList.ToXml())
+            foreach (XmlElement element in this.EntryPointList.ToXml())
             {
                 yield return element;
             }
         }
     }
 
+#pragma warning disable SA1402 // File may only contain a single class
+
     /// <summary>
     /// DynamicCoverageReadOnlySettings
     /// </summary>
     internal class DynamicCoverageReadOnlySettings : IDynamicCoverageSettings
+#pragma warning restore SA1402 // File may only contain a single class
     {
         private static readonly string[] FunctionSig = { "Functions", "Function" };
         private static readonly string[] FunctionAttr = { "Attributes", "Attribute" };
@@ -519,22 +517,11 @@ namespace Microsoft.VisualStudio.Coverage
         private static readonly string[] Company = { "CompanyNames", "CompanyName" };
         private static readonly string[] ModulePKT = { "PublicKeyTokens", "PublicKeyToken" };
         private static readonly string[][] ListNames = { FunctionSig, FunctionAttr, Source };
-        
+
         private static List<NameElementPair> readOnlySettings;
 
-        private class NameElementPair
-        {
-            internal NameElementPair(string listName, string elementName)
-            {
-                ListName = listName;
-                ElementName = elementName;
-            }
-            internal string ElementName { get; private set; }
-            internal string ListName { get; private set; }
-            internal XmlElement Config { get; set; }
-        }
-
         /// <summary>
+        /// Initializes static members of the <see cref="DynamicCoverageReadOnlySettings"/> class.
         /// Static constructor for DynamicCoverageReadOnlySettings
         /// </summary>
         static DynamicCoverageReadOnlySettings()
@@ -547,14 +534,13 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DynamicCoverageReadOnlySettings"/> class.
         /// DynamicCoverageReadOnlySettings Constructor
         /// </summary>
         /// <param name="settings">settings</param>
         internal DynamicCoverageReadOnlySettings(XmlElement settings)
         {
-            Debug.Assert(settings != null);
-
-            LoadFromXml(settings);
+            this.LoadFromXml(settings);
         }
 
         /// <summary>
@@ -574,7 +560,11 @@ namespace Microsoft.VisualStudio.Coverage
                 XmlElement configElement = settings[pair.ListName];
                 if (configElement != null)
                 {
-                    FilteringListSettings.VerifyFilteringSetting(configElement, pair.ListName, pair.ElementName, FilteringListSettings.FilterType.Both);
+                    FilteringListSettings.VerifyFilteringSetting(
+                        configElement,
+                        pair.ListName,
+                        pair.ElementName,
+                        FilteringListSettings.FilterType.Both);
                     pair.Config = configElement;
                 }
             }
@@ -586,7 +576,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>xml</returns>
         public IEnumerable<XmlElement> ToXml()
         {
-            foreach (NameElementPair pair in readOnlySettings) 
+            foreach (NameElementPair pair in readOnlySettings)
             {
                 if (pair.Config != null)
                 {
@@ -594,54 +584,54 @@ namespace Microsoft.VisualStudio.Coverage
                 }
             }
         }
+
+        private class NameElementPair
+        {
+            internal NameElementPair(string listName, string elementName)
+            {
+                this.ListName = listName;
+                this.ElementName = elementName;
+            }
+
+            internal string ElementName { get; private set; }
+
+            internal string ListName { get; private set; }
+
+            internal XmlElement Config { get; set; }
+        }
     }
 
-    /// <summary>
-    /// SimpleListSettings
-    /// </summary>
+#pragma warning disable SA1402 // File may only contain a single class
+
+    /// <inheritdoc />
     internal class SimpleListSettings : IDynamicCoverageSettings
+#pragma warning restore SA1402 // File may only contain a single class
     {
         private XmlDocument ownerDoc;
 
-        /// <summary>
-        /// List name of this list setting
-        /// </summary>
-        internal string ListName
-        {
-            private set;
-            get;
-        }
-
-        /// <summary>
-        /// Element name of this list setting
-        /// </summary>
-        internal string ElementName
-        {
-            private set;
-            get;
-        }
-
-        /// <summary>
-        /// Content of this list setting
-        /// </summary>
-        internal List<string> List
-        {
-            get;
-            private set;
-        }
-
         internal SimpleListSettings(XmlElement settings, string listName, string elementName)
         {
-            Debug.Assert(settings != null);
-            Debug.Assert(!string.IsNullOrEmpty(listName));
-            Debug.Assert(!string.IsNullOrEmpty(elementName));
+            this.ListName = listName;
+            this.ElementName = elementName;
+            this.List = new List<string>();
 
-            ListName = listName;
-            ElementName = elementName;
-            List = new List<string>();
-            
-            LoadFromXml(settings);
+            this.LoadFromXml(settings);
         }
+
+        /// <summary>
+        /// Gets list name of this list setting
+        /// </summary>
+        internal string ListName { get; private set; }
+
+        /// <summary>
+        /// Gets element name of this list setting
+        /// </summary>
+        internal string ElementName { get; private set; }
+
+        /// <summary>
+        /// Gets content of this list setting
+        /// </summary>
+        internal List<string> List { get; private set; }
 
         /// <summary>
         /// Load SimpleListSettings from xml
@@ -654,18 +644,18 @@ namespace Microsoft.VisualStudio.Coverage
                 throw new ArgumentNullException();
             }
 
-            ownerDoc = settings.OwnerDocument;
-            List.Clear();
-            XmlNode node = settings[ListName];
-            
+            this.ownerDoc = settings.OwnerDocument;
+            this.List.Clear();
+            XmlNode node = settings[this.ListName];
+
             if (node != null)
             {
-                foreach (XmlNode nodeEntry in Utility.FindChildrenByName(node, ElementName, true))
+                foreach (XmlNode nodeEntry in Utility.FindChildrenByName(node, this.ElementName, true))
                 {
                     string text = nodeEntry.InnerText.Trim();
-                    if (!string.IsNullOrEmpty(text) && !Utility.ContainsStringIgnoreCase(List, text))
+                    if (!string.IsNullOrEmpty(text) && !Utility.ContainsStringIgnoreCase(this.List, text))
                     {
-                        List.Add(text);
+                        this.List.Add(text);
                     }
                 }
             }
@@ -677,10 +667,10 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>xml text</returns>
         public IEnumerable<XmlElement> ToXml()
         {
-            XmlElement listElement = ownerDoc.CreateElement(ListName);
-            foreach (string itemName in List)
+            XmlElement listElement = this.ownerDoc.CreateElement(this.ListName);
+            foreach (string itemName in this.List)
             {
-                XmlElement itemElement = ownerDoc.CreateElement(ElementName);
+                XmlElement itemElement = this.ownerDoc.CreateElement(this.ElementName);
                 itemElement.InnerText = itemName;
                 listElement.AppendChild(itemElement);
             }
@@ -689,27 +679,40 @@ namespace Microsoft.VisualStudio.Coverage
         }
     }
 
+#pragma warning disable SA1402 // File may only contain a single class
+
     /// <summary>
     /// FilteringListSettings
     /// </summary>
     internal class FilteringListSettings : IDynamicCoverageSettings
+#pragma warning restore SA1402 // File may only contain a single class
     {
+        private const string Exclude = "Exclude";
+        private const string Include = "Include";
+        private const string EmptyRegex = @"^$";
+
         private List<string> inclusionList;
         private List<string> exclusionList;
         private XmlDocument ownerDoc;
-        
-        private const string Exclude = "Exclude";
-        private const string Include = "Include";
 
-        private const string EmptyRegex = @"^$";
-
-        /// <summary>
-        /// List name of this list setting
-        /// </summary>
-        internal string ListName
+        internal FilteringListSettings(
+            XmlElement settings,
+            string listName,
+            string elementName,
+            FilterType type,
+            string sample,
+            bool noneForEmptyInclude = false)
         {
-            private set;
-            get;
+            this.ListName = listName;
+            this.ElementName = elementName;
+            this.SampleText = sample;
+            this.ListType = type;
+            this.IncludeNoneForEmptyList = noneForEmptyInclude;
+
+            this.inclusionList = new List<string>();
+            this.exclusionList = new List<string>();
+
+            this.LoadFromXml(settings);
         }
 
         /// <summary>
@@ -723,97 +726,122 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Type of this filter list
+        /// Gets list name of this list setting
         /// </summary>
-        internal FilterType ListType
-        {
-            private set;
-            get;
-        }
+        internal string ListName { get; private set; }
 
         /// <summary>
-        /// Whether include nothing when we have an empty include list
+        /// Gets type of this filter list
         /// </summary>
-        internal bool IncludeNoneForEmptyList
-        {
-            private set;
-            get;
-        }
+        internal FilterType ListType { get; private set; }
 
         /// <summary>
-        /// Element name of this list setting
+        /// Gets a value indicating whether whether include nothing when we have an empty include list
         /// </summary>
-        internal string ElementName
-        {
-            private set;
-            get;
-        }
+        internal bool IncludeNoneForEmptyList { get; private set; }
 
         /// <summary>
-        /// Sample text
+        /// Gets element name of this list setting
         /// </summary>
-        internal string SampleText
-        {
-            private set;
-            get;
-        }
+        internal string ElementName { get; private set; }
 
         /// <summary>
-        /// Get inclusion list of this filering list
+        /// Gets sample text
+        /// </summary>
+        internal string SampleText { get; private set; }
+
+        /// <summary>
+        /// Gets get inclusion list of this filering list
         /// </summary>
         internal List<string> InclusionList
         {
-            get 
-            {
-                return ListType != FilterType.Exclusion ? inclusionList : null; 
-            }
+            get { return this.ListType != FilterType.Exclusion ? this.inclusionList : null; }
         }
 
         /// <summary>
-        /// Get exclusion list of this filering list
+        /// Gets get exclusion list of this filering list
         /// </summary>
         internal List<string> ExclusionList
         {
-            get
-            {
-                return ListType != FilterType.Inclusion ? exclusionList: null; 
-            }
-        }
-
-        internal FilteringListSettings(XmlElement settings, string listName, string elementName, FilterType type, string sample, bool noneForEmptyInclude = false)
-        {
-            Debug.Assert(settings != null);
-            Debug.Assert(!string.IsNullOrEmpty(listName));
-            Debug.Assert(!string.IsNullOrEmpty(elementName));
-
-            ListName = listName;
-            ElementName = elementName;
-            SampleText = sample;
-            ListType = type;
-            IncludeNoneForEmptyList = noneForEmptyInclude;
-
-            inclusionList = new List<string>();
-            exclusionList = new List<string>();
-
-            LoadFromXml(settings);
+            get { return this.ListType != FilterType.Inclusion ? this.exclusionList : null; }
         }
 
         /// <summary>
-        /// Verify the given XmlElement contains valid configuration, 
+        /// Verify the given XmlElement contains valid configuration,
         /// if it's invalid, XmlException will be thrown.
         /// </summary>
         /// <param name="settings">settings</param>
         /// <param name="listName">listName</param>
         /// <param name="elementName">elementName</param>
         /// <param name="type">type</param>
-        public static void VerifyFilteringSetting(XmlElement settings, string listName, string elementName, FilterType type)
+        public static void VerifyFilteringSetting(
+            XmlElement settings,
+            string listName,
+            string elementName,
+            FilterType type)
         {
             if (settings == null)
             {
                 throw new ArgumentNullException();
             }
-            
-            FilteringListSettings newSetting = new FilteringListSettings(settings, listName, elementName, type, string.Empty, false);
+
+            FilteringListSettings newSetting =
+                new FilteringListSettings(settings, listName, elementName, type, string.Empty, false);
+        }
+
+        /// <summary>
+        /// Load list setting from xml
+        /// </summary>
+        /// <param name="settings">setting xml element</param>
+        public void LoadFromXml(XmlElement settings)
+        {
+            if (settings == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            this.ownerDoc = settings.OwnerDocument;
+            XmlNode listNode = settings.Name.Equals(this.ListName) ? settings : settings[this.ListName];
+            if (listNode == null)
+            {
+                return;
+            }
+
+            VerifyFilteringItem((XmlElement)listNode, this.ListType);
+
+            if (this.ListType != FilterType.Exclusion)
+            {
+                IList<XmlNode> includeNodes = this.GetIncludedItems(listNode);
+                this.inclusionList.Clear();
+                this.AddNodesToList(includeNodes, this.inclusionList);
+            }
+
+            if (this.ListType != FilterType.Inclusion)
+            {
+                IList<XmlNode> excludeNodes = this.GetExcludedItems(listNode);
+                this.exclusionList.Clear();
+                this.AddNodesToList(excludeNodes, this.exclusionList);
+            }
+        }
+
+        /// <summary>
+        /// Convert the list setting to xml
+        /// </summary>
+        /// <returns>xml</returns>
+        public IEnumerable<XmlElement> ToXml()
+        {
+            XmlElement configElement = this.ownerDoc.CreateElement(this.ListName);
+            if (this.ListType != FilterType.Exclusion)
+            {
+                configElement.AppendChild(this.GetIncludeElement());
+            }
+
+            if (this.ListType != FilterType.Inclusion)
+            {
+                configElement.AppendChild(this.GetExcludeElement());
+            }
+
+            yield return configElement;
         }
 
         /// <summary>
@@ -821,6 +849,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// exception will be thrown if invalid.
         /// </summary>
         /// <param name="parent">parent node</param>
+        /// <param name="type">filter type.</param>
         private static void VerifyFilteringItem(XmlElement parent, FilterType type)
         {
             foreach (XmlNode node in parent.ChildNodes)
@@ -851,74 +880,8 @@ namespace Microsoft.VisualStudio.Coverage
             }
         }
 
-        /// <summary>
-        /// Load list setting from xml
-        /// </summary>
-        /// <param name="settings">setting xml element</param>
-        public void LoadFromXml(XmlElement settings)
-        {
-            if (settings == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            ownerDoc = settings.OwnerDocument;
-            XmlNode listNode = settings.Name.Equals(ListName) ? settings : settings[ListName];
-            if (listNode == null)
-            {
-                return;
-            }
-
-            VerifyFilteringItem((XmlElement)listNode, ListType);
-
-            if (ListType != FilterType.Exclusion)
-            {
-                IList<XmlNode> includeNodes = GetIncludedItems(listNode);
-                inclusionList.Clear();
-                AddNodesToList(includeNodes, inclusionList);
-            }
-
-            if (ListType != FilterType.Inclusion)
-            {
-                IList<XmlNode> excludeNodes = GetExcludedItems(listNode);
-                exclusionList.Clear();
-                AddNodesToList(excludeNodes, exclusionList);
-            }
-        }
-
-        /// <summary>
-        /// Convert the list setting to xml
-        /// </summary>
-        /// <returns>xml</returns>
-        public IEnumerable<XmlElement> ToXml()
-        {
-            XmlElement configElement = ownerDoc.CreateElement(ListName);
-            if (ListType != FilterType.Exclusion)
-            {
-                configElement.AppendChild(GetIncludeElement());
-            }
-            if (ListType != FilterType.Inclusion)
-            {
-                configElement.AppendChild(GetExcludeElement());
-            }
-
-            yield return configElement;
-        }
-
-        private IList<XmlNode> GetIncludedItems(XmlNode parent)
-        {
-            return GetFilteringItems(parent, Include, ElementName);
-        }
-
-        private IList<XmlNode> GetExcludedItems(XmlNode parent)
-        {
-            return GetFilteringItems(parent, Exclude, ElementName);
-        }
-
         private static IList<XmlNode> GetFilteringItems(XmlNode parent, string filterName, string elementName)
         {
-            Debug.Assert(parent != null);
-
             List<XmlNode> excludeItem = new List<XmlNode>();
             if (parent != null)
             {
@@ -931,14 +894,24 @@ namespace Microsoft.VisualStudio.Coverage
             return excludeItem;
         }
 
+        private IList<XmlNode> GetIncludedItems(XmlNode parent)
+        {
+            return GetFilteringItems(parent, Include, this.ElementName);
+        }
+
+        private IList<XmlNode> GetExcludedItems(XmlNode parent)
+        {
+            return GetFilteringItems(parent, Exclude, this.ElementName);
+        }
+
         private void AddNodesToList(IList<XmlNode> nodes, IList<string> list)
         {
             foreach (XmlNode nodeEntry in nodes)
             {
                 string text = nodeEntry.InnerText.Trim();
-                if (!string.IsNullOrEmpty(text) 
-                    && !Utility.ContainsStringIgnoreCase(list, text) 
-                    && String.Compare(text, EmptyRegex, StringComparison.Ordinal) != 0)
+                if (!string.IsNullOrEmpty(text)
+                    && !Utility.ContainsStringIgnoreCase(list, text)
+                    && string.Compare(text, EmptyRegex, StringComparison.Ordinal) != 0)
                 {
                     // Regex verification on input filtering items
                     try
@@ -959,28 +932,28 @@ namespace Microsoft.VisualStudio.Coverage
 
         private XmlElement GetExcludeElement()
         {
-            return GetFilteringElement(true);
+            return this.GetFilteringElement(true);
         }
 
         private XmlElement GetIncludeElement()
         {
-            return GetFilteringElement(false);
+            return this.GetFilteringElement(false);
         }
 
         private XmlElement GetFilteringElement(bool exclude)
         {
-            XmlElement filtering = ownerDoc.CreateElement(exclude ? Exclude : Include);
-            List<string> itemsToAdd = exclude ? ExclusionList : InclusionList;
+            XmlElement filtering = this.ownerDoc.CreateElement(exclude ? Exclude : Include);
+            List<string> itemsToAdd = exclude ? this.ExclusionList : this.InclusionList;
             foreach (string itemName in itemsToAdd)
             {
-                XmlElement itemElement = ownerDoc.CreateElement(ElementName);
+                XmlElement itemElement = this.ownerDoc.CreateElement(this.ElementName);
                 itemElement.InnerText = itemName;
                 filtering.AppendChild(itemElement);
             }
 
-            if (!exclude && IncludeNoneForEmptyList && InclusionList.Count == 0)
+            if (!exclude && this.IncludeNoneForEmptyList && this.InclusionList.Count == 0)
             {
-                XmlElement itemElement = ownerDoc.CreateElement(ElementName);
+                XmlElement itemElement = this.ownerDoc.CreateElement(this.ElementName);
                 itemElement.InnerText = EmptyRegex;
                 filtering.AppendChild(itemElement);
             }

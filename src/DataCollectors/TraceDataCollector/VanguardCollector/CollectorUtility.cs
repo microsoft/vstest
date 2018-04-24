@@ -37,11 +37,10 @@ namespace Microsoft.VisualStudio.Collector
             /// <summary>
             /// The x 64.
             /// </summary>
-            x64 = 0x8664
+            X64 = 0x8664
         }
 
-        public static void RemoveChildNodeAndReturnValue(ref XmlElement owner, string elementName,
-            out string elementValue)
+        public static void RemoveChildNodeAndReturnValue(ref XmlElement owner, string elementName, out string elementValue)
         {
             var node = owner.SelectSingleNode(elementName);
             elementValue = string.Empty;
@@ -64,9 +63,9 @@ namespace Microsoft.VisualStudio.Collector
             }
 
             // dos header is 64 bytes, last element, long (4 bytes) is the address of the PE header
-            int PE_HEADER_ADDR = BitConverter.ToInt32(data, PE_POINTER_OFFSET);
-            int machineUint = BitConverter.ToUInt16(data, PE_HEADER_ADDR + MACHINE_OFFSET);
-            return (MachineType) machineUint;
+            int peHeaderAddr = BitConverter.ToInt32(data, PE_POINTER_OFFSET);
+            int machineUint = BitConverter.ToUInt16(data, peHeaderAddr + MACHINE_OFFSET);
+            return (MachineType)machineUint;
         }
 
         public static string GetDotnetHostFullPath()
@@ -100,6 +99,7 @@ namespace Microsoft.VisualStudio.Collector
             {
                 throw new VanguardException(Resources.ErrorNoVanguard);
             }
+
             return vanguardPath;
         }
 
