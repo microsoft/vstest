@@ -35,6 +35,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             string root = Path.GetDirectoryName(path);
+
+            AddRelativePathNode(xmlDocument, root);
+
             var testRunSettingsNode = xmlDocument.SelectSingleNode(TestSettingsFileXPath);
             if (testRunSettingsNode != null)
             {
@@ -46,6 +49,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 FixNodeFilePath(resultsDirectoryNode, root);
             }
+        }
+
+        private static void AddRelativePathNode(XmlDocument doc, string path)
+        {
+            var node = doc.CreateNode(XmlNodeType.Element, "RunsettingsDirectory", string.Empty);
+            node.InnerXml = path;
+            doc.DocumentElement.AppendChild(node);
         }
 
         private static void FixNodeFilePath(XmlNode node, string root)
