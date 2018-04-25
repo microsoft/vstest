@@ -951,6 +951,99 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        public void RunTestsShouldCollectTelemetryForLegacySettings()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings = @"<RunSettings>
+                                       <LegacySettings>
+	                                        <Deployment>
+                                                <DeploymentItem filename="".\test.txt"" />
+                                            </Deployment>
+                                            <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                        </LegacySettings>
+                               </RunSettings>"
+            };
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualRequestData = requestData;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+            
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.LegacySettings, out var legacySettingsString));
+            StringAssert.Equals("Deployment, Scripts", legacySettingsString);
+
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
+            Assert.IsFalse((bool)testSettingsUsed);
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
+        public void RunTestsShouldCollectTelemetryForTestSettingsEmbeddedInsideRunSettings()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings = @"<RunSettings>
+                                       <MSTest>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                            <SettingsFile>..\..\Foo.testsettings</SettingsFile>
+                                       </MSTest>
+                               </RunSettings>"
+            };
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualRequestData = requestData;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
+            Assert.IsTrue((bool)testSettingsUsed);
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        }
+
+        [TestMethod]
         public void RunTestsShouldCollectMetrics()
         {
             // Opt in the Telemetry

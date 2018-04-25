@@ -493,6 +493,45 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.IsFalse(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
         }
 
+        [TestMethod]
+        public void TryGetLegacySettingsShouldReturnNull()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                      </RunSettings>";
+            
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettings(runSettingsXml, out List<string> legacySettings));
+        }
+
+        [TestMethod]
+        public void TryGetLegacySettingsShouldReturnNull2()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                        <LegacySettings>
+                                        </LegacySettings>
+                                      </RunSettings>";
+
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettings(runSettingsXml, out List<string> legacySettings));
+            Assert.AreEqual(0, legacySettings.Count);
+        }
+
+        [TestMethod]
+        public void TryGetLegacySettingsShouldReturnNull3()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <LegacySettings>
+	                                        <Deployment>
+                                                <DeploymentItem filename="".\test.txt"" />
+                                            </Deployment>
+                                            <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                       </LegacySettings>
+                                      </RunSettings>";
+
+            var expectedList = new List<string> { "Deployment", "Scripts" };
+
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettings(runSettingsXml, out List<string> legacySettings));
+            CollectionAssert.AreEqual(expectedList, legacySettings);
+        }
+
         #region RunSettingsIncompatibeWithTestSettings Tests
 
         [TestMethod]

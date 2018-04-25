@@ -286,6 +286,47 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
+        /// Returns the list of elements inside legacy settings
+        /// </summary>
+        /// <param name="runsettingsXml"></param>
+        /// <param name="legacySettings"></param>
+        /// <returns></returns>
+        public static bool TryGetLegacySettings(string runsettingsXml, out List<string> legacySettings)
+        {
+            legacySettings = new List<string>();
+            try
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings");
+                    if (node == null)
+                    {
+                        return false;
+                    }
+
+                    var childNodes = node.SelectChildren(XPathNodeType.Element);
+
+                    while (childNodes.MoveNext())
+                    {
+                        legacySettings.Add(childNodes.Current.Name);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                EqtTrace.Error("Error while trying to read legacy settings. Message:", ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Updates the <c>RunConfiguration.TargetPlatform</c> value for a run settings. if the value is already set, behavior depends on overwrite.
         /// </summary>
         /// <param name="runSettingsDocument">Navigator for runsettings xml</param>
