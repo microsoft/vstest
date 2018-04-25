@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.Coverage
             CollectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "Framework", out this.framework);
             CollectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "TargetPlatform", out this.targetPlatform);
 
-            this.implementation = DynamicCoverageDataCollectorImpl.Create(this.AgentContext);
+            this.implementation = new DynamicCoverageDataCollectorImpl();
             this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
             this.Events.SessionStart += this.SessionStart;
             this.Events.SessionEnd += this.SessionEnd;

@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Time limit for waiting the vanguard event
         /// </summary>
-        private const uint WaitLimit = 10000;
+        private const uint WaitLimit = 90000;
 
         /// <summary>
         /// Return value of WaitForSingleObject, which means the object is signaled.
@@ -183,6 +183,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="context">Data collection context. </param>
         public virtual void Start(string outputName, DataCollectionContext context)
         {
+            EqtTrace.Info("Vanguard.Start: Starting CodeCoverage.exe for coverage file: {0} datacollection session id: {1}", outputName, context.SessionId);
             this.UnregisterAll();
             foreach (var entryPoint in this.entryPoints)
             {
@@ -288,6 +289,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public virtual void UnregisterAll()
         {
+            EqtTrace.Info("Vanguard.UnregisterAll: Sending unregister all command.");
             Process process = this.StartVanguardProcess(
                 GenerateCommandLine(
                     Command.UnregisterAll,
@@ -298,7 +300,7 @@ namespace Microsoft.VisualStudio.Coverage
                 true);
             if (process.ExitCode != 0)
             {
-                // nothrow
+                EqtTrace.Warning("Vanguard.UnregisterAll: Process exited with non zero.");
             }
 
             process.Dispose();
@@ -394,6 +396,7 @@ namespace Microsoft.VisualStudio.Coverage
                     break;
             }
 
+            EqtTrace.Info("Vanguard.GenerateCommandLine: Created the command: {0}", builder);
             return builder.ToString();
         }
 
@@ -428,6 +431,12 @@ namespace Microsoft.VisualStudio.Coverage
             bool standardErrorAsynchronousCall = false)
         {
             string vanguardPath = CollectorUtility.GetVanguardPath();
+            EqtTrace.Info(
+                "Vanguard.StartVanguardProcess: Starting {0} with command line: {1}, wait for exit:{2}, Read stderr: {3}",
+                vanguardPath,
+                commandLine,
+                wait,
+                standardErrorAsynchronousCall);
             ProcessStartInfo info = new ProcessStartInfo(vanguardPath, commandLine);
             info.WorkingDirectory = Directory.GetCurrentDirectory();
             info.UseShellExecute = false;
@@ -457,11 +466,19 @@ namespace Microsoft.VisualStudio.Coverage
             }
             else if (this.jobObject != null)
             {
-                EqtTrace.Info("Add Vangaurd process to the project object");
+                EqtTrace.Info("Vanguard.StartVanguardProcess: Add Vangaurd process to the project object");
                 this.jobObject.AddProcess(process.SafeHandle.DangerousGetHandle());
             }
 
-            EqtTrace.Info("Started Vangaurd process with command line {0}", commandLine);
+            try
+            {
+                EqtTrace.Info("Vanguard.StartVanguardProcess: Started Vangaurd process id :{0}", process.Id);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Info("Vanguard.StartVanguardProcess: Fail to log vangaurd process id with exception: {0}", ex);
+            }
+
             return process;
         }
 
@@ -518,6 +535,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private void Wait()
         {
+            EqtTrace.Info("Vanguard.Wait: Waiting for CodeCoverage.exe initialization.");
             IntPtr runningEvent = CreateEvent(
                 IntPtr.Zero,
                 true,
@@ -531,12 +549,13 @@ namespace Microsoft.VisualStudio.Coverage
                 switch (result)
                 {
                     case WaitObject0:
-                        // Running event received
+                        EqtTrace.Info("Vanguard.Wait: Running event received from CodeCoverage.exe.");
                         return;
                     case WaitObject0 + 1:
                         // Process exited, something wrong happened
                         // we have already set to read messages asynchronously, so calling this.vanguardProcess.StandardError.ReadToEnd() which is synchronous is wrong.
                         // throw new VanguardException(string.Format(CultureInfo.CurrentCulture, Resources.ErrorLaunchVanguard, this.vanguardProcess.StandardError.ReadToEnd()));
+                        EqtTrace.Error("Vanguard.Wait: CodeCoverage.exe failed to initialize.");
                         throw new VanguardException(Resources.GeneralErrorLaunchVanguard, true);
                 }
             }
@@ -544,6 +563,7 @@ namespace Microsoft.VisualStudio.Coverage
             // Something happens, kill the process
             try
             {
+                EqtTrace.Error("Vanguard.Wait: Fail to create running event. Killing CodeCoverage.exe. ");
                 this.vanguardProcess.Kill();
             }
             catch (Win32Exception)
@@ -566,14 +586,12 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event args. </param>
         private void LoggerProcessExited(object sender, EventArgs e)
         {
+            EqtTrace.Info("Vanguard.LoggerProcessExited: Vangaurd process exited.");
             if (this.vanguardProcess != null)
             {
                 if (this.vanguardProcess.HasExited == true && this.vanguardProcess.ExitCode != 0)
                 {
-                    EqtTrace.Warning(string.Format(
-                        CultureInfo.CurrentCulture,
-                        "An error occurred in Code Coverage process. Error code = {0}",
-                        this.vanguardProcess.ExitCode));
+                    EqtTrace.Warning("Vanguard.LoggerProcessExited: An error occurred in Code Coverage process. Error code = {0}", this.vanguardProcess.ExitCode);
                 }
 
                 this.vanguardProcess.Exited -= this.LoggerProcessExited;

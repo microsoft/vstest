@@ -14,8 +14,6 @@
     <ProjectReference Include="..\..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
   </ItemGroup>
   <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="System.Diagnostics.Process">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -27,12 +25,6 @@
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -40,10 +32,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Update="Resources\Resources.resx">
+    <EmbeddedResource Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
+  
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

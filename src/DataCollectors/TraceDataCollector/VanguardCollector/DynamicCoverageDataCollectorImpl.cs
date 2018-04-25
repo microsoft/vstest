@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.Coverage
     /// <summary>
     /// Implementation class of dynamic code coverage data collector
     /// </summary>
-    internal abstract class DynamicCoverageDataCollectorImpl
+    internal class DynamicCoverageDataCollectorImpl
     {
         /// <summary>
         /// A magic prefix used to differentiate MTM registered sessions from manually registered sessions
@@ -138,21 +138,6 @@ namespace Microsoft.VisualStudio.Coverage
         private Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink;
 
         /// <summary>
-        /// Whether it's running a manual test
-        /// </summary>
-        private bool isManualTest;
-
-        /// <summary>
-        /// Whether the collector is running on a remote machine (environment flow)
-        /// </summary>
-        private bool isExecutedRemotely;
-
-        /// <summary>
-        /// Whether to collect ASP.Net
-        /// </summary>
-        private bool collectAspDotNet;
-
-        /// <summary>
         /// Folder to store temporary files
         /// </summary>
         private string tempPath;
@@ -163,29 +148,9 @@ namespace Microsoft.VisualStudio.Coverage
         private XmlElement configurationElement;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DynamicCoverageDataCollectorImpl"/> class.
-        /// Constructor
-        /// </summary>
-        /// <param name="isManualTest">Whether it's running a manual test</param>
-        /// <param name="isExecutedRemotely">Whether it's running inside a remote device</param>
-        public DynamicCoverageDataCollectorImpl(bool isManualTest, bool isExecutedRemotely)
-        {
-            this.isManualTest = isManualTest;
-            this.isExecutedRemotely = isExecutedRemotely;
-        }
-
-        /// <summary>
         /// Gets session name
         /// </summary>
         public string SessionName { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether whether to collect ASP.Net
-        /// </summary>
-        internal bool CollectAspDotNet
-        {
-            get { return this.collectAspDotNet; }
-        }
 
         /// <summary>
         /// Gets vanguard instance
@@ -193,16 +158,6 @@ namespace Microsoft.VisualStudio.Coverage
         protected Vanguard Vanguard
         {
             get { return this.vanguard; }
-        }
-
-        /// <summary>
-        /// Create a data collector implementation instance
-        /// </summary>
-        /// <param name="context">Context</param>
-        /// <returns>Data collector implementation</returns>
-        public static DynamicCoverageDataCollectorImpl Create(IDataCollectionAgentContext context)
-        {
-            return new UnitTestDataCollector(false, false);
         }
 
         /// <summary>
@@ -275,6 +230,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event arguments</param>
         internal virtual void SessionStart(object sender, SessionStartEventArgs e)
         {
+            this.StartVanguard(e.Context);
         }
 
         /// <summary>
@@ -284,6 +240,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event arguments</param>
         internal virtual void SessionEnd(object sender, SessionEndEventArgs e)
         {
+            this.StopVanguard(e.Context);
         }
 
         internal void InitializeBeforeSessionStart()
@@ -312,17 +269,6 @@ namespace Microsoft.VisualStudio.Coverage
         {
             if (this.vanguard != null)
             {
-                if (this.isManualTest && !this.collectAspDotNet)
-                {
-                    // We will not check the number of entry points in the following cases (under these cases entry point is not necessary):
-                    // 1. It's not a manual test run (in IDE or automated run in MTM).
-                    // 2. Collect from ASP.Net is enabled.
-                    if (this.vanguard.EntryPoints.Count == 0)
-                    {
-                        throw new VanguardException(Resources.ErrorNoEntryPoint);
-                    }
-                }
-
                 string folder = Path.Combine(this.tempPath, Guid.NewGuid().ToString());
                 try
                 {
@@ -366,6 +312,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="context">Context</param>
         protected void StopVanguard(DataCollectionContext context)
         {
+            EqtTrace.Info("DynamicCoverageDataCollectorImpl.StopVanguard: Calling Stop Vanguard. datacollection context sessionID: {0}", context.SessionId);
             if (this.vanguard != null)
             {
                 this.vanguard.Stop();
@@ -428,12 +375,7 @@ namespace Microsoft.VisualStudio.Coverage
 
         protected void OnSendFileCompletedEvent(object sender, AsyncCompletedEventArgs e)
         {
-            // Collector can send multiple files for an IIS session. Delete the directory only if we
-            // are not collecting CC for asp.net
-            if (!this.collectAspDotNet)
-            {
-                this.CleanupDirectory();
-            }
+             this.CleanupDirectory();
         }
 
         /// <summary>
@@ -481,22 +423,8 @@ namespace Microsoft.VisualStudio.Coverage
                 ? coverageFileNameElement.InnerText
                 : GenerateCoverageFileName();
             XmlElement config = this.configurationElement[RootName];
-            DynamicCoverageModuleSettings settings = new DynamicCoverageModuleSettings(config, false);
-            this.collectAspDotNet = settings.CollectAspDotNet;
-            List<string> entryPoints = new List<string>();
-            XmlElement entryPointNodes = config[DynamicCoverageModuleSettings.EntryPointListName];
-            if (entryPointNodes != null)
-            {
-                foreach (XmlNode entryPoint in entryPointNodes)
-                {
-                    if (!string.IsNullOrEmpty(entryPoint.InnerText))
-                    {
-                        entryPoints.Add(entryPoint.InnerText);
-                    }
-                }
-            }
 
-            this.vanguard = new Vanguard(this.SessionName, configurationFileName, config, entryPoints, this.logger);
+            this.vanguard = new Vanguard(this.SessionName, configurationFileName, config, new List<string>(), this.logger);
         }
 
         private void CleanupDirectory()
