@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
@@ -28,7 +29,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <inheritdoc/>
         public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
         {
-            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo);
+            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, CancellationToken.None);
+        }
+
+        /// <inheritdoc/>
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken)
+        {
+            return this.designModeClient.LaunchCustomHost(defaultTestHostStartInfo, cancellationToken);
         }
     }
 

@@ -369,30 +369,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            try
+            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+            EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+
+            if (this.customTestHostLauncher == null)
             {
-                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-                EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+                EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-                if (this.customTestHostLauncher == null)
-                {
-                    EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
-                }
-                else
-                {
-                    int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
-                    this.testHostProcess = Process.GetProcessById(processId);
-                    this.processHelper.SetExitCallback(processId, this.ExitCallBack);
-                }
+                cancellationToken.ThrowIfCancellationRequested();
+                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
             }
-            catch (OperationCanceledException ex)
+            else
             {
-                EqtTrace.Error("DefaultTestHostManager.LaunchHost: Failed to launch testhost: {0}", ex);
-                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.ToString());
-                return false;
+                int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo, cancellationToken);
+                this.testHostProcess = Process.GetProcessById(processId);
+                this.processHelper.SetExitCallback(processId, this.ExitCallBack);
             }
 
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));

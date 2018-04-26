@@ -285,7 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 Callback(() => Task.Run(sendMessageAction));
 
             var info = new TestProcessStartInfo();
-            var processId = testableDesignModeClient.LaunchCustomHost(info);
+            var processId = testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None);
 
             Assert.AreEqual(expectedProcessId, processId);
         }
@@ -309,7 +309,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 .Callback(() => Task.Run(sendMessageAction));
 
             var info = new TestProcessStartInfo();
-            testableDesignModeClient.LaunchCustomHost(info);
+            testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(OperationCanceledException))]
+        public void DesignModeClientLaunchCustomHostMustThrowIfCancellationOccursBeforeHostLaunch()
+        {
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
+
+            var info = new TestProcessStartInfo();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            testableDesignModeClient.LaunchCustomHost(info, cancellationTokenSource.Token);
         }
 
         [TestMethod]

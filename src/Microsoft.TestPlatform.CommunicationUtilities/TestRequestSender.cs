@@ -135,14 +135,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public bool WaitForRequestHandlerConnection(int connectionTimeout)
+        public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
         {
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
             }
 
-            return this.connected.Wait(connectionTimeout);
+            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle }, connectionTimeout);
+
+            // Return true if wait is because of waitHandle.
+            return waitIndex == 0;
         }
 
         /// <inheritdoc />
@@ -560,8 +563,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                     reason = this.clientExitErrorMessage;
                 }
-
-                EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+                else
+                {
+                    EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+                }
             }
 
             return reason;

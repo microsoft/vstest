@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -29,8 +30,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True, if Handler is connected</returns>
-        bool WaitForRequestHandlerConnection(int connectionTimeout);
+        bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken);
 
         /// <summary>
         /// Close the Sender
