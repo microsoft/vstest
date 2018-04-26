@@ -106,6 +106,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void Cleanup()
         {
             CommandLineOptions.Instance.Reset();
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
         
         [TestMethod]
@@ -308,9 +311,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -353,9 +353,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             object targetDevice;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.AreEqual("Local Machine", targetDevice);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -398,9 +395,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             object targetDevice;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.AreEqual("Device", targetDevice);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -443,9 +437,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             object targetDevice;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.AreEqual("Emulator 8.1 U1 WVGA 4 inch 512MB", targetDevice);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -500,9 +491,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.IsTrue(commandLineArray.Contains("/InIsolation"));
             Assert.IsTrue(commandLineArray.Contains("/UseVsixExtensions"));
             Assert.IsTrue(commandLineArray.Contains("/settings//.RunSettings"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -549,9 +537,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var commandLineArray = commandLineSwitches.ToString();
 
             Assert.IsTrue(commandLineArray.Contains("/settings//.TestSettings"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -598,9 +583,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var commandLineArray = commandLineSwitches.ToString();
 
             Assert.IsTrue(commandLineArray.Contains("/settings//.vsmdi"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -647,9 +629,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var commandLineArray = commandLineSwitches.ToString();
 
             Assert.IsTrue(commandLineArray.Contains("/settings//.testrunConfig"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -945,9 +924,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.IsTrue(commandLineArray.Contains("/InIsolation"));
             Assert.IsTrue(commandLineArray.Contains("/UseVsixExtensions"));
             Assert.IsTrue(commandLineArray.Contains("/settings//.RunSettings"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -989,14 +965,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
             // Verify
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.LegacySettings, out var legacySettingsString));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.LegacySettingElements, out var legacySettingsString));
             StringAssert.Equals("Deployment, Scripts", legacySettingsString);
 
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
             Assert.IsFalse((bool)testSettingsUsed);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -1038,9 +1011,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             // Verify
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
             Assert.IsTrue((bool)testSettingsUsed);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -1094,9 +1064,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]

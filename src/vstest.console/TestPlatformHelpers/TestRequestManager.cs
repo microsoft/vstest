@@ -294,9 +294,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
             
-            if (InferRunSettingsHelper.TryGetLegacySettings(runsettings, out List<string> legacySettings))
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out List<string> legacySettings))
             {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettings, string.Join(",", legacySettings));
+                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettingElements, string.Join(",", legacySettings));
             }
         }
 

@@ -494,28 +494,40 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
-        public void TryGetLegacySettingsShouldReturnNull()
+        public void TryGetLegacySettingsForRunSettingsWithoutLegacySettingsShouldReturnFalse()
         {
             string runSettingsXml = @"<RunSettings>
                                       </RunSettings>";
             
-            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettings(runSettingsXml, out List<string> legacySettings));
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
         }
 
         [TestMethod]
-        public void TryGetLegacySettingsShouldReturnNull2()
+        public void TryGetLegacySettingsForRunSettingsWithInvalidLegacySettingsShouldReturnFalse()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                        <LegacySettings>
+                                            <Foo>
+                                        </LegacySettings>
+                                      </RunSettings>";
+
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+        }
+
+        [TestMethod]
+        public void TryGetLegacySettingsForRunSettingsWithEmptyLegacySettingsShouldReturnTrueAndEmptyListForLegacySettingElements()
         {
             string runSettingsXml = @"<RunSettings>
                                         <LegacySettings>
                                         </LegacySettings>
                                       </RunSettings>";
 
-            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettings(runSettingsXml, out List<string> legacySettings));
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
             Assert.AreEqual(0, legacySettings.Count);
         }
 
         [TestMethod]
-        public void TryGetLegacySettingsShouldReturnNull3()
+        public void TryGetLegacySettingsForRunSettingsWithValidLegacySettingsShouldReturnTrueAndListForLegacySettingElements()
         {
             string runSettingsXml = @"<RunSettings>
                                        <LegacySettings>
@@ -528,7 +540,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             var expectedList = new List<string> { "Deployment", "Scripts" };
 
-            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettings(runSettingsXml, out List<string> legacySettings));
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
             CollectionAssert.AreEqual(expectedList, legacySettings);
         }
 

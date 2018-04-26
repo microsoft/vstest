@@ -286,14 +286,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Returns the list of elements inside legacy settings
+        /// Returns true if legacy settings node is present in runsettings
         /// </summary>
-        /// <param name="runsettingsXml"></param>
-        /// <param name="legacySettings"></param>
+        /// <param name="runsettingsXml">The run settings xml string</param>
+        /// <param name="legacySettingElements">The list of elements inside legacy settings</param>
         /// <returns></returns>
-        public static bool TryGetLegacySettings(string runsettingsXml, out List<string> legacySettings)
+        public static bool TryGetLegacySettingElements(string runsettingsXml, out List<string> legacySettingElements)
         {
-            legacySettings = new List<string>();
+            legacySettingElements = new List<string>();
             try
             {
                 using (var stream = new StringReader(runsettingsXml))
@@ -313,13 +313,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                     while (childNodes.MoveNext())
                     {
-                        legacySettings.Add(childNodes.Current.Name);
+                        legacySettingElements.Add(childNodes.Current.Name);
                     }
                 }
             }
             catch(Exception ex)
             {
-                EqtTrace.Error("Error while trying to read legacy settings. Message:", ex.Message);
+                EqtTrace.Error("Error while trying to read legacy settings. Message: {0}", ex.ToString());
                 return false;
             }
 
