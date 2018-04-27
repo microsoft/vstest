@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">При инициализации средства ведения журнала с URI "{0}" возникло исключение. Средство ведения журнала не будет использоваться. Исключение: {1}</target>
-        <note></note>
+        <target state="translated">Возникло исключение при инициализации средства ведения журнала с {0}: "{1}". Средство ведения журнала не будет использоваться. Исключение: {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Возникло исключение во время инициализации средства ведения журнала с URI «{0}».  Средства ведения журнала не будет использоваться.  Исключение: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">Не удалось найти средство ведения журнала тестирования с URI или понятным именем "{0}".</target>
-        <note></note>
+        <target state="translated">Не удалось найти средство ведения журнала тестирования с AssemblyQualifiedName, URI или FriendlyName "{0}".</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удалось найти средство ведения журнала тестирования с URI или FriendlyName «{0}».</target>
         </alt-trans>
