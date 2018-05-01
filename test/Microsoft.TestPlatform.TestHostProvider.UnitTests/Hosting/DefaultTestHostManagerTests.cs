@@ -258,6 +258,80 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnExtensionsListFromSourceFolderIfUseSpecifedAdapterLocationsIsTrue()
+        {
+            List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll", @"C:\Source2\source2.dll" };
+
+            List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            List<string> extensionsList2 = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source2\ext2.TestAdapter.dll" };
+
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[1])).Returns(new Version(5, 5));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[0])).Returns(new Version(2, 2));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[1])).Returns(new Version(5, 0));
+
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifiedAdapterLocations>true</UseSpecifiedAdapterLocations></RunConfiguration> </RunSettings>");
+            List<string> currentList = new List<string> { @"FooExtension.dll" };
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();
+
+            // Verify
+            List<string> expectedList = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            CollectionAssert.AreEqual(expectedList, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnExtensionsListFromSourceFolderAndInputFromIDEIfUseSpecifedAdapterLocationsIsFalse()
+        {
+            List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll", @"C:\Source2\source2.dll" };
+
+            List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            List<string> extensionsList2 = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source2\ext2.TestAdapter.dll" };
+
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[1])).Returns(new Version(5, 5));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[0])).Returns(new Version(2, 2));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList2[1])).Returns(new Version(5, 0));
+
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifiedAdapterLocations>false</UseSpecifiedAdapterLocations></RunConfiguration> </RunSettings>");
+            List<string> currentList = new List<string> { @"FooExtension.dll" };
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();
+
+            // Verify
+            List<string> expectedList = new List<string> { @"FooExtension.dll", @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            CollectionAssert.AreEqual(expectedList, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldNotReturnExtensionsListFromExternalIfNoAdapterPresentNearSourceAndUseSpecifedAdapterLocationsIsTrue()
+        {
+            List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll", @"C:\Source2\source2.dll" };
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><UseSpecifiedAdapterLocations>true</UseSpecifiedAdapterLocations></RunConfiguration> </RunSettings>");
+            List<string> currentList = new List<string> { @"FooExtension.dll" };
+
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(new List<string>());
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(new List<string>());
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();
+
+            Assert.AreEqual(0, resultExtensions.Count());
+        }
+
+        [TestMethod]
         public void GetTestPlatformExtensionsShouldReturnPathTheHigherVersionedFileExtensions()
         {
             List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
