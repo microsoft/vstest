@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// Constructor
         /// </summary>
         /// <param name="message">Error message</param>
+        /// <param name="isCritical">Whether to continue execution with warning or stop with error.</param>
         internal VanguardException(string message, bool isCritical = false)
             : base(message)
         {

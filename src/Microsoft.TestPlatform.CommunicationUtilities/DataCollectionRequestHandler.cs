@@ -205,6 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </param>
         public void SendDataCollectionMessage(DataCollectionMessageEventArgs args)
         {
+            EqtTrace.Verbose("DataCollectionRequestHandler.SendDataCollectionMessage: Sending message: {0}, friendlyName: {1}", args.Message, args.FriendlyName);
             this.communicationManager.SendMessage(MessageType.DataCollectionMessage, args);
         }
 

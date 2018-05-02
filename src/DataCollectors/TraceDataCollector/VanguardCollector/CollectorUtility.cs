@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.Collector
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using System.Reflection;
     using System.Xml;
@@ -100,7 +101,7 @@ namespace Microsoft.VisualStudio.Collector
             var vanguardPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), VanguardPath);
             if (!File.Exists(vanguardPath))
             {
-                throw new VanguardException(Resources.ErrorNoVanguard);
+                throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VangurdNotFound, vanguardPath));
             }
 
             return vanguardPath;

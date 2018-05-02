@@ -19,18 +19,6 @@ namespace Microsoft.VisualStudio.TraceCollector
     /// </remarks>
     public abstract class BaseDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
-        private static List<BaseDataCollector> collectors = new List<BaseDataCollector>();
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseDataCollector"/> class.
-        /// Internal constructor to prevent outside construction.
-        /// </summary>
-        internal BaseDataCollector()
-        {
-            EqtTrace.Info("BaseDataCollector.ctor: adding datacollector: {0}", this);
-            collectors.Add(this);
-        }
-
         ~BaseDataCollector()
         {
             this.Dispose(false);
@@ -43,11 +31,6 @@ namespace Microsoft.VisualStudio.TraceCollector
         internal IDataCollectionSink DataSink { get; private set; }
 
         internal IDataCollectionAgentContext AgentContext { get; private set; }
-
-        protected static ReadOnlyCollection<BaseDataCollector> Collectors
-        {
-            get { return collectors.AsReadOnly(); }
-        }
 
         protected bool IsDisposed { get; private set; }
 
@@ -188,8 +171,6 @@ namespace Microsoft.VisualStudio.TraceCollector
                     this.DataSink.SendFileCompleted -=
                         new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
                 }
-
-                collectors.Remove(this);
 
                 this.UnsubscribeFromEvents();
                 this.IsDisposed = true;

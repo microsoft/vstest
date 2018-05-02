@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.Coverage
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Globalization;
@@ -13,7 +12,9 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Text;
     using System.Threading;
     using System.Xml;
+    using Interfaces;
     using Microsoft.VisualStudio.Collector;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
@@ -22,13 +23,8 @@ namespace Microsoft.VisualStudio.Coverage
     /// <summary>
     /// A managed wrapper for Vanguard
     /// </summary>
-    internal class Vanguard : IDisposable
+    internal class Vanguard : IVangurd
     {
-        /// <summary>
-        /// Time limit for waiting the vanguard event
-        /// </summary>
-        private const uint WaitLimit = 90000;
-
         /// <summary>
         /// Return value of WaitForSingleObject, which means the object is signaled.
         /// </summary>
@@ -75,11 +71,6 @@ namespace Microsoft.VisualStudio.Coverage
         private string outputName;
 
         /// <summary>
-        /// Entry points
-        /// </summary>
-        private List<string> entryPoints;
-
-        /// <summary>
         /// Helper object to manage child process lifetimes
         /// </summary>
         private ProcessJobObject jobObject;
@@ -93,39 +84,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// Data collection context
         /// </summary>
         private DataCollectionContext context;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Vanguard"/> class.
-        /// </summary>
-        /// <param name="sessionName">Session name</param>
-        /// <param name="configurationFileName">Configuration file name</param>
-        /// <param name="configuration">Configuration XML element</param>
-        /// <param name="entryPoints">Entry points</param>
-        /// <param name="logger">Data collection logger.</param>
-        public Vanguard(
-            string sessionName,
-            string configurationFileName,
-            XmlElement configuration,
-            IEnumerable<string> entryPoints,
-            IDataCollectionLogger logger)
-        {
-            this.sessionName = sessionName;
-            this.configurationFileName = configurationFileName;
-            this.configuration = configuration;
-            this.logger = logger;
-            this.entryPoints = new List<string>();
-            this.entryPoints.AddRange(entryPoints);
-            this.CreateProcessJobObject();
-        }
-
-        public Vanguard(
-            string sessionName,
-            string configurationFileName,
-            XmlElement configuration,
-            IEnumerable<string> entryPoints)
-            : this(sessionName, configurationFileName, configuration, entryPoints, null)
-        {
-        }
 
         /// <summary>
         /// Commands definition for vanguard
@@ -150,26 +108,25 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Gets entry points
-        /// </summary>
-        public List<string> EntryPoints
-        {
-            get { return this.entryPoints; }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether whether vanguard is running
         /// </summary>
-        public bool IsRunning
+        private bool IsRunning
         {
             get { return this.vanguardProcess != null && !this.vanguardProcess.HasExited; }
         }
 
-        /// <summary>
-        /// Update the configuration and save it to a temp folder
-        /// </summary>
-        public void InitializeConfiguration()
+        /// <inheritdoc />
+        public void Initialize(
+            string sessionName,
+            string configurationFileName,
+            XmlElement configuration,
+            IDataCollectionLogger logger)
         {
+            this.sessionName = sessionName;
+            this.configurationFileName = configurationFileName;
+            this.configuration = configuration;
+            this.logger = logger;
+            this.CreateProcessJobObject();
             using (var writer = new StreamWriter(new FileStream(this.configurationFileName, FileMode.Create)))
             {
                 writer.WriteLine(this.configuration.OuterXml);
@@ -185,11 +142,6 @@ namespace Microsoft.VisualStudio.Coverage
         {
             EqtTrace.Info("Vanguard.Start: Starting CodeCoverage.exe for coverage file: {0} datacollection session id: {1}", outputName, context.SessionId);
             this.UnregisterAll();
-            foreach (var entryPoint in this.entryPoints)
-            {
-                this.Register(entryPoint, this.configurationFileName);
-            }
-
             this.Stop();
             this.vanguardProcessExitEvent = new ManualResetEvent(false);
             this.outputName = outputName;
@@ -211,13 +163,9 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public virtual void Stop()
         {
+            EqtTrace.Info("Vanguard.Stop: Stoping Vanguard.");
             if (this.IsRunning)
             {
-                foreach (var entryPoint in this.entryPoints)
-                {
-                    this.Unregister(entryPoint);
-                }
-
                 Process stopper =
                     this.StartVanguardProcess(
                         GenerateCommandLine(Command.Shutdown, this.sessionName, null, null, null),
@@ -235,88 +183,65 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Get current coverage data from the logger
-        /// </summary>
-        /// <param name="outputName">Output file to write coverage data to</param>
-        public void GetCoverageData(string outputName)
-        {
-            using (Process process = this.StartVanguardProcess(
-                GenerateCommandLine(Command.GetCoverageData, this.sessionName, outputName, null, null), true, false))
-            {
-                if (process.ExitCode != 0)
-                {
-                    throw new VanguardException(process.StandardError.ReadToEnd());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Register an entry point
-        /// </summary>
-        /// <param name="entryPoint">Entry point</param>
-        /// <param name="configFileName">Config file name.</param>
-        public virtual void Register(string entryPoint, string configFileName)
-        {
-            Process process = this.StartVanguardProcess(
-                GenerateCommandLine(Command.Register, this.sessionName, null, configFileName, entryPoint), true);
-            if (process.ExitCode != 0)
-            {
-                throw new VanguardException(process.StandardError.ReadToEnd(), true);
-            }
-
-            process.Dispose();
-        }
-
-        /// <summary>
-        /// Unregister an entry point
-        /// </summary>
-        /// <param name="entryPoint">Entry point</param>
-        public virtual void Unregister(string entryPoint)
-        {
-            Process process =
-                this.StartVanguardProcess(
-                    GenerateCommandLine(Command.Unregister, this.sessionName, null, null, entryPoint), true);
-            if (process.ExitCode != 0)
-            {
-                throw new VanguardException(process.StandardError.ReadToEnd(), true);
-            }
-
-            process.Dispose();
-        }
-
-        /// <summary>
-        /// Unregister all entry points
-        /// </summary>
-        public virtual void UnregisterAll()
-        {
-            EqtTrace.Info("Vanguard.UnregisterAll: Sending unregister all command.");
-            Process process = this.StartVanguardProcess(
-                GenerateCommandLine(
-                    Command.UnregisterAll,
-                    DynamicCoverageDataCollectorImpl.MagicMtmSessionPrefix + "*",
-                    null,
-                    null,
-                    null),
-                true);
-            if (process.ExitCode != 0)
-            {
-                EqtTrace.Warning("Vanguard.UnregisterAll: Process exited with non zero.");
-            }
-
-            process.Dispose();
-        }
-
-        /// <summary>
         /// IDisposable implementation
         /// </summary>
         public virtual void Dispose()
         {
+            EqtTrace.Info("Vanguard.Dispose: Disposing vanguard process.");
             if (this.vanguardProcess != null)
             {
                 this.vanguardProcess.Dispose();
                 this.vanguardProcess = null;
             }
         }
+
+        /// <summary>
+        /// CreateEvent API
+        /// </summary>
+        /// <param name="lpEventAttributes">A point to SECURITY_ATTRIBUTES structure</param>
+        /// <param name="bManualReset">Whether the event needs manual reset</param>
+        /// <param name="bInitialState">Initial state of the event</param>
+        /// <param name="lpName">Name of the event</param>
+        /// <returns>Event handle</returns>
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        private static extern IntPtr CreateEvent(
+            IntPtr lpEventAttributes,
+            bool bManualReset,
+            bool bInitialState,
+            string lpName);
+
+        /// <summary>
+        /// Waits until one or all of the specified objects are in the signaled state or the time-out interval elapses.
+        /// </summary>
+        /// <param name="nCount">Number of handles</param>
+        /// <param name="lpHandles">Object handles</param>
+        /// <param name="bWaitAll">Whether to wait all handles</param>
+        /// <param name="dwMilliseconds">Time-out interval</param>
+        /// <returns>Wait result</returns>
+        [DllImport("kernel32.dll")]
+        private static extern uint WaitForMultipleObjects(
+            uint nCount,
+            IntPtr[] lpHandles,
+            bool bWaitAll,
+            uint dwMilliseconds);
+
+        /// <summary>
+        /// Waitd until the object is in signaled state or the time-out interval elapses.
+        /// </summary>
+        /// <param name="hHandle">"The handle"</param>
+        /// <param name="dwMilliseconds">"The dwMilliseconds"</param>
+        /// <returns>Returns int.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        /// <summary>
+        /// Close a handle
+        /// </summary>
+        /// <param name="hObject">Object handle</param>
+        /// <returns>True if succeeded</returns>
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool CloseHandle(IntPtr hObject);
 
         /// <summary>
         /// Generate a command line string, given some parameters
@@ -327,7 +252,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="configurationFileName">Configuration file name</param>
         /// <param name="entryPoint">Entry point name for register/unregister</param>
         /// <returns>Command line string</returns>
-        protected static string GenerateCommandLine(
+        private static string GenerateCommandLine(
             Command command,
             string sessionName,
             string outputName,
@@ -400,22 +325,41 @@ namespace Microsoft.VisualStudio.Coverage
             return builder.ToString();
         }
 
-        /// <summary>
-        /// Helper for waiting for a given event
-        /// </summary>
-        /// <param name="eventName">The eventName.</param>
-        protected void WaitForEvent(string eventName)
+        private static int GetProcessId(Process process)
         {
-            IntPtr waitEvent = CreateEvent(IntPtr.Zero, true, false, eventName);
-            if (waitEvent != IntPtr.Zero)
+            var id = 0;
+            try
             {
-                uint result = WaitForSingleObject(waitEvent, WaitLimit);
-                CloseHandle(waitEvent);
-                if (result != WaitObject0)
-                {
-                    throw new VanguardException(Resources.GeneralErrorLaunchVanguard);
-                }
+                id = process.Id;
             }
+            catch (Exception ex)
+            {
+                EqtTrace.Info("Vanguard.GetProcessId: Fail to get process id with exception: {0}", ex);
+            }
+
+            return id;
+        }
+
+        /// <summary>
+        /// Unregister all entry points
+        /// </summary>
+        private void UnregisterAll()
+        {
+            EqtTrace.Info("Vanguard.UnregisterAll: Sending unregister all command.");
+            Process process = this.StartVanguardProcess(
+                GenerateCommandLine(
+                    Command.UnregisterAll,
+                    DynamicCoverageDataCollectorImpl.MagicMtmSessionPrefix + "*",
+                    null,
+                    null,
+                    null),
+                true);
+            if (process.ExitCode != 0)
+            {
+                EqtTrace.Warning("Vanguard.UnregisterAll: Process exited with non zero.");
+            }
+
+            process.Dispose();
         }
 
         /// <summary>
@@ -425,7 +369,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="wait">Whether to wait until the process exits</param>
         /// <param name="standardErrorAsynchronousCall">The standardErrorAsynchronousCall. </param>
         /// <returns>Process instance of vanguard</returns>
-        protected Process StartVanguardProcess(
+        private Process StartVanguardProcess(
             string commandLine,
             bool wait,
             bool standardErrorAsynchronousCall = false)
@@ -449,8 +393,8 @@ namespace Microsoft.VisualStudio.Coverage
 
             if (standardErrorAsynchronousCall)
             {
-                process.ErrorDataReceived += new DataReceivedEventHandler(this.LoggerProcessErrorDataReceived);
-                process.Exited += new System.EventHandler(this.LoggerProcessExited);
+                process.ErrorDataReceived += this.LoggerProcessErrorDataReceived;
+                process.Exited += this.LoggerProcessExited;
             }
 
             process.Start();
@@ -470,65 +414,12 @@ namespace Microsoft.VisualStudio.Coverage
                 this.jobObject.AddProcess(process.SafeHandle.DangerousGetHandle());
             }
 
-            try
-            {
-                EqtTrace.Info("Vanguard.StartVanguardProcess: Started Vangaurd process id :{0}", process.Id);
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Info("Vanguard.StartVanguardProcess: Fail to log vangaurd process id with exception: {0}", ex);
-            }
+            EqtTrace.Info(
+                "Vanguard.StartVanguardProcess: Started Vangaurd process id :{0}",
+                Vanguard.GetProcessId(process));
 
             return process;
         }
-
-        /// <summary>
-        /// CreateEvent API
-        /// </summary>
-        /// <param name="lpEventAttributes">A point to SECURITY_ATTRIBUTES structure</param>
-        /// <param name="bManualReset">Whether the event needs manual reset</param>
-        /// <param name="bInitialState">Initial state of the event</param>
-        /// <param name="lpName">Name of the event</param>
-        /// <returns>Event handle</returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr CreateEvent(
-            IntPtr lpEventAttributes,
-            bool bManualReset,
-            bool bInitialState,
-            string lpName);
-
-        /// <summary>
-        /// Waits until one or all of the specified objects are in the signaled state or the time-out interval elapses.
-        /// </summary>
-        /// <param name="nCount">Number of handles</param>
-        /// <param name="lpHandles">Object handles</param>
-        /// <param name="bWaitAll">Whether to wait all handles</param>
-        /// <param name="dwMilliseconds">Time-out interval</param>
-        /// <returns>Wait result</returns>
-        [DllImport("kernel32.dll")]
-        private static extern uint WaitForMultipleObjects(
-            uint nCount,
-            IntPtr[] lpHandles,
-            bool bWaitAll,
-            uint dwMilliseconds);
-
-        /// <summary>
-        /// Waitd until the object is in signaled state or the time-out interval elapses.
-        /// </summary>
-        /// <param name="hHandle">"The handle"</param>
-        /// <param name="dwMilliseconds">"The dwMilliseconds"</param>
-        /// <returns>Returns int.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
-
-        /// <summary>
-        /// Close a handle
-        /// </summary>
-        /// <param name="hObject">Object handle</param>
-        /// <returns>True if succeeded</returns>
-        [DllImport("kernel32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CloseHandle(IntPtr hObject);
 
         /// <summary>
         /// Wait until vanguard initialization is finished
@@ -543,8 +434,11 @@ namespace Microsoft.VisualStudio.Coverage
                 GlobalEventNamePrefix + this.sessionName + "_RUNNING");
             if (runningEvent != IntPtr.Zero)
             {
+                var timeout = EnvironmentHelper.GetConnectionTimeout();
+                uint waitTimeout = (uint)timeout * 1000; // Time limit for waiting the vanguard event
+
                 IntPtr[] handles = new IntPtr[] { runningEvent, this.vanguardProcess.SafeHandle.DangerousGetHandle() };
-                uint result = WaitForMultipleObjects((uint)handles.Length, handles, false, WaitLimit);
+                uint result = WaitForMultipleObjects((uint)handles.Length, handles, false, waitTimeout);
                 CloseHandle(runningEvent);
                 switch (result)
                 {
@@ -555,8 +449,8 @@ namespace Microsoft.VisualStudio.Coverage
                         // Process exited, something wrong happened
                         // we have already set to read messages asynchronously, so calling this.vanguardProcess.StandardError.ReadToEnd() which is synchronous is wrong.
                         // throw new VanguardException(string.Format(CultureInfo.CurrentCulture, Resources.ErrorLaunchVanguard, this.vanguardProcess.StandardError.ReadToEnd()));
-                        EqtTrace.Error("Vanguard.Wait: CodeCoverage.exe failed to initialize.");
-                        throw new VanguardException(Resources.GeneralErrorLaunchVanguard, true);
+                        EqtTrace.Error("Vanguard.Wait: CodeCoverage.exe failed to receive running event in {0} seconds", timeout);
+                        throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.NoRunningEventFromVanguard, timeout, EnvironmentHelper.VstestConnectionTimeout), true);
                 }
             }
 
@@ -586,7 +480,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event args. </param>
         private void LoggerProcessExited(object sender, EventArgs e)
         {
-            EqtTrace.Info("Vanguard.LoggerProcessExited: Vangaurd process exited.");
+            EqtTrace.Info("Vanguard.LoggerProcessExited: Vangaurd process exit callback started.");
             if (this.vanguardProcess != null)
             {
                 if (this.vanguardProcess.HasExited == true && this.vanguardProcess.ExitCode != 0)

@@ -62,56 +62,11 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use to collect code coverage data for ASP.NET applications running on IIS. Choose &apos;Configure&apos; to provide location of symbol files..
+        ///   Looks up a localized string similar to Failed to create directory: {0} with error:{1}.
         /// </summary>
-        internal static string CodeCoverageCollectorDescription {
+        internal static string FailedToCreateDirectory {
             get {
-                return ResourceManager.GetString("CodeCoverageCollectorDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Code Coverage.
-        /// </summary>
-        internal static string CodeCoverageCollectorFriendlyName {
-            get {
-                return ResourceManager.GetString("CodeCoverageCollectorFriendlyName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to launch CodeCoverage.exe with the following error. No code coverage data will be collected: {0}.
-        /// </summary>
-        internal static string ErrorLaunchVanguard {
-            get {
-                return ResourceManager.GetString("ErrorLaunchVanguard", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No application under test is specified..
-        /// </summary>
-        internal static string ErrorNoEntryPoint {
-            get {
-                return ResourceManager.GetString("ErrorNoEntryPoint", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot find CodeCoverage.exe..
-        /// </summary>
-        internal static string ErrorNoVanguard {
-            get {
-                return ResourceManager.GetString("ErrorNoVanguard", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The adapter &apos;Code Coverage&apos; will not be used for this test run as Microsoft Test Manager is not running as administrator. To collect code coverage, re-start Microsoft Test Manager by choosing to &apos;Run as Administrator&apos; and then start the test run..
-        /// </summary>
-        internal static string ErrorRegisterExecutable {
-            get {
-                return ResourceManager.GetString("ErrorRegisterExecutable", resourceCulture);
+                return ResourceManager.GetString("FailedToCreateDirectory", resourceCulture);
             }
         }
         
@@ -125,11 +80,20 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to execute command {0} on Lab Agent..
+        ///   Looks up a localized string similar to Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout..
         /// </summary>
-        internal static string LabAgentTaskExecutionFailed {
+        internal static string NoRunningEventFromVanguard {
             get {
-                return ResourceManager.GetString("LabAgentTaskExecutionFailed", resourceCulture);
+                return ResourceManager.GetString("NoRunningEventFromVanguard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot find CodeCoverage.exe at {0}.
+        /// </summary>
+        internal static string VangurdNotFound {
+            get {
+                return ResourceManager.GetString("VangurdNotFound", resourceCulture);
             }
         }
     }

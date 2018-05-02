@@ -4,14 +4,15 @@
 namespace Microsoft.VisualStudio.Coverage
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
     using System.Xml;
+    using Collector;
+    using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
+    using TraceCollector;
     using TraceDataCollector.Resources;
 
     /// <summary>
@@ -123,11 +124,6 @@ namespace Microsoft.VisualStudio.Coverage
         private string coverageFileName;
 
         /// <summary>
-        /// Vanguard object
-        /// </summary>
-        private Vanguard vanguard;
-
-        /// <summary>
         /// Logger
         /// </summary>
         private IDataCollectionLogger logger;
@@ -135,7 +131,17 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Data sink
         /// </summary>
-        private Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink;
+        private TraceCollector.IDataCollectionSink dataSink;
+
+        /// <summary>
+        /// Directory helper
+        /// </summary>
+        private IDirectoryHelper directoryHelper;
+
+        /// <summary>
+        /// File helper
+        /// </summary>
+        private IFileHelper fileHelper;
 
         /// <summary>
         /// Folder to store temporary files
@@ -147,6 +153,18 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private XmlElement configurationElement;
 
+        public DynamicCoverageDataCollectorImpl()
+        : this(new Vanguard(), new DirectoryHelper(), new FileHelper())
+        {
+        }
+
+        internal DynamicCoverageDataCollectorImpl(IVangurd vanguard, IDirectoryHelper directoryHelper, IFileHelper fileHelper)
+        {
+            this.Vanguard = vanguard;
+            this.directoryHelper = directoryHelper;
+            this.fileHelper = fileHelper;
+        }
+
         /// <summary>
         /// Gets session name
         /// </summary>
@@ -155,10 +173,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Gets vanguard instance
         /// </summary>
-        protected Vanguard Vanguard
-        {
-            get { return this.vanguard; }
-        }
+        protected IVangurd Vanguard { get; private set; }
 
         /// <summary>
         /// Initialize
@@ -168,17 +183,18 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="logger">Logger</param>
         public virtual void Initialize(
             XmlElement configurationElement,
-            Microsoft.VisualStudio.TraceCollector.IDataCollectionSink dataSink,
+            TraceCollector.IDataCollectionSink dataSink,
             IDataCollectionLogger logger)
         {
-            if (configurationElement == null || string.IsNullOrEmpty(configurationElement.InnerXml))
+            EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
+            if (string.IsNullOrEmpty(configurationElement?.InnerXml))
             {
                 // Add default configuration specific to CodeCoverage.
                 var doc = new XmlDocument();
                 using (
                     var xmlReader = XmlReader.Create(
                         new StringReader(DefaultCodeCoverageSettings),
-                        new XmlReaderSettings() { /*XmlResolver = null,*/ CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
+                        new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
                     doc.Load(xmlReader);
                 }
@@ -193,12 +209,12 @@ namespace Microsoft.VisualStudio.Coverage
             this.dataSink.SendFileCompleted += this.OnSendFileCompletedEvent;
 
             // the magic prefix is used by UnregisterAll to tell MTM registered from manually registered entries
-            this.SessionName = MagicMtmSessionPrefix + Guid.NewGuid().ToString();
+            this.SessionName = MagicMtmSessionPrefix + Guid.NewGuid();
+
             this.tempPath = Path.Combine(Path.GetTempPath(), this.SessionName);
-            if (!this.CreateSessionDirectory())
-            {
-                return;
-            }
+            this.directoryHelper.CreateDirectory(this.tempPath);
+
+            this.SetCoverageFileName();
 
             this.PrepareVanguardProcess();
         }
@@ -208,11 +224,10 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         public virtual void Dispose()
         {
-            // Make sure vanguard is shut down
-            if (this.vanguard != null)
+            if (this.Vanguard != null)
             {
-                this.vanguard.Stop();
-                this.vanguard.Dispose();
+                this.Vanguard.Stop();
+                this.Vanguard.Dispose();
             }
 
             if (this.dataSink != null)
@@ -243,65 +258,42 @@ namespace Microsoft.VisualStudio.Coverage
             this.StopVanguard(e.Context);
         }
 
-        internal void InitializeBeforeSessionStart()
-        {
-            if (!this.CreateSessionDirectory())
-            {
-                return;
-            }
-
-            this.PrepareVanguardProcess();
-        }
-
-        /// <summary>
-        /// Initialize vanguard configuration
-        /// </summary>
-        internal virtual void InitializeConfiguration()
-        {
-            this.Vanguard.InitializeConfiguration();
-        }
-
         /// <summary>
         /// Start vanguard
         /// </summary>
         /// <param name="context">Context</param>
         protected void StartVanguard(DataCollectionContext context)
         {
-            if (this.vanguard != null)
+            if (this.Vanguard != null)
             {
                 string folder = Path.Combine(this.tempPath, Guid.NewGuid().ToString());
                 try
                 {
-                    Directory.CreateDirectory(folder);
+                    this.directoryHelper.CreateDirectory(folder);
                 }
-                catch (IOException)
+                catch (Exception ex)
                 {
-                    this.logger.LogWarning(context, Resources.GeneralErrorLaunchVanguard);
-                    return;
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    this.logger.LogWarning(context, Resources.GeneralErrorLaunchVanguard);
-                    return;
+                    this.logger.LogError(
+                        context,
+                        string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, folder, ex));
+
+                    throw;
                 }
 
-                string outputName = Path.Combine(folder, this.coverageFileName);
+                string outputCoverageFilePath = Path.Combine(folder, this.coverageFileName);
                 try
                 {
-                    this.vanguard.Start(outputName, context);
+                    this.Vanguard.Start(outputCoverageFilePath, context);
                 }
                 catch (VanguardException ex)
                 {
                     if (ex.IsCritical)
                     {
-                        this.logger.LogError(context, ex.Message);
+                        this.logger.LogError(context, ex);
                         throw;
                     }
-                    else
-                    {
-                        this.logger.LogWarning(context, ex.Message);
-                        return;
-                    }
+
+                    this.logger.LogWarning(context, ex.Message);
                 }
             }
         }
@@ -313,63 +305,16 @@ namespace Microsoft.VisualStudio.Coverage
         protected void StopVanguard(DataCollectionContext context)
         {
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.StopVanguard: Calling Stop Vanguard. datacollection context sessionID: {0}", context.SessionId);
-            if (this.vanguard != null)
+            if (this.Vanguard != null)
             {
-                this.vanguard.Stop();
+                this.Vanguard.Stop();
 
-                if (File.Exists(this.vanguard.OutputName))
+                if (this.fileHelper.Exists(this.Vanguard.OutputName))
                 {
-                    this.dataSink.SendFileAsync(context, this.vanguard.OutputName, false);
+                    this.dataSink.SendFileAsync(context, this.Vanguard.OutputName, false);
                 }
 
-                this.vanguard = null;
-            }
-        }
-
-        /// <summary>
-        /// Sends intermediate coverage data to the client
-        /// </summary>
-        /// <param name="context">The context.</param>
-        protected void GetCoverageData(DataCollectionContext context)
-        {
-            if (this.vanguard != null)
-            {
-                string outputName = null;
-
-                try
-                {
-                    // Create unique path for the output file
-                    string folder = Path.Combine(this.tempPath, Guid.NewGuid().ToString());
-
-                    Directory.CreateDirectory(folder);
-
-                    outputName = Path.Combine(folder, GenerateCoverageFileName());
-
-                    EqtTrace.Verbose("Calling GetCoverageData with output path {0}", outputName);
-
-                    this.vanguard.GetCoverageData(outputName);
-                }
-                catch (IOException ex)
-                {
-                    this.logger.LogWarning(context, ex.Message);
-                    return;
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    this.logger.LogWarning(context, ex.Message);
-                    return;
-                }
-                catch (VanguardException ex)
-                {
-                    // We do not want to throw errors from here because that will cause the collector to get disposed
-                    this.logger.LogWarning(context, ex.Message);
-                    return;
-                }
-
-                if (File.Exists(outputName))
-                {
-                    this.dataSink.SendFileAsync(context, outputName, false);
-                }
+                this.Vanguard = null;
             }
         }
 
@@ -397,47 +342,33 @@ namespace Microsoft.VisualStudio.Coverage
                 DateTime.Now.ToString("yyyy-MM-dd.HH_mm_ss", CultureInfo.InvariantCulture));
         }
 
-        private bool CreateSessionDirectory()
+        private void SetCoverageFileName()
         {
-            try
-            {
-                Directory.CreateDirectory(this.tempPath);
-            }
-            catch (IOException)
-            {
-                return false;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private void PrepareVanguardProcess()
-        {
-            string configurationFileName = Path.Combine(this.tempPath, VanguardConfigFileName);
             XmlElement coverageFileNameElement = this.configurationElement[CoverageFileSettingName];
             this.coverageFileName = coverageFileNameElement != null
                 ? coverageFileNameElement.InnerText
                 : GenerateCoverageFileName();
-            XmlElement config = this.configurationElement[RootName];
+        }
 
-            this.vanguard = new Vanguard(this.SessionName, configurationFileName, config, new List<string>(), this.logger);
+        private void PrepareVanguardProcess()
+        {
+            EqtTrace.Info("DynamicCoverageDataCollectorImpl.PrepareVanguardProcess: Preparing Vanguard process.");
+
+            XmlElement config = this.configurationElement[RootName];
+            string configurationFileName = Path.Combine(this.tempPath, VanguardConfigFileName);
+
+            this.Vanguard.Initialize(this.SessionName, configurationFileName, config, this.logger);
         }
 
         private void CleanupDirectory()
         {
             try
             {
-                Directory.Delete(this.tempPath, true);
+                this.directoryHelper.Delete(this.tempPath, true);
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-            }
-            catch (UnauthorizedAccessException)
-            {
+                EqtTrace.Warning("DynamicCoverageDataCollectorImpl.CleanupDirectory:Failed to delete directory: {0}, with exception: {1}", this.tempPath, ex);
             }
         }
     }

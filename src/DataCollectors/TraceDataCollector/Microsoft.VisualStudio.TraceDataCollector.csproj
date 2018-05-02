@@ -25,6 +25,12 @@
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -32,10 +38,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Resources.resx">
+    <None Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    </None>
   </ItemGroup>
   
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />

@@ -40,12 +40,6 @@ namespace Microsoft.VisualStudio.Coverage
         private string framework;
         private string targetPlatform;
 
-        /// <summary>
-        /// Boolean variable to track if testcase events were unsubscribed in SessionStart
-        /// so that these events can be (re)subscribed to in SessionEnd
-        /// </summary>
-        private bool testcaseEventsUnsubscribed = false;
-
         public DynamicCoverageDataCollector()
         {
         }
@@ -178,13 +172,6 @@ namespace Microsoft.VisualStudio.Coverage
         private void SessionEnd(object sender, SessionEndEventArgs e)
         {
             this.implementation.SessionEnd(sender, e);
-            if (this.testcaseEventsUnsubscribed)
-            {
-                // Resubscribing to the Testcase events. If in the next session, if a data collector is added which needs TestCase events
-                // and code coverage data collector is not reloaded, base class will not be subscribed to TestCase events.
-                this.SubscribeToTestCaseEvents();
-                this.testcaseEventsUnsubscribed = false;
-            }
         }
 
         /// <summary>
@@ -194,18 +181,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event arguments</param>
         private void SessionStart(object sender, SessionStartEventArgs e)
         {
-            // If DynamicCodeCoverage is the only collector loaded, then we can safely unsubscribe from test case events.
-            // The events are not sent - which improves performance.
-            // If other collectors are present and code coverage data collector owns collection plan, we do not want to
-            // unsubscribe from these events. Only the data collector which owns collection plan can subscribe to these events.
-            if (BaseDataCollector.Collectors.Count == 1)
-            {
-                this.UnsubscribeFromTestCaseEvents();
-                this.testcaseEventsUnsubscribed = true;
-            }
-
-            this.implementation.InitializeBeforeSessionStart();
-            this.implementation.InitializeConfiguration();
             this.implementation.SessionStart(sender, e);
         }
 

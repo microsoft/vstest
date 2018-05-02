@@ -117,32 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CodeCoverageCollectorDescription" xml:space="preserve">
-    <value>Use to collect code coverage data for ASP.NET applications running on IIS. Choose 'Configure' to provide location of symbol files.</value>
-  </data>
-  <data name="CodeCoverageCollectorFriendlyName" xml:space="preserve">
-    <value>Code Coverage</value>
-  </data>
-  <data name="ErrorLaunchVanguard" xml:space="preserve">
-    <value>Failed to launch CodeCoverage.exe with the following error. No code coverage data will be collected: {0}</value>
-    <comment>Cannot start CodeCoverage.exe. {0} is the detailed error message from CodeCoverage.exe.</comment>
-  </data>
-  <data name="ErrorNoEntryPoint" xml:space="preserve">
-    <value>No application under test is specified.</value>
-  </data>
-  <data name="ErrorNoVanguard" xml:space="preserve">
-    <value>Cannot find CodeCoverage.exe.</value>
-    <comment>Cannot find CodeCoverage.exe installed with VS.</comment>
-  </data>
-  <data name="ErrorRegisterExecutable" xml:space="preserve">
-    <value>The adapter 'Code Coverage' will not be used for this test run as Microsoft Test Manager is not running as administrator. To collect code coverage, re-start Microsoft Test Manager by choosing to 'Run as Administrator' and then start the test run.</value>
-    <comment>In MTM, we need to register the process name using IFEO. This will requires administrator privilege. If user run MTM using a non-admin account, they will see this error.</comment>
+  <data name="FailedToCreateDirectory" xml:space="preserve">
+    <value>Failed to create directory: {0} with error:{1}</value>
   </data>
   <data name="GeneralErrorLaunchVanguard" xml:space="preserve">
     <value>Failed to launch CodeCoverage.exe. No code coverage will be collected.</value>
-    <comment>Similar to ErrorLaunchVanguard, CodeCoverage.exe cannot be launched. But we cannot know the exact reason.</comment>
   </data>
-  <data name="LabAgentTaskExecutionFailed" xml:space="preserve">
-    <value>Failed to execute command {0} on Lab Agent.</value>
+  <data name="NoRunningEventFromVanguard" xml:space="preserve">
+    <value>Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</value>
+  </data>
+  <data name="VangurdNotFound" xml:space="preserve">
+    <value>Cannot find CodeCoverage.exe at {0}</value>
   </data>
 </root>
