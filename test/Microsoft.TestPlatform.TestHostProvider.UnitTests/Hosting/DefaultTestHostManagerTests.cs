@@ -219,8 +219,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
 
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[1])).Returns(new Version(5, 5));
+
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TestAdaptersPaths>C:\\Foo</TestAdaptersPaths></RunConfiguration> </RunSettings>");
-            List<string> currentList = new List<string> { @"FooExtension.dll" };
+            List<string> currentList = new List<string> { @"FooExtension.dll", @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
 
             // Act
             var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();

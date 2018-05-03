@@ -58,7 +58,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private StringBuilder testHostProcessStdError;
         private IMessageLogger messageLogger;
         private bool hostExitedEventRaised;
-        private bool projectOutputExtensionsRequired;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
@@ -192,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
         {
-            if (sources != null && sources.Any() && this.projectOutputExtensionsRequired)
+            if (sources != null && sources.Any())
             {
                 extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
             }
@@ -248,7 +247,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess = null;
 
             this.Shared = !runConfiguration.DisableAppDomain;
-            this.projectOutputExtensionsRequired = !(runConfiguration.TestAdaptersPaths?.Length > 0);
             this.hostExitedEventRaised = false;
         }
 
