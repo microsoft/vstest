@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The test execution recorder used for recording test results and test messages.
@@ -24,7 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         private ITestCaseEventsHandler testCaseEventsHandler;
 
         private HashSet<Guid> testCaseEndStatusMap;
-        private IDictionary<Guid, List<TestResult>> testResultDictionary;
 
         private object testCaseEndStatusSyncObject = new object();
 
@@ -45,7 +43,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             // 3. Test Case Result.
             // If that is not that case.
             // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
-            this.testResultDictionary = new Dictionary<Guid, List<TestResult>>();
             this.testCaseEndStatusMap = new HashSet<Guid>();
         }
 
@@ -88,9 +85,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// test result to the framework when the test(s) is canceled. </exception>  
         public void RecordResult(TestResult testResult)
         {
-            // For test result, we cannot flush to cache unless the result is updated with datacollection data
-            var flushResult = true;
-
             if (this.testCaseEventsHandler != null)
             {
                 var testCaseId = testResult.TestCase.Id;
@@ -101,30 +95,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                     {
                         this.testCaseEventsHandler.SendTestResult(testResult);
                     }
-                    else
-                    {
-                        // No TestCaseEnd received yet
-                        // We need to wait for testcaseend before flushing
-                        flushResult = false;
-
-                        // Cache results so we can flush later.
-                        List<TestResult> testResults;
-                        if (this.testResultDictionary.TryGetValue(testCaseId, out testResults))
-                        {
-                            testResults.Add(testResult);
-                        }
-                        else
-                        {
-                            this.testResultDictionary.Add(testCaseId, new List<TestResult>() { testResult });
-                        }
-                    }
-                }                
+                }
             }
 
-            if (flushResult)
-            {
-                this.testRunCache.OnNewTestResult(testResult);
-            }
+            // Test Result should always be flushed, even if datacollecter attachement is missing
+            this.testRunCache.OnNewTestResult(testResult);
         }
 
         /// <summary>
@@ -144,32 +119,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                 lock (this.testCaseEndStatusSyncObject)
                 {
                     isTestCaseEndAlreadySent = this.testCaseEndStatusMap.Contains(testCase.Id);
-                    if (!isTestCaseEndAlreadySent)
-                    {
-                        this.testCaseEndStatusMap.Add(testCase.Id);
-                    }
 
                     // Do not support multiple - testcasends for a single test case start
                     // TestCaseEnd must always be preceded by testcasestart for a given test case id
                     if (!isTestCaseEndAlreadySent)
                     {
+                        this.testCaseEndStatusMap.Add(testCase.Id);
+
                         // Send test case end event to handler.
                         this.testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
-
-                        // If dictionary contains results for this test case, update them with datacollector data and flush them
-                        List<TestResult> testResults;
-                        if (this.testResultDictionary.TryGetValue(testCase.Id, out testResults))
-                        {
-                            foreach (var testResult in testResults)
-                            {
-                                this.testCaseEventsHandler.SendTestResult(testResult);
-
-                                // TestResult updated by datacollectors, just flush
-                                this.testRunCache.OnNewTestResult(testResult);
-                            }
-
-                            this.testResultDictionary.Remove(testCase.Id);
-                        }
                     }
                 }
             }
