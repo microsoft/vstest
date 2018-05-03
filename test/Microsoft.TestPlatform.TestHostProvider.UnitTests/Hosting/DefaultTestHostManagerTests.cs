@@ -211,7 +211,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestPlatformExtensionsShouldExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
+        public void GetTestPlatformExtensionsShouldNotExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
         {
             List<string> sourcesDir = new List<string> { @"C:\Source1" };
             List<string> sources = new List<string> { @"C:\Source1\source1.dll" };
