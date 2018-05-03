@@ -80,11 +80,20 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout..
+        ///   Looks up a localized string similar to Running event not received from CodeCoverage.exe. Check eventlogs for failure reason..
         /// </summary>
         internal static string NoRunningEventFromVanguard {
             get {
                 return ResourceManager.GetString("NoRunningEventFromVanguard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout..
+        /// </summary>
+        internal static string VanguardConnectionTimeout {
+            get {
+                return ResourceManager.GetString("VanguardConnectionTimeout", resourceCulture);
             }
         }
         

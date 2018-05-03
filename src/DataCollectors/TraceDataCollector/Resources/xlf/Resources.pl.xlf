@@ -31,13 +31,18 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NoRunningEventFromVanguard">
-        <source>Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</source>
+        <source>Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.</source>
         <target state="new">Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="VangurdNotFound">
         <source>Cannot find CodeCoverage.exe at {0}</source>
         <target state="new">Cannot find CodeCoverage.exe at {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="VanguardConnectionTimeout">
+        <source>Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
+        <target state="new">Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -4,12 +4,10 @@
 namespace Microsoft.VisualStudio.Coverage
 {
     using System;
-    using System.ComponentModel;
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Runtime.InteropServices;
-    using System.Text;
     using System.Threading;
     using System.Xml;
     using Interfaces;
@@ -73,7 +71,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Helper object to manage child process lifetimes
         /// </summary>
-        private ProcessJobObject jobObject;
+        private IProcessJobObject processJobObject;
 
         /// <summary>
         /// logger
@@ -85,18 +83,23 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private DataCollectionContext context;
 
-        /// <summary>
-        /// Commands definition for vanguard
-        /// </summary>
-        protected enum Command
+        private ICollectorUtility collectorUtility;
+
+        private IVangurdCommandBuilder vangurdCommandBuilder;
+
+        public Vanguard()
+            : this(new CollectorUtility(), new VangurdCommandBuilder(), new ProcessJobObject())
         {
-            Collect,
-            Shutdown,
-            Register,
-            Unregister,
-            UnregisterAll,
-            GetCoverageData,
-            StartIISCollection
+        }
+
+        internal Vanguard(
+            ICollectorUtility collectorUtility,
+            IVangurdCommandBuilder commandBuilder,
+            IProcessJobObject processJobObject)
+        {
+            this.collectorUtility = collectorUtility;
+            this.vangurdCommandBuilder = commandBuilder;
+            this.processJobObject = processJobObject;
         }
 
         /// <summary>
@@ -122,11 +125,11 @@ namespace Microsoft.VisualStudio.Coverage
             XmlElement configuration,
             IDataCollectionLogger logger)
         {
+            EqtTrace.Info("Vanguard.Initialize: Session name: {0}, config filename: {1} config: {2}", sessionName, configurationFileName, configuration?.InnerXml);
             this.sessionName = sessionName;
             this.configurationFileName = configurationFileName;
             this.configuration = configuration;
             this.logger = logger;
-            this.CreateProcessJobObject();
             using (var writer = new StreamWriter(new FileStream(this.configurationFileName, FileMode.Create)))
             {
                 writer.WriteLine(this.configuration.OuterXml);
@@ -141,43 +144,42 @@ namespace Microsoft.VisualStudio.Coverage
         public virtual void Start(string outputName, DataCollectionContext context)
         {
             EqtTrace.Info("Vanguard.Start: Starting CodeCoverage.exe for coverage file: {0} datacollection session id: {1}", outputName, context.SessionId);
-            this.UnregisterAll();
-            this.Stop();
+
             this.vanguardProcessExitEvent = new ManualResetEvent(false);
             this.outputName = outputName;
             this.context = context;
-            this.vanguardProcess = this.StartVanguardProcess(
-                GenerateCommandLine(
-                    Command.Collect,
-                    this.sessionName,
-                    this.outputName,
-                    this.configurationFileName,
-                    null),
-                false,
-                true);
+            var collectCommand = this.vangurdCommandBuilder.GenerateCommandLine(
+                Command.Collect,
+                this.sessionName,
+                this.outputName,
+                this.configurationFileName);
+
+            this.vanguardProcess = this.StartVanguardProcess(collectCommand, false, true);
             this.Wait();
         }
 
         /// <summary>
-        /// Stop vanguard logger
+        /// Stop vanguard logger.
         /// </summary>
         public virtual void Stop()
         {
             EqtTrace.Info("Vanguard.Stop: Stoping Vanguard.");
             if (this.IsRunning)
             {
-                Process stopper =
-                    this.StartVanguardProcess(
-                        GenerateCommandLine(Command.Shutdown, this.sessionName, null, null, null),
-                        true);
+                var shutdownCommand = this.vangurdCommandBuilder.GenerateCommandLine(
+                    Command.Shutdown,
+                    this.sessionName,
+                    null,
+                    null);
+                this.StartVanguardProcess(shutdownCommand, true);
 
                 // BugFix#1237649 We need to wait for completion of process exited event
                 this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit);
 
-                if (this.jobObject != null)
+                if (this.processJobObject != null)
                 {
-                    this.jobObject.Dispose();
-                    this.jobObject = null;
+                    this.processJobObject.Dispose();
+                    this.processJobObject = null;
                 }
             }
         }
@@ -243,88 +245,6 @@ namespace Microsoft.VisualStudio.Coverage
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool CloseHandle(IntPtr hObject);
 
-        /// <summary>
-        /// Generate a command line string, given some parameters
-        /// </summary>
-        /// <param name="command">Command to execute</param>
-        /// <param name="sessionName">Session name</param>
-        /// <param name="outputName">Output file name (for collect command)</param>
-        /// <param name="configurationFileName">Configuration file name</param>
-        /// <param name="entryPoint">Entry point name for register/unregister</param>
-        /// <returns>Command line string</returns>
-        private static string GenerateCommandLine(
-            Command command,
-            string sessionName,
-            string outputName,
-            string configurationFileName,
-            string entryPoint)
-        {
-            StringBuilder builder = new StringBuilder();
-            switch (command)
-            {
-                case Command.Collect:
-                    builder.AppendFormat(
-                        CultureInfo.InvariantCulture,
-                        "collect /session:{0}  /output:\"{1}\"",
-                        sessionName,
-                        outputName);
-                    if (!string.IsNullOrEmpty(configurationFileName))
-                    {
-                        builder.AppendFormat(CultureInfo.InvariantCulture, " /config:\"{0}\"", configurationFileName);
-                    }
-
-                    break;
-                case Command.StartIISCollection:
-                    builder.AppendFormat(
-                        CultureInfo.InvariantCulture,
-                        "collect /IIS /session:{0} /output:\"{1}\"",
-                        sessionName,
-                        outputName);
-                    if (!string.IsNullOrEmpty(configurationFileName))
-                    {
-                        builder.AppendFormat(CultureInfo.InvariantCulture, " /config:\"{0}\"", configurationFileName);
-                    }
-
-                    break;
-                case Command.Shutdown:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "shutdown /session:{0}", sessionName);
-                    break;
-
-                case Command.Register:
-                    builder.AppendFormat(CultureInfo.InvariantCulture, "register /force /session:{0} ", sessionName);
-                    if (!string.IsNullOrEmpty(configurationFileName))
-                    {
-                        builder.AppendFormat(CultureInfo.InvariantCulture, " /config:\"{0}\" ", configurationFileName);
-                    }
-
-                    builder.AppendFormat("\"{0}\"", entryPoint);
-                    break;
-                case Command.Unregister:
-                    builder.AppendFormat(
-                        CultureInfo.InvariantCulture,
-                        "unregister /force /session:{0} \"{1}\"",
-                        sessionName,
-                        entryPoint);
-                    break;
-                case Command.UnregisterAll:
-                    builder.AppendFormat(
-                        CultureInfo.InvariantCulture,
-                        "unregister /wildcard /session:{0}",
-                        sessionName);
-                    break;
-                case Command.GetCoverageData:
-                    builder.AppendFormat(
-                        CultureInfo.InvariantCulture,
-                        "getcoverageData /session:{0} /output:\"{1}\"",
-                        sessionName,
-                        outputName);
-                    break;
-            }
-
-            EqtTrace.Info("Vanguard.GenerateCommandLine: Created the command: {0}", builder);
-            return builder.ToString();
-        }
-
         private static int GetProcessId(Process process)
         {
             var id = 0;
@@ -341,28 +261,6 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Unregister all entry points
-        /// </summary>
-        private void UnregisterAll()
-        {
-            EqtTrace.Info("Vanguard.UnregisterAll: Sending unregister all command.");
-            Process process = this.StartVanguardProcess(
-                GenerateCommandLine(
-                    Command.UnregisterAll,
-                    DynamicCoverageDataCollectorImpl.MagicMtmSessionPrefix + "*",
-                    null,
-                    null,
-                    null),
-                true);
-            if (process.ExitCode != 0)
-            {
-                EqtTrace.Warning("Vanguard.UnregisterAll: Process exited with non zero.");
-            }
-
-            process.Dispose();
-        }
-
-        /// <summary>
         /// Start a vanguard process
         /// </summary>
         /// <param name="commandLine">Command line options</param>
@@ -374,7 +272,7 @@ namespace Microsoft.VisualStudio.Coverage
             bool wait,
             bool standardErrorAsynchronousCall = false)
         {
-            string vanguardPath = CollectorUtility.GetVanguardPath();
+            string vanguardPath = this.collectorUtility.GetVanguardPath();
             EqtTrace.Info(
                 "Vanguard.StartVanguardProcess: Starting {0} with command line: {1}, wait for exit:{2}, Read stderr: {3}",
                 vanguardPath,
@@ -408,10 +306,10 @@ namespace Microsoft.VisualStudio.Coverage
             {
                 process.WaitForExit();
             }
-            else if (this.jobObject != null)
+            else if (this.processJobObject != null)
             {
                 EqtTrace.Info("Vanguard.StartVanguardProcess: Add Vangaurd process to the project object");
-                this.jobObject.AddProcess(process.SafeHandle.DangerousGetHandle());
+                this.processJobObject.AddProcess(process.SafeHandle.DangerousGetHandle());
             }
 
             EqtTrace.Info(
@@ -432,10 +330,10 @@ namespace Microsoft.VisualStudio.Coverage
                 true,
                 false,
                 GlobalEventNamePrefix + this.sessionName + "_RUNNING");
+            var timeout = EnvironmentHelper.GetConnectionTimeout();
             if (runningEvent != IntPtr.Zero)
             {
-                var timeout = EnvironmentHelper.GetConnectionTimeout();
-                uint waitTimeout = (uint)timeout * 1000; // Time limit for waiting the vanguard event
+                uint waitTimeout = (uint)timeout * 1000; // Time limit for waiting for vanguard running event.
 
                 IntPtr[] handles = new IntPtr[] { runningEvent, this.vanguardProcess.SafeHandle.DangerousGetHandle() };
                 uint result = WaitForMultipleObjects((uint)handles.Length, handles, false, waitTimeout);
@@ -449,8 +347,8 @@ namespace Microsoft.VisualStudio.Coverage
                         // Process exited, something wrong happened
                         // we have already set to read messages asynchronously, so calling this.vanguardProcess.StandardError.ReadToEnd() which is synchronous is wrong.
                         // throw new VanguardException(string.Format(CultureInfo.CurrentCulture, Resources.ErrorLaunchVanguard, this.vanguardProcess.StandardError.ReadToEnd()));
-                        EqtTrace.Error("Vanguard.Wait: CodeCoverage.exe failed to receive running event in {0} seconds", timeout);
-                        throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.NoRunningEventFromVanguard, timeout, EnvironmentHelper.VstestConnectionTimeout), true);
+                        EqtTrace.Error("Vanguard.Wait: From CodeCoverage.exe failed to receive running event in {0} seconds", timeout);
+                        throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.NoRunningEventFromVanguard), true);
                 }
             }
 
@@ -460,17 +358,12 @@ namespace Microsoft.VisualStudio.Coverage
                 EqtTrace.Error("Vanguard.Wait: Fail to create running event. Killing CodeCoverage.exe. ");
                 this.vanguardProcess.Kill();
             }
-            catch (Win32Exception)
+            catch (Exception ex)
             {
-            }
-            catch (NotSupportedException)
-            {
-            }
-            catch (InvalidOperationException)
-            {
+                EqtTrace.Warning("Vanguard.Wait: Fail to kill CodeCoverage.exe. process with exception: {0}", ex);
             }
 
-            throw new VanguardException(Resources.GeneralErrorLaunchVanguard);
+            throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VanguardConnectionTimeout, timeout, EnvironmentHelper.VstestConnectionTimeout), true);
         }
 
         /// <summary>
@@ -510,21 +403,6 @@ namespace Microsoft.VisualStudio.Coverage
             if (this.logger != null && this.context != null && !string.IsNullOrWhiteSpace(e.Data))
             {
                 this.logger.LogWarning(this.context, e.Data);
-            }
-        }
-
-        /// <summary>
-        /// Helper function to create a job object for child process management
-        /// </summary>
-        private void CreateProcessJobObject()
-        {
-            try
-            {
-                this.jobObject = new ProcessJobObject();
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Warning("CreateProcessJobObject Failed : {0}", ex);
             }
         }
     }

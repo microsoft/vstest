@@ -124,9 +124,12 @@
     <value>Failed to launch CodeCoverage.exe. No code coverage will be collected.</value>
   </data>
   <data name="NoRunningEventFromVanguard" xml:space="preserve">
-    <value>Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</value>
+    <value>Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.</value>
   </data>
   <data name="VangurdNotFound" xml:space="preserve">
     <value>Cannot find CodeCoverage.exe at {0}</value>
+  </data>
+  <data name="VanguardConnectionTimeout" xml:space="preserve">
+    <value>Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
   </data>
 </root>

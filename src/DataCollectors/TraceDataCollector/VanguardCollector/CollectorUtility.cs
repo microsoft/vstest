@@ -9,9 +9,10 @@ namespace Microsoft.VisualStudio.Collector
     using System.Reflection;
     using System.Xml;
     using Coverage;
+    using Coverage.Interfaces;
     using TraceDataCollector.Resources;
 
-    public static class CollectorUtility
+    public class CollectorUtility : ICollectorUtility
     {
         /// <summary>
         /// Vanguard executable path (relative to VS install path)
@@ -96,9 +97,9 @@ namespace Microsoft.VisualStudio.Collector
         /// Get path to vanguard.exe
         /// </summary>
         /// <returns>Vanguard path</returns>
-        public static string GetVanguardPath()
+        public string GetVanguardPath()
         {
-            var vanguardPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), VanguardPath);
+            var vanguardPath = Path.Combine(this.GetVanguardDirectory(), VanguardPath);
             if (!File.Exists(vanguardPath))
             {
                 throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VangurdNotFound, vanguardPath));
@@ -111,7 +112,7 @@ namespace Microsoft.VisualStudio.Collector
         /// Get path to vanguard.exe
         /// </summary>
         /// <returns>Vanguard path</returns>
-        public static string GetVanguardDirectory()
+        public string GetVanguardDirectory()
         {
             return Path.GetDirectoryName(typeof(CollectorUtility).GetTypeInfo().Assembly.Location);
         }

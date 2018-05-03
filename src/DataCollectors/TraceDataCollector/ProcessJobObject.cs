@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TraceCollector
 {
     using System;
     using System.Runtime.InteropServices;
+    using Coverage.Interfaces;
     using TestPlatform.ObjectModel;
 
     /// <summary>
@@ -12,7 +13,7 @@ namespace Microsoft.VisualStudio.TraceCollector
     /// the parent process dies
     /// </summary>
     /// <summary>An interface to the Windows Job Objects API.</summary>
-    internal class ProcessJobObject : IDisposable
+    internal class ProcessJobObject : IProcessJobObject
     {
         #region Native 32/64 Bit Switching Flag
 

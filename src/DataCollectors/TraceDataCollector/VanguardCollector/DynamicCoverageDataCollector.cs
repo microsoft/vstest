@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
+    using Interfaces;
     using Microsoft.VisualStudio.Collector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
@@ -39,9 +40,16 @@ namespace Microsoft.VisualStudio.Coverage
 
         private string framework;
         private string targetPlatform;
+        private ICollectorUtility collectorUtility;
 
         public DynamicCoverageDataCollector()
+        : this(new CollectorUtility())
         {
+        }
+
+        private DynamicCoverageDataCollector(ICollectorUtility collectorUtility)
+        {
+            this.collectorUtility = collectorUtility;
         }
 
         internal override void SetCollectionPerProcess(Dictionary<string, XmlElement> processCPMap)
@@ -108,7 +116,7 @@ namespace Microsoft.VisualStudio.Coverage
                 profilerPath = this.GetProfilerPathBasedOnTargetPlatform();
             }
 
-            var vanguardProfilerPath = Path.Combine(CollectorUtility.GetVanguardDirectory(), profilerPath);
+            var vanguardProfilerPath = Path.Combine(this.collectorUtility.GetVanguardDirectory(), profilerPath);
             List<KeyValuePair<string, string>> vars = new List<KeyValuePair<string, string>>();
             vars.Add(new KeyValuePair<string, string>(
                 DynamicCoverageDataCollector.CoreclrEnableProfilingVariable, "1"));

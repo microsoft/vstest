@@ -363,13 +363,13 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 (directoryPath) => { this.atempDirectory = directoryPath; });
         }
 
-        private static XmlElement CreateXmlElement(string xmlString)
+        internal static XmlElement CreateXmlElement(string xmlString)
         {
             var doc = new XmlDocument();
             using (
                 var xmlReader = XmlReader.Create(
                     new StringReader(xmlString),
-                    new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
+                    new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit}))
             {
                 doc.Load(xmlReader);
             }
