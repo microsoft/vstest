@@ -3,6 +3,9 @@
 
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
+    using System.Xml;
+    using Collector;
+
     /// <summary>
     /// The CollectorUtility interface.
     /// </summary>
@@ -19,5 +22,11 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
         /// </summary>
         /// <returns>Vanguard path</returns>
         string GetVanguardDirectory();
+
+        void RemoveChildNodeAndReturnValue(ref XmlElement configurationElement, string elementName, out string elementValue);
+
+        string GetDotnetHostFullPath();
+
+        CollectorUtility.MachineType GetMachineType(string exePath);
     }
 }

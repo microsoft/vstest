@@ -42,12 +42,12 @@ namespace Microsoft.VisualStudio.Collector
             X64 = 0x8664
         }
 
-        public static void RemoveChildNodeAndReturnValue(
+        public void RemoveChildNodeAndReturnValue(
             ref XmlElement owner,
             string elementName,
             out string elementValue)
         {
-            var node = owner.SelectSingleNode(elementName);
+            var node = owner?.SelectSingleNode(elementName);
             elementValue = string.Empty;
 
             if (node != null)
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.Collector
             }
         }
 
-        public static MachineType GetMachineType(string fileName)
+        public MachineType GetMachineType(string fileName)
         {
             const int PE_POINTER_OFFSET = 60;
             const int MACHINE_OFFSET = 4;
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.Collector
             return (MachineType)machineUint;
         }
 
-        public static string GetDotnetHostFullPath()
+        public string GetDotnetHostFullPath()
         {
             char separator = ';';
             var dotnetExeName = "dotnet.exe";

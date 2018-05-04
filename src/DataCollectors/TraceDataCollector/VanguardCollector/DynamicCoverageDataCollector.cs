@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.Coverage
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Xml;
     using Interfaces;
@@ -12,6 +13,7 @@ namespace Microsoft.VisualStudio.Coverage
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
+    using TraceDataCollector.Resources;
 
     /// <summary>
     /// DynamicCoverageDataCollector class
@@ -31,49 +33,37 @@ namespace Microsoft.VisualStudio.Coverage
         private const string VanguardProfilerGuid = "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}";
         private const string FullCorProfiler = "COR_PROFILER";
         private const string CodeCoverageSessionNameVariable = "CODE_COVERAGE_SESSION_NAME";
-        private const string DefaultConfiguration = @"<Configuration></Configuration>";
 
         /// <summary>
         /// Data collector implementation
         /// </summary>
-        private DynamicCoverageDataCollectorImpl implementation;
+        private IDynamicCoverageDataCollectorImpl implementation;
 
         private string framework;
         private string targetPlatform;
         private ICollectorUtility collectorUtility;
 
         public DynamicCoverageDataCollector()
-        : this(new CollectorUtility())
+        : this(new CollectorUtility(), new DynamicCoverageDataCollectorImpl())
         {
         }
 
-        private DynamicCoverageDataCollector(ICollectorUtility collectorUtility)
+        internal DynamicCoverageDataCollector(
+            ICollectorUtility collectorUtility,
+            IDynamicCoverageDataCollectorImpl dynamicCoverageDataCollectorImpl)
         {
             this.collectorUtility = collectorUtility;
-        }
-
-        internal override void SetCollectionPerProcess(Dictionary<string, XmlElement> processCPMap)
-        {
-            // No-op for .NET Core
+            this.implementation = dynamicCoverageDataCollectorImpl;
         }
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
-            if (configurationElement == null)
-            {
-                var doc = new XmlDocument();
-                using (
-                    var xmlReader = XmlReader.Create(
-                        new StringReader(DefaultConfiguration),
-                        new XmlReaderSettings { /* XmlResolver = null,*/ CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                {
-                    doc.Load(xmlReader);
-                }
+            this.collectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "Framework", out this.framework);
+            this.collectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "TargetPlatform", out this.targetPlatform);
 
-                configurationElement = doc.DocumentElement;
-            }
-
-            this.Initialize(configurationElement);
+            this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
+            this.Events.SessionStart += this.SessionStart;
+            this.Events.SessionEnd += this.SessionEnd;
         }
 
         /// <summary>
@@ -82,94 +72,47 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="disposing"> The disposing</param>
         protected override void Dispose(bool disposing)
         {
-            // Bug 1437108
-            // this can be null only when the base implementation does not initialize all datacollectors
-            if (this.implementation != null)
-            {
-                this.implementation.Dispose();
-            }
-
+            this.Events.SessionStart -= this.SessionStart;
+            this.Events.SessionEnd -= this.SessionEnd;
+            this.implementation?.Dispose();
             base.Dispose(disposing);
         }
 
         /// <summary>
-        /// GetEnvironmentVariables is called after all the collectors have been initialized
-        /// so we know whether or not Vanguard is the only collector in the test settings
-        /// We need to stop all running w3wp processes so that any new request is served
-        /// by the instrumented processes. We can do this as part of SessionStart but
-        /// IISReset /stop takes a lot of time and so its better to do it here as part of Initialize
-        /// where timeouts are larger.
+        /// The GetEnvironmentVariables
         /// </summary>
         /// <returns>Returns EnvironmentVariables required for code coverage profiler. </returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
-            string profilerPath = string.Empty;
-
-            if (this.IsDotnetCoreTargetFramework())
+            var vanguardProfilerPath = this.GetVanguardProfilerPath();
+            var envVaribles = new List<KeyValuePair<string, string>>
             {
-                // Currently TestPlatform doesn't honor the TargetPlatform(architecture - x86, x64) option for .NET Core tests.
-                // Set the profiler path based on dotnet process architecture.
-                profilerPath = GetProfilerPathBasedOnDotnet();
-            }
-            else
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrEnableProfilingVariable, "1"),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerPathVariable, vanguardProfilerPath),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerVariable, VanguardProfilerGuid),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CodeCoverageSessionNameVariable, this.implementation.GetSessionName()),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorEnableProfilingVariable, "1"),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable, vanguardProfilerPath),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.FullCorProfiler, VanguardProfilerGuid),
+            };
+
+            if (EqtTrace.IsInfoEnabled)
             {
-                profilerPath = this.GetProfilerPathBasedOnTargetPlatform();
+                EqtTrace.Info("DynamicCoverageDataCollector.GetEnvironmentVariables: Returning following environment variables: {0}", string.Join(",", envVaribles));
             }
 
-            var vanguardProfilerPath = Path.Combine(this.collectorUtility.GetVanguardDirectory(), profilerPath);
-            List<KeyValuePair<string, string>> vars = new List<KeyValuePair<string, string>>();
-            vars.Add(new KeyValuePair<string, string>(
-                DynamicCoverageDataCollector.CoreclrEnableProfilingVariable, "1"));
-            vars.Add(new KeyValuePair<string, string>(
-                DynamicCoverageDataCollector.CoreclrProfilerPathVariable, vanguardProfilerPath));
-            vars.Add(new KeyValuePair<string, string>(
-                DynamicCoverageDataCollector.CoreclrProfilerVariable, VanguardProfilerGuid));
-            vars.Add(new KeyValuePair<string, string>(
-                DynamicCoverageDataCollector.CodeCoverageSessionNameVariable, this.implementation.SessionName));
-
-            vars.Add(new KeyValuePair<string, string>(
-                DynamicCoverageDataCollector.CorProfilerPathVariable, vanguardProfilerPath));
-            vars.Add(new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorEnableProfilingVariable, "1"));
-            vars.Add(new KeyValuePair<string, string>(
-                DynamicCoverageDataCollector.FullCorProfiler, VanguardProfilerGuid));
-            return vars.AsReadOnly();
+            return envVaribles.AsReadOnly();
         }
 
-        private static string GetProfilerPathBasedOnDotnet()
+        private static void ThrowOnNotSupportedTargetPlatform(string targetPlatform)
         {
-            string profilerPath;
-            var dotnetPath = CollectorUtility.GetDotnetHostFullPath();
-            var processArchitecture = CollectorUtility.GetMachineType(dotnetPath);
-
-            if (processArchitecture == CollectorUtility.MachineType.I386)
-            {
-                profilerPath = VanguardX86ProfilerPath;
-            }
-            else if (processArchitecture == CollectorUtility.MachineType.X64)
-            {
-                profilerPath = VanguardX64ProfilerPath;
-            }
-            else
-            {
-                throw new VanguardException("Invalid Architecture");
-            }
-
-            return profilerPath;
-        }
-
-        /// <summary>
-        /// Initialize
-        /// </summary>
-        /// <param name="configurationElement">Configuration element</param>
-        private void Initialize(XmlElement configurationElement)
-        {
-            CollectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "Framework", out this.framework);
-            CollectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "TargetPlatform", out this.targetPlatform);
-
-            this.implementation = new DynamicCoverageDataCollectorImpl();
-            this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
-            this.Events.SessionStart += this.SessionStart;
-            this.Events.SessionEnd += this.SessionEnd;
+            EqtTrace.Error(
+                "DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform: code coverage profiler not available for TargetPlatform: \"{0}\"",
+                targetPlatform);
+            throw new VanguardException(string.Format(
+                CultureInfo.CurrentUICulture,
+                Resources.NotSupportedTargetPlatform,
+                targetPlatform));
         }
 
         /// <summary>
@@ -192,12 +135,43 @@ namespace Microsoft.VisualStudio.Coverage
             this.implementation.SessionStart(sender, e);
         }
 
+        private string GetVanguardProfilerPath()
+        {
+            var profilerPath = this.IsDotnetCoreTargetFramework()
+                ? this.GetProfilerPathBasedOnDotnet()
+                : this.GetProfilerPathBasedOnTargetPlatform();
+
+            return Path.Combine(this.collectorUtility.GetVanguardDirectory(), profilerPath);
+        }
+
+        private string GetProfilerPathBasedOnDotnet()
+        {
+            string profilerPath = string.Empty;
+            var dotnetPath = this.collectorUtility.GetDotnetHostFullPath();
+            var targetPlatform = this.collectorUtility.GetMachineType(dotnetPath);
+
+            if (targetPlatform == CollectorUtility.MachineType.I386)
+            {
+                profilerPath = VanguardX86ProfilerPath;
+            }
+            else if (targetPlatform == CollectorUtility.MachineType.X64)
+            {
+                profilerPath = VanguardX64ProfilerPath;
+            }
+            else
+            {
+                DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform(targetPlatform.ToString());
+            }
+
+            return profilerPath;
+        }
+
         private string GetProfilerPathBasedOnTargetPlatform()
         {
-            string profilerPath;
+            string profilerPath = string.Empty;
             if (string.IsNullOrWhiteSpace(this.targetPlatform))
             {
-                throw new VanguardException("Invalid Architecture");
+                DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform(this.targetPlatform);
             }
 
             Architecture arch = (Architecture)Enum.Parse(typeof(Architecture), this.targetPlatform, true);
@@ -211,7 +185,7 @@ namespace Microsoft.VisualStudio.Coverage
             }
             else
             {
-                throw new VanguardException("Invalid Architecture");
+                DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform(this.targetPlatform);
             }
 
             return profilerPath;

@@ -3,9 +3,7 @@
 
 namespace Microsoft.VisualStudio.TraceCollector
 {
-    using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using TestPlatform.ObjectModel;
@@ -19,11 +17,6 @@ namespace Microsoft.VisualStudio.TraceCollector
     /// </remarks>
     public abstract class BaseDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
-        ~BaseDataCollector()
-        {
-            this.Dispose(false);
-        }
-
         internal IDataCollectionEvents Events { get; private set; }
 
         internal IDataCollectionLogger Logger { get; private set; }
@@ -31,8 +24,6 @@ namespace Microsoft.VisualStudio.TraceCollector
         internal IDataCollectionSink DataSink { get; private set; }
 
         internal IDataCollectionAgentContext AgentContext { get; private set; }
-
-        protected bool IsDisposed { get; private set; }
 
         #region Interface entry points
 
@@ -43,7 +34,7 @@ namespace Microsoft.VisualStudio.TraceCollector
             DataCollectionLogger logger,
             DataCollectionEnvironmentContext environmentContext)
         {
-            this.InternalConstruct(
+            this.Initialize(
                 configurationElement,
                 new DataCollectionEventsWrapper(events),
                 new DataCollectionSinkWrapper(dataSink),
@@ -59,133 +50,7 @@ namespace Microsoft.VisualStudio.TraceCollector
 
         #endregion
 
-        #region Test entry point
-
         internal void Initialize(
-            XmlElement configurationElement,
-            IDataCollectionEvents events,
-            IDataCollectionSink dataSink,
-            IDataCollectionLogger logger,
-            IDataCollectionAgentContext agentContext)
-        {
-            this.InternalConstruct(configurationElement, events, dataSink, logger, agentContext);
-        }
-
-        internal IEnumerable<KeyValuePair<string, string>> RequestEnvironmentVariables()
-        {
-            return this.GetEnvironmentVariables();
-        }
-
-        #endregion
-
-        internal abstract void SetCollectionPerProcess(Dictionary<string, XmlElement> processCPMap);
-
-        protected abstract void OnInitialize(XmlElement configurationElement);
-
-        // Provide required environment variables for test execution through this method.
-        protected abstract IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables();
-
-        protected void SubscribeToEvents()
-        {
-            if (this.Events != null)
-            {
-                this.Events.SessionStart += new EventHandler<SessionStartEventArgs>(this.OnSessionStart);
-                this.Events.SessionEnd += new EventHandler<SessionEndEventArgs>(this.OnSessionEnd);
-
-                this.SubscribeToTestCaseEvents();
-            }
-        }
-
-        protected void UnsubscribeFromEvents()
-        {
-            if (this.Events != null)
-            {
-                this.Events.SessionStart -= new EventHandler<SessionStartEventArgs>(this.OnSessionStart);
-                this.Events.SessionEnd -= new EventHandler<SessionEndEventArgs>(this.OnSessionEnd);
-
-                this.UnsubscribeFromTestCaseEvents();
-
-                this.Events = null;
-            }
-        }
-
-        /// <summary>
-        /// Unsubscribe to test case events.
-        /// If for active set of data collectors, test case events is not required, calling this
-        /// method will unsubscribe BaseDataCollector from TestCase events
-        /// If only Dynamic Code Coverage Collector is enabled, this method is called from
-        /// SessionStart of DynamicCodeCoverageDataCollector
-        /// </summary>
-        protected void UnsubscribeFromTestCaseEvents()
-        {
-            if (this.Events != null)
-            {
-                this.Events.TestCaseStart -= new EventHandler<TestCaseStartEventArgs>(this.OnTestCaseStart);
-                this.Events.TestCaseEnd -= new EventHandler<TestCaseEndEventArgs>(this.OnTestCaseEnd);
-            }
-        }
-
-        /// <summary>
-        /// Subscribe to testcase events.
-        /// </summary>
-        protected void SubscribeToTestCaseEvents()
-        {
-            if (this.Events != null)
-            {
-                this.Events.TestCaseStart += new EventHandler<TestCaseStartEventArgs>(this.OnTestCaseStart);
-                this.Events.TestCaseEnd += new EventHandler<TestCaseEndEventArgs>(this.OnTestCaseEnd);
-            }
-        }
-
-        protected virtual void OnSendFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
-        {
-            this.AssertNotDisposed();
-        }
-
-        protected virtual void OnSessionEnd(object sender, SessionEndEventArgs e)
-        {
-            this.AssertNotDisposed();
-        }
-
-        protected virtual void OnSessionStart(object sender, SessionStartEventArgs e)
-        {
-            this.AssertNotDisposed();
-        }
-
-        protected virtual void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
-        {
-            this.AssertNotDisposed();
-        }
-
-        protected virtual void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
-        {
-            this.AssertNotDisposed();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && !this.IsDisposed)
-            {
-                if (this.DataSink != null)
-                {
-                    this.DataSink.SendFileCompleted -=
-                        new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
-                }
-
-                this.UnsubscribeFromEvents();
-                this.IsDisposed = true;
-            }
-        }
-
-        private void AssertNotDisposed()
-        {
-            if (this.IsDisposed)
-            {
-                throw new ObjectDisposedException(this.GetType().ToString());
-            }
-        }
-
-        private void InternalConstruct(
             XmlElement configurationElement,
             IDataCollectionEvents events,
             IDataCollectionSink dataSink,
@@ -200,16 +65,12 @@ namespace Microsoft.VisualStudio.TraceCollector
             this.Logger = logger;
             this.AgentContext = agentContext;
 
-            // Add to the SendFileCompleted event here since the data sink will persist for all derived classes.
-            if (this.DataSink != null)
-            {
-                this.DataSink.SendFileCompleted +=
-                    new System.ComponentModel.AsyncCompletedEventHandler(this.OnSendFileCompleted);
-            }
-
             this.OnInitialize(configurationElement);
-
-            this.SubscribeToEvents();
         }
+
+        protected abstract void OnInitialize(XmlElement configurationElement);
+
+        // Provide required environment variables for test execution through this method.
+        protected abstract IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables();
     }
 }

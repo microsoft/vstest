@@ -89,6 +89,15 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Code Coverage not available for TargetPlatform: &quot;{0}&quot;.
+        /// </summary>
+        internal static string NotSupportedTargetPlatform {
+            get {
+                return ResourceManager.GetString("NotSupportedTargetPlatform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout..
         /// </summary>
         internal static string VanguardConnectionTimeout {

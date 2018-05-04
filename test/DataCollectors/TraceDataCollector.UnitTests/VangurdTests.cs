@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 {
     using System;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -111,7 +110,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             cts.Cancel();
 
-            // When tests are running under code coverage, we launch more than one CodeCoverage.exe process.
+            // TODO find the reason why more than one processes launched.
             Assert.IsTrue(numOfProcessCreatedTask.Result >= 1);
         }
 
@@ -162,7 +161,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.vanguard.Stop();
             cts.Cancel();
 
-            // When tests are running under code coverage, we launch more than one CodeCoverage.exe process.
+            // TODO find the reason why more than two processes launched.
             Assert.IsTrue(numOfProcessCreatedTask.Result >= 2);
         }
 

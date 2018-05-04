@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.Coverage
     /// <summary>
     /// Implementation class of dynamic code coverage data collector
     /// </summary>
-    internal class DynamicCoverageDataCollectorImpl
+    internal class DynamicCoverageDataCollectorImpl : IDynamicCoverageDataCollectorImpl
     {
         /// <summary>
         /// A magic prefix used to differentiate MTM registered sessions from manually registered sessions
@@ -166,14 +166,19 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Gets session name
+        /// Gets or sets gets session name
         /// </summary>
-        public string SessionName { get; private set; }
+        private string SessionName { get; set; }
 
         /// <summary>
-        /// Gets vanguard instance
+        /// Gets or sets vanguard instance
         /// </summary>
-        protected IVangurd Vanguard { get; private set; }
+        private IVangurd Vanguard { get; set; }
+
+        public string GetSessionName()
+        {
+            return this.SessionName;
+        }
 
         /// <summary>
         /// Initialize
@@ -243,7 +248,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         /// <param name="sender">Sender</param>
         /// <param name="e">Event arguments</param>
-        internal virtual void SessionStart(object sender, SessionStartEventArgs e)
+        public void SessionStart(object sender, SessionStartEventArgs e)
         {
             this.StartVanguard(e.Context);
         }
@@ -253,7 +258,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         /// <param name="sender">Sender</param>
         /// <param name="e">Event arguments</param>
-        internal virtual void SessionEnd(object sender, SessionEndEventArgs e)
+        public void SessionEnd(object sender, SessionEndEventArgs e)
         {
             this.StopVanguard(e.Context);
         }
