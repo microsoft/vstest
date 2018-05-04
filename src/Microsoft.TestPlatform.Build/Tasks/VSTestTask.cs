@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestTestAdapterPath
+        public string[] VSTestTestAdapterPath
         {
             get;
             set;
@@ -54,7 +54,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             get;
             set;
         }
-        public string VSTestLogger
+        public string[] VSTestLogger
         {
             get;
             set;
@@ -131,6 +131,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         internal IEnumerable<string> CreateArgument()
         {
+            var initializeConsoleLogger = true;
             var allArgs = new List<string>();
 
             // TODO log arguments in task
@@ -139,9 +140,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestSetting));
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
+            if (this.VSTestTestAdapterPath != null && this.VSTestTestAdapterPath.Length > 0)
             {
-                allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestAdapterPath));
+                foreach (var arg in this.VSTestTestAdapterPath)
+                {
+                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                }
             }
             else
             {
@@ -168,9 +172,17 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--testCaseFilter:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestCaseFilter));
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestLogger))
+            if (this.VSTestLogger != null && this.VSTestLogger.Length > 0)
             {
-                allArgs.Add("--logger:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestLogger));
+                foreach (var arg in this.VSTestLogger)
+                {
+                    allArgs.Add("--logger:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+
+                    if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
+                    {
+                        initializeConsoleLogger = false;
+                    }
+                }
             }
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
@@ -197,8 +209,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.TestFileFullPath));
             }
 
-            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) &&
-                (string.IsNullOrEmpty(this.VSTestLogger) || !this.VSTestLogger.StartsWith("console", StringComparison.OrdinalIgnoreCase)))
+            // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
+            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && initializeConsoleLogger)
             {
                 var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
                 var quietTestLogging = new List<string>() { "q", "quiet" };

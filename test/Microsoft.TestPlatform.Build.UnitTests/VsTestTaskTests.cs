@@ -53,7 +53,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             // Add values for required properties.
             vstestTask.TestFileFullPath = "abc";
             vstestTask.VSTestFramework = "abc";
-            vstestTask.VSTestLogger = "Console;Verbosity=quiet";
+            vstestTask.VSTestLogger = new string[] { "Console;Verbosity=quiet" };
 
             var allArguments = vstestTask.CreateArgument().ToArray();
 
@@ -209,7 +209,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             // Add values for required properties.
             vstestTask.TestFileFullPath = "abc";
             vstestTask.VSTestFramework = "abc";
-            vstestTask.VSTestLogger = "trx;LogFileName=foo bar.trx";
+            vstestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx" };
 
 
             var allArguments = vstestTask.CreateArgument().ToArray();
@@ -233,6 +233,41 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name 2\"")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldAddMultipleTestAdapterPaths()
+        {
+            var vstestTask = new VSTestTask();
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            vstestTask.VSTestTestAdapterPath = new string[] { "path1", "path2" };
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path1")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path1")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldAddMultipleLoggers()
+        {
+            var vstestTask = new VSTestTask();
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            vstestTask.VSTestLogger = new string[] { "trx;LogFileName=foo bar.trx", "console" };
+
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:console")));
         }
     }
 }
