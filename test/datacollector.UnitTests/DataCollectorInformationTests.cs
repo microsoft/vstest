@@ -3,10 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,11 +16,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class DataCollectorInformationTests
     {
+        private const string TargetPlatformSetting = "<TargetPlatform>X86</TargetPlatform>";
+        private const string TargetFrameworkSetting = "<TargetFrameworkVersion>.NETCoreApp,Version=v2.0</TargetFrameworkVersion>";
+        private readonly static string DefaultRunSettings = $@"<RunSettings>
+                                                      <RunConfiguration>
+                                                        {DataCollectorInformationTests.TargetFrameworkSetting}
+                                                        {DataCollectorInformationTests.TargetPlatformSetting}
+                                                      </RunConfiguration >
+                                                   </RunSettings >";
         private DataCollectorInformation dataCollectorInfo;
 
         private List<KeyValuePair<string, string>> envVarList;
 
         private Mock<DataCollector2> mockDataCollector;
+
+        private string dataCollectorReceivedConfig;
+
 
         public DataCollectorInformationTests()
         {
@@ -38,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                 new Mock<IDataCollectionAttachmentManager>().Object,
                 new TestPlatformDataCollectionEvents(),
                 mockMessageSink.Object,
-                string.Empty);
+                DataCollectorInformationTests.DefaultRunSettings);
         }
 
         [TestMethod]
@@ -59,6 +69,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorInfo.DisposeDataCollector();
 
             this.mockDataCollector.Protected().Verify("Dispose", Times.Once(), true);
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorShouldPassTargetPlatformtoDataCollectorConfig()
+        {
+            this.SetupDataCollectorInitialize();
+
+            this.dataCollectorInfo.InitializeDataCollector();
+
+            StringAssert.Contains(this.dataCollectorReceivedConfig, DataCollectorInformationTests.TargetPlatformSetting);
+        }
+
+        [TestMethod]
+        public void InitializeDataCollectorShouldPassTargetFrameworktoDataCollectorConfig()
+        {
+            this.SetupDataCollectorInitialize();
+
+            this.dataCollectorInfo.InitializeDataCollector();
+
+            StringAssert.Contains(this.dataCollectorReceivedConfig, "<Framework>.NETCoreApp,Version=v2.0</Framework>");
+        }
+
+        private void SetupDataCollectorInitialize()
+        {
+            this.mockDataCollector.Setup(d => d.Initialize(
+                    It.IsAny<XmlElement>(),
+                    It.IsAny<DataCollectionEvents>(),
+                    It.IsAny<DataCollectionSink>(),
+                    It.IsAny<DataCollectionLogger>(),
+                    It.IsAny<DataCollectionEnvironmentContext>()))
+                .Callback<XmlElement, DataCollectionEvents, DataCollectionSink, DataCollectionLogger,
+                    DataCollectionEnvironmentContext>(
+                    (xmlEle, events, sink, logger, envContext) => { this.dataCollectorReceivedConfig = xmlEle.InnerXml; });
         }
     }
 }
