@@ -178,13 +178,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
+        public void RecordResultShouldFlushEvenIfTestCaseEndWasCalledBefore()
         {
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
-            this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
-            Assert.IsFalse(this.testableTestRunCache.TestResultList.Contains(this.testResult));
-
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
             Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
         }
         #endregion
