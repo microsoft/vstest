@@ -3,9 +3,7 @@
 
 namespace Microsoft.VisualStudio.Coverage
 {
-    using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Xml;
     using Interfaces;
@@ -13,7 +11,6 @@ namespace Microsoft.VisualStudio.Coverage
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
-    using TraceDataCollector.Resources;
 
     /// <summary>
     /// DynamicCoverageDataCollector class
@@ -25,10 +22,12 @@ namespace Microsoft.VisualStudio.Coverage
         private const string VanguardX86ProfilerPath = @"covrun32.dll";
         private const string VanguardX64ProfilerPath = @"amd64\covrun64.dll";
 
-        private const string CoreclrProfilerPathVariable = "CORECLR_PROFILER_PATH";
+        private const string CoreclrProfilerPathVariable32 = "CORECLR_PROFILER_PATH_32";
+        private const string CoreclrProfilerPathVariable64 = "CORECLR_PROFILER_PATH_64";
         private const string CoreclrEnableProfilingVariable = "CORECLR_ENABLE_PROFILING";
         private const string CoreclrProfilerVariable = "CORECLR_PROFILER";
-        private const string CorProfilerPathVariable = "COR_PROFILER_PATH";
+        private const string CorProfilerPathVariable32 = "COR_PROFILER_PATH_32";
+        private const string CorProfilerPathVariable64 = "COR_PROFILER_PATH_64";
         private const string CorEnableProfilingVariable = "COR_ENABLE_PROFILING";
         private const string VanguardProfilerGuid = "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}";
         private const string FullCorProfiler = "COR_PROFILER";
@@ -39,8 +38,6 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private IDynamicCoverageDataCollectorImpl implementation;
 
-        private string framework;
-        private string targetPlatform;
         private ICollectorUtility collectorUtility;
 
         public DynamicCoverageDataCollector()
@@ -58,9 +55,6 @@ namespace Microsoft.VisualStudio.Coverage
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
-            this.collectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "Framework", out this.framework);
-            this.collectorUtility.RemoveChildNodeAndReturnValue(ref configurationElement, "TargetPlatform", out this.targetPlatform);
-
             this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
             this.Events.SessionStart += this.SessionStart;
             this.Events.SessionEnd += this.SessionEnd;
@@ -84,15 +78,19 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>Returns EnvironmentVariables required for code coverage profiler. </returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
-            var vanguardProfilerPath = this.GetVanguardProfilerPath();
+            var vanguardDirectory = this.collectorUtility.GetVanguardDirectory();
+            var vanguardX86ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX86ProfilerPath);
+            var vanguardX64ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX64ProfilerPath);
             var envVaribles = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrEnableProfilingVariable, "1"),
-                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerPathVariable, vanguardProfilerPath),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerPathVariable32, vanguardX86ProfilerFullPath),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerPathVariable64, vanguardX64ProfilerFullPath),
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CoreclrProfilerVariable, VanguardProfilerGuid),
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CodeCoverageSessionNameVariable, this.implementation.GetSessionName()),
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorEnableProfilingVariable, "1"),
-                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable, vanguardProfilerPath),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable32, vanguardX86ProfilerFullPath),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable64, vanguardX64ProfilerFullPath),
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.FullCorProfiler, VanguardProfilerGuid),
             };
 
@@ -102,17 +100,6 @@ namespace Microsoft.VisualStudio.Coverage
             }
 
             return envVaribles.AsReadOnly();
-        }
-
-        private static void ThrowOnNotSupportedTargetPlatform(string targetPlatform)
-        {
-            EqtTrace.Error(
-                "DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform: code coverage profiler not available for TargetPlatform: \"{0}\"",
-                targetPlatform);
-            throw new VanguardException(string.Format(
-                CultureInfo.CurrentUICulture,
-                Resources.NotSupportedTargetPlatform,
-                targetPlatform));
         }
 
         /// <summary>
@@ -133,68 +120,6 @@ namespace Microsoft.VisualStudio.Coverage
         private void SessionStart(object sender, SessionStartEventArgs e)
         {
             this.implementation.SessionStart(sender, e);
-        }
-
-        private string GetVanguardProfilerPath()
-        {
-            var profilerPath = this.IsDotnetCoreTargetFramework()
-                ? this.GetProfilerPathBasedOnDotnet()
-                : this.GetProfilerPathBasedOnTargetPlatform();
-
-            return Path.Combine(this.collectorUtility.GetVanguardDirectory(), profilerPath);
-        }
-
-        private string GetProfilerPathBasedOnDotnet()
-        {
-            string profilerPath = string.Empty;
-            var dotnetPath = this.collectorUtility.GetDotnetHostFullPath();
-            var targetPlatform = this.collectorUtility.GetMachineType(dotnetPath);
-
-            if (targetPlatform == CollectorUtility.MachineType.I386)
-            {
-                profilerPath = VanguardX86ProfilerPath;
-            }
-            else if (targetPlatform == CollectorUtility.MachineType.X64)
-            {
-                profilerPath = VanguardX64ProfilerPath;
-            }
-            else
-            {
-                DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform(targetPlatform.ToString());
-            }
-
-            return profilerPath;
-        }
-
-        private string GetProfilerPathBasedOnTargetPlatform()
-        {
-            string profilerPath = string.Empty;
-            if (string.IsNullOrWhiteSpace(this.targetPlatform))
-            {
-                DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform(this.targetPlatform);
-            }
-
-            Architecture arch = (Architecture)Enum.Parse(typeof(Architecture), this.targetPlatform, true);
-            if (arch == Architecture.X86)
-            {
-                profilerPath = VanguardX86ProfilerPath;
-            }
-            else if (arch == Architecture.X64)
-            {
-                profilerPath = VanguardX64ProfilerPath;
-            }
-            else
-            {
-                DynamicCoverageDataCollector.ThrowOnNotSupportedTargetPlatform(this.targetPlatform);
-            }
-
-            return profilerPath;
-        }
-
-        private bool IsDotnetCoreTargetFramework()
-        {
-            return this.framework?.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                   || this.framework?.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

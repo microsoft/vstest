@@ -27,11 +27,6 @@
         <target state="new">Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="NotSupportedTargetPlatform">
-        <source>Code Coverage not available for TargetPlatform: "{0}"</source>
-        <target state="new">Code Coverage not available for platform: "{0}"</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

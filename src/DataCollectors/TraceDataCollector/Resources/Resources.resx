@@ -132,7 +132,4 @@
   <data name="VanguardConnectionTimeout" xml:space="preserve">
     <value>Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</value>
   </data>
-  <data name="NotSupportedTargetPlatform" xml:space="preserve">
-    <value>Code Coverage not available for TargetPlatform: "{0}"</value>
-  </data>
 </root>

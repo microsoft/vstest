@@ -3,11 +3,9 @@
 
 namespace Microsoft.VisualStudio.Collector
 {
-    using System;
     using System.Globalization;
     using System.IO;
     using System.Reflection;
-    using System.Xml;
     using Coverage;
     using Coverage.Interfaces;
     using TraceDataCollector.Resources;
@@ -15,83 +13,9 @@ namespace Microsoft.VisualStudio.Collector
     public class CollectorUtility : ICollectorUtility
     {
         /// <summary>
-        /// Vanguard executable path (relative to VS install path)
+        /// Vanguard executable name
         /// </summary>
-        private const string VanguardPath = @"CodeCoverage.exe";
-
-        public enum MachineType
-        {
-            /// <summary>
-            /// The native.
-            /// </summary>
-            Native = 0,
-
-            /// <summary>
-            /// The i 386.
-            /// </summary>
-            I386 = 0x014c,
-
-            /// <summary>
-            /// The itanium.
-            /// </summary>
-            Itanium = 0x0200,
-
-            /// <summary>
-            /// The x 64.
-            /// </summary>
-            X64 = 0x8664
-        }
-
-        public void RemoveChildNodeAndReturnValue(
-            ref XmlElement owner,
-            string elementName,
-            out string elementValue)
-        {
-            var node = owner?.SelectSingleNode(elementName);
-            elementValue = string.Empty;
-
-            if (node != null)
-            {
-                elementValue = node.InnerText;
-                owner.RemoveChild(node);
-            }
-        }
-
-        public MachineType GetMachineType(string fileName)
-        {
-            const int PE_POINTER_OFFSET = 60;
-            const int MACHINE_OFFSET = 4;
-            byte[] data = new byte[4096];
-            using (Stream s = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-            {
-                s.Read(data, 0, 4096);
-            }
-
-            // dos header is 64 bytes, last element, long (4 bytes) is the address of the PE header
-            int peHeaderAddr = BitConverter.ToInt32(data, PE_POINTER_OFFSET);
-            int machineUint = BitConverter.ToUInt16(data, peHeaderAddr + MACHINE_OFFSET);
-            return (MachineType)machineUint;
-        }
-
-        public string GetDotnetHostFullPath()
-        {
-            char separator = ';';
-            var dotnetExeName = "dotnet.exe";
-
-            var pathString = Environment.GetEnvironmentVariable("PATH");
-            foreach (string path in pathString.Split(separator))
-            {
-                string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
-                if (File.Exists(exeFullPath))
-                {
-                    return exeFullPath;
-                }
-            }
-
-            string errorMessage = string.Format("NoDotnetExeFound", dotnetExeName);
-
-            throw new FileNotFoundException(errorMessage);
-        }
+        private const string VanguardExeName = @"CodeCoverage.exe";
 
         /// <summary>
         /// Get path to vanguard.exe
@@ -99,7 +23,7 @@ namespace Microsoft.VisualStudio.Collector
         /// <returns>Vanguard path</returns>
         public string GetVanguardPath()
         {
-            var vanguardPath = Path.Combine(this.GetVanguardDirectory(), VanguardPath);
+            var vanguardPath = Path.Combine(this.GetVanguardDirectory(), VanguardExeName);
             if (!File.Exists(vanguardPath))
             {
                 throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VangurdNotFound, vanguardPath));

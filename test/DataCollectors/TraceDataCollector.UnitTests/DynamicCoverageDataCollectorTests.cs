@@ -19,8 +19,8 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     [TestClass]
     public class DynamicCoverageDataCollectorTests
     {
-        private const string DefaultConfigFormat =
-            "<Configuration><Framework>{0}</Framework><TargetPlatform>{1}</TargetPlatform></Configuration>";
+        private const string DefaultConfig =
+            "<Configuration><Framework>.NETCoreApp,Version=v2.0</Framework><TargetPlatform>x64</TargetPlatform></Configuration>";
         private TestableDynamicCoverageDataCollector collector;
         private Mock<ICollectorUtility> collectorUtilityMock;
         private Mock<IDynamicCoverageDataCollectorImpl> implMock;
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.agentContextMock = new Mock<IDataCollectionAgentContext>();
             this.collector = new TestableDynamicCoverageDataCollector(this.collectorUtilityMock.Object, this.implMock.Object);
             this.collectorUtilityMock.Setup(u => u.GetVanguardDirectory()).Returns(Directory.GetCurrentDirectory);
-            var configElement = this.SetupForGetEnvironmentVariables(".NETCoreApp,Version=v2.0", "x64");
+            var configElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(DynamicCoverageDataCollectorTests.DefaultConfig);
             this.collector.Initialize(configElement, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
         }
 
@@ -76,51 +76,40 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.implMock.Verify(i => i.SessionEnd(It.IsAny<object>(), It.IsAny<SessionEndEventArgs>()));
         }
 
-        [DataRow(".NETCoreApp,Version=v2.0", "x86")]
-        [DataRow(".NETCoreApp,Version=v2.0", "X64")]
-        [DataRow(".NETFramework,Version=v4.6", "X86")]
-        [DataRow(".NETFramework,Version=v4.6", "x64")]
         [TestMethod]
-        public void GetEnvironmentVariablesShouldReturnRightEnvVaribles(string framework, string targetPlatform)
+        public void GetEnvironmentVariablesShouldReturnRightEnvVaribles()
         {
             var currentDir = Directory.GetCurrentDirectory();
-            var profileRelativePath = targetPlatform.Equals("x86", StringComparison.OrdinalIgnoreCase)? "covrun32.dll": @"amd64\covrun64.dll";
-            var profilePath = Path.Combine(currentDir, profileRelativePath);
-            var expectedEnvVariables = new Dictionary<string, string>()
+            var x64profilePath = Path.Combine(currentDir, @"amd64\covrun64.dll");
+            var x86profilePath = Path.Combine(currentDir, "covrun32.dll");
+            var expectedEnvVariables = new Dictionary<string, string>
             {
                 { "CORECLR_ENABLE_PROFILING", "1"},
-                { "CORECLR_PROFILER_PATH", profilePath},
+                { "CORECLR_PROFILER_PATH_32", x86profilePath},
+                { "CORECLR_PROFILER_PATH_64", x64profilePath},
                 { "CORECLR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}"},
                 { "CODE_COVERAGE_SESSION_NAME", "MTM_123"},
-                { "COR_PROFILER_PATH", profilePath},
+                { "COR_PROFILER_PATH_32", x86profilePath},
+                { "COR_PROFILER_PATH_64", x64profilePath},
                 { "COR_ENABLE_PROFILING", "1"},
                 { "COR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}"},
             };
 
-            var configElement = SetupForGetEnvironmentVariables(framework, targetPlatform);
-            this.collector.Initialize(configElement, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
+            this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
+
             var envVars = this.collector.GetEnvironmentVariables();
 
+            foreach (var pair in envVars)
+            {
+                Console.WriteLine(pair.Key+ " ==> " + pair.Value);
+            }
+
             Assert.AreEqual(expectedEnvVariables.Count, envVars.Count());
+
             foreach (var pair in envVars)
             {
                 Assert.IsTrue(expectedEnvVariables.ContainsKey(pair.Key) && expectedEnvVariables[pair.Key].Equals(pair.Value), $"unexpected env variable {pair}");
             }
-        }
-
-        [DataRow(".NETCoreApp,Version=v2.0", "Native")]
-        [DataRow(".NETFramework,Version=v4.6", "ARM")]
-        [DataRow(".NETFramework,Version=v4.6", null)]
-        [DataRow(".NETFramework,Version=v4.6", " ")]
-        [TestMethod]
-        public void GetEnvironmentVariablesShouldThrowForNotSupportedConfig(string framework, string targetPlatform)
-        {
-            var configElement = SetupForGetEnvironmentVariables(framework, targetPlatform);
-
-            this.collector.Initialize(configElement, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
-            var exception = Assert.ThrowsException<VanguardException>( () => this.collector.GetEnvironmentVariables());
-
-            Assert.AreEqual($"Code Coverage not available for TargetPlatform: \"{targetPlatform}\"", exception.Message);
         }
 
         [TestMethod]
@@ -139,42 +128,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 
             this.implMock.Verify(i => i.SessionStart(It.IsAny<object>(), It.IsAny<SessionStartEventArgs>()), Times.Never);
             this.implMock.Verify(i => i.SessionEnd(It.IsAny<object>(), It.IsAny<SessionEndEventArgs>()), Times.Never);
-        }
-
-        private XmlElement SetupForGetEnvironmentVariables(string framework, string targetPlatform)
-        {
-            string config = string.Format(DynamicCoverageDataCollectorTests.DefaultConfigFormat, framework, targetPlatform);
-            var configElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(config);
-
-            this.collectorUtilityMock.Setup(u =>
-                u.RemoveChildNodeAndReturnValue(ref configElement, "Framework", out framework));
-
-            this.collectorUtilityMock.Setup(u =>
-                u.RemoveChildNodeAndReturnValue(ref configElement, "TargetPlatform", out targetPlatform));
-            this.SetupGetMachineType(targetPlatform);
-
-            this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
-            return configElement;
-        }
-
-        private void SetupGetMachineType(string targetPlatform)
-        {
-            this.collectorUtilityMock.Setup(u => u.GetMachineType(It.IsAny<string>()))
-                .Returns(() =>
-                {
-                    if (targetPlatform.Equals("x86", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return CollectorUtility.MachineType.I386;
-                    }
-                    else if (targetPlatform.Equals("x64", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return CollectorUtility.MachineType.X64;
-                    }
-                    else
-                    {
-                        return CollectorUtility.MachineType.Native;
-                    }
-                });
         }
 
         private class TestableDynamicCoverageDataCollector : DynamicCoverageDataCollector

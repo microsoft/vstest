@@ -26,7 +26,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void CollectCodeCoverage(RunnerInfo runnerInfo)
+        public void CollectCodeCoverageX86(RunnerInfo runnerInfo)
+        {
+            this.CollectCodeCoverage(runnerInfo, "x86");
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void CollectCodeCoverageX64(RunnerInfo runnerInfo)
+        {
+            this.CollectCodeCoverage(runnerInfo, "x64");
+        }
+
+        private void CollectCodeCoverage(RunnerInfo runnerInfo, string targetPlatform)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -49,6 +62,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDirectory}", $" /Diag:{diagFileName}",
                 $" /TestAdapterPath:{traceDataCollectorDir}", " /Collect:\"Code Coverage\"");
+            arguments = string.Concat(arguments, $" /Platform:{targetPlatform}");
+
             var trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
@@ -59,6 +74,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
             Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
+
+            // Microsoft.VisualStudio.Coverage.Analysis assembly not avaialble for .NET Core.
 #if NET451
             this.ValidateCoverageData(actualCoverageFile);
 #endif
