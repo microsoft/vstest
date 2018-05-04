@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 IntegrationTestEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
 
             this.InvokeVsTest(arguments);
 
@@ -74,7 +74,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.RunnerFramework);
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), null, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector");
 
             this.InvokeVsTest(arguments);
 

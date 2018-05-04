@@ -131,7 +131,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         internal IEnumerable<string> CreateArgument()
         {
-            var initializeConsoleLogger = true;
+            var isConsoleLoggerEnabled = true;
             var allArgs = new List<string>();
 
             // TODO log arguments in task
@@ -145,14 +145,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 foreach (var arg in this.VSTestTestAdapterPath)
                 {
                     allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
-                }
-            }
-            else
-            {
-                // For Full CLR, add source directory as test adapter path.
-                if (this.VSTestFramework.StartsWith(".NETFramework", StringComparison.OrdinalIgnoreCase))
-                {
-                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(Path.GetDirectoryName(this.TestFileFullPath)));
                 }
             }
 
@@ -180,7 +172,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
                     if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
                     {
-                        initializeConsoleLogger = false;
+                        isConsoleLoggerEnabled = false;
                     }
                 }
             }
@@ -210,7 +202,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
 
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && initializeConsoleLogger)
+            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && isConsoleLoggerEnabled)
             {
                 var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
                 var quietTestLogging = new List<string>() { "q", "quiet" };

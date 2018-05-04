@@ -249,7 +249,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             var allArguments = vstestTask.CreateArgument().ToArray();
 
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path1")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:path2")));
         }
 
         [TestMethod]
