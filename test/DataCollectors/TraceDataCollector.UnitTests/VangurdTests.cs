@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.outputFileName = Path.Combine(this.outputDir, Guid.NewGuid() + ".coverage");
             this.configXmlElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(ConfigXml)["CodeCoverage"];
             this.vangurdCommandBuilderMock.Setup(c =>
-                    c.GenerateCommandLine(Command.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
+                    c.GenerateCommandLine(VangurdCommand.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(VangurdTests.GetShutdownCommand(this.sessionName));
             this.vanguard.Initialize(this.sessionName, this.configFileName, this.configXmlElement, this.dataCollectionLoggerMock.Object);
             this.collectorUtilityMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage.exe"));
@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 VangurdTests.CodeCoverageExeFileName);
 
             this.vangurdCommandBuilderMock.Setup(c =>
-                    c.GenerateCommandLine(Command.Collect, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                    c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(VangurdTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
 
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var expectedErrorMessage =
                 "Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.";
             this.vangurdCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(Command.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(c => c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>())).Returns("invalid command");
             var exception = Assert.ThrowsException<VanguardException>(() => this.vanguard.Start(this.outputFileName, this.dataCollectionContext));
             Assert.AreEqual(expectedErrorMessage, exception.Message);
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var expectedErrorMessage =
                 "Failed to receive running event from CodeCoverage.exe in 0 seconds, This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
             this.vangurdCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(Command.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(c => c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>())).Returns(VangurdTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
             var exception = Assert.ThrowsException<VanguardException>(() => this.vanguard.Start(this.outputFileName, this.dataCollectionContext));
             Assert.AreEqual(expectedErrorMessage, exception.Message);
@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 cts,
                 VangurdTests.CodeCoverageExeFileName);
             this.vangurdCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(Command.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(c => c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>())).Returns(VangurdTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             this.vanguard.Stop();

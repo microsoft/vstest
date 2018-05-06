@@ -14,15 +14,15 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     {
         /// <inheritdoc />
         public string GenerateCommandLine(
-            Command command,
+            VangurdCommand vangurdCommand,
             string sessionName,
             string outputName,
             string configurationFileName)
         {
             StringBuilder builder = new StringBuilder();
-            switch (command)
+            switch (vangurdCommand)
             {
-                case Command.Collect:
+                case VangurdCommand.Collect:
                     builder.AppendFormat(
                         CultureInfo.InvariantCulture,
                         "collect /session:{0}  /output:\"{1}\"",
@@ -34,12 +34,12 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
                     }
 
                     break;
-                case Command.Shutdown:
+                case VangurdCommand.Shutdown:
                     builder.AppendFormat(CultureInfo.InvariantCulture, "shutdown /session:{0}", sessionName);
                     break;
             }
 
-            EqtTrace.Info("VangurdCommandBuilder.GenerateCommandLine: Created the command: {0}", builder);
+            EqtTrace.Info("VangurdCommandBuilder.GenerateCommandLine: Created the vangurdCommand: {0}", builder);
             return builder.ToString();
         }
     }

@@ -6,11 +6,13 @@ namespace Microsoft.VisualStudio.Collector
     using System.IO;
     using Coverage.Interfaces;
 
-    public class FileHelper : IFileHelper
+    /// <inheritdoc />
+    internal class FileHelper : IFileHelper
     {
-        public bool Exists(string filePath)
+        /// <inheritdoc />
+        public bool Exists(string path)
         {
-            return File.Exists(filePath);
+            return File.Exists(path);
         }
     }
 }

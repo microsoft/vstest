@@ -15,17 +15,9 @@ namespace Microsoft.VisualStudio.Coverage
         /// Constructor
         /// </summary>
         /// <param name="message">Error message</param>
-        /// <param name="isCritical">Whether to continue execution with warning or stop with error.</param>
-        internal VanguardException(string message, bool isCritical = false)
+        internal VanguardException(string message)
             : base(message)
         {
-            this.IsCritical = isCritical;
         }
-
-        /// <summary>
-        /// Gets a value indicating whether whether it's a critical exception. Critical exception cannot be caught and will stop the data collector from running.
-        /// Non-critical exception will be caught and be logged as a warning message.
-        /// </summary>
-        public bool IsCritical { get; private set; }
     }
 }

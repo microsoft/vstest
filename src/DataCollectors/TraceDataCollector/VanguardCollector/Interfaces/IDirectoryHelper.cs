@@ -3,18 +3,23 @@
 
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
-    using System;
-    using System.IO;
-    using System.Xml;
-    using TestPlatform.ObjectModel.DataCollection;
-
     /// <summary>
-    /// The IVangurd interface.
+    /// Interface to Abstraction System.IO.Directory funcationalities for mocking Directory functionalities
+    /// in unit tests.
     /// </summary>
     internal interface IDirectoryHelper
     {
-        void Delete(string directoryPath, bool recursive);
+        /// <summary>
+        ///  Deletes the specified directory and, if indicated, any subdirectories and files in the directory.
+        /// </summary>
+        /// <param name="path">The name of the directory to remove.</param>
+        /// <param name="recursive">true to remove directories, subdirectories, and files in path; otherwise, false.</param>
+        void Delete(string path, bool recursive);
 
-        void CreateDirectory(string directoryPath);
+        /// <summary>
+        /// Creates all directories and subdirectories in the specified path unless they already exist.
+        /// </summary>
+        /// <param name="path">The directory to create.</param>
+        void CreateDirectory(string path);
     }
 }

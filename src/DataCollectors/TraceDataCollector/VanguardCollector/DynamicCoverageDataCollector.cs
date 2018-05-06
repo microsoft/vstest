@@ -13,7 +13,8 @@ namespace Microsoft.VisualStudio.Coverage
     using TestPlatform.ObjectModel;
 
     /// <summary>
-    /// DynamicCoverageDataCollector class
+    /// DynamicCoverageDataCollector implements BaseDataCollector for "Code Coverage" . Handles datacollector's SessionStart and SessionsEnd events
+    /// and provides environment variable required for code coverage profiler.
     /// </summary>
     [DataCollectorTypeUri("datacollector://Microsoft/CodeCoverage/2.0")]
     [DataCollectorFriendlyName("Code Coverage")]

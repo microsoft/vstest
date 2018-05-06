@@ -50,7 +50,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.GetAssetFullPath(assemblyName);
             string runSettings = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
-                @"scripts\vstest.runsettings");
+                @"scripts\vstest-codecoverage.runsettings");
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
                 $@"src\DataCollectors\TraceDataCollector\bin\{

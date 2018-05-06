@@ -71,15 +71,6 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to launch CodeCoverage.exe. No code coverage will be collected..
-        /// </summary>
-        internal static string GeneralErrorLaunchVanguard {
-            get {
-                return ResourceManager.GetString("GeneralErrorLaunchVanguard", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Running event not received from CodeCoverage.exe. Check eventlogs for failure reason..
         /// </summary>
         internal static string NoRunningEventFromVanguard {

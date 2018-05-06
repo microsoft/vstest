@@ -2,11 +2,6 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
-      <trans-unit id="GeneralErrorLaunchVanguard">
-        <source>Failed to launch CodeCoverage.exe. No code coverage will be collected.</source>
-        <target state="new">Failed to launch CodeCoverage.exe. No code coverage will be collected.</target>
-        <note>Similar to ErrorLaunchVanguard, CodeCoverage.exe cannot be launched. But we cannot know the exact reason.</note>
-      </trans-unit>
       <trans-unit id="FailedToCreateDirectory">
         <source>Failed to create directory: {0} with error:{1}</source>
         <target state="new">Failed to create directory: {0} with error:{1}</target>

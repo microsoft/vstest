@@ -4,20 +4,18 @@
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
     /// <summary>
-    /// The CollectorUtility interface.
+    ///  Commands for vanguard process.
     /// </summary>
-    internal interface ICollectorUtility
+    public enum VangurdCommand
     {
         /// <summary>
-        /// Get path to vanguard exe
+        /// Start the collecting code coverage for given session.
         /// </summary>
-        /// <returns>Vanguard path</returns>
-        string GetVanguardPath();
+        Collect,
 
         /// <summary>
-        /// Get path to vanguard exe's directory
+        /// Stop the collecting code coverage for given session.
         /// </summary>
-        /// <returns>Vanguard exe's directory. </returns>
-        string GetVanguardDirectory();
+        Shutdown
     }
 }

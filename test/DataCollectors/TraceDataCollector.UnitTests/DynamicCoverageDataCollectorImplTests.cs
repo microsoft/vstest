@@ -95,7 +95,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             @"            <PublicKeyTokens/>" + Environment.NewLine;
 
         private const string DefaultConfigFileName = "CodeCoverage.config";
-        private const string SessionNamePrefix = "MTM_";
 
         private const string DefaultCoverageFileName = "abc.coverage";
         private static XmlElement SampleConfigurationElement =
@@ -136,7 +135,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             this.collectorImpl.Initialize(null, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
 
-            StringAssert.StartsWith(aSessionName, DynamicCoverageDataCollectorImplTests.SessionNamePrefix);
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(aConfigFileName));
             StringAssert.Contains(aConfigFileName, Path.GetTempPath());
             Assert.AreEqual(
@@ -153,7 +151,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 
             this.collectorImpl.Initialize(configElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
 
-            StringAssert.StartsWith(aSessionName, DynamicCoverageDataCollectorImplTests.SessionNamePrefix);
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(aConfigFileName));
             Assert.AreEqual(expectedContent, aConfig.InnerXml);
         }
@@ -279,31 +276,13 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         }
 
         [TestMethod]
-        public void SessionStartShouldLogWarningOnNonCriticalException()
-        {
-            var sessionStartEventArgs = new SessionStartEventArgs();
-            var exceptionMessage = "Vanguard not found";
-            var actualMessage = string.Empty;
-            this.vangurdMock.Setup(d => d.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
-                .Throws(new VanguardException(exceptionMessage, false));
-            this.dataCollectionLoggerMock
-                .Setup(l => l.LogWarning(It.IsAny<DataCollectionContext>(), It.IsAny<string>()))
-                .Callback<DataCollectionContext, string>((context, msg) => { actualMessage = msg;});
-             this.collectorImpl.SessionStart(null, sessionStartEventArgs);
-
-            this.vangurdMock.Verify(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()));
-            StringAssert.Contains(actualMessage, exceptionMessage);
-
-        }
-
-        [TestMethod]
-        public void SessionStartShouldLogErrorOnCriticalException()
+        public void SessionStartShouldLogErrorOnException()
         {
             var sessionStartEventArgs = new SessionStartEventArgs();
             var exceptionMessage = "Vanguard not found";
             Exception expectedEx= null;
             this.vangurdMock.Setup(d => d.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
-                .Throws(new VanguardException(exceptionMessage, true));
+                .Throws(new VanguardException(exceptionMessage));
             this.dataCollectionLoggerMock
                 .Setup(l => l.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<Exception>()))
                 .Callback<DataCollectionContext, Exception>((context, ex) =>

@@ -10,17 +10,14 @@ namespace Microsoft.VisualStudio.Collector
     using Coverage.Interfaces;
     using TraceDataCollector.Resources;
 
-    public class CollectorUtility : ICollectorUtility
+    internal class CollectorUtility : ICollectorUtility
     {
         /// <summary>
         /// Vanguard executable name
         /// </summary>
         private const string VanguardExeName = @"CodeCoverage.exe";
 
-        /// <summary>
-        /// Get path to vanguard.exe
-        /// </summary>
-        /// <returns>Vanguard path</returns>
+        /// <inheritdoc />
         public string GetVanguardPath()
         {
             var vanguardPath = Path.Combine(this.GetVanguardDirectory(), VanguardExeName);
@@ -32,10 +29,7 @@ namespace Microsoft.VisualStudio.Collector
             return vanguardPath;
         }
 
-        /// <summary>
-        /// Get path to vanguard.exe
-        /// </summary>
-        /// <returns>Vanguard path</returns>
+        /// <inheritdoc />
         public string GetVanguardDirectory()
         {
             return Path.GetDirectoryName(typeof(CollectorUtility).GetTypeInfo().Assembly.Location);

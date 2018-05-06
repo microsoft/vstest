@@ -39,34 +39,25 @@ namespace Microsoft.VisualStudio.Coverage
         private const string GlobalEventNamePrefix = "Global\\";
 
         /// <summary>
-        /// Event set when vangaurd process exit
+        /// Stop() will use this event to check wheather the stop vanguard commnad
+        /// successful stop the collect command codecoverage.exe.
         /// </summary>
         private ManualResetEvent vanguardProcessExitEvent;
 
         /// <summary>
-        /// Vanguard process
+        /// To monitor vanguard collect command CodeCoverage.exe process.
         /// </summary>
         private Process vanguardProcess;
 
         /// <summary>
-        /// Session name of the vanguard logger
+        /// Session name of the vanguard logger.
         /// </summary>
         private string sessionName;
 
         /// <summary>
-        /// Vanguard configuration file name, empty for default config
+        /// Vanguard configuration file name.
         /// </summary>
         private string configurationFileName;
-
-        /// <summary>
-        /// Configuration XML element
-        /// </summary>
-        private XmlElement configuration;
-
-        /// <summary>
-        /// Output file name of vanguard
-        /// </summary>
-        private string outputName;
 
         /// <summary>
         /// Helper object to manage child process lifetimes
@@ -74,7 +65,7 @@ namespace Microsoft.VisualStudio.Coverage
         private IProcessJobObject processJobObject;
 
         /// <summary>
-        /// logger
+        /// Data collection logger
         /// </summary>
         private IDataCollectionLogger logger;
 
@@ -105,10 +96,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Gets output file name of vanguard
         /// </summary>
-        public string OutputName
-        {
-            get { return this.outputName; }
-        }
+        public string OutputName { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether whether vanguard is running
@@ -125,56 +113,54 @@ namespace Microsoft.VisualStudio.Coverage
             XmlElement configuration,
             IDataCollectionLogger logger)
         {
-            EqtTrace.Info("Vanguard.Initialize: Session name: {0}, config filename: {1} config: {2}", sessionName, configurationFileName, configuration?.InnerXml);
+            ValidateArg.NotNull(configuration, nameof(configuration));
+
+            EqtTrace.Info("Vanguard.Initialize: Session name: {0}, config filename: {1} config: {2}", sessionName, configurationFileName, configuration.InnerXml);
+
             this.sessionName = sessionName;
             this.configurationFileName = configurationFileName;
-            this.configuration = configuration;
             this.logger = logger;
             using (var writer = new StreamWriter(new FileStream(this.configurationFileName, FileMode.Create)))
             {
-                writer.WriteLine(this.configuration.OuterXml);
+                writer.WriteLine(configuration.OuterXml);
             }
         }
 
-        /// <summary>
-        /// Start a vanguard logger
-        /// </summary>
-        /// <param name="outputName">Output file name</param>
-        /// <param name="context">Data collection context. </param>
+        /// <inheritdoc />
         public virtual void Start(string outputName, DataCollectionContext context)
         {
             EqtTrace.Info("Vanguard.Start: Starting CodeCoverage.exe for coverage file: {0} datacollection session id: {1}", outputName, context.SessionId);
 
             this.vanguardProcessExitEvent = new ManualResetEvent(false);
-            this.outputName = outputName;
+            this.OutputName = outputName;
             this.context = context;
             var collectCommand = this.vangurdCommandBuilder.GenerateCommandLine(
-                Command.Collect,
+                VangurdCommand.Collect,
                 this.sessionName,
-                this.outputName,
+                this.OutputName,
                 this.configurationFileName);
 
             this.vanguardProcess = this.StartVanguardProcess(collectCommand, false, true);
             this.Wait();
         }
 
-        /// <summary>
-        /// Stop vanguard logger.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void Stop()
         {
             EqtTrace.Info("Vanguard.Stop: Stoping Vanguard.");
             if (this.IsRunning)
             {
                 var shutdownCommand = this.vangurdCommandBuilder.GenerateCommandLine(
-                    Command.Shutdown,
+                    VangurdCommand.Shutdown,
                     this.sessionName,
                     null,
                     null);
                 this.StartVanguardProcess(shutdownCommand, true);
 
-                // BugFix#1237649 We need to wait for completion of process exited event
-                this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit);
+                if (this.vanguardProcessExitEvent.WaitOne(ProcessExitWaitLimit) == false)
+                {
+                    EqtTrace.Warning("Vanguard.Stop: Vangurad process not exited in {0} ms", ProcessExitWaitLimit);
+                }
 
                 if (this.processJobObject != null)
                 {
@@ -184,9 +170,7 @@ namespace Microsoft.VisualStudio.Coverage
             }
         }
 
-        /// <summary>
-        /// IDisposable implementation
-        /// </summary>
+        /// <inheritdoc />
         public virtual void Dispose()
         {
             EqtTrace.Info("Vanguard.Dispose: Disposing vanguard process.");
@@ -228,15 +212,6 @@ namespace Microsoft.VisualStudio.Coverage
             uint dwMilliseconds);
 
         /// <summary>
-        /// Waitd until the object is in signaled state or the time-out interval elapses.
-        /// </summary>
-        /// <param name="hHandle">"The handle"</param>
-        /// <param name="dwMilliseconds">"The dwMilliseconds"</param>
-        /// <returns>Returns int.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
-
-        /// <summary>
         /// Close a handle
         /// </summary>
         /// <param name="hObject">Object handle</param>
@@ -263,7 +238,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Start a vanguard process
         /// </summary>
-        /// <param name="commandLine">Command line options</param>
+        /// <param name="commandLine">VangurdCommand line options</param>
         /// <param name="wait">Whether to wait until the process exits</param>
         /// <param name="standardErrorAsynchronousCall">The standardErrorAsynchronousCall. </param>
         /// <returns>Process instance of vanguard</returns>
@@ -348,11 +323,11 @@ namespace Microsoft.VisualStudio.Coverage
                         // we have already set to read messages asynchronously, so calling this.vanguardProcess.StandardError.ReadToEnd() which is synchronous is wrong.
                         // throw new VanguardException(string.Format(CultureInfo.CurrentCulture, Resources.ErrorLaunchVanguard, this.vanguardProcess.StandardError.ReadToEnd()));
                         EqtTrace.Error("Vanguard.Wait: From CodeCoverage.exe failed to receive running event in {0} seconds", timeout);
-                        throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.NoRunningEventFromVanguard), true);
+                        throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.NoRunningEventFromVanguard));
                 }
             }
 
-            // Something happens, kill the process
+            // No running event received from code coverage.exe and not exited. Kill the CodeCoverage.exe.
             try
             {
                 EqtTrace.Error("Vanguard.Wait: Fail to create running event. Killing CodeCoverage.exe. ");
@@ -363,7 +338,7 @@ namespace Microsoft.VisualStudio.Coverage
                 EqtTrace.Warning("Vanguard.Wait: Fail to kill CodeCoverage.exe. process with exception: {0}", ex);
             }
 
-            throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VanguardConnectionTimeout, timeout, EnvironmentHelper.VstestConnectionTimeout), true);
+            throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VanguardConnectionTimeout, timeout, EnvironmentHelper.VstestConnectionTimeout));
         }
 
         /// <summary>
@@ -395,10 +370,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="e">Event args</param>
         private void LoggerProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
-            EqtTrace.Warning(string.Format(
-                CultureInfo.CurrentCulture,
-                "ProcessErrorDataReceived : {0}",
-                e.Data));
+            EqtTrace.Warning("Vanguard.LoggerProcessErrorDataReceived: received error data: {0}", e.Data);
 
             if (this.logger != null && this.context != null && !string.IsNullOrWhiteSpace(e.Data))
             {

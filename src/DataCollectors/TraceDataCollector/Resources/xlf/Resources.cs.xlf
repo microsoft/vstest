@@ -20,11 +20,6 @@
       </count-group>
     </header>
     <body>
-      <trans-unit id="GeneralErrorLaunchVanguard">
-        <source>Failed to launch CodeCoverage.exe. No code coverage will be collected.</source>
-        <target state="new">Failed to launch CodeCoverage.exe. No code coverage will be collected.</target>
-        <note>Similar to ErrorLaunchVanguard, CodeCoverage.exe cannot be launched. But we cannot know the exact reason.</note>
-      </trans-unit>
       <trans-unit id="FailedToCreateDirectory">
         <source>Failed to create directory: {0} with error:{1}</source>
         <target state="new">Failed to create directory: {0} with error:{1}</target>

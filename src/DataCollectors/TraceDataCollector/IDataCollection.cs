@@ -55,19 +55,6 @@ namespace Microsoft.VisualStudio.TraceCollector
         DataCollectionContext SessionDataCollectionContext { get; }
     }
 
-    internal interface ITestCaseContextEventArgs
-    {
-        DataCollectionContext Context { get; }
-
-        bool IsChildTestCase { get; }
-
-        Guid TestCaseId { get; }
-
-        string TestCaseName { get; }
-
-        TestCase TestElement { get; }
-    }
-
     internal sealed class DataCollectionEnvironmentContextWrapper : IDataCollectionAgentContext
     {
         private readonly DataCollectionEnvironmentContext environmentContext;
@@ -192,78 +179,6 @@ namespace Microsoft.VisualStudio.TraceCollector
         }
 
         #endregion
-    }
-
-    internal sealed class TestCaseStartEventArgsWrapper : ITestCaseContextEventArgs
-    {
-        private readonly TestCaseStartEventArgs args;
-
-        public TestCaseStartEventArgsWrapper(TestCaseStartEventArgs e)
-        {
-            this.args = e;
-        }
-
-        public DataCollectionContext Context
-        {
-            get { return this.args.Context; }
-        }
-
-        public bool IsChildTestCase
-        {
-            get { return this.args.IsChildTestCase; }
-        }
-
-        // public Int32 TcmTestCaseId { get { return _args.TcmInformation == null ? 0 : _args.TcmInformation.TestCaseId; } }
-        public Guid TestCaseId
-        {
-            get { return this.args.TestCaseId; }
-        }
-
-        public string TestCaseName
-        {
-            get { return this.args.TestCaseName; }
-        }
-
-        public Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase TestElement
-        {
-            get { return this.args.TestElement; }
-        }
-    }
-
-    internal sealed class TestCaseEndEventArgsWrapper : ITestCaseContextEventArgs
-    {
-        private readonly TestCaseEndEventArgs args;
-
-        public TestCaseEndEventArgsWrapper(TestCaseEndEventArgs e)
-        {
-            this.args = e;
-        }
-
-        public DataCollectionContext Context
-        {
-            get { return this.args.Context; }
-        }
-
-        public bool IsChildTestCase
-        {
-            get { return this.args.IsChildTestCase; }
-        }
-
-        public Guid TestCaseId
-        {
-            get { return this.args.TestCaseId; }
-        }
-
-        public string TestCaseName
-        {
-            get { return this.args.TestCaseName; }
-        }
-
-        // public Int32 TcmTestCaseId { get { return _args.TcmInformation == null ? 0 : _args.TcmInformation.TestCaseId; } }
-        public TestCase TestElement
-        {
-            get { return this.args.TestElement; }
-        }
     }
 
     #endregion

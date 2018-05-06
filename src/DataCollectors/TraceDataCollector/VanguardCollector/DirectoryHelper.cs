@@ -6,18 +6,19 @@ namespace Microsoft.VisualStudio.Collector
     using System.IO;
     using Coverage.Interfaces;
 
-    public class DirectoryHelper : IDirectoryHelper
+    /// <inheritdoc />
+    internal class DirectoryHelper : IDirectoryHelper
     {
         /// <inheritdoc />
-        public void Delete(string directoryPath, bool recursive)
+        public void Delete(string path, bool recursive)
         {
-            Directory.Delete(directoryPath, recursive);
+            Directory.Delete(path, recursive);
         }
 
         /// <inheritdoc />
-        public void CreateDirectory(string directoryPath)
+        public void CreateDirectory(string path)
         {
-            Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(path);
         }
     }
 }
