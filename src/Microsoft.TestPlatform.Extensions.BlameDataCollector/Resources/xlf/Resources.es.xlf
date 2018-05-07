@@ -27,13 +27,13 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">La variable de entorno PROCDUMP_PATH requerida era NULL o estaba vacía. Establezca PROCDUMP_PATH en la ruta de acceso de la carpeta que contiene el ejecutable procdump correcto.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">La opción para recopilar un volcado de memoria estaba habilitada, pero no se generó ningún archivo de volcado de memoria.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

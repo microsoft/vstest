@@ -27,13 +27,13 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">필요한 환경 변수 PROCDUMP_PATH가 null이거나 비어 있습니다. 적절한 procdump 실행 파일이 포함된 폴더의 경로에 PROCDUMP_PATH를 설정하세요.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">덤프 수집이 사용하도록 설정되었지만 덤프 파일이 생성되지 않았습니다.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
