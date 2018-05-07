@@ -9,7 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -360,6 +362,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             double totalTimeTakenByAdapters = 0;
 
+            bool executorsFromDeprecatedLocations = false;
+
             // Call the executor for each group of tests.
             var exceptionsHitDuringRunTests = false;
 
@@ -417,6 +421,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             var totalTestRun = this.testRunCache.TotalExecutedTests - totalTests;
                             this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsRanByAdapter, executorUriExtensionTuple.Item1.AbsoluteUri), totalTestRun);
 
+                            if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(executor.Metadata.ExtensionUri, StringComparer.OrdinalIgnoreCase))
+                            {
+                                var executorLocation = executor.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
+
+                                executorsFromDeprecatedLocations |= Path.GetDirectoryName(executorLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation);
+                            }
+
                             totalTests = this.testRunCache.TotalExecutedTests;
                         }
 
@@ -470,6 +481,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             // Collecting Total Time Taken by Adapters
             this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenByAllAdaptersInSec, totalTimeTakenByAdapters);
+
+            if (executorsFromDeprecatedLocations)
+            {
+                this.TestRunEventsHandler?.HandleLogMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
+            }
 
             return exceptionsHitDuringRunTests;
         }

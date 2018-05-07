@@ -191,6 +191,11 @@
         <target state="translated">你使用的是旧版 Microsoft.NET.Test.Sdk。请迁移到 15.3.0 及更高版本。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DeprecatedAdapterPath">
+        <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
+        <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/pull/125 for more details.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
