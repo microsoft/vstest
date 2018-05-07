@@ -240,6 +240,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 // Collect Commands
                 this.LogCommandsTelemetryPoints(requestData);
+
+                // Collect data for Legacy Settings
+                this.LogTelemetryForLegacySettings(requestData, runsettings);
             }
 
             if (!commandLineOptions.IsDesignMode)
@@ -284,6 +287,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 // Post the run complete event
                 this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestExecutionCompleteEvent, requestData.MetricsCollection.Metrics);
+            }
+        }
+
+        private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
+        {
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
+            
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out List<string> legacySettings))
+            {
+                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettingElements, string.Join(",", legacySettings));
             }
         }
 

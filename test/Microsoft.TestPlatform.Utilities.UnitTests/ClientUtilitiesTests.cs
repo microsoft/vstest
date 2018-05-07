@@ -41,7 +41,11 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = doc.OuterXml;
 
-            Assert.AreEqual(runSettingsXML, finalSettingsXml);
+            var expectedRunSettingsXML = string.Concat("<RunSettings><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
+
+            Assert.AreEqual(expectedRunSettingsXML, finalSettingsXml);
         }
 
         [TestMethod]
@@ -63,7 +67,9 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var expectedSettingsXml = string.Concat(
                 "<RunSettings><MSTest><SettingsFile>",
                 expectedPath,
-                "</SettingsFile></MSTest></RunSettings>");
+                "</SettingsFile></MSTest><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
@@ -82,7 +88,11 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = doc.OuterXml;
 
-            Assert.AreEqual(runSettingsXML, finalSettingsXml);
+            var expectedRunSettingsXML = string.Concat("<RunSettings><MSTest><SettingsFile>C:\\temp\\remote.testsettings</SettingsFile></MSTest><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
+
+            Assert.AreEqual(expectedRunSettingsXML, finalSettingsXml);
         }
 
         [TestMethod]
@@ -99,7 +109,11 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = doc.OuterXml;
 
-            Assert.AreEqual(runSettingsXML, finalSettingsXml);
+            var expectedRunSettingsXML = string.Concat("<RunSettings><MSTest><SettingsFile></SettingsFile></MSTest><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
+
+            Assert.AreEqual(expectedRunSettingsXML, finalSettingsXml);
         }
 
         [TestMethod]
@@ -121,7 +135,9 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var expectedSettingsXml = string.Concat(
                 "<RunSettings><RunConfiguration><ResultsDirectory>",
                 expectedPath,
-                "</ResultsDirectory></RunConfiguration></RunSettings>");
+                "</ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
@@ -140,7 +156,11 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = doc.OuterXml;
 
-            Assert.AreEqual(runSettingsXML, finalSettingsXml);
+            var expectedRunSettingsXML = string.Concat("<RunSettings><RunConfiguration><ResultsDirectory>C:\\temp\\results</ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
+
+            Assert.AreEqual(expectedRunSettingsXML, finalSettingsXml);
         }
 
         [TestMethod]
@@ -157,7 +177,11 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             var finalSettingsXml = doc.OuterXml;
 
-            Assert.AreEqual(runSettingsXML, finalSettingsXml);
+            var expectedRunSettingsXML = string.Concat("<RunSettings><RunConfiguration><ResultsDirectory></ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
+
+            Assert.AreEqual(expectedRunSettingsXML, finalSettingsXml);
         }
 
         [TestMethod]
@@ -179,7 +203,9 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var expectedSettingsXml = string.Concat(
                 "<RunSettings><RunConfiguration><ResultsDirectory>",
                 expectedPath,
-                "</ResultsDirectory></RunConfiguration></RunSettings>");
+                "</ResultsDirectory></RunConfiguration><RunSettingsDirectory>",
+                Path.GetDirectoryName(currentAssemblyLocation),
+                "</RunSettingsDirectory></RunSettings>");
 
             Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
         }
