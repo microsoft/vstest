@@ -191,6 +191,11 @@
         <target state="translated">Sie verwenden eine ältere Version von Microsoft.NET.Test.Sdk. Wechseln Sie zu Version 15.3.0 oder höher.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NonExistingExtensions">
+        <source>Could not find extensions: {0}</source>
+        <target state="new">Could not find extensions: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
