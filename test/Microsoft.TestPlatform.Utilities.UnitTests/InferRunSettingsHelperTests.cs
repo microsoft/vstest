@@ -493,6 +493,57 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.IsFalse(InferRunSettingsHelper.IsTestSettingsEnabled(runsettingsString));
         }
 
+        [TestMethod]
+        public void TryGetLegacySettingsForRunSettingsWithoutLegacySettingsShouldReturnFalse()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                      </RunSettings>";
+            
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+        }
+
+        [TestMethod]
+        public void TryGetLegacySettingsForRunSettingsWithInvalidLegacySettingsShouldReturnFalse()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                        <LegacySettings>
+                                            <Foo>
+                                        </LegacySettings>
+                                      </RunSettings>";
+
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+        }
+
+        [TestMethod]
+        public void TryGetLegacySettingsForRunSettingsWithEmptyLegacySettingsShouldReturnTrueAndEmptyListForLegacySettingElements()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                        <LegacySettings>
+                                        </LegacySettings>
+                                      </RunSettings>";
+
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+            Assert.AreEqual(0, legacySettings.Count);
+        }
+
+        [TestMethod]
+        public void TryGetLegacySettingsForRunSettingsWithValidLegacySettingsShouldReturnTrueAndListForLegacySettingElements()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <LegacySettings>
+	                                        <Deployment>
+                                                <DeploymentItem filename="".\test.txt"" />
+                                            </Deployment>
+                                            <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                       </LegacySettings>
+                                      </RunSettings>";
+
+            var expectedList = new List<string> { "Deployment", "Scripts" };
+
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+            CollectionAssert.AreEqual(expectedList, legacySettings);
+        }
+
         #region RunSettingsIncompatibeWithTestSettings Tests
 
         [TestMethod]

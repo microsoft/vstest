@@ -211,7 +211,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestPlatformExtensionsShouldExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
+        public void GetTestPlatformExtensionsShouldNotExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
         {
             List<string> sourcesDir = new List<string> { @"C:\Source1" };
             List<string> sources = new List<string> { @"C:\Source1\source1.dll" };
@@ -219,8 +219,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
 
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[1])).Returns(new Version(5, 5));
+
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TestAdaptersPaths>C:\\Foo</TestAdaptersPaths></RunConfiguration> </RunSettings>");
-            List<string> currentList = new List<string> { @"FooExtension.dll" };
+            List<string> currentList = new List<string> { @"FooExtension.dll", @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
 
             // Act
             var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();
@@ -368,13 +371,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
             var currentProcess = Process.GetCurrentProcess();
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
 
             this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
 
             Task<bool> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None);
             pid.Wait();
-            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsTrue(pid.Result);
             Assert.AreEqual(currentProcess.Id, this.testHostId);
@@ -386,7 +389,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
             var currentProcess = Process.GetCurrentProcess();
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
             this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None).Wait();
 
             this.mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object>>()));

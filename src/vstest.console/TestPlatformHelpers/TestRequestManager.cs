@@ -59,8 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private ITestRunRequest currentTestRunRequest;
 
-        private readonly EventWaitHandle runRequestStartedEventHandle = new AutoResetEvent(false);
-
         private object syncobject = new object();
 
         private Task<IMetricsPublisher> metricsPublisher;
@@ -242,6 +240,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 // Collect Commands
                 this.LogCommandsTelemetryPoints(requestData);
+
+                // Collect data for Legacy Settings
+                this.LogTelemetryForLegacySettings(requestData, runsettings);
             }
 
             if (!commandLineOptions.IsDesignMode)
@@ -259,9 +260,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testRunRequestPayload.KeepAlive,
                                   runsettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
-                                  testHostLauncher);
-                runCriteria.TestCaseFilter = testRunRequestPayload.TestPlatformOptions?.TestCaseFilter;
-                runCriteria.FilterOptions = testRunRequestPayload.TestPlatformOptions?.FilterOptions;
+                                  testHostLauncher,
+                                  testRunRequestPayload.TestPlatformOptions?.TestCaseFilter,
+                                  testRunRequestPayload.TestPlatformOptions?.FilterOptions);
             }
             else
             {
@@ -289,14 +290,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
+        private void LogTelemetryForLegacySettings(IRequestData requestData, string runsettings)
+        {
+            requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
+            
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out List<string> legacySettings))
+            {
+                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettingElements, string.Join(",", legacySettings));
+            }
+        }
+
         /// <summary>
         /// Cancel the test run.
         /// </summary>
         public void CancelTestRun()
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
-
-            this.runRequestStartedEventHandle.WaitOne(runRequestTimeout);
             this.currentTestRunRequest?.CancelAsync();
         }
 
@@ -306,8 +315,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public void AbortTestRun()
         {
             EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
-
-            this.runRequestStartedEventHandle.WaitOne(runRequestTimeout);
             this.currentTestRunRequest?.Abort();
         }
 
@@ -517,8 +524,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     this.testPlatformEventSource.ExecutionRequestStart();
 
                     this.currentTestRunRequest.ExecuteAsync();
-                    
-                    this.runRequestStartedEventHandle.Set();
 
                     // Wait for the run completion event
                     this.currentTestRunRequest.WaitForCompletion();

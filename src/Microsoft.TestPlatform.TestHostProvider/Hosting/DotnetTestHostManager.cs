@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private IFileHelper fileHelper;
 
-        private ITestHostLauncher testHostLauncher;
+        private ITestHostLauncher customTestHostLauncher;
 
         private Process testHostProcess;
 
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
-            this.testHostLauncher = customLauncher;
+            this.customTestHostLauncher = customLauncher;
         }
 
         /// <inheritdoc/>
@@ -326,28 +326,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            try
+            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+            if (this.customTestHostLauncher == null)
             {
-                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-                if (this.testHostLauncher == null)
-                {
-                    EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+                EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-                    cancellationToken.ThrowIfCancellationRequested();
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
-                }
-                else
-                {
-                    var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
-                    this.testHostProcess = Process.GetProcessById(processId);
-                    this.processHelper.SetExitCallback(processId, this.ExitCallBack);
-                }
+                cancellationToken.ThrowIfCancellationRequested();
+                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
             }
-            catch (OperationCanceledException ex)
+            else
             {
-                EqtTrace.Error("DotnetTestHostManager.LaunchHost: Failed to launch testhost: {0}", ex);
-                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.ToString());
-                return false;
+                var processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo, cancellationToken);
+                this.testHostProcess = Process.GetProcessById(processId);
+                this.processHelper.SetExitCallback(processId, this.ExitCallBack);
             }
 
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
