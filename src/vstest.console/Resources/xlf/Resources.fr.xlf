@@ -225,28 +225,19 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;URI/FriendlyName de l'enregistreur d'événements&gt;
+        <target state="translated">--logger|/logger:&lt;URI/FriendlyName de l'enregistreur d'événements&gt;
       Spécifiez un enregistreur d'événements pour les résultats des tests. Par exemple, pour journaliser des résultats dans un 
-      fichier de résultats des tests Visual Studio (TRX), utilisez /logger:trx[;LogFileName=&lt;valeur par défaut du nom de fichier unique&gt;]
+      fichier de résultats des tests Visual Studio (TRX), utilisez /logger:trx[;LogFileName=&lt;nom de fichier unique comme valeur par défaut&gt;]
       Crée un fichier dans le répertoire TestResults avec le LogFileName spécifié.
 
       Changez le niveau de détail des messages du journal de console, comme suit
-      Exemple : /logger:console;verbosity=&lt;Valeur par défaut sur "minimal"&gt;
-      Valeurs autorisées pour les commentaires : quiet, minimal et normal.
+      Exemple : /logger:console;verbosity=&lt;a la valeur par défaut "normal"&gt;
+      Valeurs autorisées pour les commentaires : quiet, minimal, normal et detailed.
 
       Changez le préfixe du niveau de diagnostic du journal de console, comme suit
-      Exemple : /logger:console;prefix=&lt;Valeur par défaut sur "false"&gt;
-      Informations supplémentaires sur le journal de console ici : https://aka.ms/console-logger
-
-      Pour publier les résultats des tests sur Team Foundation Server, utilisez TfsPublisher comme indiqué ci-dessous
-      Exemple : /logger:TfsPublisher;
-                Collection=&lt;URL de la collection de projets d'équipe&gt;;
-                BuildName=&lt;nom de la build&gt;;
-                TeamProject=&lt;nom du projet d'équipe&gt;
-                [;Platform=&lt;"Any CPU" par défaut&gt;]
-                [;Flavor=&lt;"Debug" par défaut&gt;]
-                [;RunTitle=&lt;titre&gt;]</target>
-        <note></note>
+      Exemple : /logger:console;prefix=&lt;a la valeur par défaut "false"&gt;
+      Informations supplémentaires sur le journal de console ici : https://aka.ms/console-logger</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--journal | / journal : &lt; Uri de journal/FriendlyName &gt;
       Spécifiez un journal de résultats de test.  Par exemple, pour enregistrer les résultats dans un fichier trans (Visual Studio Test résultats.) utilisent /logger:trx.
@@ -748,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;version du framework&gt;
+        <target state="translated">--Framework|/Framework:&lt;version du framework&gt;
       Version cible du .Net Framework à utiliser pour l'exécution des tests. 
       Les valeurs valides sont : ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0", etc.
-      Les autres valeurs prises en charge sont Framework35, Framework40, Framework45 et FrameworkCore10.</target>
-        <note></note>
+      Les autres valeurs prises en charge sont Framework35, Framework40, Framework45, FrameworkCore10 et FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework : &lt; Version .NET Framework &gt;
       Ciblez .net version de Framework à utiliser pour l’exécution du test. 
@@ -772,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Version non valide du .Net Framework : {0}. Indiquez le nom complet de TargetFramework. Les autres versions du .Net Framework prises en charge sont Framework35, Framework40, Framework45 et FrameworkCore10.</target>
-        <note></note>
+        <target state="translated">Version non valide du .Net Framework : {0}. Indiquez le nom complet de TargetFramework. Les autres versions du .Net Framework prises en charge sont Framework35, Framework40, Framework45, FrameworkCore10 et FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Non valide .net version du Framework : {0}. Veuillez donner le nom complet de la TargetFramework. Autre prise en charge de .net Framework versions sont Framework35, Framework40 et Framework45.</target>
         </alt-trans>
@@ -1569,33 +1560,24 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Creates file in TestResults directory with given LogFileName.
+        <target state="translated">--logger|/logger:&lt;URI/FriendlyName de l'enregistreur d'événements&gt;
+      Spécifiez un enregistreur d'événements pour les résultats des tests. Par exemple, pour journaliser des résultats dans un 
+      fichier de résultats des tests Visual Studio (TRX), utilisez /logger:trx[;LogFileName=&lt;nom de fichier unique comme valeur par défaut&gt;]
+      Crée un fichier dans le répertoire TestResults avec le LogFileName spécifié.
 
-      Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal, normal and detailed.
+      Changez le niveau de détail des messages du journal de console, comme suit
+      Exemple : /logger:console;verbosity=&lt;a la valeur par défaut "minimal"&gt;
+      Valeurs autorisées pour les commentaires : quiet, minimal, normal et detailed.
 
-      Change the diagnostic level prefix for console logger as shown below
-      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      Changez le préfixe du niveau de diagnostic du journal de console, comme suit
+      Exemple : /logger:console;prefix=&lt;a la valeur par défaut "false"&gt;
+      Informations supplémentaires sur le journal de console ici : https://aka.ms/console-logger</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
-        <note></note>
+        <target state="translated">L'option CollectDump pour Blame n'est pas prise en charge pour cette plateforme.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
