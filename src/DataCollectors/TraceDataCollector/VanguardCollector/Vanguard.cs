@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.Coverage
                 this.configurationFileName);
 
             this.vanguardProcess = this.StartVanguardProcess(collectCommand, false, true);
-            this.Wait();
+            this.WaitForRunningEvent();
         }
 
         /// <inheritdoc />
@@ -295,11 +295,11 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Wait until vanguard initialization is finished
+        /// WaitForRunningEvent until vanguard initialization is finished
         /// </summary>
-        private void Wait()
+        private void WaitForRunningEvent()
         {
-            EqtTrace.Info("Vanguard.Wait: Waiting for CodeCoverage.exe initialization.");
+            EqtTrace.Info("Vanguard.WaitForRunningEvent: Waiting for CodeCoverage.exe initialization.");
             IntPtr runningEvent = CreateEvent(
                 IntPtr.Zero,
                 true,
@@ -316,13 +316,13 @@ namespace Microsoft.VisualStudio.Coverage
                 switch (result)
                 {
                     case WaitObject0:
-                        EqtTrace.Info("Vanguard.Wait: Running event received from CodeCoverage.exe.");
+                        EqtTrace.Info("Vanguard.WaitForRunningEvent: Running event received from CodeCoverage.exe.");
                         return;
                     case WaitObject0 + 1:
                         // Process exited, something wrong happened
                         // we have already set to read messages asynchronously, so calling this.vanguardProcess.StandardError.ReadToEnd() which is synchronous is wrong.
                         // throw new VanguardException(string.Format(CultureInfo.CurrentCulture, Resources.ErrorLaunchVanguard, this.vanguardProcess.StandardError.ReadToEnd()));
-                        EqtTrace.Error("Vanguard.Wait: From CodeCoverage.exe failed to receive running event in {0} seconds", timeout);
+                        EqtTrace.Error("Vanguard.WaitForRunningEvent: From CodeCoverage.exe failed to receive running event in {0} seconds", timeout);
                         throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.NoRunningEventFromVanguard));
                 }
             }
@@ -330,12 +330,12 @@ namespace Microsoft.VisualStudio.Coverage
             // No running event received from code coverage.exe and not exited. Kill the CodeCoverage.exe.
             try
             {
-                EqtTrace.Error("Vanguard.Wait: Fail to create running event. Killing CodeCoverage.exe. ");
+                EqtTrace.Error("Vanguard.WaitForRunningEvent: Fail to create running event. Killing CodeCoverage.exe. ");
                 this.vanguardProcess.Kill();
             }
             catch (Exception ex)
             {
-                EqtTrace.Warning("Vanguard.Wait: Fail to kill CodeCoverage.exe. process with exception: {0}", ex);
+                EqtTrace.Warning("Vanguard.WaitForRunningEvent: Fail to kill CodeCoverage.exe. process with exception: {0}", ex);
             }
 
             throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VanguardConnectionTimeout, timeout, EnvironmentHelper.VstestConnectionTimeout));

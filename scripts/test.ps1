@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp1.0", "net451")]
+    [ValidateSet("netcoreapp1.0", "net451", "netcoreapp2.0")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -163,7 +163,7 @@ function Invoke-Test
     {
         Write-Log ".. Test: Computing sources"
         Get-ChildItem -Recurse -Path $src -Include *.csproj | Where-Object { $_.FullName -inotmatch "TestAssets" } | ForEach-Object {
-            $testContainerName = $_.Directory.Name
+            $testContainerName = $_.BaseName
             $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
             $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
             
