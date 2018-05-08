@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         protected readonly Mock<ITestRuntimeProvider> mockTestHostManager;
         protected Mock<IDataSerializer> mockDataSerializer;
         protected Mock<ICommunicationChannel> mockChannel;
+        private Mock<IFileHelper> mockFileHelper;
 
         public ProxyBaseManagerTests()
         {
@@ -36,6 +38,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockChannel = new Mock<ICommunicationChannel>();
+            this.mockFileHelper = new Mock<IFileHelper>();
 
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new Mock<IMetricsCollection>().Object);
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
@@ -103,7 +106,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 mockRequestData.Object,
                 testRequestSender,
                 mockTestHostManager.Object,
-                mockDataSerializer.Object);
+                mockDataSerializer.Object,
+                this.mockFileHelper.Object);
 
             return testDiscoveryManager;
         }
@@ -111,8 +115,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         internal ProxyExecutionManager GetProxyExecutionManager()
         {
             this.SetupAndInitializeTestRequestSender();
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
             var testExecutionManager = new ProxyExecutionManager(mockRequestData.Object, testRequestSender,
-                mockTestHostManager.Object, mockDataSerializer.Object);
+                mockTestHostManager.Object, mockDataSerializer.Object, this.mockFileHelper.Object);
 
             return testExecutionManager;
         }

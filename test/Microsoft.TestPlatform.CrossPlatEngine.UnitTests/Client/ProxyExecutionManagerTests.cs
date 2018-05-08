@@ -5,6 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Threading;
@@ -24,6 +25,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Moq;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     [TestClass]
     public class ProxyExecutionManagerTests : ProxyBaseManagerTests
@@ -36,6 +38,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<IMetricsCollection> mockMetricsCollection;
 
+        private Mock<IFileHelper> mockFileHelper;
+
         private ProxyExecutionManager testExecutionManager;
 
         //private Mock<IDataSerializer> mockDataSerializer;
@@ -47,9 +51,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             //this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockFileHelper = new Mock<IFileHelper>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object);
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.mockFileHelper.Object);
 
             //this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
             //this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
@@ -194,6 +199,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
             try
             {
+                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(string.Empty);
 
@@ -267,6 +273,33 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunShouldInitializeExtensionsWithExistingExtensionsOnly()
+        {
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
+            var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
+
+            this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) =>
+            {
+                return extensions.Select(extension => { return Path.GetFileName(extension); });
+            });
+
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns((string extensionPath) =>
+            {
+                return !extensionPath.Contains("def.TestAdapter.dll");
+            });
+
+            this.mockFileHelper.Setup(fh => fh.Exists("def.TestAdapter.dll")).Returns(false);
+            this.mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
+
+            var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            this.mockRequestSender.Verify(s => s.InitializeExecution(expectedOutputPaths), Times.Once);
+        }
+
+    [TestMethod]
         public void SetupChannelShouldThrowExceptionIfClientConnectionTimeout()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
@@ -373,6 +406,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldInitiateTestRunForSourcesThroughTheServer()
         {
             TestRunCriteriaWithSources testRunCriteriaPassed = null;
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), this.testExecutionManager))
                 .Callback(
@@ -395,6 +429,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldInitiateTestRunForTestsThroughTheServer()
         {
             TestRunCriteriaWithTests testRunCriteriaPassed = null;
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
             this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), this.testExecutionManager))
                 .Callback(
@@ -550,6 +585,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void ExecutionManagerShouldPassOnTestRunStatsChange()
         {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
             Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var runCriteria = new Mock<TestRunCriteria>(
                 new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
@@ -619,6 +655,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void ExecutionManagerShouldPassOnLaunchProcessWithDebuggerAttached()
         {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
             Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
             var runCriteria = new Mock<TestRunCriteria>(
                 new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
@@ -637,6 +674,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var completeMessage = new Message() { MessageType = MessageType.ExecutionComplete, Payload = null };
             this.SetupChannelMessage(MessageType.StartTestExecutionWithTests,
                 MessageType.LaunchAdapterProcessWithDebuggerAttached, payload);
+
             mockTestRunEventsHandler.Setup(mh => mh.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>())).Callback(
                 () =>
                 {
@@ -679,6 +717,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
+                this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
                 this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
                 var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
