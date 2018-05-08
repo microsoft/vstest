@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Globalization;
     using System.IO;
     using System.Xml;
-    using Collector;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using TestPlatform.ObjectModel;

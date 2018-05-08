@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Threading;
     using System.Xml;
     using Interfaces;
-    using Microsoft.VisualStudio.Collector;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;

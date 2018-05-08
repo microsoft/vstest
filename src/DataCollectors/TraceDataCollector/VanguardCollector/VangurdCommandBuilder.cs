@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.Coverage.Interfaces
+namespace Microsoft.VisualStudio.Coverage
 {
     using System.Globalization;
     using System.Text;
+    using Interfaces;
     using TestPlatform.ObjectModel;
 
     /// <summary>

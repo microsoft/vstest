@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     using System.IO;
     using System.Linq;
     using System.Xml;
-    using Collector;
     using Coverage;
     using Coverage.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

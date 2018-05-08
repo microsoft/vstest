@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.Coverage
     using System.IO;
     using System.Xml;
     using Interfaces;
-    using Microsoft.VisualStudio.Collector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
