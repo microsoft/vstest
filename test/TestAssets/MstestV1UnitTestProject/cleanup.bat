@@ -1,0 +1,1 @@
+del %temp%\ScriptTestingFile.txt

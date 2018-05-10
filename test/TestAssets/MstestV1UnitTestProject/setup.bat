@@ -1,0 +1,1 @@
+echo > %temp%\ScriptTestingFile.txt

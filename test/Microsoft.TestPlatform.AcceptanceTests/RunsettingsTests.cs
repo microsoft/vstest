@@ -261,6 +261,99 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             File.Delete(runsettingsFilePath);
         }
 
+        #region LegacySettings Tests
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useOnlyDesktopRunner: true)]
+        public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssemblyPath = this.GetAssetFullPath("MstestV1UnitTestProject.dll");
+            var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
+
+            var setupScriptPath = Path.Combine(testAssemblyDirectory, "Scripts", "setup.bat");
+            var cleanupScriptPath = Path.Combine(testAssemblyDirectory, "Scripts", "cleanup.bat");
+
+            var runsettingsFormat = @"<RunSettings>
+                                    <MSTest>
+                                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <LegacySettings>
+                                         <Scripts setupScript=""{0}"" cleanupScript=""{1}"" />
+                                    </LegacySettings>
+                                   </RunSettings>";
+            var runsettingsXml = string.Format(runsettingsFormat, setupScriptPath, cleanupScriptPath);
+
+            string runsettingsFilePath = GetRunsettingsFilePath(runsettingsXml);
+
+            var arguments = PrepareArguments(
+               testAssemblyPath,
+               string.Empty,
+               runsettingsFilePath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /tests:LegacySettingsScriptsTest");
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+
+            //Validate cleanup script ran
+            var scriptPath = Path.Combine(Path.GetTempPath() + "ScriptTestingFile.txt");
+            Assert.IsFalse(File.Exists(scriptPath));
+            File.Delete(runsettingsFilePath);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useOnlyDesktopRunner: true)]
+        public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssemblyPath = this.GetAssetFullPath("MstestV1UnitTestProject.dll");
+            var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
+
+            var deploymentItem = Path.Combine(testAssemblyDirectory, "Deployment", "DeploymentFile.xml");
+
+            var runsettingsFormat = @"<RunSettings>
+                                    <MSTest>
+                                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <LegacySettings>
+                                         <Deployment>
+                                            <DeploymentItem filename=""{0}"" />
+                                         </Deployment>
+                                    </LegacySettings>
+                                   </RunSettings>";
+
+            var runsettingsXml = string.Format(runsettingsFormat, deploymentItem);
+            string runsettingsFilePath = GetRunsettingsFilePath(runsettingsXml);
+
+            var arguments = PrepareArguments(
+               testAssemblyPath,
+               string.Empty,
+               runsettingsFilePath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /tests:LegacySettingsDeploymentItemTest");
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+            File.Delete(runsettingsFilePath);
+        }
+
+        #endregion
+
+        private string GetRunsettingsFilePath(string runsettingsXml)
+        {
+            var runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+            if (File.Exists(runsettingsPath))
+            {
+                File.Delete(runsettingsPath);
+            }
+
+            using (var file = File.CreateText(runsettingsPath))
+            {
+                file.Write(runsettingsXml);
+                file.Flush();
+            }
+            return runsettingsPath;
+        }
+
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
             var runsettingsPath = Path.Combine(

@@ -23,10 +23,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         /// <param name="inIsolation">Run test in isolation</param>
         /// <param name="inProcess">Run tests in process</param>
-        public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false)
+        public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false, bool useOnlyDesktopRunner = false)
         {
             this.dataRows = new List<object[]>();
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)});
+
+            if (!useOnlyDesktopRunner)
+            {
+                this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
+            }
 
             if (inIsolation == true)
             {

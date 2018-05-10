@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project InitialTargets="CopyFiles" Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
@@ -7,7 +7,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFramework>net451</TargetFramework>
     <AssemblyName>MstestV1UnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
@@ -34,5 +34,9 @@
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+  <Target Name="CopyFiles">
+    <Copy SourceFiles="DeploymentFile.xml" DestinationFolder="$(OutputPath)\Deployment" ContinueOnError="false" />
+    <Copy SourceFiles="setup.bat;cleanup.bat" DestinationFolder="$(OutputPath)\Scripts" ContinueOnError="false" />
+  </Target>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
