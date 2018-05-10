@@ -158,8 +158,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 @"                <Attribute>^System.Diagnostics.DebuggerHiddenAttribute$</Attribute>" + Environment.NewLine +
 @"                <Attribute>^System.Diagnostics.DebuggerNonUserCodeAttribute$</Attribute>" + Environment.NewLine +
 @"                <Attribute>^System.Runtime.CompilerServices.CompilerGeneratedAttribute$</Attribute>" + Environment.NewLine +
-@"                <Attribute>^System.CodeDom.Compiler.GeneratedCode.*</Attribute>" + Environment.NewLine +
+@"                <Attribute>^System.CodeDom.Compiler.GeneratedCodeAttribute$</Attribute>" + Environment.NewLine +
 @"                <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute$</Attribute>" + Environment.NewLine +
+@"                <Attribute>^Microsoft.VisualStudio.TestPlatform.ObjectModel.CodeCoverage.ExcludeFromCoverage$</Attribute>" + Environment.NewLine +
 @"              </Exclude>" + Environment.NewLine +
 @"            </Attributes>" + Environment.NewLine +
 @"            <Sources>" + Environment.NewLine +
