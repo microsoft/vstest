@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                                                                       </Configuration>");
 
         private DynamicCoverageDataCollectorImpl collectorImpl;
-        private Mock<IVangurd> vangurdMock;
+        private Mock<IVanguard> vanguardMock;
         private Mock<TraceCollector.IDataCollectionSink> dataCollectionSinkMock;
         private Mock<IDataCollectionLogger> dataCollectionLoggerMock;
         private Mock<IDirectoryHelper> directoryHelperMock;
@@ -119,12 +119,12 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 
         public DynamicCoverageDataCollectorImplTests()
         {
-            this.vangurdMock = new Mock<IVangurd>();
+            this.vanguardMock = new Mock<IVanguard>();
             this.dataCollectionSinkMock = new Mock<TraceCollector.IDataCollectionSink>();
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.directoryHelperMock = new Mock<IDirectoryHelper>();
             this.fileHelperMock = new Mock<IFileHelper>();
-            this.collectorImpl = new DynamicCoverageDataCollectorImpl(this.vangurdMock.Object, this.directoryHelperMock.Object, this.fileHelperMock.Object);
+            this.collectorImpl = new DynamicCoverageDataCollectorImpl(this.vanguardMock.Object, this.directoryHelperMock.Object, this.fileHelperMock.Object);
             this.SetupForInitialize();
             this.collectorImpl.Initialize(DynamicCoverageDataCollectorImplTests.SampleConfigurationElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
         }
@@ -158,7 +158,9 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         [TestMethod]
         public void InitializeShouldRegisterForSendFileCompleteEvent()
         {
+            this.directoryHelperMock.Setup(d => d.Exists(this.atempDirectory)).Returns(true);
             this.dataCollectionSinkMock.Raise(s => s.SendFileCompleted += null, new AsyncCompletedEventArgs(null, false, null));
+            this.directoryHelperMock.Verify(d => d.Exists(this.atempDirectory));
             this.directoryHelperMock.Verify(d => d.Delete(this.atempDirectory, true));
         }
 
@@ -167,6 +169,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             this.directoryHelperMock.Verify(d => d.CreateDirectory(this.atempDirectory));
         }
+
         #endregion
 
         #region Dispose Tests
@@ -174,21 +177,30 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         public void DisposeShouldStopVanguard()
         {
             this.collectorImpl.Dispose();
-            this.vangurdMock.Verify(v =>v.Stop());
+            this.vanguardMock.Verify(v =>v.Stop());
         }
 
         [TestMethod]
         public void DisposeShouldDisposeVanguard()
         {
             this.collectorImpl.Dispose();
-            this.vangurdMock.Verify(v => v.Stop());
+            this.vanguardMock.Verify(v => v.Dispose());
         }
 
         [TestMethod]
         public void DisposeShouldDeleteTempDirectory()
         {
+            this.directoryHelperMock.Setup(d => d.Exists(this.atempDirectory)).Returns(true);
             this.collectorImpl.Dispose();
             this.directoryHelperMock.Verify(d => d.Delete(this.atempDirectory, true));
+        }
+
+        [TestMethod]
+        public void DisposeShouldNotDeleteTempDirectoryIfNotExists()
+        {
+            this.directoryHelperMock.Setup(d => d.Exists(this.atempDirectory)).Returns(false);
+            this.collectorImpl.Dispose();
+            this.directoryHelperMock.Verify(d => d.Delete(this.atempDirectory, true), Times.Never);
         }
 
         [TestMethod]
@@ -196,7 +208,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             this.collectorImpl.Dispose();
             this.dataCollectionSinkMock.Raise(s => s.SendFileCompleted += null, new AsyncCompletedEventArgs(null, false, null));
-            this.directoryHelperMock.Verify(d => d.Delete(this.atempDirectory, true), Times.Once);
+            this.directoryHelperMock.Verify(d => d.Exists(this.atempDirectory), Times.Once);
         }
 
         #endregion
@@ -209,7 +221,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var sessionStartEventArgs = new SessionStartEventArgs();
             var coverageFilePath = string.Empty;
 
-            this.vangurdMock.Setup(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
+            this.vanguardMock.Setup(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
                 .Callback<string, DataCollectionContext>((filePath, dcContext) =>
                 {
                     coverageFilePath = filePath;
@@ -228,7 +240,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var coverageFilePath = string.Empty;
 
             this.collectorImpl.Initialize(null, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
-            this.vangurdMock.Setup(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
+            this.vanguardMock.Setup(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
                 .Callback<string, DataCollectionContext>((filePath, dcContext) =>
                 {
                     coverageFilePath = filePath;
@@ -272,7 +284,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 
             this.collectorImpl.SessionStart(null, sessionStartEventArgs);
 
-            this.vangurdMock.Verify(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()));
+            this.vanguardMock.Verify(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()));
         }
 
         [TestMethod]
@@ -281,7 +293,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var sessionStartEventArgs = new SessionStartEventArgs();
             var exceptionMessage = "Vanguard not found";
             Exception expectedEx= null;
-            this.vangurdMock.Setup(d => d.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
+            this.vanguardMock.Setup(d => d.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()))
                 .Throws(new VanguardException(exceptionMessage));
             this.dataCollectionLoggerMock
                 .Setup(l => l.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<Exception>()))
@@ -291,7 +303,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 });
             var actualEx = Assert.ThrowsException<VanguardException>(() => this.collectorImpl.SessionStart(null, sessionStartEventArgs));
 
-            this.vangurdMock.Verify(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()));
+            this.vanguardMock.Verify(v => v.Start(It.IsAny<string>(), It.IsAny<DataCollectionContext>()));
             Assert.AreEqual(expectedEx, actualEx);
             StringAssert.Contains(actualEx.Message , exceptionMessage);
         }
@@ -307,7 +319,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 
             this.collectorImpl.SessionEnd(null, sessionEndEventArgs);
 
-            this.vangurdMock.Verify(v => v.Stop());
+            this.vanguardMock.Verify(v => v.Stop());
         }
 
         [TestMethod]
@@ -315,7 +327,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             string tempFile = Path.GetTempFileName();
             var sessionEndEventArgs = new SessionEndEventArgs();
-            this.vangurdMock.Setup(v => v.OutputName).Returns(tempFile);
+            this.vanguardMock.Setup(v => v.OutputName).Returns(tempFile);
             this.fileHelperMock.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
             this.collectorImpl.SessionEnd(null, sessionEndEventArgs);
 
@@ -327,7 +339,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         #region private methods
         private void SetupForInitialize()
         {
-            this.vangurdMock.Setup(v => v.Initialize(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<XmlElement>(),
+            this.vanguardMock.Setup(v => v.Initialize(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<XmlElement>(),
                     It.IsAny<IDataCollectionLogger>()))
                 .Callback<string, string, XmlElement, IDataCollectionLogger>(
                     (sessionName, configFileName, config, logger) =>

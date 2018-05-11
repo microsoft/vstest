@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TraceCollector
             var vanguardPath = Path.Combine(this.GetVanguardDirectory(), VanguardExeName);
             if (!File.Exists(vanguardPath))
             {
-                throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VangurdNotFound, vanguardPath));
+                throw new VanguardException(string.Format(CultureInfo.CurrentUICulture, Resources.VanguardNotFound, vanguardPath));
             }
 
             return vanguardPath;

@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     using TestPlatform.ObjectModel.DataCollection;
 
     [TestClass]
-    public class VangurdTests
+    public class VanguardTests
     {
         private const string CodeCoverageExeFileName = "CodeCoverage";
         private const string SessionNamePrefix = "MTM_";
@@ -50,29 +50,29 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         private string outputFileName;
         private string outputDir;
         private DataCollectionContext dataCollectionContext;
-        private Mock<IVangurdCommandBuilder> vangurdCommandBuilderMock;
+        private Mock<IVanguardCommandBuilder> vanguardCommandBuilderMock;
         private IProcessJobObject processJobObject;
 
-        public VangurdTests()
+        public VanguardTests()
         {
             TestCase testcase = new TestCase { Id = Guid.NewGuid() };
             this.dataCollectionContext = new DataCollectionContext(testcase);
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.processJobObject = new ProcessJobObject();
-            this.vangurdCommandBuilderMock = new Mock<IVangurdCommandBuilder>();
+            this.vanguardCommandBuilderMock = new Mock<IVanguardCommandBuilder>();
             this.collectorUtilityMock  = new Mock<ICollectorUtility>();
 
-            this.vanguard = new Vanguard(this.collectorUtilityMock.Object, this.vangurdCommandBuilderMock.Object, this.processJobObject);
+            this.vanguard = new Vanguard(this.collectorUtilityMock.Object, this.vanguardCommandBuilderMock.Object, this.processJobObject);
             var guid = Guid.NewGuid();
-            this.sessionName = VangurdTests.SessionNamePrefix + guid;
-            this.configFileName = string.Format(VangurdTests.ConfigFileNameFormat, Path.GetTempPath(), guid);
+            this.sessionName = VanguardTests.SessionNamePrefix + guid;
+            this.configFileName = string.Format(VanguardTests.ConfigFileNameFormat, Path.GetTempPath(), guid);
             this.outputDir = Path.GetDirectoryName(this.configFileName);
             Directory.CreateDirectory(outputDir);
             this.outputFileName = Path.Combine(this.outputDir, Guid.NewGuid() + ".coverage");
             this.configXmlElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(ConfigXml)["CodeCoverage"];
-            this.vangurdCommandBuilderMock.Setup(c =>
-                    c.GenerateCommandLine(VangurdCommand.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(VangurdTests.GetShutdownCommand(this.sessionName));
+            this.vanguardCommandBuilderMock.Setup(c =>
+                    c.GenerateCommandLine(VanguardCommand.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(VanguardTests.GetShutdownCommand(this.sessionName));
             this.vanguard.Initialize(this.sessionName, this.configFileName, this.configXmlElement, this.dataCollectionLoggerMock.Object);
             this.collectorUtilityMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage.exe"));
         }
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             Assert.IsTrue(File.Exists(this.configFileName));
             StringAssert.Contains(
-                VangurdTests.ConfigXml.Replace(" ", string.Empty).Replace(Environment.NewLine, String.Empty),
+                VanguardTests.ConfigXml.Replace(" ", string.Empty).Replace(Environment.NewLine, String.Empty),
                 File.ReadAllText(this.configFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, String.Empty));
         }
 
@@ -101,11 +101,11 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                VangurdTests.CodeCoverageExeFileName);
+                VanguardTests.CodeCoverageExeFileName);
 
-            this.vangurdCommandBuilderMock.Setup(c =>
-                    c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(VangurdTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
+            this.vanguardCommandBuilderMock.Setup(c =>
+                    c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(VanguardTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
 
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             cts.Cancel();
@@ -127,8 +127,8 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             var expectedErrorMessage =
                 "Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.";
-            this.vangurdCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
+            this.vanguardCommandBuilderMock
+                .Setup(c => c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>())).Returns("invalid command");
             var exception = Assert.ThrowsException<VanguardException>(() => this.vanguard.Start(this.outputFileName, this.dataCollectionContext));
             Assert.AreEqual(expectedErrorMessage, exception.Message);
@@ -140,9 +140,9 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "0");
             var expectedErrorMessage =
                 "Failed to receive running event from CodeCoverage.exe in 0 seconds, This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
-            this.vangurdCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>())).Returns(VangurdTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
+            this.vanguardCommandBuilderMock
+                .Setup(c => c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>())).Returns(VanguardTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
             var exception = Assert.ThrowsException<VanguardException>(() => this.vanguard.Start(this.outputFileName, this.dataCollectionContext));
             Assert.AreEqual(expectedErrorMessage, exception.Message);
         }
@@ -153,10 +153,10 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                VangurdTests.CodeCoverageExeFileName);
-            this.vangurdCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(VangurdCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
-                    It.IsAny<string>())).Returns(VangurdTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
+                VanguardTests.CodeCoverageExeFileName);
+            this.vanguardCommandBuilderMock
+                .Setup(c => c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                    It.IsAny<string>())).Returns(VanguardTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             this.vanguard.Stop();
             cts.Cancel();

@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.Coverage
     /// <summary>
     /// A managed wrapper for Vanguard
     /// </summary>
-    internal class Vanguard : IVangurd
+    internal class Vanguard : IVanguard
     {
         /// <summary>
         /// Return value of WaitForSingleObject, which means the object is signaled.
@@ -75,20 +75,20 @@ namespace Microsoft.VisualStudio.Coverage
 
         private ICollectorUtility collectorUtility;
 
-        private IVangurdCommandBuilder vangurdCommandBuilder;
+        private IVanguardCommandBuilder vanguardCommandBuilder;
 
         public Vanguard()
-            : this(new CollectorUtility(), new VangurdCommandBuilder(), new ProcessJobObject())
+            : this(new CollectorUtility(), new VanguardCommandBuilder(), new ProcessJobObject())
         {
         }
 
         internal Vanguard(
             ICollectorUtility collectorUtility,
-            IVangurdCommandBuilder commandBuilder,
+            IVanguardCommandBuilder commandBuilder,
             IProcessJobObject processJobObject)
         {
             this.collectorUtility = collectorUtility;
-            this.vangurdCommandBuilder = commandBuilder;
+            this.vanguardCommandBuilder = commandBuilder;
             this.processJobObject = processJobObject;
         }
 
@@ -133,8 +133,8 @@ namespace Microsoft.VisualStudio.Coverage
             this.vanguardProcessExitEvent = new ManualResetEvent(false);
             this.OutputName = outputName;
             this.context = context;
-            var collectCommand = this.vangurdCommandBuilder.GenerateCommandLine(
-                VangurdCommand.Collect,
+            var collectCommand = this.vanguardCommandBuilder.GenerateCommandLine(
+                VanguardCommand.Collect,
                 this.sessionName,
                 this.OutputName,
                 this.configurationFileName);
@@ -149,8 +149,8 @@ namespace Microsoft.VisualStudio.Coverage
             EqtTrace.Info("Vanguard.Stop: Stoping Vanguard.");
             if (this.IsRunning)
             {
-                var shutdownCommand = this.vangurdCommandBuilder.GenerateCommandLine(
-                    VangurdCommand.Shutdown,
+                var shutdownCommand = this.vanguardCommandBuilder.GenerateCommandLine(
+                    VanguardCommand.Shutdown,
                     this.sessionName,
                     null,
                     null);
@@ -237,7 +237,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Start a vanguard process
         /// </summary>
-        /// <param name="commandLine">VangurdCommand line options</param>
+        /// <param name="commandLine">VanguardCommand line options</param>
         /// <param name="wait">Whether to wait until the process exits</param>
         /// <param name="standardErrorAsynchronousCall">The standardErrorAsynchronousCall. </param>
         /// <returns>Process instance of vanguard</returns>

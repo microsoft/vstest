@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     /// <summary>
     ///  Commands for vanguard process.
     /// </summary>
-    public enum VangurdCommand
+    public enum VanguardCommand
     {
         /// <summary>
         /// Start the collecting code coverage for given session.

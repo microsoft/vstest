@@ -123,7 +123,7 @@
   <data name="NoRunningEventFromVanguard" xml:space="preserve">
     <value>Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.</value>
   </data>
-  <data name="VangurdNotFound" xml:space="preserve">
+  <data name="VanguardNotFound" xml:space="preserve">
     <value>Cannot find CodeCoverage.exe at {0}</value>
   </data>
   <data name="VanguardConnectionTimeout" xml:space="preserve">

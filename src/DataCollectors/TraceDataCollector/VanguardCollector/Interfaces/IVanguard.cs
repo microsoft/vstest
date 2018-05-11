@@ -9,9 +9,9 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     using TraceCollector;
 
     /// <summary>
-    /// The IVangurd interface.
+    /// The IVanguard interface.
     /// </summary>
-    internal interface IVangurd : IDisposable
+    internal interface IVanguard : IDisposable
     {
         /// <summary>
         /// Gets output file name of vanguard
@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
         string OutputName { get; }
 
         /// <summary>
-        /// Initilize Vangurd.
+        /// Initilize Vanguard.
         /// </summary>
         /// <param name="sessionName">Session name</param>
         /// <param name="configurationFileName">Configuration file name</param>

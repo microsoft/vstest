@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.Coverage
         {
         }
 
-        internal DynamicCoverageDataCollectorImpl(IVangurd vanguard, IDirectoryHelper directoryHelper, IFileHelper fileHelper)
+        internal DynamicCoverageDataCollectorImpl(IVanguard vanguard, IDirectoryHelper directoryHelper, IFileHelper fileHelper)
         {
             this.Vanguard = vanguard;
             this.directoryHelper = directoryHelper;
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <summary>
         /// Gets or sets vanguard instance
         /// </summary>
-        private IVangurd Vanguard { get; set; }
+        private IVanguard Vanguard { get; set; }
 
         public string GetSessionName()
         {
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.Coverage
             this.SessionName = Guid.NewGuid().ToString();
 
             this.sessionDirectory = Path.Combine(Path.GetTempPath(), this.SessionName);
-            this.directoryHelper.CreateDirectory(this.sessionDirectory);
+            this.CreateDirectory(null, this.sessionDirectory);
 
             this.SetCoverageFileName(configurationElement);
 
@@ -262,18 +262,7 @@ namespace Microsoft.VisualStudio.Coverage
             if (this.Vanguard != null)
             {
                 string outputCoverageFolder = Path.Combine(this.sessionDirectory, Guid.NewGuid().ToString());
-                try
-                {
-                    this.directoryHelper.CreateDirectory(outputCoverageFolder);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(
-                        context,
-                        string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, outputCoverageFolder, ex));
-
-                    throw;
-                }
+                this.CreateDirectory(context, outputCoverageFolder);
 
                 string outputCoverageFilePath = Path.Combine(outputCoverageFolder, this.coverageFileName);
                 try
@@ -354,11 +343,35 @@ namespace Microsoft.VisualStudio.Coverage
         {
             try
             {
-                this.directoryHelper.Delete(this.sessionDirectory, true);
+                if (this.directoryHelper.Exists(this.sessionDirectory))
+                {
+                    this.directoryHelper.Delete(this.sessionDirectory, true);
+                }
             }
             catch (Exception ex)
             {
                 EqtTrace.Warning("DynamicCoverageDataCollectorImpl.CleanupDirectory:Failed to delete directory: {0}, with exception: {1}", this.sessionDirectory, ex);
+            }
+        }
+
+        private void CreateDirectory(DataCollectionContext context, string path)
+        {
+            try
+            {
+                this.directoryHelper.CreateDirectory(path);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("DynamicCoverageDataCollectorImpl.CreateDirectory:Failed to create directory: {0}, with exception: {1}", path, ex);
+
+                if (context != null)
+                {
+                    this.logger.LogError(
+                        context,
+                        string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, path, ex));
+                }
+
+                throw;
             }
         }
     }

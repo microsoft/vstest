@@ -9,21 +9,21 @@ namespace Microsoft.VisualStudio.Coverage
     using TestPlatform.ObjectModel;
 
     /// <summary>
-    /// The VangurdCommandBuilder class.
+    /// The VanguardCommandBuilder class.
     /// </summary>
-    internal class VangurdCommandBuilder : IVangurdCommandBuilder
+    internal class VanguardCommandBuilder : IVanguardCommandBuilder
     {
         /// <inheritdoc />
         public string GenerateCommandLine(
-            VangurdCommand vangurdCommand,
+            VanguardCommand vanguardCommand,
             string sessionName,
             string outputName,
             string configurationFileName)
         {
             StringBuilder builder = new StringBuilder();
-            switch (vangurdCommand)
+            switch (vanguardCommand)
             {
-                case VangurdCommand.Collect:
+                case VanguardCommand.Collect:
                     builder.AppendFormat(
                         CultureInfo.InvariantCulture,
                         "collect /session:{0}  /output:\"{1}\"",
@@ -35,12 +35,12 @@ namespace Microsoft.VisualStudio.Coverage
                     }
 
                     break;
-                case VangurdCommand.Shutdown:
+                case VanguardCommand.Shutdown:
                     builder.AppendFormat(CultureInfo.InvariantCulture, "shutdown /session:{0}", sessionName);
                     break;
             }
 
-            EqtTrace.Info("VangurdCommandBuilder.GenerateCommandLine: Created the vangurdCommand: {0}", builder);
+            EqtTrace.Info("VanguardCommandBuilder.GenerateCommandLine: Created the vanguardCommand: {0}", builder);
             return builder.ToString();
         }
     }

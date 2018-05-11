@@ -20,5 +20,11 @@ namespace Microsoft.VisualStudio.TraceCollector
         {
             Directory.CreateDirectory(path);
         }
+
+        /// <inheritdoc />
+        public bool Exists(string path)
+        {
+            return Directory.Exists(path);
+        }
     }
 }

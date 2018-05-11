@@ -12,7 +12,7 @@
         <target state="new">Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="VangurdNotFound">
+      <trans-unit id="VanguardNotFound">
         <source>Cannot find CodeCoverage.exe at {0}</source>
         <target state="new">Cannot find CodeCoverage.exe at {0}</target>
         <note></note>

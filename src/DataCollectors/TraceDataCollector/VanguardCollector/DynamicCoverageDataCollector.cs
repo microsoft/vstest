@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.Coverage
         private const string CorProfilerPathVariable64 = "COR_PROFILER_PATH_64";
         private const string CorEnableProfilingVariable = "COR_ENABLE_PROFILING";
         private const string VanguardProfilerGuid = "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}";
-        private const string FullCorProfiler = "COR_PROFILER";
+        private const string CorProfilerVariable = "COR_PROFILER";
         private const string CodeCoverageSessionNameVariable = "CODE_COVERAGE_SESSION_NAME";
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.Coverage
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorEnableProfilingVariable, "1"),
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable32, vanguardX86ProfilerFullPath),
                 new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerPathVariable64, vanguardX64ProfilerFullPath),
-                new KeyValuePair<string, string>(DynamicCoverageDataCollector.FullCorProfiler, VanguardProfilerGuid),
+                new KeyValuePair<string, string>(DynamicCoverageDataCollector.CorProfilerVariable, VanguardProfilerGuid),
             };
 
             if (EqtTrace.IsInfoEnabled)

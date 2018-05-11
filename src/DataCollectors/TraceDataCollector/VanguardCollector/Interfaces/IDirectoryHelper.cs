@@ -21,5 +21,13 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
         /// </summary>
         /// <param name="path">The directory to create.</param>
         void CreateDirectory(string path);
+
+        /// <summary>
+        /// Determines whether the given path refers to an existing directory on disk.
+        /// </summary>
+        /// <param name="path">The path to test.</param>
+        /// <returns>true if path refers to an existing directory;
+        /// false if the directory does not exist or an error occurs when trying to determine if the specified directory exists.</returns>
+        bool Exists(string path);
     }
 }

@@ -91,9 +91,9 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Cannot find CodeCoverage.exe at {0}.
         /// </summary>
-        internal static string VangurdNotFound {
+        internal static string VanguardNotFound {
             get {
-                return ResourceManager.GetString("VangurdNotFound", resourceCulture);
+                return ResourceManager.GetString("VanguardNotFound", resourceCulture);
             }
         }
     }

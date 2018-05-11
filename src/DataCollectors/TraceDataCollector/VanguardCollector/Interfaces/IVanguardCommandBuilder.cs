@@ -4,20 +4,20 @@
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
     /// <summary>
-    /// The IVangurdCommandBuilder interface.
+    /// The IVanguardCommandBuilder interface.
     /// </summary>
-    internal interface IVangurdCommandBuilder
+    internal interface IVanguardCommandBuilder
     {
         /// <summary>
-        /// Generate a vangurdCommand line string, given some parameters
+        /// Generate a vanguardCommand line string, given some parameters
         /// </summary>
-        /// <param name="vangurdCommand">VangurdCommand to execute</param>
+        /// <param name="vanguardCommand">VanguardCommand to execute</param>
         /// <param name="sessionName">Session name</param>
-        /// <param name="outputName">Output file name (for collect vangurdCommand)</param>
+        /// <param name="outputName">Output file name (for collect vanguardCommand)</param>
         /// <param name="configurationFileName">Configuration file name</param>
-        /// <returns>VangurdCommand line string</returns>
+        /// <returns>VanguardCommand line string</returns>
         string GenerateCommandLine(
-            VangurdCommand vangurdCommand,
+            VanguardCommand vanguardCommand,
             string sessionName,
             string outputName,
             string configurationFileName);
