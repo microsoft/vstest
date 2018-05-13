@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System;
     using TestPlatform.ObjectModel.DataCollection;
 
+    /// <inheritdoc />
     internal sealed class DataCollectionEventsWrapper : IDataCollectionEvents
     {
         private readonly DataCollectionEvents wrapped;

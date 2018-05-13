@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System.ComponentModel;
     using TestPlatform.ObjectModel.DataCollection;
 
+    /// <inheritdoc />
     internal sealed class DataCollectionSinkWrapper : IDataCollectionSink
     {
         private readonly DataCollectionSink wrapped;

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TraceCollector
 {
     using TestPlatform.ObjectModel.DataCollection;
 
+    /// <inheritdoc />
     internal sealed class DataCollectionEnvironmentContextWrapper : IDataCollectionAgentContext
     {
         private readonly DataCollectionEnvironmentContext environmentContext;

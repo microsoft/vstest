@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     internal interface IVanguard : IDisposable
     {
         /// <summary>
-        /// Initilize Vanguard.
+        /// Initialize Vanguard.
         /// </summary>
         /// <param name="sessionName">Session name</param>
         /// <param name="configurationFileName">Configuration file name</param>

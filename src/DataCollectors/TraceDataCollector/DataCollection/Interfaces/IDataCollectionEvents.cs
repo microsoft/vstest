@@ -6,6 +6,10 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System;
     using TestPlatform.ObjectModel.DataCollection;
 
+    /// <summary>
+    /// Wrapper for <see cref="Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionEvents"/>
+    /// to make the collector testable.
+    /// </summary>
     internal interface IDataCollectionEvents
     {
         event EventHandler<SessionEndEventArgs> SessionEnd;

@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         }
 
         [TestMethod]
-        public void InitilizeShouldNotThrowOnNullConfig()
+        public void InitializeShouldNotThrowOnNullConfig()
         {
             XmlElement actualConfig = null;
             this.implMock.Setup(i => i.Initialize(
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         }
 
         [TestMethod]
-        public void InitilizeShouldRegisterForSessionStartEvent()
+        public void InitializeShouldRegisterForSessionStartEvent()
         {
             this.eventsMock.Raise(e => e.SessionStart += null, new SessionStartEventArgs());
 
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         }
 
         [TestMethod]
-        public void InitilizeShouldRegisterForSessionEndEvent()
+        public void InitializeShouldRegisterForSessionEndEvent()
         {
             this.eventsMock.Raise(e => e.SessionEnd += null, new SessionEndEventArgs());
 

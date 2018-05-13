@@ -4,8 +4,7 @@
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
     /// <summary>
-    /// Interface to Abstraction System.IO.File funcationalities for mocking File functionalities
-    /// in unit tests.
+    /// Interface to Abstract System.IO.File methods for mocking in unit tests.
     /// </summary>
     internal interface IFileHelper
     {

@@ -6,6 +6,10 @@ namespace Microsoft.VisualStudio.TraceCollector
     using System.ComponentModel;
     using TestPlatform.ObjectModel.DataCollection;
 
+    /// <summary>
+    /// Wrapper for <see cref="Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.DataCollectionSink"/>
+    /// to make the collector testable.
+    /// </summary>
     internal interface IDataCollectionSink
     {
         event AsyncCompletedEventHandler SendFileCompleted;

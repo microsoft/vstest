@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Gets or sets gets session name
+        /// Gets or sets session name
         /// </summary>
         private string SessionName { get; set; }
 

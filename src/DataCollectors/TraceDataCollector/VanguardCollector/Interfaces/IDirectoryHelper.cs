@@ -4,8 +4,7 @@
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
     /// <summary>
-    /// Interface to Abstraction System.IO.Directory funcationalities for mocking Directory functionalities
-    /// in unit tests.
+    /// Interface to Abstract System.IO.Directory methods for mocking in unit tests.
     /// </summary>
     internal interface IDirectoryHelper
     {
