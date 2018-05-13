@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TraceCollector.UnitTests
+namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 {
     using System;
     using System.ComponentModel;
@@ -14,88 +14,13 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     using Moq;
     using TestPlatform.ObjectModel;
     using TestPlatform.ObjectModel.DataCollection;
+    using TraceCollector;
 
     [TestClass]
     public class DynamicCoverageDataCollectorImplTests
     {
         private const string DefaultConfigFileName = "CodeCoverage.config";
         private const string DefaultCoverageFileName = "abc.coverage";
-
-        private static readonly string DefaultCodeCoverageConfig =
-            @"            <CodeCoverage><ModulePaths>" + Environment.NewLine +
-            @"              <Exclude>" + Environment.NewLine +
-            @"                 <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.intellitrace.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*testhost.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*datacollector.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.teamfoundation.testplatform.*</ModulePath>" +
-            Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.visualstudio.testplatform.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.visualstudio.testwindow.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.visualstudio.mstest.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.visualstudio.qualitytools.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.vssdk.testhostadapter.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*microsoft.vssdk.testhostframework.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*qtagent32.*</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*msvcr.*dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*msvcp.*dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*clr.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*clr.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*clrjit.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*clrjit.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*mscoree.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*mscoreei.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*mscoreei.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*mscorlib.dll$</ModulePath>" + Environment.NewLine +
-            @"                 <ModulePath>.*mscorlib.ni.dll$</ModulePath>" + Environment.NewLine +
-            @"               </Exclude>" + Environment.NewLine +
-            @"            </ModulePaths>" + Environment.NewLine +
-            @"            <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>" + Environment.NewLine +
-            @"            <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>" + Environment.NewLine +
-            @"            <CollectFromChildProcesses>True</CollectFromChildProcesses>" + Environment.NewLine +
-            @"            <CollectAspDotNet>false</CollectAspDotNet>" + Environment.NewLine +
-            @"            <SymbolSearchPaths />" + Environment.NewLine +
-            @"            <Functions>" + Environment.NewLine +
-            @"              <Exclude>" + Environment.NewLine +
-            @"                <Function>^std::.*</Function>" + Environment.NewLine +
-            @"                <Function>^ATL::.*</Function>" + Environment.NewLine +
-            @"                <Function>.*::__GetTestMethodInfo.*</Function>" + Environment.NewLine +
-            @"                <Function>.*__CxxPureMSILEntry.*</Function>" + Environment.NewLine +
-            @"                <Function>^Microsoft::VisualStudio::CppCodeCoverageFramework::.*</Function>" +
-            Environment.NewLine +
-            @"                <Function>^Microsoft::VisualStudio::CppUnitTestFramework::.*</Function>" +
-            Environment.NewLine +
-            @"                <Function>.*::YOU_CAN_ONLY_DESIGNATE_ONE_.*</Function>" + Environment.NewLine +
-            @"                <Function>^__.*</Function>" + Environment.NewLine +
-            @"                <Function>.*::__.*</Function>" + Environment.NewLine +
-            @"              </Exclude>" + Environment.NewLine +
-            @"            </Functions>" + Environment.NewLine +
-            @"            <Attributes>" + Environment.NewLine +
-            @"              <Exclude>" + Environment.NewLine +
-            @"                <Attribute>^System.Diagnostics.DebuggerHidden.*</Attribute>" + Environment.NewLine +
-            @"                <Attribute>^System.Diagnostics.DebuggerNonUserCode.*</Attribute>" + Environment.NewLine +
-            @"                <Attribute>^System.Runtime.CompilerServices.CompilerGenerated.*</Attribute>" +
-            Environment.NewLine +
-            @"                <Attribute>^System.CodeDom.Compiler.GeneratedCode.*</Attribute>" + Environment.NewLine +
-            @"                <Attribute>^System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage.*</Attribute>" +
-            Environment.NewLine +
-            @"              </Exclude>" + Environment.NewLine +
-            @"            </Attributes>" + Environment.NewLine +
-            @"            <Sources>" + Environment.NewLine +
-            @"              <Exclude>" + Environment.NewLine +
-            @"                <Source>.*\\atlmfc\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\vctools\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\public\\sdk\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\externalapis\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\microsoft sdks\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\vc\\include\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\msclr\\.*</Source>" + Environment.NewLine +
-            @"                <Source>.*\\ucrt\\.*</Source>" + Environment.NewLine +
-            @"              </Exclude>" + Environment.NewLine +
-            @"            </Sources>" + Environment.NewLine +
-            @"            <CompanyNames/>" + Environment.NewLine +
-            @"            <PublicKeyTokens/></CodeCoverage>" + Environment.NewLine;
 
         private static XmlElement sampleConfigurationElement =
             DynamicCoverageDataCollectorImplTests.CreateXmlElement($@"<Configuration>
@@ -157,8 +82,8 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
             StringAssert.Contains(this.aConfigFileName, Path.GetTempPath());
             Assert.AreEqual(
-                DefaultCodeCoverageConfig.Replace(Environment.NewLine, string.Empty).Replace(" ", string.Empty),
-                File.ReadAllText(this.aConfigFileName).Replace(Environment.NewLine, string.Empty).Replace(" ", string.Empty));
+                GetDefaultCodeCoverageConfig().Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty),
+                File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
         }
 
         [TestMethod]
@@ -391,6 +316,22 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 Environment.MachineName);
         }
 
+        private static string GetDefaultCodeCoverageConfig()
+        {
+            string result = string.Empty;
+
+            using (Stream stream = typeof(DynamicCoverageDataCollectorImplTests).Assembly.
+                GetManifestResourceStream("Microsoft.VisualStudio.TraceDataCollector.UnitTests.DefaultCodeCoverageConfig.xml"))
+            {
+                using (StreamReader sr = new StreamReader(stream))
+                {
+                    result = sr.ReadToEnd();
+                }
+            }
+
+            return result;
+        }
+
         private void SetupForInitialize()
         {
             this.vanguardMock.Setup(v => v.Initialize(
@@ -408,6 +349,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>())).Callback<string>(
                 (directoryPath) => { this.atempDirectory = directoryPath; });
         }
+
         #endregion
     }
 }

@@ -11,6 +11,9 @@
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="DefaultCodeCoverageConfig.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -22,6 +25,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="VanguardCollector\DefaultCodeCoverageConfig.xml" />
     <EmbeddedResource Include="Resources\Resources.resx" />
   </ItemGroup>
   <ItemGroup>

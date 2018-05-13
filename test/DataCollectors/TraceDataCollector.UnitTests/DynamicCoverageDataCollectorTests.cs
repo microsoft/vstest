@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TraceCollector.UnitTests
+namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using TestPlatform.ObjectModel.DataCollection;
+    using TraceCollector;
     using IDataCollectionSink = TraceCollector.IDataCollectionSink;
 
     [TestClass]
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         private Mock<ICollectorUtility> collectorUtilityMock;
         private Mock<IDynamicCoverageDataCollectorImpl> implMock;
         private Mock<IDataCollectionEvents> eventsMock;
-        private Mock<IDataCollectionSink> sinkMock;
+        private Mock<TraceCollector.IDataCollectionSink> sinkMock;
         private Mock<IDataCollectionLogger> loggerMock;
         private Mock<IDataCollectionAgentContext> agentContextMock;
 
@@ -34,7 +35,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.collectorUtilityMock = new Mock<ICollectorUtility>();
             this.implMock = new Mock<IDynamicCoverageDataCollectorImpl>();
             this.eventsMock = new Mock<IDataCollectionEvents>();
-            this.sinkMock = new Mock<IDataCollectionSink>();
+            this.sinkMock = new Mock<TraceCollector.IDataCollectionSink>();
             this.loggerMock = new Mock<IDataCollectionLogger>();
             this.agentContextMock = new Mock<IDataCollectionAgentContext>();
             this.collector = new TestableDynamicCoverageDataCollector(this.collectorUtilityMock.Object, this.implMock.Object);
@@ -49,7 +50,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             XmlElement actualConfig = null;
             this.implMock.Setup(i => i.Initialize(
                     It.IsAny<XmlElement>(),
-                    It.IsAny<IDataCollectionSink>(),
+                    It.IsAny<TraceCollector.IDataCollectionSink>(),
                     It.IsAny<IDataCollectionLogger>()))
                 .Callback<XmlElement, IDataCollectionSink, IDataCollectionLogger>((config, sink, logger) =>
                 {

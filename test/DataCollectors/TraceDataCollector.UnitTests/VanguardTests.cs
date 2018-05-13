@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TraceCollector.UnitTests
+namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 {
     using System;
     using System.ComponentModel;
@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     using TestPlatform.CoreUtilities.Helpers;
     using TestPlatform.ObjectModel;
     using TestPlatform.ObjectModel.DataCollection;
+    using TraceCollector;
 
     [TestClass]
     public class VanguardTests
