@@ -57,13 +57,13 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.processJobObject = new ProcessJobObject();
             this.vanguardCommandBuilderMock = new Mock<IVanguardCommandBuilder>();
-            this.collectorUtilityMock  = new Mock<ICollectorUtility>();
+            this.collectorUtilityMock = new Mock<ICollectorUtility>();
 
             this.vanguard = new Vanguard(this.collectorUtilityMock.Object, this.vanguardCommandBuilderMock.Object, this.processJobObject);
             this.sessionName = Guid.NewGuid().ToString();
             this.configFileName = string.Format(VanguardTests.ConfigFileNameFormat, Path.GetTempPath(), this.sessionName);
             this.outputDir = Path.GetDirectoryName(this.configFileName);
-            Directory.CreateDirectory(outputDir);
+            Directory.CreateDirectory(this.outputDir);
             File.WriteAllText(this.configFileName, VanguardTests.ConfigXml);
             this.outputFileName = Path.Combine(this.outputDir, Guid.NewGuid() + ".coverage");
             this.vanguardCommandBuilderMock.Setup(c =>
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         [TestCleanup]
         public void Cleanup()
         {
-            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "");
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
             this.vanguard.Stop();
             File.Delete(this.configFileName);
             Directory.Delete(this.outputDir, true);
@@ -87,14 +87,13 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             Assert.IsTrue(File.Exists(this.configFileName));
             StringAssert.Contains(
-                VanguardTests.ConfigXml.Replace(" ", string.Empty).Replace(Environment.NewLine, String.Empty),
-                File.ReadAllText(this.configFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, String.Empty));
+                VanguardTests.ConfigXml.Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty),
+                File.ReadAllText(this.configFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
         }
 
         [TestMethod]
         public void StartShouldStartVanguardProcessWithCollectCommand()
         {
-            Console.WriteLine("Config file content: {0}", File.ReadAllText(this.configFileName));
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
@@ -107,8 +106,8 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             cts.Cancel();
 
-            // TODO find the reason why more than one processes launched.
-            Assert.IsTrue(numOfProcessCreatedTask.Result >= 1);
+            // TODO find the reason why additional process launched when collecting code coverage.
+            Assert.IsTrue(numOfProcessCreatedTask.Result == 1 || numOfProcessCreatedTask.Result == 2, "Number of process created:{0} expected is 1 or 2.");
         }
 
         [TestMethod]
@@ -125,7 +124,10 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var expectedErrorMessage =
                 "Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.";
             this.vanguardCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(c => c.GenerateCommandLine(
+                    VanguardCommand.Collect,
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>())).Returns("invalid command");
             var exception = Assert.ThrowsException<VanguardException>(() => this.vanguard.Start(this.outputFileName, this.dataCollectionContext));
             Assert.AreEqual(expectedErrorMessage, exception.Message);
@@ -138,7 +140,10 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var expectedErrorMessage =
                 "Failed to receive running event from CodeCoverage.exe in 0 seconds, This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
             this.vanguardCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(c => c.GenerateCommandLine(
+                    VanguardCommand.Collect,
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>())).Returns(VanguardTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
             var exception = Assert.ThrowsException<VanguardException>(() => this.vanguard.Start(this.outputFileName, this.dataCollectionContext));
             Assert.AreEqual(expectedErrorMessage, exception.Message);
@@ -152,14 +157,19 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 cts,
                 VanguardTests.CodeCoverageExeFileName);
             this.vanguardCommandBuilderMock
-                .Setup(c => c.GenerateCommandLine(VanguardCommand.Collect, It.IsAny<string>(), It.IsAny<string>(),
+                .Setup(c => c.GenerateCommandLine(
+                    VanguardCommand.Collect,
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>())).Returns(VanguardTests.GetCollectCommand(this.sessionName, this.outputFileName, this.configFileName));
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             this.vanguard.Stop();
             cts.Cancel();
 
-            // TODO find the reason why more than two processes launched.
-            Assert.IsTrue(numOfProcessCreatedTask.Result >= 2);
+            var numOfProcessCreated = numOfProcessCreatedTask.Result;
+
+            // TODO find the reason why additional process launched when collecting code coverage.
+            Assert.IsTrue(numOfProcessCreated == 2 || numOfProcessCreated == 4, $"Number of process created:{numOfProcessCreated} expected is 2 or 4.");
         }
 
         private static string GetCollectCommand(string sessionName, string outputName, string configurationFileName)

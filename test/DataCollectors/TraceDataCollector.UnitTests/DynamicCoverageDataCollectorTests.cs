@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     {
         private const string DefaultConfig =
             "<Configuration><Framework>.NETCoreApp,Version=v2.0</Framework><TargetPlatform>x64</TargetPlatform></Configuration>";
+
         private TestableDynamicCoverageDataCollector collector;
         private Mock<ICollectorUtility> collectorUtilityMock;
         private Mock<IDynamicCoverageDataCollectorImpl> implMock;
@@ -46,14 +47,16 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         public void InitilizeShouldNotThrowOnNullConfig()
         {
             XmlElement actualConfig = null;
-            this.implMock.Setup(i => i.Initialize(It.IsAny<XmlElement>(), It.IsAny<IDataCollectionSink>(),
+            this.implMock.Setup(i => i.Initialize(
+                    It.IsAny<XmlElement>(),
+                    It.IsAny<IDataCollectionSink>(),
                     It.IsAny<IDataCollectionLogger>()))
                 .Callback<XmlElement, IDataCollectionSink, IDataCollectionLogger>((config, sink, logger) =>
                 {
                     actualConfig = config;
                 });
 
-            this.collector.Initialize(null,this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
+            this.collector.Initialize(null, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
 
             Assert.AreEqual(null, actualConfig);
         }
@@ -61,7 +64,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         [TestMethod]
         public void InitilizeShouldRegisterForSessionStartEvent()
         {
-
             this.eventsMock.Raise(e => e.SessionStart += null, new SessionStartEventArgs());
 
             this.implMock.Verify(i => i.SessionStart(It.IsAny<object>(), It.IsAny<SessionStartEventArgs>()));
@@ -83,15 +85,15 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             var x86profilePath = Path.Combine(currentDir, "covrun32.dll");
             var expectedEnvVariables = new Dictionary<string, string>
             {
-                { "CORECLR_ENABLE_PROFILING", "1"},
-                { "CORECLR_PROFILER_PATH_32", x86profilePath},
-                { "CORECLR_PROFILER_PATH_64", x64profilePath},
-                { "CORECLR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}"},
-                { "CODE_COVERAGE_SESSION_NAME", "MTM_123"},
-                { "COR_PROFILER_PATH_32", x86profilePath},
-                { "COR_PROFILER_PATH_64", x64profilePath},
-                { "COR_ENABLE_PROFILING", "1"},
-                { "COR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}"},
+                { "CORECLR_ENABLE_PROFILING", "1" },
+                { "CORECLR_PROFILER_PATH_32", x86profilePath },
+                { "CORECLR_PROFILER_PATH_64", x64profilePath },
+                { "CORECLR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}" },
+                { "CODE_COVERAGE_SESSION_NAME", "MTM_123" },
+                { "COR_PROFILER_PATH_32", x86profilePath },
+                { "COR_PROFILER_PATH_64", x64profilePath },
+                { "COR_ENABLE_PROFILING", "1" },
+                { "COR_PROFILER", "{E5F256DC-7959-4DD6-8E4F-C11150AB28E0}" },
             };
 
             this.implMock.Setup(i => i.GetSessionName()).Returns("MTM_123");
@@ -100,7 +102,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
 
             foreach (var pair in envVars)
             {
-                Console.WriteLine(pair.Key+ " ==> " + pair.Value);
+                Console.WriteLine(pair.Key + " ==> " + pair.Value);
             }
 
             Assert.AreEqual(expectedEnvVariables.Count, envVars.Count());
@@ -115,7 +117,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         public void DisposeShouldDisposeImpl()
         {
             this.collector.Dispose();
-            this.implMock.Verify( i => i.Dispose());
+            this.implMock.Verify(i => i.Dispose());
         }
 
         [TestMethod]
@@ -132,7 +134,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         private class TestableDynamicCoverageDataCollector : DynamicCoverageDataCollector
         {
             public TestableDynamicCoverageDataCollector(ICollectorUtility collectorUtility, IDynamicCoverageDataCollectorImpl impl)
-            :base(collectorUtility, impl)
+            : base(collectorUtility, impl)
             {
             }
 

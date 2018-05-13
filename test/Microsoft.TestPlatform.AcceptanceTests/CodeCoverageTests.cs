@@ -91,7 +91,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 AssertModuleCoverageCollected(coverageDs);
                 AssertSourceFileName(coverageDs);
             }
-
         }
 
         private static void AssertSourceFileName(CoverageDS coverageDS)
