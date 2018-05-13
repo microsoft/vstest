@@ -250,14 +250,14 @@ function Invoke-Test
                 if($fx -eq $TPT_TargetFrameworkFullCLR)
                 {
 
-                    Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter $ConsoleLogger"
+                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter $ConsoleLogger
                 }
                 else
                 {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter /settings:$Script:TPT_RunSettingsFile /testadapterpath:$Script:TPT_NSTraceDataCollectorPath"
-                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter /settings:"$Script:TPT_RunSettingsFile" /testadapterpath:"$Script:TPT_NSTraceDataCollectorPath"
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter /settings:$Script:TPT_RunSettingsFile /testadapterpath:$Script:TPT_NSTraceDataCollectorPath $ConsoleLogger"
+                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter /settings:"$Script:TPT_RunSettingsFile" /testadapterpath:"$Script:TPT_NSTraceDataCollectorPath $ConsoleLogger"
                 }
 
                 Reset-TestEnvironment
@@ -357,7 +357,7 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test run configuration: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Format-Table
 
-$ConsoleLogger = if ($VerbosePreference -eq "Continue") {'/logger:"console;verbosity=normal"'} else {'/logger:"console;verbosity=minimal"'}
+$ConsoleLogger = if ($VerbosePreference -eq "Continue") {'/logger:"console;verbosity=detailed"'} else {'/logger:"console;verbosity=minimal"'}
 
 Invoke-Test
 
