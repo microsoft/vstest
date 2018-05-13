@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     using System.IO;
     using System.Text;
     using System.Threading;
-    using System.Xml;
     using Coverage;
     using Coverage.Interfaces;
     using global::TestPlatform.TestUtilities;
@@ -23,14 +22,12 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     public class VanguardTests
     {
         private const string CodeCoverageExeFileName = "CodeCoverage";
-        private const string SessionNamePrefix = "MTM_";
         private const string ConfigFileNameFormat =
-            @"{0}\MTM_{1}\CodeCoverage.config"; // {TempDirPath}\MTM_{GUID}\CodeCoverage.config
+            @"{0}\{1}\CodeCoverage.config"; // {TempDirPath}\{Session_GUID}\CodeCoverage.config
 
         private const string ConfigXml =
-            @"  <Configuration>
-                <CodeCoverage>
-                <ModulePaths>
+            @"<CodeCoverage>
+                 <ModulePaths>
                  <Exclude>
                    <ModulePath>.*Tests.dll</ModulePath>
                  </Exclude>
@@ -39,9 +36,9 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
                 <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>
                 <CollectFromChildProcesses>True</CollectFromChildProcesses>
                 <CollectAspDotNet>False</CollectAspDotNet>
-              </CodeCoverage></Configuration>";
+               </CodeCoverage>
+              ";
 
-        private XmlElement configXmlElement;
         private Vanguard vanguard;
         private string sessionName;
         private string configFileName;
@@ -63,17 +60,16 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.collectorUtilityMock  = new Mock<ICollectorUtility>();
 
             this.vanguard = new Vanguard(this.collectorUtilityMock.Object, this.vanguardCommandBuilderMock.Object, this.processJobObject);
-            var guid = Guid.NewGuid();
-            this.sessionName = VanguardTests.SessionNamePrefix + guid;
-            this.configFileName = string.Format(VanguardTests.ConfigFileNameFormat, Path.GetTempPath(), guid);
+            this.sessionName = Guid.NewGuid().ToString();
+            this.configFileName = string.Format(VanguardTests.ConfigFileNameFormat, Path.GetTempPath(), this.sessionName);
             this.outputDir = Path.GetDirectoryName(this.configFileName);
             Directory.CreateDirectory(outputDir);
+            File.WriteAllText(this.configFileName, VanguardTests.ConfigXml);
             this.outputFileName = Path.Combine(this.outputDir, Guid.NewGuid() + ".coverage");
-            this.configXmlElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(ConfigXml)["CodeCoverage"];
             this.vanguardCommandBuilderMock.Setup(c =>
                     c.GenerateCommandLine(VanguardCommand.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(VanguardTests.GetShutdownCommand(this.sessionName));
-            this.vanguard.Initialize(this.sessionName, this.configFileName, this.configXmlElement, this.dataCollectionLoggerMock.Object);
+            this.vanguard.Initialize(this.sessionName, this.configFileName, this.dataCollectionLoggerMock.Object);
             this.collectorUtilityMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage.exe"));
         }
 
@@ -98,6 +94,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         [TestMethod]
         public void StartShouldStartVanguardProcessWithCollectCommand()
         {
+            Console.WriteLine("Config file content: {0}", File.ReadAllText(this.configFileName));
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,

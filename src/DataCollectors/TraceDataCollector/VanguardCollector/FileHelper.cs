@@ -14,5 +14,11 @@ namespace Microsoft.VisualStudio.TraceCollector
         {
             return File.Exists(path);
         }
+
+        /// <inheritdoc />
+        public void WriteAllText(string path, string contents)
+        {
+            File.WriteAllText(path, contents);
+        }
     }
 }

@@ -14,21 +14,14 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     internal interface IVanguard : IDisposable
     {
         /// <summary>
-        /// Gets output file name of vanguard
-        /// </summary>
-        string OutputName { get; }
-
-        /// <summary>
         /// Initilize Vanguard.
         /// </summary>
         /// <param name="sessionName">Session name</param>
         /// <param name="configurationFileName">Configuration file name</param>
-        /// <param name="configuration">Configuration XML element</param>
         /// <param name="logger">Data collection logger.</param>
         void Initialize(
             string sessionName,
             string configurationFileName,
-            XmlElement configuration,
             IDataCollectionLogger logger);
 
         /// <summary>

@@ -145,6 +145,8 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private string sessionDirectory;
 
+        private string coverageFilePath;
+
         public DynamicCoverageDataCollectorImpl()
         : this(new Vanguard(), new DirectoryHelper(), new FileHelper())
         {
@@ -264,13 +266,17 @@ namespace Microsoft.VisualStudio.Coverage
                 string outputCoverageFolder = Path.Combine(this.sessionDirectory, Guid.NewGuid().ToString());
                 this.CreateDirectory(context, outputCoverageFolder);
 
-                string outputCoverageFilePath = Path.Combine(outputCoverageFolder, this.coverageFileName);
+                this.coverageFilePath = Path.Combine(outputCoverageFolder, this.coverageFileName);
                 try
                 {
-                    this.Vanguard.Start(outputCoverageFilePath, context);
+                    this.Vanguard.Start(this.coverageFilePath, context);
                 }
                 catch (Exception ex)
                 {
+                    EqtTrace.Error(
+                        "DynamicCoverageDataCollectorImpl.StartVanguard: Failed to start Vanguard for datacollection context sessionID: {0}, with exception: {1}",
+                        context.SessionId,
+                        ex);
                     this.logger.LogError(context, ex);
                     throw;
                 }
@@ -288,9 +294,9 @@ namespace Microsoft.VisualStudio.Coverage
             {
                 this.Vanguard.Stop();
 
-                if (this.fileHelper.Exists(this.Vanguard.OutputName))
+                if (this.fileHelper.Exists(this.coverageFilePath))
                 {
-                    this.dataSink.SendFileAsync(context, this.Vanguard.OutputName, false);
+                    this.dataSink.SendFileAsync(context, this.coverageFilePath, false);
                 }
 
                 this.Vanguard = null;
@@ -336,7 +342,10 @@ namespace Microsoft.VisualStudio.Coverage
             XmlElement config = configurationElement[ConfigCodeCoverageElementName];
             string configurationFileName = Path.Combine(this.sessionDirectory, VanguardConfigFileName);
 
-            this.Vanguard.Initialize(this.SessionName, configurationFileName, config, this.logger);
+            this.fileHelper.WriteAllText(configurationFileName, config.OuterXml);
+
+            EqtTrace.Info("DynamicCoverageDataCollectorImpl.PrepareVanguardProcess: Initializing  with config: {0}.", config.OuterXml);
+            this.Vanguard.Initialize(this.SessionName, configurationFileName, this.logger);
         }
 
         private void CleanupDirectory()

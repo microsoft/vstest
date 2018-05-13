@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
     public class DynamicCoverageDataCollectorImplTests
     {
         private static readonly string DefaultCodeCoverageConfig =
-            @"            <ModulePaths>" + Environment.NewLine +
+            @"            <CodeCoverage><ModulePaths>" + Environment.NewLine +
             @"              <Exclude>" + Environment.NewLine +
             @"                 <ModulePath>.*CPPUnitTestFramework.*</ModulePath>" + Environment.NewLine +
             @"                 <ModulePath>.*vstest.console.*</ModulePath>" + Environment.NewLine +
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             @"              </Exclude>" + Environment.NewLine +
             @"            </Sources>" + Environment.NewLine +
             @"            <CompanyNames/>" + Environment.NewLine +
-            @"            <PublicKeyTokens/>" + Environment.NewLine;
+            @"            <PublicKeyTokens/></CodeCoverage>" + Environment.NewLine;
 
         private const string DefaultConfigFileName = "CodeCoverage.config";
 
@@ -111,11 +111,11 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         private Mock<IDirectoryHelper> directoryHelperMock;
         private Mock<IFileHelper> fileHelperMock;
 
-        private XmlElement aConfig;
         private string aConfigFileName;
         private string aSessionName;
         private IDataCollectionLogger aLogger;
         private string atempDirectory;
+        private string tempSessionDir;
 
         public DynamicCoverageDataCollectorImplTests()
         {
@@ -124,35 +124,64 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.directoryHelperMock = new Mock<IDirectoryHelper>();
             this.fileHelperMock = new Mock<IFileHelper>();
+            this.tempSessionDir = null;
             this.collectorImpl = new DynamicCoverageDataCollectorImpl(this.vanguardMock.Object, this.directoryHelperMock.Object, this.fileHelperMock.Object);
             this.SetupForInitialize();
             this.collectorImpl.Initialize(DynamicCoverageDataCollectorImplTests.SampleConfigurationElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (this.tempSessionDir != null)
+            {
+                if (Directory.Exists(this.tempSessionDir))
+                {
+                    Directory.Delete(this.tempSessionDir, true);
+                }
+            }
         }
 
         #region Initialize Tests
         [TestMethod]
         public void InitializeShouldCreateDefaultCodeCoverageSettingsIfConfigElementIsNull()
         {
+            this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>()))
+                .Callback<string>((path) => Directory.CreateDirectory(path));
+
+            this.fileHelperMock.Setup(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((path, content) => { File.WriteAllText(path, content);});
+
             this.collectorImpl.Initialize(null, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
 
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(aConfigFileName));
             StringAssert.Contains(aConfigFileName, Path.GetTempPath());
             Assert.AreEqual(
                 DefaultCodeCoverageConfig.Replace(Environment.NewLine, string.Empty).Replace(" ", String.Empty)
-                , aConfig.InnerXml.Replace(Environment.NewLine, string.Empty).Replace(" ", String.Empty));
+                , File.ReadAllText(aConfigFileName).Replace(Environment.NewLine, string.Empty).Replace(" ", String.Empty));
         }
 
         [TestMethod]
         public void InitializeShouldInitializeVanguardWithRightCoverageSettings()
         {
-            var expectedContent = "CoverageSettingsContent";
+            var expectedContent ="<CodeCoverage>CoverageSettingsContent</CodeCoverage>";
             XmlElement configElement =
-                DynamicCoverageDataCollectorImplTests.CreateXmlElement($@"<Configuration><CodeCoverage>{expectedContent}</CodeCoverage></Configuration>");
+                DynamicCoverageDataCollectorImplTests.CreateXmlElement($"<Configuration>{expectedContent}</Configuration>");
+
+            this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>()))
+                .Callback<string>((path) =>
+                {
+                    this.tempSessionDir = path;
+                    Directory.CreateDirectory(path);
+                });
+
+            this.fileHelperMock.Setup(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((path, content) => { File.WriteAllText(path, content); });
 
             this.collectorImpl.Initialize(configElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
 
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(aConfigFileName));
-            Assert.AreEqual(expectedContent, aConfig.InnerXml);
+            Assert.AreEqual(expectedContent, File.ReadAllText(aConfigFileName));
         }
 
         [TestMethod]
@@ -327,7 +356,6 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         {
             string tempFile = Path.GetTempFileName();
             var sessionEndEventArgs = new SessionEndEventArgs();
-            this.vanguardMock.Setup(v => v.OutputName).Returns(tempFile);
             this.fileHelperMock.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
             this.collectorImpl.SessionEnd(null, sessionEndEventArgs);
 
@@ -339,14 +367,13 @@ namespace Microsoft.VisualStudio.TraceCollector.UnitTests
         #region private methods
         private void SetupForInitialize()
         {
-            this.vanguardMock.Setup(v => v.Initialize(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<XmlElement>(),
+            this.vanguardMock.Setup(v => v.Initialize(It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<IDataCollectionLogger>()))
-                .Callback<string, string, XmlElement, IDataCollectionLogger>(
-                    (sessionName, configFileName, config, logger) =>
+                .Callback<string, string, IDataCollectionLogger>(
+                    (sessionName, configFileName, logger) =>
                     {
                         this.aSessionName = sessionName;
                         this.aConfigFileName = configFileName;
-                        this.aConfig = config;
                         this.aLogger = logger;
                     });
 

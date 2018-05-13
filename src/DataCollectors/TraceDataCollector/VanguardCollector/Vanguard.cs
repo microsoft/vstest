@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.Coverage
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Threading;
-    using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -59,6 +58,11 @@ namespace Microsoft.VisualStudio.Coverage
         private string configurationFileName;
 
         /// <summary>
+        /// Vanguard output file name.
+        /// </summary>
+        private string outputName;
+
+        /// <summary>
         /// Helper object to manage child process lifetimes
         /// </summary>
         private IProcessJobObject processJobObject;
@@ -93,11 +97,6 @@ namespace Microsoft.VisualStudio.Coverage
         }
 
         /// <summary>
-        /// Gets output file name of vanguard
-        /// </summary>
-        public string OutputName { get; private set; }
-
-        /// <summary>
         /// Gets a value indicating whether whether vanguard is running
         /// </summary>
         private bool IsRunning
@@ -109,34 +108,27 @@ namespace Microsoft.VisualStudio.Coverage
         public void Initialize(
             string sessionName,
             string configurationFileName,
-            XmlElement configuration,
             IDataCollectionLogger logger)
         {
-            ValidateArg.NotNull(configuration, nameof(configuration));
-
-            EqtTrace.Info("Vanguard.Initialize: Session name: {0}, config filename: {1} config: {2}", sessionName, configurationFileName, configuration.InnerXml);
+            EqtTrace.Info("Vanguard.Initialize: Session name: {0}, config filename: {1}", sessionName, configurationFileName);
 
             this.sessionName = sessionName;
             this.configurationFileName = configurationFileName;
             this.logger = logger;
-            using (var writer = new StreamWriter(new FileStream(this.configurationFileName, FileMode.Create)))
-            {
-                writer.WriteLine(configuration.OuterXml);
-            }
         }
 
         /// <inheritdoc />
         public virtual void Start(string outputName, DataCollectionContext context)
         {
-            EqtTrace.Info("Vanguard.Start: Starting CodeCoverage.exe for coverage file: {0} datacollection session id: {1}", outputName, context.SessionId);
+            EqtTrace.Info("Vanguard.Start: Starting CodeCoverage.exe for output file: {0} datacollection session id: {1}", outputName, context.SessionId);
 
             this.vanguardProcessExitEvent = new ManualResetEvent(false);
-            this.OutputName = outputName;
+            this.outputName = outputName;
             this.context = context;
             var collectCommand = this.vanguardCommandBuilder.GenerateCommandLine(
                 VanguardCommand.Collect,
                 this.sessionName,
-                this.OutputName,
+                this.outputName,
                 this.configurationFileName);
 
             this.vanguardProcess = this.StartVanguardProcess(collectCommand, false, true);
