@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="824728581">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">1766</count>
+        <count count-type="x-adjWordCount">1498.1</count>
+        <count count-type="x-curAdjWordCount">1498.1</count>
+        <count count-type="x-repeatAdjWordCount">1.25</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">1761</count>
+        <count count-type="repetition">5</count>
+      </count-group>
+    </header>
+    <body>
+      <trans-unit id="asdf">
+        <source>Logging Vstest Diagnostics in file</source>
+        <target state="new">Logging Vstest Diagnostics in file</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

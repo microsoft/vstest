@@ -233,6 +233,7 @@ function Publish-Package
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
     $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS1_4")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
+	$settingsMigratorProject = Join-Path $env:TP_ROOT_DIR "src\SettingsMigrator\SettingsMigrator.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish src\package\package\package.csproj"
@@ -245,6 +246,9 @@ function Publish-Package
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
+	
+	Write-Log "Package: Publish src\SettingsMigrator\SettingsMigrator.csproj"
+	Publish-PackageInternal $settingsMigratorProject $TPB_TargetFramework $fullCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
