@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.Coverage
     using TraceCollector;
     using TraceCollector.Interfaces;
     using TraceDataCollector.Resources;
+    using IDataCollectionSink = TraceCollector.IDataCollectionSink;
 
     /// <summary>
     /// Create config file and output directory required for vanguard process and manages life cycle of vanguard process.
@@ -103,7 +104,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <param name="logger">Logger</param>
         public virtual void Initialize(
             XmlElement configurationElement,
-            TraceCollector.IDataCollectionSink dataSink,
+            IDataCollectionSink dataSink,
             IDataCollectionLogger logger)
         {
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
@@ -129,7 +130,7 @@ namespace Microsoft.VisualStudio.Coverage
             this.SessionName = Guid.NewGuid().ToString();
 
             this.sessionDirectory = Path.Combine(Path.GetTempPath(), this.SessionName);
-            this.CreateDirectory(null, this.sessionDirectory);
+            this.directoryHelper.CreateDirectory(this.sessionDirectory);
 
             this.SetCoverageFileName(configurationElement);
 
@@ -292,14 +293,9 @@ namespace Microsoft.VisualStudio.Coverage
             catch (Exception ex)
             {
                 EqtTrace.Error("DynamicCoverageDataCollectorImpl.CreateDirectory:Failed to create directory: {0}, with exception: {1}", path, ex);
-
-                if (context != null)
-                {
-                    this.logger.LogError(
-                        context,
-                        string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, path, ex));
-                }
-
+                this.logger.LogError(
+                    context,
+                    string.Format(CultureInfo.CurrentUICulture, Resources.FailedToCreateDirectory, path, ex));
                 throw;
             }
         }

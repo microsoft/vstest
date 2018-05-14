@@ -120,6 +120,9 @@
   <data name="FailedToCreateDirectory" xml:space="preserve">
     <value>Failed to create directory: {0} with error:{1}</value>
   </data>
+  <data name="FailedToInitializeCodeCoverageDataCollector" xml:space="preserve">
+    <value>Failed to initialize code coverage datacollector with error: {0}</value>
+  </data>
   <data name="NoRunningEventFromVanguard" xml:space="preserve">
     <value>Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.</value>
   </data>

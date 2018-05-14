@@ -3,13 +3,16 @@
 
 namespace Microsoft.VisualStudio.Coverage
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
+    using TraceDataCollector.Resources;
 
     /// <summary>
     /// DynamicCoverageDataCollector implements BaseDataCollector for "Code Coverage" . Handles datacollector's SessionStart and SessionsEnd events
@@ -55,7 +58,19 @@ namespace Microsoft.VisualStudio.Coverage
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
-            this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
+            try
+            {
+                this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("DynamicCoverageDataCollector.OnInitialize: Failed to initialize code coverage datacolector with exception: {0}", ex);
+                this.Logger.LogError(
+                    this.AgentContext.SessionDataCollectionContext,
+                    string.Format(CultureInfo.CurrentUICulture, Resources.FailedToInitializeCodeCoverageDataCollector, ex));
+                throw;
+            }
+
             this.Events.SessionStart += this.SessionStart;
             this.Events.SessionEnd += this.SessionEnd;
         }

@@ -71,6 +71,15 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to initialize code coverage datacollector with error: {0}.
+        /// </summary>
+        internal static string FailedToInitializeCodeCoverageDataCollector {
+            get {
+                return ResourceManager.GetString("FailedToInitializeCodeCoverageDataCollector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Running event not received from CodeCoverage.exe. Check eventlogs for failure reason..
         /// </summary>
         internal static string NoRunningEventFromVanguard {

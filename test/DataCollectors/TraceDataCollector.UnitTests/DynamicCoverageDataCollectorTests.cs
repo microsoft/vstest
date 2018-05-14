@@ -79,6 +79,28 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
+        public void InitializeShouldNotLogMessageOnException()
+        {
+            var exceptionReason = "Failed to create directory";
+            this.implMock.Setup(i => i.Initialize(
+                    It.IsAny<XmlElement>(),
+                    It.IsAny<TraceCollector.IDataCollectionSink>(),
+                    It.IsAny<IDataCollectionLogger>()))
+                .Throws(new Exception(exceptionReason));
+
+            var actualErrorMessage = string.Empty;
+            this.loggerMock.Setup(l => l.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>()))
+                .Callback<DataCollectionContext, string>((c, m) => { actualErrorMessage = m; });
+            Assert.ThrowsException<Exception>(() => this.collector.Initialize(null, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object));
+
+            this.loggerMock.Verify(l => l.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>()), Times.Once());
+
+            var expectedMessagePrefix = "Failed to initialize code coverage datacollector with error:";
+            StringAssert.StartsWith(actualErrorMessage, expectedMessagePrefix);
+            StringAssert.Contains(actualErrorMessage, exceptionReason);
+        }
+
+        [TestMethod]
         public void GetEnvironmentVariablesShouldReturnRightEnvVaribles()
         {
             var currentDir = Directory.GetCurrentDirectory();

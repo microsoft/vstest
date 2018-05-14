@@ -16,7 +16,10 @@ namespace Microsoft.VisualStudio.Coverage.Interfaces
     {
         string GetSessionName();
 
-        void Initialize(XmlElement configurationElement, IDataCollectionSink dataSink, IDataCollectionLogger logger);
+        void Initialize(
+            XmlElement configurationElement,
+            IDataCollectionSink dataSink,
+            IDataCollectionLogger logger);
 
         void SessionEnd(object sender, SessionEndEventArgs sessionEndEventArgs);
 
