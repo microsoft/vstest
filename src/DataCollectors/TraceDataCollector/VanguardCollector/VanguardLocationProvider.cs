@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TraceCollector
     using Coverage.Interfaces;
     using TraceDataCollector.Resources;
 
-    internal class CollectorUtility : ICollectorUtility
+    internal class VanguardLocationProvider : IVanguardLocationProvider
     {
         /// <summary>
         /// Vanguard executable name
@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TraceCollector
         /// <inheritdoc />
         public string GetVanguardDirectory()
         {
-            return Path.GetDirectoryName(typeof(CollectorUtility).GetTypeInfo().Assembly.Location);
+            return Path.GetDirectoryName(typeof(VanguardLocationProvider).GetTypeInfo().Assembly.Location);
         }
     }
 }

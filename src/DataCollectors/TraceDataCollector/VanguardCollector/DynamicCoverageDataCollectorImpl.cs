@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.Coverage
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using TestPlatform.ObjectModel;
     using TraceCollector;
+    using TraceCollector.Interfaces;
     using TraceDataCollector.Resources;
 
     /// <summary>

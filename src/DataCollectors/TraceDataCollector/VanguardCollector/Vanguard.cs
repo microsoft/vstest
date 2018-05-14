@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.Coverage
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
+    using TraceCollector.Interfaces;
     using TraceDataCollector.Resources;
 
     /// <summary>
@@ -77,21 +78,21 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private DataCollectionContext context;
 
-        private ICollectorUtility collectorUtility;
+        private IVanguardLocationProvider vanguardLocationProvider;
 
         private IVanguardCommandBuilder vanguardCommandBuilder;
 
         public Vanguard()
-            : this(new CollectorUtility(), new VanguardCommandBuilder(), new ProcessJobObject())
+            : this(new VanguardLocationProvider(), new VanguardCommandBuilder(), new ProcessJobObject())
         {
         }
 
         internal Vanguard(
-            ICollectorUtility collectorUtility,
+            IVanguardLocationProvider vanguardLocationProvider,
             IVanguardCommandBuilder commandBuilder,
             IProcessJobObject processJobObject)
         {
-            this.collectorUtility = collectorUtility;
+            this.vanguardLocationProvider = vanguardLocationProvider;
             this.vanguardCommandBuilder = commandBuilder;
             this.processJobObject = processJobObject;
         }
@@ -238,7 +239,7 @@ namespace Microsoft.VisualStudio.Coverage
             bool wait,
             bool standardErrorAsynchronousCall = false)
         {
-            string vanguardPath = this.collectorUtility.GetVanguardPath();
+            string vanguardPath = this.vanguardLocationProvider.GetVanguardPath();
             EqtTrace.Info(
                 "Vanguard.StartVanguardProcess: Starting {0} with command line: {1}, wait for exit:{2}, Read stderr: {3}",
                 vanguardPath,

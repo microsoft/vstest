@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TraceCollector
 {
     using System;
     using System.Runtime.InteropServices;
-    using Coverage.Interfaces;
+    using Interfaces;
     using TestPlatform.ObjectModel;
 
     /// <summary>

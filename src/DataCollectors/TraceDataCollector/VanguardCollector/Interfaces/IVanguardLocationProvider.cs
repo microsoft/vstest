@@ -4,9 +4,9 @@
 namespace Microsoft.VisualStudio.Coverage.Interfaces
 {
     /// <summary>
-    /// The CollectorUtility interface.
+    /// Interface to provide vanguard directory and path.
     /// </summary>
-    internal interface ICollectorUtility
+    internal interface IVanguardLocationProvider
     {
         /// <summary>
         /// Get path to vanguard exe

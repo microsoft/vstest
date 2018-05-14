@@ -12,9 +12,9 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using Coverage.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using TestPlatform.ObjectModel;
     using TestPlatform.ObjectModel.DataCollection;
     using TraceCollector;
+    using TraceCollector.Interfaces;
 
     [TestClass]
     public class DynamicCoverageDataCollectorImplTests
@@ -37,8 +37,6 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         private Mock<IFileHelper> fileHelperMock;
 
         private string aConfigFileName;
-        private string aSessionName;
-        private IDataCollectionLogger aLogger;
         private string atempDirectory;
         private string tempSessionDir;
 
@@ -341,9 +339,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 .Callback<string, string, IDataCollectionLogger>(
                     (sessionName, configFileName, logger) =>
                     {
-                        this.aSessionName = sessionName;
                         this.aConfigFileName = configFileName;
-                        this.aLogger = logger;
                     });
 
             this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>())).Callback<string>(

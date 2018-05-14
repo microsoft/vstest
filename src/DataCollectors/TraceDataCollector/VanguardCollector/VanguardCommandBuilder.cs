@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.Coverage
                 case VanguardCommand.Collect:
                     builder.AppendFormat(
                         CultureInfo.InvariantCulture,
-                        "collect /session:{0}  /output:\"{1}\"",
+                        "collect /session:{0} /output:\"{1}\"",
                         sessionName,
                         outputName);
                     if (!string.IsNullOrEmpty(configurationFileName))

@@ -38,18 +38,18 @@ namespace Microsoft.VisualStudio.Coverage
         /// </summary>
         private IDynamicCoverageDataCollectorImpl implementation;
 
-        private ICollectorUtility collectorUtility;
+        private IVanguardLocationProvider vanguardLocationProvider;
 
         public DynamicCoverageDataCollector()
-        : this(new CollectorUtility(), new DynamicCoverageDataCollectorImpl())
+        : this(new VanguardLocationProvider(), new DynamicCoverageDataCollectorImpl())
         {
         }
 
         internal DynamicCoverageDataCollector(
-            ICollectorUtility collectorUtility,
+            IVanguardLocationProvider vanguardLocationProvider,
             IDynamicCoverageDataCollectorImpl dynamicCoverageDataCollectorImpl)
         {
-            this.collectorUtility = collectorUtility;
+            this.vanguardLocationProvider = vanguardLocationProvider;
             this.implementation = dynamicCoverageDataCollectorImpl;
         }
 
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>Returns EnvironmentVariables required for code coverage profiler. </returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
-            var vanguardDirectory = this.collectorUtility.GetVanguardDirectory();
+            var vanguardDirectory = this.vanguardLocationProvider.GetVanguardDirectory();
             var vanguardX86ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX86ProfilerPath);
             var vanguardX64ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX64ProfilerPath);
             var envVaribles = new List<KeyValuePair<string, string>>

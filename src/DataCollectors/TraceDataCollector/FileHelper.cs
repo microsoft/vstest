@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TraceCollector
 {
     using System.IO;
-    using Coverage.Interfaces;
+    using Interfaces;
 
     /// <inheritdoc />
     internal class FileHelper : IFileHelper

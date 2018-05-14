@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             "<Configuration><Framework>.NETCoreApp,Version=v2.0</Framework><TargetPlatform>x64</TargetPlatform></Configuration>";
 
         private TestableDynamicCoverageDataCollector collector;
-        private Mock<ICollectorUtility> collectorUtilityMock;
+        private Mock<IVanguardLocationProvider> vanguardLocationProviderMock;
         private Mock<IDynamicCoverageDataCollectorImpl> implMock;
         private Mock<IDataCollectionEvents> eventsMock;
         private Mock<TraceCollector.IDataCollectionSink> sinkMock;
@@ -32,14 +32,14 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
         public DynamicCoverageDataCollectorTests()
         {
-            this.collectorUtilityMock = new Mock<ICollectorUtility>();
+            this.vanguardLocationProviderMock = new Mock<IVanguardLocationProvider>();
             this.implMock = new Mock<IDynamicCoverageDataCollectorImpl>();
             this.eventsMock = new Mock<IDataCollectionEvents>();
             this.sinkMock = new Mock<TraceCollector.IDataCollectionSink>();
             this.loggerMock = new Mock<IDataCollectionLogger>();
             this.agentContextMock = new Mock<IDataCollectionAgentContext>();
-            this.collector = new TestableDynamicCoverageDataCollector(this.collectorUtilityMock.Object, this.implMock.Object);
-            this.collectorUtilityMock.Setup(u => u.GetVanguardDirectory()).Returns(Directory.GetCurrentDirectory);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, this.implMock.Object);
+            this.vanguardLocationProviderMock.Setup(u => u.GetVanguardDirectory()).Returns(Directory.GetCurrentDirectory);
             var configElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(DynamicCoverageDataCollectorTests.DefaultConfig);
             this.collector.Initialize(configElement, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
         }
@@ -134,8 +134,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
         private class TestableDynamicCoverageDataCollector : DynamicCoverageDataCollector
         {
-            public TestableDynamicCoverageDataCollector(ICollectorUtility collectorUtility, IDynamicCoverageDataCollectorImpl impl)
-            : base(collectorUtility, impl)
+            public TestableDynamicCoverageDataCollector(IVanguardLocationProvider vanguardLocationProvider, IDynamicCoverageDataCollectorImpl impl)
+            : base(vanguardLocationProvider, impl)
             {
             }
 

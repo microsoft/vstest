@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using TestPlatform.ObjectModel;
     using TestPlatform.ObjectModel.DataCollection;
     using TraceCollector;
+    using TraceCollector.Interfaces;
 
     [TestClass]
     public class VanguardTests
@@ -44,7 +45,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         private string sessionName;
         private string configFileName;
         private Mock<IDataCollectionLogger> dataCollectionLoggerMock;
-        private Mock<ICollectorUtility> collectorUtilityMock;
+        private Mock<IVanguardLocationProvider> vanguardLocationProviderMock;
         private string outputFileName;
         private string outputDir;
         private DataCollectionContext dataCollectionContext;
@@ -58,9 +59,9 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.dataCollectionLoggerMock = new Mock<IDataCollectionLogger>();
             this.processJobObject = new ProcessJobObject();
             this.vanguardCommandBuilderMock = new Mock<IVanguardCommandBuilder>();
-            this.collectorUtilityMock = new Mock<ICollectorUtility>();
+            this.vanguardLocationProviderMock = new Mock<IVanguardLocationProvider>();
 
-            this.vanguard = new Vanguard(this.collectorUtilityMock.Object, this.vanguardCommandBuilderMock.Object, this.processJobObject);
+            this.vanguard = new Vanguard(this.vanguardLocationProviderMock.Object, this.vanguardCommandBuilderMock.Object, this.processJobObject);
             this.sessionName = Guid.NewGuid().ToString();
             this.configFileName = string.Format(VanguardTests.ConfigFileNameFormat, Path.GetTempPath(), this.sessionName);
             this.outputDir = Path.GetDirectoryName(this.configFileName);
@@ -71,7 +72,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                     c.GenerateCommandLine(VanguardCommand.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(VanguardTests.GetShutdownCommand(this.sessionName));
             this.vanguard.Initialize(this.sessionName, this.configFileName, this.dataCollectionLoggerMock.Object);
-            this.collectorUtilityMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage.exe"));
+            this.vanguardLocationProviderMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage.exe"));
         }
 
         [TestCleanup]
@@ -115,7 +116,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         [ExpectedException(typeof(Win32Exception))]
         public void StartShouldThrowOnInvalidVarguardPath()
         {
-            this.collectorUtilityMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "WrongExePath.exe"));
+            this.vanguardLocationProviderMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "WrongExePath.exe"));
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
         }
 
