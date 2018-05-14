@@ -286,6 +286,47 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
+        /// Returns true if legacy settings node is present in runsettings
+        /// </summary>
+        /// <param name="runsettingsXml">The run settings xml string</param>
+        /// <param name="legacySettingElements">The list of elements inside legacy settings</param>
+        /// <returns></returns>
+        public static bool TryGetLegacySettingElements(string runsettingsXml, out List<string> legacySettingElements)
+        {
+            legacySettingElements = new List<string>();
+            try
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings");
+                    if (node == null)
+                    {
+                        return false;
+                    }
+
+                    var childNodes = node.SelectChildren(XPathNodeType.Element);
+
+                    while (childNodes.MoveNext())
+                    {
+                        legacySettingElements.Add(childNodes.Current.Name);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                EqtTrace.Error("Error while trying to read legacy settings. Message: {0}", ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Updates the <c>RunConfiguration.TargetPlatform</c> value for a run settings. if the value is already set, behavior depends on overwrite.
         /// </summary>
         /// <param name="runSettingsDocument">Navigator for runsettings xml</param>
