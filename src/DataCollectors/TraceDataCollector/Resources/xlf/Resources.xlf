@@ -22,6 +22,11 @@
         <target state="new">Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="FailedToInitializeCodeCoverageDataCollector">
+        <source>Failed to initialize code coverage datacollector with error: {0}</source>
+        <target state="new">Failed to initialize code coverage datacollector with error: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
