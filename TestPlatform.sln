@@ -119,6 +119,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{DED1590A-ED25-413B-8590-006A4DD5B2FD}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\build\TestPlatform.Dependencies.props = scripts\build\TestPlatform.Dependencies.props
+		scripts\build\TestPlatform.Localization.targets = scripts\build\TestPlatform.Localization.targets
 		scripts\build\TestPlatform.Settings.targets = scripts\build\TestPlatform.Settings.targets
 		scripts\build\TestPlatform.targets = scripts\build\TestPlatform.targets
 	EndProjectSection
