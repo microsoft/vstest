@@ -26,5 +26,6 @@
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>15.7.0-preview-1570038</TestPlatformExternalsVersion>
+    <MSInternalCodeCoverageVersion>1.0.1</MSInternalCodeCoverageVersion>
   </PropertyGroup>
 </Project>
