@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp1.0", "net451")]
+    [ValidateSet("netcoreapp1.0", "net451", "netcoreapp2.0")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -91,6 +91,8 @@ $Script:TPT_Parallel = $Parallel
 $Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
 $Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
+$Script:TPT_RunSettingsFile = Join-Path (Get-Item (Split-Path $MyInvocation.MyCommand.Path)) "vstest-codecoverage.runsettings"
+$Script:TPT_NSTraceDataCollectorPath = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$Script:TPT_Configuration\netstandard2.0"
 
 #
 # Capture error state in any step globally to modify return code
@@ -161,7 +163,7 @@ function Invoke-Test
     {
         Write-Log ".. Test: Computing sources"
         Get-ChildItem -Recurse -Path $src -Include *.csproj | Where-Object { $_.FullName -inotmatch "TestAssets" } | ForEach-Object {
-            $testContainerName = $_.Directory.Name
+            $testContainerName = $_.BaseName
             $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
             $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
             
@@ -248,14 +250,14 @@ function Invoke-Test
                 if($fx -eq $TPT_TargetFrameworkFullCLR)
                 {
 
-                    Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    Write-Verbose "$vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter $ConsoleLogger"
+                    & $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter $ConsoleLogger
                 }
                 else
                 {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter"
-                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter /settings:$Script:TPT_RunSettingsFile /testadapterpath:$Script:TPT_NSTraceDataCollectorPath $ConsoleLogger"
+                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter /settings:"$Script:TPT_RunSettingsFile" /testadapterpath:"$Script:TPT_NSTraceDataCollectorPath $ConsoleLogger"
                 }
 
                 Reset-TestEnvironment
@@ -355,7 +357,7 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test run configuration: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Format-Table
 
-$ConsoleLogger = if ($VerbosePreference -eq "Continue") {'/logger:"console;verbosity=normal"'} else {'/logger:"console;verbosity=minimal"'}
+$ConsoleLogger = if ($VerbosePreference -eq "Continue") {'/logger:"console;verbosity=detailed"'} else {'/logger:"console;verbosity=minimal"'}
 
 Invoke-Test
 

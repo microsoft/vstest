@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 using (
                     var xmlReader = XmlReader.Create(
                         new StringReader(DefaultConfigurationSettings),
-                        new XmlReaderSettings{ CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
+                        new XmlReaderSettings { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
                     doc.Load(xmlReader);
                 }
