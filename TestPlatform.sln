@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.x86", "src\testhos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.console", "src\vstest.console\vstest.console.csproj", "{10B6ADE1-F808-4612-801D-4452F5B52242}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SettingsMigrator", "src\SettingsMigrator\SettingsMigrator.csproj", "{699B8910-79E0-4950-B85A-E131AE712776}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{46250E12-4CF1-4051-B4A7-80C8C06E0068}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logger", "Logger", "{020E15EA-731F-4667-95AF-226671E0C3AE}"
@@ -795,6 +797,18 @@ Global
 		{24C7683D-2607-4901-B8EB-83A57E49E93D}.Release|x64.Build.0 = Release|Any CPU
 		{24C7683D-2607-4901-B8EB-83A57E49E93D}.Release|x86.ActiveCfg = Release|Any CPU
 		{24C7683D-2607-4901-B8EB-83A57E49E93D}.Release|x86.Build.0 = Release|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Debug|x64.Build.0 = Debug|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Debug|x86.Build.0 = Debug|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Release|Any CPU.Build.0 = Release|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Release|x64.ActiveCfg = Release|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Release|x64.Build.0 = Release|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Release|x86.ActiveCfg = Release|Any CPU
+		{699B8910-79E0-4950-B85A-E131AE712776}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
