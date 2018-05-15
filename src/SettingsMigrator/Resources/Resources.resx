@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="asdf" xml:space="preserve">
-    <value>Logging Vstest Diagnostics in file</value>
+  <data name="ValidUsage" xml:space="preserve">
+    <value>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;</value>
   </data>
 </root>

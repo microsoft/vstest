@@ -20,9 +20,9 @@
       </count-group>
     </header>
     <body>
-      <trans-unit id="asdf">
-        <source>Logging Vstest Diagnostics in file</source>
-        <target state="new">Logging Vstest Diagnostics in file</target>
+      <trans-unit id="ValidUsage">
+        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;</source>
+        <target state="new">Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;</target>
         <note></note>
       </trans-unit>
     </body>
