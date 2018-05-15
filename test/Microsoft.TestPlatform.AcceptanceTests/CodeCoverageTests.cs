@@ -36,6 +36,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource]
         public void CollectCodeCoverageX64(RunnerInfo runnerInfo)
         {
+            if (runnerInfo.TargetFramework.Equals("net451"))
+            {
+                this.SkipIfRuningInCI();
+            }
+
             this.CollectCodeCoverage(runnerInfo, "x64");
         }
 
@@ -151,6 +156,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     trxFilePath);
                 return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
             }
+        }
+        private bool SkipIfRuningInCI()
+        {
+            // Setting Console.ForegroundColor to newColor which will be used to determine whether
+            // test command output is redirecting to file or writting to console.
+            // If command output is redirecting to file, then Console.ForegroundColor can't be modified.
+            // So that tests which assert Console.ForegroundColor should not run.
+            var previousColor = Console.ForegroundColor;
+            var newColor = previousColor == ConsoleColor.Gray
+                ? ConsoleColor.Black
+                : ConsoleColor.Blue;
+            Console.ForegroundColor = newColor;
+            if (Console.ForegroundColor != newColor)
+            {
+                Console.ForegroundColor = previousColor;
+                Assert.Inconclusive("Skipping for x64 Desktop tests.");
+            }
+
+            Console.ForegroundColor = previousColor;
+
+            return false;
         }
     }
 }
