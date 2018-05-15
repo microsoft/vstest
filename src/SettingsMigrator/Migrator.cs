@@ -1,12 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.IO;
 using System.Xml;
 
 namespace SettingsMigrator
 {
     public class Migrator
-    {        
-
+    {
         /// <summary>
         /// Given a runsettings with an embedded testsettings, converts it to runsettings.
         /// </summary>
@@ -24,13 +26,14 @@ namespace SettingsMigrator
                 var root = document.DocumentElement;
 
                 var testsettingsNode = root.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-                if(testsettingsNode != null)
+
+                if (testsettingsNode != null)
                 {
                     testsettingsPath = testsettingsNode.InnerText;
                 }
-                if(!string.IsNullOrWhiteSpace(testsettingsPath))
+                if (!string.IsNullOrWhiteSpace(testsettingsPath))
                 {
-                    if(!Path.IsPathRooted(testsettingsPath))
+                    if (!Path.IsPathRooted(testsettingsPath))
                     {
                         testsettingsPath = Path.Combine(oldRunsettingsPath, testsettingsPath);
                     }
@@ -69,120 +72,153 @@ namespace SettingsMigrator
                 var hostsNode = root.SelectSingleNode(@"/TestSettings/Execution/Hosts");
                 var executionNode = root.SelectSingleNode(@"/TestSettings/Execution");
 
-                var hasTestTimeout = timeoutNode != null && timeoutNode.Attributes[TestTimeoutAttributeName] != null;
-                var hasRunTimeout = timeoutNode != null && timeoutNode.Attributes[RunTimeoutAttributeName] != null;
-                var hasParallelTestCount = executionNode != null && executionNode.Attributes[ParallelTestCountAttributeName] != null;
+                string testTimeout = null;
+                if (timeoutNode != null && timeoutNode.Attributes[TestTimeoutAttributeName] != null)
+                {
+                    testTimeout = timeoutNode.Attributes[TestTimeoutAttributeName].Value;
+                }
 
-                var newxml = new XmlDocument();
-                newxml.LoadXml(oldRunSettingsContent);
+                string runTimeout = null;
+                if (timeoutNode != null && timeoutNode.Attributes[RunTimeoutAttributeName] != null)
+                {
+                    runTimeout = timeoutNode.Attributes[RunTimeoutAttributeName].Value;
+                }
+
+                string parallelTestCount = null;
+                if (executionNode != null && executionNode.Attributes[ParallelTestCountAttributeName] != null)
+                {
+                    parallelTestCount = executionNode.Attributes[ParallelTestCountAttributeName].Value;
+                }
+
+                var newXmlDoc = new XmlDocument();
+                newXmlDoc.LoadXml(oldRunSettingsContent);
+
+                // Remove the embedded testsettings node if it exists.
+                var testsettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+                if (testsettingsNode != null)
+                {
+                    testsettingsNode.ParentNode.RemoveChild(testsettingsNode);
+                }
 
                 if (websettingsNode != null)
                 {
-                    newxml.DocumentElement.AppendChild(newxml.ImportNode(websettingsNode, deep: true));
+                    newXmlDoc.DocumentElement.AppendChild(newXmlDoc.ImportNode(websettingsNode, deep: true));
                 }
 
                 if (deploymentNode != null || scriptnode != null || assemblyresolutionNode != null ||
-                    hasParallelTestCount || hasTestTimeout || hostsNode != null)
+                    !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || hostsNode != null)
                 {
-                    //Remove if the legacy node already exists.
-                    var legacyNode = newxml.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");
-                    if (legacyNode != null)
-                    {
-                        legacyNode.ParentNode.RemoveChild(legacyNode);
-                    }
-
-                    legacyNode = newxml.CreateNode(XmlNodeType.Element, LegacySettingsNodeName, null);
-
-                    if (deploymentNode != null)
-                    {
-                        legacyNode.AppendChild(newxml.ImportNode(deploymentNode, deep: true));
-                    }
-                    if (scriptnode != null)
-                    {
-                        legacyNode.AppendChild(newxml.ImportNode(scriptnode, deep: true));
-                    }
-
-                    if (assemblyresolutionNode != null || hasParallelTestCount || hasTestTimeout || hostsNode != null)
-                    {
-                        var newExecutionNode = newxml.CreateNode(XmlNodeType.Element, ExecutionNodeName, null);
-
-                        if (hasParallelTestCount)
-                        {
-                            var paralellAttribute = newxml.CreateAttribute(ParallelTestCountAttributeName);
-                            paralellAttribute.Value = executionNode.Attributes[ParallelTestCountAttributeName].Value;
-                            newExecutionNode.Attributes.Append(paralellAttribute);
-                        }
-
-                        if (hasTestTimeout)
-                        {
-                            var newTimeoutsNode = newxml.CreateNode(XmlNodeType.Element, TimeoutsNodeName, null);
-                            var testtimeoutattribute = newxml.CreateAttribute(TestTimeoutAttributeName);
-                            testtimeoutattribute.Value = timeoutNode.Attributes[TestTimeoutAttributeName].Value;
-                            newTimeoutsNode.Attributes.Append(testtimeoutattribute);
-                            newExecutionNode.AppendChild(newxml.ImportNode(newTimeoutsNode, deep: true));
-                        }
-
-                        if (hostsNode != null)
-                        {
-                            newExecutionNode.AppendChild(newxml.ImportNode(hostsNode, deep: true));
-                        }
-
-                        if (assemblyresolutionNode != null)
-                        {
-                            var testTypeSpecificNode = newxml.CreateNode(XmlNodeType.Element, TestTypeSpecificNodeName, null);
-                            testTypeSpecificNode.AppendChild(newxml.ImportNode(assemblyresolutionNode, deep: true));
-                            newExecutionNode.AppendChild(newxml.ImportNode(testTypeSpecificNode, deep: true));
-                        }
-
-                        legacyNode.AppendChild(newxml.ImportNode(newExecutionNode, deep: true));
-                    }
-
-                    newxml.DocumentElement.AppendChild(legacyNode);
+                    AddLegacyNodes(deploymentNode, scriptnode, testTimeout, assemblyresolutionNode, hostsNode, parallelTestCount, newXmlDoc);
                 }
 
-
-                if (hasRunTimeout)
+                if (!string.IsNullOrEmpty(runTimeout))
                 {
-                    var runConfigurationNode = newxml.DocumentElement.SelectSingleNode(@"/RunSettings/RunConfiguration");
-                    if(runConfigurationNode == null)
-                    {
-                        runConfigurationNode = newxml.CreateNode(XmlNodeType.Element, RunConfigurationNodeName, null);
-                    }
-                    
-                    var testSessionTimeoutNode = newxml.CreateNode(XmlNodeType.Element, TestSessionTimeoutNodeName, null);
-                    testSessionTimeoutNode.InnerText = timeoutNode.Attributes[RunTimeoutAttributeName].Value;
-                    runConfigurationNode.AppendChild(newxml.ImportNode(testSessionTimeoutNode, deep: true));
-
-                    newxml.DocumentElement.AppendChild(runConfigurationNode);
+                    AddRunTimeoutNode(runTimeout, newXmlDoc);
                 }
 
                 if (oldDatacollectorNodes != null && oldDatacollectorNodes.Count > 0)
                 {
-
-                    var dataCollectionRunSettingsNode = newxml.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings");
-                    if(dataCollectionRunSettingsNode == null)
-                    {
-                        dataCollectionRunSettingsNode = newxml.CreateNode(XmlNodeType.Element, DataCollectionRunSettingsNodeName, null);
-                    }
-                    
-                    var dataCollectorsNode = newxml.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors");
-                    if(dataCollectorsNode == null)
-                    {
-                        dataCollectorsNode = newxml.CreateNode(XmlNodeType.Element, DataCollectorsNodeName, null);
-                        dataCollectionRunSettingsNode.AppendChild(newxml.ImportNode(dataCollectorsNode, deep: true));
-                        dataCollectorsNode = newxml.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors");
-                    }
-
-                    foreach(XmlNode datacollector in oldDatacollectorNodes)
-                    {
-                        dataCollectorsNode.AppendChild(newxml.ImportNode(datacollector, deep: true));
-                    }
-                    newxml.DocumentElement.AppendChild(dataCollectionRunSettingsNode);
+                    AddDataCollectorNodes(oldDatacollectorNodes, newXmlDoc);
                 }
 
-
-                newxml.Save(newRunsettingsPath);
+                newXmlDoc.Save(newRunsettingsPath);
             }
+        }
+
+        private static void AddLegacyNodes(XmlNode deploymentNode, XmlNode scriptnode, string testTimeout, XmlNode assemblyresolutionNode, XmlNode hostsNode, string parallelTestCount, XmlDocument newXmlDoc)
+        {
+            //Remove if the legacy node already exists.
+            var legacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");
+            if (legacyNode != null)
+            {
+                legacyNode.ParentNode.RemoveChild(legacyNode);
+            }
+
+            legacyNode = newXmlDoc.CreateNode(XmlNodeType.Element, LegacySettingsNodeName, null);
+
+            if (deploymentNode != null)
+            {
+                legacyNode.AppendChild(newXmlDoc.ImportNode(deploymentNode, deep: true));
+            }
+            if (scriptnode != null)
+            {
+                legacyNode.AppendChild(newXmlDoc.ImportNode(scriptnode, deep: true));
+            }
+
+            if (assemblyresolutionNode != null || !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || hostsNode != null)
+            {
+                var newExecutionNode = newXmlDoc.CreateNode(XmlNodeType.Element, ExecutionNodeName, null);
+
+                if (string.IsNullOrEmpty(parallelTestCount))
+                {
+                    var paralellAttribute = newXmlDoc.CreateAttribute(ParallelTestCountAttributeName);
+                    paralellAttribute.Value = parallelTestCount;
+                    newExecutionNode.Attributes.Append(paralellAttribute);
+                }
+
+                if (!string.IsNullOrEmpty(testTimeout))
+                {
+                    var newTimeoutsNode = newXmlDoc.CreateNode(XmlNodeType.Element, TimeoutsNodeName, null);
+                    var testtimeoutattribute = newXmlDoc.CreateAttribute(TestTimeoutAttributeName);
+                    testtimeoutattribute.Value = testTimeout;
+                    newTimeoutsNode.Attributes.Append(testtimeoutattribute);
+                    newExecutionNode.AppendChild(newXmlDoc.ImportNode(newTimeoutsNode, deep: true));
+                }
+
+                if (hostsNode != null)
+                {
+                    newExecutionNode.AppendChild(newXmlDoc.ImportNode(hostsNode, deep: true));
+                }
+
+                if (assemblyresolutionNode != null)
+                {
+                    var testTypeSpecificNode = newXmlDoc.CreateNode(XmlNodeType.Element, TestTypeSpecificNodeName, null);
+                    testTypeSpecificNode.AppendChild(newXmlDoc.ImportNode(assemblyresolutionNode, deep: true));
+                    newExecutionNode.AppendChild(newXmlDoc.ImportNode(testTypeSpecificNode, deep: true));
+                }
+
+                legacyNode.AppendChild(newXmlDoc.ImportNode(newExecutionNode, deep: true));
+            }
+
+            newXmlDoc.DocumentElement.AppendChild(legacyNode);
+        }
+
+        private static void AddDataCollectorNodes(XmlNodeList oldDatacollectorNodes, XmlDocument newXmlDoc)
+        {
+            var dataCollectionRunSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings");
+            if (dataCollectionRunSettingsNode == null)
+            {
+                dataCollectionRunSettingsNode = newXmlDoc.CreateNode(XmlNodeType.Element, DataCollectionRunSettingsNodeName, null);
+            }
+
+            var dataCollectorsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors");
+            if (dataCollectorsNode == null)
+            {
+                dataCollectorsNode = newXmlDoc.CreateNode(XmlNodeType.Element, DataCollectorsNodeName, null);
+                dataCollectionRunSettingsNode.AppendChild(newXmlDoc.ImportNode(dataCollectorsNode, deep: true));
+                dataCollectorsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors");
+            }
+
+            foreach (XmlNode datacollector in oldDatacollectorNodes)
+            {
+                dataCollectorsNode.AppendChild(newXmlDoc.ImportNode(datacollector, deep: true));
+            }
+            newXmlDoc.DocumentElement.AppendChild(dataCollectionRunSettingsNode);
+        }
+
+        private static void AddRunTimeoutNode(string runTimeout, XmlDocument newXmlDoc)
+        {
+            var runConfigurationNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/RunConfiguration");
+            if (runConfigurationNode == null)
+            {
+                runConfigurationNode = newXmlDoc.CreateNode(XmlNodeType.Element, RunConfigurationNodeName, null);
+            }
+
+            var testSessionTimeoutNode = newXmlDoc.CreateNode(XmlNodeType.Element, TestSessionTimeoutNodeName, null);
+            testSessionTimeoutNode.InnerText = runTimeout;
+            runConfigurationNode.AppendChild(newXmlDoc.ImportNode(testSessionTimeoutNode, deep: true));
+
+            newXmlDoc.DocumentElement.AppendChild(runConfigurationNode);
         }
 
         const string TestTimeoutAttributeName = "testTimeout";
