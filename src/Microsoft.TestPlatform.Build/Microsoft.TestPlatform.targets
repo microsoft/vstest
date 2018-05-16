@@ -46,6 +46,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestVerbosity="$(VSTestVerbosity)"
       VSTestCollect="$(VSTestCollect)"
       VSTestBlame="$(VSTestBlame)"
+      VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
     />
   </Target>
 
@@ -85,6 +86,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestVerbosity = $(VSTestVerbosity)" Importance="low" />
     <Message Text="VSTestCollect = $(VSTestCollect)" Importance="low" />
     <Message Text="VSTestBlame = $(VSTestBlame)" Importance="low" />
+    <Message Text="VSTestTraceDataCollectorDirectoryPath = $(TraceDataCollectorDirectoryPath)" Importance="low" />
   </Target>
 
 </Project>
