@@ -206,6 +206,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find extensions: {0}.
+        /// </summary>
+        internal static string NonExistingExtensions {
+            get {
+                return ResourceManager.GetString("NonExistingExtensions", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to None of the specified source(s) &apos;{0}&apos; is valid. Fix the above errors/warnings and then try again. .
         /// </summary>
         internal static string NoValidSourceFoundForDiscovery {

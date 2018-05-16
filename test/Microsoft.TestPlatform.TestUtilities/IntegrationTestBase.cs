@@ -472,6 +472,9 @@ namespace Microsoft.TestPlatform.TestUtilities
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
                 exitCode = vstestconsole.ExitCode;
+
+                Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
+                Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", exitCode);
             }
         }
