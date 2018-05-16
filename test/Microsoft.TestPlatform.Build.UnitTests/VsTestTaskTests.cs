@@ -11,13 +11,15 @@ namespace Microsoft.TestPlatform.Build.UnitTests
     [TestClass]
     public class VSTestTaskTests
     {
-        private VSTestTask vsTestTask;
+        private readonly VSTestTask vsTestTask;
 
         public VSTestTaskTests()
         {
-            this.vsTestTask = new VSTestTask();
-            this.vsTestTask.TestFileFullPath = @"C:\path\to\test-assembly.dll";
-            this.vsTestTask.VSTestFramework = ".NETCoreapp,Version2.0";
+            this.vsTestTask = new VSTestTask
+            {
+                TestFileFullPath = @"C:\path\to\test-assembly.dll",
+                VSTestFramework = ".NETCoreapp,Version2.0"
+            };
         }
 
         [TestMethod]
@@ -242,6 +244,18 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             const string expectedArg = "--testAdapterPath:c:\\path\\to\\tracedatacollector\\";
             CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldNotAddTestAdapterPathIfVSTestTraceDataCollectorDirectoryPathIsEmpty()
+        {
+            this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = string.Empty;
+            this.vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
+            this.vsTestTask.VSTestCollect = new string[] { "code coverage" };
+
+            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+
+            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:")));
         }
     }
 }
