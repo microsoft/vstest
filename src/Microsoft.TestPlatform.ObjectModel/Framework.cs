@@ -51,11 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             FrameworkName frameworkName;
             try
             {
-                // FrameworkName already trims the input identifier.
-                frameworkName = new FrameworkName(frameworkString);
-            }
-            catch
-            {
+                // IDE always sends framework in form of ENUM, which always throws exception
+                // This throws up in first chance exception, refer Bug https://devdiv.visualstudio.com/DefaultCollection/DevDiv/_workitems/edit/591142
                 switch (frameworkString.Trim().ToLower())
                 {
                     case "framework35":
@@ -74,8 +71,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         frameworkName = new FrameworkName(Constants.DotNetFrameworkUap10);
                         break;
                     default:
-                        return null;
+                        // FrameworkName already trims the input identifier.
+                        frameworkName = new FrameworkName(frameworkString);
+                        break;
                 }
+            }
+            catch
+            {
+                return null;
             }
 
             return new Framework() { Name = frameworkName.FullName, Version = frameworkName.Version.ToString() };
