@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Xml;
 
-namespace SettingsMigrator
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     public class Migrator
     {
@@ -54,7 +54,7 @@ namespace SettingsMigrator
         /// <param name="testsettingsPath"></param>
         /// <param name="newRunsettingsPath"></param>
         /// <param name="oldRunSettingsContent"></param>
-        public void MigrateTestsettings(string testsettingsPath, string newRunsettingsPath, string oldRunSettingsContent)
+        public void MigrateTestsettings(string testsettingsPath, string newRunsettingsPath, string oldRunSettingsContent = null)
         {
             using (XmlTextReader reader = new XmlTextReader(testsettingsPath))
             {
@@ -92,6 +92,10 @@ namespace SettingsMigrator
                     parallelTestCount = executionNode.Attributes[ParallelTestCountAttributeName].Value;
                 }
 
+                if(string.IsNullOrEmpty(oldRunSettingsContent))
+                {
+                    oldRunSettingsContent = sampleRunsettingsContent;
+                }
                 var newXmlDoc = new XmlDocument();
                 newXmlDoc.LoadXml(oldRunSettingsContent);
 
@@ -265,6 +269,8 @@ namespace SettingsMigrator
         const string TestSessionTimeoutNodeName = "TestSessionTimeout";
         const string DataCollectionRunSettingsNodeName = "DataCollectionRunSettings";
         const string DataCollectorsNodeName = "DataCollectors";
+        const string sampleRunsettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                                                "<RunSettings></RunSettings>";
     }
 }
 

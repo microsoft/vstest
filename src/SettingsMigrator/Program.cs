@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 
-namespace SettingsMigrator
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     class Program
     {
@@ -29,7 +29,7 @@ namespace SettingsMigrator
 
             if (string.Equals(Path.GetExtension(oldFilePath), TestsettingsExtension))
             {
-                migrator.MigrateTestsettings(oldFilePath, newFilePath, sampleRunsettingsContent);
+                migrator.MigrateTestsettings(oldFilePath, newFilePath);
             }
             else if (string.Equals(Path.GetExtension(oldFilePath), RunsettingsExtension))
             {
@@ -42,8 +42,6 @@ namespace SettingsMigrator
             }
         }
 
-        const string sampleRunsettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                                          "<RunSettings></RunSettings>";
         const string RunsettingsExtension = ".runsettings";
         const string TestsettingsExtension = ".testsettings";
     }
