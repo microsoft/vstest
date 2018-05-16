@@ -109,6 +109,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestTraceDataCollectorDirectoryPath
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -132,11 +138,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
         internal IEnumerable<string> CreateArgument()
         {
             var isConsoleLoggerEnabled = true;
+            var isCollectCodeCoverageEnabled = false;
+            var isRunSettingsEnabled = false;
             var allArgs = new List<string>();
 
             // TODO log arguments in task
             if (!string.IsNullOrEmpty(this.VSTestSetting))
             {
+                isRunSettingsEnabled = true;
                 allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestSetting));
             }
 
@@ -233,7 +242,27 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach (var arg in this.VSTestCollect)
                 {
+                    if (arg.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        isCollectCodeCoverageEnabled = true;
+                    }
                     allArgs.Add("--collect:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                }
+            }
+
+            if (isCollectCodeCoverageEnabled || isRunSettingsEnabled)
+            {
+
+                // Pass TraceDataCollector path to vstest.console as TestAdapterPath if --collect "Code Coverage"
+                // or --settings (User can enable code coverage from runsettings) option given.
+                // Not parsing the runsettings for two reason:
+                //    1. To keep no knowledge of runsettings structure in VSTestTask.
+                //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
+                // This is required due to currently trace datacollector not ships with dotnet sdk, can be remove once we have
+                // go code coverage x-plat.
+                if (!string.IsNullOrEmpty(this.VSTestTraceDataCollectorDirectoryPath))
+                {
+                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTraceDataCollectorDirectoryPath));
                 }
             }
 
