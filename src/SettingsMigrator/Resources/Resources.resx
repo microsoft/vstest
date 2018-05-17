@@ -124,6 +124,7 @@
     <value>The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.</value>
   </data>
   <data name="ValidUsage" xml:space="preserve">
-    <value>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;</value>
+    <value>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
+Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings</value>
   </data>
 </root>

@@ -149,10 +149,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 testSettingsNodes.Hosts = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Hosts");
                 testSettingsNodes.Execution = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution");
 
-                if (testSettingsNodes.Timeout != null && (testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null ||
-                    testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null || testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null))
+                if (testSettingsNodes.Timeout != null && (testSettingsNodes.Timeout.Attributes[AgentNotRespondingTimeoutAttribute] != null ||
+                    testSettingsNodes.Timeout.Attributes[DeploymentTimeoutAttribute] != null || testSettingsNodes.Timeout.Attributes[ScriptTimeoutAttribute] != null))
                 {
-                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.UnsupportedAttributes));
                 }
             }
 
@@ -298,9 +298,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         const string DataCollectorsNodeName = "DataCollectors";
         const string sampleRunSettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                                                 "<RunSettings></RunSettings>";
-        const string agentNotRespondingTimeout = "agentNotRespondingTimeout";
-        const string DeploymentTimeout = "deploymentTimeout";
-        const string ScriptTimeout = "scriptTimeout";
+        const string AgentNotRespondingTimeoutAttribute = "agentNotRespondingTimeout";
+        const string DeploymentTimeoutAttribute = "deploymentTimeout";
+        const string ScriptTimeoutAttribute = "scriptTimeout";
     }
 }
 
