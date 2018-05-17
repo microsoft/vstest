@@ -58,6 +58,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                 var testSessionTimeoutNode = root.SelectSingleNode(@"/RunSettings/RunConfiguration/TestSessionTimeout");
                 Assert.IsNotNull(testSessionTimeoutNode, "There should be a TestSessionTimeout node");
                 Assert.AreEqual(testSessionTimeoutNode.InnerText, "60000", "Timeout value does not match.");
+
+                var dataCollectorNode = root.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+                Assert.IsNotNull(dataCollectorNode, "There should be a DataCollector node");
+                Assert.AreEqual("Event Log", dataCollectorNode.Attributes["friendlyName"].Value, "Data collector does not match.");
             }
 
             File.Delete(oldRunsettingsPath);
@@ -106,6 +110,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                 var testSessionTimeoutNode = root.SelectSingleNode(@"/RunSettings/RunConfiguration/TestSessionTimeout");
                 Assert.IsNotNull(testSessionTimeoutNode, "There should be a TestSessionTimeout node");
                 Assert.AreEqual(testSessionTimeoutNode.InnerText, "60000", "Timeout value does not match.");
+
+                var dataCollectorNode = root.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
+                Assert.IsNotNull(dataCollectorNode, "There should be a DataCollector node");
+                Assert.AreEqual("Event Log", dataCollectorNode.Attributes["friendlyName"].Value, "Data collector does not match.");
             }
 
             File.Delete(newRunsettingsPath);
@@ -148,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         const string OldRunSettings = "<RunSettings>" +
                                     "<MSTest>" +
                                     "<ForcedLegacyMode>true</ForcedLegacyMode>" +
-                                    "<SettingsFile ></SettingsFile>" +
+                                    "<SettingsFile></SettingsFile>" +
                                     "</MSTest>" +
                                     "</RunSettings>";
 
@@ -179,6 +187,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                                     "</WebTestRunConfiguration>" +
                                     "</TestTypeSpecific>" +
                                     "<AgentRule name=\"LocalMachineDefaultRole\">" +
+                                    "<DataCollectors>" +
+                                    "<DataCollector uri=\"datacollector://microsoft/EventLog/1.0\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestTools.DataCollection.EventLog.EventLogDataCollector, Microsoft.VisualStudio.TestTools.DataCollection.EventLog, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" friendlyName=\"Event Log\">" +
+                                    "</DataCollector>" +
+                                    "</DataCollectors>" +
                                     "</AgentRule>" +
                                     "</Execution>" +
                                     "<Properties/>" +

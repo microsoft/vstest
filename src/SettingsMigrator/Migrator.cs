@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 testSettingsNodes.Deployment = testSettingsRoot.SelectSingleNode(@"/TestSettings/Deployment");
                 testSettingsNodes.Script = testSettingsRoot.SelectSingleNode(@"/TestSettings/Scripts");
                 testSettingsNodes.WebSettings = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/WebTestRunConfiguration");
-                testSettingsNodes.Datacollectors = testSettingsRoot.SelectNodes(@"/TestSettings/AgentRule/DataCollectors/DataCollector");
+                testSettingsNodes.Datacollectors = testSettingsRoot.SelectNodes(@"/TestSettings/Execution/AgentRule/DataCollectors/DataCollector");
                 testSettingsNodes.Timeout = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Timeouts");
                 testSettingsNodes.UnitTestConfig = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/UnitTestRunConfig");
                 testSettingsNodes.Hosts = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Hosts");
@@ -255,6 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 dataCollectorsNode = newXmlDoc.CreateNode(XmlNodeType.Element, DataCollectorsNodeName, null);
                 dataCollectionRunSettingsNode.AppendChild(newXmlDoc.ImportNode(dataCollectorsNode, deep: true));
+                newXmlDoc.DocumentElement.AppendChild(dataCollectionRunSettingsNode);
                 dataCollectorsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings/DataCollectors");
             }
 
@@ -262,7 +263,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 dataCollectorsNode.AppendChild(newXmlDoc.ImportNode(datacollector, deep: true));
             }
-            newXmlDoc.DocumentElement.AppendChild(dataCollectionRunSettingsNode);
         }
 
         /// <summary>
