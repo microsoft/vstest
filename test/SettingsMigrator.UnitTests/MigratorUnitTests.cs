@@ -19,11 +19,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             string oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
             string oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
             
-            File.WriteAllText(oldTestsettingsPath, oldtestsettings);
+            File.WriteAllText(oldTestsettingsPath, OldTestSettings);
             File.WriteAllText(newRunsettingsPath, "");
 
             var doc = new XmlDocument();
-            doc.LoadXml(oldrunsettings);
+            doc.LoadXml(OldRunSettings);
             var settingsnode = doc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
                 settingsnode.InnerText = oldTestsettingsPath;
             File.WriteAllText(oldRunsettingsPath, doc.InnerXml);
@@ -72,9 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             var migrator = new Migrator();
             string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
             string oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
-            //File.Create(oldTestsettingsPath);
-            //File.Create(newRunsettingsPath);
-            File.WriteAllText(oldTestsettingsPath, oldtestsettings);
+            
+            File.WriteAllText(oldTestsettingsPath, OldTestSettings);
             File.WriteAllText(newRunsettingsPath, "");
 
             migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
@@ -113,14 +112,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             File.Delete(oldTestsettingsPath);
         }
 
-        const string oldrunsettings = "<RunSettings>" +
-                                      "<MSTest>" +
-                                      "<ForcedLegacyMode>true</ForcedLegacyMode>" +
-                                      "<SettingsFile ></SettingsFile>" +
-                                      "</MSTest>" +
-                                      "</RunSettings>";
+        [TestMethod]
+        [ExpectedException(typeof(XmlException))]
+        public void InvalidSettingsThrowsException()
+        {
+            var migrator = new Migrator();
+            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
+            string oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
+            
+            File.WriteAllText(oldTestsettingsPath, InvalidSettings);
+            File.WriteAllText(newRunsettingsPath, "");
 
-        const string oldtestsettings = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
+
+            File.Delete(oldTestsettingsPath);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(DirectoryNotFoundException))]
+        public void InvalidPathThrowsException()
+        {
+            var migrator = new Migrator();
+            string newRunsettingsPath = @"X:\generatedRunsettings.runsettings";
+            string oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
+
+            File.WriteAllText(oldTestsettingsPath, OldTestSettings);
+            File.WriteAllText(newRunsettingsPath, "");
+
+            migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
+
+            File.Delete(oldTestsettingsPath);
+        }
+
+        const string InvalidSettings = "<InvalidSettings>";
+        const string OldRunSettings = "<RunSettings>" +
+                                    "<MSTest>" +
+                                    "<ForcedLegacyMode>true</ForcedLegacyMode>" +
+                                    "<SettingsFile ></SettingsFile>" +
+                                    "</MSTest>" +
+                                    "</RunSettings>";
+
+        const string OldTestSettings = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                                     "<TestSettings name=\"TestSettings1\" id=\"cfb5c9a7-f57f-42db-8006-108cdf34bee1\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\">" +
                                     "<Description>These are default test settings for a local test run.</Description>" +
                                     "<Deployment>" +
@@ -151,7 +183,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                                     "</Execution>" +
                                     "<Properties/>" +
                                     "</TestSettings>";
-    }
-
-    
+    }   
 }
