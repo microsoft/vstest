@@ -555,7 +555,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                 if (lastChunk.Any())
                 {
-                    UpdateTestResults(lastChunk, this.package);
+                    UpdateTestResults(lastChunk, null, this.package);
                 }
 
                 this.testRunEventsHandler.HandleTestRunComplete(
@@ -574,7 +574,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testRunEventsHandler != null)
             {
-                UpdateTestResults(results, this.package);
+                UpdateTestResults(results, inProgressTests, this.package);
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -608,7 +608,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private static void UpdateTestResults(IEnumerable<TestResult> testResults, string package)
+        private static void UpdateTestResults(IEnumerable<TestResult> testResults, IEnumerable<TestCase> testCases, string package)
         {
             // Before sending the testresults back, update the test case objects with source provided by IDE/User.
             if (!string.IsNullOrEmpty(package))
@@ -616,6 +616,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 foreach (var tr in testResults)
                 {
                     tr.TestCase.Source = package;
+                }
+
+                // TestCases can be empty, enumerate on EmptyList then
+                foreach (var tc in testCases ?? Enumerable.Empty<TestCase>())
+                {
+                    tc.Source = package;
                 }
             }
         }
