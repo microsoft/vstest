@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                 settingsnode.InnerText = oldTestsettingsPath;
             File.WriteAllText(oldRunsettingsPath, doc.InnerXml);
 
-            migrator.MigrateRunsettings(oldRunsettingsPath, newRunsettingsPath);
+            migrator.MigrateRunSettings(oldRunsettingsPath, newRunsettingsPath);
 
             Assert.IsTrue(File.Exists(newRunsettingsPath), "Run settings should be generated.");
 
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             File.WriteAllText(oldTestsettingsPath, oldtestsettings);
             File.WriteAllText(newRunsettingsPath, "");
 
-            migrator.MigrateTestsettings(oldTestsettingsPath, newRunsettingsPath);
+            migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
 
             Assert.IsTrue(File.Exists(newRunsettingsPath), "Run settings should be generated.");
 

@@ -10,143 +10,155 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     public class Migrator
     {
         /// <summary>
-        /// Given a runsettings with an embedded testsettings, converts it to runsettings.
+        /// Given a runSettings with an embedded testSettings, converts it to runSettings.
         /// </summary>
-        /// <param name="oldRunsettingsPath"></param>
-        /// <param name="newRunsettingsPath"></param>
-        public void MigrateRunsettings(string oldRunsettingsPath, string newRunsettingsPath)
+        /// <param name="oldRunSettingsPath"></param>
+        /// <param name="newRunSettingsPath"></param>
+        public void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
         {
-            string testsettingsPath = null;
-            using (XmlTextReader reader = new XmlTextReader(oldRunsettingsPath))
+            string testSettingsPath = null;
+            using (XmlTextReader reader = new XmlTextReader(oldRunSettingsPath))
             {
                 reader.Namespaces = false;
 
-                var document = new XmlDocument();
-                document.Load(reader);
-                var root = document.DocumentElement;
+                var runSettingsXmlDoc = new XmlDocument();
+                runSettingsXmlDoc.Load(reader);
+                var root = runSettingsXmlDoc.DocumentElement;
 
-                var testsettingsNode = root.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+                var testSettingsNode = root.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
 
-                if (testsettingsNode != null)
+                if (testSettingsNode != null)
                 {
-                    testsettingsPath = testsettingsNode.InnerText;
+                    testSettingsPath = testSettingsNode.InnerText;
                 }
-                if (!string.IsNullOrWhiteSpace(testsettingsPath))
+                if (!string.IsNullOrWhiteSpace(testSettingsPath))
                 {
-                    // Expand path relative to runsettings location.
-                    if (!Path.IsPathRooted(testsettingsPath))
+                    // Expand path relative to runSettings location.
+                    if (!Path.IsPathRooted(testSettingsPath))
                     {
-                        testsettingsPath = Path.Combine(oldRunsettingsPath, testsettingsPath);
+                        testSettingsPath = Path.Combine(oldRunSettingsPath, testSettingsPath);
                     }
 
-                    MigrateTestsettings(testsettingsPath, newRunsettingsPath, File.ReadAllText(oldRunsettingsPath));
+                    MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
+
+                    runSettingsXmlDoc.Save(newRunSettingsPath);
                 }
                 else
                 {
-                    Console.WriteLine("Runsettings does not contain an embedded testsettings, not migrating.");
+                    Console.WriteLine("RunSettings does not contain an embedded testSettings, not migrating.");
                 }
             }
         }
 
-        /// <summary>
-        /// Given a testsettings, converts it to runsettings
-        /// </summary>
-        /// <param name="testsettingsPath"></param>
-        /// <param name="newRunsettingsPath"></param>
-        /// <param name="oldRunSettingsContent"></param>
-        public void MigrateTestsettings(string testsettingsPath, string newRunsettingsPath, string oldRunSettingsContent = null)
+
+        public void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
         {
-            using (XmlTextReader reader = new XmlTextReader(testsettingsPath))
+            var runSettingsXmlDoc = new XmlDocument();
+            runSettingsXmlDoc.LoadXml(sampleRunSettingsContent);
+
+            MigrateTestSettingsNodesToRunSettings(oldTestSettingsPath, runSettingsXmlDoc);
+
+            runSettingsXmlDoc.Save(newRunSettingsPath);
+        }
+
+        /// <summary>
+        /// Given a testSettings, converts it to runSettings
+        /// </summary>
+        /// <param name="testSettingsPath"></param>
+        /// <param name="newRunSettingsPath"></param>
+        /// <param name="oldRunSettingsContent"></param>
+        public void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
+        {
+            var testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
+
+            string testTimeout = null;
+            if (testSettingsNodes.Timeout != null && testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null)
+            {
+                testTimeout = testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName].Value;
+            }
+
+            string runTimeout = null;
+            if (testSettingsNodes.Timeout != null && testSettingsNodes.Timeout.Attributes[RunTimeoutAttributeName] != null)
+            {
+                runTimeout = testSettingsNodes.Timeout.Attributes[RunTimeoutAttributeName].Value;
+            }
+
+            string parallelTestCount = null;
+            if (testSettingsNodes.Execution != null && testSettingsNodes.Execution.Attributes[ParallelTestCountAttributeName] != null)
+            {
+                parallelTestCount = testSettingsNodes.Execution.Attributes[ParallelTestCountAttributeName].Value;
+            }
+
+            // Remove the embedded testSettings node if it exists.
+            RemoveEmbeddedTestSettings(runSettingsXmlDoc);
+
+            // WebTestRunConfiguration node.
+            if (testSettingsNodes.WebSettings != null)
+            {
+                runSettingsXmlDoc.DocumentElement.AppendChild(runSettingsXmlDoc.ImportNode(testSettingsNodes.WebSettings, deep: true));
+            }
+
+            // LegacySettings node.
+            if (testSettingsNodes.Deployment != null || testSettingsNodes.Script != null || testSettingsNodes.UnitTestConfig != null ||
+                !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || testSettingsNodes.Hosts != null)
+            {
+                AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, runSettingsXmlDoc);
+            }
+
+            // TestSessionTimeout node.
+            if (!string.IsNullOrEmpty(runTimeout))
+            {
+                AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
+            }
+
+            // DataCollectors node.
+            if (testSettingsNodes.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
+            {
+                AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc);
+            }
+        }
+
+        private TestSettingsNodes ReadTestSettingsNodes(string testSettingsPath)
+        {
+            var testSettingsNodes = new TestSettingsNodes();
+
+            using (XmlTextReader reader = new XmlTextReader(testSettingsPath))
             {
                 reader.Namespaces = false;
 
-                var document = new XmlDocument();
-                document.Load(reader);
-                var root = document.DocumentElement;
+                var testSettingsXmlDoc = new XmlDocument();
+                testSettingsXmlDoc.Load(reader);
+                var testSettingsRoot = testSettingsXmlDoc.DocumentElement;
 
                 // Select the interesting nodes from the xml.
-                var deploymentNode = root.SelectSingleNode(@"/TestSettings/Deployment");
-                var scriptnode = root.SelectSingleNode(@"/TestSettings/Scripts");
-                var websettingsNode = root.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/WebTestRunConfiguration");
-                var oldDatacollectorNodes = root.SelectNodes(@"/TestSettings/AgentRule/DataCollectors/DataCollector");
-                var timeoutNode = root.SelectSingleNode(@"/TestSettings/Execution/Timeouts");
-                var assemblyresolutionNode = root.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/UnitTestRunConfig");
-                var hostsNode = root.SelectSingleNode(@"/TestSettings/Execution/Hosts");
-                var executionNode = root.SelectSingleNode(@"/TestSettings/Execution");
-
-                string testTimeout = null;
-                if (timeoutNode != null && timeoutNode.Attributes[TestTimeoutAttributeName] != null)
-                {
-                    testTimeout = timeoutNode.Attributes[TestTimeoutAttributeName].Value;
-                }
-
-                string runTimeout = null;
-                if (timeoutNode != null && timeoutNode.Attributes[RunTimeoutAttributeName] != null)
-                {
-                    runTimeout = timeoutNode.Attributes[RunTimeoutAttributeName].Value;
-                }
-
-                string parallelTestCount = null;
-                if (executionNode != null && executionNode.Attributes[ParallelTestCountAttributeName] != null)
-                {
-                    parallelTestCount = executionNode.Attributes[ParallelTestCountAttributeName].Value;
-                }
-
-                if(string.IsNullOrEmpty(oldRunSettingsContent))
-                {
-                    oldRunSettingsContent = sampleRunsettingsContent;
-                }
-                var newXmlDoc = new XmlDocument();
-                newXmlDoc.LoadXml(oldRunSettingsContent);
-
-                // Remove the embedded testsettings node if it exists.
-                RemoveEmbeddedTestsettings(newXmlDoc);
-
-                // WebTestRunConfiguration node.
-                if (websettingsNode != null)
-                {
-                    newXmlDoc.DocumentElement.AppendChild(newXmlDoc.ImportNode(websettingsNode, deep: true));
-                }
-
-                // LegacySettings node.
-                if (deploymentNode != null || scriptnode != null || assemblyresolutionNode != null ||
-                    !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || hostsNode != null)
-                {
-                    AddLegacyNodes(deploymentNode, scriptnode, testTimeout, assemblyresolutionNode, hostsNode, parallelTestCount, newXmlDoc);
-                }
-
-                // TestSessionTimeout node.
-                if (!string.IsNullOrEmpty(runTimeout))
-                {
-                    AddRunTimeoutNode(runTimeout, newXmlDoc);
-                }
-
-                // DataCollectors node.
-                if (oldDatacollectorNodes != null && oldDatacollectorNodes.Count > 0)
-                {
-                    AddDataCollectorNodes(oldDatacollectorNodes, newXmlDoc);
-                }
-
-                newXmlDoc.Save(newRunsettingsPath);
+                testSettingsNodes.Deployment = testSettingsRoot.SelectSingleNode(@"/TestSettings/Deployment");
+                testSettingsNodes.Script = testSettingsRoot.SelectSingleNode(@"/TestSettings/Scripts");
+                testSettingsNodes.WebSettings = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/WebTestRunConfiguration");
+                testSettingsNodes.Datacollectors = testSettingsRoot.SelectNodes(@"/TestSettings/AgentRule/DataCollectors/DataCollector");
+                testSettingsNodes.Timeout = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Timeouts");
+                testSettingsNodes.UnitTestConfig = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/UnitTestRunConfig");
+                testSettingsNodes.Hosts = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Hosts");
+                testSettingsNodes.Execution = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution");
             }
+
+            return testSettingsNodes;
         }
 
         /// <summary>
-        /// Removes the embedded testsettings node if present.
+        /// Removes the embedded testSettings node if present.
         /// </summary>
         /// <param name="newXmlDoc"></param>
-        private void RemoveEmbeddedTestsettings(XmlDocument newXmlDoc)
+        private void RemoveEmbeddedTestSettings(XmlDocument newXmlDoc)
         {
-            var testsettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-            if (testsettingsNode != null)
+            var testSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
+            if (testSettingsNode != null)
             {
-                testsettingsNode.ParentNode.RemoveChild(testsettingsNode);
+                testSettingsNode.ParentNode.RemoveChild(testSettingsNode);
             }
         }
 
-
         /// <summary>
-        /// Adds the legacy nodes to runsettings xml.
+        /// Adds the legacy nodes to runSettings xml.
         /// </summary>
         /// <param name="deploymentNode"></param>
         /// <param name="scriptnode"></param>
@@ -155,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="hostsNode"></param>
         /// <param name="parallelTestCount"></param>
         /// <param name="newXmlDoc"></param>
-        private void AddLegacyNodes(XmlNode deploymentNode, XmlNode scriptnode, string testTimeout, XmlNode assemblyresolutionNode, XmlNode hostsNode, string parallelTestCount, XmlDocument newXmlDoc)
+        private void AddLegacyNodes(TestSettingsNodes testSettingsNodes, string testTimeout, string parallelTestCount, XmlDocument newXmlDoc)
         {
             //Remove if the legacy node already exists.
             var legacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");
@@ -166,17 +178,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             legacyNode = newXmlDoc.CreateNode(XmlNodeType.Element, LegacySettingsNodeName, null);
 
-            if (deploymentNode != null)
+            if (testSettingsNodes.Deployment != null)
             {
-                legacyNode.AppendChild(newXmlDoc.ImportNode(deploymentNode, deep: true));
+                legacyNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.Deployment, deep: true));
             }
-            if (scriptnode != null)
+            if (testSettingsNodes.Script != null)
             {
-                legacyNode.AppendChild(newXmlDoc.ImportNode(scriptnode, deep: true));
+                legacyNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.Script, deep: true));
             }
 
             // Execution node.
-            if (assemblyresolutionNode != null || !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || hostsNode != null)
+            if (testSettingsNodes.UnitTestConfig != null || !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || testSettingsNodes.Hosts != null)
             {
                 var newExecutionNode = newXmlDoc.CreateNode(XmlNodeType.Element, ExecutionNodeName, null);
 
@@ -194,14 +206,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     newTimeoutsNode.Attributes.Append(testtimeoutattribute);
                     newExecutionNode.AppendChild(newXmlDoc.ImportNode(newTimeoutsNode, deep: true));
                 }
-                if (hostsNode != null)
+                if (testSettingsNodes.Hosts != null)
                 {
-                    newExecutionNode.AppendChild(newXmlDoc.ImportNode(hostsNode, deep: true));
+                    newExecutionNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.Hosts, deep: true));
                 }
-                if (assemblyresolutionNode != null)
+                if (testSettingsNodes.UnitTestConfig != null)
                 {
                     var testTypeSpecificNode = newXmlDoc.CreateNode(XmlNodeType.Element, TestTypeSpecificNodeName, null);
-                    testTypeSpecificNode.AppendChild(newXmlDoc.ImportNode(assemblyresolutionNode, deep: true));
+                    testTypeSpecificNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.UnitTestConfig, deep: true));
                     newExecutionNode.AppendChild(newXmlDoc.ImportNode(testTypeSpecificNode, deep: true));
                 }
                 legacyNode.AppendChild(newXmlDoc.ImportNode(newExecutionNode, deep: true));
@@ -209,9 +221,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             newXmlDoc.DocumentElement.AppendChild(legacyNode);
         }
 
-
         /// <summary>
-        /// Adds the datacollector nodes to the runsettings xml.
+        /// Adds the datacollector nodes to the runSettings xml.
         /// </summary>
         /// <param name="oldDatacollectorNodes"></param>
         /// <param name="newXmlDoc"></param>
@@ -269,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         const string TestSessionTimeoutNodeName = "TestSessionTimeout";
         const string DataCollectionRunSettingsNodeName = "DataCollectionRunSettings";
         const string DataCollectorsNodeName = "DataCollectors";
-        const string sampleRunsettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+        const string sampleRunSettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                                                 "<RunSettings></RunSettings>";
     }
 }

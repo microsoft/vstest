@@ -2,7 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Globalization;
 using System.IO;
+using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
@@ -12,38 +14,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (args.Length != 2)
             {
-                Console.WriteLine("Valid usage:\nSettingsMigrator.exe [Full path to testsettings file/runsettings file to be migrated] [Full path to new runsettings file]");
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
                 return;
             }
 
             string oldFilePath = args[0];
             string newFilePath = args[1];
 
-            if (!Path.IsPathRooted(oldFilePath) || !Path.IsPathRooted(newFilePath) || !string.Equals(Path.GetExtension(newFilePath), RunsettingsExtension))
+            if (!Path.IsPathRooted(oldFilePath) || !Path.IsPathRooted(newFilePath) || !string.Equals(Path.GetExtension(newFilePath), RunSettingsExtension))
             {
-                Console.WriteLine("Valid usage:\nSettingsMigrator.exe [Full path to testsettings file/runsettings file to be migrated] [Full path to new runsettings file]");
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
                 return;
             }
 
             var migrator = new Migrator();
 
-            if (string.Equals(Path.GetExtension(oldFilePath), TestsettingsExtension))
+            if (string.Equals(Path.GetExtension(oldFilePath), TestSettingsExtension))
             {
-                migrator.MigrateTestsettings(oldFilePath, newFilePath);
+                migrator.MigrateTestSettings(oldFilePath, newFilePath);
             }
-            else if (string.Equals(Path.GetExtension(oldFilePath), RunsettingsExtension))
+            else if (string.Equals(Path.GetExtension(oldFilePath), RunSettingsExtension))
             {
-                migrator.MigrateRunsettings(oldFilePath, newFilePath);
+                migrator.MigrateRunSettings(oldFilePath, newFilePath);
             }
             else
             {
-                Console.WriteLine("Valid usage:\nSettingsMigrator.exe [Full path to testsettings file/runsettings file to be migrated] [Full path to new runsettings file]");
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
                 return;
             }
         }
 
-        const string RunsettingsExtension = ".runsettings";
-        const string TestsettingsExtension = ".testsettings";
+        const string RunSettingsExtension = ".runsettings";
+        const string TestSettingsExtension = ".testsettings";
     }
 }
 
