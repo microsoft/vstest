@@ -1,15 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Globalization;
-using System.IO;
-using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+    /// <summary>
+    /// Entry point for SettingsMigrator.
+    /// </summary>
     class Program
     {
+        /// <summary>
+        /// Main entry point. Hands off execution to Migrator.
+        /// </summary>
+        /// <param name="args">Arguments provided on the command line.</param>
         static void Main(string[] args)
         {
             if (args.Length != 2)

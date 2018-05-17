@@ -71,6 +71,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Any LegacySettings node already present in the runsettings will be removed.
+        /// </summary>
+        public static string IgnoringLegacySettings
+        {
+            get
+            {
+                return ResourceManager.GetString("IgnoringLegacySettings", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Valid usage: SettingsMigrator.exe <Full path to testsettings file or runsettings file to be migrated> <Full path to new runsettings file>
         /// </summary>
         public static string ValidUsage
@@ -78,6 +89,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("ValidUsage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.
+        /// </summary>
+        public static string UnsupportedAttributes
+        {
+            get
+            {
+                return ResourceManager.GetString("UnsupportedAttributes", resourceCulture);
             }
         }
     }

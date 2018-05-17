@@ -1,12 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.IO;
-using System.Xml;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
+    using System;
+    using System.IO;
+    using System.Xml;
+    using System.Globalization;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
+    /// <summary>
+    /// Migrator used to migrate test settings and run settings with embedded testsettings to run settings.
+    /// </summary>
     public class Migrator
     {
         /// <summary>
@@ -50,7 +55,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
         }
 
-
+        /// <summary>
+        /// Given a testSettings, converts it to runSettings.
+        /// </summary>
+        /// <param name="oldTestSettingsPath"></param>
+        /// <param name="newRunSettingsPath"></param>
         public void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
         {
             var runSettingsXmlDoc = new XmlDocument();
@@ -67,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="testSettingsPath"></param>
         /// <param name="newRunSettingsPath"></param>
         /// <param name="oldRunSettingsContent"></param>
-        public void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
+        private void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
         {
             var testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
 
@@ -139,6 +148,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 testSettingsNodes.UnitTestConfig = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/TestTypeSpecific/UnitTestRunConfig");
                 testSettingsNodes.Hosts = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution/Hosts");
                 testSettingsNodes.Execution = testSettingsRoot.SelectSingleNode(@"/TestSettings/Execution");
+
+                if (testSettingsNodes.Timeout != null && (testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null ||
+                    testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null || testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null))
+                {
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+                }
             }
 
             return testSettingsNodes;
@@ -173,6 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             var legacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");
             if (legacyNode != null)
             {
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.IgnoringLegacySettings));
                 legacyNode.ParentNode.RemoveChild(legacyNode);
             }
 
@@ -282,6 +298,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         const string DataCollectorsNodeName = "DataCollectors";
         const string sampleRunSettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                                                 "<RunSettings></RunSettings>";
+        const string agentNotRespondingTimeout = "agentNotRespondingTimeout";
+        const string DeploymentTimeout = "deploymentTimeout";
+        const string ScriptTimeout = "scriptTimeout";
     }
 }
 
