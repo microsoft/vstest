@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources
 {
     using System;
     using System.Reflection;
@@ -78,6 +78,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("IgnoringLegacySettings", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to RunSettings does not contain an embedded testSettings, not migrating.
+        /// </summary>
+        public static string NoEmbeddedSettings
+        {
+            get
+            {
+                return ResourceManager.GetString("NoEmbeddedSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The migrated RunSettings file has been created at
+        /// </summary>
+        public static string RunSettingsCreated
+        {
+            get
+            {
+                return ResourceManager.GetString("RunSettingsCreated", resourceCulture);
             }
         }
 

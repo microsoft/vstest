@@ -6,14 +6,15 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>SettingsMigrator</AssemblyName>
-    <TargetFrameworks>net451</TargetFrameworks>
+    <TargetFramework>net451</TargetFramework>
+	<WarningsAsErrors>true</WarningsAsErrors>
+    <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
-    <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
-    <Prefer32Bit Condition="'$(TargetFramework)' == 'net451'">true</Prefer32Bit>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.0'">
+  <PropertyGroup>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>

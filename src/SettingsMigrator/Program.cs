@@ -1,38 +1,44 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 {
     using System;
     using System.Globalization;
     using System.IO;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Entry point for SettingsMigrator.
     /// </summary>
-    class Program
+    public static class Program
     {
+        private const string RunSettingsExtension = ".runsettings";
+
+        private const string TestSettingsExtension = ".testsettings";
+
         /// <summary>
         /// Main entry point. Hands off execution to Migrator.
         /// </summary>
         /// <param name="args">Arguments provided on the command line.</param>
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length != 1)
             {
                 Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
                 return;
             }
 
             string oldFilePath = args[0];
-            string newFilePath = args[1];
 
-            if (!Path.IsPathRooted(oldFilePath) || !Path.IsPathRooted(newFilePath) || !string.Equals(Path.GetExtension(newFilePath), RunSettingsExtension))
+            if (!Path.IsPathRooted(oldFilePath))
             {
                 Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
                 return;
             }
+
+            var newFileName = string.Concat(Guid.NewGuid().ToString(), RunSettingsExtension);
+            string newFilePath = Path.Combine(Path.GetDirectoryName(oldFilePath), newFileName);
 
             var migrator = new Migrator();
 
@@ -50,9 +56,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 return;
             }
         }
-
-        const string RunSettingsExtension = ".runsettings";
-        const string TestSettingsExtension = ".testsettings";
     }
 }
-

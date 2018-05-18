@@ -1,24 +1,55 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using System.Xml;
-    using System.Globalization;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Migrator used to migrate test settings and run settings with embedded testsettings to run settings.
     /// </summary>
     public class Migrator
     {
+        private const string TestTimeoutAttributeName = "testTimeout";
+
+        private const string ParallelTestCountAttributeName = "parallelTestCount";
+
+        private const string RunTimeoutAttributeName = "runTimeout";
+
+        private const string LegacySettingsNodeName = "LegacySettings";
+
+        private const string ExecutionNodeName = "Execution";
+
+        private const string TimeoutsNodeName = "Timeouts";
+
+        private const string TestTypeSpecificNodeName = "TestTypeSpecific";
+
+        private const string RunConfigurationNodeName = "RunConfiguration";
+
+        private const string TestSessionTimeoutNodeName = "TestSessionTimeout";
+
+        private const string DataCollectionRunSettingsNodeName = "DataCollectionRunSettings";
+
+        private const string DataCollectorsNodeName = "DataCollectors";
+
+        private const string SampleRunSettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                                                "<RunSettings></RunSettings>";
+
+        private const string AgentNotRespondingTimeoutAttribute = "agentNotRespondingTimeout";
+
+        private const string DeploymentTimeoutAttribute = "deploymentTimeout";
+
+        private const string ScriptTimeoutAttribute = "scriptTimeout";
+
         /// <summary>
         /// Given a runSettings with an embedded testSettings, converts it to runSettings.
         /// </summary>
-        /// <param name="oldRunSettingsPath"></param>
-        /// <param name="newRunSettingsPath"></param>
+        /// <param name="oldRunSettingsPath"> Path to old runsettings.</param>
+        /// <param name="newRunSettingsPath">Path to new runsettings.</param>
         public void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
         {
             string testSettingsPath = null;
@@ -36,21 +67,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 {
                     testSettingsPath = testSettingsNode.InnerText;
                 }
+
                 if (!string.IsNullOrWhiteSpace(testSettingsPath))
                 {
                     // Expand path relative to runSettings location.
                     if (!Path.IsPathRooted(testSettingsPath))
                     {
-                        testSettingsPath = Path.Combine(oldRunSettingsPath, testSettingsPath);
+                        testSettingsPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(oldRunSettingsPath), testSettingsPath));
                     }
 
-                    MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
+                    // Remove the embedded testSettings node if it exists.
+                    this.RemoveEmbeddedTestSettings(runSettingsXmlDoc);
+
+                    this.MigrateTestSettingsNodesToRunSettings(testSettingsPath, runSettingsXmlDoc);
 
                     runSettingsXmlDoc.Save(newRunSettingsPath);
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.RunSettingsCreated, newRunSettingsPath));
                 }
                 else
                 {
-                    Console.WriteLine("RunSettings does not contain an embedded testSettings, not migrating.");
+                    Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoEmbeddedSettings));
                 }
             }
         }
@@ -58,27 +94,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Given a testSettings, converts it to runSettings.
         /// </summary>
-        /// <param name="oldTestSettingsPath"></param>
-        /// <param name="newRunSettingsPath"></param>
+        /// <param name="oldTestSettingsPath">Path to old testsettings.</param>
+        /// <param name="newRunSettingsPath">Path to new runsettings.</param>
         public void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
         {
             var runSettingsXmlDoc = new XmlDocument();
-            runSettingsXmlDoc.LoadXml(sampleRunSettingsContent);
+            runSettingsXmlDoc.LoadXml(SampleRunSettingsContent);
 
-            MigrateTestSettingsNodesToRunSettings(oldTestSettingsPath, runSettingsXmlDoc);
+            this.MigrateTestSettingsNodesToRunSettings(oldTestSettingsPath, runSettingsXmlDoc);
 
             runSettingsXmlDoc.Save(newRunSettingsPath);
+            Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.RunSettingsCreated, newRunSettingsPath));
         }
 
         /// <summary>
         /// Given a testSettings, converts it to runSettings
         /// </summary>
-        /// <param name="testSettingsPath"></param>
-        /// <param name="newRunSettingsPath"></param>
-        /// <param name="oldRunSettingsContent"></param>
+        /// <param name="testSettingsPath">Path to test settings</param>
+        /// <param name="runSettingsXmlDoc">Runsettings Xml</param>
         private void MigrateTestSettingsNodesToRunSettings(string testSettingsPath, XmlDocument runSettingsXmlDoc)
         {
-            var testSettingsNodes = ReadTestSettingsNodes(testSettingsPath);
+            var testSettingsNodes = this.ReadTestSettingsNodes(testSettingsPath);
 
             string testTimeout = null;
             if (testSettingsNodes.Timeout != null && testSettingsNodes.Timeout.Attributes[TestTimeoutAttributeName] != null)
@@ -98,9 +134,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 parallelTestCount = testSettingsNodes.Execution.Attributes[ParallelTestCountAttributeName].Value;
             }
 
-            // Remove the embedded testSettings node if it exists.
-            RemoveEmbeddedTestSettings(runSettingsXmlDoc);
-
             // WebTestRunConfiguration node.
             if (testSettingsNodes.WebSettings != null)
             {
@@ -108,22 +141,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             // LegacySettings node.
-            if (testSettingsNodes.Deployment != null || testSettingsNodes.Script != null || testSettingsNodes.UnitTestConfig != null ||
-                !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || testSettingsNodes.Hosts != null)
-            {
-                AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, runSettingsXmlDoc);
-            }
+            this.AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, runSettingsXmlDoc);
 
             // TestSessionTimeout node.
             if (!string.IsNullOrEmpty(runTimeout))
             {
-                AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
+                this.AddRunTimeoutNode(runTimeout, runSettingsXmlDoc);
             }
 
             // DataCollectors node.
             if (testSettingsNodes.Datacollectors != null && testSettingsNodes.Datacollectors.Count > 0)
             {
-                AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc);
+                this.AddDataCollectorNodes(testSettingsNodes.Datacollectors, runSettingsXmlDoc);
             }
         }
 
@@ -162,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Removes the embedded testSettings node if present.
         /// </summary>
-        /// <param name="newXmlDoc"></param>
+        /// <param name="newXmlDoc">Xml doc to process</param>
         private void RemoveEmbeddedTestSettings(XmlDocument newXmlDoc)
         {
             var testSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
@@ -175,16 +204,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Adds the legacy nodes to runSettings xml.
         /// </summary>
-        /// <param name="deploymentNode"></param>
-        /// <param name="scriptnode"></param>
-        /// <param name="testTimeout"></param>
-        /// <param name="assemblyresolutionNode"></param>
-        /// <param name="hostsNode"></param>
-        /// <param name="parallelTestCount"></param>
-        /// <param name="newXmlDoc"></param>
+        /// <param name="testSettingsNodes">testSettingsNodes</param>
+        /// <param name="testTimeout">testTimeout</param>
+        /// <param name="parallelTestCount">parallelTestCount</param>
+        /// <param name="newXmlDoc">newXmlDoc</param>
         private void AddLegacyNodes(TestSettingsNodes testSettingsNodes, string testTimeout, string parallelTestCount, XmlDocument newXmlDoc)
         {
-            //Remove if the legacy node already exists.
+            if (!(testSettingsNodes.Deployment != null || testSettingsNodes.Script != null || testSettingsNodes.UnitTestConfig != null ||
+                !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || testSettingsNodes.Hosts != null))
+            {
+                return;
+            }
+
+            // Remove if the legacy node already exists.
             var legacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");
             if (legacyNode != null)
             {
@@ -198,6 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 legacyNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.Deployment, deep: true));
             }
+
             if (testSettingsNodes.Script != null)
             {
                 legacyNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.Script, deep: true));
@@ -208,12 +241,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 var newExecutionNode = newXmlDoc.CreateNode(XmlNodeType.Element, ExecutionNodeName, null);
 
-                if (string.IsNullOrEmpty(parallelTestCount))
+                if (!string.IsNullOrEmpty(parallelTestCount))
                 {
                     var paralellAttribute = newXmlDoc.CreateAttribute(ParallelTestCountAttributeName);
                     paralellAttribute.Value = parallelTestCount;
                     newExecutionNode.Attributes.Append(paralellAttribute);
                 }
+
                 if (!string.IsNullOrEmpty(testTimeout))
                 {
                     var newTimeoutsNode = newXmlDoc.CreateNode(XmlNodeType.Element, TimeoutsNodeName, null);
@@ -222,26 +256,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     newTimeoutsNode.Attributes.Append(testtimeoutattribute);
                     newExecutionNode.AppendChild(newXmlDoc.ImportNode(newTimeoutsNode, deep: true));
                 }
+
                 if (testSettingsNodes.Hosts != null)
                 {
                     newExecutionNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.Hosts, deep: true));
                 }
+
                 if (testSettingsNodes.UnitTestConfig != null)
                 {
                     var testTypeSpecificNode = newXmlDoc.CreateNode(XmlNodeType.Element, TestTypeSpecificNodeName, null);
                     testTypeSpecificNode.AppendChild(newXmlDoc.ImportNode(testSettingsNodes.UnitTestConfig, deep: true));
                     newExecutionNode.AppendChild(newXmlDoc.ImportNode(testTypeSpecificNode, deep: true));
                 }
+
                 legacyNode.AppendChild(newXmlDoc.ImportNode(newExecutionNode, deep: true));
             }
+
             newXmlDoc.DocumentElement.AppendChild(legacyNode);
         }
 
         /// <summary>
         /// Adds the datacollector nodes to the runSettings xml.
         /// </summary>
-        /// <param name="oldDatacollectorNodes"></param>
-        /// <param name="newXmlDoc"></param>
+        /// <param name="oldDatacollectorNodes"> Datacollector Nodes</param>
+        /// <param name="newXmlDoc">Xml doc to process</param>
         private void AddDataCollectorNodes(XmlNodeList oldDatacollectorNodes, XmlDocument newXmlDoc)
         {
             var dataCollectionRunSettingsNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/DataCollectionRunSettings");
@@ -268,8 +306,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Adds run session timeout node.
         /// </summary>
-        /// <param name="runTimeout"></param>
-        /// <param name="newXmlDoc"></param>
+        /// <param name="runTimeout">Run Timeout</param>
+        /// <param name="newXmlDoc">Xml doc to process</param>
         private void AddRunTimeoutNode(string runTimeout, XmlDocument newXmlDoc)
         {
             var runConfigurationNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/RunConfiguration");
@@ -284,23 +322,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             newXmlDoc.DocumentElement.AppendChild(runConfigurationNode);
         }
-
-        const string TestTimeoutAttributeName = "testTimeout";
-        const string ParallelTestCountAttributeName = "testTimeout";
-        const string RunTimeoutAttributeName = "runTimeout";
-        const string LegacySettingsNodeName = "LegacySettings";
-        const string ExecutionNodeName = "Execution";
-        const string TimeoutsNodeName = "Timeouts";
-        const string TestTypeSpecificNodeName = "TestTypeSpecific";
-        const string RunConfigurationNodeName = "RunConfiguration";
-        const string TestSessionTimeoutNodeName = "TestSessionTimeout";
-        const string DataCollectionRunSettingsNodeName = "DataCollectionRunSettings";
-        const string DataCollectorsNodeName = "DataCollectors";
-        const string sampleRunSettingsContent = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                                                "<RunSettings></RunSettings>";
-        const string AgentNotRespondingTimeoutAttribute = "agentNotRespondingTimeout";
-        const string DeploymentTimeoutAttribute = "deploymentTimeout";
-        const string ScriptTimeoutAttribute = "scriptTimeout";
     }
 }
-
