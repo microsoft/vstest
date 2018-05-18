@@ -45,8 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForEmbeddedTestSettings()
         {
-            this.oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
-
             var doc = new XmlDocument();
             doc.LoadXml(OldRunSettings);
             var settingsnode = doc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
