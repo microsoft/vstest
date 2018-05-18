@@ -9,8 +9,27 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class MigratorUnitTests
+    public class MigratorTests
     {
+        private const string InvalidSettings = "<InvalidSettings>";
+
+        private const string OldRunSettings = "<RunSettings>" +
+                                    "<MSTest>" +
+                                    "<ForcedLegacyMode>true</ForcedLegacyMode>" +
+                                    "<SettingsFile></SettingsFile>" +
+                                    "</MSTest>" +
+                                    "</RunSettings>";
+
+        [TestMethod]
+        public void NonRootedPathIsNotMigrator()
+        {
+            var migrator = new Migrator();
+            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
+            migrator.Migrate("asda", newRunsettingsPath);
+
+            Assert.IsFalse(File.Exists(newRunsettingsPath), "Run settings should not be generated.");
+        }
+
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForEmbeddedTestSettings()
         {
@@ -25,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                 settingsnode.InnerText = oldTestsettingsPath;
             File.WriteAllText(oldRunsettingsPath, doc.InnerXml);
 
-            migrator.MigrateRunSettings(oldRunsettingsPath, newRunsettingsPath);
+            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
 
             Validate(newRunsettingsPath);
 
@@ -38,9 +57,9 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         {
             var migrator = new Migrator();
             string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            string oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunsettings.runsettings"));
+            string oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runsettings"));
 
-            migrator.MigrateRunSettings(oldRunsettingsPath, newRunsettingsPath);
+            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
             Validate(newRunsettingsPath);
 
             File.Delete(newRunsettingsPath);
@@ -53,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
             string oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithDataCollector.runsettings"));
 
-            migrator.MigrateRunSettings(oldRunsettingsPath, newRunsettingsPath);
+            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
 
             using (XmlTextReader reader = new XmlTextReader(newRunsettingsPath))
             {
@@ -75,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
             string oldTestsettingsPath = Path.GetFullPath(Path.Combine(".", "oldTestsettings.testsettings"));
 
-            migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
+            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
 
             Validate(newRunsettingsPath);
 
@@ -89,11 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             var migrator = new Migrator();
             string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
             string oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
-            
-            File.WriteAllText(oldTestsettingsPath, InvalidSettings);
-            File.WriteAllText(newRunsettingsPath, "");
 
-            migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
+            File.WriteAllText(oldTestsettingsPath, InvalidSettings);
+            File.WriteAllText(newRunsettingsPath, string.Empty);
+
+            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
 
             File.Delete(oldTestsettingsPath);
         }
@@ -106,7 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             string newRunsettingsPath = @"X:\generatedRunsettings.runsettings";
             string oldTestsettingsPath = @"X:\generatedRunsettings.runsettings";
 
-            migrator.MigrateTestSettings(oldTestsettingsPath, newRunsettingsPath);
+            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
         }
 
         private static void Validate(string newRunsettingsPath)
@@ -130,7 +149,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                 Assert.AreEqual(".\\setup.bat", scriptNode.Attributes["setupScript"].Value, "setupScript does not match.");
                 Assert.AreEqual(".\\cleanup.bat", scriptNode.Attributes["cleanupScript"].Value, "cleanupScript does not match.");
 
-                var executionNode = root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution");
+                var forcedLegacyNode = root.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode");
+                Assert.IsNotNull(forcedLegacyNode, "ForcedLegacy node should be present");
+                Assert.AreEqual("true", forcedLegacyNode.InnerText, "Forced legacy should be true");
+
+                var executionNode = root.SelectSingleNode(@" / RunSettings/LegacySettings/Execution");
                 Assert.IsNotNull(executionNode, "There should be a Execution node");
                 Assert.AreEqual("2", executionNode.Attributes["parallelTestCount"].Value, "parallelTestCount value does not match.");
 
@@ -151,13 +174,5 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                 Assert.AreEqual("Event Log", dataCollectorNode.Attributes["friendlyName"].Value, "Data collector does not match.");
             }
         }
-
-        const string InvalidSettings = "<InvalidSettings>";
-        const string OldRunSettings = "<RunSettings>" +
-                                    "<MSTest>" +
-                                    "<ForcedLegacyMode>true</ForcedLegacyMode>" +
-                                    "<SettingsFile></SettingsFile>" +
-                                    "</MSTest>" +
-                                    "</RunSettings>";
-    }   
+    }
 }

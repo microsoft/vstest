@@ -22,6 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 
         private const string LegacySettingsNodeName = "LegacySettings";
 
+        private const string MSTestNodeName = "MSTest";
+
+        private const string ForcedLegacyModeName = "ForcedLegacyMode";
+
         private const string ExecutionNodeName = "Execution";
 
         private const string TimeoutsNodeName = "Timeouts";
@@ -45,12 +49,37 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 
         private const string ScriptTimeoutAttribute = "scriptTimeout";
 
+        private const string TestSettingsExtension = ".testsettings";
+
+        private const string RunSettingsExtension = ".runsettings";
+
+        public void Migrate(string oldFilePath, string newFilePath)
+        {
+            if (!Path.IsPathRooted(oldFilePath))
+            {
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+            }
+
+            if (string.Equals(Path.GetExtension(oldFilePath), TestSettingsExtension))
+            {
+                this.MigrateTestSettings(oldFilePath, newFilePath);
+            }
+            else if (string.Equals(Path.GetExtension(oldFilePath), RunSettingsExtension))
+            {
+                this.MigrateRunSettings(oldFilePath, newFilePath);
+            }
+            else
+            {
+                Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
+            }
+        }
+
         /// <summary>
         /// Given a runSettings with an embedded testSettings, converts it to runSettings.
         /// </summary>
         /// <param name="oldRunSettingsPath"> Path to old runsettings.</param>
         /// <param name="newRunSettingsPath">Path to new runsettings.</param>
-        public void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
+        private void MigrateRunSettings(string oldRunSettingsPath, string newRunSettingsPath)
         {
             string testSettingsPath = null;
             using (XmlTextReader reader = new XmlTextReader(oldRunSettingsPath))
@@ -96,7 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         /// </summary>
         /// <param name="oldTestSettingsPath">Path to old testsettings.</param>
         /// <param name="newRunSettingsPath">Path to new runsettings.</param>
-        public void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
+        private void MigrateTestSettings(string oldTestSettingsPath, string newRunSettingsPath)
         {
             var runSettingsXmlDoc = new XmlDocument();
             runSettingsXmlDoc.LoadXml(SampleRunSettingsContent);
@@ -215,6 +244,26 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
             {
                 return;
             }
+
+            // Add ForcedLegacy node.
+            var mstestNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest");
+            XmlNode forcedLegacyNode;
+            if (mstestNode == null)
+            {
+                mstestNode = newXmlDoc.CreateNode(XmlNodeType.Element, MSTestNodeName, null);
+                newXmlDoc.DocumentElement.AppendChild(mstestNode);
+                mstestNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest");
+            }
+
+            forcedLegacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode");
+            if (forcedLegacyNode == null)
+            {
+                forcedLegacyNode = newXmlDoc.CreateNode(XmlNodeType.Element, ForcedLegacyModeName, null);
+                mstestNode.AppendChild(newXmlDoc.ImportNode(forcedLegacyNode, deep: true));
+                forcedLegacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/ForcedLegacyMode");
+            }
+
+            forcedLegacyNode.InnerText = "true";
 
             // Remove if the legacy node already exists.
             var legacyNode = newXmlDoc.DocumentElement.SelectSingleNode(@"/RunSettings/LegacySettings");

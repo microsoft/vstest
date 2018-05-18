@@ -36,14 +36,14 @@
         <note></note>
       </trans-unit>
       <trans-unit id="UnsupportedAttributes">
-        <source>The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.</source>
+        <source>The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout of Timeouts node are not supported, so these will not be migrated.</source>
         <target state="new">The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ValidUsage">
-        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
-Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings</source>
+        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
+Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</source>
         <target state="new">Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
 Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
 Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings</target>
