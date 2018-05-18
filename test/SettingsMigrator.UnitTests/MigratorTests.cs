@@ -20,61 +20,66 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                                     "</MSTest>" +
                                     "</RunSettings>";
 
+        private Migrator migrator;
+        private string newRunsettingsPath;
+        private string oldTestsettingsPath;
+        private string oldRunsettingsPath;
+
+        [TestInitialize]
+        public void TestInit()
+        {
+            this.migrator = new Migrator();
+            this.newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
+            this.oldTestsettingsPath = Path.GetFullPath(Path.Combine(".", "oldTestsettings.testsettings"));
+            this.oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
+        }
+
         [TestMethod]
         public void NonRootedPathIsNotMigrator()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            migrator.Migrate("asda", newRunsettingsPath);
+            this.migrator.Migrate("asda", this.newRunsettingsPath);
 
-            Assert.IsFalse(File.Exists(newRunsettingsPath), "Run settings should not be generated.");
+            Assert.IsFalse(File.Exists(this.newRunsettingsPath), "Run settings should not be generated.");
         }
 
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForEmbeddedTestSettings()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            string oldTestsettingsPath = Path.GetFullPath(Path.Combine(".", "oldTestsettings.testsettings"));
-            string oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
+            this.oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
 
             var doc = new XmlDocument();
             doc.LoadXml(OldRunSettings);
             var settingsnode = doc.DocumentElement.SelectSingleNode(@"/RunSettings/MSTest/SettingsFile");
-                settingsnode.InnerText = oldTestsettingsPath;
-            File.WriteAllText(oldRunsettingsPath, doc.InnerXml);
+                settingsnode.InnerText = this.oldTestsettingsPath;
+            File.WriteAllText(this.oldRunsettingsPath, doc.InnerXml);
 
-            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
+            this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
 
-            Validate(newRunsettingsPath);
+            Validate(this.newRunsettingsPath);
 
-            File.Delete(oldRunsettingsPath);
-            File.Delete(newRunsettingsPath);
+            File.Delete(this.oldRunsettingsPath);
+            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForEmbeddedTestSettingsOfRelativePath()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            string oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runsettings"));
+            this.oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runsettings"));
 
-            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
-            Validate(newRunsettingsPath);
+            this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
+            Validate(this.newRunsettingsPath);
 
-            File.Delete(newRunsettingsPath);
+            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsWithDC()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            string oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithDataCollector.runsettings"));
+            this.oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithDataCollector.runsettings"));
 
-            migrator.Migrate(oldRunsettingsPath, newRunsettingsPath);
+            this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
 
-            using (XmlTextReader reader = new XmlTextReader(newRunsettingsPath))
+            using (XmlTextReader reader = new XmlTextReader(this.newRunsettingsPath))
             {
                 reader.Namespaces = false;
                 var document = new XmlDocument();
@@ -84,48 +89,40 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                 Assert.AreEqual(2, dataCollectorNode.Count, "Data collector is missing");
             }
 
-            File.Delete(newRunsettingsPath);
+            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForTestSettings()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            string oldTestsettingsPath = Path.GetFullPath(Path.Combine(".", "oldTestsettings.testsettings"));
+            this.migrator.Migrate(this.oldTestsettingsPath, this.newRunsettingsPath);
 
-            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
+            Validate(this.newRunsettingsPath);
 
-            Validate(newRunsettingsPath);
-
-            File.Delete(newRunsettingsPath);
+            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
         [ExpectedException(typeof(XmlException))]
         public void InvalidSettingsThrowsException()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = Path.Combine(Path.GetTempPath(), "generatedRunsettings.runsettings");
-            string oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
+            this.oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
 
-            File.WriteAllText(oldTestsettingsPath, InvalidSettings);
-            File.WriteAllText(newRunsettingsPath, string.Empty);
+            File.WriteAllText(this.oldTestsettingsPath, InvalidSettings);
+            File.WriteAllText(this.newRunsettingsPath, string.Empty);
 
-            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
+            this.migrator.Migrate(this.oldTestsettingsPath, this.newRunsettingsPath);
 
-            File.Delete(oldTestsettingsPath);
+            File.Delete(this.oldTestsettingsPath);
         }
 
         [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
         public void InvalidPathThrowsException()
         {
-            var migrator = new Migrator();
-            string newRunsettingsPath = @"X:\generatedRunsettings.runsettings";
-            string oldTestsettingsPath = @"X:\generatedRunsettings.runsettings";
+            string oldTestsettingsPath = @"X:\generatedRun,settings.runsettings";
 
-            migrator.Migrate(oldTestsettingsPath, newRunsettingsPath);
+            this.migrator.Migrate(oldTestsettingsPath, this.newRunsettingsPath);
         }
 
         private static void Validate(string newRunsettingsPath)
