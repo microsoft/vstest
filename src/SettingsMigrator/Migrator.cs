@@ -53,6 +53,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 
         private const string RunSettingsExtension = ".runsettings";
 
+        /// <summary>
+        /// Migrates the nodes from given settings to run settings format.
+        /// </summary>
+        /// <param name="oldFilePath">Path to old file</param>
+        /// <param name="newFilePath">Path to new file</param>
         public void Migrate(string oldFilePath, string newFilePath)
         {
             if (!Path.IsPathRooted(oldFilePath))
