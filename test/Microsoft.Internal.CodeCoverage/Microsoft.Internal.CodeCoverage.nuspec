@@ -2,12 +2,12 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Microsoft.Internal.CodeCoverage</id>
-    <version>1.0.1</version>
+    <version>1.0.4</version>
     <title>Microsoft.Internal.CodeCoverage</title>
     <authors>Microsoft, vstest</authors>
     <owners>Microsoft, vstest</owners>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>The cross platform Microsoft Test Platform.</description>
+    <description>Package to acquire Code Coverage infra from DevDiv VS repo artifacts.</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>

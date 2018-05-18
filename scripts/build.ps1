@@ -93,6 +93,7 @@ $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_TargetFrameworkUap = "uap10.0"
 $TPB_TargetFrameworkNS1_4 = "netstandard1.4"
+$TPB_TargetFrameworkNS2_0 = "netstandard2.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 # Version suffix is empty for RTM releases
@@ -398,6 +399,8 @@ function Publish-Package
     Copy-Item "$visualStudioTelemetryDirectory\Microsoft.VisualStudio.Telemetry.dll" $testPlatformDirectory -Force
     Copy-Item "$visualStudioUtilitiesDirectory\Microsoft.VisualStudio.Utilities.Internal.dll" $testPlatformDirectory -Force
 
+    Copy-CodeCoverage-Package-Artifacts
+
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -550,16 +553,25 @@ function Create-NugetPackages
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec", "Microsoft.TestPlatform.nuspec", "Microsoft.TestPlatform.Portable.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec",
+                     "TestPlatform.ObjectModel.nuspec",
+                     "TestPlatform.TestHost.nuspec",
+                     "TestPlatform.CLI.nuspec",
+                     "TestPlatform.Build.nuspec",
+                     "Microsoft.Net.Test.Sdk.nuspec",
+                     "Microsoft.TestPlatform.nuspec",
+                     "Microsoft.TestPlatform.Portable.nuspec",
+                     "Microsoft.CodeCoverage.nuspec")
+
     $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
+    $propFiles = @("Microsoft.Net.Test.Sdk.props", "Microsoft.CodeCoverage.props")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
-    foreach ($file in $nuspecFiles + $targetFiles) {
+    foreach ($file in $nuspecFiles + $targetFiles + $propFiles) {
         Copy-Item $tpNuspecDir\$file $stagingDir -Force
     }
 
-    # Copy over props, empty and third patry notice file
-    Copy-Item $tpNuspecDir\"Microsoft.Net.Test.Sdk.props" $stagingDir -Force
+    # Copy empty and third patry notice file
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
 
@@ -588,6 +600,27 @@ function Create-NugetPackages
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Copy-CodeCoverage-Package-Artifacts
+{
+    # Copy TraceDataCollector to Microsoft.CodeCoverage folder.
+    $microsoftCodeCoveragePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.CodeCoverage\")
+
+    New-Item -ItemType directory -Path $microsoftCodeCoveragePackageDir -Force | Out-Null
+
+    $traceDataCollectorOutDir = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$TPB_Configuration\$TPB_TargetFrameworkNS2_0"
+
+    Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.CodeCoverage.Shim.dll $microsoftCodeCoveragePackageDir -Force
+    Copy-Item $traceDataCollectorOutDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
+
+    # Copy TraceDataCollector resource dlls
+    if($TPB_LocalizedBuild) {
+        Copy-Loc-Files $traceDataCollectorOutDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+        Copy-Loc-Files $traceDataCollectorOutDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
+    }
 }
 
 function Copy-PackageItems($packageName)
