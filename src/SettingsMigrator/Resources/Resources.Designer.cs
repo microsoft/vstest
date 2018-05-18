@@ -8,12 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources
-{
+namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources {
     using System;
-    using System.Reflection;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -21,107 +19,91 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SettingsMigrator.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SettingsMigrator.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Any LegacySettings node already present in the runsettings will be removed.
+        ///   Looks up a localized string similar to Any LegacySettings node already present in the runsettings will be removed..
         /// </summary>
-        public static string IgnoringLegacySettings
-        {
-            get
-            {
+        internal static string IgnoringLegacySettings {
+            get {
                 return ResourceManager.GetString("IgnoringLegacySettings", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to RunSettings does not contain an embedded testSettings, not migrating.
+        ///   Looks up a localized string similar to RunSettings does not contain an embedded testSettings, not migrating..
         /// </summary>
-        public static string NoEmbeddedSettings
-        {
-            get
-            {
+        internal static string NoEmbeddedSettings {
+            get {
                 return ResourceManager.GetString("NoEmbeddedSettings", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The migrated RunSettings file has been created at
+        ///   Looks up a localized string similar to The migrated RunSettings file has been created at: {0}.
         /// </summary>
-        public static string RunSettingsCreated
-        {
-            get
-            {
+        internal static string RunSettingsCreated {
+            get {
                 return ResourceManager.GetString("RunSettingsCreated", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Valid usage: SettingsMigrator.exe <Full path to testsettings file or runsettings file to be migrated> <Full path to new runsettings file>
+        ///   Looks up a localized string similar to The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated..
         /// </summary>
-        public static string ValidUsage
-        {
-            get
-            {
-                return ResourceManager.GetString("ValidUsage", resourceCulture);
+        internal static string UnsupportedAttributes {
+            get {
+                return ResourceManager.GetString("UnsupportedAttributes", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.
+        ///   Looks up a localized string similar to Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
+        ///Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
+        ///Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings.
         /// </summary>
-        public static string UnsupportedAttributes
-        {
-            get
-            {
-                return ResourceManager.GetString("UnsupportedAttributes", resourceCulture);
+        internal static string ValidUsage {
+            get {
+                return ResourceManager.GetString("ValidUsage", resourceCulture);
             }
         }
     }
