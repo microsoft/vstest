@@ -78,7 +78,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("DataCollectorDebuggerWarning", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details..
+        /// </summary>
+        internal static string DeprecatedAdapterPath
+        {
+            get
+            {
+                return ResourceManager.GetString("DeprecatedAdapterPath", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Exception occurred while instantiating discoverer : {0}.
         /// </summary>
@@ -205,6 +216,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find extensions: {0}.
+        /// </summary>
+        internal static string NonExistingExtensions {
+            get {
+                return ResourceManager.GetString("NonExistingExtensions", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to None of the specified source(s) &apos;{0}&apos; is valid. Fix the above errors/warnings and then try again. .
         /// </summary>

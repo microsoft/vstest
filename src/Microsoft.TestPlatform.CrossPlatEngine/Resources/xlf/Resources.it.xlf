@@ -191,6 +191,16 @@
         <target state="translated">La versione di Microsoft.NET.Test.Sdk è obsoleta. Passare alla versione 15.3.0 o a una versione successiva.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NonExistingExtensions">
+        <source>Could not find extensions: {0}</source>
+        <target state="new">Could not find extensions: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DeprecatedAdapterPath">
+        <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
+        <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
