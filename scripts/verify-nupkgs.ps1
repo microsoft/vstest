@@ -11,7 +11,6 @@ function Unzip
 
 function Verify-Nuget-Packages($packageDirectory)
 {
-    Verify-Nuget-Packages
     Write-Log "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{"Microsoft.CodeCoverage" = 28;
                      "Microsoft.NET.Test.Sdk" = 10;
@@ -50,6 +49,8 @@ function Verify-Nuget-Packages($packageDirectory)
         {
             Write-Error "Number of files are not equal $unzipNugetPackageDir, expected: $($expectedNumOfFiles[$packageKey]) actual: $actualNumOfFiles"
         }
+
+        Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
     }
 
     Write-Log "Completed Verify-Nuget-Packages."

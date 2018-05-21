@@ -54,7 +54,8 @@ $ErrorActionPreference = "Stop"
 # Variables
 #
 Write-Verbose "Setup environment variables."
-$env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.FullName
+$CurrentScriptDir = (Get-Item (Split-Path $MyInvocation.MyCommand.Path))
+$env:TP_ROOT_DIR = $CurrentScriptDir.Parent.FullName
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
@@ -107,7 +108,7 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
-Import-Module $PSScriptRoot\verify-nupkgs.ps1
+Import-Module "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1"
 
 function Write-Log ([string] $message)
 {
