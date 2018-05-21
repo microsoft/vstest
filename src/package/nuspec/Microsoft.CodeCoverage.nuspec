@@ -35,7 +35,7 @@
     <file src="Microsoft.CodeCoverage\ru\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\ru" />
     <file src="Microsoft.CodeCoverage\tr\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\tr" />
     <file src="Microsoft.CodeCoverage\zh-Hans\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hans" />
-    <!-- <file src="Microsoft.CodeCoverage\zh-Hant\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hant" />-->
+    <file src="Microsoft.CodeCoverage\zh-Hant\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\zh-Hant" />
 
   </files>
 </package>
