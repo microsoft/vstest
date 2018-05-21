@@ -175,7 +175,6 @@
     <file src="net451\$Runtime$\vstest.console.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" />
     <file src="net451\$Runtime$\vstest.console.exe.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\vstest.console.exe.config" />
     <file src="net451\$Runtime$\SettingsMigrator.exe"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\SettingsMigrator.exe" />
-    <file src="net451\$Runtime$\SettingsMigrator.exe.config"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\SettingsMigrator.exe.config" />
     <file src="net451\$Runtime$\VsWebSite.Interop.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\VsWebSite.Interop.dll" />
     <file src="net451\$Runtime$\Webloadtest.testtype"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Webloadtest.testtype" />
     <file src="net451\$Runtime$\CoreCon\VisualStudioDatastoreConfigurationProvider.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\CoreCon\VisualStudioDatastoreConfigurationProvider.dll" />
