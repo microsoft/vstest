@@ -11,8 +11,8 @@
     <AssemblyName>LegacySettingsUnitTestProject</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MstestV1UnitTestProject">
-      <HintPath>..\MstestV1UnitTestProject\bin\Debug\net451\MstestV1UnitTestProject.dll</HintPath>
+    <Reference Include="DependencyAssemblyForTest">
+      <HintPath>DependencyAssembly\DependencyAssemblyForTest.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="System" />

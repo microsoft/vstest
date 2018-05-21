@@ -57,7 +57,7 @@ namespace LegacySettingsUnitTestProject
         [TestMethod]
         public void DependencyTest()
         {
-            var unitTest = new MstestV1UnitTestProject.UnitTest1();
+            var unitTest = new DependencyAssemblyForTest.Class1();
         }
     }
 }

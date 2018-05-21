@@ -391,7 +391,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                     </LegacySettings>
                                    </RunSettings>";
 
-            var testAssemblyDirectory = Path.GetDirectoryName(this.GetAssetFullPath("MSTestV1UnitTestProject.dll"));
+            var testAssemblyDirectory = Path.Combine(this.testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
             var runsettingsXml = string.Format(runsettingsFormat, testAssemblyDirectory);
 
             File.WriteAllText(this.runsettingsPath, runsettingsXml);
