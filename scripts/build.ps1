@@ -107,6 +107,8 @@ $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
 
+Import-Module $PSScriptRoot\verify-nupkgs.ps1
+
 function Write-Log ([string] $message)
 {
     $currentColor = $Host.UI.RawUI.ForegroundColor
@@ -598,6 +600,8 @@ function Create-NugetPackages
 
         Set-ScriptFailedOnError
     }
+
+    Verify-Nuget-Packages $packageOutputDir
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
 }
