@@ -25,14 +25,17 @@ function Verify-Nuget-Packages($packageDirectory)
     $nugetPackages = Get-ChildItem -Filter "*.nupkg" $packageDirectory | % { $_.FullName}
 
     Write-VerboseLog "Unzip NuGet packages."
-
     $unzipNugetPackageDirs =  New-Object System.Collections.Generic.List[System.Object]
     foreach($nugetPackage in $nugetPackages)
     {
         $unzipNugetPackageDir = $(Join-Path $packageDirectory $(Get-Item $nugetPackage).BaseName)
         $unzipNugetPackageDirs.Add($unzipNugetPackageDir)
 
-        Remove-Item -Force -Recurse $unzipNugetPackageDir | Out-Null
+        if(Test-Path -Path $unzipNugetPackageDir)
+        {
+            Remove-Item -Force -Recurse $unzipNugetPackageDir
+        }
+
         Unzip $nugetPackage $unzipNugetPackageDir
     }
 
