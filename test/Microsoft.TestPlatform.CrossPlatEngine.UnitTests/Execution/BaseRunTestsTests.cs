@@ -73,6 +73,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableBaseRunTests(
                 null,
+                null,
                 testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
@@ -627,6 +628,67 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        public void RunTestsShouldUpdateTestCasesWithPackageWhenCacheIsHitIfProvided()
+        {
+            var package = "x.apprecipe";
+            this.testExecutionContext.FrequencyOfRunStatsChangeEvent = 2;
+            TestRunChangedEventArgs receivedRunStatusArgs = null;
+            this.runTestsInstance = new TestableBaseRunTests(
+                null,
+                package,
+                testExecutionContext,
+                null,
+                this.mockTestRunEventsHandler.Object,
+                this.mockTestPlatformEventSource.Object,
+                this.mockRequestData.Object);
+
+            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+            var executorUriExtensionMap = new List<Tuple<Uri, string>>
+            {
+                new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
+                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
+            };
+
+            // Setup mocks.
+            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
+            this.runTestsInstance.InvokeExecutorCallback =
+                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
+                {
+                    var testCase = new TestCase("x.y.z1", new Uri("uri://dummy"), "x.dll");
+                    var inProgTestCase = new TestCase("x.y.z2", new Uri("uri://dummy"), "x.dll");
+                    var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+                    this.runTestsInstance.GetTestRunCache.OnTestStarted(inProgTestCase);
+                    this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
+                };
+            this.mockTestRunEventsHandler.Setup( treh => treh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
+                .Callback((TestRunChangedEventArgs stats) =>
+            {
+                receivedRunStatusArgs = stats;
+            });
+
+            // Act.
+            this.runTestsInstance.RunTests();
+
+            // Test run changed event assertions
+            Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
+            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
+
+            Assert.IsNotNull(receivedRunStatusArgs.ActiveTests);
+            Assert.AreEqual(receivedRunStatusArgs.ActiveTests.Count(), 1);
+
+            // verify TC.Source is updated with package
+            foreach (var tr in receivedRunStatusArgs.NewTestResults)
+            {
+                Assert.AreEqual(tr.TestCase.Source, package);
+            }
+
+            foreach (var tc in receivedRunStatusArgs.ActiveTests)
+            {
+                Assert.AreEqual(tc.Source, package);
+            }
+        }
+
+        [TestMethod]
         public void RunTestsShouldNotifyItsImplementersOfAnyExceptionThrownByTheExecutors()
         {
             bool? isExceptionThrown = null;
@@ -855,17 +917,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private class TestableBaseRunTests : BaseRunTests
         {
-            public TestableBaseRunTests(
-                string runSettings,
-                TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler,
-                ITestRunEventsHandler testRunEventsHandler,
-                ITestPlatformEventSource testPlatformEventSource,
-                IRequestData requestData)
-                : base(requestData, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
-            {
-            }
-
             public TestableBaseRunTests(
                 string runSettings,
                 string package,
