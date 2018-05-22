@@ -4,6 +4,7 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
   </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <OutputType>library</OutputType>
@@ -22,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>15.5.0-preview-1046721</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
