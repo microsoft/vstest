@@ -282,16 +282,16 @@
 
     <!-- Sign Microsoft.CodeCoverage -->
     <ItemGroup>
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\%(ResxLang.Identity)\*.*" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\CodeCoverage.exe" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\%(ResxLang.Identity)\*.*" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\CodeCoverage.exe" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.TestHost -->
@@ -355,6 +355,11 @@
         <Authenticode>Microsoft</Authenticode>
         <StrongName>StrongName</StrongName>
       </IntellitraceAssembliesToSign>
+
+      <CodeCoverageAssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </CodeCoverageAssembliesToSign>
     </ItemGroup>
 
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
@@ -385,7 +390,13 @@
     <SignFiles Files="@(IntellitraceAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Intellitrace"
                IntermediatesDirectory="$(IntermediatesDirectory)"
-               Type="$(SignType)" />               
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
+    <SignFiles Files="@(CodeCoverageAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
   </Target>
 
   <Target Name="SignNugetPackages">
