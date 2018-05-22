@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
             StringAssert.Contains(this.aConfigFileName, Path.GetTempPath());
             Assert.AreEqual(
-                GetDefaultCodeCoverageConfig().Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty),
+                DynamicCoverageDataCollectorImplTests.GetDefaultCodeCoverageConfig().Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty),
                 File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
         }
 
@@ -105,6 +105,30 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
             Assert.AreEqual(expectedContent, File.ReadAllText(this.aConfigFileName));
+        }
+
+        [TestMethod]
+        public void InitializeShouldInitializeDefaultConfigIfNoCodeCoverageConfigExists()
+        {
+            var expectedContent = "<Framework>.NETCoreApp,Version=v1.1</Framework>";
+            XmlElement configElement =
+                DynamicCoverageDataCollectorImplTests.CreateXmlElement($"<Configuration>{expectedContent}</Configuration>");
+
+            this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>()))
+                .Callback<string>((path) =>
+                {
+                    this.tempSessionDir = path;
+                    Directory.CreateDirectory(path);
+                });
+
+            this.fileHelperMock.Setup(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((path, content) => { File.WriteAllText(path, content); });
+
+            this.collectorImpl.Initialize(configElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
+
+            Assert.AreEqual(
+                DynamicCoverageDataCollectorImplTests.GetDefaultCodeCoverageConfig().Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty),
+                File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
         }
 
         [TestMethod]
