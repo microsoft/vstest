@@ -30,7 +30,6 @@
   </ItemGroup>
   <Target Name="CopyFiles">
     <Copy SourceFiles="DeploymentFile.xml" DestinationFolder="$(OutputPath)\Deployment" ContinueOnError="false" />
-    <Copy SourceFiles="setup.bat;cleanup.bat" DestinationFolder="$(OutputPath)\Scripts" ContinueOnError="false" />
   </Target>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

@@ -281,8 +281,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
             var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
 
-            var setupScriptPath = Path.Combine(testAssemblyDirectory, "Scripts", "setup.bat");
-            var cleanupScriptPath = Path.Combine(testAssemblyDirectory, "Scripts", "cleanup.bat");
+            // Create the script files
+            var guid = Guid.NewGuid();
+            var setupScriptName = "setupScript_" + guid + ".bat";
+            var setupScriptPath = Path.Combine(Path.GetTempPath(), setupScriptName);
+            File.WriteAllText(setupScriptPath, @"echo > %temp%\ScriptTestingFile.txt");
+
+            var cleanupScriptName = "cleanupScript_" + guid + ".bat";
+            var cleanupScriptPath = Path.Combine(Path.GetTempPath(), cleanupScriptName);
+            File.WriteAllText(cleanupScriptPath, @"del %temp%\ScriptTestingFile.txt");
 
             var runsettingsFormat = @"<RunSettings>
                                     <MSTest>
@@ -292,7 +299,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                          <Scripts setupScript=""{0}"" cleanupScript=""{1}"" />
                                     </LegacySettings>
                                    </RunSettings>";
-            var runsettingsXml = string.Format(runsettingsFormat, setupScriptPath, cleanupScriptPath);
+
+            // Scripts have relative paths to temp directory where the runsettings is created.
+            var runsettingsXml = string.Format(runsettingsFormat, setupScriptName, cleanupScriptName);
 
             File.WriteAllText(this.runsettingsPath, runsettingsXml);
 
@@ -304,9 +313,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
 
-            //Validate cleanup script ran
+            // Validate cleanup script ran
             var scriptPath = Path.Combine(Path.GetTempPath() + "ScriptTestingFile.txt");
             Assert.IsFalse(File.Exists(scriptPath));
+
+            // Cleanup script files
+            File.Delete(setupScriptPath);
+            File.Delete(cleanupScriptPath);
         }
 
         [TestMethod]
