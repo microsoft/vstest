@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Xml.Linq;
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
     using System;
@@ -690,6 +692,35 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             Assert.IsNotNull(actualMessage);
             Assert.IsTrue(string.Equals(message, actualMessage), string.Format("StdOut messages do not match. Expected:{0}, Actual:{1}", message, actualMessage));
+        }
+
+        [TestMethod]
+        public void TestRunInformationShouldContainUtcDateTime()
+        {
+            this.MakeTestRunComplete();
+            this.ValidateDateTimeInTrx(this.testableTrxLogger.trxFile);
+        }
+
+        private void ValidateDateTimeInTrx(string trxFileName)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            {
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    XDocument document = XDocument.Load(reader);
+                    var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
+                    var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
+                }
+            }
+        }
+
+        private void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
+        {
+            Assert.IsTrue(dateTime.UtcDateTime.Subtract(DateTime.UtcNow) < new TimeSpan(0, 0, 0, 60));
         }
 
         private string GetElementValueFromTrx(string trxFileName, string fieldName)
