@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             this.exception = ex;
             this.computer = computer;
             this.outcome = outcome;
-            this.timestamp = DateTime.Now.ToUniversalTime();
+            this.timestamp = DateTime.UtcNow;
         }
 
         #endregion
