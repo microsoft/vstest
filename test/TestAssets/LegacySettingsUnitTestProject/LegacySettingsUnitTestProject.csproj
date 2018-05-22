@@ -1,35 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-  <!-- Package dependency versions -->
+<Project InitialTargets="CopyFiles" Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
   </PropertyGroup>
-  <!-- Imports Common TestAssets props. -->
-  
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
-
   <PropertyGroup>
-    <AssemblyName>CUITTestProject</AssemblyName>
-    <TargetFrameworks>net451</TargetFrameworks>
-    <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
+    <OutputType>library</OutputType>
+    <TargetFramework>net451</TargetFramework>
+    <AssemblyName>LegacySettingsUnitTestProject</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
+    <Reference Include="DependencyAssemblyForTest">
+      <HintPath>DependencyAssembly\DependencyAssemblyForTest.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-    <Reference Include="Microsoft.VisualStudio.QualityTools.CodedUITestFramework" />
-    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Common" />
-    <Reference Include="Microsoft.VisualStudio.TestTools.UITest.Extension" />
-    <Reference Include="Microsoft.VisualStudio.TestTools.UITesting" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.cuit">
-      <Version>$(TestPlatformExternalsVersion)</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
       <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
@@ -37,5 +29,8 @@
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+  <Target Name="CopyFiles">
+    <Copy SourceFiles="DeploymentFile.xml" DestinationFolder="$(OutputPath)\Deployment" ContinueOnError="false" />
+  </Target>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
