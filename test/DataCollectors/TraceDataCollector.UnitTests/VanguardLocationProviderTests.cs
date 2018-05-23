@@ -44,7 +44,9 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
         private string GetVanguardDirectory()
         {
-            return Path.GetDirectoryName(typeof(VanguardLocationProviderTests).GetTypeInfo().Assembly.Location);
+            var currentAssemblyLocation =
+                Path.GetDirectoryName(typeof(VanguardLocationProviderTests).GetTypeInfo().Assembly.Location);
+            return Path.Combine(currentAssemblyLocation, "CodeCoverage");
         }
     }
 }

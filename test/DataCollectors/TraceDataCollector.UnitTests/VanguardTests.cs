@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                     c.GenerateCommandLine(VanguardCommand.Shutdown, this.sessionName, It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(VanguardTests.GetShutdownCommand(this.sessionName));
             this.vanguard.Initialize(this.sessionName, this.configFileName, this.dataCollectionLoggerMock.Object);
-            this.vanguardLocationProviderMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage.exe"));
+            this.vanguardLocationProviderMock.Setup(c => c.GetVanguardPath()).Returns(Path.Combine(Directory.GetCurrentDirectory(), "CodeCoverage", "CodeCoverage.exe"));
         }
 
         [TestCleanup]
