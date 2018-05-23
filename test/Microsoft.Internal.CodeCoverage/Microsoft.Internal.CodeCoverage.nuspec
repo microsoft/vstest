@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Microsoft.Internal.CodeCoverage</id>
-    <version>1.0.4</version>
+    <version>1.0.7</version>
     <title>Microsoft.Internal.CodeCoverage</title>
     <authors>Microsoft, vstest</authors>
     <owners>Microsoft, vstest</owners>

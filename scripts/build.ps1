@@ -602,6 +602,8 @@ function Create-NugetPackages
         Set-ScriptFailedOnError
     }
 
+    # Verifies that expected number of files gets shipped in nuget packages.
+    # Few nuspec uses wildcard characters.
     Verify-Nuget-Packages $packageOutputDir
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -618,8 +620,8 @@ function Copy-CodeCoverage-Package-Artifacts
 
     Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
-    Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.CodeCoverage.Shim.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $traceDataCollectorOutDir\CodeCoverage $microsoftCodeCoveragePackageDir -Force -Recurse
+    Copy-Item $traceDataCollectorOutDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
 
     # Copy TraceDataCollector resource dlls
     if($TPB_LocalizedBuild) {

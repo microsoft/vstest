@@ -20,7 +20,8 @@
     <file src="Microsoft.CodeCoverage.props" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\**\*.*"  exclude="**\*.pdb" target="build\netstandard1.0\" />
-    <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp1.0\" />
+    <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net45\" />
 
     <!-- Add localized resources -->
     <file src="Microsoft.CodeCoverage\cs\Microsoft.VisualStudio.TraceDataCollector.resources.dll" target="build\netstandard1.0\cs" />
