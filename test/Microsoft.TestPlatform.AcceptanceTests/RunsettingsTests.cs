@@ -15,6 +15,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class RunsettingsTests : AcceptanceTestBase
     {
+        private string runsettingsPath = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            if (File.Exists(runsettingsPath))
+            {
+                File.Delete(runsettingsPath);
+            }
+        }
+
         #region Runsettings precedence tests
         /// <summary>
         /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
@@ -236,7 +247,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.StdErrorContains(@"Settings file provided does not conform to required format. An error occurred while loading the settings. Error: Invalid setting 'RunConfiguration'. Invalid value '123' specified for 'TargetPlatform'.");
-            File.Delete(runsettingsFilePath);
         }
 
         [TestMethod]
@@ -258,8 +268,155 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 runnerInfo.InIsolationValue);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
-            File.Delete(runsettingsFilePath);
         }
+
+        #region LegacySettings Tests
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
+            var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
+
+            // Create the script files
+            var guid = Guid.NewGuid();
+            var setupScriptName = "setupScript_" + guid + ".bat";
+            var setupScriptPath = Path.Combine(Path.GetTempPath(), setupScriptName);
+            File.WriteAllText(setupScriptPath, @"echo > %temp%\ScriptTestingFile.txt");
+
+            var cleanupScriptName = "cleanupScript_" + guid + ".bat";
+            var cleanupScriptPath = Path.Combine(Path.GetTempPath(), cleanupScriptName);
+            File.WriteAllText(cleanupScriptPath, @"del %temp%\ScriptTestingFile.txt");
+
+            var runsettingsFormat = @"<RunSettings>
+                                    <MSTest>
+                                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <LegacySettings>
+                                         <Scripts setupScript=""{0}"" cleanupScript=""{1}"" />
+                                    </LegacySettings>
+                                   </RunSettings>";
+
+            // Scripts have relative paths to temp directory where the runsettings is created.
+            var runsettingsXml = string.Format(runsettingsFormat, setupScriptName, cleanupScriptName);
+
+            File.WriteAllText(this.runsettingsPath, runsettingsXml);
+
+            var arguments = PrepareArguments(
+               testAssemblyPath,
+               string.Empty,
+               this.runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /testcasefilter:Name=ScriptsTest");
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+
+            // Validate cleanup script ran
+            var scriptPath = Path.Combine(Path.GetTempPath() + "ScriptTestingFile.txt");
+            Assert.IsFalse(File.Exists(scriptPath));
+
+            // Cleanup script files
+            File.Delete(setupScriptPath);
+            File.Delete(cleanupScriptPath);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        public void LegacySettingsWithDeploymentItem(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
+            var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
+
+            var deploymentItem = Path.Combine(testAssemblyDirectory, "Deployment", "DeploymentFile.xml");
+
+            var runsettingsFormat = @"<RunSettings>
+                                    <MSTest>
+                                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <LegacySettings>
+                                         <Deployment>
+                                            <DeploymentItem filename=""{0}"" />
+                                         </Deployment>
+                                    </LegacySettings>
+                                   </RunSettings>";
+
+            var runsettingsXml = string.Format(runsettingsFormat, deploymentItem);
+            File.WriteAllText(this.runsettingsPath, runsettingsXml);
+
+            var arguments = PrepareArguments(
+               testAssemblyPath,
+               string.Empty,
+               this.runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /testcasefilter:Name=DeploymentItemTest");
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        public void LegacySettingsTestTimeout(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
+            var runsettingsXml = @"<RunSettings>
+                                    <MSTest>
+                                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <LegacySettings>
+                                        <Execution><Timeouts testTimeout=""2000"" />
+                                        </Execution>
+                                    </LegacySettings>
+                                   </RunSettings>";
+            File.WriteAllText(this.runsettingsPath, runsettingsXml);
+            var arguments = PrepareArguments(testAssemblyPath, string.Empty, this.runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /testcasefilter:Name~TimeTest");
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        public void LegacySettingsAssemblyResolution(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
+            var runsettingsFormat = @"<RunSettings>
+                                    <MSTest><ForcedLegacyMode>true</ForcedLegacyMode></MSTest>
+                                    <LegacySettings>
+                                        <Execution>
+                                         <TestTypeSpecific>
+                                          <UnitTestRunConfig testTypeId=""13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b"">
+                                           <AssemblyResolution>
+                                              <TestDirectory useLoadContext=""true"" />
+                                              <RuntimeResolution>
+                                                  <Directory path=""{0}"" includeSubDirectories=""true"" />
+                                              </RuntimeResolution>
+                                           </AssemblyResolution>
+                                          </UnitTestRunConfig>
+                                         </TestTypeSpecific>
+                                        </Execution>
+                                    </LegacySettings>
+                                   </RunSettings>";
+
+            var testAssemblyDirectory = Path.Combine(this.testEnvironment.TestAssetsPath, "LegacySettingsUnitTestProject", "DependencyAssembly");
+            var runsettingsXml = string.Format(runsettingsFormat, testAssemblyDirectory);
+
+            File.WriteAllText(this.runsettingsPath, runsettingsXml);
+            var arguments = PrepareArguments(testAssemblyPath, string.Empty, this.runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, " /testcasefilter:Name=DependencyTest");
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        #endregion
 
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
