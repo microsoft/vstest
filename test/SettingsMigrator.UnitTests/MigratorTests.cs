@@ -34,8 +34,17 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             this.oldRunsettingsPath = Path.Combine(Path.GetTempPath(), "oldRunsettings.runsettings");
         }
 
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            if (File.Exists(this.newRunsettingsPath))
+            {
+                File.Delete(this.newRunsettingsPath);
+            }
+        }
+
         [TestMethod]
-        public void NonRootedPathIsNotMigrator()
+        public void NonRootedPathIsNotMigrated()
         {
             this.migrator.Migrate("asda", this.newRunsettingsPath);
 
@@ -56,7 +65,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             Validate(this.newRunsettingsPath);
 
             File.Delete(this.oldRunsettingsPath);
-            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
@@ -66,8 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
 
             this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
             Validate(this.newRunsettingsPath);
-
-            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
@@ -86,8 +92,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                 var dataCollectorNode = root.SelectNodes(@"/RunSettings/DataCollectionRunSettings/DataCollectors/DataCollector");
                 Assert.AreEqual(2, dataCollectorNode.Count, "Data collector is missing");
             }
-
-            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
@@ -96,8 +100,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
             this.migrator.Migrate(this.oldTestsettingsPath, this.newRunsettingsPath);
 
             Validate(this.newRunsettingsPath);
-
-            File.Delete(this.newRunsettingsPath);
         }
 
         [TestMethod]
