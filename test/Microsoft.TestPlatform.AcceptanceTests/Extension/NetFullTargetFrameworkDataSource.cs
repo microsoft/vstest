@@ -23,8 +23,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         /// <param name="inIsolation">Run test in isolation</param>
         /// <param name="inProcess">Run tests in process</param>
-        /// <param name="useDesktopRunner">Enable desktop runner framework</param>
-        /// <param name="useCoreRunner">Enable core runner framework</param>
+        /// <param name="useDesktopRunner">To run tests with desktop runner(vstest.console.exe)</param>
+        /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
         public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
         {
             this.dataRows = new List<object[]>();
