@@ -153,7 +153,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         {
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
 
-            this.mockTestCaseEventsHandler.Verify(x => x.SendTestResult(this.testResult), Times.Never);
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestResult(this.testResult), Times.Once);
         }
 
         [TestMethod]
@@ -167,7 +167,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldFlushIfTestCaseEndWasCalledBefore()
+        public void RecordResultShouldFlushIfRecordEndWasCalledBefore()
         {
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
@@ -178,11 +178,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldFlushEvenIfTestCaseEndWasCalledBefore()
+        public void RecordResultShouldFlushIfRecordEndWasNotCalledBefore()
         {
+            this.testResult.Outcome = TestOutcome.Passed;
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, this.testResult.Outcome);
+
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
             Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
         }
+
+        [TestMethod]
+        public void RecordResultShouldSendTestCaseEndEvenIfRecordEndWasNotCalled()
+        {
+            this.testResult.Outcome = TestOutcome.Passed;
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
+            this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
+
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
+            Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
+        }
+
         #endregion
     }
 }
