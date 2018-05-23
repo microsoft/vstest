@@ -26,25 +26,33 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void CollectCodeCoverageX86(RunnerInfo runnerInfo)
+        public void CollectCodeCoverageWithCollectOption(RunnerInfo runnerInfo)
         {
-            this.CollectCodeCoverage(runnerInfo, "x86");
+            this.CollectCodeCoverage(runnerInfo, "x86", withRunsettings: false);
         }
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void CollectCodeCoverageX64(RunnerInfo runnerInfo)
+        public void CollectCodeCoverageX86WithRunSettings(RunnerInfo runnerInfo)
+        {
+            this.CollectCodeCoverage(runnerInfo, "x86", withRunsettings: true);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void CollectCodeCoverageX64WithRunSettings(RunnerInfo runnerInfo)
         {
             if (runnerInfo.TargetFramework.Equals("net451"))
             {
                 this.SkipIfRuningInCI();
             }
 
-            this.CollectCodeCoverage(runnerInfo, "x64");
+            this.CollectCodeCoverage(runnerInfo, "x64", withRunsettings: true);
         }
 
-        private void CollectCodeCoverage(RunnerInfo runnerInfo, string targetPlatform)
+        private void CollectCodeCoverage(RunnerInfo runnerInfo, string targetPlatform, bool withRunsettings)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -63,14 +71,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                     }\netstandard2.0");
 
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings,
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,
                 this.FrameworkArgValue, runnerInfo.InIsolationValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDirectory}", $" /Diag:{diagFileName}",
-                $" /TestAdapterPath:{traceDataCollectorDir}", " /Collect:\"Code Coverage\"");
+                $" /TestAdapterPath:{traceDataCollectorDir}");
             arguments = string.Concat(arguments, $" /Platform:{targetPlatform}");
 
             var trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
+
+            if (withRunsettings)
+            {
+                arguments = string.Concat(arguments, $" /settings:{runSettings}");
+            }
+            else
+            {
+                // With /collect:"Code Coverage" option.
+                arguments = string.Concat(arguments, $" /collect:\"Code Coverage\"");
+            }
 
             this.InvokeVsTest(arguments);
 
