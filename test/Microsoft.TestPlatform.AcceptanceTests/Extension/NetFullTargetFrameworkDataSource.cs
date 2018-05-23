@@ -23,19 +23,28 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         /// <param name="inIsolation">Run test in isolation</param>
         /// <param name="inProcess">Run tests in process</param>
-        public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false)
+        /// <param name="useDesktopRunner">Enable desktop runner framework</param>
+        /// <param name="useCoreRunner">Enable core runner framework</param>
+        public NetFullTargetFrameworkDataSource(bool inIsolation = true, bool inProcess = false, bool useDesktopRunner = true, bool useCoreRunner = true)
         {
             this.dataRows = new List<object[]>();
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)});
 
-            if (inIsolation == true)
+            if (useCoreRunner)
             {
-                this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation)});
+                this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
             }
 
-            if (inProcess == true)
+            if (useDesktopRunner)
             {
-                this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework)});
+                if (inIsolation)
+                {
+                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.InIsolation) });
+                }
+
+                if (inProcess)
+                {
+                    this.dataRows.Add(new object[] { new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework) });
+                }
             }
         }
 
