@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml.Linq;
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
@@ -12,6 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     using System.IO;
     using System.Linq;
     using System.Xml;
+    using System.Xml.Linq;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -680,7 +680,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             string message = $"one line{ Environment.NewLine }second line\r\nthird line";
             var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock("Pass1", new List<TestResultMessage> { new TestResultMessage(TestResultMessage.StandardOutCategory, message) });
-            
+
             this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
 
             var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
