@@ -256,8 +256,8 @@ function Invoke-Test
                 else
                 {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter /settings:$Script:TPT_RunSettingsFile /testadapterpath:$Script:TPT_NSTraceDataCollectorPath $ConsoleLogger"
-                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter /settings:"$Script:TPT_RunSettingsFile" /testadapterpath:"$Script:TPT_NSTraceDataCollectorPath $ConsoleLogger"
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:`"trx;LogFileName=$trxLogFileName`" $testFilter /settings:$Script:TPT_RunSettingsFile $ConsoleLogger /testadapterpath:$Script:TPT_NSTraceDataCollectorPath"
+                    & $dotNetPath $vstestConsolePath $testContainerSet /parallel /logger:"trx;LogFileName=$trxLogFileName" $testFilter /settings:"$Script:TPT_RunSettingsFile" $ConsoleLogger /testadapterpath:"$Script:TPT_NSTraceDataCollectorPath"
                 }
 
                 Reset-TestEnvironment

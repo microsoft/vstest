@@ -24,6 +24,12 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         }
 
         [TestMethod]
+        public void FrameworkFromStringShouldReturnNullForInvalidString()
+        {
+            Assert.IsNull(Framework.FromString("InvalidFramework"));
+        }
+
+        [TestMethod]
         public void FrameworkFromStringShouldIgnoreCase()
         {
             var fx = Framework.FromString("framework35");
