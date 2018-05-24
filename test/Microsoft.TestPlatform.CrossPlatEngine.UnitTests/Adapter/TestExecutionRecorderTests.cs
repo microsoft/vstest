@@ -149,7 +149,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldPublishTestCaseResultEventIfTestCaseStartAndTestCaseEndEventsAreNotPublished()
+        public void RecordResultShouldPublishTestResultIfRecordStartAndRecordEndEventsAreNotPublished()
         {
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
 
@@ -178,7 +178,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldFlushIfRecordEndWasNotCalledBefore()
+        public void RecordResultShouldSendTestCaseEndEventAndFlushIfRecordEndWasCalledAfterRecordResult()
         {
             this.testResult.Outcome = TestOutcome.Passed;
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
@@ -190,7 +190,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldSendTestCaseEndEvenIfRecordEndWasNotCalled()
+        public void RecordResultShouldSendTestCaseEndEventIfRecordEndWasNotCalled()
         {
             this.testResult.Outcome = TestOutcome.Passed;
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
