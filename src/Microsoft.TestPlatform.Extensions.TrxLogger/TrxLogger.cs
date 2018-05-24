@@ -289,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 XmlElement rootElement = helper.CreateRootElement("TestRun");
 
                 // Save runId/username/creation time etc.
-                this.testRun.Finished = DateTime.Now;
+                this.testRun.Finished = DateTime.UtcNow;
                 helper.SaveSingleFields(rootElement, this.testRun, parameters);
 
                 // Save test settings
@@ -410,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.passTests = 0;
             this.failTests = 0;
             this.runLevelStdOut = new StringBuilder();
-            this.testRunStartTime = DateTime.Now;
+            this.testRunStartTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -589,7 +589,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="parentTestResult"></param>
         /// <param name="rocksteadyTestResult"></param>
         /// <returns>Trx test result</returns>
-        private ITestResult CreateTestResult(Guid executionId, Guid parentExecutionId, TestType testType, 
+        private ITestResult CreateTestResult(Guid executionId, Guid parentExecutionId, TestType testType,
             ITestElement testElement, ITestElement parentTestElement, ITestResult parentTestResult, ObjectModel.TestResult rocksteadyTestResult)
         {
             // Create test result
@@ -611,7 +611,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 this.innerResults.TryAdd(executionId, testResult);
                 return testResult;
             }
-            
+
             // Data driven inner result scenario
             if (parentTestElement != null && parentTestElement.TestType.Equals(TrxLoggerConstants.UnitTestType))
             {

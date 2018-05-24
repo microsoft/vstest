@@ -209,10 +209,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 this.runUser = string.Empty;
             }
-            this.created = DateTime.Now.ToUniversalTime();
-            this.queued = DateTime.Now.ToUniversalTime();
-            this.started = DateTime.Now.ToUniversalTime();
-            this.finished = DateTime.Now.ToUniversalTime();
+            this.created = DateTime.UtcNow;
+            this.queued = DateTime.UtcNow;
+            this.started = DateTime.UtcNow;
+            this.finished = DateTime.UtcNow;
         }
     }
 }

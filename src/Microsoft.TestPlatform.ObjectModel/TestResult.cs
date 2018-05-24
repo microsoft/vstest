@@ -36,8 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             // Default start and end time values for a test result are initialized to current timestamp
             // to maintain compatibility.
-            this.StartTime = DateTimeOffset.Now;
-            this.EndTime = DateTimeOffset.Now;
+            this.StartTime = DateTimeOffset.UtcNow;
+            this.EndTime = DateTimeOffset.UtcNow;
         }
 
         #endregion
@@ -255,10 +255,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public class TestResultMessage
     {
         // Bugfix: 297759 Moving the category from the resources to the code
-        // so that it works on machines which has eng OS & non-eng VS and vice versa. 
+        // so that it works on machines which has eng OS & non-eng VS and vice versa.
 
         /// <summary>
-        ///     Standard Output Message Category 
+        ///     Standard Output Message Category
         /// </summary>
         public static readonly string StandardOutCategory = "StdOutMsgs";
 
@@ -278,7 +278,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly string AdditionalInfoCategory = "AdtnlInfo";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestResultMessage"/> class. 
+        /// Initializes a new instance of the <see cref="TestResultMessage"/> class.
         /// </summary>
         /// <param name="category">Category of the message.</param>
         /// <param name="text">Text of the message.</param>

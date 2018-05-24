@@ -36,8 +36,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void TestResultShouldInitializeStartAndEndTimeToCurrent()
         {
-            Assert.IsTrue(this.result.StartTime.Subtract(DateTimeOffset.Now) < new TimeSpan(0, 0, 0, 10));
-            Assert.IsTrue(this.result.EndTime.Subtract(DateTimeOffset.Now) < new TimeSpan(0, 0, 0, 10));
+            Assert.IsTrue(this.result.StartTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
+            Assert.IsTrue(this.result.EndTime.Subtract(DateTimeOffset.UtcNow) < new TimeSpan(0, 0, 0, 10));
         }
 
         #region GetSetPropertyValue Tests
