@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -23,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -105,6 +107,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
 
+            var discoverersFromDeprecatedLocations = false;
+
             var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
@@ -175,6 +179,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     {
                         var totalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
                         this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter, discoverer.Metadata.DefaultExecutorUri), totalDiscoveredTests);
+                        if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(), StringComparer.OrdinalIgnoreCase))
+                        {
+                            var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
+
+                            discoverersFromDeprecatedLocations |= Path.GetDirectoryName(discovererLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
+                        }
                         totalAdaptersUsed++;
                     }
 
@@ -183,6 +193,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         EqtTrace.Verbose(
                             "DiscoveryContext.LoadTests: Done loading tests for {0}",
                             discoverer.Value.GetType().FullName);
+                    }
+
+                    if (discoverersFromDeprecatedLocations)
+                    {
+                        logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
                     }
 
                     // Collecting Data Point for Time Taken to Discover Tests by each Adapter
