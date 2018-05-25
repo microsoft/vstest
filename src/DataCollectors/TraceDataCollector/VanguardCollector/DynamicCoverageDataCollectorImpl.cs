@@ -110,16 +110,7 @@ namespace Microsoft.VisualStudio.Coverage
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.Initialize: Initialize configuration. ");
             if (string.IsNullOrEmpty(configurationElement?.InnerXml))
             {
-                // Add default configuration specific to CodeCoverage. https://msdn.microsoft.com/en-us/library/jj635153.aspx
-                var doc = new XmlDocument();
-                Assembly a = typeof(DynamicCoverageDataCollectorImpl).GetTypeInfo().Assembly;
-                using (Stream s = a.GetManifestResourceStream(
-                    "Microsoft.VisualStudio.TraceDataCollector.VanguardCollector.DefaultCodeCoverageConfig.xml"))
-                {
-                    doc.Load(s);
-                }
-
-                configurationElement = doc.DocumentElement;
+                configurationElement = DynamicCoverageDataCollectorImpl.GetDefaultConfiguration();
             }
 
             this.logger = logger;
@@ -248,6 +239,20 @@ namespace Microsoft.VisualStudio.Coverage
                 DateTime.Now.ToString("yyyy-MM-dd.HH_mm_ss", CultureInfo.InvariantCulture));
         }
 
+        private static XmlElement GetDefaultConfiguration()
+        {
+            // Add default configuration specific to CodeCoverage. https://msdn.microsoft.com/en-us/library/jj635153.aspx
+            var doc = new XmlDocument();
+            Assembly a = typeof(DynamicCoverageDataCollectorImpl).GetTypeInfo().Assembly;
+            using (Stream s = a.GetManifestResourceStream(
+                "Microsoft.VisualStudio.TraceDataCollector.VanguardCollector.DefaultCodeCoverageConfig.xml"))
+            {
+                doc.Load(s);
+            }
+
+            return doc.DocumentElement;
+        }
+
         private void SetCoverageFileName(XmlElement configurationElement)
         {
             XmlElement coverageFileNameElement = configurationElement[CoverageFileSettingName];
@@ -260,7 +265,9 @@ namespace Microsoft.VisualStudio.Coverage
         {
             EqtTrace.Info("DynamicCoverageDataCollectorImpl.PrepareVanguardProcess: Preparing Vanguard process.");
 
-            XmlElement config = configurationElement[ConfigCodeCoverageElementName];
+            XmlElement config = configurationElement[ConfigCodeCoverageElementName]
+                                ?? DynamicCoverageDataCollectorImpl.GetDefaultConfiguration()[ConfigCodeCoverageElementName];
+
             string configurationFileName = Path.Combine(this.sessionDirectory, VanguardConfigFileName);
 
             this.fileHelper.WriteAllText(configurationFileName, config.OuterXml);
