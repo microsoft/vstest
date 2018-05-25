@@ -28,10 +28,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CollectCodeCoverageWithCollectOption(RunnerInfo runnerInfo)
         {
-            if (runnerInfo.TargetFramework.StartsWith("netcore"))
-            {
-                this.SkipIfRuningInCI("Skipping for core code coverage with no runsettings.");
-            }
             this.CollectCodeCoverage(runnerInfo, "x86", withRunsettings: false);
         }
 
@@ -180,6 +176,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
             }
         }
+
         private bool SkipIfRuningInCI(string message)
         {
             // Setting Console.ForegroundColor to newColor which will be used to determine whether
