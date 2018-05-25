@@ -87,15 +87,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         {
             if (this.testCaseEventsHandler != null)
             {
-                var testCaseId = testResult.TestCase.Id;
-
-                lock (this.testCaseEndStatusSyncObject)
-                {
-                    if (this.testCaseEndStatusMap.Contains(testCaseId))
-                    {
-                        this.testCaseEventsHandler.SendTestResult(testResult);
-                    }
-                }
+                // Send TestCaseEnd in case RecordEnd was not called.
+                this.SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
+                this.testCaseEventsHandler.SendTestResult(testResult);
             }
 
             // Test Result should always be flushed, even if datacollecter attachement is missing
@@ -111,18 +105,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public void RecordEnd(TestCase testCase, TestOutcome outcome)
         {
             this.testRunCache.OnTestCompletion(testCase);
+            this.SendTestCaseEnd(testCase, outcome);
+        }
 
+        /// <summary>
+        /// Send TestCaseEnd event for given testCase if not sent already
+        /// </summary>
+        /// <param name="testCase"></param>
+        /// <param name="outcome"></param>
+        private void SendTestCaseEnd(TestCase testCase, TestOutcome outcome)
+        {
             if (this.testCaseEventsHandler != null)
             {
-                var isTestCaseEndAlreadySent = false;
-
                 lock (this.testCaseEndStatusSyncObject)
                 {
-                    isTestCaseEndAlreadySent = this.testCaseEndStatusMap.Contains(testCase.Id);
-
-                    // Do not support multiple - testcasends for a single test case start
-                    // TestCaseEnd must always be preceded by testcasestart for a given test case id
-                    if (!isTestCaseEndAlreadySent)
+                    // Do not support multiple - TestCaseEnds for a single TestCaseStart
+                    // TestCaseEnd must always be preceded by TestCaseStart for a given test case id
+                    if (!this.testCaseEndStatusMap.Contains(testCase.Id))
                     {
                         this.testCaseEndStatusMap.Add(testCase.Id);
 
