@@ -153,6 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
                 var executionNode = root.SelectSingleNode(@" / RunSettings/LegacySettings/Execution");
                 Assert.IsNotNull(executionNode, "There should be a Execution node");
                 Assert.AreEqual("2", executionNode.Attributes["parallelTestCount"].Value, "parallelTestCount value does not match.");
+                Assert.AreEqual("MSIL", executionNode.Attributes["hostProcessPlatform"].Value, "hostProcessPlatform value does not match.");
 
                 Assert.IsNotNull(root.SelectSingleNode(@"/RunSettings/LegacySettings/Execution/Hosts"), "There should be a Hosts node");
 

@@ -18,6 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 
         private const string ParallelTestCountAttributeName = "parallelTestCount";
 
+        private const string HostProcessPlatformAttributeName = "hostProcessPlatform";
+
         private const string RunTimeoutAttributeName = "runTimeout";
 
         private const string LegacySettingsNodeName = "LegacySettings";
@@ -168,6 +170,12 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
                 parallelTestCount = testSettingsNodes.Execution.Attributes[ParallelTestCountAttributeName].Value;
             }
 
+            string hostProcessPlatform = null;
+            if (testSettingsNodes.Execution != null && testSettingsNodes.Execution.Attributes[HostProcessPlatformAttributeName] != null)
+            {
+                hostProcessPlatform = testSettingsNodes.Execution.Attributes[HostProcessPlatformAttributeName].Value;
+            }
+
             // WebTestRunConfiguration node.
             if (testSettingsNodes.WebSettings != null)
             {
@@ -175,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
             }
 
             // LegacySettings node.
-            this.AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, runSettingsXmlDoc);
+            this.AddLegacyNodes(testSettingsNodes, testTimeout, parallelTestCount, hostProcessPlatform, runSettingsXmlDoc);
 
             // TestSessionTimeout node.
             if (!string.IsNullOrEmpty(runTimeout))
@@ -241,11 +249,12 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         /// <param name="testSettingsNodes">testSettingsNodes</param>
         /// <param name="testTimeout">testTimeout</param>
         /// <param name="parallelTestCount">parallelTestCount</param>
+        /// <param name="hostProcessPlatform">hostProcessPlatform</param>
         /// <param name="newXmlDoc">newXmlDoc</param>
-        private void AddLegacyNodes(TestSettingsNodes testSettingsNodes, string testTimeout, string parallelTestCount, XmlDocument newXmlDoc)
+        private void AddLegacyNodes(TestSettingsNodes testSettingsNodes, string testTimeout, string parallelTestCount, string hostProcessPlatform, XmlDocument newXmlDoc)
         {
-            if (!(testSettingsNodes.Deployment != null || testSettingsNodes.Script != null || testSettingsNodes.UnitTestConfig != null ||
-                !string.IsNullOrEmpty(parallelTestCount) || !string.IsNullOrEmpty(testTimeout) || testSettingsNodes.Hosts != null))
+            if (testSettingsNodes.Deployment == null && testSettingsNodes.Script == null && testSettingsNodes.UnitTestConfig == null &&
+                string.IsNullOrEmpty(parallelTestCount) && string.IsNullOrEmpty(testTimeout) && string.IsNullOrEmpty(hostProcessPlatform) && testSettingsNodes.Hosts == null)
             {
                 return;
             }
@@ -300,6 +309,13 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
                     var paralellAttribute = newXmlDoc.CreateAttribute(ParallelTestCountAttributeName);
                     paralellAttribute.Value = parallelTestCount;
                     newExecutionNode.Attributes.Append(paralellAttribute);
+                }
+
+                if (!string.IsNullOrEmpty(hostProcessPlatform))
+                {
+                    var hostProcessPlatformAttribute = newXmlDoc.CreateAttribute(HostProcessPlatformAttributeName);
+                    hostProcessPlatformAttribute.Value = hostProcessPlatform;
+                    newExecutionNode.Attributes.Append(hostProcessPlatformAttribute);
                 }
 
                 if (!string.IsNullOrEmpty(testTimeout))
