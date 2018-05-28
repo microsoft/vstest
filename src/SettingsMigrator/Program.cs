@@ -13,8 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
     /// </summary>
     public static class Program
     {
-        private const string RunSettingsExtension = ".runsettings";
-
         /// <summary>
         /// Main entry point. Hands off execution to Migrator.
         /// </summary>
@@ -23,11 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
         public static int Main(string[] args)
         {
             var pathResolver = new PathResolver();
-            string oldFilePath = args[0];
             string newFilePath = pathResolver.GetTargetPath(args);
 
             if (!string.IsNullOrEmpty(newFilePath))
             {
+                string oldFilePath = args[0];
                 var migrator = new Migrator();
                 migrator.Migrate(oldFilePath, newFilePath);
             }

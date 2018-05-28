@@ -6,8 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
     using System;
     using System.Globalization;
     using System.IO;
-    using System.Xml;
-    using CommandLineResources = Resources.Resources;
 
     /// <summary>
     /// Used to resolve the inputs provided by the user to paths needed by migrator.
@@ -18,6 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
 
         private const string RunSettingsExtension = ".runsettings";
 
+        /// <summary>
+        /// Gets the target path based on user inputs.
+        /// </summary>
+        /// <param name="args">User inputs</param>
+        /// <returns>New file path to create</returns>
         public string GetTargetPath(string[] args)
         {
             string newFilePath = null;
