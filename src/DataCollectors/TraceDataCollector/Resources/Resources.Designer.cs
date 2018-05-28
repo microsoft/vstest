@@ -62,6 +62,15 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Currently code coverage support available only for Windows operating system. No code coverage data available for current test run..
+        /// </summary>
+        internal static string CodeCoverageOnlySupportsWindows {
+            get {
+                return ResourceManager.GetString("CodeCoverageOnlySupportsWindows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to create directory: {0} with error:{1}.
         /// </summary>
         internal static string FailedToCreateDirectory {

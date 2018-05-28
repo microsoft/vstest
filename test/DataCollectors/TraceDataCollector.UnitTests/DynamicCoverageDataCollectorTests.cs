@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using TestPlatform.ObjectModel.DataCollection;
+    using TestPlatform.PlatformAbstractions;
+    using TestPlatform.PlatformAbstractions.Interfaces;
     using TraceCollector;
     using IDataCollectionSink = TraceCollector.IDataCollectionSink;
 
@@ -29,6 +31,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         private Mock<TraceCollector.IDataCollectionSink> sinkMock;
         private Mock<IDataCollectionLogger> loggerMock;
         private Mock<IDataCollectionAgentContext> agentContextMock;
+        private Mock<IEnvironment> environmentMock;
 
         public DynamicCoverageDataCollectorTests()
         {
@@ -38,8 +41,10 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.sinkMock = new Mock<TraceCollector.IDataCollectionSink>();
             this.loggerMock = new Mock<IDataCollectionLogger>();
             this.agentContextMock = new Mock<IDataCollectionAgentContext>();
-            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, this.implMock.Object);
+            this.environmentMock = new Mock<IEnvironment>();
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, this.implMock.Object, this.environmentMock.Object);
             this.vanguardLocationProviderMock.Setup(u => u.GetVanguardDirectory()).Returns(Directory.GetCurrentDirectory);
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
             var configElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(DynamicCoverageDataCollectorTests.DefaultConfig);
             this.collector.Initialize(configElement, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
         }
@@ -60,6 +65,26 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.collector.Initialize(null, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
 
             Assert.AreEqual(null, actualConfig);
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowIfCurrentOperatingSystemIsUnix()
+        {
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+
+            var actualException = Assert.ThrowsException<VanguardException>(() =>
+                this.collector.Initialize(
+                    null,
+                    this.eventsMock.Object,
+                    this.sinkMock.Object,
+                    this.loggerMock.Object,
+                    this.agentContextMock.Object));
+
+            var expectedExMsg =
+                "Currently code coverage support available only for Windows operating system. No code coverage data available for current test run.";
+            Assert.AreEqual(expectedExMsg, actualException.Message);
+
+            this.loggerMock.Verify(l => l.LogWarning(It.IsAny<DataCollectionContext>(), expectedExMsg));
         }
 
         [TestMethod]
@@ -156,8 +181,11 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
         private class TestableDynamicCoverageDataCollector : DynamicCoverageDataCollector
         {
-            public TestableDynamicCoverageDataCollector(IVanguardLocationProvider vanguardLocationProvider, IDynamicCoverageDataCollectorImpl impl)
-            : base(vanguardLocationProvider, impl)
+            public TestableDynamicCoverageDataCollector(
+                IVanguardLocationProvider vanguardLocationProvider,
+                IDynamicCoverageDataCollectorImpl impl,
+                IEnvironment environment)
+            : base(vanguardLocationProvider, impl, environment)
             {
             }
 

@@ -10,8 +10,10 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
+    using TestPlatform.PlatformAbstractions.Interfaces;
     using TraceDataCollector.Resources;
 
     /// <summary>
@@ -36,6 +38,8 @@ namespace Microsoft.VisualStudio.Coverage
         private const string CorProfilerVariable = "COR_PROFILER";
         private const string CodeCoverageSessionNameVariable = "CODE_COVERAGE_SESSION_NAME";
 
+        private readonly IEnvironment environment;
+
         /// <summary>
         /// Data collector implementation
         /// </summary>
@@ -44,20 +48,24 @@ namespace Microsoft.VisualStudio.Coverage
         private IVanguardLocationProvider vanguardLocationProvider;
 
         public DynamicCoverageDataCollector()
-        : this(new VanguardLocationProvider(), new DynamicCoverageDataCollectorImpl())
+        : this(new VanguardLocationProvider(), new DynamicCoverageDataCollectorImpl(), new PlatformEnvironment())
         {
         }
 
         internal DynamicCoverageDataCollector(
             IVanguardLocationProvider vanguardLocationProvider,
-            IDynamicCoverageDataCollectorImpl dynamicCoverageDataCollectorImpl)
+            IDynamicCoverageDataCollectorImpl dynamicCoverageDataCollectorImpl,
+            IEnvironment environment)
         {
             this.vanguardLocationProvider = vanguardLocationProvider;
             this.implementation = dynamicCoverageDataCollectorImpl;
+            this.environment = environment;
         }
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
+            this.ThrowIfNotSupportedOperatingSystem();
+
             try
             {
                 this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
@@ -135,6 +143,24 @@ namespace Microsoft.VisualStudio.Coverage
         private void SessionStart(object sender, SessionStartEventArgs e)
         {
             this.implementation.SessionStart(sender, e);
+        }
+
+        private void ThrowIfNotSupportedOperatingSystem()
+        {
+            if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            {
+                return;
+            }
+
+            EqtTrace.Warning($"DynamicCoverageDataCollector.ThrowIfNotSupportedOS: Code coverage not supported for operating system: {this.environment.OperatingSystem}");
+
+            this.Logger.LogWarning(
+                this.AgentContext.SessionDataCollectionContext,
+                string.Format(CultureInfo.CurrentUICulture, Resources.CodeCoverageOnlySupportsWindows));
+
+            throw new VanguardException(string.Format(
+                CultureInfo.CurrentUICulture,
+                Resources.CodeCoverageOnlySupportsWindows));
         }
     }
 }

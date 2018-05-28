@@ -27,6 +27,11 @@
         <target state="new">Failed to initialize code coverage datacollector with error: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="CodeCoverageOnlySupportsWindows">
+        <source>Currently code coverage support available only for Windows operating system. No code coverage data available for current test run.</source>
+        <target state="new">Currently code coverage support available only for Windows operating system. No code coverage data available for current test run.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
