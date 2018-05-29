@@ -21,15 +21,41 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// Initializes a new instance of the <see cref="NetCoreTargetFrameworkDataSource"/> class.
         /// </summary>
-        public NetCoreTargetFrameworkDataSource()
+        /// <param name="useDesktopRunner">To run tests with desktop runner(vstest.console.exe)</param>
+        /// <param name="useCoreRunner">To run tests with core runner(dotnet vstest.console.dll)</param>
+        public NetCoreTargetFrameworkDataSource(bool useDesktopRunner = true, bool useCoreRunner = true)
         {
             this.dataRows = new List<object[]>(6);
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework)});
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework)});
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework)});
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework)});
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)});
-            this.dataRows.Add(new object[] {new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)});
+
+            if (useDesktopRunner)
+            {
+                this.dataRows.Add(new object[]
+                {
+                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework)
+                });
+                this.dataRows.Add(new object[]
+                {
+                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework)
+                });
+                this.dataRows.Add(new object[]
+                {
+                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
+                });
+            }
+
+            if (useCoreRunner)
+            {
+                this.dataRows.Add(new object[]
+                    {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework)});
+                this.dataRows.Add(new object[]
+                {
+                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework)
+                });
+                this.dataRows.Add(new object[]
+                {
+                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
+                });
+            }
         }
 
         private List<object[]> dataRows;
