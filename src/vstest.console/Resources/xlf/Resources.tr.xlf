@@ -225,29 +225,19 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
       Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
       Visual Studio Test Sonuçları Dosyası’na (TRX) kaydetmek için şunu kullanın: /logger:trx [;LogFileName=&lt;Varsayılan değer benzersiz dosya adıdır&gt;]
       Dosyayı belirtilen LogFileName ile TestResults dizininde oluşturur.
 
       Konsol günlükçüsü için günlük iletilerinin ayrıntı düzeyini aşağıdaki gibi değiştirin
-      Örnek: /logger:console;verbosity=&lt;Varsayılan değer "minimal"&gt;
-      İzin verilen verbosity değerleri: quiet, minimal ve normal.
+      Örnek: /logger:console;verbosity=&lt;Varsayılan değer "normal"&gt;
+      İzin verilen verbosity değerleri: quiet, minimal, normal ve detailed.
 
       Konsol günlükçüsü için tanılama düzeyi önekini aşağıdaki gibi değiştirin
       Örnek: /logger:console;prefix=&lt;Varsayılan değer "false"&gt;
-      Konsol Günlükçüsü hakkında daha fazla bilgi için bkz. https://aka.ms/console-logger
-
-
-      Test sonuçlarını Team Foundation Server’da yayımlamak için, TfsPublisher’ı aşağıdaki gibi kullanın
-      Örnek: /logger:TfsPublisher;
-                Collection=&lt;takım projesi koleksiyonu URL’si&gt;;
-                BuildName=&lt;derleme adı&gt;;
-                TeamProject=&lt;takım projesi adı&gt;
-                [;Platform=&lt;Varsayılan değer "Any CPU"&gt;]
-                [;Flavor=&lt;Varsayılan değer "Debug"&gt;]
-                [;RunTitle=&lt;başlık&gt;]</target>
-        <note></note>
+      Konsol Günlükçüsü hakkında daha fazla bilgi için bkz. https://aka.ms/console-logger</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Günlükçü | / Günlükçü: &lt; Günlükçü URI/FriendlyName &gt;
       Test sonuçları için Günlükçü belirtin.  Örneğin, oturum açmak için /logger:trx sonuçları içine bir Visual Studio Test sonuçları dosyası (TRX) kullanın.
@@ -749,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework Sürümü&gt;
+        <target state="translated">--Framework|/Framework:&lt;Framework Sürümü&gt;
       Test yürütmesi için kullanılacak hedef .NET Framework sürümü. 
       Geçerli değerler ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" vb.
-      Framework35, Framework40, Framework45 ve FrameworkCore10 desteklenen diğer değerlerdir.</target>
-        <note></note>
+      Framework35, Framework40, Framework45, FrameworkCore10 ve FrameworkUap10 desteklenen diğer değerlerdir.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework sürüm &gt;
       Hedef .net Framework sürümünü test yürütmesi için kullanılacak. 
@@ -773,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Geçersiz .NET Framework sürümü: {0}. Lütfen TargetFramework tam adını belirtin. Desteklenen diğer .NET Framework sürümleri Framework35, Framework40, Framework45 ve FrameworkCore10’dur.</target>
-        <note></note>
+        <target state="translated">Geçersiz .NET Framework sürümü: {0}. Lütfen TargetFramework tam adını belirtin. Desteklenen diğer .NET Framework sürümleri Framework35, Framework40, Framework45, FrameworkCore10 ve FrameworkUap10’dur.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz .net Framework sürümü: {0}. Lütfen fullname in TargetFramework verin. Diğer desteklenen .net Framework sürümleri şunlardır: Framework35, Framework40 ve Framework45.</target>
         </alt-trans>
@@ -1570,33 +1560,24 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Creates file in TestResults directory with given LogFileName.
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
+      Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
+      Visual Studio Test Sonuçları Dosyası’na (TRX) kaydetmek için şunu kullanın: /logger:trx [;LogFileName=&lt;Varsayılan değer benzersiz dosya adıdır&gt;]
+      Dosyayı belirtilen LogFileName ile TestResults dizininde oluşturur.
 
-      Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal, normal and detailed.
+      Konsol günlükçüsü için günlük iletilerinin ayrıntı düzeyini aşağıdaki gibi değiştirin
+      Örnek: /logger:console;verbosity=&lt;Varsayılan değer "minimal"&gt;
+      İzin verilen verbosity değerleri: quiet, minimal, normal ve detailed.
 
-      Change the diagnostic level prefix for console logger as shown below
-      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      Konsol günlükçüsü için tanılama düzeyi önekini aşağıdaki gibi değiştirin
+      Örnek: /logger:console;prefix=&lt;Varsayılan değer "false"&gt;
+      Konsol Günlükçüsü hakkında daha fazla bilgi için bkz. https://aka.ms/console-logger</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
-        <note></note>
+        <target state="translated">Blame için CollectDump seçeneği bu platformda desteklenmez.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
