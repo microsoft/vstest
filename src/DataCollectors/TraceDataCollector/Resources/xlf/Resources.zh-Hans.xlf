@@ -46,7 +46,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="CodeCoverageOnlySupportsWindows">
-        <source>Currently code coverage support available only for Windows operating system. No code coverage data available for current test run.</source>
+        <source>No code coverage data available. Code coverage is currently supported only on Windows.</source>
         <target state="new">Currently code coverage support available only for Windows operating system. No code coverage data available for current test run.</target>
         <note></note>
       </trans-unit>

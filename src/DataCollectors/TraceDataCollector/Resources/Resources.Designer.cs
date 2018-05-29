@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Currently code coverage support available only for Windows operating system. No code coverage data available for current test run..
+        ///   Looks up a localized string similar to No code coverage data available. Code coverage is currently supported only on Windows..
         /// </summary>
         internal static string CodeCoverageOnlySupportsWindows {
             get {

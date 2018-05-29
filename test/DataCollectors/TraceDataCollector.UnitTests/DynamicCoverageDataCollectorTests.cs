@@ -67,24 +67,43 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
-        public void InitializeShouldThrowIfCurrentOperatingSystemIsUnix()
+        public void InitializeShouldLogWarningIfCurrentOperatingSystemIsUnix()
         {
             this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
             this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
 
-            var actualException = Assert.ThrowsException<VanguardException>(() =>
-                this.collector.Initialize(
-                    null,
-                    this.eventsMock.Object,
-                    this.sinkMock.Object,
-                    this.loggerMock.Object,
-                    this.agentContextMock.Object));
+           this.collector.Initialize(
+               null,
+               this.eventsMock.Object,
+               this.sinkMock.Object,
+               this.loggerMock.Object,
+               this.agentContextMock.Object);
 
             var expectedExMsg =
-                "Currently code coverage support available only for Windows operating system. No code coverage data available for current test run.";
-            Assert.AreEqual(expectedExMsg, actualException.Message);
+                "No code coverage data available. Code coverage is currently supported only on Windows.";
 
             this.loggerMock.Verify(l => l.LogWarning(It.IsAny<DataCollectionContext>(), expectedExMsg));
+        }
+
+        [TestMethod]
+        public void InitializeShouldNotRegisterForSessionEvents()
+        {
+            this.implMock = new Mock<IDynamicCoverageDataCollectorImpl>();
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
+
+            this.collector.Initialize(
+                null,
+                this.eventsMock.Object,
+                this.sinkMock.Object,
+                this.loggerMock.Object,
+                this.agentContextMock.Object);
+
+            this.eventsMock.Raise(e => e.SessionStart += null, new SessionStartEventArgs());
+            this.eventsMock.Raise(e => e.SessionEnd += null, new SessionEndEventArgs());
+
+            this.implMock.Verify(i => i.SessionStart(It.IsAny<object>(), It.IsAny<SessionStartEventArgs>()), Times.Never);
+            this.implMock.Verify(i => i.SessionEnd(It.IsAny<object>(), It.IsAny<SessionEndEventArgs>()), Times.Never);
         }
 
         [TestMethod]

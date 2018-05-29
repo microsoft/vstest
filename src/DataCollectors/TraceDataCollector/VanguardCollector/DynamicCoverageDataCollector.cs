@@ -85,11 +85,22 @@ namespace Microsoft.VisualStudio.Coverage
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
-            this.ThrowIfNotRunningOnWindowsOS();
+            if (this.isWindowsOS == false)
+            {
+                EqtTrace.Warning($"DynamicCoverageDataCollector.OnInitialize: Code coverage not supported for operating system: {this.environment.OperatingSystem}");
+
+                this.Logger.LogWarning(
+                    this.AgentContext.SessionDataCollectionContext,
+                    string.Format(CultureInfo.CurrentUICulture, Resources.CodeCoverageOnlySupportsWindows));
+
+                return;
+            }
 
             try
             {
                 this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
+                this.Events.SessionStart += this.SessionStart;
+                this.Events.SessionEnd += this.SessionEnd;
             }
             catch (Exception ex)
             {
@@ -99,9 +110,6 @@ namespace Microsoft.VisualStudio.Coverage
                     string.Format(CultureInfo.CurrentUICulture, Resources.FailedToInitializeCodeCoverageDataCollector, ex));
                 throw;
             }
-
-            this.Events.SessionStart += this.SessionStart;
-            this.Events.SessionEnd += this.SessionEnd;
         }
 
         /// <summary>
@@ -164,24 +172,6 @@ namespace Microsoft.VisualStudio.Coverage
         private void SessionStart(object sender, SessionStartEventArgs e)
         {
             this.implementation.SessionStart(sender, e);
-        }
-
-        private void ThrowIfNotRunningOnWindowsOS()
-        {
-            if (this.isWindowsOS)
-            {
-                return;
-            }
-
-            EqtTrace.Warning($"DynamicCoverageDataCollector.ThrowIfNotSupportedOS: Code coverage not supported for operating system: {this.environment.OperatingSystem}");
-
-            this.Logger.LogWarning(
-                this.AgentContext.SessionDataCollectionContext,
-                string.Format(CultureInfo.CurrentUICulture, Resources.CodeCoverageOnlySupportsWindows));
-
-            throw new VanguardException(string.Format(
-                CultureInfo.CurrentUICulture,
-                Resources.CodeCoverageOnlySupportsWindows));
         }
     }
 }
