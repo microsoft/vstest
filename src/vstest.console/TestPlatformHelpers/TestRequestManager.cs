@@ -294,9 +294,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
             
-            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out List<string> legacySettings))
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsCIData))
             {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettingElements, string.Join(",", legacySettings));
+                foreach( var ciData in legacySettingsCIData)
+                {
+                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingElements, ciData.Key), ciData.Value);
+                }
             }
         }
 

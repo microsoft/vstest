@@ -19,7 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TestSettingsUsed = "VS.TestRun.IsTestSettingsUsed";
 
-        public static string LegacySettingElements = "VS.TestRun.LegacySettingsElements";
+        // All data related to legacy settings nodes will be prefixed with this.
+        public static string LegacySettingElements = "VS.TestRun.LegacySettings";
 
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
