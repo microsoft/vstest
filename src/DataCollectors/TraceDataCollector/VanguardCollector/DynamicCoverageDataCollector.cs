@@ -47,8 +47,16 @@ namespace Microsoft.VisualStudio.Coverage
 
         private IVanguardLocationProvider vanguardLocationProvider;
 
+        /// <summary>
+        /// To show warning on non windows.
+        /// </summary>
+        private bool isWindowsOS;
+
         public DynamicCoverageDataCollector()
-        : this(new VanguardLocationProvider(), new DynamicCoverageDataCollectorImpl(), new PlatformEnvironment())
+        : this(
+            new VanguardLocationProvider(),
+            null, /* DynamicCoverageDataCollectorImpl .ctor has dependency on WinAPIs */
+            new PlatformEnvironment())
         {
         }
 
@@ -58,13 +66,27 @@ namespace Microsoft.VisualStudio.Coverage
             IEnvironment environment)
         {
             this.vanguardLocationProvider = vanguardLocationProvider;
-            this.implementation = dynamicCoverageDataCollectorImpl;
             this.environment = environment;
+
+            // Create DynamicCoverageDataCollectorImpl .ctor only when running on windows, because it has dependency on WinAPIs.
+            if (dynamicCoverageDataCollectorImpl == null)
+            {
+                this.isWindowsOS = this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows);
+                if (this.isWindowsOS)
+                {
+                    this.implementation = new DynamicCoverageDataCollectorImpl();
+                }
+            }
+            else
+            {
+                this.isWindowsOS = true;
+                this.implementation = dynamicCoverageDataCollectorImpl;
+            }
         }
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
-            this.ThrowIfNotSupportedOperatingSystem();
+            this.ThrowIfNotRunningOnWindowsOS();
 
             try
             {
@@ -145,9 +167,9 @@ namespace Microsoft.VisualStudio.Coverage
             this.implementation.SessionStart(sender, e);
         }
 
-        private void ThrowIfNotSupportedOperatingSystem()
+        private void ThrowIfNotRunningOnWindowsOS()
         {
-            if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            if (this.isWindowsOS)
             {
                 return;
             }

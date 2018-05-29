@@ -71,6 +71,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         public void InitializeShouldThrowIfCurrentOperatingSystemIsUnix()
         {
             this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
 
             var actualException = Assert.ThrowsException<VanguardException>(() =>
                 this.collector.Initialize(
