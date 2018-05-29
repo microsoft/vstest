@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TraceCollector.Interfaces
     /// <summary>
     /// Available operating systems.
     /// </summary>
-    public enum PlatformOperatingSystem
+    internal enum PlatformOperatingSystem
     {
         Windows,
         Unix

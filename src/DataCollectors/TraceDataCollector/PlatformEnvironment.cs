@@ -8,7 +8,8 @@ namespace Microsoft.VisualStudio.TraceCollector
 
     /// <inheritdoc />
     internal class PlatformEnvironment : IEnvironment
-    {/// <inheritdoc />
+    {
+        /// <inheritdoc />
         public PlatformOperatingSystem OperatingSystem
         {
             get
