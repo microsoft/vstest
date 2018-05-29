@@ -13,9 +13,8 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using TestPlatform.ObjectModel.DataCollection;
-    using TestPlatform.PlatformAbstractions;
-    using TestPlatform.PlatformAbstractions.Interfaces;
     using TraceCollector;
+    using TraceCollector.Interfaces;
     using IDataCollectionSink = TraceCollector.IDataCollectionSink;
 
     [TestClass]

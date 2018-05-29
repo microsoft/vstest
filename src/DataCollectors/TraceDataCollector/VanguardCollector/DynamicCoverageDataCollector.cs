@@ -10,10 +10,9 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
-    using TestPlatform.PlatformAbstractions.Interfaces;
+    using TraceCollector.Interfaces;
     using TraceDataCollector.Resources;
 
     /// <summary>
