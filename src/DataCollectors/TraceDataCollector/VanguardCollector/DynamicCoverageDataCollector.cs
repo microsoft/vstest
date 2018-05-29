@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -130,6 +131,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>Returns EnvironmentVariables required for code coverage profiler. </returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
+            if (this.isWindowsOS == false)
+            {
+                return Enumerable.Empty<KeyValuePair<string, string>>();
+            }
+
             var vanguardDirectory = this.vanguardLocationProvider.GetVanguardDirectory();
             var vanguardX86ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX86ProfilerPath);
             var vanguardX64ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX64ProfilerPath);

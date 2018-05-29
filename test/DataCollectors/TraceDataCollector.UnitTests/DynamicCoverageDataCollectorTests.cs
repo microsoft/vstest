@@ -181,6 +181,24 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
+        public void GetEnvironmentVariablesShouldReturnNoEnvVaribles()
+        {
+            this.implMock = new Mock<IDynamicCoverageDataCollectorImpl>();
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
+
+            this.collector.Initialize(
+                null,
+                this.eventsMock.Object,
+                this.sinkMock.Object,
+                this.loggerMock.Object,
+                this.agentContextMock.Object);
+            var envVars = this.collector.GetEnvironmentVariables();
+
+            Assert.IsFalse(envVars.Any(), "No environment variables set on unix.");
+        }
+
+        [TestMethod]
         public void DisposeShouldDisposeImpl()
         {
             this.collector.Dispose();
