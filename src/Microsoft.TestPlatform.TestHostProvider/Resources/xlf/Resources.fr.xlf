@@ -4,8 +4,8 @@
     <body>
       <trans-unit id="NoTestHostFileExist">
         <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
-        <target state="new">Aucun test n'est disponible dans {0}. Vérifiez que le projet de test a une référence NuGet de package "Microsoft.NET.Test.Sdk" et que les paramètres de version du framework sont corrects, puis réessayez.</target>
-        <note></note>
+        <target state="translated">Tests introuvables pour {0}. Vérifiez que le projet de test a une référence NuGet de package "Microsoft.NET.Test.Sdk" et que les paramètres de version du framework sont corrects. Relancez l’exécution avec l'option /diag pour effectuer un diagnostic plus poussé.</target>
+        <note />
       </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.

@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">Ausnahme beim Initialisieren der Protokollierung mit dem URI "{0}". Die Protokollierung wird nicht verwendet. Ausnahme: {1}</target>
-        <note></note>
+        <target state="translated">Ausnahme beim Initialisieren der Protokollierung mit "{0}": "{1}". Die Protokollierung wird nicht verwendet. Ausnahme: {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ausnahme beim Initialisieren der Protokollierung mit URI '{0}'.  Die Protokollierung wird nicht verwendet.  Ausnahme: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">Eine Testprotokollierung mit dem URI oder FriendlyName "{0}" wurde nicht gefunden.</target>
-        <note></note>
+        <target state="translated">Es wurde keine Testprotokollierung mit AssemblyQualifiedName, URI oder FriendlyName "{0}" gefunden.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
