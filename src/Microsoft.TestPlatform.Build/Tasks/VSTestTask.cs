@@ -229,13 +229,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
             }
 
-            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
+            if (!string.IsNullOrEmpty(this.VSTestBlame))
             {
-                allArgs.Add("--");
-                foreach (var arg in this.VSTestCLIRunSettings)
-                {
-                    allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
-                }
+                allArgs.Add("--Blame");
             }
 
             if (this.VSTestCollect != null && this.VSTestCollect.Length > 0)
@@ -264,12 +260,27 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 {
                     allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTraceDataCollectorDirectoryPath));
                 }
+                else
+                {
+                    if (isCollectCodeCoverageEnabled)
+                    {
+                        // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
+                        // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
+                        Console.WriteLine(Resources.UpdateTestSdkForCollectingCodeCoverage);
+                    }
+                }
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestBlame))
+            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
             {
-                allArgs.Add("--Blame");
+                allArgs.Add("--");
+                foreach (var arg in this.VSTestCLIRunSettings)
+                {
+                    allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                }
             }
+
+            // VSTestCLIRunSettings should always be last argument in allArgs. As vstest.console ignore options after "--"(CLIRunSettings option).
 
             return allArgs;
         }

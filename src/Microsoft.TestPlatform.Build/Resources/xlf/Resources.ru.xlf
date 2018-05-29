@@ -35,6 +35,11 @@
         <target state="translated">Тестовый запуск {0}({1})</target>
         <note />
       </trans-unit>
+      <trans-unit id="UpdateTestSdkForCollectingCodeCoverage">
+        <source>To collect code coverage update Microsoft.NET.Test.Sdk package version to latest.</source>
+        <target state="new">To collect code coverage update Microsoft.NET.Test.Sdk package version to latest.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

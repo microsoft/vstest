@@ -34,9 +34,31 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = this.vsTestTask.CreateArgument().ToArray();
 
-            // First, second and third args would be --framework:abc, testfilepath and -- respectively.
+            // First, second and third args would be framework:.NETCoreapp,Version2.0, testfilepath and -- respectively.
             Assert.AreEqual($"\"{arg1}\"", result[3]);
             Assert.AreEqual($"{arg2}", result[4]);
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldAddCLIRunSettingsArgAtEnd()
+        {
+            const string codeCoverageOption = "Code Coverage";
+
+            this.vsTestTask.VSTestCollect = new string[] { codeCoverageOption };
+            this.vsTestTask.VSTestBlame = "Blame";
+
+            const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
+            const string arg2 = "MSTest.DeploymentEnabled";
+
+            this.vsTestTask.VSTestCLIRunSettings = new string[2];
+            this.vsTestTask.VSTestCLIRunSettings[0] = arg1;
+            this.vsTestTask.VSTestCLIRunSettings[1] = arg2;
+
+            var result = this.vsTestTask.CreateArgument().ToArray();
+
+            // Following are expected  --framework:abc, testfilepath, blame, collect:"Code coverage" -- respectively.
+            Assert.AreEqual($"\"{arg1}\"", result[5]);
+            Assert.AreEqual($"{arg2}", result[6]);
         }
 
         [TestMethod]
