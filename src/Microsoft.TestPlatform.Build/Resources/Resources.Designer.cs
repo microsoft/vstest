@@ -87,5 +87,14 @@ namespace Microsoft.TestPlatform.Build.Resources {
                 return ResourceManager.GetString("TestRunningSummary", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage..
+        /// </summary>
+        internal static string UpdateTestSdkForCollectingCodeCoverage {
+            get {
+                return ResourceManager.GetString("UpdateTestSdkForCollectingCodeCoverage", resourceCulture);
+            }
+        }
     }
 }
