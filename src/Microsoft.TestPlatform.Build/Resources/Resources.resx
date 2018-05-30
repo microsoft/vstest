@@ -127,6 +127,6 @@
     <value>Test run for {0}({1})</value>
   </data>
   <data name="UpdateTestSdkForCollectingCodeCoverage" xml:space="preserve">
-    <value>To collect code coverage update Microsoft.NET.Test.Sdk package version to latest.</value>
+    <value>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</value>
   </data>
 </root>

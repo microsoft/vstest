@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = this.vsTestTask.CreateArgument().ToArray();
 
-            // First, second and third args would be framework:.NETCoreapp,Version2.0, testfilepath and -- respectively.
+            // First, second and third args would be framework:".NETCoreapp,Version2.0", testfilepath and -- respectively.
             Assert.AreEqual($"\"{arg1}\"", result[3]);
             Assert.AreEqual($"{arg2}", result[4]);
         }
@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = this.vsTestTask.CreateArgument().ToArray();
 
-            // Following are expected  --framework:abc, testfilepath, blame, collect:"Code coverage" -- respectively.
+            // Following are expected  --framework:".NETCoreapp,Version2.0", testfilepath, blame, collect:"Code coverage" -- respectively.
             Assert.AreEqual($"\"{arg1}\"", result[5]);
             Assert.AreEqual($"{arg2}", result[6]);
         }
