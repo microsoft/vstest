@@ -34,6 +34,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = this.vsTestTask.CreateArgument().ToArray();
 
+            Assert.Equals(5, result.Length);
+
             // First, second and third args would be framework:".NETCoreapp,Version2.0", testfilepath and -- respectively.
             Assert.AreEqual($"\"{arg1}\"", result[3]);
             Assert.AreEqual($"{arg2}", result[4]);
@@ -55,6 +57,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             this.vsTestTask.VSTestCLIRunSettings[1] = arg2;
 
             var result = this.vsTestTask.CreateArgument().ToArray();
+
+            Assert.Equals(7, result.Length);
 
             // Following are expected  --framework:".NETCoreapp,Version2.0", testfilepath, blame, collect:"Code coverage" -- respectively.
             Assert.AreEqual($"\"{arg1}\"", result[5]);
