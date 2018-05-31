@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
             else if (args.Length == 2)
             {
                 newFilePath = args[1];
-                if (!Path.IsPathRooted(newFilePath) || !string.Equals(Path.GetExtension(newFilePath), RunSettingsExtension))
+                if (!Path.IsPathRooted(newFilePath) || !string.Equals(Path.GetExtension(newFilePath), RunSettingsExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     newFilePath = null;
                 }

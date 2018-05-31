@@ -294,11 +294,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns true if legacy settings node is present in runsettings
         /// </summary>
         /// <param name="runsettingsXml">The run settings xml string</param>
-        /// <param name="legacySettingsCIData">The Customer Intelligence data that needs to be captured</param>
+        /// <param name="legacySettingsTelemetry">The telemetry data that needs to be captured</param>
         /// <returns></returns>
-        public static bool TryGetLegacySettingElements(string runsettingsXml, out Dictionary<string, string> legacySettingsCIData)
+        public static bool TryGetLegacySettingElements(string runsettingsXml, out Dictionary<string, string> legacySettingsTelemetry)
         {
-            legacySettingsCIData = new Dictionary<string, string>();
+            legacySettingsTelemetry = new Dictionary<string, string>();
             try
             {
                 using (var stream = new StringReader(runsettingsXml))
@@ -333,21 +333,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                     if(legacySettingElements.Count > 0)
                     {
-                        legacySettingsCIData.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
+                        legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
                     }
                     
                     var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
                     var deploymentAttributes = GetNodeAttributes(deploymentNode);
                     if (deploymentAttributes != null)
                     {
-                        legacySettingsCIData.Add(DeploymentAttributesString, string.Join(", ", deploymentAttributes));
+                        legacySettingsTelemetry.Add(DeploymentAttributesString, string.Join(", ", deploymentAttributes));
                     }
 
                     var executiontNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Execution");
                     var executiontAttributes = GetNodeAttributes(executiontNode);
                     if (executiontAttributes != null)
                     {
-                        legacySettingsCIData.Add(ExecutionAttributesString, string.Join(", ", executiontAttributes));
+                        legacySettingsTelemetry.Add(ExecutionAttributesString, string.Join(", ", executiontAttributes));
                     }
                 }
             }

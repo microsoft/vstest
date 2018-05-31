@@ -67,11 +67,11 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
                 Console.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ValidUsage));
             }
 
-            if (string.Equals(Path.GetExtension(oldFilePath), TestSettingsExtension))
+            if (string.Equals(Path.GetExtension(oldFilePath), TestSettingsExtension, StringComparison.OrdinalIgnoreCase))
             {
                 this.MigrateTestSettings(oldFilePath, newFilePath);
             }
-            else if (string.Equals(Path.GetExtension(oldFilePath), RunSettingsExtension))
+            else if (string.Equals(Path.GetExtension(oldFilePath), RunSettingsExtension, StringComparison.OrdinalIgnoreCase))
             {
                 this.MigrateRunSettings(oldFilePath, newFilePath);
             }

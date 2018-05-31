@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestMethod]
         public void MigratorGeneratesCorrectRunsettingsForEmbeddedTestSettingsOfRelativePath()
         {
-            this.oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runsettings"));
+            this.oldRunsettingsPath = Path.GetFullPath(Path.Combine(".", "oldRunSettingsWithEmbeddedSettings.runSEttings"));
 
             this.migrator.Migrate(this.oldRunsettingsPath, this.newRunsettingsPath);
             Validate(this.newRunsettingsPath);

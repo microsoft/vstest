@@ -45,8 +45,15 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestMethod]
         public void PathResolverShouldReturnNullForRelativePathsWithTwoArguments()
         {
-            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "asd.testsettings", "C:\\asd.runsettings" });
+            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "asd.Testsettings", "C:\\asd.runsettings" });
             Assert.IsNull(newFilePath, "Relative paths should return null");
+        }
+
+        [TestMethod]
+        public void PathResolverShouldNotReturnNullForPathsWithExtensionInCapitals()
+        {
+            var newFilePath = this.pathResolver.GetTargetPath(new string[] { "C:\\asd.TestSEettings", "C:\\asd.RuNSettings" });
+            Assert.IsNotNull(newFilePath, "Relative paths should not return null");
         }
 
         [TestMethod]
