@@ -12,8 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator
     /// </summary>
     public class PathResolver
     {
-        private const string TestSettingsExtension = ".testsettings";
-
         private const string RunSettingsExtension = ".runsettings";
 
         /// <summary>

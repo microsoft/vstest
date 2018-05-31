@@ -291,7 +291,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                     </LegacySettings>
                                    </RunSettings>";
 
-
             File.WriteAllText(this.runsettingsPath, runsettingsXml);
 
             var arguments = PrepareArguments(
