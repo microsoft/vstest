@@ -148,6 +148,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
         public static List<CollectorDataEntry> ToCollectionEntries(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"Converter.ToCollectionEntries: Converting attachmentSets {string.Join(",", attachmentSets)} to collection entries.");
+            }
+
             List<CollectorDataEntry> collectorEntries = new List<CollectorDataEntry>();
             if (attachmentSets == null)
             {
@@ -456,8 +461,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 string targetFileName = FileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
                 CopyFile(sourceFile, targetFileName);
 
-                // Add the source file name to the collector files list. 
-                // (Trx viewer automatically adds In\ to the collected file. 
+                // Add the target file name to the collector files list.
+                // (Trx viewer automatically adds In\ to the collected file.
                 string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
                 Uri sourceFileUri = new Uri(fileName, UriKind.Relative);
                 TrxObjectModel.UriDataAttachment dataAttachment = new TrxObjectModel.UriDataAttachment(uriDataAttachment.Description, sourceFileUri);
@@ -507,8 +512,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 string targetFileName = FileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
                 CopyFile(sourceFile, targetFileName);
 
-                // Add the source file name to the result files list. 
-                // (Trx viewer automatically adds In\<Guid> to the result file. 
+                // Add the target file name to the result files list.
+                // (Trx viewer automatically adds In\<Guid> to the result file.
                 string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
                 resultFiles.Add(fileName);
             }

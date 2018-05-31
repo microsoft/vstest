@@ -40,6 +40,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             DisplayName = displayName;
             Attachments = new List<UriDataAttachment>();
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(DisplayName)}: {DisplayName}, {nameof(Attachments)}: [{ string.Join(",", Attachments)}]";
+        }
     }
 
 
@@ -66,6 +71,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             Uri = uri;
             Description = description;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Uri)}: {Uri.AbsoluteUri}, {nameof(Description)}: {Description}";
         }
     }
 }
