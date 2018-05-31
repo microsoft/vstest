@@ -458,7 +458,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                 // Add the source file name to the collector files list. 
                 // (Trx viewer automatically adds In\ to the collected file. 
-                string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(sourceFile));
+                string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
                 Uri sourceFileUri = new Uri(fileName, UriKind.Relative);
                 TrxObjectModel.UriDataAttachment dataAttachment = new TrxObjectModel.UriDataAttachment(uriDataAttachment.Description, sourceFileUri);
 
