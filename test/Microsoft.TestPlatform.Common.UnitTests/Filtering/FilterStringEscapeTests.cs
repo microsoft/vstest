@@ -58,6 +58,16 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
+        public void EscapeStringWithPrefix()
+        {
+            var value = "printf(\"%s | %d\", text, 0)";
+            var escapedValue = FilterHelpers.Escape(value);
+
+            Assert.AreEqual("printf%1\"%0s %4 %0d\", text, 0%2", escapedValue);
+            Assert.AreEqual(value, FilterHelpers.Unescape(escapedValue));
+        }
+
+        [TestMethod]
         public void UnescapeInvalid1()
         {
             var invalidString = @"TestClass%8""a %4 b""%2.TestMethod";     
