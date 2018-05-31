@@ -7,11 +7,13 @@ namespace Microsoft.VisualStudio.Coverage
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Xml;
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TraceCollector;
     using TestPlatform.ObjectModel;
+    using TraceCollector.Interfaces;
     using TraceDataCollector.Resources;
 
     /// <summary>
@@ -36,6 +38,8 @@ namespace Microsoft.VisualStudio.Coverage
         private const string CorProfilerVariable = "COR_PROFILER";
         private const string CodeCoverageSessionNameVariable = "CODE_COVERAGE_SESSION_NAME";
 
+        private readonly IEnvironment environment;
+
         /// <summary>
         /// Data collector implementation
         /// </summary>
@@ -43,24 +47,61 @@ namespace Microsoft.VisualStudio.Coverage
 
         private IVanguardLocationProvider vanguardLocationProvider;
 
+        /// <summary>
+        /// To show warning on non windows.
+        /// </summary>
+        private bool isWindowsOS;
+
         public DynamicCoverageDataCollector()
-        : this(new VanguardLocationProvider(), new DynamicCoverageDataCollectorImpl())
+        : this(
+            new VanguardLocationProvider(),
+            null, /* DynamicCoverageDataCollectorImpl .ctor has dependency on WinAPIs */
+            new PlatformEnvironment())
         {
         }
 
         internal DynamicCoverageDataCollector(
             IVanguardLocationProvider vanguardLocationProvider,
-            IDynamicCoverageDataCollectorImpl dynamicCoverageDataCollectorImpl)
+            IDynamicCoverageDataCollectorImpl dynamicCoverageDataCollectorImpl,
+            IEnvironment environment)
         {
             this.vanguardLocationProvider = vanguardLocationProvider;
-            this.implementation = dynamicCoverageDataCollectorImpl;
+            this.environment = environment;
+
+            // Create DynamicCoverageDataCollectorImpl .ctor only when running on windows, because it has dependency on WinAPIs.
+            if (dynamicCoverageDataCollectorImpl == null)
+            {
+                this.isWindowsOS = this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows);
+                if (this.isWindowsOS)
+                {
+                    this.implementation = new DynamicCoverageDataCollectorImpl();
+                }
+            }
+            else
+            {
+                this.isWindowsOS = true;
+                this.implementation = dynamicCoverageDataCollectorImpl;
+            }
         }
 
         protected override void OnInitialize(XmlElement configurationElement)
         {
+            if (this.isWindowsOS == false)
+            {
+                EqtTrace.Warning($"DynamicCoverageDataCollector.OnInitialize: Code coverage not supported for operating system: {this.environment.OperatingSystem}");
+
+                this.Logger.LogWarning(
+                    this.AgentContext.SessionDataCollectionContext,
+                    string.Format(CultureInfo.CurrentUICulture, Resources.CodeCoverageOnlySupportsWindows));
+
+                return;
+            }
+
             try
             {
                 this.implementation.Initialize(configurationElement, this.DataSink, this.Logger);
+                this.Events.SessionStart += this.SessionStart;
+                this.Events.SessionEnd += this.SessionEnd;
             }
             catch (Exception ex)
             {
@@ -70,9 +111,6 @@ namespace Microsoft.VisualStudio.Coverage
                     string.Format(CultureInfo.CurrentUICulture, Resources.FailedToInitializeCodeCoverageDataCollector, ex));
                 throw;
             }
-
-            this.Events.SessionStart += this.SessionStart;
-            this.Events.SessionEnd += this.SessionEnd;
         }
 
         /// <summary>
@@ -93,6 +131,11 @@ namespace Microsoft.VisualStudio.Coverage
         /// <returns>Returns EnvironmentVariables required for code coverage profiler. </returns>
         protected override IEnumerable<KeyValuePair<string, string>> GetEnvironmentVariables()
         {
+            if (this.isWindowsOS == false)
+            {
+                return Enumerable.Empty<KeyValuePair<string, string>>();
+            }
+
             var vanguardDirectory = this.vanguardLocationProvider.GetVanguardDirectory();
             var vanguardX86ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX86ProfilerPath);
             var vanguardX64ProfilerFullPath = Path.Combine(vanguardDirectory, VanguardX64ProfilerPath);
