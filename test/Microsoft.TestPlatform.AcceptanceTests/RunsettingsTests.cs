@@ -274,6 +274,36 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
+        public void LegacySettingsWithPlatform(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssemblyPath = this.GetAssetFullPath("LegacySettingsUnitTestProject.dll");
+            var testAssemblyDirectory = Path.GetDirectoryName(testAssemblyPath);
+
+            var runsettingsXml = @"<RunSettings>
+                                    <MSTest>
+                                    <ForcedLegacyMode>true</ForcedLegacyMode>
+                                    </MSTest>
+                                    <LegacySettings>
+                                      <Execution hostProcessPlatform=""x64"">
+                                      </Execution>
+                                    </LegacySettings>
+                                   </RunSettings>";
+
+
+            File.WriteAllText(this.runsettingsPath, runsettingsXml);
+
+            var arguments = PrepareArguments(
+               testAssemblyPath,
+               string.Empty,
+               this.runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(0, 0, 0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, useCoreRunner: false)]
         public void LegacySettingsWithScripts(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
