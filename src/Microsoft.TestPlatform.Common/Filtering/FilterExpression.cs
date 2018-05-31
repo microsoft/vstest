@@ -52,8 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
         {
-            ValidateArg.NotNull(left, "left");
-            ValidateArg.NotNull(right, "right");
+            ValidateArg.NotNull(left, nameof(left));
+            ValidateArg.NotNull(right, nameof(right));
 
             this.left = left;
             this.right = right;
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         private FilterExpression(Condition condition)
         {
-            ValidateArg.NotNull(condition, "condition");
+            ValidateArg.NotNull(condition, nameof(condition));
             this.condition = condition;
         }
         #endregion        
@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
         {
-            ValidateArg.NotNull(filterString, "filterString");
+            ValidateArg.NotNull(filterString, nameof(filterString));
 
             // below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
             var invalidInput = Regex.Match(filterString, @"\(\s*\)");
@@ -283,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <returns> True if evaluation is successful. </returns>
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
             bool filterResult = false;
             if (null != this.condition)

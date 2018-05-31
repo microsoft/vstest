@@ -50,5 +50,19 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             Assert.AreEqual(Operation.Equal, condition.Operation);
             Assert.AreEqual("PropertyValue", condition.Value);
         }
+
+        [TestMethod]
+        public void ParseShouldHandleEscapedString()
+        {
+            var escaspedConditionString = "TestClass1%1\"hello\"%2.TestMethod%11.5%2";
+            var conditionValue = "TestClass1(\"hello\").TestMethod(1.5)";
+
+            var conditionString = "FullyQualifiedName=" + escaspedConditionString;
+
+            Condition condition = Condition.Parse(conditionString);
+            Assert.AreEqual("FullyQualifiedName", condition.Name);
+            Assert.AreEqual(Operation.Equal, condition.Operation);
+            Assert.AreEqual(conditionValue, condition.Value);
+        }
     }
 }

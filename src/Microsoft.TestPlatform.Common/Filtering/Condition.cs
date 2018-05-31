@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
             var result = false;
             var multiValue = this.GetPropertyValue(propertyValueProvider);
             switch (this.Operation)
@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 // If only parameter values is passed, create condition with default property name,
                 // default operation and given condition string as parameter value.
-                return new Condition(Condition.DefaultPropertyName, Condition.DefaultOperation, conditionString.Trim());
+                return new Condition(Condition.DefaultPropertyName, Condition.DefaultOperation, FilterHelpers.Unescape(conditionString.Trim()));
             }
 
             if (parts.Length != 3)
@@ -192,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
 
             Operation operation = GetOperator(parts[1]);
-            Condition condition = new Condition(parts[0], operation, parts[2]);
+            Condition condition = new Condition(parts[0], operation, FilterHelpers.Unescape(parts[2]));
             return condition;
         }
 
