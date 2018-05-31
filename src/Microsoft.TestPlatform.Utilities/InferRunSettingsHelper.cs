@@ -49,6 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string LegacyElementsString = "Elements";
         private const string DeploymentAttributesString = "DeploymentAttributes";
         private const string ExecutionAttributesString = "ExecutionAttributes";
+        private static readonly List<string> ExecutionNodesPaths = new List<string> { @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts" };
 
         /// <summary>
         /// Make runsettings compatible with testhost of version 15.0.0-preview
@@ -293,7 +294,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns true if legacy settings node is present in runsettings
         /// </summary>
         /// <param name="runsettingsXml">The run settings xml string</param>
-        /// <param name="legacySettingElements">The list of elements inside legacy settings</param>
+        /// <param name="legacySettingsCIData">The Customer Intelligence data that needs to be captured</param>
         /// <returns></returns>
         public static bool TryGetLegacySettingElements(string runsettingsXml, out Dictionary<string, string> legacySettingsCIData)
         {
@@ -321,27 +322,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                         legacySettingElements.Add(childNodes.Current.Name);
                     }
 
-                    AddNodeToCI(@"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", runSettingsNavigator, legacySettingElements);
-                    AddNodeToCI(@"/RunSettings/LegacySettings/Execution/Timeouts", runSettingsNavigator, legacySettingElements);
-                    AddNodeToCI(@"/RunSettings/LegacySettings/Execution/Hosts", runSettingsNavigator, legacySettingElements);
+                    foreach (var executionNodePath in ExecutionNodesPaths)
+                    {
+                        var executionNode = runSettingsNavigator.SelectSingleNode(executionNodePath);
+                        if (executionNode != null)
+                        {
+                            legacySettingElements.Add(executionNode.Name);
+                        }
+                    }
 
                     if(legacySettingElements.Count > 0)
                     {
-                        legacySettingsCIData.Add(LegacyElementsString, string.Join(",", legacySettingElements));
+                        legacySettingsCIData.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
                     }
                     
                     var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
                     var deploymentAttributes = GetNodeAttributes(deploymentNode);
                     if (deploymentAttributes != null)
                     {
-                        legacySettingsCIData.Add(DeploymentAttributesString, string.Join(",", deploymentAttributes));
+                        legacySettingsCIData.Add(DeploymentAttributesString, string.Join(", ", deploymentAttributes));
                     }
 
                     var executiontNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Execution");
                     var executiontAttributes = GetNodeAttributes(executiontNode);
                     if (executiontAttributes != null)
                     {
-                        legacySettingsCIData.Add(ExecutionAttributesString, string.Join(",", executiontAttributes));
+                        legacySettingsCIData.Add(ExecutionAttributesString, string.Join(", ", executiontAttributes));
                     }
                 }
             }
@@ -352,15 +358,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return true;
-        }
-
-        private static void AddNodeToCI(string path, XPathNavigator runSettingsNavigator, List<string> legacySettingElements)
-        {
-            var node = runSettingsNavigator.SelectSingleNode(path);
-            if (node != null)
-            {
-                legacySettingElements.Add(node.Name);
-            }
         }
 
         private static List<string> GetNodeAttributes(XPathNavigator node)

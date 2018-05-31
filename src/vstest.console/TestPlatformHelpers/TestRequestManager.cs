@@ -298,7 +298,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 foreach( var ciData in legacySettingsCIData)
                 {
-                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingElements, ciData.Key), ciData.Value);
+                    // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
+                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingPrefix, ciData.Key), ciData.Value);
                 }
             }
         }

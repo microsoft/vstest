@@ -975,11 +975,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             // Verify
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.Elements", out var legacySettingsNodes));
-            StringAssert.Equals("Deployment,Scripts,Execution,AssemblyResolution,Timeouts,Hosts", legacySettingsNodes);
+            StringAssert.Equals("Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts", legacySettingsNodes);
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.DeploymentAttributes", out var deploymentAttributes));
-            StringAssert.Equals("enabled,deploySatelliteAssemblies", deploymentAttributes);
+            StringAssert.Equals("enabled, deploySatelliteAssemblies", deploymentAttributes);
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.ExecutionAttributes", out var executionAttributes));
-            StringAssert.Equals("hostProcessPlatform,parallelTestCount", executionAttributes);
+            StringAssert.Equals("hostProcessPlatform, parallelTestCount", executionAttributes);
 
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
             Assert.IsFalse((bool)testSettingsUsed);

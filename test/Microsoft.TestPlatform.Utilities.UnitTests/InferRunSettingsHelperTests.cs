@@ -547,9 +547,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                                        </LegacySettings>
                                       </RunSettings>";
 
-            var expectedElements = "Deployment,Scripts,Execution,AssemblyResolution,Timeouts,Hosts";
-            var expectedDeploymentAttributes = "enabled,deploySatelliteAssemblies";
-            var expectedExecutionAttributes = "hostProcessPlatform,parallelTestCount";
+            var expectedElements = "Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts";
+            var expectedDeploymentAttributes = "enabled, deploySatelliteAssemblies";
+            var expectedExecutionAttributes = "hostProcessPlatform, parallelTestCount";
 
             Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out Dictionary<string, string> legacySettings));
             Assert.AreEqual(3, legacySettings.Count, "count does not match");

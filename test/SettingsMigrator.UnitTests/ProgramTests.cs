@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
         [TestMethod]
         public void NoArgumentsShouldNotBeAccepted()
         {
-            int returnCode = Program.Main(new string[] { "asd", "asd", "asd" });
+            int returnCode = Program.Main(new string[] { });
             Assert.AreEqual(1, returnCode, "No arguments should not be accepted.");
         }
     }
