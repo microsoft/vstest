@@ -149,15 +149,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public static List<CollectorDataEntry> ToCollectionEntries(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory)
         {
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info($"Converter.ToCollectionEntries: Converting attachmentSets {string.Join(",", attachmentSets ?? Enumerable.Empty<AttachmentSet>())} to collection entries.");
-            }
-
             List<CollectorDataEntry> collectorEntries = new List<CollectorDataEntry>();
             if (attachmentSets == null)
             {
+                EqtTrace.Info($"Converter.ToCollectionEntries: Received {nameof(attachmentSets)} as null returning empty collection entries.");
                 return collectorEntries;
+            }
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"Converter.ToCollectionEntries: Converting attachmentSets {string.Join(",", attachmentSets)} to collection entries.");
             }
 
             foreach (var attachmentSet in attachmentSets)
