@@ -4,10 +4,7 @@
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Resources;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

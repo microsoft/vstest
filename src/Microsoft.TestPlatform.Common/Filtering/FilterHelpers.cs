@@ -13,8 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     public static class FilterHelpers
     {
         private const char EscapePrefix = '%';  
-        private static readonly Dictionary<char, char> LookUpMap =
-            new Dictionary<char, char>()
+        private static readonly Dictionary<char, char> LookUpMap;  
+        private static readonly Dictionary<char, char> ReverseLookUpMap;    
+        private static readonly char[] SpecialCharacters;
+
+        static FilterHelpers()
+        {
+            LookUpMap = new Dictionary<char, char>()
             {
                 { '%', '0'},
                 { '(', '1'},
@@ -26,8 +31,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 { '~', '7'},
             };
 
-        private static readonly Dictionary<char, char> ReverseLookUpMap = LookUpMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);    
-        private static readonly char[] SpecialCharacters = LookUpMap.Keys.ToArray();
+            ReverseLookUpMap = new Dictionary<char, char>();
+            foreach (var kvp in LookUpMap)
+            {
+                ReverseLookUpMap[kvp.Value] = kvp.Key;
+            }
+
+            SpecialCharacters = LookUpMap.Keys.ToArray();
+        }
 
         /// <summary>
         /// Escapes a set of special characters for filter (%, (, ), &, |, =, !, ~) by replacing them with their escape sequences. 
