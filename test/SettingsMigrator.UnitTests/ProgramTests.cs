@@ -12,10 +12,17 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.UnitTests
     public class ProgramTests
     {
         [TestMethod]
-        public void OnlyOneArgumentShouldBeAccepted()
+        public void MoreThanTwoArgumentsShouldNotBeAccepted()
         {
-            int returnCode = Program.Main(new string[] { "asd", "asd" });
-            Assert.AreEqual(1, returnCode, "Only one argument should be accepted.");
+            int returnCode = Program.Main(new string[] { "asd", "asd", "asd" });
+            Assert.AreEqual(1, returnCode, "More than 2 arguments should not be accepted.");
+        }
+
+        [TestMethod]
+        public void NoArgumentsShouldNotBeAccepted()
+        {
+            int returnCode = Program.Main(new string[] { });
+            Assert.AreEqual(1, returnCode, "No arguments should not be accepted.");
         }
     }
 }

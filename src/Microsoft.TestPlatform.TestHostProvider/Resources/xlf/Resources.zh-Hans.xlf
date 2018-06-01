@@ -4,8 +4,8 @@
     <body>
       <trans-unit id="NoTestHostFileExist">
         <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
-        <target state="new">{0} 中没有可用的测试。请确保测试项目具有包“Microsoft.NET.Test.Sdk”的 nuget 参考并确保框架版本设置适当，然后重试。</target>
-        <note></note>
+        <target state="translated">没有可用于 {0} 的测试。请确保测试项目具有程序包 "Microsoft.NET.Test.Sdk" 的 Nuget 参考并确保框架版本设置得当。使用 /diag 选项返回，进行进一步的检查。</target>
+        <note />
       </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.

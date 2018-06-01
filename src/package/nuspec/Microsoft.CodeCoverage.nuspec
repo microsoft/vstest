@@ -19,7 +19,13 @@
 
     <file src="Microsoft.CodeCoverage.props" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard1.0\" />
-    <file src="Microsoft.CodeCoverage\CodeCoverage\**\*.*"  exclude="**\*.pdb" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.config" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" target="build\netstandard1.0\CodeCoverage\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
+    <file src="Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" target="build\netstandard1.0\CodeCoverage\amd64\" />
     <file src="Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\netcoreapp1.0\" />
     <file src="Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" target="lib\net45\" />
 
