@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -44,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// String seperator used for parsing input string of format '<propertyName>Operation<propertyValue>'
         /// ! is not a valid operation, but is required to filter the invalid patterns.
         /// </summary>
-        private static string propertyNameValueSeperatorString = @"(\!\=)|(\=)|(\~)|(\!)";
+        //private static string propertyNameValueSeperatorString = @"(\!\=)|(\=)|(\~)|(\!)";
 
         /// <summary>
         ///  Default property name which will be used when filter has only property value.
@@ -169,7 +170,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 ThrownFormatExceptionForInvalidCondition(conditionString);
             }
-            string[] parts = Regex.Split(conditionString, propertyNameValueSeperatorString);
+
+            var parts = FilterHelpers.TokenizeFilterConditionString(conditionString).ToArray();
             if (parts.Length == 1)
             {
                 // If only parameter values is passed, create condition with default property name,

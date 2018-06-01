@@ -54,15 +54,63 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         [TestMethod]
         public void ParseShouldHandleEscapedString()
         {
-            var escaspedConditionString = "TestClass1%1\"hello\"%2.TestMethod%11.5%2";
-            var conditionValue = "TestClass1(\"hello\").TestMethod(1.5)";
-
-            var conditionString = "FullyQualifiedName=" + escaspedConditionString;
+            var conditionString = @"FullyQualifiedName=TestClass1\(""hello""\).TestMethod\(1.5\)";
 
             Condition condition = Condition.Parse(conditionString);
             Assert.AreEqual("FullyQualifiedName", condition.Name);
             Assert.AreEqual(Operation.Equal, condition.Operation);
-            Assert.AreEqual(conditionValue, condition.Value);
+            Assert.AreEqual(@"TestClass1(""hello"").TestMethod(1.5)", condition.Value);
+        }
+
+        [TestMethod]
+        public void ParseShouldHandleEscapedBang()
+        {
+            var conditionString = @"FullyQualifiedName!=TestClass1\(""\!""\).TestMethod\(1.5\)";
+
+            Condition condition = Condition.Parse(conditionString);
+            Assert.AreEqual("FullyQualifiedName", condition.Name);
+            Assert.AreEqual(Operation.NotEqual, condition.Operation);
+            Assert.AreEqual(@"TestClass1(""!"").TestMethod(1.5)", condition.Value);
+        }
+
+        [TestMethod]
+        public void ParseShouldHandleEscapedNotEqual()
+        {
+            var conditionString = @"FullyQualifiedName!=TestClass1\(""\!\=""\).TestMethod\(1.5\)";
+
+            Condition condition = Condition.Parse(conditionString);
+            Assert.AreEqual("FullyQualifiedName", condition.Name);
+            Assert.AreEqual(Operation.NotEqual, condition.Operation);
+            Assert.AreEqual(@"TestClass1(""!="").TestMethod(1.5)", condition.Value);
+        }
+
+        [TestMethod]
+        public void ParseShouldHandleEscapedTilde()
+        {
+            var conditionString = @"FullyQualifiedName~TestClass1\(""\~""\).TestMethod\(1.5\)";
+
+            Condition condition = Condition.Parse(conditionString);
+            Assert.AreEqual("FullyQualifiedName", condition.Name);
+            Assert.AreEqual(Operation.Contains, condition.Operation);
+            Assert.AreEqual(@"TestClass1(""~"").TestMethod(1.5)", condition.Value);
+        }
+
+        [TestMethod]
+        public void ParseStringWithSingleUnescapedBangShouldFail1()
+        {
+
+            var conditionString = @"FullyQualifiedName=Test1(""!"")";
+
+            Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        }
+
+        [TestMethod]
+        public void ParseStringWithSingleUnescapedBangShouldFail2()
+        {
+
+            var conditionString = @"FullyQualifiedName!Test1()";
+
+            Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
         }
     }
 }

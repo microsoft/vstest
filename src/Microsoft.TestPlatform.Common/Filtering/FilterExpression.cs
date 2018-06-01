@@ -170,14 +170,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             ValidateArg.NotNull(filterString, nameof(filterString));
 
-            // below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
+            //// below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
             var invalidInput = Regex.Match(filterString, @"\(\s*\)");
             if (invalidInput.Success)
             {
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.EmptyParenthesis));
             }
 
-            var tokens = Regex.Split(filterString, filterExpressionSeperatorString);
+            var tokens = FilterHelpers.TokenizeFilterExpressionString(filterString);
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
 
