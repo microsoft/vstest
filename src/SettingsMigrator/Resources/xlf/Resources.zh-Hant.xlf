@@ -41,9 +41,14 @@
         <note></note>
       </trans-unit>
       <trans-unit id="ValidUsage">
-        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
-Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</source>
+        <source>Valid usage:
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to runsettings file to be created&gt;
+Examples:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
         <target state="new">Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
 Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
 Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings</target>

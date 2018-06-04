@@ -95,11 +95,16 @@ namespace Microsoft.VisualStudio.TestPlatform.SettingsMigrator.Resources {
                 return ResourceManager.GetString("UnsupportedAttributes", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
-        ///Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
-        ///Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings.
+        ///   Looks up a localized string similar to Valid usage:
+        ///SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+        ///SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to runsettings file to be created&gt;
+        ///Examples:
+        ///SettingsMigrator.exe E:\MyTest\MyTestSettings.testsettings
+        ///SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+        ///SettingsMigrator.exe E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+        ///SettingsMigrator.exe E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings.
         /// </summary>
         internal static string ValidUsage {
             get {
