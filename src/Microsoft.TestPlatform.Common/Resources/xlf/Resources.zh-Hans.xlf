@@ -264,11 +264,6 @@
         <target state="translated">创建“快”筛选器时遇到错误。</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestCaseFilterEscapeException">
-        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
-        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

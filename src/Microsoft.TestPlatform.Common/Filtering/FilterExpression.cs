@@ -8,9 +8,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
@@ -22,12 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     /// </summary>
     internal class FilterExpression
     {
-
-        /// <summary>
-        /// Seperator string to seperate various tokens in input string.
-        /// </summary>
-        private const string filterExpressionSeperatorString = @"(\&)|(\|)|(\()|(\))";
-
         /// <summary>
         /// Condition, if expression is conditional expression.
         /// </summary>
@@ -177,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.EmptyParenthesis));
             }
 
-            var tokens = FilterHelpers.TokenizeFilterExpressionString(filterString);
+            var tokens = TokenizeFilterExpressionString(filterString);
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
 
@@ -305,6 +301,70 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 }
             }
             return filterResult;
+        }     
+
+        internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
+        {
+            if (str == null)
+            {
+                throw new ArgumentNullException(nameof(str));
+            }
+
+            return TokenizeFilterExpressionStringHelper(str);
+
+            IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)
+            {
+                StringBuilder tokenBuilder = new StringBuilder();
+
+                var last = '\0';
+                for (int i = 0; i < s.Length; ++i)
+                {
+                    var current = s[i];
+
+                    if (last == FilterHelper.EscapeCharacter)
+                    {
+                        // Don't check if `current` is one of the special characters here.
+                        // Instead, we blindly let any character follows '\' pass though and 
+                        // relies on `FilterHelpers.Unescape` to report such errors.
+                        tokenBuilder.Append(current);
+
+                        if (current == FilterHelper.EscapeCharacter)
+                        {
+                            // We just encountered "\\" (escaped '\'), this will set last to '\0' 
+                            // so the next char will not be treated as a suffix of escape sequence.
+                            current = '\0';
+                        }
+                    }
+                    else
+                    {
+                        switch (current)
+                        {
+                            case '(':
+                            case ')':
+                            case '&':
+                            case '|':
+                                if (tokenBuilder.Length > 0)
+                                {
+                                    yield return tokenBuilder.ToString();
+                                    tokenBuilder.Clear();
+                                }
+                                yield return current.ToString();
+                                break;
+
+                            default:
+                                tokenBuilder.Append(current);
+                                break;
+                        }
+                    }
+
+                    last = current;
+                }
+
+                if (tokenBuilder.Length > 0)
+                {
+                    yield return tokenBuilder.ToString();
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
 {
     using System;
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -96,7 +97,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
-        public void ParseStringWithSingleUnescapedBangShouldFail1()
+        public void ParseStringWithSingleUnescapedBangThrowsFormatException1()
         {
 
             var conditionString = @"FullyQualifiedName=Test1(""!"")";
@@ -105,12 +106,110 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
-        public void ParseStringWithSingleUnescapedBangShouldFail2()
+        public void ParseStringWithSingleUnescapedBangThrowsFormatException2()
         {
 
             var conditionString = @"FullyQualifiedName!Test1()";
 
             Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        }
+
+        [TestMethod]
+        public void TokenizeNullThrowsArgumentNullException()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null), "str");
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleEscapedBang()
+        {
+            var conditionString = @"FullyQualifiedName=TestMethod\(""\!""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(3, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("=", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""\!""\)", tokens[2]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleEscapedNotEqual1()
+        {
+            var conditionString = @"FullyQualifiedName=TestMethod\(""\!\=""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(3, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("=", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""\!\=""\)", tokens[2]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleEscapedNotEqual2()
+        {
+            var conditionString = @"FullyQualifiedName!=TestMethod\(""\!\=""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(3, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("!=", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""\!\=""\)", tokens[2]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleEscapedBackslash()
+        {
+            var conditionString = @"FullyQualifiedName=TestMethod\(""\\""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(3, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("=", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""\\""\)", tokens[2]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleEscapedTilde()
+        {
+            var conditionString = @"FullyQualifiedName~TestMethod\(""\~""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(3, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("~", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""\~""\)", tokens[2]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleSingleUnescapedBang()
+        {
+            var conditionString = @"FullyQualifiedName!=TestMethod\(""!""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(5, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("!=", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""", tokens[2]);
+            Assert.AreEqual("!", tokens[3]);
+            Assert.AreEqual(@"""\)", tokens[4]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleSingleBangAtEnd()
+        {
+            var conditionString = "FullyQualifiedName!";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(2, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("!", tokens[1]);
         }
     }
 }

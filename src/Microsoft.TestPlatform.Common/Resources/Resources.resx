@@ -204,9 +204,6 @@
   <data name="SettingsProviderNotFound" xml:space="preserve">
     <value>Settings Provider named '{0}' was not found.  The settings can not be loaded.</value>
   </data>
-  <data name="TestCaseFilterEscapeException" xml:space="preserve">
-    <value>Filter string '{0}' includes unrecognized escape sequence.</value>
-  </data>
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>
   </data>

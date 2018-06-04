@@ -323,15 +323,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter string &apos;{0}&apos; includes unrecognized escape sequence..
-        /// </summary>
-        internal static string TestCaseFilterEscapeException {
-            get {
-                return ResourceManager.GetString("TestCaseFilterEscapeException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed..
         /// </summary>
         internal static string TestCaseFilterFormatException {

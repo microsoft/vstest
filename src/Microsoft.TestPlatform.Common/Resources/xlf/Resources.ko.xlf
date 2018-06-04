@@ -264,11 +264,6 @@
         <target state="translated">빠른 필터를 만드는 중 오류가 발생했습니다.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestCaseFilterEscapeException">
-        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
-        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

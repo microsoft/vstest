@@ -264,11 +264,6 @@
         <target state="translated">Ocorreu um erro ao criar o filtro Rápido.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestCaseFilterEscapeException">
-        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
-        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>
