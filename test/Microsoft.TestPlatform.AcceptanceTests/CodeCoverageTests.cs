@@ -187,7 +187,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // test command output is redirecting to file or writting to console.
             // If command output is redirecting to file, then Console.ForegroundColor can't be modified.
             // So that tests which assert Console.ForegroundColor should not run.
-            /* var previousColor = Console.ForegroundColor;
+            var previousColor = Console.ForegroundColor;
             var newColor = previousColor == ConsoleColor.Gray
                 ? ConsoleColor.Black
                 : ConsoleColor.Blue;
@@ -198,7 +198,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 Assert.Inconclusive(message);
             }
 
-            Console.ForegroundColor = previousColor; */
+            Console.ForegroundColor = previousColor;
 
             return false;
         }
