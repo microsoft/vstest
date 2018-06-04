@@ -37,8 +37,8 @@
       </trans-unit>
       <trans-unit id="UpdateTestSdkForCollectingCodeCoverage">
         <source>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</source>
-        <target state="new">To collect code coverage update Microsoft.NET.Test.Sdk package version to latest.</target>
-        <note></note>
+        <target state="translated">警告: 將 Microsoft.NET.Test.Sdk 套件參考更新至版本 15.8.0 或更新版本，才可收集程式碼涵蓋範圍。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
