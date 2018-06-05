@@ -676,5 +676,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("FailedToCreateDiaSession", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Filter string &apos;{0}&apos; includes unrecognized escape sequence..
+        /// </summary>
+        internal static string TestCaseFilterEscapeException
+        {
+            get
+            {
+                return ResourceManager.GetString("TestCaseFilterEscapeException", resourceCulture);
+            }
+        }
     }
 }

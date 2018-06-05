@@ -612,6 +612,11 @@
         <target state="translated">'{0}' 설정이 잘못되었습니다. friendlyName, URI 및 assemblyQualifiedName 중 하나 이상의 XmlAttribute가 필요합니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestCaseFilterEscapeException">
+        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
+        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
