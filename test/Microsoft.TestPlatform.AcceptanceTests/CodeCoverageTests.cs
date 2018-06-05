@@ -180,6 +180,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
             }
         }
+
         private bool SkipIfRuningInCI(string message)
         {
             // Setting Console.ForegroundColor to newColor which will be used to determine whether
