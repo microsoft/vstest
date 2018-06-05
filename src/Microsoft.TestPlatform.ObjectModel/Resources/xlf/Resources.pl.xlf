@@ -612,6 +612,11 @@
         <target state="translated">Nieprawidłowe ustawienia „{0}”. Oczekiwany jest co najmniej jeden atrybut XmlAttribute wraz z przyjazną nazwą, identyfikatorem URI oraz kwalifikowaną nazwą zestawu.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestCaseFilterEscapeException">
+        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
+        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="1470250083">
     <header>
@@ -193,13 +193,13 @@
       </trans-unit>
       <trans-unit id="NonExistingExtensions">
         <source>Could not find extensions: {0}</source>
-        <target state="new">Could not find extensions: {0}</target>
-        <note></note>
+        <target state="translated">확장을 찾을 수 없음: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DeprecatedAdapterPath">
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
-        <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</target>
-        <note></note>
+        <target state="translated">어댑터 조회가 변경됩니다. 자세한 내용은 https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap을 참조하세요.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -612,6 +612,11 @@
         <target state="translated">无效设置 "{0}"。按照预期，在 friendlyName、URI 和 assemblyQualifiedName 中至少存在一个 XmlAttribute。</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestCaseFilterEscapeException">
+        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
+        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
