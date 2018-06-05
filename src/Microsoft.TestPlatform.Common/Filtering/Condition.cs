@@ -302,8 +302,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
                         if (current == FilterHelper.EscapeCharacter)
                         {
-                            // We just encountered "\\" (escaped '\'), this will set last to '\0' 
-                            // so the next char will not be treated as a suffix of escape sequence.
+                            // We just encountered double backslash (i.e. escaped '\'), therefore set `last` to '\0' 
+                            // so the second '\' (i.e. current) will not be treated as the prefix of escape sequence 
+                            // in next iteration.
                             current = '\0';
                         }
                     }
