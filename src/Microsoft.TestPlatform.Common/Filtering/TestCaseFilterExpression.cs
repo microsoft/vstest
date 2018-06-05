@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public TestCaseFilterExpression(FilterExpressionWrapper filterWrapper)
         {
-            ValidateArg.NotNull(filterWrapper, "filterWrapper");
+            ValidateArg.NotNull(filterWrapper, nameof(filterWrapper));
             this.filterWrapper = filterWrapper;
             this.validForMatch = string.IsNullOrEmpty(filterWrapper.ParseError);
         }
@@ -62,8 +62,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public bool MatchTestCase(TestCase testCase, Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(testCase, "testCase");
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(testCase, nameof(testCase));
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
             if (!this.validForMatch)
             {
                 return false;

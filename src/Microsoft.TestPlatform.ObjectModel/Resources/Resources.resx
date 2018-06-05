@@ -344,4 +344,7 @@
   <data name="MissingLoggerAttributes" xml:space="preserve">
     <value>Invalid settings '{0}'. Expected atleast one of the XmlAttribute among friendlyName, uri and assemblyQualifiedName.</value>
   </data>
+  <data name="TestCaseFilterEscapeException" xml:space="preserve">
+    <value>Filter string '{0}' includes unrecognized escape sequence.</value>
+  </data>
 </root>
