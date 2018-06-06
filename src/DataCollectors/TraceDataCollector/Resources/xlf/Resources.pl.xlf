@@ -22,28 +22,33 @@
     <body>
       <trans-unit id="FailedToCreateDirectory">
         <source>Failed to create directory: {0} with error:{1}</source>
-        <target state="new">Failed to create directory: {0} with error:{1}</target>
-        <note></note>
+        <target state="translated">Nie można utworzyć katalogu: {0}. Błąd: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoRunningEventFromVanguard">
         <source>Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.</source>
-        <target state="new">Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</target>
-        <note></note>
+        <target state="translated">Nie odebrano bieżącego zdarzenia z pliku CodeCoverage.exe. Sprawdź dziennik zdarzeń, aby poznać przyczynę niepowodzenia.</target>
+        <note />
       </trans-unit>
       <trans-unit id="VanguardNotFound">
         <source>Cannot find CodeCoverage.exe at {0}</source>
-        <target state="new">Cannot find CodeCoverage.exe at {0}</target>
-        <note></note>
+        <target state="translated">Nie można znaleźć pliku CodeCoverage.exe w lokalizacji {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VanguardConnectionTimeout">
         <source>Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
-        <note></note>
+        <target state="translated">Nie udało się odebrać bieżącego zdarzenia z programu CodeCoverage.exe w ciągu {0} sek. Przyczyną może być wolne działanie maszyny. Aby zwiększyć limit czasu, ustaw zmienną środowiskową {1}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="FailedToInitializeCodeCoverageDataCollector">
         <source>Failed to initialize code coverage datacollector with error: {0}</source>
-        <target state="new">Failed to initialize code coverage datacollector with error: {0}</target>
-        <note></note>
+        <target state="translated">Nie udało się zainicjować modułu zbierającego dane pokrycia kodu. Błąd: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CodeCoverageOnlySupportsWindows">
+        <source>No code coverage data available. Code coverage is currently supported only on Windows.</source>
+        <target state="translated">Dane pokrycia kodu są niedostępne. Pokrycie kodu jest obecnie obsługiwane wyłącznie w systemie Windows.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

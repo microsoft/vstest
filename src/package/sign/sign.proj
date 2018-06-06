@@ -20,6 +20,7 @@
 
     <!-- Directory with .NETCore binaries -->
     <ArtifactsCoreDirectory Condition="'$(ArtifactsCoreDirectory)' == ''">$(ArtifactsBaseDirectory)netcoreapp2.0\</ArtifactsCoreDirectory>
+
     <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(ArtifactsBaseDirectory)obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
   </PropertyGroup>
 
@@ -170,6 +171,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
+	  <AssembliesToSign Include="$(ArtifactsDirectory)SettingsMigrator.exe" />
 
       <!-- NetFullExtensions -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
@@ -279,6 +281,20 @@
       <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard1.3\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
+    <!-- Sign Microsoft.CodeCoverage -->
+    <ItemGroup>
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\%(ResxLang.Identity)\*.*" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\Shim\net45\Microsoft.VisualStudio.CodeCoverage.Shim.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\codecoveragemessages.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\covrun32.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\msdia140.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\covrun64.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\amd64\msdia140.dll" />
+      <CodeCoverageAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" />
+    </ItemGroup>
+
     <!-- Sign Microsoft.TestPlatform.TestHost -->
     <ItemGroup>
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.dll" />
@@ -340,6 +356,11 @@
         <Authenticode>Microsoft</Authenticode>
         <StrongName>StrongName</StrongName>
       </IntellitraceAssembliesToSign>
+
+      <CodeCoverageAssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </CodeCoverageAssembliesToSign>
     </ItemGroup>
 
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
@@ -370,7 +391,13 @@
     <SignFiles Files="@(IntellitraceAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Intellitrace"
                IntermediatesDirectory="$(IntermediatesDirectory)"
-               Type="$(SignType)" />               
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CodeCoverageAssembliesToSign)"/>
+    <SignFiles Files="@(CodeCoverageAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.CodeCoverage"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
   </Target>
 
   <Target Name="SignNugetPackages">

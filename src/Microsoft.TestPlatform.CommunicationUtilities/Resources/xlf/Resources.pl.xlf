@@ -68,13 +68,13 @@
       </trans-unit>
       <trans-unit id="VersionCheckTimedout">
         <source>Failed to negotiate protocol, waiting for response timed out after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Nie można negocjować protokołu. Zaczekaj na przekroczenie limitu czasu odpowiedzi.</target>
-        <note></note>
+        <target state="translated">Negocjowanie protokołu nie powiodło się, po upływie {0} sekund został przekroczony limit czasu oczekiwania na odpowiedź. Przyczyną może być wolne działanie maszyny. Zwiększ limit czasu, ustawiając zmienną środowiskową {1}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ConnectionTimeoutErrorMessage">
         <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
-        <target state="new">{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</target>
-        <note></note>
+        <target state="translated">Proces {0} nie mógł połączyć się z procesem {1} w ciągu {2} sekund. Przyczyną może być wolne działanie maszyny. Zwiększ limit czasu, ustawiając zmienną środowiskową {3}.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

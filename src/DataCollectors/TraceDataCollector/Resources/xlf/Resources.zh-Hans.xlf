@@ -22,28 +22,33 @@
     <body>
       <trans-unit id="FailedToCreateDirectory">
         <source>Failed to create directory: {0} with error:{1}</source>
-        <target state="new">Failed to create directory: {0} with error:{1}</target>
-        <note></note>
+        <target state="translated">目录 {0} 创建失败，出现错误: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoRunningEventFromVanguard">
         <source>Running event not received from CodeCoverage.exe. Check eventlogs for failure reason.</source>
-        <target state="new">Running event not received from CodeCoverage.exe in {0} seconds. Check eventlogs for failure reason. This may occur due to machine slowness, please set environment variable {2} to increase timeout.</target>
-        <note></note>
+        <target state="translated">未收到来自 CodeCoverage.exe 的运行事件。请查看事件日志，了解失败原因。</target>
+        <note />
       </trans-unit>
       <trans-unit id="VanguardNotFound">
         <source>Cannot find CodeCoverage.exe at {0}</source>
-        <target state="new">Cannot find CodeCoverage.exe at {0}</target>
-        <note></note>
+        <target state="translated">无法在 {0} 中找到 CodeCoverage.exe</target>
+        <note />
       </trans-unit>
       <trans-unit id="VanguardConnectionTimeout">
         <source>Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
-        <target state="new">Failed to receive running event from CodeCoverage.exe in {0} seconds, This may occur due to machine slowness, please set environment variable {1} to increase timeout.</target>
-        <note></note>
+        <target state="translated">未能在 {0} 秒内接收到来自 CodeCoverage.exe 的运行事件，出现此问题可能是因为计算机性能较低，请设置环境变量 {1}，增加超时时间值。</target>
+        <note />
       </trans-unit>
       <trans-unit id="FailedToInitializeCodeCoverageDataCollector">
         <source>Failed to initialize code coverage datacollector with error: {0}</source>
-        <target state="new">Failed to initialize code coverage datacollector with error: {0}</target>
-        <note></note>
+        <target state="translated">无法初始化代码覆盖率 datacollector，出现错误: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CodeCoverageOnlySupportsWindows">
+        <source>No code coverage data available. Code coverage is currently supported only on Windows.</source>
+        <target state="translated">没有可用的代码覆盖率数据。代码覆盖率目前仅在 Windows 上受支持。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

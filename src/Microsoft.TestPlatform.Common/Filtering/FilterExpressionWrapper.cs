@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public FilterExpressionWrapper(string filterString, FilterOptions options)
         {
-            ValidateArg.NotNullOrEmpty(filterString, "filterString");
+            ValidateArg.NotNullOrEmpty(filterString, nameof(filterString));
 
             this.FilterString = filterString;
             this.FilterOptions = options;
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         public bool Evaluate(Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
             
             if (UseFastFilter)
             {

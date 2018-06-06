@@ -225,28 +225,19 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
+        <target state="translated">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
       指定測試結果的記錄器。例如，若要將結果記錄到 
       Visual Studio 測試結果檔案 (TRX)，請使用 /logger:trx[;LogFileName=&lt;預設為唯一的檔案名稱&gt;]
-      使用指定的 LogFileName 在 TestResults 目錄中建立檔案。
+      使用指定的 LogFileName，在 TestResults 目錄中建立檔案。
 
-      變更主控台記錄器中，記錄訊息的詳細資訊層級，如下所示
-      範例: /logger:console;verbosity=&lt;預設為 "minimal"&gt;
-      允許的詳細資訊值: quiet、minimal 及 normal。
+      變更主控台記錄器中記錄訊息的詳細資訊層級，如下所示
+      範例: /logger:console;verbosity=&lt;預設為 "normal"&gt;
+      允許的詳細資訊值為: quiet、minimal、normal 及 detailed。
 
       變更主控台記錄器的診斷層級前置詞，如下所示
       範例: /logger:console;prefix=&lt;預設為 "false"&gt;
-      您可在此處找到主控台記錄器的詳細資訊: https://aka.ms/console-logger
-
-      若要將測試結果發佈至 Team Foundation Server，請使用 TfsPublisher，如下所示
-      範例: /logger:TfsPublisher;
-                Collection=&lt;Team 專案集合 URL&gt;;
-                BuildName=&lt;組建名稱&gt;;
-                TeamProject=&lt;Team 專案名稱&gt;
-                [;Platform=&lt;預設為 [任何 CPU]&gt;]
-                [;Flavor=&lt;預設為 [偵錯]&gt;]
-                [;RunTitle=&lt;標題&gt;]</target>
-        <note></note>
+      此處提供主控台記錄器的詳細資訊: https://aka.ms/console-logger</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
       指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。
@@ -748,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework 版本&gt;
+        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
       要用於測試執行的目標 .Net Framework 版本。 
-      有效值為 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等
-      其他支援的值為 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
-        <note></note>
+      有效值為 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等等
+      其他支援的值為 Framework35、Framework40、Framework45、FrameworkCore10 與 FrameworkUap10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
       目标.Net Framework 版本以用于测试执行。
@@ -772,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">.NET Framework 版本無效: {0}。請指定 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
-        <note></note>
+        <target state="translated">.Net Framework 版本無效:{0}。請提供 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40、Framework45、FrameworkCore10 以及 FrameworkUap10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">无效的.Net Framework 版本︰ {0}。 请给 TargetFramework 的全名。其他受支持的.Net Framework 版本是 Framework35、 Framework40 和 Framework45。</target>
         </alt-trans>
@@ -1569,33 +1560,24 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Creates file in TestResults directory with given LogFileName.
+        <target state="translated">--logger|/logger:&lt;記錄器 URI/易記名稱&gt;
+      指定測試結果的記錄器。例如，若要將結果記錄到 
+      Visual Studio 測試結果檔案 (TRX)，請使用 /logger:trx[;LogFileName=&lt;預設為唯一的檔案名稱&gt;]
+      使用指定的 LogFileName，在 TestResults 目錄中建立檔案。
 
-      Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal, normal and detailed.
+      變更主控台記錄器中記錄訊息的詳細資訊層級，如下所示
+      範例: /logger:console;verbosity=&lt;預設為 "minimal"&gt;
+      允許的詳細資訊值為: quiet、minimal、normal 及 detailed。
 
-      Change the diagnostic level prefix for console logger as shown below
-      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      變更主控台記錄器的診斷層級前置詞，如下所示
+      範例: /logger:console;prefix=&lt;預設為 "false"&gt;
+      此處提供主控台記錄器的詳細資訊: https://aka.ms/console-logger</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
-        <note></note>
+        <target state="translated">對此平台不支援 Blame 的 CollectDump 選項。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

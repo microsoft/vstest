@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">Si è verificata un'eccezione durante l'inizializzazione del logger con URI '{0}'. Il logger non verrà usato. Eccezione: {1}</target>
-        <note></note>
+        <target state="translated">Si è verificata un'eccezione durante l'inizializzazione del logger con {0}: '{1}'. Il logger non verrà usato. Eccezione: {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Eccezione durante l'inizializzazione del logger con URI '{0}'.  Non verrà utilizzato il logger.  Eccezione: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">Non è stato trovato alcun logger di test con URI o nome descrittivo '{0}'.</target>
-        <note></note>
+        <target state="translated">Non è stato trovato alcun logger di test con AssemblyQualifiedName, URI o FriendlyName '{0}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossibile trovare un logger di test con l'URI o FriendlyName '{0}'.</target>
         </alt-trans>
