@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Linq;
 
 namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using System.Collections.Generic;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class TestCaseFilterExpressionTests
@@ -25,7 +25,6 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             bool result = testCaseFilterExpression.MatchTestCase(dummyTestCase, (s) => { return "unused"; });
 
             Assert.IsTrue(result);
-        }
-
+        }   
     }
 }

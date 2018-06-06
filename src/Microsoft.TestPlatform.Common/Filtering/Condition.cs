@@ -8,9 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using System.Text.RegularExpressions;
-
+    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     internal enum Operation
@@ -40,11 +40,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     internal class Condition
     {
         #region Fields
-        /// <summary>
-        /// String seperator used for parsing input string of format '<propertyName>Operation<propertyValue>'
-        /// ! is not a valid operation, but is required to filter the invalid patterns.
-        /// </summary>
-        private static string propertyNameValueSeperatorString = @"(\!\=)|(\=)|(\~)|(\!)";
 
         /// <summary>
         ///  Default property name which will be used when filter has only property value.
@@ -99,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
             var result = false;
             var multiValue = this.GetPropertyValue(propertyValueProvider);
             switch (this.Operation)
@@ -155,10 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                     break;
             }
             return result;
-        }
-
-
-
+        } 
 
         /// <summary>
         /// Returns a condition object after parsing input string of format '<propertyName>Operation<propertyValue>'
@@ -169,12 +161,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 ThrownFormatExceptionForInvalidCondition(conditionString);
             }
-            string[] parts = Regex.Split(conditionString, propertyNameValueSeperatorString);
+
+            var parts = TokenizeFilterConditionString(conditionString).ToArray();
             if (parts.Length == 1)
             {
                 // If only parameter values is passed, create condition with default property name,
                 // default operation and given condition string as parameter value.
-                return new Condition(Condition.DefaultPropertyName, Condition.DefaultOperation, conditionString.Trim());
+                return new Condition(Condition.DefaultPropertyName, Condition.DefaultOperation, FilterHelper.Unescape(conditionString.Trim()));
             }
 
             if (parts.Length != 3)
@@ -192,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
 
             Operation operation = GetOperator(parts[1]);
-            Condition condition = new Condition(parts[0], operation, parts[2]);
+            Condition condition = new Condition(parts[0], operation, FilterHelper.Unescape(parts[2]));
             return condition;
         }
 
@@ -200,8 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         {
             throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException,
                 string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
-        }
-
+        }          
 
         /// <summary>
         /// Check if condition validates any property in properties.
@@ -281,7 +273,96 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
 
             return null;
-        }
+        }    
 
+        internal static IEnumerable<string> TokenizeFilterConditionString(string str)
+        {
+            if (str == null)
+            {
+                throw new ArgumentNullException(nameof(str));
+            }
+
+            return TokenizeFilterConditionStringWorker(str);
+
+            IEnumerable<string> TokenizeFilterConditionStringWorker(string s)
+            {
+                StringBuilder tokenBuilder = new StringBuilder();
+
+                var last = '\0';
+                for (int i = 0; i < s.Length; ++i)
+                {
+                    var current = s[i];
+
+                    if (last == FilterHelper.EscapeCharacter)
+                    {
+                        // Don't check if `current` is one of the special characters here.
+                        // Instead, we blindly let any character follows '\' pass though and 
+                        // relies on `FilterHelpers.Unescape` to report such errors.
+                        tokenBuilder.Append(current);
+
+                        if (current == FilterHelper.EscapeCharacter)
+                        {
+                            // We just encountered double backslash (i.e. escaped '\'), therefore set `last` to '\0' 
+                            // so the second '\' (i.e. current) will not be treated as the prefix of escape sequence 
+                            // in next iteration.
+                            current = '\0';
+                        }
+                    }
+                    else
+                    {
+                        switch (current)
+                        {
+                            case '=':
+                                if (tokenBuilder.Length > 0)
+                                {
+                                    yield return tokenBuilder.ToString();
+                                    tokenBuilder.Clear();
+                                }
+                                yield return "=";
+                                break;
+
+                            case '!':
+                                if (tokenBuilder.Length > 0)
+                                {
+                                    yield return tokenBuilder.ToString();
+                                    tokenBuilder.Clear();
+                                }
+                                // Determine if this is a "!=" or just a single "!".
+                                var next = i + 1;
+                                if (next < s.Length && s[next] == '=')
+                                {
+                                    i = next;
+                                    current = '=';
+                                    yield return "!=";
+                                }
+                                else
+                                {
+                                    yield return "!";
+                                }
+                                break;
+
+                            case '~':
+                                if (tokenBuilder.Length > 0)
+                                {
+                                    yield return tokenBuilder.ToString();
+                                    tokenBuilder.Clear();
+                                }
+                                yield return "~";
+                                break;
+
+                            default:
+                                tokenBuilder.Append(current);
+                                break;
+                        }
+                    }
+                    last = current;
+                }
+
+                if (tokenBuilder.Length > 0)
+                {
+                    yield return tokenBuilder.ToString();
+                }
+            }
+        }
     }
 }
