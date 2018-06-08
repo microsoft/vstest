@@ -24,11 +24,11 @@
       </group>
       <group targetFramework="netcoreapp1.0">
         <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
-        <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+        <dependency id="Microsoft.CodeCoverage" version="$Version$" />
       </group>
       <group targetFramework="net45">
         <!-- TestHost gets shipped with vstest.console -->
-        <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+        <dependency id="Microsoft.CodeCoverage" version="$Version$" />
       </group>
     </dependencies>
   </metadata>
