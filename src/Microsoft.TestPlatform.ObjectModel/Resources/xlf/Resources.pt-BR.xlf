@@ -612,6 +612,11 @@
         <target state="translated">Configurações inválidas '{0}'. Era esperado pelo menos um do XmlAttribute entre friendlyName, uri e assemblyQualifiedName.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestCaseFilterEscapeException">
+        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
+        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

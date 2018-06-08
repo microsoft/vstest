@@ -22,32 +22,32 @@
     <body>
       <trans-unit id="IgnoringLegacySettings">
         <source>Any LegacySettings node already present in the runsettings will be removed.</source>
-        <target state="new">Any LegacySettings node already present in the runsettings will be removed.</target>
-        <note></note>
+        <target state="translated">Wszelkie węzły LegacySettings już istniejące w pliku runsettings zostaną usunięte.</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoEmbeddedSettings">
         <source>RunSettings does not contain an embedded testSettings, not migrating.</source>
-        <target state="new">RunSettings does not contain an embedded testSettings, not migrating.</target>
-        <note></note>
+        <target state="translated">Plik RunSettings nie zawiera osadzonego elementu testSettings, migracja nie jest wykonywana.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunSettingsCreated">
         <source>The migrated RunSettings file has been created at: {0}</source>
-        <target state="new">The migrated RunSettings file has been created at: {0}</target>
-        <note></note>
+        <target state="translated">Zmigrowany plik RunSettings został utworzony w: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="UnsupportedAttributes">
         <source>The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout of Timeouts node are not supported, so these will not be migrated.</source>
-        <target state="new">The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.</target>
-        <note></note>
+        <target state="translated">Atrybuty agentNotRespondingTimeout, deploymentTimeout i scriptTimeout węzła Timeouts nie są obsługiwane, więc nie zostaną zmigrowane.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ValidUsage">
         <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
 Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
 Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</source>
-        <target state="new">Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
-Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">Prawidłowe użycie: SettingsMigrator.exe &lt;pełna ścieżka do pliku testsettings lub runsettings do zmigrowania&gt;
+Przykład: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
+Przykład: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>

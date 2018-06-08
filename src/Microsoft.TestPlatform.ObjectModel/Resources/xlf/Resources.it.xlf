@@ -612,6 +612,11 @@
         <target state="translated">Impostazioni '{0}' non valide. È previsto almeno un elemento XmlAttribute, tra friendlyName, uri e assemblyQualifiedName.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestCaseFilterEscapeException">
+        <source>Filter string '{0}' includes unrecognized escape sequence.</source>
+        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
