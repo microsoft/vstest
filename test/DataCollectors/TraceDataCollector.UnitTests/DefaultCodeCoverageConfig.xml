@@ -21,10 +21,12 @@
         <ModulePath>.*clrjit.dll$</ModulePath>
         <ModulePath>.*clrjit.ni.dll$</ModulePath>
         <ModulePath>.*mscoree.dll$</ModulePath>
-        <!--<ModulePath>.*mscoreei.dll$</ModulePath> -->
+        <ModulePath>.*mscoreei.dll$</ModulePath>
         <ModulePath>.*mscoreei.ni.dll$</ModulePath>
         <ModulePath>.*mscorlib.dll$</ModulePath>
         <ModulePath>.*mscorlib.ni.dll$</ModulePath>
+        <ModulePath>.*cryptbase.dll$</ModulePath>
+        <ModulePath>.*bcryptPrimitives.dll$</ModulePath>
       </Exclude>
     </ModulePaths>
     <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>

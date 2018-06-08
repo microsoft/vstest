@@ -26,9 +26,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-        public void CollectCodeCoverageWithCollectOption(RunnerInfo runnerInfo)
+        public void CollectCodeCoverageWithCollectOptionForx86(RunnerInfo runnerInfo)
         {
             this.CollectCodeCoverage(runnerInfo, "x86", withRunsettings: false);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+        public void CollectCodeCoverageWithCollectOptionForx64(RunnerInfo runnerInfo)
+        {
+            this.CollectCodeCoverage(runnerInfo, "x64", withRunsettings: false);
         }
 
         [TestMethod]
@@ -44,11 +52,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
         public void CollectCodeCoverageX64WithRunSettings(RunnerInfo runnerInfo)
         {
-            if (runnerInfo.TargetFramework.Equals("net451"))
-            {
-                this.SkipIfRuningInCI("Skipping for x64 Desktop tests. tracking here: https://github.com/Microsoft/vstest/pull/1594");
-            }
-
             this.CollectCodeCoverage(runnerInfo, "x64", withRunsettings: true);
         }
 
