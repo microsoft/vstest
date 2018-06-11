@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
             }
 
-            return base.ConvertFrom(context, culture, value);
+            return null;
         }
     }
 }
