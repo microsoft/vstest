@@ -100,9 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
                             testResult.ErrorStackTrace = propertyData; break;
                         default:
                             // No need to register member properties as they get registered as part of TestResultProperties class.
-                            // Use a previously registered property if one exists.
-                            testProperty = TestProperty.Find(testProperty.Id) ??
-                                TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
+                            testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
                             testResult.SetPropertyValue(testProperty, propertyData);
                             break;
                     }
