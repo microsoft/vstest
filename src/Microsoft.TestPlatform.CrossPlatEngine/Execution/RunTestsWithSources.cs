@@ -66,12 +66,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 var sourcesArray = this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
                 var sourcesString = string.Join(" ", sourcesArray);
 
-                this.TestRunEventsHandler?.HandleLogMessage(
-                    TestMessageLevel.Warning,
-                    string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
-                        sourcesString));
+                if (this.TestExecutionContext.TestCaseFilter != null)
+                {
+                    this.TestRunEventsHandler?.HandleLogMessage(
+                        TestMessageLevel.Warning,
+                        $"No test available for testcase filter `{this.TestExecutionContext.TestCaseFilter}` in {sourcesString}");
+                }
+                else
+                {
+
+                    this.TestRunEventsHandler?.HandleLogMessage(
+                        TestMessageLevel.Warning,
+                        string.Format(
+                            CultureInfo.CurrentUICulture,
+                            CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
+                            sourcesString));
+                }
             }
         }
 
