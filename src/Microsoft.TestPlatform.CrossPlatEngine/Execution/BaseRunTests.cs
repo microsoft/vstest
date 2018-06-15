@@ -586,13 +586,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-        private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTests)
+        private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTestCases)
         {
             if (this.testRunEventsHandler != null)
             {
-                inProgressTests = UpdateTestResultsAndInProgressTests(results, inProgressTests, this.package);
+                inProgressTestCases = UpdateTestResultsAndInProgressTests(results, inProgressTestCases, this.package);
 
-                var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
+                var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTestCases);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
             }
             else
@@ -624,13 +624,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private static ICollection<TestCase> UpdateTestResultsAndInProgressTests(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTests, string package)
+        private static ICollection<TestCase> UpdateTestResultsAndInProgressTests(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTestCases, string package)
         {
 
             // No change required to testcases and testresults.
             if (string.IsNullOrEmpty(package))
             {
-                return inProgressTests;
+                return inProgressTestCases;
             }
 
             EqtTrace.Verbose("BaseRunTests.UpdateTestResultsAndInProgressTests: Update source details for testResults and testCases.");
@@ -641,12 +641,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 tr.TestCase.Source = package;
             }
 
-            return UpdateInProgressTests(inProgressTests, package);
+            return UpdateInProgressTests(inProgressTestCases, package);
         }
 
-        private static ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTests, string package)
+        private static ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTestCases, string package)
         {
-            if (inProgressTests == null)
+            if (inProgressTestCases == null)
             {
                 return null;
             }
@@ -654,10 +654,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             EqtTrace.Verbose("BaseRunTests.UpdateInProgressTests: Updating source for inprogress tests.");
 
             ICollection<TestCase> updatedTestCases  = new List<TestCase>();
-            foreach (var tc in inProgressTests)
+            foreach (var inProgressTestCase in inProgressTestCases)
             {
-                var updatedTest = JsonDataSerializer.Instance.Clone<TestCase>(tc);
-                updatedTest.Source = package;
+                var updatedTestCase = JsonDataSerializer.Instance.Clone<TestCase>(inProgressTestCase);
+                updatedTestCase.Source = package;
+                updatedTestCases.Add(updatedTestCase);
             }
 
             return updatedTestCases;
