@@ -152,6 +152,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             return JsonConvert.SerializeObject(message);
         }
 
+        /// <inheritdoc/>
+        public T Clone<T>(T obj)
+        {
+            var stringObj = this.Serialize<T>(obj);
+            return this.Deserialize<T>(stringObj);
+        }
+
         /// <summary>
         /// Serialize an object to JSON using default serialization settings.
         /// </summary>

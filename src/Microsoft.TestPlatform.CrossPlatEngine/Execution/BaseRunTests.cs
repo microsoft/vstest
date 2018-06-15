@@ -571,7 +571,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                 if (lastChunk.Any())
                 {
-                    UpdateTestResults(lastChunk, null, this.package);
+                    UpdateTestResultsAndInProgressTests(lastChunk, null, this.package);
                 }
 
                 this.testRunEventsHandler.HandleTestRunComplete(
@@ -590,7 +590,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testRunEventsHandler != null)
             {
-                UpdateTestResults(results, inProgressTests, this.package);
+                inProgressTests = UpdateTestResultsAndInProgressTests(results, inProgressTests, this.package);
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -624,22 +624,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private static void UpdateTestResults(IEnumerable<TestResult> testResults, IEnumerable<TestCase> testCases, string package)
+        private static ICollection<TestCase> UpdateTestResultsAndInProgressTests(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTests, string package)
         {
-            // Before sending the testresults back, update the test case objects with source provided by IDE/User.
-            if (!string.IsNullOrEmpty(package))
-            {
-                foreach (var tr in testResults)
-                {
-                    tr.TestCase.Source = package;
-                }
 
-                // TestCases can be empty, enumerate on EmptyList then
-                foreach (var tc in testCases ?? Enumerable.Empty<TestCase>())
-                {
-                    tc.Source = package;
-                }
+            // No change required to testcases and testresults.
+            if (string.IsNullOrEmpty(package))
+            {
+                return inProgressTests;
             }
+
+            EqtTrace.Verbose("BaseRunTests.UpdateTestResultsAndInProgressTests: Update source details for testResults and testCases.");
+
+            // Before sending the testresults back, update the test case objects with source provided by IDE/User.
+            foreach (var tr in testResults)
+            {
+                tr.TestCase.Source = package;
+            }
+
+            return UpdateInProgressTests(inProgressTests, package);
+        }
+
+        private static ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTests, string package)
+        {
+            if (inProgressTests == null)
+            {
+                return null;
+            }
+
+            EqtTrace.Verbose("BaseRunTests.UpdateInProgressTests: Updating source for inprogress tests.");
+
+            ICollection<TestCase> updatedTestCases  = new List<TestCase>();
+            foreach (var tc in inProgressTests)
+            {
+                var updatedTest = JsonDataSerializer.Instance.Clone<TestCase>(tc);
+                updatedTest.Source = package;
+            }
+
+            return updatedTestCases;
         }
 
         #endregion
