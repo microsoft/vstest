@@ -34,6 +34,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     [TestClass]
     public class BaseRunTestsTests
     {
+        private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
+        private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
+
         private TestExecutionContext testExecutionContext;
         private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
 
@@ -46,9 +49,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private Mock<IMetricsCollection> mockMetricsCollection;
 
-        private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
-        private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
+        private TestRunChangedEventArgs receivedRunStatusArgs;
+        private TestRunCompleteEventArgs receivedRunCompleteArgs;
+        private ICollection<AttachmentSet> receivedattachments;
+        private ICollection<string> receivedExecutorUris;
 
+
+        // private const string
         [TestInitialize]
         public void TestInit()
         {
@@ -74,7 +81,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance = new TestableBaseRunTests(
                 null,
                 null,
-                testExecutionContext,
+                this.testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
@@ -136,7 +143,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
-                    (TestRunCompleteEventArgs complete,
+                    (
+                     TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
                      ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
@@ -154,6 +162,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldNotThrowIfExceptionIsAFileNotFoundException()
         {
             TestRunCompleteEventArgs receivedCompleteArgs = null;
+
             // Setup mocks.
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { throw new FileNotFoundException(); };
             this.mockTestRunEventsHandler.Setup(
@@ -164,7 +173,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
-                    (TestRunCompleteEventArgs complete,
+                    (
+                     TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
                      ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
@@ -183,6 +193,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldNotThrowIfExceptionIsAnArgumentException()
         {
             TestRunCompleteEventArgs receivedCompleteArgs = null;
+
             // Setup mocks.
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { throw new ArgumentException(); };
             this.mockTestRunEventsHandler.Setup(
@@ -193,7 +204,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
-                    (TestRunCompleteEventArgs complete,
+                    (
+                     TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
                      ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
@@ -223,14 +235,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
-                    (TestRunCompleteEventArgs complete,
+                    (
+                     TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
                      ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                     {
                         receivedCompleteArgs = complete;
                     });
-
 
             // This should not throw.
             this.runTestsInstance.RunTests();
@@ -297,7 +309,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldInstrumentExecutionStop()
         {
-
             this.SetupExecutorUriMock();
 
             this.runTestsInstance.RunTests();
@@ -347,11 +358,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             var expectedWarningMessageFormat =
                 "Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.";
-            //var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",
+
+            // var runtimeVersion = string.Concat(PlatformServices.Default.Runtime.RuntimeType, " ",
             //            PlatformServices.Default.Runtime.RuntimeVersion);
             var runtimeVersion = " ";
 
-            var expectedWarningMessage = string.Format(expectedWarningMessageFormat, "executor://nonexistent/",
+            var expectedWarningMessage = string.Format(
+                expectedWarningMessageFormat,
+                "executor://nonexistent/",
                 runtimeVersion);
             this.mockTestRunEventsHandler.Verify(
                 treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedWarningMessage), Times.Once);
@@ -423,12 +437,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             var messageFormat = "An exception occurred while invoking executor '{0}': {1}";
             var message = string.Format(messageFormat, BaseRunTestsExecutorUri.ToLower(), "Test influenced.");
-            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Error, message),
+            this.mockTestRunEventsHandler.Verify(
+                treh => treh.HandleLogMessage(TestMessageLevel.Error, message),
                 Times.Once);
 
             // Also validate that a test run complete is called.
             this.mockTestRunEventsHandler.Verify(
-                treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+                treh => treh.HandleTestRunComplete(
+                    It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
                     It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()), Times.Once);
@@ -496,45 +512,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldRaiseTestRunComplete()
         {
-            TestRunCompleteEventArgs receivedRunCompleteArgs = null;
-            TestRunChangedEventArgs receivedRunStatusArgs = null;
-            ICollection<AttachmentSet> receivedattachments = null;
-            ICollection<string> receivedExecutorUris = null;
-
-            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
-            var executorUriExtensionMap = new List<Tuple<Uri, string>>
-            {
-                new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
-                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
-            };
-
-            // Setup mocks.
-            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
-            this.runTestsInstance.InvokeExecutorCallback =
-                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
-                {
-                    var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-                    var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-                    this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
-                };
-            this.mockTestRunEventsHandler.Setup(
-                treh =>
-                treh.HandleTestRunComplete(
-                    It.IsAny<TestRunCompleteEventArgs>(),
-                    It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
-                    It.IsAny<ICollection<string>>()))
-                .Callback(
-                    (TestRunCompleteEventArgs complete,
-                     TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
-                     ICollection<string> executorUris) =>
-                    {
-                        receivedRunCompleteArgs = complete;
-                        receivedRunStatusArgs = stats;
-                        receivedattachments = attachments;
-                        receivedExecutorUris = executorUris;
-                    });
+            this.SetUpTestRunEvents();
 
             // Act.
             this.runTestsInstance.RunTests();
@@ -563,54 +541,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsTestRunCompleteShouldUpdateTestCasesWithPackageIfProvided()
         {
-            var package = "x.apprecipe";
-            TestRunCompleteEventArgs receivedRunCompleteArgs = null;
-            TestRunChangedEventArgs receivedRunStatusArgs = null;
-            ICollection<AttachmentSet> receivedattachments = null;
-            ICollection<string> receivedExecutorUris = null;
-            this.runTestsInstance = new TestableBaseRunTests(
-                null,
-                package,
-                testExecutionContext,
-                null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockTestPlatformEventSource.Object,
-                this.mockRequestData.Object);
-
-            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
-            var executorUriExtensionMap = new List<Tuple<Uri, string>>
-            {
-                new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
-                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
-            };
-
-            // Setup mocks.
-            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
-            this.runTestsInstance.InvokeExecutorCallback =
-                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
-                {
-                    var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-                    var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-                    this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
-                };
-            this.mockTestRunEventsHandler.Setup(
-                treh =>
-                treh.HandleTestRunComplete(
-                    It.IsAny<TestRunCompleteEventArgs>(),
-                    It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
-                    It.IsAny<ICollection<string>>()))
-                .Callback(
-                    (TestRunCompleteEventArgs complete,
-                     TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
-                     ICollection<string> executorUris) =>
-                    {
-                        receivedRunCompleteArgs = complete;
-                        receivedRunStatusArgs = stats;
-                        receivedattachments = attachments;
-                        receivedExecutorUris = executorUris;
-                    });
+            const string package = "x.apprecipe";
+            this.SetUpTestRunEvents(package);
 
             // Act.
             this.runTestsInstance.RunTests();
@@ -620,51 +552,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
 
             // verify TC.Source is updated with package
-            foreach(var tr in receivedRunStatusArgs.NewTestResults)
+            foreach (var tr in receivedRunStatusArgs.NewTestResults)
             {
                 Assert.AreEqual(tr.TestCase.Source, package);
             }
-            Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || receivedRunStatusArgs.ActiveTests.Count() == 0);
         }
 
         [TestMethod]
         public void RunTestsShouldUpdateTestCasesWithPackageWhenCacheIsHitIfProvided()
         {
-            var package = "x.apprecipe";
-            this.testExecutionContext.FrequencyOfRunStatsChangeEvent = 2;
-            TestRunChangedEventArgs receivedRunStatusArgs = null;
-            this.runTestsInstance = new TestableBaseRunTests(
-                null,
-                package,
-                testExecutionContext,
-                null,
-                this.mockTestRunEventsHandler.Object,
-                this.mockTestPlatformEventSource.Object,
-                this.mockRequestData.Object);
-
-            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
-            var executorUriExtensionMap = new List<Tuple<Uri, string>>
-            {
-                new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
-                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
-            };
-
-            // Setup mocks.
-            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
-            this.runTestsInstance.InvokeExecutorCallback =
-                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
-                {
-                    var testCase = new TestCase("x.y.z1", new Uri("uri://dummy"), "x.dll");
-                    var inProgTestCase = new TestCase("x.y.z2", new Uri("uri://dummy"), "x.dll");
-                    var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-                    this.runTestsInstance.GetTestRunCache.OnTestStarted(inProgTestCase);
-                    this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
-                };
-            this.mockTestRunEventsHandler.Setup( treh => treh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
-                .Callback((TestRunChangedEventArgs stats) =>
-            {
-                receivedRunStatusArgs = stats;
-            });
+            const string package = "x.apprecipe";
+            this.SetUpTestRunEvents(package, setupHandleTestRunComplete:false);
 
             // Act.
             this.runTestsInstance.RunTests();
@@ -674,7 +572,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
 
             Assert.IsNotNull(receivedRunStatusArgs.ActiveTests);
-            Assert.AreEqual(receivedRunStatusArgs.ActiveTests.Count(), 1);
+            Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
 
             // verify TC.Source is updated with package
             foreach (var tr in receivedRunStatusArgs.NewTestResults)
@@ -761,7 +659,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                             It.IsAny<ICollection<AttachmentSet>>(),
                             It.IsAny<ICollection<string>>()))
                 .Callback(
-                    (TestRunCompleteEventArgs complete,
+                    (
+                        TestRunCompleteEventArgs complete,
                         TestRunChangedEventArgs stats,
                         ICollection<AttachmentSet> attachments,
                         ICollection<string> executorUris) =>
@@ -802,7 +701,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     };
             mockMetricsCollector.Setup(mc => mc.Metrics).Returns(dict);
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollector.Object);
-
 
             // Act.
             this.runTestsInstance.RunTests();
@@ -848,7 +746,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void CancelShouldCreateSTAThreadIfExecutionThreadApartmentStateIsSTA()
         {
             this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
-            mockThread.Setup(mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()))
+            this.mockThread.Setup(mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()))
                 .Callback<Action, PlatformApartmentState, bool>((action, start, waitForCompletion) =>
                 {
                     if (waitForCompletion)
@@ -896,7 +794,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                      <ExecutionThreadApartmentState>{apartmentState}</ExecutionThreadApartmentState>
                    </RunConfiguration>
                 </RunSettings>",
-                testExecutionContext,
+                this.testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
@@ -911,6 +809,72 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
         }
+
+        private void SetUpTestRunEvents(string package = null, bool setupHandleTestRunComplete = true)
+        {
+            if (setupHandleTestRunComplete)
+            {
+                this.mockTestRunEventsHandler.Setup(
+                        treh =>
+                            treh.HandleTestRunComplete(
+                                It.IsAny<TestRunCompleteEventArgs>(),
+                                It.IsAny<TestRunChangedEventArgs>(),
+                                It.IsAny<ICollection<AttachmentSet>>(),
+                                It.IsAny<ICollection<string>>()))
+                    .Callback(
+                        (
+                            TestRunCompleteEventArgs complete,
+                            TestRunChangedEventArgs stats,
+                            ICollection<AttachmentSet> attachments,
+                            ICollection<string> executorUris) =>
+                        {
+                            receivedRunCompleteArgs = complete;
+                            this.receivedRunStatusArgs = stats;
+                            receivedattachments = attachments;
+                            receivedExecutorUris = executorUris;
+                        });
+            }
+            else
+            {
+                this.testExecutionContext.FrequencyOfRunStatsChangeEvent = 2;
+                this.mockTestRunEventsHandler
+                    .Setup(treh => treh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
+                    .Callback((TestRunChangedEventArgs stats) =>
+                    {
+                        receivedRunStatusArgs = stats;
+                    });
+            }
+
+            this.runTestsInstance = new TestableBaseRunTests(
+                null,
+                package,
+                this.testExecutionContext,
+                null,
+                this.mockTestRunEventsHandler.Object,
+                this.mockTestPlatformEventSource.Object,
+                this.mockRequestData.Object);
+
+            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+            var executorUriExtensionMap = new List<Tuple<Uri, string>>
+            {
+                new Tuple<Uri, string>(new Uri(BadBaseRunTestsExecutorUri), assemblyLocation),
+                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
+            };
+
+            // Setup mocks.
+            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
+            this.runTestsInstance.InvokeExecutorCallback =
+                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
+                {
+                    var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+                    var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+                    var inProgTestCase = new TestCase("x.y.z2", new Uri("uri://dummy"), "x.dll");
+
+                    this.runTestsInstance.GetTestRunCache.OnTestStarted(inProgTestCase);
+                    this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
+                };
+        }
+
         #endregion
 
         #region Testable Implementation
@@ -1001,17 +965,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             public void Cancel()
             {
-
             }
 
             public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
             {
-
             }
 
             public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
             {
-
             }
         }
 

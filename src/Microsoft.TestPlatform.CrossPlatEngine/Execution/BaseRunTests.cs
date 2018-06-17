@@ -571,7 +571,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
                 if (lastChunk.Any())
                 {
-                    UpdateTestResultsAndInProgressTests(lastChunk, null, this.package);
+                    UpdateTestResultsAndInProgressTestCases(lastChunk, null, this.package);
                 }
 
                 this.testRunEventsHandler.HandleTestRunComplete(
@@ -590,7 +590,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testRunEventsHandler != null)
             {
-                inProgressTestCases = UpdateTestResultsAndInProgressTests(results, inProgressTestCases, this.package);
+                inProgressTestCases = UpdateTestResultsAndInProgressTestCases(results, inProgressTestCases, this.package);
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTestCases);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -624,7 +624,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private static ICollection<TestCase> UpdateTestResultsAndInProgressTests(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTestCases, string package)
+        private static ICollection<TestCase> UpdateTestResultsAndInProgressTestCases(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTestCases, string package)
         {
 
             // No change required to testcases and testresults.
