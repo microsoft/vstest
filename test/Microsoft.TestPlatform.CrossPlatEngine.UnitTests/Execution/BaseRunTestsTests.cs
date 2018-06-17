@@ -15,6 +15,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -49,15 +51,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private Mock<IMetricsCollection> mockMetricsCollection;
 
+        private Mock<IDataSerializer> mockDataSerializer;
+
         private TestRunChangedEventArgs receivedRunStatusArgs;
         private TestRunCompleteEventArgs receivedRunCompleteArgs;
         private ICollection<AttachmentSet> receivedattachments;
         private ICollection<string> receivedExecutorUris;
+        private TestCase inProgressTestCase;
 
-
-        // private const string
-        [TestInitialize]
-        public void TestInit()
+        public BaseRunTestsTests()
         {
             this.testExecutionContext = new TestExecutionContext(
                           frequencyOfRunStatsChangeEvent: 100,
@@ -76,16 +78,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.mockThread = new Mock<IThread>();
+            this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
 
             this.runTestsInstance = new TestableBaseRunTests(
+                this.mockRequestData.Object,
                 null,
                 null,
                 this.testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
-                this.mockRequestData.Object);
+                null,
+                new PlatformThread(), 
+                this.mockDataSerializer.Object);
 
             TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
         }
@@ -539,9 +546,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        public void RunTestsTestRunCompleteShouldUpdateTestCasesWithPackageIfProvided()
+        public void RunTestsShouldUpdateTestResultsTestCaseSourceWithPackageIfTestSourceIsPackage()
         {
-            const string package = "x.apprecipe";
+            const string package = @"C:\Projects\UnitTestApp1\AppPackages\UnitTestApp1\UnitTestApp1_1.0.0.0_Win32_Debug_Test\UnitTestApp1_1.0.0.0_Win32_Debug.appx";
             this.SetUpTestRunEvents(package);
 
             // Act.
@@ -559,31 +566,41 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        public void RunTestsShouldUpdateTestCasesWithPackageWhenCacheIsHitIfProvided()
+        public void RunTestsShouldUpdateActiveTestCasesSourceWithPackageIfTestSourceIsPackage()
         {
-            const string package = "x.apprecipe";
+            const string package = @"C:\Porjects\UnitTestApp3\Debug\UnitTestApp3\UnitTestApp3.build.appxrecipe";
+            this.mockDataSerializer.Setup(d => d.Clone<TestCase>(It.IsAny<TestCase>()))
+                .Returns<TestCase>(t => JsonDataSerializer.Instance.Clone<TestCase>(t));
             this.SetUpTestRunEvents(package, setupHandleTestRunComplete:false);
 
             // Act.
             this.runTestsInstance.RunTests();
 
-            // Test run changed event assertions
-            Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
-            Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
-
             Assert.IsNotNull(receivedRunStatusArgs.ActiveTests);
             Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
 
-            // verify TC.Source is updated with package
-            foreach (var tr in receivedRunStatusArgs.NewTestResults)
-            {
-                Assert.AreEqual(tr.TestCase.Source, package);
-            }
 
             foreach (var tc in receivedRunStatusArgs.ActiveTests)
             {
                 Assert.AreEqual(tc.Source, package);
             }
+        }
+
+        [TestMethod]
+        public void RunTestsShouldCloneTheActiveTestCaseObjectsIfTestSourceIsPackage()
+        {
+            const string package = @"C:\Porjects\UnitTestApp3\Debug\UnitTestApp3\UnitTestApp3.build.appxrecipe";
+            this.mockDataSerializer.Setup(d => d.Clone<TestCase>(It.IsAny<TestCase>()))
+                .Returns<TestCase>(t => JsonDataSerializer.Instance.Clone<TestCase>(t));
+            this.SetUpTestRunEvents(package, setupHandleTestRunComplete: false);
+
+            // Act.
+            this.runTestsInstance.RunTests();
+
+            Assert.IsNotNull(receivedRunStatusArgs.ActiveTests);
+            Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
+
+            this.mockDataSerializer.Verify(d => d.Clone<TestCase>(It.IsAny<TestCase>()), Times.Exactly(2));
         }
 
         [TestMethod]
@@ -789,6 +806,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.mockThread = new Mock<IThread>();
 
             this.runTestsInstance = new TestableBaseRunTests(
+                this.mockRequestData.Object,
+                null,
                 $@"<RunSettings>
                   <RunConfiguration>
                      <ExecutionThreadApartmentState>{apartmentState}</ExecutionThreadApartmentState>
@@ -800,7 +819,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockTestPlatformEventSource.Object,
                 null,
                 this.mockThread.Object,
-                this.mockRequestData.Object);
+                this.mockDataSerializer.Object);
+
             TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -845,14 +865,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     });
             }
 
-            this.runTestsInstance = new TestableBaseRunTests(
-                null,
+            this.runTestsInstance = this.runTestsInstance = new TestableBaseRunTests(
+                this.mockRequestData.Object,
                 package,
+                null,
                 this.testExecutionContext,
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
-                this.mockRequestData.Object);
+                null,
+                new PlatformThread(), 
+                this.mockDataSerializer.Object);
 
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -868,9 +891,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 {
                     var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
                     var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-                    var inProgTestCase = new TestCase("x.y.z2", new Uri("uri://dummy"), "x.dll");
+                    this.inProgressTestCase = new TestCase("x.y.z2", new Uri("uri://dummy"), "x.dll");
 
-                    this.runTestsInstance.GetTestRunCache.OnTestStarted(inProgTestCase);
+                    this.runTestsInstance.GetTestRunCache.OnTestStarted(inProgressTestCase);
                     this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
                 };
         }
@@ -882,18 +905,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private class TestableBaseRunTests : BaseRunTests
         {
             public TestableBaseRunTests(
-                string runSettings,
+                IRequestData requestData,
                 string package,
-                TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler,
-                ITestRunEventsHandler testRunEventsHandler,
-                ITestPlatformEventSource testPlatformEventSource,
-                IRequestData requestData)
-                : base(requestData, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
-            {
-            }
-
-            public TestableBaseRunTests(
                 string runSettings,
                 TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler,
@@ -901,10 +914,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestPlatformEventSource testPlatformEventSource,
                 ITestEventsPublisher testEventsPublisher,
                 IThread platformThread,
-                IRequestData requestData)
-                : base(requestData, null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, testEventsPublisher, platformThread)
+                IDataSerializer dataSerializer)
+                : base(
+                    requestData,
+                    package,
+                    runSettings,
+                    testExecutionContext,
+                    testCaseEventsHandler,
+                    testRunEventsHandler,
+                    testPlatformEventSource,
+                    testEventsPublisher,
+                    platformThread,
+                    dataSerializer)
             {
             }
+
 
             public Action<bool> BeforeRaisingTestRunCompleteCallback { get; set; }
 

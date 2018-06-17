@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
-
+    using CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -78,6 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         private RunConfiguration runConfiguration;
 
+        /// <summary>
+        /// The Serializer to clone testcase object incase of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
+        /// </summary>
+        private IDataSerializer dataSerializer;
+
         #endregion
 
         #region Constructor
@@ -107,7 +112,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testRunEventsHandler, 
                 testPlatformEventSource, 
                 testCaseEventsHandler as ITestEventsPublisher, 
-                new PlatformThread())
+                new PlatformThread(),
+                JsonDataSerializer.Instance)
         {
         }
 
@@ -131,7 +137,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestRunEventsHandler testRunEventsHandler, 
             ITestPlatformEventSource testPlatformEventSource, 
             ITestEventsPublisher testEventsPublisher, 
-            IThread platformThread)
+            IThread platformThread,
+            IDataSerializer dataSerializer)
         {
             this.package = package;
             this.runSettings = runSettings;
@@ -144,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testPlatformEventSource = testPlatformEventSource;
             this.testEventsPublisher = testEventsPublisher;
             this.platformThread = platformThread;
+            this.dataSerializer = dataSerializer;
             this.SetContext();
         }
 
@@ -624,7 +632,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private static ICollection<TestCase> UpdateTestResultsAndInProgressTestCases(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTestCases, string package)
+        private ICollection<TestCase> UpdateTestResultsAndInProgressTestCases(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTestCases, string package)
         {
 
             // No change required to testcases and testresults.
@@ -644,7 +652,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return UpdateInProgressTests(inProgressTestCases, package);
         }
 
-        private static ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTestCases, string package)
+        private  ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTestCases, string package)
         {
             if (inProgressTestCases == null)
             {
@@ -656,7 +664,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ICollection<TestCase> updatedTestCases  = new List<TestCase>();
             foreach (var inProgressTestCase in inProgressTestCases)
             {
-                var updatedTestCase = JsonDataSerializer.Instance.Clone<TestCase>(inProgressTestCase);
+                var updatedTestCase = this.dataSerializer.Clone<TestCase>(inProgressTestCase);
                 updatedTestCase.Source = package;
                 updatedTestCases.Add(updatedTestCase);
             }
