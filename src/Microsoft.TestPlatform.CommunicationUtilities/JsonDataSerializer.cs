@@ -155,8 +155,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public T Clone<T>(T obj)
         {
-            var stringObj = this.Serialize<T>(obj);
-            return this.Deserialize<T>(stringObj);
+            if (obj == null)
+            {
+                return default(T);
+            }
+
+            var stringObj = this.Serialize<T>(obj, 2);
+            return this.Deserialize<T>(stringObj, 2);
         }
 
         /// <summary>

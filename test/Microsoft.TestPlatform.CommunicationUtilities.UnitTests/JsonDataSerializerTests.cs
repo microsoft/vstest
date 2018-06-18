@@ -50,6 +50,23 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void CloneShouldReturnNullForNull()
+        {
+            var clonedTestCase = this.jsonDataSerializer.Clone<TestCase>(null);
+
+            Assert.IsNull(clonedTestCase);
+        }
+
+        [TestMethod]
+        public void CloneShouldWorkForValueType()
+        {
+            var i = 2;
+            var clonedI = this.jsonDataSerializer.Clone<int>(i);
+
+            Assert.AreEqual(clonedI, i);
+        }
+
+        [TestMethod]
         public void CloneShouldCloneTestCaseObject()
         {
             var testCase = JsonDataSerializerTests.GetSampleTestCase(out var expectedTrait);
