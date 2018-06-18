@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -13,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
-
+    using CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -78,6 +79,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         private RunConfiguration runConfiguration;
 
+        /// <summary>
+        /// The Serializer to clone testcase object incase of user input test source is package. E.g UWP scenario(appx/build.appxrecipe).
+        /// </summary>
+        private IDataSerializer dataSerializer;
+
         #endregion
 
         #region Constructor
@@ -107,7 +113,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testRunEventsHandler, 
                 testPlatformEventSource, 
                 testCaseEventsHandler as ITestEventsPublisher, 
-                new PlatformThread())
+                new PlatformThread(),
+                JsonDataSerializer.Instance)
         {
         }
 
@@ -131,7 +138,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestRunEventsHandler testRunEventsHandler, 
             ITestPlatformEventSource testPlatformEventSource, 
             ITestEventsPublisher testEventsPublisher, 
-            IThread platformThread)
+            IThread platformThread,
+            IDataSerializer dataSerializer)
         {
             this.package = package;
             this.runSettings = runSettings;
@@ -144,6 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testPlatformEventSource = testPlatformEventSource;
             this.testEventsPublisher = testEventsPublisher;
             this.platformThread = platformThread;
+            this.dataSerializer = dataSerializer;
             this.SetContext();
         }
 
@@ -557,6 +566,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // Collecting Number of Adapters Used to run tests. 
                 this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, this.ExecutorUrisThatRanTests.Count());
 
+                if (lastChunk.Any() && string.IsNullOrEmpty(package) == false)
+                {
+                    Tuple<ICollection<TestResult>, ICollection<TestCase>> updatedTestResultsAndInProgressTestCases = this.UpdateTestCaseSourceToPackage(lastChunk, null);
+                    lastChunk = updatedTestResultsAndInProgressTestCases.Item1;
+                }
+
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
 
                 // Adding Metrics along with Test Run Complete Event Args
@@ -569,10 +584,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     attachments,
                     elapsedTime);
                 testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
-                if (lastChunk.Any())
-                {
-                    UpdateTestResults(lastChunk, null, this.package);
-                }
 
                 this.testRunEventsHandler.HandleTestRunComplete(
                     testRunCompleteEventArgs,
@@ -586,13 +597,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-        private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTests)
+        private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTestCases)
         {
             if (this.testRunEventsHandler != null)
             {
-                UpdateTestResults(results, inProgressTests, this.package);
+                if (string.IsNullOrEmpty(package) == false)
+                {
+                    Tuple<ICollection<TestResult>, ICollection<TestCase>> updatedTestResultsAndInProgressTestCases
+                        = this.UpdateTestCaseSourceToPackage(results, inProgressTestCases);
+                    results = updatedTestResultsAndInProgressTestCases.Item1;
+                    inProgressTestCases = updatedTestResultsAndInProgressTestCases.Item2;
+                }
 
-                var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
+                var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTestCases);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
             }
             else
@@ -624,22 +641,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private static void UpdateTestResults(IEnumerable<TestResult> testResults, IEnumerable<TestCase> testCases, string package)
+        private Tuple<ICollection<TestResult>, ICollection<TestCase>> UpdateTestCaseSourceToPackage(
+            ICollection<TestResult> testResults,
+            ICollection<TestCase> inProgressTestCases)
         {
-            // Before sending the testresults back, update the test case objects with source provided by IDE/User.
-            if (!string.IsNullOrEmpty(package))
-            {
-                foreach (var tr in testResults)
-                {
-                    tr.TestCase.Source = package;
-                }
 
-                // TestCases can be empty, enumerate on EmptyList then
-                foreach (var tc in testCases ?? Enumerable.Empty<TestCase>())
-                {
-                    tc.Source = package;
-                }
+            EqtTrace.Verbose("BaseRunTests.UpdateTestCaseSourceToPackage: Update source details for testResults and testCases.");
+
+            var updatedTestResults = UpdateTestResults(testResults, package);
+
+            var updatedInProgressTestCases = UpdateInProgressTests(inProgressTestCases, package);
+
+            return new Tuple<ICollection<TestResult>, ICollection<TestCase>>(updatedTestResults, updatedInProgressTestCases);
+        }
+
+        private ICollection<TestResult> UpdateTestResults(ICollection<TestResult> testResults, string package)
+        {
+            ICollection<TestResult> updatedTestResults = new List<TestResult>();
+
+            foreach (var testResult in testResults)
+            {
+                var updatedTestResult = this.dataSerializer.Clone<TestResult>(testResult);
+                updatedTestResult.TestCase.Source = package;
+                updatedTestResults.Add(updatedTestResult);
             }
+
+            return updatedTestResults;
+        }
+
+        private  ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTestCases, string package)
+        {
+            if (inProgressTestCases == null)
+            {
+                return null;
+            }
+
+            ICollection<TestCase> updatedTestCases  = new List<TestCase>();
+            foreach (var inProgressTestCase in inProgressTestCases)
+            {
+                var updatedTestCase = this.dataSerializer.Clone<TestCase>(inProgressTestCase);
+                updatedTestCase.Source = package;
+                updatedTestCases.Add(updatedTestCase);
+            }
+
+            return updatedTestCases;
         }
 
         #endregion
