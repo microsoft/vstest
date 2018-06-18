@@ -5,9 +5,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using VisualStudio.TestPlatform.ObjectModel;
+    using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
     public class JsonDataSerializerTests
@@ -47,30 +50,65 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void CloneShouldCloneNewObject()
+        public void CloneShouldCloneTestCaseObject()
         {
-            var myClass = new MyClass()
+            var testCase = JsonDataSerializerTests.GetSampleTestCase(out var expectedTrait);
+
+            var clonedTestCase = this.jsonDataSerializer.Clone<TestCase>(testCase);
+
+            VerifyTestCaseClone(clonedTestCase, testCase, expectedTrait);
+        }
+
+        [TestMethod]
+        public void CloneShouldCloneTestResultsObject()
+        {
+            var testCase = JsonDataSerializerTests.GetSampleTestCase(out var expectedTrait);
+
+            var testResult = new TestResult(testCase);
+
+            var startTime = DateTimeOffset.UtcNow;
+            testResult.StartTime = startTime;
+
+            var clonedTestResult = this.jsonDataSerializer.Clone<TestResult>(testResult);
+
+            Assert.IsFalse(ReferenceEquals(testResult, clonedTestResult));
+
+            Assert.AreEqual(testResult.StartTime, clonedTestResult.StartTime);
+
+            VerifyTestCaseClone(testResult.TestCase, clonedTestResult.TestCase, expectedTrait);
+        }
+
+        private static TestCase GetSampleTestCase(out Trait expectedTrait)
+        {
+            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
+
+            expectedTrait = new Trait("TraitName1", "TraitValue1");
+
+            testCase.Traits.Add(expectedTrait);
+            return testCase;
+        }
+
+        private static void VerifyTestCaseClone(TestCase clonedTestCase, TestCase testCase, Trait expectedTrait)
+        {
+            Assert.IsFalse(ReferenceEquals(clonedTestCase, testCase));
+
+            Assert.AreEqual(testCase.FullyQualifiedName, clonedTestCase.FullyQualifiedName);
+            Assert.IsFalse(ReferenceEquals(testCase.FullyQualifiedName, clonedTestCase.FullyQualifiedName));
+
+            Assert.AreEqual(testCase.ExecutorUri, clonedTestCase.ExecutorUri);
+            Assert.IsFalse(ReferenceEquals(testCase.ExecutorUri, clonedTestCase.ExecutorUri));
+
+            Assert.AreEqual(testCase.Source, clonedTestCase.Source);
+            Assert.IsFalse(ReferenceEquals(testCase.Source, clonedTestCase.Source));
+
+            Assert.AreEqual(1, clonedTestCase.Traits.Count());
+
+            foreach (var trait in clonedTestCase.Traits)
             {
-                Id = Guid.NewGuid(),
-                Name = "Name1",
-                Properties = new Dictionary<string, object>()
-                {
-                    { "PropKey1", 10 },
-                    { "PropKey2", "PropValue2" },
-                    { "PropKey3", new MyClass() { Id = Guid.NewGuid(), Name = "Name2" } },
-                }
-            };
-
-            var clonedMyClass = this.jsonDataSerializer.Clone<MyClass>(myClass);
-
-            Console.WriteLine("myClass.Properties[\"PropKey3\"].GetType(): " + myClass.Properties["PropKey3"].GetType());
-            Console.WriteLine("clonedMyClass.Properties[\"PropKey3\"].GetType(): " + clonedMyClass.Properties["PropKey3"].GetType());
-
-            Assert.AreNotEqual(myClass.GetHashCode(), clonedMyClass.GetHashCode());
-
-            clonedMyClass.Properties["PropKey1"] = 11;
-
-            Assert.AreEqual(10, myClass.Properties["PropKey1"]);
+                Assert.IsFalse(ReferenceEquals(expectedTrait, trait));
+                Assert.AreEqual(expectedTrait.Name, trait.Name);
+                Assert.AreEqual(expectedTrait.Value, trait.Value);
+            }
         }
 
         public class ClassWithSelfReferencingLoop
@@ -85,19 +123,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                 get;
                 set;
             }
-        }
-
-        [DataContract]
-        private class MyClass
-        {
-            [DataMember]
-            public string Name { get; set; }
-
-            [DataMember]
-            public Guid Id { get; set; }
-
-            [DataMember]
-            public Dictionary<string, object> Properties { get; set; }
         }
     }
 }

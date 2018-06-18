@@ -30,6 +30,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using OMTestResult =  Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
 
     using Moq;
 
@@ -590,8 +592,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldCloneTheActiveTestCaseObjectsIfTestSourceIsPackage()
         {
             const string package = @"C:\Porjects\UnitTestApp3\Debug\UnitTestApp3\UnitTestApp3.build.appxrecipe";
-            this.mockDataSerializer.Setup(d => d.Clone<TestCase>(It.IsAny<TestCase>()))
-                .Returns<TestCase>(t => JsonDataSerializer.Instance.Clone<TestCase>(t));
+
             this.SetUpTestRunEvents(package, setupHandleTestRunComplete: false);
 
             // Act.
@@ -601,6 +602,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
 
             this.mockDataSerializer.Verify(d => d.Clone<TestCase>(It.IsAny<TestCase>()), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        public void RunTestsShouldCloneTheTestResultsObjectsIfTestSourceIsPackage()
+        {
+            const string package = @"C:\Porjects\UnitTestApp3\Debug\UnitTestApp3\UnitTestApp3.build.appxrecipe";
+
+            this.SetUpTestRunEvents(package, setupHandleTestRunComplete: false);
+
+            // Act.
+            this.runTestsInstance.RunTests();
+
+            Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
+            Assert.AreEqual(1, receivedRunStatusArgs.ActiveTests.Count());
+
+            this.mockDataSerializer.Verify(d => d.Clone<OMTestResult>(It.IsAny<OMTestResult>()), Times.Exactly(2));
         }
 
         [TestMethod]
@@ -834,36 +851,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             if (setupHandleTestRunComplete)
             {
-                this.mockTestRunEventsHandler.Setup(
-                        treh =>
-                            treh.HandleTestRunComplete(
-                                It.IsAny<TestRunCompleteEventArgs>(),
-                                It.IsAny<TestRunChangedEventArgs>(),
-                                It.IsAny<ICollection<AttachmentSet>>(),
-                                It.IsAny<ICollection<string>>()))
-                    .Callback(
-                        (
-                            TestRunCompleteEventArgs complete,
-                            TestRunChangedEventArgs stats,
-                            ICollection<AttachmentSet> attachments,
-                            ICollection<string> executorUris) =>
-                        {
-                            receivedRunCompleteArgs = complete;
-                            this.receivedRunStatusArgs = stats;
-                            receivedattachments = attachments;
-                            receivedExecutorUris = executorUris;
-                        });
+                this.SetupHandleTestRunComplete();
             }
             else
             {
-                this.testExecutionContext.FrequencyOfRunStatsChangeEvent = 2;
-                this.mockTestRunEventsHandler
-                    .Setup(treh => treh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
-                    .Callback((TestRunChangedEventArgs stats) =>
-                    {
-                        receivedRunStatusArgs = stats;
-                    });
+                this.SetupHandleTestRunStatsChange();
             }
+
+            this.SetupDataSerializer();
 
             this.runTestsInstance = this.runTestsInstance = new TestableBaseRunTests(
                 this.mockRequestData.Object,
@@ -885,6 +880,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
 
             // Setup mocks.
+            this.SetupExecutorCallback(executorUriExtensionMap);
+        }
+
+        private void SetupExecutorCallback(List<Tuple<Uri, string>> executorUriExtensionMap)
+        {
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
@@ -896,6 +896,46 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     this.runTestsInstance.GetTestRunCache.OnTestStarted(inProgressTestCase);
                     this.runTestsInstance.GetTestRunCache.OnNewTestResult(testResult);
                 };
+        }
+
+        private void SetupDataSerializer()
+        {
+            this.mockDataSerializer.Setup(d => d.Clone<TestCase>(It.IsAny<TestCase>()))
+                .Returns<TestCase>(t => JsonDataSerializer.Instance.Clone<TestCase>(t));
+
+            this.mockDataSerializer.Setup(d => d.Clone<OMTestResult>(It.IsAny<OMTestResult>()))
+                .Returns<OMTestResult>(t => JsonDataSerializer.Instance.Clone<OMTestResult>(t));
+        }
+
+        private void SetupHandleTestRunStatsChange()
+        {
+            this.testExecutionContext.FrequencyOfRunStatsChangeEvent = 2;
+            this.mockTestRunEventsHandler
+                .Setup(treh => treh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
+                .Callback((TestRunChangedEventArgs stats) => { receivedRunStatusArgs = stats; });
+        }
+
+        private void SetupHandleTestRunComplete()
+        {
+            this.mockTestRunEventsHandler.Setup(
+                    treh =>
+                        treh.HandleTestRunComplete(
+                            It.IsAny<TestRunCompleteEventArgs>(),
+                            It.IsAny<TestRunChangedEventArgs>(),
+                            It.IsAny<ICollection<AttachmentSet>>(),
+                            It.IsAny<ICollection<string>>()))
+                .Callback(
+                    (
+                        TestRunCompleteEventArgs complete,
+                        TestRunChangedEventArgs stats,
+                        ICollection<AttachmentSet> attachments,
+                        ICollection<string> executorUris) =>
+                    {
+                        receivedRunCompleteArgs = complete;
+                        this.receivedRunStatusArgs = stats;
+                        receivedattachments = attachments;
+                        receivedExecutorUris = executorUris;
+                    });
         }
 
         #endregion

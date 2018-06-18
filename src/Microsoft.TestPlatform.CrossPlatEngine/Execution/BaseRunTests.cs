@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -565,6 +566,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // Collecting Number of Adapters Used to run tests. 
                 this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToRunTests, this.ExecutorUrisThatRanTests.Count());
 
+                if (lastChunk.Any() && string.IsNullOrEmpty(package) == false)
+                {
+                    Tuple<ICollection<TestResult>, ICollection<TestCase>> updatedTestResultsAndInProgressTestCases = this.UpdateTestCaseSourceToPackage(lastChunk, null);
+                    lastChunk = updatedTestResultsAndInProgressTestCases.Item1;
+                }
+
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
 
                 // Adding Metrics along with Test Run Complete Event Args
@@ -577,10 +584,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     attachments,
                     elapsedTime);
                 testRunCompleteEventArgs.Metrics = this.requestData.MetricsCollection.Metrics;
-                if (lastChunk.Any())
-                {
-                    UpdateTestResultsAndInProgressTestCases(lastChunk, null, this.package);
-                }
 
                 this.testRunEventsHandler.HandleTestRunComplete(
                     testRunCompleteEventArgs,
@@ -598,7 +601,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testRunEventsHandler != null)
             {
-                inProgressTestCases = UpdateTestResultsAndInProgressTestCases(results, inProgressTestCases, this.package);
+                if (string.IsNullOrEmpty(package) == false)
+                {
+                    Tuple<ICollection<TestResult>, ICollection<TestCase>> updatedTestResultsAndInProgressTestCases
+                        = this.UpdateTestCaseSourceToPackage(results, inProgressTestCases);
+                    results = updatedTestResultsAndInProgressTestCases.Item1;
+                    inProgressTestCases = updatedTestResultsAndInProgressTestCases.Item2;
+                }
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTestCases);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -632,24 +641,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 
-        private ICollection<TestCase> UpdateTestResultsAndInProgressTestCases(IEnumerable<TestResult> testResults, ICollection<TestCase> inProgressTestCases, string package)
+        private Tuple<ICollection<TestResult>, ICollection<TestCase>> UpdateTestCaseSourceToPackage(
+            ICollection<TestResult> testResults,
+            ICollection<TestCase> inProgressTestCases)
         {
 
-            // No change required to testcases and testresults.
-            if (string.IsNullOrEmpty(package))
+            EqtTrace.Verbose("BaseRunTests.UpdateTestCaseSourceToPackage: Update source details for testResults and testCases.");
+
+            var updatedTestResults = UpdateTestResults(testResults, package);
+
+            var updatedInProgressTestCases = UpdateInProgressTests(inProgressTestCases, package);
+
+            return new Tuple<ICollection<TestResult>, ICollection<TestCase>>(updatedTestResults, updatedInProgressTestCases);
+        }
+
+        private ICollection<TestResult> UpdateTestResults(ICollection<TestResult> testResults, string package)
+        {
+            ICollection<TestResult> updatedTestResults = new List<TestResult>();
+
+            foreach (var testResult in testResults)
             {
-                return inProgressTestCases;
+                var updatedTestResult = this.dataSerializer.Clone<TestResult>(testResult);
+                updatedTestResult.TestCase.Source = package;
+                updatedTestResults.Add(updatedTestResult);
             }
 
-            EqtTrace.Verbose("BaseRunTests.UpdateTestResultsAndInProgressTests: Update source details for testResults and testCases.");
-
-            // Before sending the testresults back, update the test case objects with source provided by IDE/User.
-            foreach (var tr in testResults)
-            {
-                tr.TestCase.Source = package;
-            }
-
-            return UpdateInProgressTests(inProgressTestCases, package);
+            return updatedTestResults;
         }
 
         private  ICollection<TestCase> UpdateInProgressTests(ICollection<TestCase> inProgressTestCases, string package)
@@ -658,8 +675,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 return null;
             }
-
-            EqtTrace.Verbose("BaseRunTests.UpdateInProgressTests: Updating source for inprogress tests.");
 
             ICollection<TestCase> updatedTestCases  = new List<TestCase>();
             foreach (var inProgressTestCase in inProgressTestCases)
