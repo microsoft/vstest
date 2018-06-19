@@ -8,6 +8,7 @@
     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine</AssemblyName>
     <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
+    <!--<EnableCodeAnalysis>true</EnableCodeAnalysis>-->
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
