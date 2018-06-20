@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The Run Tests using VsTestConsoleWrapper API's
@@ -137,6 +138,34 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert
             Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
+        public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
+
+            var expectedAssemblyName = "SimpleTestProject3.dll";
+            var source = new List<string>() {this.GetAssetFullPath(expectedAssemblyName)};
+
+            var veryLongTestCaseFilter =
+                "FullyQualifiedName=VeryLongTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+            this.vstestConsoleWrapper.RunTests(
+                source,
+                this.GetDefaultRunSettings(),
+                new TestPlatformOptions() { TestCaseFilter = veryLongTestCaseFilter },
+                this.runEventHandler);
+
+            var expectedFilter = veryLongTestCaseFilter.Substring(0, 60) + "...";
+
+            // Assert
+            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test available for testcase filter `{expectedFilter}` in");
+            StringAssert.EndsWith(this.runEventHandler.LogMessage, expectedAssemblyName);
+
+            Assert.AreEqual(TestMessageLevel.Warning , this.runEventHandler.TestMessageLevel);
         }
 
         private IList<string> GetTestAssemblies()

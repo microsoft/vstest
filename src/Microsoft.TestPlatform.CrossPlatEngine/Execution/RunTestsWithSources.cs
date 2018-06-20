@@ -62,26 +62,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             if (!exceptionsHitDuringRunTests && this.executorUriVsSourceList?.Count > 0 && !this.IsCancellationRequested
                 && this.TestRunCache?.TotalExecutedTests <= 0)
             {
-                IEnumerable<string> sources = new List<string>();
-                var sourcesArray = this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
-                var sourcesString = string.Join(" ", sourcesArray);
+                this.LogWarningOnNoTestsDiscovered();
+            }
+        }
 
-                if (this.TestExecutionContext.TestCaseFilter != null)
-                {
-                    this.TestRunEventsHandler?.HandleLogMessage(
-                        TestMessageLevel.Warning,
-                        $"No test available for testcase filter `{this.TestExecutionContext.TestCaseFilter}` in {sourcesString}");
-                }
-                else
-                {
+        private void LogWarningOnNoTestsDiscovered()
+        {
+            IEnumerable<string> sources = new List<string>();
+            var sourcesArray = this.adapterSourceMap.Values
+                .Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
+            var sourcesString = string.Join(" ", sourcesArray);
 
-                    this.TestRunEventsHandler?.HandleLogMessage(
-                        TestMessageLevel.Warning,
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
-                            sourcesString));
-                }
+            if (this.TestExecutionContext.TestCaseFilter != null)
+            {
+                var testCaseFilterToShow = TestCaseFilterToShow(this.TestExecutionContext.TestCaseFilter);
+                this.TestRunEventsHandler?.HandleLogMessage(
+                    TestMessageLevel.Warning,
+                    $"No test available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
+            }
+            else
+            {
+                this.TestRunEventsHandler?.HandleLogMessage(
+                    TestMessageLevel.Warning,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
+                        sourcesString));
             }
         }
 
@@ -179,6 +185,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
 
             return result;
+        }
+
+        private static string TestCaseFilterToShow(string testCaseFilter)
+        {
+            var maxTestCaseFilterToShowLength = 63;
+            string testCaseFilterToShow;
+
+            if (testCaseFilter.Length > maxTestCaseFilterToShowLength)
+            {
+                testCaseFilterToShow = testCaseFilter.Substring(0, maxTestCaseFilterToShowLength - 3) + "...";
+            }
+            else
+            {
+                testCaseFilterToShow = testCaseFilter;
+            }
+
+            return testCaseFilterToShow;
         }
     }
 }
