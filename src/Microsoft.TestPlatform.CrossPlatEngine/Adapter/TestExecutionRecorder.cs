@@ -64,6 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <param name="testCase">test case which will be started.</param>
         public void RecordStart(TestCase testCase)
         {
+            EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase?.FullyQualifiedName);
             this.testRunCache.OnTestStarted(testCase);
 
             if (this.testCaseEventsHandler != null)
@@ -85,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// test result to the framework when the test(s) is canceled. </exception>  
         public void RecordResult(TestResult testResult)
         {
+            EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult?.TestCase?.FullyQualifiedName);
             if (this.testCaseEventsHandler != null)
             {
                 // Send TestCaseEnd in case RecordEnd was not called.
@@ -104,6 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <param name="outcome">outcome of the test case.</param>
         public void RecordEnd(TestCase testCase, TestOutcome outcome)
         {
+            EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase?.FullyQualifiedName);
             this.testRunCache.OnTestCompletion(testCase);
             this.SendTestCaseEnd(testCase, outcome);
         }

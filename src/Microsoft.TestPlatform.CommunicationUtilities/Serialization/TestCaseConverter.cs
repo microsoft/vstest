@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
                             testCase.LineNumber = int.Parse(propertyData); break;
                         default:
                             // No need to register member properties as they get registered as part of TestCaseProperties class.
-                            TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), typeof(TestObject));
+                            testProperty = TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), testProperty.Attributes, typeof(TestObject));
                             testCase.SetPropertyValue(testProperty, propertyData);
                             break;
                     }

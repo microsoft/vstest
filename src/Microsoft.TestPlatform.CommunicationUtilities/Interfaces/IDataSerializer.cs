@@ -46,5 +46,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="version">version to be sent</param>
         /// <returns>Raw Serialized message</returns>
         string SerializePayload(string messageType, object payload, int version);
+
+        /// <summary>
+        /// Creates cloned object for given object.
+        /// </summary>
+        /// <typeparam name="T"> The type of object to be cloned. </typeparam>
+        /// <param name="obj">Object to be cloned.</param>
+        /// <returns>Newly cloned object.</returns>
+        T Clone<T>(T obj);
     }
 }
