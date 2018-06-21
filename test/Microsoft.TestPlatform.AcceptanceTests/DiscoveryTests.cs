@@ -77,8 +77,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll", "SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
+            var assetFullPath = this.GetAssetFullPath("SimpleTestProject2.dll");
+            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /listtests" );
             arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");
             arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
@@ -86,7 +86,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             StringAssert.Contains(this.StdOut, "Warning: No test available for testcase filter `NonExistTestCaseName` in");
 
-            StringAssert.Contains(this.StdOut, "SimpleTestProject3.dll");
             StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
 
             this.ExitCodeEquals(0);
