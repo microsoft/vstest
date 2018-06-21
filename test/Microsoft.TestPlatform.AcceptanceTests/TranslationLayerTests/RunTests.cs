@@ -148,7 +148,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            var expectedAssemblyName = "SimpleTestProject3.dll";
+            var expectedAssemblyName = "SimpleTestProject2.dll";
             var source = new List<string>() {this.GetAssetFullPath(expectedAssemblyName)};
 
             var veryLongTestCaseFilter =
