@@ -548,6 +548,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        public void RunTestsShouldNotCloneTestCaseAndTestResultsObjectForNonPackageSource()
+        {
+            this.SetUpTestRunEvents();
+
+            this.runTestsInstance.RunTests();
+
+            this.mockDataSerializer.Verify(d => d.Clone<TestCase>(It.IsAny<TestCase>()), Times.Never);
+            this.mockDataSerializer.Verify(d => d.Clone<OMTestResult>(It.IsAny<OMTestResult>()), Times.Never);
+        }
+
+        [TestMethod]
         public void RunTestsShouldUpdateTestResultsTestCaseSourceWithPackageIfTestSourceIsPackage()
         {
             const string package = @"C:\Projects\UnitTestApp1\AppPackages\UnitTestApp1\UnitTestApp1_1.0.0.0_Win32_Debug_Test\UnitTestApp1_1.0.0.0_Win32_Debug.appx";

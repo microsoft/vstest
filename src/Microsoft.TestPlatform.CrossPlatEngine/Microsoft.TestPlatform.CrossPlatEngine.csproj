@@ -9,6 +9,7 @@
     <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.4</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
+    <!--<EnableCodeAnalysis>true</EnableCodeAnalysis>-->
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />
