@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(this.TestExecutionContext.TestCaseFilter);
                 this.TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Warning,
-                    $"No test is available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
+                    string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
             }
             else
             {
