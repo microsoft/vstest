@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
 
-            // TODO Get change from https://github.com/Microsoft/vstest/pull/1111/
+            // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
         }
 

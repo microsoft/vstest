@@ -502,15 +502,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         }
 
         [TestMethod]
-        public void LoadTestsShouldShortenTheTestCaseFilterWhenNoTestsDiscovered()
+        public void LoadTestsShouldShortenTheLongTestCaseFilterWhenNoTestsDiscovered()
         {
             DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
 
-            var testCaseFilter = "Name~LongTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+            var veryLengthyTestCaseFilter = "FullyQualifiedName=TestPlatform.CrossPlatEngine" +
+                                            ".UnitTests.Discovery.DiscovererEnumeratorTests." +
+                                            "LoadTestsShouldShortenTheLongTestCaseFilterWhenNoTestsDiscovered" +
+                                            "TestCaseFilterWithVeryLengthTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, veryLengthyTestCaseFilter, this.messageLoggerMock.Object);
 
-            var expectedTestCaseFilter = testCaseFilter.Substring(0, 60) + "...";
+            var expectedTestCaseFilter = veryLengthyTestCaseFilter.Substring(0, 256) + "...";
             var expectedMessage =
                 $"No test is available for testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
 

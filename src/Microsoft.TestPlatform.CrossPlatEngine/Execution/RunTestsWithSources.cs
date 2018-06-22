@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using ObjectModel.Client;
     using ObjectModel.Logging;
-
+    using Utilities;
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     internal class RunTestsWithSources : BaseRunTests
@@ -75,10 +75,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             if (this.TestExecutionContext.TestCaseFilter != null)
             {
-                var testCaseFilterToShow = TestCaseFilterToShow(this.TestExecutionContext.TestCaseFilter);
+                var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(this.TestExecutionContext.TestCaseFilter);
                 this.TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Warning,
-                    $"No test available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
+                    $"No test is available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
             }
             else
             {

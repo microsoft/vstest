@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
+    using Utilities;
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
@@ -298,28 +298,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             IMessageLogger logger,
             string sourcesString)
         {
-            var testCaseFilterToShow = TestCaseFilterToShow(testCaseFilter);
+            var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
 
             logger.SendMessage(
                 TestMessageLevel.Warning,
                 $"No test is available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
-        }
-
-        private static string TestCaseFilterToShow(string testCaseFilter)
-        {
-            var maxTestCaseFilterToShowLength = 63;
-            string testCaseFilterToShow;
-
-            if (testCaseFilter.Length > maxTestCaseFilterToShowLength)
-            {
-                testCaseFilterToShow = testCaseFilter.Substring(0, 60) + "...";
-            }
-            else
-            {
-                testCaseFilterToShow = testCaseFilter;
-            }
-
-            return testCaseFilterToShow;
         }
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
