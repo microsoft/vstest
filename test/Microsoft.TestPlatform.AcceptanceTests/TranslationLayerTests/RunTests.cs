@@ -148,22 +148,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
-            var expectedAssemblyName = "SimpleTestProject2.dll";
-            var source = new List<string>() {this.GetAssetFullPath(expectedAssemblyName)};
+            var testAssemblyName = "SimpleTestProject2.dll";
+            var source = new List<string>() {this.GetAssetFullPath(testAssemblyName)};
 
             var veryLongTestCaseFilter =
-                "FullyQualifiedName=VeryLongTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+                "FullyQualifiedName=VeryLongTestCaseNameeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
             this.vstestConsoleWrapper.RunTests(
                 source,
                 this.GetDefaultRunSettings(),
                 new TestPlatformOptions() { TestCaseFilter = veryLongTestCaseFilter },
                 this.runEventHandler);
 
-            var expectedFilter = veryLongTestCaseFilter.Substring(0, 60) + "...";
+            var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
 
             // Assert
-            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test available for testcase filter `{expectedFilter}` in");
-            StringAssert.EndsWith(this.runEventHandler.LogMessage, expectedAssemblyName);
+            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test is available for testcase filter `{expectedFilter}` in");
+            StringAssert.EndsWith(this.runEventHandler.LogMessage, testAssemblyName);
 
             Assert.AreEqual(TestMessageLevel.Warning , this.runEventHandler.TestMessageLevel);
         }
