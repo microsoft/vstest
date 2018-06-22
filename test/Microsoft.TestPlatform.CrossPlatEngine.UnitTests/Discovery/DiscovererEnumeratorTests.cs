@@ -49,6 +49,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockAssemblyProperties.Object);
             this.runSettingsMock = new Mock<IRunSettings>();
             this.messageLoggerMock = new Mock<IMessageLogger>();
+            TestPluginCacheTests.SetupMockExtensions( new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+                () => { });
             TestDiscoveryExtensionManager.Destroy();
         }
 
@@ -389,6 +391,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         }
 
         [TestMethod]
+        public void LoadTestsShouldNotShowAnyWarningOnTestsDiscovered()
+        {
+            this.InvokeLoadTestWithMockSetup();
+
+            Assert.AreEqual(2, this.discoveryResultCache.Tests.Count);
+
+            this.messageLoggerMock.Verify(m => m.SendMessage(TestMessageLevel.Warning, It.IsAny<string>()), Times.Never);
+        }
+
+        [TestMethod]
         public void LoadTestShouldInstrumentDiscoveryStart()
         {
             this.InvokeLoadTestWithMockSetup();
@@ -460,17 +472,62 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             Assert.AreEqual(this.messageLoggerMock.Object, JsonTestDiscoverer.MessageLogger);
             Assert.IsNotNull(JsonTestDiscoverer.DiscoverySink);
         }
-        private void SetupForNoTestsAvailableInGivenAssemblies()
-        {
-            var corssPlatEngineAssembly = typeof(DiscovererEnumerator).GetTypeInfo().Assembly.Location;
-            var objectModelAssembly = typeof(TestCase).GetTypeInfo().Assembly.Location;
-            var sources = new string[] { corssPlatEngineAssembly, objectModelAssembly };
-            TestPluginCacheTests.SetupMockExtensions(sources, () => { });
 
-            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-            extensionSourceMap.Add("_none_", sources);
+        [TestMethod]
+        public void LoadTestsShouldLogWarningMessageOnNoTestsInAssemblies()
+        {
+            DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
 
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, null, this.messageLoggerMock.Object);
+
+            var expectedMessage =
+                $"No test is available in {sourcesString}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
+
+            this.messageLoggerMock.Verify( l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+        }
+
+        [TestMethod]
+        public void LoadTestsShouldLogWarningMessageOnNoTestsInAssembliesWithTestCaseFilter()
+        {
+            DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
+
+            var testCaseFilter = "Name~TestMethod1";
+
+            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+
+            var expectedMessage =
+                $"No test is available for testcase filter `{testCaseFilter}` in {sourcesString}";
+
+            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+        }
+
+        [TestMethod]
+        public void LoadTestsShouldShortenTheTestCaseFilterWhenNoTestsDiscovered()
+        {
+            DiscovererEnumeratorTests.SetupForNoTestsAvailableInGivenAssemblies(out var extensionSourceMap, out var sourcesString);
+
+            var testCaseFilter = "Name~LongTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
+            this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
+
+            var expectedTestCaseFilter = testCaseFilter.Substring(0, 60) + "...";
+            var expectedMessage =
+                $"No test is available for testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
+
+            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+        }
+
+        private static void SetupForNoTestsAvailableInGivenAssemblies(
+            out Dictionary<string, IEnumerable<string>> extensionSourceMap,
+            out string sourcesString)
+        {
+            var crossPlatEngineAssemblyLocation = typeof(DiscovererEnumerator).GetTypeInfo().Assembly.Location;
+            var objectModelAseeAssemblyLocation = typeof(TestCase).GetTypeInfo().Assembly.Location;
+            var sources = new string[] { crossPlatEngineAssemblyLocation, objectModelAseeAssemblyLocation };
+
+            extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
+            extensionSourceMap.Add("_none_", sources);
+            sourcesString = string.Join(" ", crossPlatEngineAssemblyLocation, objectModelAseeAssemblyLocation);
         }
 
         private void InvokeLoadTestWithMockSetup()
@@ -590,12 +647,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             public virtual void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
+                if (DllTestDiscoverer.ShouldTestDiscovered(sources) == false)
+                {
+                    return;
+                }
+
                 DiscoveryContext = discoveryContext;
                 MessageLogger = logger;
                 DiscoverySink = discoverySink;
 
                 var testCase = new TestCase("A.C.M", new Uri("executor://dllexecutor"), "A");
                 discoverySink.SendTestCase(testCase);
+            }
+
+            private static bool ShouldTestDiscovered(IEnumerable<string> sources)
+            {
+                var shouldTestDiscovered = false;
+                foreach (var source in sources)
+                {
+                    if (source.Equals("native.dll") || source.Equals("managed.dll") || source.EndsWith("CrossPlatEngine.UnitTests.dll"))
+                    {
+                        shouldTestDiscovered = true;
+                        break;
+                    }
+                }
+
+                return shouldTestDiscovered;
             }
         }
 

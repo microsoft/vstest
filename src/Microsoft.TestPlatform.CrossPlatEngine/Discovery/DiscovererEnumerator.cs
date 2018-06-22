@@ -302,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             logger.SendMessage(
                 TestMessageLevel.Warning,
-                $"No test available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
+                $"No test is available for testcase filter `{testCaseFilterToShow}` in {sourcesString}");
         }
 
         private static string TestCaseFilterToShow(string testCaseFilter)
