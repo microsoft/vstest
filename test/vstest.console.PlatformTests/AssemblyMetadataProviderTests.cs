@@ -11,6 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
+    using Utilities.Helpers;
+    using Utilities.Helpers.Interfaces;
 
     [TestClass]
     public class AssemblyMetadataProviderTests : IntegrationTestBase
@@ -20,9 +23,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         private IAssemblyMetadataProvider assemblyMetadataProvider;
 
+        private Mock<IFileHelper> fileHelperMock;
+
+        private FileHelper fileHelper;
+
+        private bool isManagedAssemblyArchitectureTest;
+
         public AssemblyMetadataProviderTests()
         {
-            this.assemblyMetadataProvider = new AssemblyMetadataProvider();
+            this.fileHelper = new FileHelper();
+            this.fileHelperMock = new Mock<IFileHelper>();
+            this.isManagedAssemblyArchitectureTest = false;
+            this.assemblyMetadataProvider = new AssemblyMetadataProvider(this.fileHelperMock.Object);
+
+            this.fileHelperMock.Setup(f =>
+                    f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read, FileShare.Read))
+                .Returns<string, FileMode, FileAccess, FileShare>((filePath, mode, access, share) => this.fileHelper.GetStream(filePath, mode, access, share));
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (this.isManagedAssemblyArchitectureTest == false)
+            {
+                this.fileHelperMock.Verify(
+                    f => f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read, FileShare.Read), Times.Once);
+            }
         }
 
         [TestMethod]
@@ -135,6 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         private void TestDotnetAssemblyArch(string projectName, string framework, Architecture expectedArch, long expectedElapsedTime)
         {
+            this.isManagedAssemblyArchitectureTest = true;
             var assemblyPath = this.testEnvironment.GetTestAsset(projectName + ".dll", framework);
             this.LoadAssemblyIntoMemory(assemblyPath);
             var stopWatch = Stopwatch.StartNew();
