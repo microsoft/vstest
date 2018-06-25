@@ -5,14 +5,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities
 {
     internal class TestCaseFilterDeterminer
     {
+        private const int MaxLengthOfTestCaseFilterToShow = 256;
+
         internal static string ShortenTestCaseFilterIfRequired(string testCaseFilter)
         {
-            var maxLength = 256;
             string shortenTestCaseFilter;
 
-            if (testCaseFilter.Length > maxLength)
+            if (testCaseFilter.Length > MaxLengthOfTestCaseFilterToShow)
             {
-                shortenTestCaseFilter = testCaseFilter.Substring(0, maxLength) + "...";
+                shortenTestCaseFilter = testCaseFilter.Substring(0, MaxLengthOfTestCaseFilterToShow) + "...";
             }
             else
             {

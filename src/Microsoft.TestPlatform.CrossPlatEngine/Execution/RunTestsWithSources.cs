@@ -62,11 +62,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             if (!exceptionsHitDuringRunTests && this.executorUriVsSourceList?.Count > 0 && !this.IsCancellationRequested
                 && this.TestRunCache?.TotalExecutedTests <= 0)
             {
-                this.LogWarningOnNoTestsDiscovered();
+                this.LogWarningOnNoTestsExecuted();
             }
         }
 
-        private void LogWarningOnNoTestsDiscovered()
+        private void LogWarningOnNoTestsExecuted()
         {
             IEnumerable<string> sources = new List<string>();
             var sourcesArray = this.adapterSourceMap.Values

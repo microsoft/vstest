@@ -102,12 +102,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             Justification = "This methods must invoke all possible discoverers and not fail or crash in any one.")]
         private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
         {
-            double totalAdaptersUsed = 0;
-
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
-
-            var discoverersFromDeprecatedLocations = false;
 
             var discovererToSourcesMap = DiscovererEnumerator.GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
@@ -132,10 +128,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
             double totalTimeTakenByAdapters = 0;
+            double totalAdaptersUsed = 0;
 
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
-                this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref discoverersFromDeprecatedLocations, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
+                this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
             }
 
             if (this.discoveryResultCache.TotalDiscoveredTests == 0)
@@ -159,15 +156,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
         private void DiscoverTestsFromSingleDiscoverer(
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer,
-            Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>,IEnumerable<string>> discovererToSourcesMap,
+            Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> discovererToSourcesMap,
             DiscoveryContext context,
             TestCaseDiscoverySink discoverySink,
             IMessageLogger logger,
-            ref bool discoverersFromDeprecatedLocations,
             ref double totalAdaptersUsed,
             ref double totalTimeTakenByAdapters)
         {
-            if (TryToLoadDiscoverer(discoverer, logger, out var discovererType) == false)
+            if (DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType) == false)
             {
                 // Fail to instantiate the discoverer type.
                 return;
@@ -191,18 +187,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests -
                                                                   currentTotalTests);
 
-                // Record Total Tests Discovered By each Adapter.
-                this.RecordTotalTestsDiscoveredByCurrentAdapter(
-                    currentTotalTests,
-                    discoverer,
-                    ref discoverersFromDeprecatedLocations,
-                    ref totalAdaptersUsed);
+                // Record Total Tests Discovered By each Discoverer.
+                var totalTestsDiscoveredByCurrentDiscoverer = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
+                this.requestData.MetricsCollection.Add(
+                    string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
+                        discoverer.Metadata.DefaultExecutorUri), totalTestsDiscoveredByCurrentDiscoverer);
+
+                totalAdaptersUsed++;
+
 
                 EqtTrace.Verbose("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Done loading tests for {0}",
                         discoverer.Value.GetType().FullName);
 
-
-                if (discoverersFromDeprecatedLocations)
+                var discovererFromDeprecatedLocations = DiscovererEnumerator.IsDiscovererFromDeprecatedLocations(discoverer);
+                if (discovererFromDeprecatedLocations)
                 {
                     logger.SendMessage(TestMessageLevel.Warning,
                         string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
@@ -251,26 +249,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             return true;
         }
 
-        private void RecordTotalTestsDiscoveredByCurrentAdapter(long currentTotalTests, LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer,
-            ref bool discoverersFromDeprecatedLocations, ref double totalAdaptersUsed)
+        private static bool IsDiscovererFromDeprecatedLocations(
+            LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer)
         {
-            if (this.discoveryResultCache.TotalDiscoveredTests > currentTotalTests)
+            if (CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(),
+                StringComparer.OrdinalIgnoreCase))
             {
-                var totalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
-                this.requestData.MetricsCollection.Add(
-                    string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
-                        discoverer.Metadata.DefaultExecutorUri), totalDiscoveredTests);
-                if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(),
-                    StringComparer.OrdinalIgnoreCase))
-                {
-                    var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
-
-                    discoverersFromDeprecatedLocations |= Path.GetDirectoryName(discovererLocation)
-                        .Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
-                }
-
-                totalAdaptersUsed++;
+                return false;
             }
+
+            var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
+
+            return Path.GetDirectoryName(discovererLocation)
+                .Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
         }
 
         private static void LogWarningOnNoTestsDiscovered(IEnumerable<string> sources, string testCaseFilter, IMessageLogger logger)
@@ -280,7 +271,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Print warning on no tests.
             if (string.IsNullOrEmpty(testCaseFilter) == false)
             {
-                LogWarningOnNoTestsDiscoveredWithTestCaseFilter(testCaseFilter, logger, sourcesString);
+                var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
+
+                logger.SendMessage(
+                    TestMessageLevel.Warning,
+                    string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
             }
             else
             {
@@ -293,17 +288,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
         }
 
-        private static void LogWarningOnNoTestsDiscoveredWithTestCaseFilter(
-            string testCaseFilter,
-            IMessageLogger logger,
-            string sourcesString)
-        {
-            var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
-
-            logger.SendMessage(
-                TestMessageLevel.Warning,
-                string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
-        }
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
         {
