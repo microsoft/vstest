@@ -9,6 +9,8 @@
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine.UnitTests</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
+    <!--<WarningsAsErrors>true</WarningsAsErrors>
+    <EnableCodeAnalysis>true</EnableCodeAnalysis> -->
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />

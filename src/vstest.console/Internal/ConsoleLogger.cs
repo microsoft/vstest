@@ -147,6 +147,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
+
+            // Register for the discovery events.
+            events.DiscoveryMessage += this.TestMessageHandler;
+
+            // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
+            // events.DiscoveredTests += DiscoveredTestsHandler;
         }
 
         public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
