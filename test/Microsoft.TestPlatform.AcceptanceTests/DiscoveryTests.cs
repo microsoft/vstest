@@ -84,7 +84,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
             this.InvokeVsTest(arguments);
 
-            StringAssert.Contains(this.StdOut, "Warning: No test is available for testcase filter `NonExistTestCaseName` in");
+            StringAssert.Contains(this.StdOut, "Warning: No test matches the given testcase filter `NonExistTestCaseName` in");
 
             StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
 

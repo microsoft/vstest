@@ -224,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No test is available for testcase filter `{0}` in {1}.
+        ///   Looks up a localized string similar to No test matches the given testcase filter `{0}` in {1}.
         /// </summary>
         internal static string NoTestsAvailableForGivenTestCaseFilter {
             get {

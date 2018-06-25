@@ -167,7 +167,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
 
             // Assert
-            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test is available for testcase filter `{expectedFilter}` in");
+            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
             StringAssert.EndsWith(this.runEventHandler.LogMessage, testAssemblyName);
 
             Assert.AreEqual(TestMessageLevel.Warning , this.runEventHandler.TestMessageLevel);

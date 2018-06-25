@@ -196,6 +196,6 @@
     <value>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</value>
   </data>
   <data name="NoTestsAvailableForGivenTestCaseFilter" xml:space="preserve">
-    <value>No test is available for testcase filter `{0}` in {1}</value>
+    <value>No test matches the given testcase filter `{0}` in {1}</value>
   </data>
 </root>
