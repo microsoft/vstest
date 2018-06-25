@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.runSettingsManager = runSettingsProvider;
             this.testRequestManager = testRequestManager;
             this.output = output;
-            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output);
+            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
         #endregion
@@ -206,10 +206,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar
         {
             private IOutput output;
+            private CommandLineOptions commandLineOptions;
 
-            public TestRunRequestEventsRegistrar(IOutput output)
+            public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
             {
                 this.output = output;
+                this.commandLineOptions = commandLineOptions;
             }
 
             public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
@@ -236,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
 
                     // Indicate the user to use testadapterpath command if there are no tests found
-                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath))
+                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && this.commandLineOptions.TestCaseFilterValue == null) 
                     {
                         this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                     }

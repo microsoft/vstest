@@ -41,13 +41,18 @@
         <note />
       </trans-unit>
       <trans-unit id="ValidUsage">
-        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
-Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</source>
-        <target state="translated">Platné použití: SettingsMigrator.exe &lt;kompletní cesta k souboru testsettings nebo runsettings, který se má migrovat&gt;
+        <source>Valid usage:
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to runsettings file to be created&gt;
+Examples:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
+        <target state="new">Platné použití: SettingsMigrator.exe &lt;kompletní cesta k souboru testsettings nebo runsettings, který se má migrovat&gt;
 Příklad: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
 Příklad: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note />
+        <note></note>
       </trans-unit>
     </body>
   </file>

@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using ObjectModel.Client;
     using ObjectModel.Logging;
-
+    using Utilities;
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     internal class RunTestsWithSources : BaseRunTests
@@ -62,10 +62,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             if (!exceptionsHitDuringRunTests && this.executorUriVsSourceList?.Count > 0 && !this.IsCancellationRequested
                 && this.TestRunCache?.TotalExecutedTests <= 0)
             {
-                IEnumerable<string> sources = new List<string>();
-                var sourcesArray = this.adapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
-                var sourcesString = string.Join(" ", sourcesArray);
+                this.LogWarningOnNoTestsExecuted();
+            }
+        }
 
+        private void LogWarningOnNoTestsExecuted()
+        {
+            IEnumerable<string> sources = new List<string>();
+            var sourcesArray = this.adapterSourceMap.Values
+                .Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).ToArray();
+            var sourcesString = string.Join(" ", sourcesArray);
+
+            if (this.TestExecutionContext.TestCaseFilter != null)
+            {
+                var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(this.TestExecutionContext.TestCaseFilter);
+                this.TestRunEventsHandler?.HandleLogMessage(
+                    TestMessageLevel.Warning,
+                    string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
+            }
+            else
+            {
                 this.TestRunEventsHandler?.HandleLogMessage(
                     TestMessageLevel.Warning,
                     string.Format(
@@ -169,6 +185,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
 
             return result;
+        }
+
+        private static string TestCaseFilterToShow(string testCaseFilter)
+        {
+            var maxTestCaseFilterToShowLength = 63;
+            string testCaseFilterToShow;
+
+            if (testCaseFilter.Length > maxTestCaseFilterToShowLength)
+            {
+                testCaseFilterToShow = testCaseFilter.Substring(0, maxTestCaseFilterToShowLength - 3) + "...";
+            }
+            else
+            {
+                testCaseFilterToShow = testCaseFilter;
+            }
+
+            return testCaseFilterToShow;
         }
     }
 }
