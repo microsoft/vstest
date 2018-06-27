@@ -496,7 +496,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discovererEnumerator.LoadTests(extensionSourceMap, this.runSettingsMock.Object, testCaseFilter, this.messageLoggerMock.Object);
 
             var expectedMessage =
-                $"No test is available for testcase filter `{testCaseFilter}` in {sourcesString}";
+                $"No test matches the given testcase filter `{testCaseFilter}` in {sourcesString}";
 
             this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
         }
@@ -515,7 +515,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             var expectedTestCaseFilter = veryLengthyTestCaseFilter.Substring(0, 256) + "...";
             var expectedMessage =
-                $"No test is available for testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
+                $"No test matches the given testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
 
             this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
         }

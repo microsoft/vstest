@@ -231,7 +231,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.RunTests();
 
             var expectedMessage =
-                $"No test is available for testcase filter `{testCaseFilter}` in {sourcesString}";
+                $"No test matches the given testcase filter `{testCaseFilter}` in {sourcesString}";
             this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
         }
 
@@ -249,7 +249,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var expectedTestCaseFilter = veryLengthyTestCaseFilter.Substring(0, 256)+ "...";
 
             var expectedMessage =
-                $"No test is available for testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
+                $"No test matches the given testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
             this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
         }
 
