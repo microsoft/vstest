@@ -26,7 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 
         internal AssemblyMetadataProvider(IFileHelper fileHelper)
         {
-
             this.fileHelper = fileHelper;
         }
 
@@ -36,14 +35,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             try
             {
-                using (var assemblyStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var assemblyStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read))
                 {
                     frameworkName = AssemblyMetadataProvider.GetFrameworkNameFromAssemblyMetadata(assemblyStream);
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion: {0} for assembly: {1}", ex, filePath);
+                EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion exception: {0} for assembly: {1}", ex, filePath);
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -172,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 //get the input stream
-                using (Stream fs = this.fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (Stream fs = this.fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read))
                 using (var reader = new BinaryReader(fs))
                 {
                     var validImage = true;
