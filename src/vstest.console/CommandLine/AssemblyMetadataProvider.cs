@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         /// <summary>
         /// Gets the instance.
         /// </summary>
-        internal static AssemblyMetadataProvider Instance => instance ?? (instance = new AssemblyMetadataProvider(new FileHelper()));
+        public static AssemblyMetadataProvider Instance => instance ?? (instance = new AssemblyMetadataProvider(new FileHelper()));
 
         internal AssemblyMetadataProvider(IFileHelper fileHelper)
         {
