@@ -37,8 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             this.assemblyMetadataProvider = new AssemblyMetadataProvider(this.fileHelperMock.Object);
 
             this.fileHelperMock.Setup(f =>
-                    f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read, FileShare.Read))
-                .Returns<string, FileMode, FileAccess, FileShare>((filePath, mode, access, share) => this.fileHelper.GetStream(filePath, mode, access, share));
+                    f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read))
+                .Returns<string, FileMode, FileAccess>((filePath, mode, access) => this.fileHelper.GetStream(filePath, mode, access));
         }
 
         [TestCleanup]
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
             if (this.isManagedAssemblyArchitectureTest == false)
             {
                 this.fileHelperMock.Verify(
-                    f => f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read, FileShare.Read), Times.Once);
+                    f => f.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.Read), Times.Once);
             }
         }
 
