@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestPlatformFactory.GetTestPlatform(),
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
-                  new InferHelper(new AssemblyMetadataProvider()),
+                  new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
         }
