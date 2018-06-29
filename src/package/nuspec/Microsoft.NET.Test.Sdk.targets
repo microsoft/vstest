@@ -90,8 +90,12 @@
     <!--
     Compile Include the generated Program File
     -->
-    <ItemGroup>
+    <ItemGroup Condition="'$(Language)'!='F#'">
       <Compile Include="$(GeneratedProgramFile)"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(Language)'=='F#'">
+      <CompileAfter Include="$(GeneratedProgramFile)"/>
     </ItemGroup>
   </Target>
 </Project>
