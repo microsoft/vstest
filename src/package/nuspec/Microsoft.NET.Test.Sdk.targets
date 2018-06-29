@@ -56,7 +56,7 @@
           Condition="'$(GenerateProgramFile)' == 'true'" />
 
   <Target Name="CoreGenerateProgramFile"
-          Condition="'$(Language)'=='VB' or '$(Language)'=='C#'"
+          Condition="'$(Language)'=='VB' or '$(Language)'=='C#' or '$(Language)'=='F#'"
           Inputs="$(MSBuildAllProjects)"
           Outputs="$(GeneratedProgramFile)">
 
@@ -76,6 +76,13 @@
       <Line Include="End Sub"/>
       <Line Include="End Module"/>
     </ItemGroup>
+
+    <ItemGroup Condition="'$(Language)'=='F#'">
+      <Line Include="module Program"/>
+      <Line Include="[&lt;EntryPoint&gt;]"/>
+      <Line Include="let main _ = 0"/>
+    </ItemGroup>
+
     <WriteLinesToFile
       File="$(GeneratedProgramFile)" Lines="@(Line)" Overwrite="true" Encoding="Unicode">
     </WriteLinesToFile>
