@@ -403,6 +403,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunForCancelRequestShouldHandleLogMessageWithProperErrorMessage()
+        {
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            this.testExecutionManager.Cancel(mockTestRunEventsHandler.Object);
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            mockTestRunEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, "Cancelling the operation as requested."));
+        }
+
+        [TestMethod]
         public void StartTestRunShouldInitiateTestRunForSourcesThroughTheServer()
         {
             TestRunCriteriaWithSources testRunCriteriaPassed = null;

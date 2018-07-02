@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -262,7 +263,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
                 WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
 
-                cancellationToken.ThrowIfCancellationRequested();
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
                 this.onAckMessageReceived = null;
 
