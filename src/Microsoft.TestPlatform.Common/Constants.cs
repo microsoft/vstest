@@ -63,10 +63,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Pattern used to find the run time providers library using String.EndWith
         /// </summary>
         public const string RunTimeEndsWithPattern = @"RuntimeProvider.dll";
-
-        /// <summary>
-        /// Pattern used to find the settings providers library using String.EndWith
-        /// </summary>
-        public const string SettingsProviderEndsWithPattern = @"SettingsProvider.dll";
     }
 }
