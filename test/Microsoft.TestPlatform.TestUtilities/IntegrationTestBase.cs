@@ -39,10 +39,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         private const string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build";
         private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
         private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
+        private const string GoogleTestAdapterRelativePath = @"chutzpah\{0}\tools";
 
         public enum UnitTestFramework
         {
-            NUnit, XUnit, MSTest, CPP, Chutzpah
+            NUnit, XUnit, MSTest, CPP, Chutzpah, GoogleTest
         }
 
         public IntegrationTestBase()
@@ -346,6 +347,10 @@ namespace Microsoft.TestPlatform.TestUtilities
                 adapterRelativePath = string.Format(XUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.Chutzpah)
+            {
+                adapterRelativePath = string.Format(ChutzpahTestAdapterRelativePath, this.testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+            }
+            else if (testFramework == UnitTestFramework.GoogleTest)
             {
                 adapterRelativePath = string.Format(ChutzpahTestAdapterRelativePath, this.testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
             }
