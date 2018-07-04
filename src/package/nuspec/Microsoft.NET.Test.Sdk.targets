@@ -97,7 +97,10 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Language)'=='F#'">
-      <CompileAfter Include="$(GeneratedProgramFile)"/>
+      <ProgramCompiles Include="@(Compile)" Condition=" '%(Identity)' == 'Program.fs' "/>
+      <CompileAfter Include="$(GeneratedProgramFile)" Condition="@(ProgramCompiles-&gt;Count()) == 0"/>
     </ItemGroup>
+
+    <Warning Condition=" @(ProgramCompiles-&gt;Count()) != 0 " Text="A 'Program.fs' file can be automatically generated for F# .NET Core test projects. To fix this warning, either delete the file from the project, or set the &lt;GenerateProgramFile&gt; property to 'false'." />
   </Target>
 </Project>
