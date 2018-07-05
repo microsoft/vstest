@@ -570,7 +570,7 @@ function Create-NugetPackages
                      "Microsoft.TestPlatform.Portable.nuspec",
                      "Microsoft.CodeCoverage.nuspec")
 
-    $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
+    $targetFiles = @("Microsoft.Net.Test.Sdk.targets", "Microsoft.CodeCoverage.targets")
     $propFiles = @("Microsoft.Net.Test.Sdk.props", "Microsoft.CodeCoverage.props")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
