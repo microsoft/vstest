@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-    using System.Threading.Tasks;
     using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -141,10 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
 
-                    if (ex is AggregateException && ex.InnerException is TaskCanceledException)
-                    {
-                        throw new TestPlatformException(Common.Resources.Resources.CancellationRequested);
-                    }
+                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
                 }
 

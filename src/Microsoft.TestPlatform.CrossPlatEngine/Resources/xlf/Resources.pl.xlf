@@ -172,10 +172,6 @@
         <target state="translated">Rejestrowanie diagnostyki TestHost w pliku: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">Przebieg testu jest anulowany, ponieważ zażądano anulowania.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Nie można uruchomić hosta testów. Błąd: {0}</target>

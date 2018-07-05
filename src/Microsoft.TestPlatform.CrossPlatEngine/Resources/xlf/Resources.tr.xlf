@@ -172,10 +172,6 @@
         <target state="translated">TestHost Tanılamaları şu dosyadaki günlüğe kaydediliyor: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">İptal isteğinde bulunulduğundan test çalıştırması iptal ediliyor.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Testhost başlatılamadı. Şu hata alındı: {0}</target>

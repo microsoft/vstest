@@ -62,15 +62,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Canceling test run as cancelation requested..
-        /// </summary>
-        internal static string CancelationRequested {
-            get {
-                return ResourceManager.GetString("CancelationRequested", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DataCollector debugging is enabled. Please attach debugger to datacollector process to continue..
         /// </summary>
         internal static string DataCollectorDebuggerWarning {
