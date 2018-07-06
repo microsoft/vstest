@@ -734,7 +734,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             TestPluginCache.Instance = null;
             TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
-            TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll", "filterTestAdapter.SettingsProvider.dll" }, false);
             TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
 
             try
@@ -742,7 +742,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
                 this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
-                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
+                var adapterPaths = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
+                var settingsProviderPaths = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.SettingsProviderEndsWithPattern, skipDefaultAdapters);
+                var expectedResult = adapterPaths.Union(settingsProviderPaths);
 
                 this.testExecutionManager.Initialize(skipDefaultAdapters);
                 this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);

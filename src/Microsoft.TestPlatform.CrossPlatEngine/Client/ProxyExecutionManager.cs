@@ -258,7 +258,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
+            var adapterExtensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
+            var settingsProviderExtensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.SettingsProviderEndsWithPattern, this.skipDefaultAdapters);
+
+            var extensions = adapterExtensions.Union(settingsProviderExtensions);
 
             // Filter out non existing extensions
             var nonExistingExtensions = extensions.Where(extension => !this.fileHelper.Exists(extension));
