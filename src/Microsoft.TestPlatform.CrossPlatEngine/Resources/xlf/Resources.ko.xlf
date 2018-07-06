@@ -172,10 +172,6 @@
         <target state="translated">{0} 파일에 TestHost Diagnostics 로깅 중</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">취소가 요청되어 테스트 실행을 취소합니다.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Testhost를 시작하지 못했습니다(오류: {0}).</target>
