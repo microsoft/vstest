@@ -572,6 +572,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return owner ?? string.Empty;
         }
 
+        /// <summary>
+        /// Gets test class name.
+        /// </summary>
+        /// <param name="testName">Test name.</param>
+        /// <param name="fullyQualifiedName">Fully qualified name.</param>
+        /// <param name="source">Source.</param>
+        /// <returns>Test class name.</returns>
         private static string GetTestClassName(string testName, string fullyQualifiedName, string source)
         {
             var className = "DefaultClassName";
