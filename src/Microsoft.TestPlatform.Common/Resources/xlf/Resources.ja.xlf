@@ -264,6 +264,11 @@
         <target state="translated">高速フィルターを作成中にエラーが発生しました。</target>
         <note />
       </trans-unit>
+      <trans-unit id="CancellationRequested">
+        <source>Cancelling the operation as requested.</source>
+        <target state="new">Cancelling the operation as requested.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

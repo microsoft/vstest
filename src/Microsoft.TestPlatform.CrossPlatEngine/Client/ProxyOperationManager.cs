@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Threading;
     using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -24,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
-
+   
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
@@ -99,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </returns>
         public virtual bool SetupChannel(IEnumerable<string> sources)
         {
-            this.CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
             var connTimeout = EnvironmentHelper.GetConnectionTimeout();
 
             if (!this.initialized)
@@ -138,6 +139,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 catch (Exception ex)
                 {
                     EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
+
+                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
                 }
 
@@ -158,6 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (!this.testHostLaunched ||
                     !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
+                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
                     this.ThrowExceptionOnConnectionFailure(connTimeout);
                 }
 
