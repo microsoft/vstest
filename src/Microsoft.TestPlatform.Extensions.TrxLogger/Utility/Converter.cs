@@ -606,9 +606,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     return testCaseSource;
                 }
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
                 // If source is not valid file path, then className will continue to point default value.
+                if (ObjectModel.EqtTrace.IsVerboseEnabled)
+                {
+                    ObjectModel.EqtTrace.Verbose("Converter: GetTestClassName: " + ex);
+                }
             }
 
             return className;

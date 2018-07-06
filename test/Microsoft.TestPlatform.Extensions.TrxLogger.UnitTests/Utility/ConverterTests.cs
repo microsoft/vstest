@@ -106,14 +106,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             var fullyQualifiedName = expectedClassName + "." + "TestMethod1(2, 3, 4.0d)";
             var testName = "TestMethod1(2, 3, 4.0d)";
 
-            ObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
-
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
-
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
-
-            Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
-            Assert.AreEqual(testName, unitTestElement.TestMethod.Name);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
         }
 
         [TestMethod]
@@ -123,8 +116,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             var fullyQualifiedName = "TestProject1.Class1.TestMethod1(2, 3, 4.0d)";
             var testName = "TestMethod1";
 
-            ObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+        }
 
+        private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName)
+        {
+            ObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
 
             var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
