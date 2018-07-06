@@ -3,14 +3,18 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Xml;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ObjectModel;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
+    using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using TestOutcome = VisualStudio.TestPlatform.ObjectModel.TestOutcome;
+    using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerOutcome = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel.TestOutcome;
     using UriDataAttachment = VisualStudio.TestPlatform.ObjectModel.UriDataAttachment;
 
@@ -58,6 +62,80 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
             Assert.AreEqual($@"{Environment.MachineName}\123[1].coverage", ((ObjectModel.UriDataAttachment)collectorDataEntries[0].Attachments[1]).Uri.OriginalString);
 
             Directory.Delete(tempDir, true);
+        }
+
+        /// <summary>
+        /// Unit test for assigning or populating test categories read to the unit test element.
+        /// </summary>
+        [TestMethod]
+        public void ToTestElementShouldAssignTestCategoryOfUnitTestElement()
+        {
+            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+            TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
+
+            testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
+
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+
+            object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
+
+            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x.ToString()).ToArray());
+        }
+
+        /// <summary>
+        /// Unit test for regression when there's no test categories.
+        /// </summary>
+        [TestMethod]
+        public void ToTestElementShouldNotFailWhenThereIsNoTestCategoreis()
+        {
+            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+
+            object[] expected = Enumerable.Empty<Object>().ToArray();
+
+            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray());
+        }
+
+        [TestMethod]
+        public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnEndsWithTestName()
+        {
+            var expectedClassName = "TestProject1.Class1";
+            var fullyQualifiedName = expectedClassName + "." + "TestMethod1(2, 3, 4.0d)";
+            var testName = "TestMethod1(2, 3, 4.0d)";
+
+            ObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
+
+            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+
+            Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
+            Assert.AreEqual(testName, unitTestElement.TestMethod.Name);
+        }
+
+        [TestMethod]
+        public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnDoesNotEndsWithTestName()
+        {
+            var expectedClassName = "TestProject1.Class1.TestMethod1(2, 3, 4";
+            var fullyQualifiedName = "TestProject1.Class1.TestMethod1(2, 3, 4.0d)";
+            var testName = "TestMethod1";
+
+            ObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
+
+            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+
+            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
+
+            Assert.AreEqual(expectedClassName, unitTestElement.TestMethod.ClassName);
+            Assert.AreEqual(testName, unitTestElement.TestMethod.Name);
+        }
+
+        private static TestCase CreateTestCase(string fullyQualifiedName)
+        {
+            return new ObjectModel.TestCase(fullyQualifiedName, new Uri("some://uri"), "DummySourceFileName");
         }
 
         private static void SetupForToCollectionEntries(out string tempDir, out List<AttachmentSet> attachmentSets, out TestRun testRun,

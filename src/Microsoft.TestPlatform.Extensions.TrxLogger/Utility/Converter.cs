@@ -572,45 +572,46 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return owner ?? string.Empty;
         }
 
-        /// <summary>
-        /// Gets TestMethod for given testCase name and its class name.
-        /// </summary>
-        /// <param name="testDisplayName">test case display name</param>
-        /// <param name="rockSteadyTestCase">rockSteady Test Case</param>
-        /// <returns>The <see cref="TestMethod"/></returns>
-        private static TestMethod GetTestMethod(string testDisplayName, string testCaseName, string source)
+        private static string GetTestClassName(string testName, string fullyQualifiedName, string source)
         {
-            string className = "DefaultClassName";
-            if (testCaseName.Contains("."))
+            var className = "DefaultClassName";
+
+            // In case, fullyQualifiedName ends with testName, className is checked within remaining value of fullyQualifiedName.
+            // Example: In case, testName = TestMethod1(2, 3, 4.0d) and fullyQualifiedName = TestProject1.Class1.TestMethod1(2, 3, 4.0d), className will be checked within 'TestProject1.Class1.' only
+            var nameToCheck = fullyQualifiedName.EndsWith(testName) ?
+                fullyQualifiedName.Substring(0, fullyQualifiedName.Length - testName.Length) :
+                fullyQualifiedName;
+
+            // C# test case scenario.
+            if (nameToCheck.Contains("."))
             {
-                className = testCaseName.Substring(0, testCaseName.LastIndexOf('.'));
+                return nameToCheck.Substring(0, nameToCheck.LastIndexOf('.'));
             }
-            else if (testCaseName.Contains("::"))
+
+            // C++ test case scenario (we would have a "::" instead of a '.')
+            if (nameToCheck.Contains("::"))
             {
-                // if this is a C++ test case then we would have a "::" instaed of a '.'
-                className = testCaseName.Substring(0, testCaseName.LastIndexOf("::"));
+                className = nameToCheck.Substring(0, nameToCheck.LastIndexOf("::"));
 
                 // rename for a consistent behaviour for all tests.
-                className = className.Replace("::", ".");
-            }
-            else
-            {
-                // Setting class name as source name if FQDn doesnt have . or :: [E.g. ordered test, web test]
-                try
-                {
-                    string testCaseSource = Path.GetFileNameWithoutExtension(source);
-                    if (!String.IsNullOrEmpty(testCaseSource))
-                    {
-                        className = testCaseSource;
-                    }
-                }
-                catch (ArgumentException)
-                {
-                    // If source is not valid file path, then className will continue to point default value.
-                }
+                return className.Replace("::", ".");
             }
 
-            return new TestMethod(testDisplayName, className);
+            // Ordered test, web test scenario (Setting class name as source name if FQDn doesnt have . or ::)
+            try
+            {
+                string testCaseSource = Path.GetFileNameWithoutExtension(source);
+                if (!String.IsNullOrEmpty(testCaseSource))
+                {
+                    return testCaseSource;
+                }
+            }
+            catch (ArgumentException)
+            {
+                // If source is not valid file path, then className will continue to point default value.
+            }
+
+            return className;
         }
 
         /// <summary>
@@ -635,7 +636,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             else
             {
                 var codeBase = source;
-                var testMethod = GetTestMethod(name, fullyQualifiedName, source);
+                var className = GetTestClassName(name, fullyQualifiedName, source);
+                var testMethod = new TestMethod(name, className);
 
                 testElement = new UnitTestElement(testId, name, adapter, testMethod);
                 (testElement as UnitTestElement).CodeBase = codeBase;
