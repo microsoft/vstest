@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using System.Collections.Generic;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -123,10 +124,91 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument))
-            {
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            }
+            ValidateArgumentNotEmpty(argument);
+
+            var diagFilePath = GetDiagFilePath(argument);
+            ValidateArgumentNotEmpty(diagFilePath);
+
+            var arguments = GetDiagArguments(argument);
+
+            InitializeDiagLogging(diagFilePath, arguments);
+
+            // Following patterns should match
+            // "abc"
+            // "abc";verbosity=xyz
+            // abc;verbosity=xyz
+            // Here abc and xyz can have any character including ", ;, =
+
+            // Pattern 1:
+            // Starts with quote
+            // Atleast 2 quotes in string (including starting one)
+            // Between first 2 quotes, there should be atleast one non-whitespace char.
+            // After 2 quotes, there can be string or not.
+            // If there is string after 2 quotes, it should start with ;
+            // Remaining of the string expect can be empty or non empty
+            // Remaining of the string needs be split using ; [remove empty entries]
+            // Search among all the values and split each value using =. Each split should have exactly one =.
+            // Understand verbosity key. Ignore rest key value pairs.
+
+            // Pattern 2:
+            // Doesn't start with quote
+            // Entire arg should be considered as diag file path.
+
+            //if (string.IsNullOrWhiteSpace(argument))
+            //{
+            //    // /diag:, /diag:  ,
+            //    // Check if /diag, belong here.
+            //    throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+            //}
+
+            //if (argument.StartsWith('"'))
+            //{
+            //    int startQuoteOfFilePath = 0;
+            //    int endQuoteOfFilePath = argument.IndexOf('"', startQuoteOfFilePath + 1); // TODO: does this throw error on / diag:", scenario?
+            //    int diagFilePathLength = endQuoteOfFilePath - startQuoteOfFilePath - 1;
+            //    if (endQuoteOfFilePath > 0 && diagFilePathLength > 0)
+            //    {
+            //        // /diag:" ", /diag:"a",
+            //        var diagFilePath = argument.Substring(startQuoteOfFilePath + 1, endQuoteOfFilePath - startQuoteOfFilePath);
+            //        // var parameters
+            //    }
+            //    else
+            //    {
+            //        // / diag:", /diag:"", /diag:"abc,
+            //        throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+            //    }
+            //}
+            //else
+            //{
+            //    // pattern 2
+            //}
+
+            // TODO: try /diag, /diag:, /diag: , /diag:  , /diag:"",
+            //if (string.IsNullOrWhiteSpace(argument) ||
+            //    argument.StartsWith(@""""))
+            //{
+            //    throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+            //}
+
+            //var diagFilePath = string.Empty;
+
+            //if (argument.StartsWith('"'))
+            //{
+            //    //  TODO: /diag:"a, /diag:"abc"def", /diag:"abc"d"ef", , /diag:"abc"def, /diag:"abc"   , /diag:"  "abc;
+            //    var ArgumentSeperator = new char[] { '"' };
+            //    var argumentParts = argument.Split(ArgumentSeperator, StringSplitOptions.None);
+            //    if (argumentParts.Length > 0)
+            //    {
+            //        diagFilePath = argumentParts[0];
+            //    }
+            //    else
+            //    {
+            //        //  TODO: /diag:", /diag:" , /diag:"  ",
+            //        throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+            //    }
+            //}
+
+            //  TODO: /diag:a, /diag:a"
 
             if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
             {
@@ -153,6 +235,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
+        private void InitializeDiagLogging(string diagFilePath, object arguments)
+        {
+            throw new NotImplementedException();
+        }
+
+        private object GetDiagArguments(string argument)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Validates that argument is not empty.
+        /// Throws CommandLineException in case argument is empty.
+        /// </summary>
+        /// <param name="argument">Diag argument.</param>
+        private void ValidateArgumentNotEmpty(string argument)
+        {
+            if (string.IsNullOrWhiteSpace(argument))
+            {
+                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+            }
+        }
+
+        /// <summary>
+        /// Gets diag file path.
+        /// </summary>
+        /// <param name="argument">Argument.</param>
+        /// <returns>Diag file path.</returns>
+        private string GetDiagFilePath(string argument)
+        {
+            // If quotes are present in argument, value between first two quotes is considered as diag file path.
+            bool startsWithQuote = argument.StartsWith('"');
+            if (startsWithQuote)
+            {
+                var firstQuoteIndex = 0;
+                var secondQuoteIndex = argument.IndexOf('"', firstQuoteIndex + 1);
+                return argument.Substring(firstQuoteIndex + 1, secondQuoteIndex - firstQuoteIndex);
+            }
+
+            // If no quotes are present, entire argument is considered as diag file path.
+            return argument;
+        }
+
         /// <summary>
         /// Executes the argument processor.
         /// </summary>
@@ -164,5 +289,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         #endregion
+
+        public static bool TryParseDiagArgument(string argument, out string diagFilePath, out Dictionary<string, string> parameters)
+        {
+            diagFilePath = null;
+            parameters = null;
+
+            var parseSucceeded = true;
+            var ArgumentSeperator = new char[] { ';' };
+            var NameValueSeperator = new char[] { '=' };
+
+            var argumentParts = argument.Split(ArgumentSeperator, StringSplitOptions.RemoveEmptyEntries);
+
+            if (argumentParts.Length > 0 && !argumentParts[0].Contains("="))
+            {
+                diagFilePath = argumentParts[0];
+
+                if (argumentParts.Length > 1)
+                {
+                    parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    for (int index = 1; index < argumentParts.Length; ++index)
+                    {
+                        string[] nameValuePair = argumentParts[index].Split(NameValueSeperator, StringSplitOptions.RemoveEmptyEntries);
+                        if (nameValuePair.Length == 2)
+                        {
+                            parameters[nameValuePair[0]] = nameValuePair[1];
+                        }
+                        else
+                        {
+                            parseSucceeded = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                parseSucceeded = false;
+            }
+
+            return parseSucceeded;
+        }
     }
 }

@@ -480,6 +480,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         /// </summary>
         public static string EnableDiagUsage
         {
+            // TODO: Check this EnableLoggersArgumentHelp to change the help here.
             get
             {
                 return ResourceManager.GetString("EnableDiagUsage", resourceCulture);
