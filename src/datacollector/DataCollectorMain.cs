@@ -35,6 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         private const string LogFileArgument = "--diag";
 
+        /// <summary>
+        /// Trace level for logs.
+        /// </summary>
+        private const string TraceLevelArgument = "--tracelevel";
+
         private IProcessHelper processHelper;
 
         private IEnvironment environment;
@@ -65,7 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             string logFile;
             if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
             {
-                EqtTrace.InitializeVerboseTrace(logFile);
+                var traceLevel = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
+                EqtTrace.InitializeTrace(logFile, (PlatformTraceLevel)traceLevel);
             }
             else
             {

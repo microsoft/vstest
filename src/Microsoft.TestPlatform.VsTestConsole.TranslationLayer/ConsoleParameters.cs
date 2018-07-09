@@ -36,6 +36,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <summary>
+        /// Trace level for logs.
+        /// </summary>
+        public PlatformTraceLevel TraceLevel { get; set; } = PlatformTraceLevel.Verbose;
+
+        /// <summary>
         /// Full path for the log file
         /// </summary>
         public string LogFilePath

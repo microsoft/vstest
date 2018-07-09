@@ -33,7 +33,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 Console.WriteLine(ex.Message);
             }
 
-            EqtTrace.InitializeVerboseTrace(logFile);
+            EqtTrace.InitializeTrace(logFile, PlatformTraceLevel.Verbose);
         }
 
         [TestMethod]

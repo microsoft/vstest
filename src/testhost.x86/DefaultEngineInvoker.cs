@@ -44,6 +44,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private const string LogFileArgument = "--diag";
 
+        private const string TraceLevelArgument = "--tracelevel";
+
         private const string DataCollectionPortArgument = "--datacollectionport";
 
         private const string TelemetryOptedIn = "--telemetryoptedin";
@@ -228,7 +230,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // Setup logging if enabled
             if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
             {
-                EqtTrace.InitializeVerboseTrace(logFile);
+                var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
+                EqtTrace.InitializeTrace(logFile, (PlatformTraceLevel)traceLevelInt);
             }
             else
             {

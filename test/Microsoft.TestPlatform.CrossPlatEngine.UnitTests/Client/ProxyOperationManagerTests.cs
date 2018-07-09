@@ -85,7 +85,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldCreateTimestampedLogFileForHost()
         {
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
-            EqtTrace.InitializeVerboseTrace("log.txt");
+            EqtTrace.InitializeTrace("log.txt", PlatformTraceLevel.Verbose);
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 

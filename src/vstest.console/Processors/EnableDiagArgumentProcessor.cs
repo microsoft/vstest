@@ -4,15 +4,15 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Collections.Generic;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -103,6 +103,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private readonly IFileHelper fileHelper;
 
+        /// <summary>
+        /// Parameter for trace level
+        /// </summary>
+        public const string TraceLevelParam = "tracelevel";
+
         #region Constructor
 
         /// <summary>
@@ -124,158 +129,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            ValidateArgumentNotEmpty(argument);
-
-            var diagFilePath = GetDiagFilePath(argument);
-            ValidateArgumentNotEmpty(diagFilePath);
-
-            var arguments = GetDiagArguments(argument);
-
-            InitializeDiagLogging(diagFilePath, arguments);
-
-            // Following patterns should match
-            // "abc"
-            // "abc";verbosity=xyz
-            // abc;verbosity=xyz
-            // Here abc and xyz can have any character including ", ;, =
-
-            // Pattern 1:
-            // Starts with quote
-            // Atleast 2 quotes in string (including starting one)
-            // Between first 2 quotes, there should be atleast one non-whitespace char.
-            // After 2 quotes, there can be string or not.
-            // If there is string after 2 quotes, it should start with ;
-            // Remaining of the string expect can be empty or non empty
-            // Remaining of the string needs be split using ; [remove empty entries]
-            // Search among all the values and split each value using =. Each split should have exactly one =.
-            // Understand verbosity key. Ignore rest key value pairs.
-
-            // Pattern 2:
-            // Doesn't start with quote
-            // Entire arg should be considered as diag file path.
-
-            //if (string.IsNullOrWhiteSpace(argument))
-            //{
-            //    // /diag:, /diag:  ,
-            //    // Check if /diag, belong here.
-            //    throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            //}
-
-            //if (argument.StartsWith('"'))
-            //{
-            //    int startQuoteOfFilePath = 0;
-            //    int endQuoteOfFilePath = argument.IndexOf('"', startQuoteOfFilePath + 1); // TODO: does this throw error on / diag:", scenario?
-            //    int diagFilePathLength = endQuoteOfFilePath - startQuoteOfFilePath - 1;
-            //    if (endQuoteOfFilePath > 0 && diagFilePathLength > 0)
-            //    {
-            //        // /diag:" ", /diag:"a",
-            //        var diagFilePath = argument.Substring(startQuoteOfFilePath + 1, endQuoteOfFilePath - startQuoteOfFilePath);
-            //        // var parameters
-            //    }
-            //    else
-            //    {
-            //        // / diag:", /diag:"", /diag:"abc,
-            //        throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            //    }
-            //}
-            //else
-            //{
-            //    // pattern 2
-            //}
-
-            // TODO: try /diag, /diag:, /diag: , /diag:  , /diag:"",
-            //if (string.IsNullOrWhiteSpace(argument) ||
-            //    argument.StartsWith(@""""))
-            //{
-            //    throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            //}
-
-            //var diagFilePath = string.Empty;
-
-            //if (argument.StartsWith('"'))
-            //{
-            //    //  TODO: /diag:"a, /diag:"abc"def", /diag:"abc"d"ef", , /diag:"abc"def, /diag:"abc"   , /diag:"  "abc;
-            //    var ArgumentSeperator = new char[] { '"' };
-            //    var argumentParts = argument.Split(ArgumentSeperator, StringSplitOptions.None);
-            //    if (argumentParts.Length > 0)
-            //    {
-            //        diagFilePath = argumentParts[0];
-            //    }
-            //    else
-            //    {
-            //        //  TODO: /diag:", /diag:" , /diag:"  ",
-            //        throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            //    }
-            //}
-
-            //  TODO: /diag:a, /diag:a"
-
-            if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
-            {
-                // Throwing error if the argument is just path and not a file
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            }
-
-            // Create the base directory for logging if doesn't exist. Directory could be empty if just a
-            // filename is provided. E.g. log.txt
-            var logDirectory = Path.GetDirectoryName(argument);
-            if (!string.IsNullOrEmpty(logDirectory) && !this.fileHelper.DirectoryExists(logDirectory))
-            {
-                this.fileHelper.CreateDirectory(logDirectory);
-            }
-
-            // Find full path and send this to testhost so that vstest and testhost create logs at same location.
-            argument = Path.GetFullPath(argument);
-
-            // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of initialization.
-            if (!EqtTrace.InitializeVerboseTrace(argument))
-            {
-                if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
-                    ConsoleOutput.Instance.Warning(false, EqtTrace.ErrorOnInitialization);
-            }
-        }
-
-        private void InitializeDiagLogging(string diagFilePath, object arguments)
-        {
-            throw new NotImplementedException();
-        }
-
-        private object GetDiagArguments(string argument)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Validates that argument is not empty.
-        /// Throws CommandLineException in case argument is empty.
-        /// </summary>
-        /// <param name="argument">Diag argument.</param>
-        private void ValidateArgumentNotEmpty(string argument)
-        {
+            // Throw error if argument is null or empty.
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            }
-        }
-
-        /// <summary>
-        /// Gets diag file path.
-        /// </summary>
-        /// <param name="argument">Argument.</param>
-        /// <returns>Diag file path.</returns>
-        private string GetDiagFilePath(string argument)
-        {
-            // If quotes are present in argument, value between first two quotes is considered as diag file path.
-            bool startsWithQuote = argument.StartsWith('"');
-            if (startsWithQuote)
-            {
-                var firstQuoteIndex = 0;
-                var secondQuoteIndex = argument.IndexOf('"', firstQuoteIndex + 1);
-                return argument.Substring(firstQuoteIndex + 1, secondQuoteIndex - firstQuoteIndex);
+                HandleInvalidDiagArgument();
             }
 
-            // If no quotes are present, entire argument is considered as diag file path.
-            return argument;
+            // Get diag argument list.
+            var diagArgumentList = GetDiagArgumentList(argument);
+
+            // Get diag file path.
+            var diagFilePathArg = diagArgumentList[0];
+            var diagFilePath = GetDiagFilePath(diagFilePathArg);
+
+            // Get diag parameters.
+            var diagParameterArgs = diagArgumentList.Skip(1);
+            var diagParameters = GetDiagParameters(diagParameterArgs);
+
+            // Initialize diag logging.
+            InitializeDiagLogging(diagFilePath, diagParameters);
         }
 
         /// <summary>
@@ -288,47 +160,142 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        #endregion
-
-        public static bool TryParseDiagArgument(string argument, out string diagFilePath, out Dictionary<string, string> parameters)
+        /// <summary>
+        /// Get diag parameters.
+        /// </summary>
+        /// <param name="diagParameterArgs">Diag parameter args.</param>
+        /// <returns>Diag parameters dictionary.</returns>
+        private Dictionary<string, string> GetDiagParameters(IEnumerable<string> diagParameterArgs)
         {
-            diagFilePath = null;
-            parameters = null;
+            var nameValueSeperator = new char[] { '=' };
+            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            var parseSucceeded = true;
-            var ArgumentSeperator = new char[] { ';' };
-            var NameValueSeperator = new char[] { '=' };
-
-            var argumentParts = argument.Split(ArgumentSeperator, StringSplitOptions.RemoveEmptyEntries);
-
-            if (argumentParts.Length > 0 && !argumentParts[0].Contains("="))
+            // Get parameters from parameterNameValuePairs.
+            // Throw error in case of invalid name value pairs.
+            foreach (string diagParameterArg in diagParameterArgs)
             {
-                diagFilePath = argumentParts[0];
-
-                if (argumentParts.Length > 1)
+                var nameValuePair = diagParameterArg?.Split(nameValueSeperator, StringSplitOptions.RemoveEmptyEntries);
+                if (nameValuePair.Length == 2)
                 {
-                    parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    for (int index = 1; index < argumentParts.Length; ++index)
-                    {
-                        string[] nameValuePair = argumentParts[index].Split(NameValueSeperator, StringSplitOptions.RemoveEmptyEntries);
-                        if (nameValuePair.Length == 2)
-                        {
-                            parameters[nameValuePair[0]] = nameValuePair[1];
-                        }
-                        else
-                        {
-                            parseSucceeded = false;
-                            break;
-                        }
-                    }
+                    parameters[nameValuePair[0]] = nameValuePair[1];
+                }
+                else
+                {
+                    HandleInvalidDiagArgument();
                 }
             }
-            else
+
+            return parameters;
+        }
+
+        /// <summary>
+        /// Get diag argument list.
+        /// </summary>
+        /// <param name="argument">Argument.</param>
+        /// <returns>Diag argument list.</returns>
+        private string[] GetDiagArgumentList(string argument)
+        {
+            var argumentSeperator = new char[] { ';' };
+            var diagArgumentList = argument?.Split(argumentSeperator, StringSplitOptions.RemoveEmptyEntries);
+
+            // Handle invalid diag argument.
+            if (diagArgumentList == null || diagArgumentList.Length <= 0)
             {
-                parseSucceeded = false;
+                HandleInvalidDiagArgument();
             }
 
-            return parseSucceeded;
+            return diagArgumentList;
         }
+
+        /// <summary>
+        /// Initialize diag loggin.
+        /// </summary>
+        /// <param name="diagFilePath">Diag file path.</param>
+        /// <param name="diagParameters">Diag parameters</param>
+        private void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
+        {
+            // Get trace level from diag parameters.
+            var traceLevel = GetDiagTraceLevel(diagParameters);
+
+            // Initialize trace.
+            // Trace initialized is false in case of any exception at time of initialization like Catch exception(UnauthorizedAccessException, PathTooLongException...)
+            var traceInitialized = EqtTrace.InitializeTrace(diagFilePath, traceLevel);
+
+            // Show console warning in case trace is not initialized.
+            if (!traceInitialized && !string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+            {
+                ConsoleOutput.Instance.Warning(false, EqtTrace.ErrorOnInitialization);
+            }
+        }
+
+        /// <summary>
+        /// Gets diag trace level.
+        /// </summary>
+        /// <param name="diagParameters">Diag parameters.</param>
+        /// <returns>Diag trace level.</returns>
+        private PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
+        {
+            // If diag parameters is null, set value of trace level as verbose.
+            if (diagParameters == null)
+            {
+                return PlatformTraceLevel.Verbose;
+            }
+
+            // Get trace level from diag parameters.
+            var traceLevelExists = diagParameters.TryGetValue(TraceLevelParam, out string traceLevelStr);
+            if (traceLevelExists && Enum.TryParse(traceLevelStr, true, out PlatformTraceLevel traceLevel))
+            {
+                return traceLevel;
+            }
+
+            // Default value of diag trace level is verbose.
+            return PlatformTraceLevel.Verbose;
+        }
+
+        /// <summary>
+        /// Throws an exception indicating that the diag argument is invalid.
+        /// </summary>
+        private static void HandleInvalidDiagArgument()
+        {
+            throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+        }
+
+        /// <summary>
+        /// Gets diag file path.
+        /// </summary>
+        /// <param name="diagFilePathArgument">Diag file path argument.</param>
+        /// <returns>Diag file path.</returns>
+        private string GetDiagFilePath(string diagFilePathArgument)
+        {
+            // Throw error in case diag file path is not a valid file path
+            var fileExtension = Path.GetExtension(diagFilePathArgument);
+            if (string.IsNullOrWhiteSpace(fileExtension))
+            {
+                HandleInvalidDiagArgument();
+            }
+
+            // Create base directory for diag file path (if doesn't exist)
+            CreateDirectoryIfNotExists(diagFilePathArgument);
+
+            // return full diag file path. (This is done so that vstest and testhost create logs at same location.)
+            return Path.GetFullPath(diagFilePathArgument);
+        }
+
+        /// <summary>
+        /// Create directory if not exists.
+        /// </summary>
+        /// <param name="filePath">File path.</param>
+        private void CreateDirectoryIfNotExists(string filePath)
+        {
+            // Create the base directory of file path if doesn't exist.
+            // Directory could be empty if just a filename is provided. E.g. log.txt
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !this.fileHelper.DirectoryExists(directory))
+            {
+                this.fileHelper.CreateDirectory(directory);
+            }
+        }
+
+        #endregion
     }
 }
