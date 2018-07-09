@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Throw error if argument is null or empty.
             if (string.IsNullOrWhiteSpace(argument))
             {
-                HandleInvalidDiagArgument();
+                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
             // Get diag argument list.
@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
                 else
                 {
-                    HandleInvalidDiagArgument();
+                    throw new CommandLineException(CommandLineResources.EnableDiagUsage);
                 }
             }
 
@@ -199,10 +199,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var argumentSeperator = new char[] { ';' };
             var diagArgumentList = argument?.Split(argumentSeperator, StringSplitOptions.RemoveEmptyEntries);
 
-            // Handle invalid diag argument.
+            // Throw error in case of invalid diag argument.
             if (diagArgumentList == null || diagArgumentList.Length <= 0)
             {
-                HandleInvalidDiagArgument();
+                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
             return diagArgumentList;
@@ -254,14 +254,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Throws an exception indicating that the diag argument is invalid.
-        /// </summary>
-        private static void HandleInvalidDiagArgument()
-        {
-            throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-        }
-
-        /// <summary>
         /// Gets diag file path.
         /// </summary>
         /// <param name="diagFilePathArgument">Diag file path argument.</param>
@@ -275,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var fileExtension = Path.GetExtension(diagFilePathArgument);
             if (string.IsNullOrWhiteSpace(fileExtension))
             {
-                HandleInvalidDiagArgument();
+                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
             // Create base directory for diag file path (if doesn't exist)
