@@ -5,6 +5,7 @@ namespace testhost.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -28,7 +29,8 @@ namespace testhost.UnitTests
             { "--endpoint", "127.0.0.1:021291"  },
             { "--role", "client"},
             { "--parentprocessid", ParentProcessId.ToString() },
-            { "--diag", @"C:\Users\samadala\src\vstest\log_3.host.18-04-17_20-25-45_48171_1.txt"},
+            { "--diag", "temp.txt"},
+            { "--tracelevel", "3"},
             { "--telemetryoptedin", "false"},
             { "--datacollectionport", "21290"}
         };
@@ -92,6 +94,22 @@ namespace testhost.UnitTests
             this.engineInvoker.Invoke(argsDictionary);
 
             this.mockProcssHelper.Verify(h => h.SetExitCallback(ParentProcessId, It.IsAny<Action<object>>()));
+        }
+
+        [TestMethod]
+        public void InvokeShouldInitializeTraceWithCorrectTraceLevel()
+        {
+            // Setting EqtTrace.TraceLevel to a value other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Verbose;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
+#endif
+
+            this.engineInvoker.Invoke(argsDictionary);
+
+            // Verify
+            Assert.AreEqual(PlatformTraceLevel.Info, EqtTrace.TraceLevel);
         }
     }
 }

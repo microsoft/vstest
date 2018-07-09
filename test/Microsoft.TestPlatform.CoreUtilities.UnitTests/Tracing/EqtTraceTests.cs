@@ -33,7 +33,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
                 Console.WriteLine(ex.Message);
             }
 
-            EqtTrace.InitializeTrace(logFile, PlatformTraceLevel.Verbose);
+            EqtTrace.InitializeTrace(logFile, PlatformTraceLevel.Off);
         }
 
         [TestMethod]
@@ -132,6 +132,22 @@ namespace TestPlatform.CoreUtilities.UnitTests
 #endif
             EqtTrace.Info("Dummy Info Message");
             Assert.IsTrue(ReadLogFile().Contains("Dummy Info Message"), "Expected Info message");
+        }
+
+        [TestMethod]
+        public void TraceShouldNotWriteVerboseIfTraceLevelIsInfo()
+        {
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Info;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Info;
+#endif
+            EqtTrace.Info("Dummy Info Message");
+            EqtTrace.Verbose("Unexpected Dummy Verbose Message");
+
+            var logFileContent = ReadLogFile();
+            Assert.IsFalse(logFileContent.Contains("Unexpected Dummy Verbose Message"), "Verbose message not expected");
+            Assert.IsTrue(logFileContent.Contains("Dummy Info Message"), "Expected Info message");
         }
 
         [TestMethod]

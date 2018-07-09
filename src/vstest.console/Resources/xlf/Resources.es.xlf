@@ -1392,12 +1392,16 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
-        <target state="translated">--Diag|/Diag:&lt;RutaDelArchivoDeRegistro&gt;
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
+        <target state="new">--Diag|/Diag:&lt;RutaDelArchivoDeRegistro&gt;
       Habilita registros detallados para la plataforma de pruebas.
       Los registros se escriben en el archivo proporcionado.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Diag | / Diag: &lt; ruta de acceso al archivo de registro &gt;
       Habilitar registros detallados de la plataforma de pruebas.

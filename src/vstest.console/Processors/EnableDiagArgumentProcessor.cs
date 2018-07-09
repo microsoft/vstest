@@ -139,6 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var diagArgumentList = GetDiagArgumentList(argument);
 
             // Get diag file path.
+            // Note: Even though semi colon is valid file path, we are not respecting the file name having semi-colon [As we are separating arguments based on semi colon].
             var diagFilePathArg = diagArgumentList[0];
             var diagFilePath = GetDiagFilePath(diagFilePathArg);
 
@@ -267,6 +268,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>Diag file path.</returns>
         private string GetDiagFilePath(string diagFilePathArgument)
         {
+            // Remove double quotes if present.
+            diagFilePathArgument = diagFilePathArgument.Replace("\"", "");
+
             // Throw error in case diag file path is not a valid file path
             var fileExtension = Path.GetExtension(diagFilePathArgument);
             if (string.IsNullOrWhiteSpace(fileExtension))

@@ -4,9 +4,15 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
     using CommunicationUtilities.DataCollection.Interfaces;
     using CoreUtilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,11 +26,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class DataCollectorMainTests
     {
-        private readonly string[] args = {"--port", "1025", "--parentprocessid", "100" };
+        private readonly string[] args = {"--port", "1025", "--parentprocessid", "100", "--diag", "abc.txt", "--tracelevel", "3" };
 
         private static readonly string TimoutErrorMessage =
             "datacollector process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
         private Mock<IProcessHelper> mockProcessHelper;
+        private Mock<IMessageSink> mockMessageSink;
+        private Mock<ICommunicationManager> mockCommunicationManager;
         private Mock<IEnvironment> mockEnvironment;
         private Mock<IDataCollectionRequestHandler> mockDataCollectionRequestHandler;
         private DataCollectorMain dataCollectorMain;
@@ -32,6 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public DataCollectorMainTests()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.mockMessageSink = new Mock<IMessageSink>();
+            this.mockCommunicationManager = new Mock<ICommunicationManager>();
             this.mockEnvironment = new Mock<IEnvironment>();
             this.mockDataCollectionRequestHandler = new Mock<IDataCollectionRequestHandler>();
             this.dataCollectorMain = new DataCollectorMain(this.mockProcessHelper.Object, this.mockEnvironment.Object, this.mockDataCollectionRequestHandler.Object);
@@ -58,6 +68,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorMain.Run(args);
 
             this.mockDataCollectionRequestHandler.Verify(rh => rh.WaitForRequestSenderConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
+        }
+
+        [TestMethod]
+        public void RunShouldInitializeTraceWithCorrectTraceLevel()
+        {
+            // Setting EqtTrace.TraceLevel to a value other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Verbose;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
+#endif
+            // Action
+            try
+            {
+                this.dataCollectorMain.Run(args); // Passing tracelevel as info from args.
+            }
+            catch (Exception)
+            {
+                // Ignore exceptions as they are coming because of trying to type cast mock interface into different object.
+            }
+
+            // Verify
+            Assert.AreEqual(PlatformTraceLevel.Info, EqtTrace.TraceLevel);
         }
 
         [TestMethod]

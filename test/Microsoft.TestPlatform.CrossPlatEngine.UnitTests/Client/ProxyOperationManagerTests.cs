@@ -120,6 +120,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void SetupChannelShouldAddCorrectTraceLevelForTestHost()
+        {
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Info;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Info;
+#endif
+
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockTestHostManager.Verify(
+                th =>
+                    th.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        null,
+                        It.Is<TestRunnerConnectionInfo>(t => t.TraceLevel == (int)PlatformTraceLevel.Info)));
+        }
+
+        [TestMethod]
         public void SetupChannelShouldSetupServerForCommunication()
         {
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());

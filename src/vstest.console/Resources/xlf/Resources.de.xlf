@@ -1387,12 +1387,16 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
-        <target state="translated">--Diag|/Diag:&lt;Pfad zur Protokolldatei&gt;
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
+        <target state="new">--Diag|/Diag:&lt;Pfad zur Protokolldatei&gt;
       Aktiviert ausführliche Protokolle für die Testplattform.
       Protokolle werden in die angegebene Datei geschrieben.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; Pfad zur Protokolldatei &gt;
       Aktivieren Sie ausführliche Protokolle Testplattform.

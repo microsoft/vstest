@@ -477,10 +477,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         ///   Looks up a localized string similar to --Diag|/Diag:&lt;Path to log file&gt;
         ///      Enable verbose logs for test platform.
         ///      Logs are written to the provided file..
+        ///
+        ///      Change the trace level for logs as shown below
+        ///      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+        ///      Allowed values for tracelevel: off, error, warning, info and verbose.
         /// </summary>
         public static string EnableDiagUsage
         {
-            // TODO: Check this EnableLoggersArgumentHelp to change the help here.
             get
             {
                 return ResourceManager.GetString("EnableDiagUsage", resourceCulture);

@@ -1387,12 +1387,16 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
-        <target state="translated">--Diag|/Diag:&lt;記錄檔的路徑&gt;
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
+        <target state="new">--Diag|/Diag:&lt;記錄檔的路徑&gt;
       啟用測試平台的詳細資訊記錄檔。
       記錄會寫入提供的檔案中。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-诊断 | / 诊断︰ &lt; 日志文件路径 &gt;
       启用详细日志中的测试平台。
