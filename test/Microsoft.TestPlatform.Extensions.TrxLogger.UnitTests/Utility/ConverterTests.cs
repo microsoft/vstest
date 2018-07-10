@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using ObjectModel;
-    using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using TestPlatformObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using TestOutcome = VisualStudio.TestPlatform.ObjectModel.TestOutcome;
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerOutcome = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel.TestOutcome;
@@ -70,8 +70,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         [TestMethod]
         public void ToTestElementShouldAssignTestCategoryOfUnitTestElement()
         {
-            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+            TestPlatformObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
             TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
 
             testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
@@ -89,8 +89,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         [TestMethod]
         public void ToTestElementShouldNotFailWhenThereIsNoTestCategoreis()
         {
-            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+            TestPlatformObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
 
             var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
 
@@ -121,8 +121,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
 
         private void ValidateTestMethodProperties(string testName, string fullyQualifiedName, string expectedClassName)
         {
-            ObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+            TestPlatformObjectModel.TestCase testCase = CreateTestCase(fullyQualifiedName);
+            TestPlatformObjectModel.TestResult result = new TestPlatformObjectModel.TestResult(testCase);
 
             var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testName, TrxLoggerConstants.UnitTestType, testCase) as UnitTestElement;
 
@@ -132,7 +132,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
 
         private static TestCase CreateTestCase(string fullyQualifiedName)
         {
-            return new ObjectModel.TestCase(fullyQualifiedName, new Uri("some://uri"), "DummySourceFileName");
+            return new TestPlatformObjectModel.TestCase(fullyQualifiedName, new Uri("some://uri"), "DummySourceFileName");
         }
 
         private static void SetupForToCollectionEntries(out string tempDir, out List<AttachmentSet> attachmentSets, out TestRun testRun,
