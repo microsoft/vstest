@@ -36,6 +36,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string BlameCollectDumpKey = "CollectDump";
 
         /// <summary>
+        /// Name of collect dump option for blame.
+        /// </summary>
+        public const string BlameCollectDumpOnlyOnAbortKey = "CollectDumpOnlyOnAbort";
+
+        /// <summary>
         /// Name of data collection settings node in RunSettings.
         /// </summary>
         public const string DataCollectionRunSettingsName = "DataCollectionRunSettings";

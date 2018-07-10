@@ -63,14 +63,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void InitializeShouldThrowExceptionIfDataCollectionLoggerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-                {
-                    this.blameDataCollector.Initialize(
-                        this.configurationElement,
-                        this.mockDataColectionEvents.Object,
-                        this.mockDataCollectionSink.Object,
-                        null,
-                        null);
-                });
+            {
+                this.blameDataCollector.Initialize(
+                    this.configurationElement,
+                    this.mockDataColectionEvents.Object,
+                    this.mockDataCollectionSink.Object,
+                    null,
+                    null);
+            });
         }
 
         /// <summary>
@@ -142,6 +142,63 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()))
+                .Returns(this.filepath);
+
+            // Raise
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new TestCase()));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify GetDumpFiles Call
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger session ended handler should not dump files if proc dump was enabled and test host did not crash
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldNotGetDumpFileIfNoCrash()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Setup
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()))
+                .Returns(this.filepath);
+
+            // Raise
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify GetDumpFiles Call
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Never);
+        }
+
+        /// <summary>
+        /// The trigger session ended handler should get dump files if collect dump always was enabled irrespective of completed test case count
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldGetDumpFileIfCollectDumpAlwaysIsEnabled()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(alwaysCollectDump: true),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Setup
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()))
+                .Returns(this.filepath);
 
             // Raise
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
@@ -166,8 +223,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Setup and raise events
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()))
+                .Returns(this.filepath);
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Throws(new FileNotFoundException());
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(new TestCase()));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
@@ -192,7 +252,28 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()));
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false));
+        }
+
+        /// <summary>
+        /// The trigger test host launched handler should start process dump utility for full dump if full dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityForFullDumpIfFullDumpEnabled()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(isFullDump: true),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify StartProcessDumpCall
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
         }
 
         /// <summary>
@@ -211,7 +292,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var tpex = new TestPlatformException("env var exception");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()))
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false))
                                        .Throws(tpex);
 
             // Raise TestHostLaunched
@@ -237,7 +318,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var ex = new Exception("start process failed");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>()))
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false))
                                        .Throws(ex);
 
             // Raise TestHostLaunched
@@ -253,13 +334,26 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             File.Delete(this.filepath);
         }
 
-        private XmlElement GetDumpConfigurationElement()
+        private XmlElement GetDumpConfigurationElement(bool isFullDump = false, bool alwaysCollectDump = false)
         {
             var xmldoc = new XmlDocument();
             var outernode = xmldoc.CreateElement("Configuration");
             var node = xmldoc.CreateElement(BlameDataCollector.Constants.DumpModeKey);
             outernode.AppendChild(node);
             node.InnerText = "Text";
+            if (isFullDump)
+            {
+                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
+                fulldumpAttribute.Value = "full";
+                node.Attributes.Append(fulldumpAttribute);
+            }
+
+            if (alwaysCollectDump)
+            {
+                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
+                fulldumpAttribute.Value = "true";
+                node.Attributes.Append(fulldumpAttribute);
+            }
 
             return outernode;
         }

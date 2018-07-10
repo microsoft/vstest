@@ -4,17 +4,20 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
     using System.Xml;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
     {
@@ -30,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableBlameArgumentProcessor"/> class.
         /// </summary>
-        public EnableBlameArgumentProcessor() 
+        public EnableBlameArgumentProcessor()
         {
         }
 
@@ -133,7 +136,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             bool isDumpEnabled = false;
 
-            if (!string.IsNullOrWhiteSpace(argument) && argument.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase))
+            var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out string loggerIdentifier, out Dictionary<string, string> parameters);
+            if (parseSucceeded && loggerIdentifier.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase))
             {
                 if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
                     this.environment.Architecture != PlatformArchitecture.ARM64 &&
@@ -195,12 +199,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (isDumpEnabled)
             {
                 var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
+                if (parameters != null && parameters.Count > 0)
+                {
+                    foreach (KeyValuePair<string, string> entry in parameters)
+                    {
+                        var attribute = XmlDocument.CreateAttribute(entry.Key);
+                        attribute.Value = entry.Value;
+                        dumpNode.Attributes.Append(attribute);
+                    }
+                }
                 outernode.AppendChild(dumpNode);
             }
 
             foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
             {
-                if( item.FriendlyName.Equals(BlameFriendlyName))
+                if (item.FriendlyName.Equals(BlameFriendlyName))
                 {
                     item.Configuration = outernode;
                 }
