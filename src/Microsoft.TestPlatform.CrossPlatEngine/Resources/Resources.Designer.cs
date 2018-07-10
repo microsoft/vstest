@@ -62,15 +62,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Canceling test run as cancelation requested..
-        /// </summary>
-        internal static string CancelationRequested {
-            get {
-                return ResourceManager.GetString("CancelationRequested", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DataCollector debugging is enabled. Please attach debugger to datacollector process to continue..
         /// </summary>
         internal static string DataCollectorDebuggerWarning {
@@ -78,18 +69,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("DataCollectorDebuggerWarning", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details..
         /// </summary>
-        internal static string DeprecatedAdapterPath
-        {
-            get
-            {
+        internal static string DeprecatedAdapterPath {
+            get {
                 return ResourceManager.GetString("DeprecatedAdapterPath", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Exception occurred while instantiating discoverer : {0}.
         /// </summary>
@@ -224,7 +213,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("NonExistingExtensions", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No test matches the given testcase filter `{0}` in {1}.
+        /// </summary>
+        internal static string NoTestsAvailableForGivenTestCaseFilter {
+            get {
+                return ResourceManager.GetString("NoTestsAvailableForGivenTestCaseFilter", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to None of the specified source(s) &apos;{0}&apos; is valid. Fix the above errors/warnings and then try again. .
         /// </summary>

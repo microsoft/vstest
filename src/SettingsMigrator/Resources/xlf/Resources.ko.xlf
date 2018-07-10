@@ -22,31 +22,36 @@
     <body>
       <trans-unit id="IgnoringLegacySettings">
         <source>Any LegacySettings node already present in the runsettings will be removed.</source>
-        <target state="new">Any LegacySettings node already present in the runsettings will be removed.</target>
-        <note></note>
+        <target state="translated">runsettings에 이미 존재하는 LegacySettings 노드가 제거됩니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoEmbeddedSettings">
         <source>RunSettings does not contain an embedded testSettings, not migrating.</source>
-        <target state="new">RunSettings does not contain an embedded testSettings, not migrating.</target>
-        <note></note>
+        <target state="translated">RunSettings에 포함된 testSettings이 없으며 마이그레이션되지 않습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="RunSettingsCreated">
         <source>The migrated RunSettings file has been created at: {0}</source>
-        <target state="new">The migrated RunSettings file has been created at: {0}</target>
-        <note></note>
+        <target state="translated">마이그레이션된 RunSettings 파일은 {0}에 생성되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="UnsupportedAttributes">
         <source>The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout of Timeouts node are not supported, so these will not be migrated.</source>
-        <target state="new">The attributes agentNotRespondingTimeout, deploymentTimeout, scriptTimeout are not supported, so these will not be migrated.</target>
-        <note></note>
+        <target state="translated">시간 제한 노드의 agentNotRespondingTimeout, deploymentTimeout, scriptTimeout 특성은 지원되지 않으므로 마이그레이션되지 않습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ValidUsage">
-        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+        <source>Valid usage:
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to runsettings file to be created&gt;
+Examples:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
+        <target state="new">유효한 사용: SettingsMigrator.exe &lt;마이그레이션할 testsettings 파일 또는 runsettings 파일의 전체 경로&gt;
 Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</source>
-        <target state="new">Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to new runsettings file&gt;
-Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings  E:\MyTest\MyRunSettings.runsettings
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings  E:\MyTest\MyRunSettings.runsettings</target>
+Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
         <note></note>
       </trans-unit>
     </body>

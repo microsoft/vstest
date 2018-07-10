@@ -936,12 +936,21 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             {
                 Sources = new List<string>() { "a" },
                 RunSettings = @"<RunSettings>
-                                       <LegacySettings>
-	                                        <Deployment>
-                                                <DeploymentItem filename="".\test.txt"" />
-                                            </Deployment>
-                                            <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
-                                        </LegacySettings>
+                                    <LegacySettings>
+	                                    <Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
+                                            <DeploymentItem filename="".\test.txt"" />
+                                        </Deployment>
+                                        <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                        <Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
+                                            <Timeouts testTimeout=""120"" />
+                                            <TestTypeSpecific>
+                                                <UnitTestRunConfig>
+                                                    <AssemblyResolution />
+                                                </UnitTestRunConfig>
+                                            </TestTypeSpecific>
+                                            <Hosts />
+                                        </Execution>
+                                    </LegacySettings>
                                </RunSettings>"
             };
             var mockProtocolConfig = new ProtocolConfig { Version = 4 };
@@ -965,8 +974,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
             // Verify
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.LegacySettingElements, out var legacySettingsString));
-            StringAssert.Equals("Deployment, Scripts", legacySettingsString);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.Elements", out var legacySettingsNodes));
+            StringAssert.Equals("Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts", legacySettingsNodes);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.DeploymentAttributes", out var deploymentAttributes));
+            StringAssert.Equals("enabled, deploySatelliteAssemblies", deploymentAttributes);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.ExecutionAttributes", out var executionAttributes));
+            StringAssert.Equals("hostProcessPlatform, parallelTestCount", executionAttributes);
 
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
             Assert.IsFalse((bool)testSettingsUsed);

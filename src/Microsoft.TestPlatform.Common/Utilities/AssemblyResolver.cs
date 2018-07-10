@@ -48,6 +48,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         [System.Security.SecurityCritical]
         public AssemblyResolver(IEnumerable<string> directories)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
+            }
+
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
 
             if (directories == null || !directories.Any())
@@ -72,6 +77,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         [System.Security.SecurityCritical]
         internal void AddSearchDirectories(IEnumerable<string> directories)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
+            }
+
             foreach (var directory in directories)
             {
                 this.searchDirectories.Add(directory);
@@ -99,14 +109,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 return null;
             }
 
-            EqtTrace.Info("AssemblyResolver: {0}: Resolving assembly.", args.Name);
+            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Resolving assembly.", args.Name);
 
             // args.Name is like: "Microsoft.VisualStudio.TestTools.Common, Version=[VersionMajor].0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
             lock (this.resolvedAssemblies)
             {
                 if (this.resolvedAssemblies.TryGetValue(args.Name, out var assembly))
                 {
-                    EqtTrace.Info("AssemblyResolver: {0}: Resolved from cache.", args.Name);
+                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Resolved from cache.", args.Name);
                     return assembly;
                 }
 
@@ -120,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 {
                     if (EqtTrace.IsInfoEnabled)
                     {
-                        EqtTrace.Info("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
+                        EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
                     }
 
                     this.resolvedAssemblies[args.Name] = null;
@@ -156,13 +166,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                             assembly = this.platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
                             this.resolvedAssemblies[args.Name] = assembly;
 
-                            EqtTrace.Info("AssemblyResolver: {0}: Resolved assembly. ", args.Name);
+                            EqtTrace.Info("AssemblyResolver.OnResolve: Resolved assembly: {0}, from path: {1}", args.Name, assemblyPath);
 
                             return assembly;
                         }
                         catch (FileLoadException ex)
                         {
-                            EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
+                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
 
                             // Rethrow FileLoadException, because this exception means that the assembly
                             // was found, but could not be loaded. This will allow us to report a more
@@ -172,14 +182,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                         catch (Exception ex)
                         {
                             // For all other exceptions, try the next extension.
-                            EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
+                            EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
                         }
                     }
                 }
 
                 if (EqtTrace.IsInfoEnabled)
                 {
-                    EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly.", args.Name);
+                    EqtTrace.Info("AssemblyResolver.OnResolve: {0}: Failed to load assembly.", args.Name);
                 }
 
                 this.resolvedAssemblies[args.Name] = null;

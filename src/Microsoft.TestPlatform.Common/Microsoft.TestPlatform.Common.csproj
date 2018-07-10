@@ -7,6 +7,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Common</AssemblyName>
     <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.4</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>

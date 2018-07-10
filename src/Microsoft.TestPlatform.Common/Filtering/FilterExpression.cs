@@ -8,9 +8,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
@@ -22,12 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     /// </summary>
     internal class FilterExpression
     {
-
-        /// <summary>
-        /// Seperator string to seperate various tokens in input string.
-        /// </summary>
-        private const string filterExpressionSeperatorString = @"(\&)|(\|)|(\()|(\))";
-
         /// <summary>
         /// Condition, if expression is conditional expression.
         /// </summary>
@@ -52,8 +48,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         private FilterExpression(FilterExpression left, FilterExpression right, bool areJoinedByAnd)
         {
-            ValidateArg.NotNull(left, "left");
-            ValidateArg.NotNull(right, "right");
+            ValidateArg.NotNull(left, nameof(left));
+            ValidateArg.NotNull(right, nameof(right));
 
             this.left = left;
             this.right = right;
@@ -62,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
         private FilterExpression(Condition condition)
         {
-            ValidateArg.NotNull(condition, "condition");
+            ValidateArg.NotNull(condition, nameof(condition));
             this.condition = condition;
         }
         #endregion        
@@ -168,16 +164,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         internal static FilterExpression Parse(string filterString, out FastFilter fastFilter)
         {
-            ValidateArg.NotNull(filterString, "filterString");
+            ValidateArg.NotNull(filterString, nameof(filterString));
 
-            // below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
+            // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parethesis).
             var invalidInput = Regex.Match(filterString, @"\(\s*\)");
             if (invalidInput.Success)
             {
                 throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.EmptyParenthesis));
             }
 
-            var tokens = Regex.Split(filterString, filterExpressionSeperatorString);
+            var tokens = TokenizeFilterExpressionString(filterString);
             var operatorStack = new Stack<Operator>();
             var filterStack = new Stack<FilterExpression>();
 
@@ -283,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// <returns> True if evaluation is successful. </returns>
         internal bool Evaluate(Func<string, Object> propertyValueProvider)
         {
-            ValidateArg.NotNull(propertyValueProvider, "propertyValueProvider");
+            ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
 
             bool filterResult = false;
             if (null != this.condition)
@@ -305,6 +301,70 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 }
             }
             return filterResult;
+        }     
+
+        internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
+        {
+            if (str == null)
+            {
+                throw new ArgumentNullException(nameof(str));
+            }
+
+            return TokenizeFilterExpressionStringHelper(str);
+
+            IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)
+            {
+                StringBuilder tokenBuilder = new StringBuilder();
+
+                var last = '\0';
+                for (int i = 0; i < s.Length; ++i)
+                {
+                    var current = s[i];
+
+                    if (last == FilterHelper.EscapeCharacter)
+                    {
+                        // Don't check if `current` is one of the special characters here.
+                        // Instead, we blindly let any character follows '\' pass though and 
+                        // relies on `FilterHelpers.Unescape` to report such errors.
+                        tokenBuilder.Append(current);
+
+                        if (current == FilterHelper.EscapeCharacter)
+                        {
+                            // We just encountered "\\" (escaped '\'), this will set last to '\0' 
+                            // so the next char will not be treated as a suffix of escape sequence.
+                            current = '\0';
+                        }
+                    }
+                    else
+                    {
+                        switch (current)
+                        {
+                            case '(':
+                            case ')':
+                            case '&':
+                            case '|':
+                                if (tokenBuilder.Length > 0)
+                                {
+                                    yield return tokenBuilder.ToString();
+                                    tokenBuilder.Clear();
+                                }
+                                yield return current.ToString();
+                                break;
+
+                            default:
+                                tokenBuilder.Append(current);
+                                break;
+                        }
+                    }
+
+                    last = current;
+                }
+
+                if (tokenBuilder.Length > 0)
+                {
+                    yield return tokenBuilder.ToString();
+                }
+            }
         }
     }
 }

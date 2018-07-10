@@ -6,26 +6,24 @@
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <NETTestSdkPreviousVersion>15.5.0</NETTestSdkPreviousVersion>
 
-    <MSTestFrameworkVersion>1.3.0-beta2</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>1.3.0-beta2</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>1.3.1</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>1.3.1</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
     
     <XUnitFrameworkVersion>2.3.1</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.3.1</XUnitAdapterVersion>
     <XUnitConsoleRunnerVersion>2.3.1</XUnitConsoleRunnerVersion>
 
-    <NUnit3FrameworkVersion>3.9.0-dev-04564</NUnit3FrameworkVersion>
-    <NUnit3AdapterVersion>3.10.0-dev-00671</NUnit3AdapterVersion>
-    <NUnitConsoleRunnerVersion>3.8.0-dev-03796</NUnitConsoleRunnerVersion>
-    
-    <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
-    <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
+    <NUnit3FrameworkVersion>3.10.1</NUnit3FrameworkVersion>
+    <NUnit3AdapterVersion>3.10.0</NUnit3AdapterVersion>
+    <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
-    <ChutzpahAdapterVersion>4.2.4</ChutzpahAdapterVersion>
+    <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
 
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
-    <TestPlatformExternalsVersion>15.8.0-preview-1705516</TestPlatformExternalsVersion>
-    <MSInternalCodeCoverageVersion>1.0.7</MSInternalCodeCoverageVersion>
+    <TestPlatformExternalsVersion>15.8.0-preview-1831095</TestPlatformExternalsVersion>
+    <MSInternalCodeCoverageVersion>1.0.8</MSInternalCodeCoverageVersion>
+
   </PropertyGroup>
 </Project>

@@ -35,6 +35,11 @@
         <target state="translated">Série de tests pour {0}({1})</target>
         <note />
       </trans-unit>
+      <trans-unit id="UpdateTestSdkForCollectingCodeCoverage">
+        <source>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</source>
+        <target state="translated">Avertissement : mettez à jour la référence de package Microsoft.NET.Test.Sdk vers la version 15.8.0 ou ultérieure pour collecter la couverture du code.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

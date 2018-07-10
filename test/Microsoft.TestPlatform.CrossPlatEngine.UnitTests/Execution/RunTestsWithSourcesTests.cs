@@ -93,7 +93,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockTestRunEventsHandler.Object,
                 executorUriVsSourceList,
                 this.mockRequestData.Object);
-            
+
             this.runTestsInstance.CallBeforeRaisingTestRunComplete(false);
 
             var messageFormat =
@@ -198,7 +198,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             bool isExecutorCalled = false;
             RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = (s, rc, fh) => { isExecutorCalled = true; };
-            
+
             this.runTestsInstance.RunTests();
 
             Assert.IsTrue(isExecutorCalled);
@@ -207,6 +207,74 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     It.IsAny<TestRunChangedEventArgs>(),
                     It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldLogWarningOnNoTestsAvailableInAssembly()
+        {
+            string testCaseFilter = null;
+            this.SetupForNoTestsAvailable(testCaseFilter, out var sourcesString);
+
+            this.runTestsInstance.RunTests();
+
+            var expectedMessage =
+                $"No test is available in {sourcesString}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
+            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldLogWarningOnNoTestsAvailableInAssemblyWithTestCaseFilter()
+        {
+            var testCaseFilter = "Name~TestMethod1";
+            this.SetupForNoTestsAvailable(testCaseFilter, out var sourcesString);
+
+            this.runTestsInstance.RunTests();
+
+            var expectedMessage =
+                $"No test matches the given testcase filter `{testCaseFilter}` in {sourcesString}";
+            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldLogWarningOnNoTestsAvailableInAssemblyWithLongTestCaseFilter()
+        {
+            var veryLengthyTestCaseFilter = "FullyQualifiedName=TestPlatform.CrossPlatEngine" +
+                                 ".UnitTests.Execution.RunTestsWithSourcesTests." +
+                                 "RunTestsShouldLogWarningOnNoTestsAvailableInAssemblyWithLongTestCaseFilter" +
+                                 "WithVeryLengthTestCaseNameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+            this.SetupForNoTestsAvailable(veryLengthyTestCaseFilter, out var sourcesString);
+
+            this.runTestsInstance.RunTests();
+
+            var expectedTestCaseFilter = veryLengthyTestCaseFilter.Substring(0, 256)+ "...";
+
+            var expectedMessage =
+                $"No test matches the given testcase filter `{expectedTestCaseFilter}` in {sourcesString}";
+            this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
+        }
+
+        private void SetupForNoTestsAvailable(string testCaseFilter, out string sourcesString)
+        {
+            var testAssemblyLocation = typeof(TestCase).GetTypeInfo().Assembly.Location;
+
+            var adapterAssemblyLocation = typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location;
+
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+
+            var sources = new[] {testAssemblyLocation, "a"};
+            sourcesString = string.Join(" ", sources);
+
+            adapterSourceMap.Add(adapterAssemblyLocation, sources);
+
+            this.testExecutionContext.TestCaseFilter = testCaseFilter;
+
+            this.runTestsInstance = new TestableRunTestsWithSources(
+                adapterSourceMap,
+                null,
+                testExecutionContext,
+                null,
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
         }
 
         #region Testable Implemetations

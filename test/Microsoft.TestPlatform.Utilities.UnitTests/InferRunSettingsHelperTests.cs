@@ -499,7 +499,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string runSettingsXml = @"<RunSettings>
                                       </RunSettings>";
             
-            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out Dictionary<string, string> legacySettings));
         }
 
         [TestMethod]
@@ -511,7 +511,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                                         </LegacySettings>
                                       </RunSettings>";
 
-            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+            Assert.IsFalse(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out Dictionary<string, string> legacySettings));
         }
 
         [TestMethod]
@@ -522,7 +522,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                                         </LegacySettings>
                                       </RunSettings>";
 
-            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out Dictionary<string, string> legacySettings));
             Assert.AreEqual(0, legacySettings.Count);
         }
 
@@ -531,17 +531,31 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         {
             string runSettingsXml = @"<RunSettings>
                                        <LegacySettings>
-	                                        <Deployment>
+	                                        <Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
                                                 <DeploymentItem filename="".\test.txt"" />
                                             </Deployment>
                                             <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                            <Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
+                                                <Timeouts testTimeout=""120"" />
+                                                <TestTypeSpecific>
+                                                    <UnitTestRunConfig>
+                                                        <AssemblyResolution />
+                                                    </UnitTestRunConfig>
+                                                </TestTypeSpecific>
+                                                <Hosts />
+                                            </Execution>
                                        </LegacySettings>
                                       </RunSettings>";
 
-            var expectedList = new List<string> { "Deployment", "Scripts" };
+            var expectedElements = "Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts";
+            var expectedDeploymentAttributes = "enabled, deploySatelliteAssemblies";
+            var expectedExecutionAttributes = "hostProcessPlatform, parallelTestCount";
 
-            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out List<string> legacySettings));
-            CollectionAssert.AreEqual(expectedList, legacySettings);
+            Assert.IsTrue(InferRunSettingsHelper.TryGetLegacySettingElements(runSettingsXml, out Dictionary<string, string> legacySettings));
+            Assert.AreEqual(3, legacySettings.Count, "count does not match");
+            Assert.AreEqual(expectedElements, legacySettings["Elements"]);
+            Assert.AreEqual(expectedDeploymentAttributes, legacySettings["DeploymentAttributes"]);
+            Assert.AreEqual(expectedExecutionAttributes, legacySettings["ExecutionAttributes"]);
         }
 
         #region RunSettingsIncompatibeWithTestSettings Tests

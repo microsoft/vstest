@@ -7,6 +7,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Utilities</AssemblyName>
     <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.4</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

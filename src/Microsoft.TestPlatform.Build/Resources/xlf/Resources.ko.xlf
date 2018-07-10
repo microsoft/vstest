@@ -35,6 +35,11 @@
         <target state="translated">{0}({1})에 대한 테스트 실행</target>
         <note />
       </trans-unit>
+      <trans-unit id="UpdateTestSdkForCollectingCodeCoverage">
+        <source>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</source>
+        <target state="translated">경고: 코드 검사를 수집하려면 Microsoft.NET.Test.Sdk 패키지 참조를 버전 15.8.0 이상으로 업데이트하세요.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-
+    using Utilities;
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
@@ -102,14 +102,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             Justification = "This methods must invoke all possible discoverers and not fail or crash in any one.")]
         private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
         {
-            double totalAdaptersUsed = 0;
-
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
 
-            var discoverersFromDeprecatedLocations = false;
-
-            var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
+            var discovererToSourcesMap = DiscovererEnumerator.GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
             // Collecting Data Point for TimeTaken to Load Adapters
@@ -132,97 +128,166 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
             double totalTimeTakenByAdapters = 0;
+            double totalAdaptersUsed = 0;
 
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
-                Type discovererType = null;
-
-                // See if discoverer can be instantiated successfully else move next.
-                try
-                {
-                    discovererType = discoverer.Value.GetType();
-                }
-                catch (Exception e)
-                {
-                    var mesage = string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatEngineResources.DiscovererInstantiationException,
-                        e.Message);
-                    logger.SendMessage(TestMessageLevel.Warning, mesage);
-                    EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
-
-                    continue;
-                }
-
-                // if instantiated successfully, get tests
-                try
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose(
-                            "DiscoveryContext.LoadTests: Loading tests for {0}",
-                            discoverer.Value.GetType().FullName);
-                    }
-
-                    var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
-                    var newTimeStart = DateTime.UtcNow;
-
-                    this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);
-                    discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
-
-                    var totalAdapterRunTime = DateTime.UtcNow - newTimeStart;
-
-                    this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
-
-                    // Collecting Total Tests Discovered By each Adapter.
-                    if (this.discoveryResultCache.TotalDiscoveredTests > currentTotalTests)
-                    {
-                        var totalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
-                        this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter, discoverer.Metadata.DefaultExecutorUri), totalDiscoveredTests);
-                        if (!CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(), StringComparer.OrdinalIgnoreCase))
-                        {
-                            var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
-
-                            discoverersFromDeprecatedLocations |= Path.GetDirectoryName(discovererLocation).Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
-                        }
-                        totalAdaptersUsed++;
-                    }
-
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose(
-                            "DiscoveryContext.LoadTests: Done loading tests for {0}",
-                            discoverer.Value.GetType().FullName);
-                    }
-
-                    if (discoverersFromDeprecatedLocations)
-                    {
-                        logger.SendMessage(TestMessageLevel.Warning, string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
-                    }
-
-                    // Collecting Data Point for Time Taken to Discover Tests by each Adapter
-                    this.requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter, discoverer.Metadata.DefaultExecutorUri), totalAdapterRunTime.TotalSeconds);
-                    totalTimeTakenByAdapters += totalAdapterRunTime.TotalSeconds;
-                }
-                catch (Exception e)
-                {
-                    var message = string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatEngineResources.ExceptionFromLoadTests,
-                        discovererType.Name,
-                        e.Message);
-
-                    logger.SendMessage(TestMessageLevel.Error, message);
-                    EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
-                }
+                this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
             }
 
+            if (this.discoveryResultCache.TotalDiscoveredTests == 0)
+            {
+                DiscovererEnumerator.LogWarningOnNoTestsDiscovered(sources, testCaseFilter, logger);
+            }
+
+            this.CollectTelemetryAtEnd(totalTimeTakenByAdapters, totalAdaptersUsed);
+        }
+
+        private void CollectTelemetryAtEnd(double totalTimeTakenByAdapters, double totalAdaptersUsed)
+        {
             // Collecting Total Time Taken by Adapters
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters, totalTimeTakenByAdapters);
+            this.requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecByAllAdapters,
+                totalTimeTakenByAdapters);
 
             // Collecting Total Adapters Used to Discover tests
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, totalAdaptersUsed);
+            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests,
+                totalAdaptersUsed);
         }
+
+        private void DiscoverTestsFromSingleDiscoverer(
+            LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer,
+            Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> discovererToSourcesMap,
+            DiscoveryContext context,
+            TestCaseDiscoverySink discoverySink,
+            IMessageLogger logger,
+            ref double totalAdaptersUsed,
+            ref double totalTimeTakenByAdapters)
+        {
+            if (DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType) == false)
+            {
+                // Fail to instantiate the discoverer type.
+                return;
+            }
+
+            // on instantiated successfully, get tests
+            try
+            {
+                EqtTrace.Verbose(
+                    "DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Loading tests for {0}",
+                        discoverer.Value.GetType().FullName);
+
+                var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
+                var newTimeStart = DateTime.UtcNow;
+
+                this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);
+                discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
+
+                var totalAdapterRunTime = DateTime.UtcNow - newTimeStart;
+
+                this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests -
+                                                                  currentTotalTests);
+
+                // Record Total Tests Discovered By each Discoverer.
+                var totalTestsDiscoveredByCurrentDiscoverer = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
+                this.requestData.MetricsCollection.Add(
+                    string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
+                        discoverer.Metadata.DefaultExecutorUri), totalTestsDiscoveredByCurrentDiscoverer);
+
+                totalAdaptersUsed++;
+
+
+                EqtTrace.Verbose("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Done loading tests for {0}",
+                        discoverer.Value.GetType().FullName);
+
+                var discovererFromDeprecatedLocations = DiscovererEnumerator.IsDiscovererFromDeprecatedLocations(discoverer);
+                if (discovererFromDeprecatedLocations)
+                {
+                    logger.SendMessage(TestMessageLevel.Warning,
+                        string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DeprecatedAdapterPath));
+                }
+
+                // Collecting Data Point for Time Taken to Discover Tests by each Adapter
+                this.requestData.MetricsCollection.Add(
+                    string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter,
+                        discoverer.Metadata.DefaultExecutorUri), totalAdapterRunTime.TotalSeconds);
+                totalTimeTakenByAdapters += totalAdapterRunTime.TotalSeconds;
+            }
+            catch (Exception e)
+            {
+                var message = string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CrossPlatEngineResources.ExceptionFromLoadTests,
+                    discovererType.Name,
+                    e.Message);
+
+                logger.SendMessage(TestMessageLevel.Error, message);
+                EqtTrace.Error("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: {0} ", e);
+            }
+        }
+
+        private static bool TryToLoadDiscoverer(LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer, IMessageLogger logger, out Type discovererType)
+        {
+            discovererType = null;
+
+            // See if discoverer can be instantiated successfully else move next.
+            try
+            {
+                discovererType = discoverer.Value.GetType();
+            }
+            catch (Exception e)
+            {
+                var mesage = string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CrossPlatEngineResources.DiscovererInstantiationException,
+                    e.Message);
+                logger.SendMessage(TestMessageLevel.Warning, mesage);
+                EqtTrace.Error("DiscovererEnumerator.LoadTestsFromAnExtension: {0} ", e);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsDiscovererFromDeprecatedLocations(
+            LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer)
+        {
+            if (CrossPlatEngine.Constants.DefaultAdapters.Contains(discoverer.Metadata.DefaultExecutorUri.ToString(),
+                StringComparer.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            var discovererLocation = discoverer.Value.GetType().GetTypeInfo().Assembly.GetAssemblyLocation();
+
+            return Path.GetDirectoryName(discovererLocation)
+                .Equals(CrossPlatEngine.Constants.DefaultAdapterLocation, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void LogWarningOnNoTestsDiscovered(IEnumerable<string> sources, string testCaseFilter, IMessageLogger logger)
+        {
+            var sourcesString = string.Join(" ", sources);
+
+            // Print warning on no tests.
+            if (string.IsNullOrEmpty(testCaseFilter) == false)
+            {
+                var testCaseFilterToShow = TestCaseFilterDeterminer.ShortenTestCaseFilterIfRequired(testCaseFilter);
+
+                logger.SendMessage(
+                    TestMessageLevel.Warning,
+                    string.Format(CrossPlatEngineResources.NoTestsAvailableForGivenTestCaseFilter, testCaseFilterToShow, sourcesString));
+            }
+            else
+            {
+                logger.SendMessage(
+                    TestMessageLevel.Warning,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
+                        sourcesString));
+            }
+        }
+
 
         private void SetAdapterLoggingSettings(IMessageLogger messageLogger, IRunSettings runSettings)
         {

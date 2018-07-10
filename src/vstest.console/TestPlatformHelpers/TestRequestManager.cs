@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestPlatformFactory.GetTestPlatform(),
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
-                  new InferHelper(new AssemblyMetadataProvider()),
+                  new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
         }
@@ -294,9 +294,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
             
-            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out List<string> legacySettings))
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsTelemetry))
             {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettingElements, string.Join(",", legacySettings));
+                foreach( var ciData in legacySettingsTelemetry)
+                {
+                    // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
+                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingPrefix, ciData.Key), ciData.Value);
+                }
             }
         }
 

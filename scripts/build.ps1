@@ -384,7 +384,7 @@ function Publish-Package
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     # Copy IntelliTrace components.
-    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\15.8.0-preview-20180518-04\tools"
+    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\15.8.0-preview-20180702-05\tools"
     $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
 
     if (-not (Test-Path $intellitraceTargetDirectory)) {
@@ -570,7 +570,7 @@ function Create-NugetPackages
                      "Microsoft.TestPlatform.Portable.nuspec",
                      "Microsoft.CodeCoverage.nuspec")
 
-    $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
+    $targetFiles = @("Microsoft.Net.Test.Sdk.targets", "Microsoft.CodeCoverage.targets")
     $propFiles = @("Microsoft.Net.Test.Sdk.props", "Microsoft.CodeCoverage.props")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")

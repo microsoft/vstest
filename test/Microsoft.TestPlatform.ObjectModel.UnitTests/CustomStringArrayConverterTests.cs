@@ -67,5 +67,14 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(string.Empty, data[0]);
             Assert.AreEqual(string.Empty, data[1]);
         }
+
+        
+        [TestMethod]
+        public void CustomStringArrayConverterShouldDeserializeNullValue()
+        {
+            var data = this.customStringArrayConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as string[];
+
+            Assert.AreEqual(null, data);
+        }
     }
 }
