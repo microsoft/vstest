@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorMain.Run(argsWithEmptyDiagArg); // Passing tracelevel as info and diag file path is empty.
 
             // Verify
-            Assert.AreEqual(PlatformTraceLevel.Off, EqtTrace.TraceLevel);
+            Assert.AreEqual(TraceLevel.Off, (TraceLevel)EqtTrace.TraceLevel);
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorMain.Run(argsWithInvalidTraceLevel);
 
             // Verify
-            Assert.AreEqual(PlatformTraceLevel.Verbose, EqtTrace.TraceLevel);
+            Assert.AreEqual(TraceLevel.Verbose, (TraceLevel)EqtTrace.TraceLevel);
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorMain.Run(args); // Trace level is set as info in args.
 
             // Verify
-            Assert.AreEqual(PlatformTraceLevel.Info, EqtTrace.TraceLevel);
+            Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
         }
 
         [TestMethod]
