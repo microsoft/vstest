@@ -231,7 +231,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             if (argsDictionary.TryGetValue(LogFileArgument, out string logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
-                EqtTrace.InitializeTrace(logFile, (PlatformTraceLevel)traceLevelInt);
+
+                // In case traceLevelInt is not defined in PlatfromTraceLevel, default it to verbose.
+                var traceLevel = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt) ?
+                    (PlatformTraceLevel)traceLevelInt :
+                    PlatformTraceLevel.Verbose;
+
+                EqtTrace.InitializeTrace(logFile, traceLevel);
             }
             else
             {

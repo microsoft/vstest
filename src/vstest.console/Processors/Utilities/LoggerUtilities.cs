@@ -5,59 +5,79 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 {
     using System;
+    using System.Xml;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using ObjectModel;
-    using ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     internal class LoggerUtilities
     {
         /// <summary>
-        /// Parses the parameters passed as name values pairs along with the logger argument.
+        /// Add logger to run settings.
         /// </summary>
-        /// <param name="argument">Logger argument</param>
-        /// <param name="loggerIdentifier">Receives logger Uri or friendly name.</param>
-        /// <param name="parameters">Receives parse name value pairs.</param>
-        /// <returns>True is successful, false otherwise.</returns>
-        public static bool TryParseLoggerArgument(string argument, out string loggerIdentifier, out Dictionary<string, string> parameters)
+        /// <param name="loggerIdentifier">Logger Identifier.</param>
+        /// <param name="loggerParameters">Logger parameters.</param>
+        /// <param name="runSettingsManager">Run settings manager.</param>
+        public static void AddLoggerToRunSettings(string loggerIdentifier, Dictionary<string, string> loggerParameters, IRunSettingsProvider runSettingsManager)
         {
-            loggerIdentifier = null;
-            parameters = null;
-
-            var parseSucceeded = true;
-            char[] ArgumentSeperator = new char[] { ';' };
-            char[] NameValueSeperator = new char[] { '=' };
-
-            var argumentParts = argument.Split(ArgumentSeperator, StringSplitOptions.RemoveEmptyEntries);
-
-            if (argumentParts.Length > 0 && !argumentParts[0].Contains("="))
+            // Creating default run settings if required.
+            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            if (settings == null)
             {
-                loggerIdentifier = argumentParts[0];
+                runSettingsManager.AddDefaultRunSettings();
+                settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            }
 
-                if (argumentParts.Length > 1)
+            var logger = default(LoggerSettings);
+            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(settings) ?? new LoggerRunSettings();
+
+            try
+            {
+                // Logger as uri in command line.
+                var loggerUri = new Uri(loggerIdentifier);
+                logger = new LoggerSettings
                 {
-                    parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                    for (int index = 1; index < argumentParts.Length; ++index)
-                    {
-                        string[] nameValuePair = argumentParts[index].Split(NameValueSeperator, StringSplitOptions.RemoveEmptyEntries);
-                        if (nameValuePair.Length == 2)
-                        {
-                            parameters[nameValuePair[0]] = nameValuePair[1];
-                        }
-                        else
-                        {
-                            parseSucceeded = false;
-                            break;
-                        }
-                    }
-                }
+                    Uri = loggerUri,
+                    IsEnabled = true
+                };
             }
-            else
+            catch (UriFormatException)
             {
-                parseSucceeded = false;
+                // Logger as friendlyName in command line.
+                logger = new LoggerSettings
+                {
+                    FriendlyName = loggerIdentifier,
+                    IsEnabled = true
+                };
             }
 
-            return parseSucceeded;
+            // Converting logger console params to Configuration element
+            if (loggerParameters != null && loggerParameters.Count > 0)
+            {
+                var XmlDocument = new XmlDocument();
+                var outerNode = XmlDocument.CreateElement("Configuration");
+                foreach (KeyValuePair<string, string> entry in loggerParameters)
+                {
+                    var node = XmlDocument.CreateElement(entry.Key);
+                    node.InnerText = entry.Value;
+                    outerNode.AppendChild(node);
+                }
+
+                logger.Configuration = outerNode;
+            }
+
+            // Remove existing logger.
+            var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
+            if (existingLoggerIndex >= 0)
+            {
+                loggerRunSettings.LoggerSettingsList.RemoveAt(existingLoggerIndex);
+            }
+
+            loggerRunSettings.LoggerSettingsList.Add(logger);
+
+            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
         }
     }
 }

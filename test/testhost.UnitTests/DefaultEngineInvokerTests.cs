@@ -109,7 +109,30 @@ namespace testhost.UnitTests
             this.engineInvoker.Invoke(argsDictionary);
 
             // Verify
-            Assert.AreEqual(PlatformTraceLevel.Info, EqtTrace.TraceLevel);
+            Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
+        }
+
+        [TestMethod]
+        public void InvokeShouldInitializeTraceWithVerboseTraceLevelIfInvalidTraceLevelPassed()
+        {
+            // Setting EqtTrace.TraceLevel to a value other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Warning;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
+#endif
+
+            try
+            {
+                argsDictionary["--tracelevel"] = "5"; // int value which is not defined in TraceLevel.
+                this.engineInvoker.Invoke(argsDictionary);
+            }
+            finally{
+                argsDictionary["--tracelevel"] = "3"; // Setting to default value of 3.
+            }
+
+            // Verify
+            Assert.AreEqual(TraceLevel.Verbose, (TraceLevel)EqtTrace.TraceLevel);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Linq;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -143,100 +144,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            AddLoggerToRunSettings(argument, runSettingsManager);
-        }
+            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
 
-        /// <summary>
-        /// Add logger to runsettings.
-        /// </summary>
-        /// <param name="loggerArgument"></param>
-        /// <param name="runSettingsManager"></param>
-        public static void AddLoggerToRunSettings(string loggerArgument, IRunSettingsProvider runSettingsManager)
-        {
-            if (string.IsNullOrWhiteSpace(loggerArgument))
+            // Throw error in case logger argument null or empty.
+            if (string.IsNullOrWhiteSpace(argument))
             {
-                HandleInvalidArgument(loggerArgument);
+                throw new CommandLineException(exceptionMessage);
             }
 
-            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
-            if (settings == null)
+            // Get logger argument list.
+            var loggerArgumentList = ArgumemtProcessorUtilities.GetArgumentList(argument, ArgumemtProcessorUtilities.SemiColonArgumentSeperator, exceptionMessage);
+
+            // Get logger identifier.
+            var loggerIdentifier = loggerArgumentList[0];
+            if (loggerIdentifier.Contains("="))
             {
-                runSettingsManager.AddDefaultRunSettings();
-                settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+                throw new CommandLineException(exceptionMessage);
             }
 
-            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(settings) ?? new LoggerRunSettings();
-            string loggerIdentifier = null;
-            Dictionary<string, string> parameters = null;
-            var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(loggerArgument, out loggerIdentifier, out parameters);
+            // Get logger parameters
+            var loggerParameterArgs = loggerArgumentList.Skip(1);
+            var loggerParameters = ArgumemtProcessorUtilities.GetArgumentParameters(loggerParameterArgs, ArgumemtProcessorUtilities.EqualNameValueSeperator, exceptionMessage);
 
-            if (parseSucceeded)
-            {
-                var logger = default(LoggerSettings);
-
-                try
-                {
-                    // Logger as uri in command line.
-                    var loggerUri = new Uri(loggerIdentifier);
-                    logger = new LoggerSettings
-                    {
-                        Uri = loggerUri,
-                        IsEnabled = true
-                    };
-                }
-                catch (UriFormatException)
-                {
-                    // Logger as friendlyName in command line.
-                    logger = new LoggerSettings
-                    {
-                        FriendlyName = loggerIdentifier,
-                        IsEnabled = true
-                    };
-                }
-
-                // Converting logger console params to Configuration element
-                if (parameters != null && parameters.Count > 0)
-                {
-                    var XmlDocument = new XmlDocument();
-                    var outerNode = XmlDocument.CreateElement("Configuration");
-                    foreach (KeyValuePair<string, string> entry in parameters)
-                    {
-                        var node = XmlDocument.CreateElement(entry.Key);
-                        node.InnerText = entry.Value;
-                        outerNode.AppendChild(node);
-                    }
-
-                    logger.Configuration = outerNode;
-                }
-
-                // Remove existing logger.
-                var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
-                if (existingLoggerIndex >= 0)
-                {
-                    loggerRunSettings.LoggerSettingsList.RemoveAt(existingLoggerIndex);
-                }
-
-                loggerRunSettings.LoggerSettingsList.Add(logger);
-            }
-            else
-            {
-                HandleInvalidArgument(loggerArgument);
-            }
-
-            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
-        }
-
-        /// <summary>
-        /// Throws an exception indicating that the argument is invalid.
-        /// </summary>
-        /// <param name="argument">Argument which is invalid.</param>
-        private static void HandleInvalidArgument(string argument)
-        {
-            throw new CommandLineException(
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CommandLineResources.LoggerUriInvalid,
-                    argument));
+            // Add logger to run settings.
+            LoggerUtilities.AddLoggerToRunSettings(loggerIdentifier, loggerParameters, runSettingsManager);
         }
 
         /// <summary>

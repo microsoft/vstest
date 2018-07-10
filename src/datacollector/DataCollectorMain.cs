@@ -70,8 +70,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             string logFile;
             if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
             {
-                var traceLevel = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
-                EqtTrace.InitializeTrace(logFile, (PlatformTraceLevel)traceLevel);
+                var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
+
+                // In case traceLevelInt is not defined in PlatfromTraceLevel, default it to verbose.
+                var traceLevel = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt) ?
+                    (PlatformTraceLevel)traceLevelInt :
+                    PlatformTraceLevel.Verbose;
+
+                EqtTrace.InitializeTrace(logFile, traceLevel);
             }
             else
             {
@@ -106,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                ((DataCollectionRequestHandler)this.requestHandler).SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
+                (this.requestHandler as DataCollectionRequestHandler)?.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
             }
 
             // Start processing async in a different task

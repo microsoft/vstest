@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             this.diagProcessor.Executor.Value.Initialize(argument);
 
-            Assert.AreEqual(PlatformTraceLevel.Info, EqtTrace.TraceLevel);
+            Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
             Assert.IsTrue(EqtTrace.LogFile.Contains("abc.txt"));
         }
 

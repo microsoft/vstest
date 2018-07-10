@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -136,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Get diag argument list.
-            var diagArgumentList = GetDiagArgumentList(argument);
+            var diagArgumentList = ArgumemtProcessorUtilities.GetArgumentList(argument, ArgumemtProcessorUtilities.SemiColonArgumentSeperator, CommandLineResources.EnableDiagUsage);
 
             // Get diag file path.
             // Note: Even though semi colon is valid file path, we are not respecting the file name having semi-colon [As we are separating arguments based on semi colon].
@@ -145,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             // Get diag parameters.
             var diagParameterArgs = diagArgumentList.Skip(1);
-            var diagParameters = GetDiagParameters(diagParameterArgs);
+            var diagParameters = ArgumemtProcessorUtilities.GetArgumentParameters(diagParameterArgs, ArgumemtProcessorUtilities.EqualNameValueSeperator, CommandLineResources.EnableDiagUsage);
 
             // Initialize diag logging.
             InitializeDiagLogging(diagFilePath, diagParameters);
@@ -159,53 +160,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
-        }
-
-        /// <summary>
-        /// Get diag parameters.
-        /// </summary>
-        /// <param name="diagParameterArgs">Diag parameter args.</param>
-        /// <returns>Diag parameters dictionary.</returns>
-        private Dictionary<string, string> GetDiagParameters(IEnumerable<string> diagParameterArgs)
-        {
-            var nameValueSeperator = new char[] { '=' };
-            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            // Get parameters from parameterNameValuePairs.
-            // Throw error in case of invalid name value pairs.
-            foreach (string diagParameterArg in diagParameterArgs)
-            {
-                var nameValuePair = diagParameterArg?.Split(nameValueSeperator, StringSplitOptions.RemoveEmptyEntries);
-                if (nameValuePair.Length == 2)
-                {
-                    parameters[nameValuePair[0]] = nameValuePair[1];
-                }
-                else
-                {
-                    throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-                }
-            }
-
-            return parameters;
-        }
-
-        /// <summary>
-        /// Get diag argument list.
-        /// </summary>
-        /// <param name="argument">Argument.</param>
-        /// <returns>Diag argument list.</returns>
-        private string[] GetDiagArgumentList(string argument)
-        {
-            var argumentSeperator = new char[] { ';' };
-            var diagArgumentList = argument?.Split(argumentSeperator, StringSplitOptions.RemoveEmptyEntries);
-
-            // Throw error in case of invalid diag argument.
-            if (diagArgumentList == null || diagArgumentList.Length <= 0)
-            {
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            }
-
-            return diagArgumentList;
         }
 
         /// <summary>
