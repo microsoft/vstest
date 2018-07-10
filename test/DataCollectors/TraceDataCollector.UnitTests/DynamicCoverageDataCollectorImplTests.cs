@@ -79,9 +79,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
             StringAssert.Contains(this.aConfigFileName, Path.GetTempPath());
-            Assert.AreEqual(
-                GetDefaultCodeCoverageConfig().Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty),
-                File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
+            this.CompareWithDefaultConfig();
         }
 
         [TestMethod]
@@ -105,6 +103,27 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
             Assert.AreEqual(DynamicCoverageDataCollectorImplTests.DefaultConfigFileName, Path.GetFileName(this.aConfigFileName));
             Assert.AreEqual(expectedContent, File.ReadAllText(this.aConfigFileName));
+        }
+
+        [TestMethod]
+        public void InitializeShouldInitializeDefaultConfigIfNoCodeCoverageConfigExists()
+        {
+            XmlElement configElement =
+                DynamicCoverageDataCollectorImplTests.CreateXmlElement($"<Configuration><Framework>.NETCoreApp,Version=v1.1</Framework></Configuration>");
+
+            this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>()))
+                .Callback<string>((path) =>
+                {
+                    this.tempSessionDir = path;
+                    Directory.CreateDirectory(path);
+                });
+
+            this.fileHelperMock.Setup(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((path, content) => { File.WriteAllText(path, content); });
+
+            this.collectorImpl.Initialize(configElement, this.dataCollectionSinkMock.Object, this.dataCollectionLoggerMock.Object);
+
+            this.CompareWithDefaultConfig();
         }
 
         [TestMethod]
@@ -300,6 +319,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         #region private methods
+
         private static string GetAutoGenerageCodeCoverageFileNamePrefix()
         {
             string GetUserName()
@@ -344,6 +364,14 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
             this.directoryHelperMock.Setup(d => d.CreateDirectory(It.IsAny<string>())).Callback<string>(
                 (directoryPath) => { this.atempDirectory = directoryPath; });
+        }
+
+        private void CompareWithDefaultConfig()
+        {
+            Assert.AreEqual(
+                DynamicCoverageDataCollectorImplTests.GetDefaultCodeCoverageConfig().Replace(" ", string.Empty)
+                    .Replace(Environment.NewLine, string.Empty),
+                File.ReadAllText(this.aConfigFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
         }
 
         #endregion

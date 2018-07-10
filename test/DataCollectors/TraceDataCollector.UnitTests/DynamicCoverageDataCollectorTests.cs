@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
     using Moq;
     using TestPlatform.ObjectModel.DataCollection;
     using TraceCollector;
+    using TraceCollector.Interfaces;
     using IDataCollectionSink = TraceCollector.IDataCollectionSink;
 
     [TestClass]
@@ -29,6 +30,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         private Mock<TraceCollector.IDataCollectionSink> sinkMock;
         private Mock<IDataCollectionLogger> loggerMock;
         private Mock<IDataCollectionAgentContext> agentContextMock;
+        private Mock<IEnvironment> environmentMock;
 
         public DynamicCoverageDataCollectorTests()
         {
@@ -38,8 +40,10 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.sinkMock = new Mock<TraceCollector.IDataCollectionSink>();
             this.loggerMock = new Mock<IDataCollectionLogger>();
             this.agentContextMock = new Mock<IDataCollectionAgentContext>();
-            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, this.implMock.Object);
+            this.environmentMock = new Mock<IEnvironment>();
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, this.implMock.Object, this.environmentMock.Object);
             this.vanguardLocationProviderMock.Setup(u => u.GetVanguardDirectory()).Returns(Directory.GetCurrentDirectory);
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
             var configElement = DynamicCoverageDataCollectorImplTests.CreateXmlElement(DynamicCoverageDataCollectorTests.DefaultConfig);
             this.collector.Initialize(configElement, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
         }
@@ -60,6 +64,46 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.collector.Initialize(null, this.eventsMock.Object, this.sinkMock.Object, this.loggerMock.Object, this.agentContextMock.Object);
 
             Assert.AreEqual(null, actualConfig);
+        }
+
+        [TestMethod]
+        public void InitializeShouldLogWarningIfCurrentOperatingSystemIsUnix()
+        {
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
+
+           this.collector.Initialize(
+               null,
+               this.eventsMock.Object,
+               this.sinkMock.Object,
+               this.loggerMock.Object,
+               this.agentContextMock.Object);
+
+            var expectedExMsg =
+                "No code coverage data available. Code coverage is currently supported only on Windows.";
+
+            this.loggerMock.Verify(l => l.LogWarning(It.IsAny<DataCollectionContext>(), expectedExMsg));
+        }
+
+        [TestMethod]
+        public void InitializeShouldNotRegisterForSessionEvents()
+        {
+            this.implMock = new Mock<IDynamicCoverageDataCollectorImpl>();
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
+
+            this.collector.Initialize(
+                null,
+                this.eventsMock.Object,
+                this.sinkMock.Object,
+                this.loggerMock.Object,
+                this.agentContextMock.Object);
+
+            this.eventsMock.Raise(e => e.SessionStart += null, new SessionStartEventArgs());
+            this.eventsMock.Raise(e => e.SessionEnd += null, new SessionEndEventArgs());
+
+            this.implMock.Verify(i => i.SessionStart(It.IsAny<object>(), It.IsAny<SessionStartEventArgs>()), Times.Never);
+            this.implMock.Verify(i => i.SessionEnd(It.IsAny<object>(), It.IsAny<SessionEndEventArgs>()), Times.Never);
         }
 
         [TestMethod]
@@ -137,6 +181,24 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
         }
 
         [TestMethod]
+        public void GetEnvironmentVariablesShouldReturnNoEnvVaribles()
+        {
+            this.implMock = new Mock<IDynamicCoverageDataCollectorImpl>();
+            this.environmentMock.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.collector = new TestableDynamicCoverageDataCollector(this.vanguardLocationProviderMock.Object, null, this.environmentMock.Object);
+
+            this.collector.Initialize(
+                null,
+                this.eventsMock.Object,
+                this.sinkMock.Object,
+                this.loggerMock.Object,
+                this.agentContextMock.Object);
+            var envVars = this.collector.GetEnvironmentVariables();
+
+            Assert.IsFalse(envVars.Any(), "No environment variables set on unix.");
+        }
+
+        [TestMethod]
         public void DisposeShouldDisposeImpl()
         {
             this.collector.Dispose();
@@ -156,8 +218,11 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
 
         private class TestableDynamicCoverageDataCollector : DynamicCoverageDataCollector
         {
-            public TestableDynamicCoverageDataCollector(IVanguardLocationProvider vanguardLocationProvider, IDynamicCoverageDataCollectorImpl impl)
-            : base(vanguardLocationProvider, impl)
+            public TestableDynamicCoverageDataCollector(
+                IVanguardLocationProvider vanguardLocationProvider,
+                IDynamicCoverageDataCollectorImpl impl,
+                IEnvironment environment)
+            : base(vanguardLocationProvider, impl, environment)
             {
             }
 

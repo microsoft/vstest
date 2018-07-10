@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TraceCollector
         {
             EqtTrace.Info(
                 "BaseDataCollector.InternalConstruct: Enabling datacollector with configuration: {0}",
-                configurationElement?.InnerXml);
+                configurationElement?.OuterXml);
             this.Events = events;
             this.DataSink = dataSink;
             this.Logger = logger;

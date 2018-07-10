@@ -27,13 +27,13 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">A variável de ambiente obrigatória PROCDUMP_PATH era nula ou estava vazia. Defina PROCDUMP_PATH para o caminho da pasta que contém o executável procdump apropriado.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">A coleta de despejo estava habilitada, mas não foi gerado nenhum arquivo de despejo.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
