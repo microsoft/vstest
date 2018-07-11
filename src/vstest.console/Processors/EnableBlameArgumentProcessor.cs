@@ -198,17 +198,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (isDumpEnabled)
             {
-                var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
-                if (parameters != null && parameters.Count > 0)
-                {
-                    foreach (KeyValuePair<string, string> entry in parameters)
-                    {
-                        var attribute = XmlDocument.CreateAttribute(entry.Key);
-                        attribute.Value = entry.Value;
-                        dumpNode.Attributes.Append(attribute);
-                    }
-                }
-                outernode.AppendChild(dumpNode);
+                AddCollectDumpNode(parameters, XmlDocument, outernode);
             }
 
             foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
@@ -220,6 +210,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+        }
+
+        private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
+        {
+            var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
+            if (parameters != null && parameters.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> entry in parameters)
+                {
+                    var attribute = XmlDocument.CreateAttribute(entry.Key);
+                    attribute.Value = entry.Value;
+                    dumpNode.Attributes.Append(attribute);
+                }
+            }
+            outernode.AppendChild(dumpNode);
         }
 
         /// <summary>

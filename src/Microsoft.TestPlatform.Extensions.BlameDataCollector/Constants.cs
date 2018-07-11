@@ -44,9 +44,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string DumpModeKey = "CollectDump";
 
         /// <summary>
-        /// Configuration key name for coolect dump always
+        /// Configuration key name for collect dump always
         /// </summary>
-        public const string CollectDumpAlwaysKey = "AlwaysCollectDump";
+        public const string CollectDumpAlwaysKey = "CollectDumpOnProcessExit";
 
         /// <summary>
         /// Configuration key name for dump type

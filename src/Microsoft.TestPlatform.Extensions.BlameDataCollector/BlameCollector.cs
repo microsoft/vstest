@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private int testStartCount;
         private int testEndCount;
         private bool processDumpEnabled;
-        private bool alwaysCollectProcessDump;
+        private bool collectDumpOnProcessExit;
         private bool processFullDumpEnabled;
         private string attachmentGuid;
 
@@ -103,7 +103,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpEnabled = collectDumpNode != null;
                 if (this.processDumpEnabled)
                 {
-                    this.alwaysCollectProcessDump = string.Equals(collectDumpNode.Attributes[Constants.CollectDumpAlwaysKey]?.Value, "true", StringComparison.OrdinalIgnoreCase);
+                    this.collectDumpOnProcessExit = string.Equals(collectDumpNode.Attributes[Constants.CollectDumpAlwaysKey]?.Value, "true", StringComparison.OrdinalIgnoreCase);
                     this.processFullDumpEnabled = string.Equals(collectDumpNode.Attributes[Constants.DumpTypeKey]?.Value, "full", StringComparison.OrdinalIgnoreCase);
                 }
             }
@@ -167,7 +167,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.processDumpEnabled)
             {
-                if (this.testStartCount > this.testEndCount || this.alwaysCollectProcessDump)
+                // If there was a test case crash or if we need to collect dump on process exit.
+                if (this.testStartCount > this.testEndCount || this.collectDumpOnProcessExit)
                 {
                     try
                     {
@@ -180,10 +181,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         else
                         {
                             EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                            this.logger.LogWarning(args.Context, "BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
                         }
                     }
                     catch (FileNotFoundException ex)
                     {
+                        EqtTrace.Warning(ex.Message);
                         this.logger.LogWarning(args.Context, ex.Message);
                     }
                 }

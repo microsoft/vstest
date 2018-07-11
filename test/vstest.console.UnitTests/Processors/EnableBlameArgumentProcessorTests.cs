@@ -125,6 +125,25 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
+        [TestMethod]
+        public void InitializeShouldCreateEntryForBlameAlongWithCollectDumpParametersIfEnabled()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(DefaultRunSettings);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.mockEnvronment.Setup(x => x.OperatingSystem)
+                               .Returns(PlatformOperatingSystem.Windows);
+            this.mockEnvronment.Setup(x => x.Architecture)
+                               .Returns(PlatformArchitecture.X64);
+
+            this.executor.Initialize("CollectDump;DumpType=full;CollectDumpOnProcessExit=true");
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"full\" CollectDumpOnProcessExit=\"true\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
         internal class TestableEnableBlameArgumentExecutor : EnableBlameArgumentExecutor
         {
             internal TestableEnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, IEnvironment environment, IOutput output)
