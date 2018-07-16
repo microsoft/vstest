@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleManagedApp", "..\Con
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegacySettingsUnitTestProject", "..\LegacySettingsUnitTestProject\LegacySettingsUnitTestProject.csproj", "{8C38E692-FBE3-41A4-A008-4CA79B203985}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest1", "UnitTest1\UnitTest1.vcxproj", "{7D5C0435-7B8C-4310-9445-44512EFADABF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeUnitTestProject", "..\NativeUnitTestProject\NativeUnitTestProject.vcxproj", "{8D090B37-26F8-4A60-82D7-2780C91FD2E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -295,16 +295,16 @@ Global
 		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Release|x64.Build.0 = Release|Any CPU
 		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Release|x86.ActiveCfg = Release|Any CPU
 		{8C38E692-FBE3-41A4-A008-4CA79B203985}.Release|x86.Build.0 = Release|Any CPU
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Debug|x64.ActiveCfg = Debug|x64
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Debug|x64.Build.0 = Debug|x64
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Debug|x86.ActiveCfg = Debug|Win32
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Debug|x86.Build.0 = Debug|Win32
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Release|Any CPU.ActiveCfg = Release|Win32
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Release|x64.ActiveCfg = Release|x64
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Release|x64.Build.0 = Release|x64
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Release|x86.ActiveCfg = Release|Win32
-		{7D5C0435-7B8C-4310-9445-44512EFADABF}.Release|x86.Build.0 = Release|Win32
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Debug|x64.ActiveCfg = Debug|x64
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Debug|x64.Build.0 = Debug|x64
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Debug|x86.ActiveCfg = Debug|Win32
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Debug|x86.Build.0 = Debug|Win32
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Release|x64.ActiveCfg = Release|x64
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Release|x64.Build.0 = Release|x64
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Release|x86.ActiveCfg = Release|Win32
+		{8D090B37-26F8-4A60-82D7-2780C91FD2E4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

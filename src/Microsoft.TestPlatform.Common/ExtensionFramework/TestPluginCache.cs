@@ -123,6 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
             where TPluginInfo : TestPluginInformation
         {
+            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies endswith: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
             // Return the cached value if cache is valid.
             if (this.TestExtensions != null && this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
             {

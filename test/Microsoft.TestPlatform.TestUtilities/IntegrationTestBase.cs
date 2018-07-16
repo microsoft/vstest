@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         private const string NUnitTestAdapterRelativePath = @"nunit3testadapter\{0}\build";
         private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
         private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
-        private const string GoogleTestAdapterRelativePath = @"chutzpah\{0}\tools";
+        private const string GoogleTestAdapterRelativePath = @"googletestadapter\{0}\build\_common";
 
         public enum UnitTestFramework
         {
@@ -352,7 +352,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (testFramework == UnitTestFramework.GoogleTest)
             {
-                adapterRelativePath = string.Format(ChutzpahTestAdapterRelativePath, this.testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
+                adapterRelativePath = string.Format(GoogleTestAdapterRelativePath, this.testEnvironment.DependencyVersions["GoogleTestAdapterVersion"]);
             }
 
             return this.testEnvironment.GetNugetPackage(adapterRelativePath);

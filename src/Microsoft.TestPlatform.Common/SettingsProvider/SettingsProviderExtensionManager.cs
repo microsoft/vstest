@@ -115,7 +115,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
-                                TestPlatformConstants.TestAdapterEndsWithPattern,
+                                "SettingsProvider.dll",
+                                //TestPlatformConstants.TestAdapterEndsWithPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
 
