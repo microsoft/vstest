@@ -264,6 +264,11 @@
         <target state="translated">建立快速篩選時發生錯誤。</target>
         <note />
       </trans-unit>
+      <trans-unit id="CancellationRequested">
+        <source>Cancelling the operation as requested.</source>
+        <target state="new">Cancelling the operation as requested.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

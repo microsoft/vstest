@@ -172,10 +172,6 @@
         <target state="translated">在檔案 {0} 中記錄 TestHost 診斷</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">正在依取消的要求而取消測試回合。</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">無法啟動測試主機。錯誤: {0}</target>

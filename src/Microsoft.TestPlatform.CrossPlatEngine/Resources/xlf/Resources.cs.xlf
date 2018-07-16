@@ -172,10 +172,6 @@
         <target state="translated">Protokolování diagnostiky TestHost v souboru: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">Testovací běh se na vyžádání ruší.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Nepovedlo se spustit hostitele testu kvůli této chybě: {0}</target>
