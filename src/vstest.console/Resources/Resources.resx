@@ -649,11 +649,13 @@
   <data name="EnableBlameUsage" xml:space="preserve">
     <value>--Blame|/Blame:[CollectDump];[Key]=[Value]
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
-      It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.
-      You may optionally choose to collect process dump for the test host. By default, a mini dump will be collected on a crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      By default, a mini dump will be collected on a crash.
       You may also choose to override this by some optional parameters:
-      CollectDumpOnProcessExit - To collect dump on exit use key (true/false) 
-      DumpType - To collect full dump use key DumpType (mini/full)
+      CollectDumpOnProcessExit - To collect dump on exit (true/false) 
+      DumpType - To specify dump type (mini/full)
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectDumpOnProcessExit=true;DumpType=full</value>
