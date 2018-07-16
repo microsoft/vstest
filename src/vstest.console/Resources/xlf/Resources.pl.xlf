@@ -1577,6 +1577,21 @@
         <target state="translated">Opcja CollectDump dla narzędzia Blame nie jest obsługiwana na tej platformie.</target>
         <note />
       </trans-unit>
+      <trans-unit id="BlameIncorrectParameters">
+        <source>The options specified with /blame is incorrect, it will be ignored.</source>
+        <target state="new">The options specified with /blame is incorrect, it will be ignored.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter {0} is not valid. Ignoring this parameter.</source>
+        <target state="new">The blame parameter {0} is not valid. Ignoring this parameter.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter {0} can only support values {1}/{2}. Ignoring this parameter.</source>
+        <target state="new">The blame parameter {0} can only support values {1}/{2}. Ignoring this parameter.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

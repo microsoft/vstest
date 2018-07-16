@@ -103,7 +103,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpEnabled = collectDumpNode != null;
                 if (this.processDumpEnabled)
                 {
-                    this.collectDumpOnProcessExit = string.Equals(collectDumpNode.Attributes[Constants.CollectDumpAlwaysKey]?.Value, "true", StringComparison.OrdinalIgnoreCase);
+                    this.collectDumpOnProcessExit = string.Equals(collectDumpNode.Attributes[Constants.CollectDumpOnProcessExitKey]?.Value, "true", StringComparison.OrdinalIgnoreCase);
                     this.processFullDumpEnabled = string.Equals(collectDumpNode.Attributes[Constants.DumpTypeKey]?.Value, "full", StringComparison.OrdinalIgnoreCase);
                 }
             }

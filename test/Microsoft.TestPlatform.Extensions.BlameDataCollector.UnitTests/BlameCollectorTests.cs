@@ -182,14 +182,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// The trigger session ended handler should get dump files if collect dump always was enabled irrespective of completed test case count
+        /// The trigger session ended handler should get dump files if collect dump on exit was enabled irrespective of completed test case count
         /// </summary>
         [TestMethod]
-        public void TriggerSessionEndedHandlerShouldGetDumpFileIfCollectDumpAlwaysIsEnabled()
+        public void TriggerSessionEndedHandlerShouldGetDumpFileIfCollectDumpOnExitIsEnabled()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(
-                this.GetDumpConfigurationElement(alwaysCollectDump: true),
+                this.GetDumpConfigurationElement(collectDumpOnExit: true),
                 this.mockDataColectionEvents.Object,
                 this.mockDataCollectionSink.Object,
                 this.mockLogger.Object,
@@ -277,6 +277,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// The trigger test host launched handler should start process dump utility for full dump if full dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityForFullDumpIfFullDumpEnabledCaseSensitivity()
+        {
+            var dumpConfig = this.GetDumpConfigurationElement();
+            var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
+            dumpTypeAttribute.Value = "FuLl";
+            dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+            var dumpOnExitAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollectDumpOnProcessExit");
+            dumpOnExitAttribute.Value = "FaLSe";
+            dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpOnExitAttribute);
+
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                dumpConfig,
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify StartProcessDumpCall
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
+        }
+
+        /// <summary>
         /// The trigger test host launcehd handler should not break if start process dump throws TestPlatFormExceptions and log error message
         /// </summary>
         [TestMethod]
@@ -334,7 +363,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             File.Delete(this.filepath);
         }
 
-        private XmlElement GetDumpConfigurationElement(bool isFullDump = false, bool alwaysCollectDump = false)
+        private XmlElement GetDumpConfigurationElement(bool isFullDump = false, bool collectDumpOnExit = false)
         {
             var xmldoc = new XmlDocument();
             var outernode = xmldoc.CreateElement("Configuration");
@@ -348,9 +377,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 node.Attributes.Append(fulldumpAttribute);
             }
 
-            if (alwaysCollectDump)
+            if (collectDumpOnExit)
             {
-                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
+                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpOnProcessExitKey);
                 fulldumpAttribute.Value = "true";
                 node.Attributes.Append(fulldumpAttribute);
             }

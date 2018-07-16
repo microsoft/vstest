@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -150,6 +151,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
                 }
             }
+            else
+            {
+                Output.Warning(false, CommandLineResources.BlameIncorrectParameters);
+            }
 
             // Add Blame Logger
             EnableLoggerArgumentExecutor.AddLoggerToRunSettings(BlameFriendlyName, this.runSettingsManager);
@@ -212,15 +217,48 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }
 
-        private static void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
+        private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
         {
             var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
             if (parameters != null && parameters.Count > 0)
             {
                 foreach (KeyValuePair<string, string> entry in parameters)
                 {
-                    var attribute = XmlDocument.CreateAttribute(entry.Key);
-                    attribute.Value = entry.Value;
+                    string attributeKey = null;
+                    string attributeValue = null;
+                    if (string.Equals(entry.Key, Constants.BlameCollectDumpOnProcessExitKey, StringComparison.OrdinalIgnoreCase))
+                    {
+                        attributeKey = Constants.BlameCollectDumpOnProcessExitKey;
+                        if(string.Equals(entry.Value, "true", StringComparison.OrdinalIgnoreCase) || string.Equals(entry.Value, "false", StringComparison.OrdinalIgnoreCase))
+                        {
+                            attributeValue = entry.Value;
+                        }
+                        else
+                        {
+                            Output.Warning(false, String.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameParameterValueIncorrect, entry.Key, "true", "false"));
+                            continue;
+                        }
+                    }
+                    else if (string.Equals(entry.Key, Constants.BlameDumpTypeKey, StringComparison.OrdinalIgnoreCase))
+                    {
+                        attributeKey = Constants.BlameDumpTypeKey;
+                        if (string.Equals(entry.Value, "full", StringComparison.OrdinalIgnoreCase) || string.Equals(entry.Value, "mini", StringComparison.OrdinalIgnoreCase))
+                        {
+                            attributeValue = entry.Value;
+                        }
+                        else
+                        {
+                            Output.Warning(false, String.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameParameterValueIncorrect, entry.Key, "mini", "full"));
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        Output.Warning(false, String.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameParameterKeyIncorrect, entry.Key));
+                        continue;
+                    }
+                    var attribute = XmlDocument.CreateAttribute(attributeKey);
+                    attribute.Value = attributeValue;
                     dumpNode.Attributes.Append(attribute);
                 }
             }
