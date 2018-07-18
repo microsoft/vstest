@@ -70,6 +70,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private object sendSyncObject = new object();
 
+        /// <summary>
+        /// Sync object for receiving messages
+        /// </summary>
+        private object receiveSyncObject = new object();
+
         private Socket socket;
 
         /// <summary>
@@ -311,7 +316,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns> Raw message string </returns>
         public string ReceiveRawMessage()
         {
-            return this.binaryReader.ReadString();
+            lock (this.receiveSyncObject)
+            {
+                // Reading message on binaryreader is not thread-Safe
+                return this.binaryReader.ReadString();
+            }
         }
 
         /// <summary>
