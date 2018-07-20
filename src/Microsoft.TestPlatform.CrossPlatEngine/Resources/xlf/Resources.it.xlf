@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx" build-num="-2078370022">
     <header>
@@ -172,10 +172,6 @@
         <target state="translated">Registrazione della diagnostica di TestHost nel file: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">L'esecuzione dei test verrà annullata perché è stato richiesto l'annullamento.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Non è stato possibile avviare testhost. Errore: {0}</target>
@@ -200,6 +196,11 @@
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
         <target state="translated">La ricerca degli adattatori verrà modificata a breve. Per maggiori dettagli, vedere https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="new">No test is available for testcase filter `{0}` in {1}</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

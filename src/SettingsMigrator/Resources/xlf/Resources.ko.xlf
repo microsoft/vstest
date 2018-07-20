@@ -41,13 +41,18 @@
         <note />
       </trans-unit>
       <trans-unit id="ValidUsage">
-        <source>Valid usage: SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
-Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</source>
-        <target state="translated">유효한 사용: SettingsMigrator.exe &lt;마이그레이션할 testsettings 파일 또는 runsettings 파일의 전체 경로&gt;
+        <source>Valid usage:
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to runsettings file to be created&gt;
+Examples:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
+        <target state="new">유효한 사용: SettingsMigrator.exe &lt;마이그레이션할 testsettings 파일 또는 runsettings 파일의 전체 경로&gt;
 Example: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
 Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note />
+        <note></note>
       </trans-unit>
     </body>
   </file>

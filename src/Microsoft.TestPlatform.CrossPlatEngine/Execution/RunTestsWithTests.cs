@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override IEnumerable<Tuple<Uri, string>> GetExecutorUriExtensionMap(IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
         {
             this.executorUriVsTestList = this.GetExecutorVsTestCaseList(this.testCases);
-            
+
             Debug.Assert(this.TestExecutionContext.TestCaseFilter == null, "TestCaseFilter should be null for specific tests.");
             runContext.FilterExpressionWrapper = null;
 

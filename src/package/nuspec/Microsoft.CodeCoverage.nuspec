@@ -18,6 +18,7 @@
   <files>
 
     <file src="Microsoft.CodeCoverage.props" target="build\netstandard1.0\" />
+    <file src="Microsoft.CodeCoverage.targets" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\Microsoft.VisualStudio.TraceDataCollector.dll" target="build\netstandard1.0\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.config" target="build\netstandard1.0\CodeCoverage\" />
     <file src="Microsoft.CodeCoverage\CodeCoverage\CodeCoverage.exe" target="build\netstandard1.0\CodeCoverage\" />

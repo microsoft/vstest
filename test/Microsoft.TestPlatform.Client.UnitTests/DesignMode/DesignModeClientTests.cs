@@ -313,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         }
 
         [TestMethod]
-        [ExpectedException(typeof(OperationCanceledException))]
+        [ExpectedException(typeof(TestPlatformException))]
         public void DesignModeClientLaunchCustomHostMustThrowIfCancellationOccursBeforeHostLaunch()
         {
             var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);

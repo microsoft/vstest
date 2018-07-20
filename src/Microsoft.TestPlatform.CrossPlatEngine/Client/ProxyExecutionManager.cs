@@ -7,11 +7,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -110,15 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (this.isCommunicationEstablished)
                 {
-                    if (this.CancellationTokenSource.IsCancellationRequested)
-                    {
-                        if (EqtTrace.IsVerboseEnabled)
-                        {
-                            EqtTrace.Verbose("ProxyExecutionManager.StartTestRun: Canceling the current run after getting cancelation request.");
-                        }
-                        throw new TestPlatformException(Resources.Resources.CancelationRequested);
-                    }
-
+                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                    
                     this.InitializeExtensions(testPackages);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
@@ -154,9 +146,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
 
                 // Log error message to design mode and CLI.
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
+                // TestPlatformException is expected exception, log only the message
+                // For other exceptions, log the stacktrace as well
+                var errorMessage = exception is TestPlatformException ? exception.Message : exception.ToString();
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = errorMessage };
                 this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                this.LogMessage(TestMessageLevel.Error, exception.ToString());
+                this.LogMessage(TestMessageLevel.Error, errorMessage);
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager

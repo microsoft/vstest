@@ -48,6 +48,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         }
 
         /// <summary>
+        /// Gets the test method.
+        /// </summary>
+        public TestMethod TestMethod
+        {
+            get { return this.testMethod; }
+        }
+
+        /// <summary>
         /// Gets or sets the storage.
         /// </summary>
         public string CodeBase

@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"a.b\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"uri://x\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/tmp/a.b.dll\"},"
-                + "{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
+                + "{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
                 + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]}]}";
 
             var test = Deserialize<TestCase>(json);
@@ -224,7 +224,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         {
             TestProperty.TryUnregister("DummyProperty", out var property);
             var json = "{\"Id\": \"be78d6fc-61b0-4882-9d07-40d796fd96ce\",\"FullyQualifiedName\": \"sampleTestClass.sampleTestCase\",\"DisplayName\": \"sampleTestCase\",\"ExecutorUri\": \"executor://sampleTestExecutor\",\"Source\": \"sampleTest.dll\",\"CodeFilePath\": \"/user/src/testFile.cs\", \"LineNumber\": 999,"
-                + "\"Properties\": [{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
+                + "\"Properties\": [{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
                 + "{ \"Key\": { \"Id\": \"TestObject.Traits\", \"Label\": \"Traits\", \"Category\": \"\", \"Description\": \"\", \"Attributes\": 5, \"ValueType\": \"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"}, \"Value\": [{\"Key\": \"Priority\",\"Value\": \"0\"}, {\"Key\": \"Category\",\"Value\": \"unit\"}]}]}";
 
             var test = Deserialize<TestCase>(json, 2);
@@ -271,6 +271,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.IsNotNull(dummyProperty);
             Assert.AreEqual("DummyPropertyLabel", dummyProperty.Label);
             Assert.AreEqual("System.String", dummyProperty.ValueType);
+            Assert.AreEqual(5, (int)dummyProperty.Attributes);
         }
     }
 }

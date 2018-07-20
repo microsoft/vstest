@@ -11,15 +11,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     using System.Runtime.Versioning;
     using System.Text;
     using ObjectModel;
+    using TestPlatform.Utilities.Helpers;
+    using TestPlatform.Utilities.Helpers.Interfaces;
 
     internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
     {
         private static AssemblyMetadataProvider instance;
+        private IFileHelper fileHelper;
 
         /// <summary>
         /// Gets the instance.
         /// </summary>
-        internal static AssemblyMetadataProvider Instance => instance ?? (instance = new AssemblyMetadataProvider());
+        public static AssemblyMetadataProvider Instance => instance ?? (instance = new AssemblyMetadataProvider(new FileHelper()));
+
+        internal AssemblyMetadataProvider(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
 
         /// <inheritdoc />
         public FrameworkName GetFrameWork(string filePath)
@@ -27,14 +35,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             try
             {
-                using (var assemblyStream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+                using (var assemblyStream = this.fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read))
                 {
-                    frameworkName = GetFrameworkNameFromAssemblyMetadata(assemblyStream);
+                    frameworkName = AssemblyMetadataProvider.GetFrameworkNameFromAssemblyMetadata(assemblyStream);
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Warning("GetFrameWorkFromMetadata: failed to determine TargetFrameworkVersion: {0} for assembly: {1}", ex, filePath);
+                EqtTrace.Warning("AssemblyMetadataProvider.GetFrameWork: failed to determine TargetFrameworkVersion exception: {0} for assembly: {1}", ex, filePath);
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -86,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return archType;
         }
 
-        private static FrameworkName GetFrameworkNameFromAssemblyMetadata(FileStream assemblyStream)
+        private static FrameworkName GetFrameworkNameFromAssemblyMetadata(Stream assemblyStream)
         {
             FrameworkName frameworkName = new FrameworkName(Framework.DefaultFramework.Name);
             using (var peReader = new PEReader(assemblyStream))
@@ -163,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             try
             {
                 //get the input stream
-                using (Stream fs = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+                using (Stream fs = this.fileHelper.GetStream(imagePath, FileMode.Open, FileAccess.Read))
                 using (var reader = new BinaryReader(fs))
                 {
                     var validImage = true;
