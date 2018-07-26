@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Xml;
 
@@ -283,10 +284,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityForFullDumpIfFullDumpEnabledCaseSensitivity()
         {
             var dumpConfig = this.GetDumpConfigurationElement();
-            var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
+            var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DuMpType");
             dumpTypeAttribute.Value = "FuLl";
             dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
-            var dumpOnExitAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollectDumpOnProcessExit");
+            var dumpOnExitAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollEctDumpOnProcessExit");
             dumpOnExitAttribute.Value = "FaLSe";
             dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpOnExitAttribute);
 
@@ -303,6 +304,84 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Verify StartProcessDumpCall
             this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
+        }
+
+        /// <summary>
+        /// The trigger test host launched handler should start process dump utility for full dump if full dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldLogWarningForWrongCollectDumpKey()
+        {
+            var dumpConfig = this.GetDumpConfigurationElement();
+            var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("Xyz");
+            dumpTypeAttribute.Value = "FuLl";
+            dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                dumpConfig,
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, "Xyz"))), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger test host launched handler should start process dump utility for full dump if full dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldLogWarningForWrongDumpType()
+        {
+            var dumpConfig = this.GetDumpConfigurationElement();
+            var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
+            dumpTypeAttribute.Value = "random";
+            dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                dumpConfig,
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", BlameDataCollector.Constants.FullConfigurationValue, BlameDataCollector.Constants.MiniConfigurationValue))), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger test host launched handler should start process dump utility for full dump if full dump was enabled
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldLogWarningForNonBooleanCollectAlwaysValue()
+        {
+            var dumpConfig = this.GetDumpConfigurationElement();
+            var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DumpType");
+            dumpTypeAttribute.Value = "random";
+            dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
+
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                dumpConfig,
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, "DumpType", BlameDataCollector.Constants.FullConfigurationValue, BlameDataCollector.Constants.MiniConfigurationValue))), Times.Once);
         }
 
         /// <summary>
@@ -379,7 +458,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             if (collectDumpOnExit)
             {
-                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpOnProcessExitKey);
+                var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
                 fulldumpAttribute.Value = "true";
                 node.Attributes.Append(fulldumpAttribute);
             }

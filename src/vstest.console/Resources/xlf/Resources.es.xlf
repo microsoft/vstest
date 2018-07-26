@@ -1487,11 +1487,21 @@
         <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
-        <source>--Blame|/Blame
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="translated">--Blame|/Blame
+        <source>--Blame|/Blame:[CollectDump];[Key]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      By default, a mini dump will be collected on a crash.
+      You may also choose to override this by some optional parameters:
+      CollectDumpOnProcessExit - To collect dump on exit (true/false) 
+      DumpType - To specify dump type (mini/full)
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectDumpOnProcessExit=true;DumpType=full</source>
+        <target state="new">--Blame|/Blame
       Ejecuta la prueba en modo de culpa. Esta opción es útil para aislar la prueba problemática que provoca el bloqueo del host de prueba. Crea un archivo de salida en el directorio actual como "Sequence.xml" que captura el orden de ejecución de la prueba antes del bloqueo.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1584,19 +1594,14 @@
         <target state="translated">No se admite la opción CollectDump para Blame en esta plataforma.</target>
         <note />
       </trans-unit>
-      <trans-unit id="BlameIncorrectParameters">
-        <source>The options specified with /blame is incorrect, it will be ignored.</source>
-        <target state="new">The options specified with /blame is incorrect, it will be ignored.</target>
+      <trans-unit id="BlameInvalidFormat">
+        <source>The blame option specified '{0}' is not a valid format.  This will be ignored.</source>
+        <target state="new">The blame option specified '{0}' is not valid.  This will be ignored.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="BlameParameterKeyIncorrect">
-        <source>The blame parameter {0} is not valid. Ignoring this parameter.</source>
-        <target state="new">The blame parameter {0} is not valid. Ignoring this parameter.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="BlameParameterValueIncorrect">
-        <source>The blame parameter {0} can only support values {1}/{2}. Ignoring this parameter.</source>
-        <target state="new">The blame parameter {0} can only support values {1}/{2}. Ignoring this parameter.</target>
+      <trans-unit id="BlameIncorrectOption">
+        <source>The option specified with blame, {0} is invalid. This will be ignored.</source>
+        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
         <note></note>
       </trans-unit>
     </body>

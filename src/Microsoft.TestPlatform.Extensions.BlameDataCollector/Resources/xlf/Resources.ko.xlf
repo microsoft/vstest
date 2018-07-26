@@ -35,6 +35,16 @@
         <target state="translated">덤프 수집이 사용하도록 설정되었지만 덤프 파일이 생성되지 않았습니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key {0} is not valid. Ignoring this parameter.</source>
+        <target state="new">The blame parameter key {0} is not valid. Ignoring this parameter.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</source>
+        <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -70,6 +70,28 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
 
         /// <summary>
+        ///   The blame parameter key {0} is not valid. Ignoring this parameter.
+        /// </summary>
+        internal static string BlameParameterKeyIncorrect
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameParameterKeyIncorrect", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.
+        /// </summary>
+        internal static string BlameParameterValueIncorrect
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameParameterValueIncorrect", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.
         /// </summary>
         internal static string ProcDumpEnvVarEmpty

@@ -35,6 +35,16 @@
         <target state="translated">Die Abbilderfassung war aktiviert, aber es wurde keine Abbilddatei generiert.</target>
         <note />
       </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key {0} is not valid. Ignoring this parameter.</source>
+        <target state="new">The blame parameter key {0} is not valid. Ignoring this parameter.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</source>
+        <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             lock (this.receiveSyncObject)
             {
-                // Reading message on binaryreader is not thread-Safe
+                // Reading message on binaryreader is not thread-safe
                 return this.binaryReader.ReadString();
             }
         }

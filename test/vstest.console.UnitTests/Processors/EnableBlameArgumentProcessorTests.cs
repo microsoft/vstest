@@ -5,6 +5,8 @@ namespace vstest.console.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -79,6 +81,20 @@ namespace vstest.console.UnitTests.Processors
         }
 
         [TestMethod]
+        public void InitializeShouldOverwriteEntryForBlameInRunSettingsIfAlreadyPresent()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"mini\" CollectDumpOnProcessExit=\"false\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>");
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+
+            this.executor.Initialize("CollectDump;DumpType=full;CollectDumpOnProcessExit=true");
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"full\" CollectDumpOnProcessExit=\"true\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
         public void InitializeShouldWarnIfPlatformNotSupportedForCollectDumpOption()
         {
             var runsettingsString = string.Format(DefaultRunSettings, "");
@@ -109,6 +125,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldWarnIfIncorrectorParameterIsSpecifiedForCollectDumpOption()
         {
+            var invalidParameter = "CollectDumpXX";
             var runsettingsString = string.Format(DefaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(DefaultRunSettings);
@@ -119,56 +136,18 @@ namespace vstest.console.UnitTests.Processors
             this.mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize("CollectDumpXX");
-            this.mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameIncorrectParameters, OutputLevel.Warning));
+            this.executor.Initialize(invalidParameter);
+            this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, invalidParameter), OutputLevel.Warning));
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
-        public void InitializeShouldWarnIfInvalidKeysAreSpecifiedForCollectDumpOption()
-        {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
-            var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
-                               .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
-                               .Returns(PlatformArchitecture.X64);
-
-            this.executor.Initialize("CollectDump;Key=value");
-            this.mockOutput.Verify(x => x.WriteLine(string.Format(CommandLineResources.BlameParameterKeyIncorrect, "Key"), OutputLevel.Warning));
-
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
-        }
-
-        [TestMethod]
-        public void InitializeShouldWarnIfInvalidValuesAreSpecifiedForCollectDumpOption()
-        {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
-            var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
-                               .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
-                               .Returns(PlatformArchitecture.X64);
-
-            this.executor.Initialize("CollectDump;CollectDumpOnProcessExit=asd");
-            this.mockOutput.Verify(x => x.WriteLine(string.Format(CommandLineResources.BlameParameterValueIncorrect, "CollectDumpOnProcessExit", "true", "false") , OutputLevel.Warning));
-
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
-        }
-
-        [TestMethod]
+        [ExpectedException(typeof(CommandLineException))]
         public void InitializeShouldWarnIfInvalidParameterFormatIsSpecifiedForCollectDumpOption()
         {
+            var invalidString = "CollectDump;sdf=sdg;;as;a=";
             var runsettingsString = string.Format(DefaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(DefaultRunSettings);
@@ -179,8 +158,8 @@ namespace vstest.console.UnitTests.Processors
             this.mockEnvronment.Setup(x => x.Architecture)
                                .Returns(PlatformArchitecture.X64);
 
-            this.executor.Initialize("CollectDump;sdf=sdg;;as;a=");
-            this.mockOutput.Verify(x => x.WriteLine(CommandLineResources.BlameIncorrectParameters, OutputLevel.Warning));
+            this.executor.Initialize(invalidString);
+            this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameInvalidFormat, invalidString), OutputLevel.Warning));
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
@@ -219,25 +198,6 @@ namespace vstest.console.UnitTests.Processors
                                .Returns(PlatformArchitecture.X64);
 
             this.executor.Initialize("CollectDump;DumpType=full;CollectDumpOnProcessExit=true");
-
-            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"full\" CollectDumpOnProcessExit=\"true\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
-        }
-
-        [TestMethod]
-        public void InitializeShouldCreateEntryForBlameAlongWithCollectDumpParametersCaseInsensitively()
-        {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
-            var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(DefaultRunSettings);
-            this.settingsProvider.SetActiveRunSettings(runsettings);
-
-            this.mockEnvronment.Setup(x => x.OperatingSystem)
-                               .Returns(PlatformOperatingSystem.Windows);
-            this.mockEnvronment.Setup(x => x.Architecture)
-                               .Returns(PlatformArchitecture.X64);
-
-            this.executor.Initialize("CollectDump;DUmpTYpe=full;CollectDUMPOnProcessExit=true");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n          <CollectDump DumpType=\"full\" CollectDumpOnProcessExit=\"true\" />\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);

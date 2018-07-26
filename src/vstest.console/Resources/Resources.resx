@@ -696,13 +696,10 @@
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</value>
   </data>
-  <data name="BlameIncorrectParameters" xml:space="preserve">
-    <value>The options specified with /blame is incorrect, it will be ignored.</value>
+  <data name="BlameIncorrectOption" xml:space="preserve">
+    <value>The option specified with blame, {0} is invalid. This will be ignored.</value>
   </data>
-  <data name="BlameParameterKeyIncorrect" xml:space="preserve">
-    <value>The blame parameter {0} is not valid. Ignoring this parameter.</value>
-  </data>
-  <data name="BlameParameterValueIncorrect" xml:space="preserve">
-    <value>The blame parameter {0} can only support values {1}/{2}. Ignoring this parameter.</value>
+  <data name="BlameInvalidFormat" xml:space="preserve">
+    <value>The blame option specified '{0}' is not a valid format.  This will be ignored.</value>
   </data>
 </root>

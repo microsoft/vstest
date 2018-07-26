@@ -138,7 +138,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             bool isDumpEnabled = false;
 
             var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out string loggerIdentifier, out Dictionary<string, string> parameters);
-            if (parseSucceeded && loggerIdentifier.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase))
+
+            if (!string.IsNullOrWhiteSpace(argument) && !parseSucceeded)
+            {
+                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameInvalidFormat, argument));
+            }
+
+            if (loggerIdentifier != null && loggerIdentifier.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase))
             {
                 if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
                     this.environment.Architecture != PlatformArchitecture.ARM64 &&
@@ -153,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             else
             {
-                Output.Warning(false, CommandLineResources.BlameIncorrectParameters);
+                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, loggerIdentifier));
             }
 
             // Add Blame Logger
@@ -224,41 +230,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 foreach (KeyValuePair<string, string> entry in parameters)
                 {
-                    string attributeKey = null;
-                    string attributeValue = null;
-                    if (string.Equals(entry.Key, Constants.BlameCollectDumpOnProcessExitKey, StringComparison.OrdinalIgnoreCase))
-                    {
-                        attributeKey = Constants.BlameCollectDumpOnProcessExitKey;
-                        if(string.Equals(entry.Value, "true", StringComparison.OrdinalIgnoreCase) || string.Equals(entry.Value, "false", StringComparison.OrdinalIgnoreCase))
-                        {
-                            attributeValue = entry.Value;
-                        }
-                        else
-                        {
-                            Output.Warning(false, String.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameParameterValueIncorrect, entry.Key, "true", "false"));
-                            continue;
-                        }
-                    }
-                    else if (string.Equals(entry.Key, Constants.BlameDumpTypeKey, StringComparison.OrdinalIgnoreCase))
-                    {
-                        attributeKey = Constants.BlameDumpTypeKey;
-                        if (string.Equals(entry.Value, "full", StringComparison.OrdinalIgnoreCase) || string.Equals(entry.Value, "mini", StringComparison.OrdinalIgnoreCase))
-                        {
-                            attributeValue = entry.Value;
-                        }
-                        else
-                        {
-                            Output.Warning(false, String.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameParameterValueIncorrect, entry.Key, "mini", "full"));
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        Output.Warning(false, String.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameParameterKeyIncorrect, entry.Key));
-                        continue;
-                    }
-                    var attribute = XmlDocument.CreateAttribute(attributeKey);
-                    attribute.Value = attributeValue;
+                    var attribute = XmlDocument.CreateAttribute(entry.Key);
+                    attribute.Value = entry.Value;
                     dumpNode.Attributes.Append(attribute);
                 }
             }

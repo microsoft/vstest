@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private int testStartCount;
         private int testEndCount;
         private bool processDumpEnabled;
-        private bool collectDumpOnProcessExit;
+        private bool collectDumpAlways;
         private bool processFullDumpEnabled;
         private string attachmentGuid;
 
@@ -103,12 +103,44 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.processDumpEnabled = collectDumpNode != null;
                 if (this.processDumpEnabled)
                 {
-                    this.collectDumpOnProcessExit = string.Equals(collectDumpNode.Attributes[Constants.CollectDumpOnProcessExitKey]?.Value, "true", StringComparison.OrdinalIgnoreCase);
-                    this.processFullDumpEnabled = string.Equals(collectDumpNode.Attributes[Constants.DumpTypeKey]?.Value, "full", StringComparison.OrdinalIgnoreCase);
+                    this.ValidateAndAddProcessDumpParameters(collectDumpNode);
                 }
             }
 
             this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
+        }
+
+        private void ValidateAndAddProcessDumpParameters(XmlElement collectDumpNode)
+        {
+            foreach (XmlAttribute attribute in collectDumpNode.Attributes)
+            {
+                if (string.Equals(attribute.Name, Constants.CollectDumpAlwaysKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool.TryParse(attribute.Value, out this.collectDumpAlways);
+                    }
+                    else
+                    {
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
+                    }
+                }
+                else if (string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                    }
+                    else
+                    {
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                    }
+                }
+                else
+                {
+                    this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, attribute.Name));
+                }
+            }
         }
 
         /// <summary>
@@ -168,7 +200,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             if (this.processDumpEnabled)
             {
                 // If there was a test case crash or if we need to collect dump on process exit.
-                if (this.testStartCount > this.testEndCount || this.collectDumpOnProcessExit)
+                if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
                 {
                     try
                     {
