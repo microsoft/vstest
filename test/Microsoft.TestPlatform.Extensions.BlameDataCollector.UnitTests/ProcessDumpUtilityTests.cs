@@ -47,14 +47,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void GetDumpFileWillThrowExceptionIfNoDumpfile()
         {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var testResultsDirectory = "D:\\TestResults";
+
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
                                .Returns(new string[] { });
-
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                    .Returns(process);
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
                                   .Returns(this.mockProcDumpProcess.Object);
 
             var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
-            processDumpUtility.StartProcessDump(12345, "guid", "D:\\TestResults");
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
 
             var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
             Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);
@@ -66,12 +72,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void GetDumpFileWillReturnEmptyIfProcDumpDidntStart()
         {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var testResultsDirectory = "D:\\TestResults";
+
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
                                   .Throws(new Exception());
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                    .Returns(process);
 
             var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
 
-            Assert.ThrowsException<Exception>(() => processDumpUtility.StartProcessDump(12345, "guid", "D:\\TestResults"));
+            Assert.ThrowsException<Exception>(() => processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory));
             Assert.AreEqual(string.Empty, processDumpUtility.GetDumpFile());
         }
 
@@ -81,15 +94,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void GetDumpFileWillWaitForProcessToExitAndGetDumpFile()
         {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var testResultsDirectory = "D:\\TestResults";
+
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
                                .Returns(new string[] { "dump.dmp" });
-
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                    .Returns(process);
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
                                   .Returns(this.mockProcDumpProcess.Object);
 
             var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
 
-            processDumpUtility.StartProcessDump(12345, "guid", "D:\\TestResults");
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
             processDumpUtility.GetDumpFile();
 
             this.mockProcessHelper.Verify(x => x.WaitForProcessExit(It.IsAny<Process>()), Times.Once);
@@ -105,7 +124,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var process = "process";
             var processId = 12345;
             var filename = $"{process}_{processId}_{guid}.dmp";
-            var args = $"-accepteula -t {processId} {filename}";
+            var args = $"-accepteula -e 1 -g -t -f STACK_OVERFLOW -f ACCESS_VIOLATION {processId} {filename}";
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
@@ -138,27 +157,54 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// Start process dump will start exe corresponding to platform architecture
+        /// Start process dump will start exe according to Test host Process
         /// </summary>
         [TestMethod]
-        public void StartProcessDumpWillStartExeCorrespondingToPlatformArchitecture()
+        public void StartProcessDumpWillStartExeCorrespondingToTestHostProcessIn32BitOS()
         {
-            PlatformArchitecture[] platformArchitecture = { PlatformArchitecture.X64, PlatformArchitecture.X86 };
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var testResultsDirectory = "D:\\TestResults";
 
-            Dictionary<PlatformArchitecture, string> architectureExeMap = new Dictionary<PlatformArchitecture, string>()
+            this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X86);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                .Returns(process);
+            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+        }
+
+        /// <summary>
+        /// Start process dump will start exe according to Test host Process
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpWillStartExeCorrespondingToTestHostProcessIn64BitOS()
+        {
+            Dictionary<int, string> processIdNameMap = new Dictionary<int, string>()
             {
-                { PlatformArchitecture.X86, "procdump.exe" },
-                { PlatformArchitecture.X64, "procdump64.exe" }
+                { 1234, "testhost.x86" },
+                { 12345, "testhost" }
             };
 
-            foreach (var architecture in architectureExeMap)
+            Dictionary<string, string> processExeMap = new Dictionary<string, string>()
             {
-                this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(architecture.Key);
+                { "testhost.x86", "procdump.exe" },
+                { "testhost", "procdump64.exe" }
+            };
 
+            this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
+
+            foreach (var process in processIdNameMap)
+            {
+                this.mockProcessHelper.Setup(x => x.GetProcessName(process.Key))
+                                    .Returns(process.Value);
                 var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
-                processDumpUtility.StartProcessDump(1234, "guid", "D:\\");
+                processDumpUtility.StartProcessDump(process.Key, "guid", "D:\\");
 
-                this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", architecture.Value), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+                this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", processExeMap[process.Value]), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
             }
         }
 

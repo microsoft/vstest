@@ -42,5 +42,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Configuration key name for dump mode
         /// </summary>
         public const string DumpModeKey = "CollectDump";
+
+        /// <summary>
+        /// X86 Test Host Process Name
+        /// </summary>
+        public const string X86TestHostProcessName = "testhost.x86";
     }
 }

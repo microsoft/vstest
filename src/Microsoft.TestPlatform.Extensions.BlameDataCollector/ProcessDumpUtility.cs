@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -77,7 +76,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
-                                            this.GetProcDumpExecutable(),
+                                            this.GetProcDumpExecutable(processId),
                                             ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName),
                                             testResultsDirectory,
                                             null,
@@ -100,27 +99,38 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -accepteula: Auto accept end-user license agreement
             // -t: Write a dump when the process terminates.
             // This will create a minidump of the process with specified filename
-            return "-accepteula -t " + processId + " " + filename + ".dmp";
+            return "-accepteula -e 1 -g -t -f STACK_OVERFLOW -f ACCESS_VIOLATION " + processId + " " + filename + ".dmp";
         }
 
         /// <summary>
         /// Get procdump executable path
         /// </summary>
+        /// <param name="processId">
+        /// Process Id
+        /// </param>
         /// <returns>procdump executable path</returns>
-        private string GetProcDumpExecutable()
+        private string GetProcDumpExecutable(int processId)
         {
             var procdumpPath = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
+            string processName = this.processHelper.GetProcessName(processId);
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("Using process name {0}", processName);
+            }
+
             if (!string.IsNullOrWhiteSpace(procdumpPath))
             {
                 string filename = string.Empty;
 
-                if (this.environment.Architecture == PlatformArchitecture.X64)
-                {
-                    filename = "procdump64.exe";
-                }
-                else if (this.environment.Architecture == PlatformArchitecture.X86)
+                // Launch procdump according to process architecture
+                if (this.environment.Architecture == PlatformArchitecture.X86 || processName == Constants.X86TestHostProcessName)
                 {
                     filename = "procdump.exe";
+                }
+                else if (this.environment.Architecture == PlatformArchitecture.X64)
+                {
+                    filename = "procdump64.exe";
                 }
 
                 var procDumpExe = Path.Combine(procdumpPath, filename);
