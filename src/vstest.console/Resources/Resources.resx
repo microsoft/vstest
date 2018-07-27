@@ -647,8 +647,18 @@
       Read response file for more options.</value>
   </data>
   <data name="EnableBlameUsage" xml:space="preserve">
-    <value>--Blame|/Blame
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</value>
+    <value>--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</value>
   </data>
   <data name="TestRunAborted" xml:space="preserve">
     <value>Test Run Aborted.</value>
@@ -685,5 +695,11 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</value>
+  </data>
+  <data name="BlameIncorrectOption" xml:space="preserve">
+    <value>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</value>
+  </data>
+  <data name="BlameInvalidFormat" xml:space="preserve">
+    <value>The blame option specified '{0}' is not a valid format.  Please correct it and retry.</value>
   </data>
 </root>

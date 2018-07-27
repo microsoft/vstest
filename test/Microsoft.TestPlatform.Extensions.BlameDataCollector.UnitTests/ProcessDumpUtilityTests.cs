@@ -124,6 +124,34 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// StartProcessDump should start procdump binary with correct full dump arguments, while GetDumpFile returns full path
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpWillStartProcDumpExeWithCorrectParamsForFullDump()
+        {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var filename = $"{process}_{processId}_{guid}.dmp";
+            var args = $"-accepteula -t -ma {processId} {filename}";
+            var testResultsDirectory = "D:\\TestResults";
+
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+                                  .Returns(this.mockProcDumpProcess.Object);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                  .Returns(process);
+
+            this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
+                               .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
+
+            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
+        }
+
+        /// <summary>
         /// Start process dump will throw error if PROCDUMP_PATH env variable is not set
         /// </summary>
         [TestMethod]

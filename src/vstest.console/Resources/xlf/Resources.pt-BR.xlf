@@ -1481,11 +1481,21 @@
         <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
-        <source>--Blame|/Blame
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="translated">--Blame|/Blame
+        <source>--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
+        <target state="new">--Blame|/Blame
       Executa o teste em modo de acusação. Essa opção é útil para isolar o teste problemático causando uma falha no host de teste. Ele cria um arquivo de saída no diretório atual como "Sequence.xml", que captura a ordem de execução do teste antes da falha.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1576,6 +1586,16 @@
         <source>CollectDump option for Blame is not supported for this platform.</source>
         <target state="translated">A opção CollectDump para Blame não é compatível com esta plataforma.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="BlameInvalidFormat">
+        <source>The blame option specified '{0}' is not a valid format.  Please correct it and retry.</source>
+        <target state="new">The blame option specified '{0}' is not valid.  This will be ignored.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BlameIncorrectOption">
+        <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
+        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

@@ -71,14 +71,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory)
+        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false)
         {
             this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
                                             this.GetProcDumpExecutable(),
-                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName),
+                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName, isFullDump),
                                             testResultsDirectory,
                                             null,
                                             null,
@@ -94,13 +94,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="filename">
         /// Filename for dump file
         /// </param>
+        /// <param name="isFullDump">
+        /// Is full dump enabled
+        /// </param>
         /// <returns>Arguments</returns>
-        private static string BuildProcDumpArgs(int processId, string filename)
+        private static string BuildProcDumpArgs(int processId, string filename, bool isFullDump = false)
         {
             // -accepteula: Auto accept end-user license agreement
             // -t: Write a dump when the process terminates.
-            // This will create a minidump of the process with specified filename
-            return "-accepteula -t " + processId + " " + filename + ".dmp";
+            if (isFullDump)
+            {
+                // This will create a fulldump of the process with specified filename
+                return "-accepteula -t -ma " + processId + " " + filename + ".dmp";
+            }
+            else
+            {
+                // This will create a minidump of the process with specified filename
+                return "-accepteula -t " + processId + " " + filename + ".dmp";
+            }
         }
 
         /// <summary>
