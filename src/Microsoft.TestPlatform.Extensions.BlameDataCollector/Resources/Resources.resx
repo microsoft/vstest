@@ -121,10 +121,10 @@
     <value>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</value>
   </data>
   <data name="BlameParameterKeyIncorrect" xml:space="preserve">
-    <value>The blame parameter key {0} is not valid. Ignoring this parameter.</value>
+    <value>The blame parameter key specified {0} is not valid. Ignoring this key.</value>
   </data>
   <data name="BlameParameterValueIncorrect" xml:space="preserve">
-    <value>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</value>
+    <value>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</value>
   </data>
   <data name="DumpFileNotGeneratedErrorMessage" xml:space="preserve">
     <value>Collect dump was enabled but no dump file was generated.</value>

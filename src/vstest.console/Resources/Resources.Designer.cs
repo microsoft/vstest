@@ -236,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   The option specified with blame, {0} is invalid. This will be ignored..
+        ///   The blame parameter specified with blame, {0} is invalid. Ignoring this parameter..
         /// </summary>
         public static string BlameIncorrectOption
         {
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   The blame option specified '{0}' is not a valid format.  This will be ignored..
+        ///   The blame option specified '{0}' is not a valid format.  Please correct it and retry..
         /// </summary>
         public static string BlameInvalidFormat
         {

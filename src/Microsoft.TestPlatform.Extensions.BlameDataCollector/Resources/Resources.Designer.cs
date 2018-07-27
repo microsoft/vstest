@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
 
         /// <summary>
-        ///   The blame parameter key {0} is not valid. Ignoring this parameter.
+        ///   The blame parameter key specified {0} is not valid. Ignoring this key..
         /// </summary>
         internal static string BlameParameterKeyIncorrect
         {
@@ -81,7 +81,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
 
         /// <summary>
-        ///   The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.
+        ///   The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key..
         /// </summary>
         internal static string BlameParameterValueIncorrect
         {

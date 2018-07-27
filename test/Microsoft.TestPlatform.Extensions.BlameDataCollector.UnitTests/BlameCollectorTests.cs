@@ -287,7 +287,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var dumpTypeAttribute = dumpConfig.OwnerDocument.CreateAttribute("DuMpType");
             dumpTypeAttribute.Value = "FuLl";
             dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpTypeAttribute);
-            var dumpOnExitAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollEctDumpOnProcessExit");
+            var dumpOnExitAttribute = dumpConfig.OwnerDocument.CreateAttribute("CollEctAlways");
             dumpOnExitAttribute.Value = "FaLSe";
             dumpConfig[BlameDataCollector.Constants.DumpModeKey].Attributes.Append(dumpOnExitAttribute);
 
