@@ -598,7 +598,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     {
                         case "ResultsDirectory":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                            runConfiguration.ResultsDirectory = reader.ReadElementContentAsString();
+
+                            string resultsDir = reader.ReadElementContentAsString();
+                            if(string.IsNullOrEmpty(resultsDir))
+                            {
+                                throw new SettingsException(
+                                   string.Format(
+                                       CultureInfo.CurrentCulture,
+                                       Resources.Resources.InvalidSettingsIncorrectValue,
+                                       Constants.RunConfigurationSettingsName,
+                                       resultsDir,
+                                       elementName));
+                            }
+
+                            runConfiguration.ResultsDirectory = resultsDir;
                             break;
 
                         case "CollectSourceInformation":

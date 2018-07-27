@@ -339,5 +339,21 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
             StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
         }
+
+        [TestMethod]
+        public void RunConfigurationShouldThrowSettingsExceptionIfResultsirectoryIsEmpty()
+        {
+            string settingsXml =
+             @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <ResultsDirectory/>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            Assert.That.Throws<SettingsException>(
+              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+              .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '' specified for 'ResultsDirectory'.");
+        }
     }
 }
