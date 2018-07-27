@@ -145,7 +145,7 @@ namespace vstest.console.UnitTests.Processors
 
         [TestMethod]
         [ExpectedException(typeof(CommandLineException))]
-        public void InitializeShouldWarnIfInvalidParameterFormatIsSpecifiedForCollectDumpOption()
+        public void InitializeShouldThrowIfInvalidParameterFormatIsSpecifiedForCollectDumpOption()
         {
             var invalidString = "CollectDump;sdf=sdg;;as;a=";
             var runsettingsString = string.Format(DefaultRunSettings, "");

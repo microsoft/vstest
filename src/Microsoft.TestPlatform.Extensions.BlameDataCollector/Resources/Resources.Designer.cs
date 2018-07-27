@@ -92,6 +92,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
 
         /// <summary>
+        ///   Could not start process dump: {0}.
+        /// </summary>
+        internal static string ProcDumpCouldNotStart
+        {
+            get
+            {
+                return ResourceManager.GetString("ProcDumpCouldNotStart", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.
         /// </summary>
         internal static string ProcDumpEnvVarEmpty
@@ -99,6 +110,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
             get
             {
                 return ResourceManager.GetString("ProcDumpEnvVarEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   CollectDump was enabled but dump file was not generated..
+        /// </summary>
+        internal static string ProcDumpNotGenerated
+        {
+            get
+            {
+                return ResourceManager.GetString("ProcDumpNotGenerated", resourceCulture);
             }
         }
 

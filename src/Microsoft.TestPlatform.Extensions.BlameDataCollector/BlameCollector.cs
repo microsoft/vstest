@@ -213,7 +213,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         else
                         {
                             EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
-                            this.logger.LogWarning(args.Context, "BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                            this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
                         }
                     }
                     catch (FileNotFoundException ex)
@@ -250,7 +250,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogWarning(args.Context, e.Message);
+                this.logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
             }
             catch (Exception e)
             {
@@ -259,7 +259,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogWarning(args.Context, e.ToString());
+                this.logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
             }
         }
 

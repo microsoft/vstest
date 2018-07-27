@@ -27,6 +27,16 @@
         <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProcDumpCouldNotStart">
+        <source>Could not start process dump: {0}</source>
+        <target state="new">Could not start process dump: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProcDumpNotGenerated">
+        <source>CollectDump was enabled but dump file was not generated.</source>
+        <target state="new">CollectDump was enabled but dump file was not generated.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
