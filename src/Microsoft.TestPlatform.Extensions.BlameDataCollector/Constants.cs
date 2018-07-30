@@ -42,5 +42,35 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Configuration key name for dump mode
         /// </summary>
         public const string DumpModeKey = "CollectDump";
+
+        /// <summary>
+        /// Configuration key name for collect dump always
+        /// </summary>
+        public const string CollectDumpAlwaysKey = "CollectAlways";
+
+        /// <summary>
+        /// Configuration key name for dump type
+        /// </summary>
+        public const string DumpTypeKey = "DumpType";
+
+        /// <summary>
+        /// Configuration value for true
+        /// </summary>
+        public const string TrueConfigurationValue = "True";
+
+        /// <summary>
+        /// Configuration value for false
+        /// </summary>
+        public const string FalseConfigurationValue = "False";
+
+        /// <summary>
+        /// Configuration value for full
+        /// </summary>
+        public const string FullConfigurationValue = "Full";
+
+        /// <summary>
+        /// Configuration value for mini
+        /// </summary>
+        public const string MiniConfigurationValue = "Mini";
     }
 }

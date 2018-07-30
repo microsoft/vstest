@@ -30,6 +30,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private int testStartCount;
         private int testEndCount;
         private bool processDumpEnabled;
+        private bool collectDumpAlways;
+        private bool processFullDumpEnabled;
         private string attachmentGuid;
 
         /// <summary>
@@ -97,10 +99,48 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.configurationElement != null)
             {
-                this.processDumpEnabled = this.configurationElement[Constants.DumpModeKey] != null;
+                var collectDumpNode = this.configurationElement[Constants.DumpModeKey];
+                this.processDumpEnabled = collectDumpNode != null;
+                if (this.processDumpEnabled)
+                {
+                    this.ValidateAndAddProcessDumpParameters(collectDumpNode);
+                }
             }
 
             this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
+        }
+
+        private void ValidateAndAddProcessDumpParameters(XmlElement collectDumpNode)
+        {
+            foreach (XmlAttribute attribute in collectDumpNode.Attributes)
+            {
+                if (string.Equals(attribute.Name, Constants.CollectDumpAlwaysKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool.TryParse(attribute.Value, out this.collectDumpAlways);
+                    }
+                    else
+                    {
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
+                    }
+                }
+                else if (string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                    }
+                    else
+                    {
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                    }
+                }
+                else
+                {
+                    this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, attribute.Name));
+                }
+            }
         }
 
         /// <summary>
@@ -159,22 +199,28 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.processDumpEnabled)
             {
-                try
+                // If there was a test case crash or if we need to collect dump on process exit.
+                if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
                 {
-                    var dumpFile = this.processDumpUtility.GetDumpFile();
-                    if (!string.IsNullOrEmpty(dumpFile))
+                    try
                     {
-                        var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                        this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                        var dumpFile = this.processDumpUtility.GetDumpFile();
+                        if (!string.IsNullOrEmpty(dumpFile))
+                        {
+                            var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                            this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                        }
+                        else
+                        {
+                            EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                            this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
+                        }
                     }
-                    else
+                    catch (FileNotFoundException ex)
                     {
-                        EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                        EqtTrace.Warning(ex.Message);
+                        this.logger.LogWarning(args.Context, ex.Message);
                     }
-                }
-                catch (FileNotFoundException ex)
-                {
-                    this.logger.LogWarning(args.Context, ex.Message);
                 }
             }
 
@@ -195,7 +241,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory());
+                this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
             }
             catch (TestPlatformException e)
             {
@@ -204,7 +250,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogWarning(args.Context, e.Message);
+                this.logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.Message));
             }
             catch (Exception e)
             {
@@ -213,7 +259,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogWarning(args.Context, e.ToString());
+                this.logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
             }
         }
 

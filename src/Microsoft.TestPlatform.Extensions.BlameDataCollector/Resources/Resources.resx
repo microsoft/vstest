@@ -120,10 +120,22 @@
   <data name="AbortedTestRun" xml:space="preserve">
     <value>The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):</value>
   </data>
+  <data name="BlameParameterKeyIncorrect" xml:space="preserve">
+    <value>The blame parameter key specified {0} is not valid. Ignoring this key.</value>
+  </data>
+  <data name="BlameParameterValueIncorrect" xml:space="preserve">
+    <value>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</value>
+  </data>
   <data name="DumpFileNotGeneratedErrorMessage" xml:space="preserve">
     <value>Collect dump was enabled but no dump file was generated.</value>
   </data>
+  <data name="ProcDumpCouldNotStart" xml:space="preserve">
+    <value>Could not start process dump: {0}</value>
+  </data>
   <data name="ProcDumpEnvVarEmpty" xml:space="preserve">
     <value>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</value>
+  </data>
+  <data name="ProcDumpNotGenerated" xml:space="preserve">
+    <value>CollectDump was enabled but dump file was not generated.</value>
   </data>
 </root>
