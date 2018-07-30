@@ -17,6 +17,7 @@
     <NUnit3FrameworkVersion>3.10.1</NUnit3FrameworkVersion>
     <NUnit3AdapterVersion>3.10.0</NUnit3AdapterVersion>
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
+    <GoogleTestAdapterVersion>0.13.1</GoogleTestAdapterVersion>
 
     <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
 
