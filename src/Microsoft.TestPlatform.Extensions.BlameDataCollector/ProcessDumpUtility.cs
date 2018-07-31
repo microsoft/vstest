@@ -76,14 +76,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory)
+        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false)
         {
             this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
                                             this.GetProcDumpExecutable(processId),
-                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName),
+                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName, isFullDump),
                                             testResultsDirectory,
                                             null,
                                             null,
@@ -99,8 +99,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="filename">
         /// Filename for dump file
         /// </param>
+        /// <param name="isFullDump">
+        /// Is full dump enabled
+        /// </param>
         /// <returns>Arguments</returns>
-        private static string BuildProcDumpArgs(int processId, string filename)
+        private static string BuildProcDumpArgs(int processId, string filename, bool isFullDump = false)
         {
             ProcessDumpUtility.procDumpExceptionsList = new List<string>()
             {
@@ -112,9 +115,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
             // -g: Run as a native debugger in a managed process (no interop).
             // -t: Write a dump when the process terminates.
+            // -ma: Full dump argument.
             // -f: Filter the exceptions.
-            // This will create a minidump of the process with specified filename.
             StringBuilder procDumpArgument = new StringBuilder("-accepteula -e 1 -g -t ");
+            if (isFullDump)
+            {
+                procDumpArgument.Append("-ma ");
+            }
+
             foreach (var exceptionFilter in ProcessDumpUtility.procDumpExceptionsList)
             {
                 procDumpArgument.Append($"-f {exceptionFilter} ");

@@ -236,6 +236,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   The blame parameter specified with blame, {0} is invalid. Ignoring this parameter..
+        /// </summary>
+        public static string BlameIncorrectOption
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameIncorrectOption", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   The blame option specified '{0}' is not a valid format.  Please correct it and retry..
+        /// </summary>
+        public static string BlameInvalidFormat
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameInvalidFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///      The directory containing the temporary outputs..
         /// </summary>

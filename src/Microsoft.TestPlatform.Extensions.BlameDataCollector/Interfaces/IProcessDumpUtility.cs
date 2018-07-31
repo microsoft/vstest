@@ -27,6 +27,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="testResultsDirectory">
         /// Path to TestResults directory
         /// </param>
-        void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory);
+        /// <param name="isFullDump">
+        /// Is full dump enabled
+        /// </param>
+        void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
     }
 }

@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
 
@@ -164,6 +163,39 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// StartProcessDump should start procdump binary with correct full dump arguments, while GetDumpFile returns full path
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpWillStartProcDumpExeWithCorrectParamsForFullDump()
+        {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var filename = $"{process}_{processId}_{guid}.dmp";
+            var args = $"-accepteula -e 1 -g -t -ma -f STACK_OVERFLOW -f ACCESS_VIOLATION {processId} {filename}";
+            var testResultsDirectory = "D:\\TestResults";
+
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+                                  .Returns(this.mockProcDumpProcess.Object);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                  .Returns(process);
+
+            this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
+                               .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
+
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
+
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
+        }
+
+        /// <summary>
         /// Start process dump will throw error if PROCDUMP_PATH env variable is not set
         /// </summary>
         [TestMethod]
@@ -182,7 +214,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// Start process dump will start exe according to Test host Process
+        /// Start process dump will start exe according to Test host Process in 32Bit OS
         /// </summary>
         [TestMethod]
         public void StartProcessDumpWillStartExeCorrespondingToTestHostProcessIn32BitOS()
@@ -209,55 +241,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// Start process dump will start exe according to Test host Process
-        /// </summary>
-        [TestMethod]
-        public void StartProcessDumpWillStartExeCorrespondingToTestHostProcessIn64BitOS()
-        {
-            IntPtr x86Ptr = new IntPtr(0);
-            IntPtr x64Ptr = new IntPtr(1);
-
-            Dictionary<int, IntPtr> processIdNameMap = new Dictionary<int, IntPtr>()
-            {
-                { 1234, x86Ptr },
-                { 12345, x64Ptr }
-            };
-
-            Dictionary<IntPtr, bool> iS64BitMap = new Dictionary<IntPtr, bool>()
-            {
-                { x86Ptr, false },
-                { x64Ptr, true }
-            };
-
-            Dictionary<IntPtr, string> processExeMap = new Dictionary<IntPtr, string>()
-            {
-                { x86Ptr, "procdump.exe" },
-                { x64Ptr, "procdump64.exe" }
-            };
-
-            this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
-
-            foreach (var process in processIdNameMap)
-            {
-                this.mockProcessHelper.Setup(x => x.GetProcessHandleById(process.Key))
-                                    .Returns(process.Value);
-                this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(process.Value))
-                                    .Returns(iS64BitMap[process.Value]);
-
-                var processDumpUtility = new ProcessDumpUtility(
-                this.mockProcessHelper.Object,
-                this.mockFileHelper.Object,
-                this.mockPlatformEnvironment.Object,
-                this.mockNativeMethodsHelper.Object);
-
-                processDumpUtility.StartProcessDump(process.Key, "guid", "D:\\");
-
-                this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", processExeMap[process.Value]), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
-            }
-        }
-
-        /// <summary>
-        /// Start process dump will start exe according to Test host Process
+        /// Start process dump will start exe according to 64 Bit Test host Process in 64Bit OS
         /// </summary>
         [TestMethod]
         public void StartProcessDumpWillStartExeCorrespondingTo64BitTestHostProcessIn64BitOS()
@@ -283,7 +267,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
-        /// Start process dump will start exe according to Test host Process
+        /// Start process dump will start exe according to 32 Bit Test host Process in 64 bit OS
         /// </summary>
         [TestMethod]
         public void StartProcessDumpWillStartExeCorrespondingTo32BitTestHostProcessIn64BitOS()
