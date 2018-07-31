@@ -4,8 +4,11 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Text;
+    using Microsoft.TestPlatform.Extensions.BlameDataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -14,27 +17,30 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     public class ProcessDumpUtility : IProcessDumpUtility
     {
+        private static List<string> procDumpExceptionsList;
         private IProcessHelper processHelper;
         private IFileHelper fileHelper;
         private IEnvironment environment;
         private Process procDumpProcess;
         private string testResultsDirectory;
         private string dumpFileName;
+        private INativeMethodsHelper nativeMethodsHelper;
 
         public ProcessDumpUtility()
-            : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment())
+            : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new NativeMethodsHelper())
         {
         }
 
-        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment)
+        public ProcessDumpUtility(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, INativeMethodsHelper nativeMethodsHelper)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.environment = environment;
+            this.nativeMethodsHelper = nativeMethodsHelper;
         }
 
-        /// <inheritdoc/>
-        public string GetDumpFile()
+    /// <inheritdoc/>
+     public string GetDumpFile()
         {
             if (this.procDumpProcess == null)
             {
@@ -96,10 +102,26 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Arguments</returns>
         private static string BuildProcDumpArgs(int processId, string filename)
         {
+            ProcessDumpUtility.procDumpExceptionsList = new List<string>()
+            {
+                "STACK_OVERFLOW",
+                "ACCESS_VIOLATION"
+            };
+
             // -accepteula: Auto accept end-user license agreement
+            // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
+            // -g: Run as a native debugger in a managed process (no interop).
             // -t: Write a dump when the process terminates.
-            // This will create a minidump of the process with specified filename
-            return "-accepteula -e 1 -g -t -f STACK_OVERFLOW -f ACCESS_VIOLATION " + processId + " " + filename + ".dmp";
+            // -f: Filter the exceptions.
+            // This will create a minidump of the process with specified filename.
+            StringBuilder procDumpArgument = new StringBuilder("-accepteula -e 1 -g -t ");
+            foreach (var exceptionFilter in ProcessDumpUtility.procDumpExceptionsList)
+            {
+                procDumpArgument.Append($"-f {exceptionFilter} ");
+            }
+
+            procDumpArgument.Append($"{processId} {filename}.dmp");
+            return procDumpArgument.ToString();
         }
 
         /// <summary>
@@ -112,25 +134,26 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private string GetProcDumpExecutable(int processId)
         {
             var procdumpPath = Environment.GetEnvironmentVariable("PROCDUMP_PATH");
-            string processName = this.processHelper.GetProcessName(processId);
-
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("Using process name {0}", processName);
-            }
 
             if (!string.IsNullOrWhiteSpace(procdumpPath))
             {
                 string filename = string.Empty;
 
                 // Launch procdump according to process architecture
-                if (this.environment.Architecture == PlatformArchitecture.X86 || processName == Constants.X86TestHostProcessName)
+                if (this.environment.Architecture == PlatformArchitecture.X86)
                 {
-                    filename = "procdump.exe";
+                    filename = Constants.ProcdumpProcessName;
                 }
-                else if (this.environment.Architecture == PlatformArchitecture.X64)
+                else
                 {
-                    filename = "procdump64.exe";
+                    if (this.nativeMethodsHelper.Is64Bit(this.processHelper.GetProcessHandleById(processId)))
+                    {
+                        filename = Constants.Procdump64ProcessName;
+                    }
+                    else
+                    {
+                        filename = Constants.ProcdumpProcessName;
+                    }
                 }
 
                 var procDumpExe = Path.Combine(procdumpPath, filename);

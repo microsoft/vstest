@@ -44,8 +44,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string DumpModeKey = "CollectDump";
 
         /// <summary>
-        /// X86 Test Host Process Name
+        /// Procdump 32 bit version
         /// </summary>
-        public const string X86TestHostProcessName = "testhost.x86";
+        public const string ProcdumpProcessName = "procdump.exe";
+
+        /// <summary>
+        /// Procdump 64 bit version
+        /// </summary>
+        public const string Procdump64ProcessName = "procdump64.exe";
     }
 }

@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
     using System.Collections.Generic;
-
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
@@ -93,6 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         /// <inheritdoc/>
         public void WaitForProcessExit(object process)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IntPtr GetProcessHandleById(int processId)
         {
             throw new NotImplementedException();
         }

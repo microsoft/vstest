@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
+    using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -13,6 +15,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         public string GetCurrentProcessLocation()
         {
             return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        }
+
+        public IntPtr GetProcessHandleById(int processId)
+        {
+            return Process.GetProcessById(processId).SafeHandle.DangerousGetHandle();
         }
     }
 }

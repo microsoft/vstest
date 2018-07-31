@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.IO;
 
     using Microsoft.TestPlatform.Extensions.BlameDataCollector;
+    using Microsoft.TestPlatform.Extensions.BlameDataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -27,6 +28,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private Mock<IProcessHelper> mockProcessHelper;
         private Mock<Process> mockProcDumpProcess;
         private Mock<IEnvironment> mockPlatformEnvironment;
+        private Mock<INativeMethodsHelper> mockNativeMethodsHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessDumpUtilityTests"/> class.
@@ -37,6 +39,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcDumpProcess = new Mock<Process>();
             this.mockPlatformEnvironment = new Mock<IEnvironment>();
+            this.mockNativeMethodsHelper = new Mock<INativeMethodsHelper>();
 
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", "D:\\procdump");
         }
@@ -59,7 +62,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
                                   .Returns(this.mockProcDumpProcess.Object);
 
-            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
+
             processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
 
             var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
@@ -82,7 +90,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                                     .Returns(process);
 
-            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            var processDumpUtility = new ProcessDumpUtility(
+                 this.mockProcessHelper.Object,
+                 this.mockFileHelper.Object,
+                 this.mockPlatformEnvironment.Object,
+                 this.mockNativeMethodsHelper.Object);
 
             Assert.ThrowsException<Exception>(() => processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory));
             Assert.AreEqual(string.Empty, processDumpUtility.GetDumpFile());
@@ -106,7 +118,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
                                   .Returns(this.mockProcDumpProcess.Object);
 
-            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
 
             processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
             processDumpUtility.GetDumpFile();
@@ -135,7 +151,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
                                .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
 
-            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
+
             processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
@@ -150,7 +171,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             Environment.SetEnvironmentVariable("PROCDUMP_PATH", null);
 
-            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => processDumpUtility.StartProcessDump(1234, "guid", "D:\\"));
             Assert.AreEqual(ex.Message, Resources.Resources.ProcDumpEnvVarEmpty);
@@ -163,14 +188,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void StartProcessDumpWillStartExeCorrespondingToTestHostProcessIn32BitOS()
         {
             var guid = "guid";
-            var process = "process";
+
+            // var process = "process";
             var processId = 12345;
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X86);
-            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
-                                .Returns(process);
-            var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+            this.mockProcessHelper.Setup(x => x.GetProcessHandleById(processId))
+                                .Returns(new IntPtr(0));
+
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
 
             processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
 
@@ -183,29 +214,98 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void StartProcessDumpWillStartExeCorrespondingToTestHostProcessIn64BitOS()
         {
-            Dictionary<int, string> processIdNameMap = new Dictionary<int, string>()
+            IntPtr x86Ptr = new IntPtr(0);
+            IntPtr x64Ptr = new IntPtr(1);
+
+            Dictionary<int, IntPtr> processIdNameMap = new Dictionary<int, IntPtr>()
             {
-                { 1234, "testhost.x86" },
-                { 12345, "testhost" }
+                { 1234, x86Ptr },
+                { 12345, x64Ptr }
             };
 
-            Dictionary<string, string> processExeMap = new Dictionary<string, string>()
+            Dictionary<IntPtr, bool> iS64BitMap = new Dictionary<IntPtr, bool>()
             {
-                { "testhost.x86", "procdump.exe" },
-                { "testhost", "procdump64.exe" }
+                { x86Ptr, false },
+                { x64Ptr, true }
+            };
+
+            Dictionary<IntPtr, string> processExeMap = new Dictionary<IntPtr, string>()
+            {
+                { x86Ptr, "procdump.exe" },
+                { x64Ptr, "procdump64.exe" }
             };
 
             this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
 
             foreach (var process in processIdNameMap)
             {
-                this.mockProcessHelper.Setup(x => x.GetProcessName(process.Key))
+                this.mockProcessHelper.Setup(x => x.GetProcessHandleById(process.Key))
                                     .Returns(process.Value);
-                var processDumpUtility = new ProcessDumpUtility(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockPlatformEnvironment.Object);
+                this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(process.Value))
+                                    .Returns(iS64BitMap[process.Value]);
+
+                var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
+
                 processDumpUtility.StartProcessDump(process.Key, "guid", "D:\\");
 
                 this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", processExeMap[process.Value]), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
             }
+        }
+
+        /// <summary>
+        /// Start process dump will start exe according to Test host Process
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpWillStartExeCorrespondingTo64BitTestHostProcessIn64BitOS()
+        {
+            IntPtr x64ProcessHandle = new IntPtr(0);
+            int processId = 1234;
+            this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
+
+            this.mockProcessHelper.Setup(x => x.GetProcessHandleById(processId))
+                                .Returns(x64ProcessHandle);
+            this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(x64ProcessHandle))
+                                .Returns(true);
+
+            var processDumpUtility = new ProcessDumpUtility(
+            this.mockProcessHelper.Object,
+            this.mockFileHelper.Object,
+            this.mockPlatformEnvironment.Object,
+            this.mockNativeMethodsHelper.Object);
+
+            processDumpUtility.StartProcessDump(processId, "guid", "D:\\");
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump64.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+        }
+
+        /// <summary>
+        /// Start process dump will start exe according to Test host Process
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpWillStartExeCorrespondingTo32BitTestHostProcessIn64BitOS()
+        {
+            IntPtr x86ProcessHandle = new IntPtr(0);
+            int processId = 12345;
+            this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
+
+            this.mockProcessHelper.Setup(x => x.GetProcessHandleById(processId))
+                                .Returns(x86ProcessHandle);
+            this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(x86ProcessHandle))
+                                .Returns(false);
+
+            var processDumpUtility = new ProcessDumpUtility(
+            this.mockProcessHelper.Object,
+            this.mockFileHelper.Object,
+            this.mockPlatformEnvironment.Object,
+            this.mockNativeMethodsHelper.Object);
+
+            processDumpUtility.StartProcessDump(processId, "guid", "D:\\");
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
         }
 
         [TestCleanup]
