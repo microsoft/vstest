@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if(!string.IsNullOrEmpty(parameters.LogFilePath))
             {
-                // Extra args: --diag|/diag:<PathToLogFile>
+                // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
                 args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath, parameters.TraceLevel));
             }
 

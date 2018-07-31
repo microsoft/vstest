@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Diagnostics;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             Assert.AreEqual(expectedParentProcessId, this.consoleParameters.ParentProcessId, "Parent process Id must be set");
             Assert.AreEqual(inputPort, this.consoleParameters.PortNumber, "Port number must be set");
-            Assert.AreEqual(PlatformTraceLevel.Verbose, this.consoleParameters.TraceLevel, "Default value of trace level should be verbose.");
+            Assert.AreEqual(TraceLevel.Verbose, this.consoleParameters.TraceLevel, "Default value of trace level should be verbose.");
 
             this.mockProcessManager.Verify(pm => pm.StartProcess(this.consoleParameters), Times.Once);
         }

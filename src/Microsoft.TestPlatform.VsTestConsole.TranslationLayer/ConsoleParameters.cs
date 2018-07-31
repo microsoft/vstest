@@ -3,12 +3,14 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using System;
-    using System.IO;
 
     /// <summary>
     /// Class which defines additional specifiable parameters for vstest.console.exe
@@ -38,7 +40,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Trace level for logs.
         /// </summary>
-        public PlatformTraceLevel TraceLevel { get; set; } = PlatformTraceLevel.Verbose;
+        public TraceLevel TraceLevel { get; set; } = TraceLevel.Verbose;
 
         /// <summary>
         /// Full path for the log file
