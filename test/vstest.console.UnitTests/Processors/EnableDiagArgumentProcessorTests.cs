@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -72,10 +73,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorThrowsIfFileNameIsNullOrEmpty()
+        [DataRow(null)]
+        [DataRow("  ")]
+        [DataRow("")]
+        public void EnableDiagArgumentProcessorExecutorThrowsIfDiagArgumentIsNullOrEmpty(string argument)
         {
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(null));
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(string.Empty));
+            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
         }
 
         [TestMethod]
@@ -87,20 +91,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorShouldThrowIfAPathIsProvided()
+        [DataRow("abs;dfsdc.txt;verbosity=normal", "abs")] // ; in file path is not supported
+        [DataRow("\"abst;dfsdc.txt\";verbosity=normal", "abst")] // Even though in escaped double quotes, semi colon is not supported in file path
+        [DataRow("foo", "foo")]
+        public void EnableDiagArgumentProcessorExecutorShouldThrowIfDirectoryPathIsProvided(string argument, string filePath)
         {
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize("foo"));
+            var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagFilePath, filePath);
+
+            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
         }
 
         [TestMethod]
-        [DataRow("")]
-        [DataRow(" ")]
-        [DataRow("abs;dfsdc.txt;verbosity=normal")] // ; in file path is not supported
-        [DataRow("abc.txt;verbosity=normal=verbose")] // Multiple '=' in parameters
-        [DataRow("\"abs;dfsdc.txt\";verbosity=normal")] // Even though in escaped double quotes, semi colon is not supported in file path
+        [DataRow("abc.txt;verbosity=normal=verbose")] // Multiple '=' in parameter
+        [DataRow("abc.txt;verbosity;key1=value1")] // No '=' in parameter
         public void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument)
         {
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(argument));
+            string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
+            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
         }
 
         [TestMethod]
@@ -180,6 +187,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             public TestableEnableDiagArgumentProcessor(IFileHelper fileHelper)
                 : base(fileHelper)
             {
+            }
+        }
+
+        private void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument, string exceptionMessage)
+        {
+            try
+            {
+                this.diagProcessor.Executor.Value.Initialize(argument);
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
+                Assert.IsTrue(e.Message.Contains(exceptionMessage));
             }
         }
     }

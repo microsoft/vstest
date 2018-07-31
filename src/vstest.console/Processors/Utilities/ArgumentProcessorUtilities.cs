@@ -6,11 +6,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
-    internal class ArgumemtProcessorUtilities
+    internal class ArgumentProcessorUtilities
     {
-        public static readonly char[] SemiColonArgumentSeperator = { ';' };
-        public static readonly char[] EqualNameValueSeperator = { '=' };
+        public static readonly char[] SemiColonArgumentSeparator = { ';' };
+        public static readonly char[] EqualNameValueSeparator = { '=' };
 
         /// <summary>
         /// Get argument list from raw argument usign argument separator.
@@ -36,6 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
         /// Get argument parameters.
         /// </summary>
         /// <param name="parameterArgs">Parameter args.</param>
+        /// <param name="nameValueSeparator">Name value separator.</param>
+        /// <param name="exceptionMessage">Exception message.</param>
         /// <returns>Parameters dictionary.</returns>
         public static Dictionary<string, string> GetArgumentParameters(IEnumerable<string> parameterArgs, char[] nameValueSeparator, string exceptionMessage)
         {
@@ -46,14 +50,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             foreach (string parameterArg in parameterArgs)
             {
                 var nameValuePair = parameterArg?.Split(nameValueSeparator, StringSplitOptions.RemoveEmptyEntries);
-                if (nameValuePair.Length == 2)
-                {
-                    parameters[nameValuePair[0]] = nameValuePair[1];
-                }
-                else
+
+                if (nameValuePair.Length != 2)
                 {
                     throw new CommandLineException(exceptionMessage);
                 }
+
+                parameters[nameValuePair[0]] = nameValuePair[1];
             }
 
             return parameters;

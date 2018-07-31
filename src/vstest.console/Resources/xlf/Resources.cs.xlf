@@ -1593,14 +1593,29 @@
         <target state="translated">Možnost CollectDump pro Blame není pro tuto platformu podporovaná.</target>
         <note />
       </trans-unit>
-      <trans-unit id="BlameInvalidFormat">
-        <source>The blame option specified '{0}' is not a valid format.  Please correct it and retry.</source>
-        <target state="new">The blame option specified '{0}' is not valid.  This will be ignored.</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
         <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidDiagFilePath">
+        <source>Diag file path '{0}' is not valid.</source>
+        <target state="new">Diag file path '{0}' is not valid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidBlameArgument">
+        <source>Blame argument '{0}' is not valid.</source>
+        <target state="new">Blame argument '{0}' in invalid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidDiagArgument">
+        <source>Diag argument '{0}' is not valid.</source>
+        <target state="new">Diag argument '{0}' is invalid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidLoggerArgument">
+        <source>Logger argument '{0}' is not valid.</source>
+        <target state="new">Logger argument '{0}' is invalid.</target>
         <note></note>
       </trans-unit>
     </body>

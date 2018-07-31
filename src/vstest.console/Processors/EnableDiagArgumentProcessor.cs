@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -130,14 +131,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
+            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+
             // Throw error if argument is null or empty.
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+                throw new CommandLineException(exceptionMessage);
             }
 
             // Get diag argument list.
-            var diagArgumentList = ArgumemtProcessorUtilities.GetArgumentList(argument, ArgumemtProcessorUtilities.SemiColonArgumentSeperator, CommandLineResources.EnableDiagUsage);
+            var diagArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
 
             // Get diag file path.
             // Note: Even though semi colon is valid file path, we are not respecting the file name having semi-colon [As we are separating arguments based on semi colon].
@@ -146,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             // Get diag parameters.
             var diagParameterArgs = diagArgumentList.Skip(1);
-            var diagParameters = ArgumemtProcessorUtilities.GetArgumentParameters(diagParameterArgs, ArgumemtProcessorUtilities.EqualNameValueSeperator, CommandLineResources.EnableDiagUsage);
+            var diagParameters = ArgumentProcessorUtilities.GetArgumentParameters(diagParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
 
             // Initialize diag logging.
             InitializeDiagLogging(diagFilePath, diagParameters);
@@ -221,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var fileExtension = Path.GetExtension(diagFilePathArgument);
             if (string.IsNullOrWhiteSpace(fileExtension))
             {
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+                throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagFilePath, diagFilePathArgument));
             }
 
             // Create base directory for diag file path (if doesn't exist)

@@ -77,6 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                     (PlatformTraceLevel)traceLevelInt :
                     PlatformTraceLevel.Verbose;
 
+                EqtTrace.Warning("DataCollectorMain.Run: Invalid trace level: {0}, defaulting to vebose tracelevel.", traceLevelInt);
                 EqtTrace.InitializeTrace(logFile, traceLevel);
             }
             else

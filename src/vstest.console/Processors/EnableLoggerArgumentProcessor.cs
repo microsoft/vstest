@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Get logger argument list.
-            var loggerArgumentList = ArgumemtProcessorUtilities.GetArgumentList(argument, ArgumemtProcessorUtilities.SemiColonArgumentSeperator, exceptionMessage);
+            var loggerArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
 
             // Get logger identifier.
             var loggerIdentifier = loggerArgumentList[0];
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             // Get logger parameters
             var loggerParameterArgs = loggerArgumentList.Skip(1);
-            var loggerParameters = ArgumemtProcessorUtilities.GetArgumentParameters(loggerParameterArgs, ArgumemtProcessorUtilities.EqualNameValueSeperator, exceptionMessage);
+            var loggerParameters = ArgumentProcessorUtilities.GetArgumentParameters(loggerParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
 
             // Add logger to run settings.
             LoggerUtilities.AddLoggerToRunSettings(loggerIdentifier, loggerParameters, runSettingsManager);

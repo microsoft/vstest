@@ -703,7 +703,16 @@
   <data name="BlameIncorrectOption" xml:space="preserve">
     <value>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</value>
   </data>
-  <data name="BlameInvalidFormat" xml:space="preserve">
-    <value>The blame option specified '{0}' is not a valid format.  Please correct it and retry.</value>
+  <data name="InvalidDiagFilePath" xml:space="preserve">
+    <value>Diag file path '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidBlameArgument" xml:space="preserve">
+    <value>Blame argument '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidDiagArgument" xml:space="preserve">
+    <value>Diag argument '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidLoggerArgument" xml:space="preserve">
+    <value>Logger argument '{0}' is not valid.</value>
   </data>
 </root>

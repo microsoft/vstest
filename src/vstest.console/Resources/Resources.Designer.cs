@@ -247,17 +247,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   The blame option specified '{0}' is not a valid format.  Please correct it and retry..
-        /// </summary>
-        public static string BlameInvalidFormat
-        {
-            get
-            {
-                return ResourceManager.GetString("BlameInvalidFormat", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///      The directory containing the temporary outputs..
         /// </summary>
@@ -772,6 +761,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Blame argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidBlameArgument
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidBlameArgument", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The given configuration is invalid..
         /// </summary>
         public static string InvalidConfiguration
@@ -779,6 +779,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("InvalidConfiguration", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Diag argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidDiagArgument
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidDiagArgument", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Diag file path &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidDiagFilePath
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidDiagFilePath", resourceCulture);
             }
         }
 
@@ -812,6 +834,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("InvalidInIsolationCommand", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Logger argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidLoggerArgument
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidLoggerArgument", resourceCulture);
             }
         }
 
