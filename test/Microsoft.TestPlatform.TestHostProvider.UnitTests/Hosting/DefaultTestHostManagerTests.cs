@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestHostProvider.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.Hosting.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -600,7 +600,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 IMessageLogger logger)
                 : base(processHelper, new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
             {
-                this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             }
         }

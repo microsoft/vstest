@@ -20,24 +20,19 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
                 // This is helpful in abnormal failure of testhost.
                 EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
 
+                // Don't append more data if already reached max length.
+                if (testHostProcessStdError.Length >= testHostProcessStdError.MaxCapacity)
+                {
+                    return;
+                }
+
                 // Add newline for readbility.
                 data += Environment.NewLine;
 
-                // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                if (data.Length > testHostProcessStdError.MaxCapacity)
+                // Append sub string of data if appending all the data exceeds max capacity.
+                if (testHostProcessStdError.Length + data.Length >= testHostProcessStdError.MaxCapacity)
                 {
-                    testHostProcessStdError.Clear();
-                    data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
-                }
-
-                // remove only what is required, from beginning of error stream
-                else
-                {
-                    int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
-                    if (required > 0)
-                    {
-                        testHostProcessStdError.Remove(0, required);
-                    }
+                    data = data.Substring(0, testHostProcessStdError.MaxCapacity - testHostProcessStdError.Length);
                 }
 
                 testHostProcessStdError.Append(data);

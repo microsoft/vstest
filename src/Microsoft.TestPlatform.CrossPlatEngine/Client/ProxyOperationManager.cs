@@ -70,8 +70,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #region Properties
 
-        protected int ErrorLength { get; set; } = 1000;
-
         /// <summary>
         /// Gets or sets the server for communication.
         /// </summary>

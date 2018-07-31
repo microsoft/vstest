@@ -781,7 +781,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
                 : base(processHelper, fileHelper, dotnetTestHostHelper)
             {
-                this.ErrorLength = errorLength;
             }
         }
     }

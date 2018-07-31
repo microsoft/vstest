@@ -36,16 +36,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             this.processHelper = processHelper;
             this.messageLogger = messageLogger;
-            this.processStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+            this.processStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
         }
 
         /// <inheritdoc />
         public int DataCollectorProcessId { get; protected set; }
-
-        /// <summary>
-        /// Gets or sets the error length for data collector error stream.
-        /// </summary>
-        protected int ErrorLength { get; set; } = 4096;
 
         /// <summary>
         /// Gets callback on process exit

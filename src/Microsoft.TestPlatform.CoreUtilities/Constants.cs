@@ -22,5 +22,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
         /// Datacollector process name, without file extension(.exe/.dll)
         /// </summary>
         public const string DatacollectorProcessName = "datacollector";
+
+
+        /// <summary>
+        /// Number of character should be logged on child process exited with
+        /// error message on stadard error.
+        /// </summary>
+        public const int StandardErrorMaxLength = 20480; // 20 KB
     }
 }
