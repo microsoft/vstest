@@ -9,34 +9,17 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
     internal class TestHostManagerCallbacks
     {
         public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string data)
         {
-            if (!string.IsNullOrEmpty(data))
-            {
-                // Log all standard error message because on too much data we ignore starting part.
-                // This is helpful in abnormal failure of testhost.
-                EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
+            // Log all standard error message because on too much data we ignore starting part.
+            // This is helpful in abnormal failure of testhost.
+            EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
 
-                // Don't append more data if already reached max length.
-                if (testHostProcessStdError.Length >= testHostProcessStdError.MaxCapacity)
-                {
-                    return;
-                }
-
-                // Add newline for readbility.
-                data += Environment.NewLine;
-
-                // Append sub string of data if appending all the data exceeds max capacity.
-                if (testHostProcessStdError.Length + data.Length >= testHostProcessStdError.MaxCapacity)
-                {
-                    data = data.Substring(0, testHostProcessStdError.MaxCapacity - testHostProcessStdError.Length);
-                }
-
-                testHostProcessStdError.Append(data);
-            }
+            data.AppendToStringBuilderBasedOnMaxLength(testHostProcessStdError);
         }
 
         public static void ExitCallBack(

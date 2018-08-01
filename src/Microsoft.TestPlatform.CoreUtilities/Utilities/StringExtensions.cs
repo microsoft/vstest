@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions
 {
     using System;
     using System.Net;
+    using System.Text;
+    using ObjectModel;
 
     public static class StringExtensions
     {
@@ -16,6 +18,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions
         public static string AddDoubleQuote(this string value)
         {
             return "\"" + value + "\"";
+        }
+
+        public static void AppendToStringBuilderBasedOnMaxLength(this string data, StringBuilder result)
+        {
+            if (!string.IsNullOrEmpty(data))
+            {
+                // Don't append more data if already reached max length.
+                if (result.Length >= result.MaxCapacity)
+                {
+                    return;
+                }
+
+                // Add newline for readbility.
+                data += Environment.NewLine;
+
+                // Append sub string of data if appending all the data exceeds max capacity.
+                if (result.Length + data.Length >= result.MaxCapacity)
+                {
+                    data = data.Substring(0, result.MaxCapacity - result.Length);
+                }
+
+                result.Append(data);
+            }
         }
     }
 }

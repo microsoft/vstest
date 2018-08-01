@@ -37,6 +37,15 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         }
 
         [TestMethod]
+        public void ErrorReceivedCallbackShouldAppendWhiteSpaceString()
+        {
+            this.testHostProcessStdError.Append("OldData");
+            TestHostManagerCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, " ");
+
+            Assert.AreEqual("OldData " + Environment.NewLine, this.testHostProcessStdError.ToString());
+        }
+
+        [TestMethod]
         public void ErrorReceivedCallbackShouldAppendGivenData()
         {
             this.testHostProcessStdError.Append("NoDataShouldAppend");
