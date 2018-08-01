@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Initialize diag loggin.
+        /// Initialize diag logging.
         /// </summary>
         /// <param name="diagFilePath">Diag file path.</param>
         /// <param name="diagParameters">Diag parameters</param>

@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Initializes the tracing with custom log file and trace level.
         /// Overrides if any trace is set before.
         /// </summary>
-        /// <param name="customLogFile">Customr log file for trace messages.</param>
+        /// <param name="customLogFile">Custom log file for trace messages.</param>
         /// <param name="traceLevel">Trace level.</param>
         /// <returns>Trace initialized flag.</returns>
         public static bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)

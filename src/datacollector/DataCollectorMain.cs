@@ -71,14 +71,19 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
             {
                 var traceLevelInt = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, TraceLevelArgument);
+                var isTraceLevelArgValid = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt);
 
                 // In case traceLevelInt is not defined in PlatfromTraceLevel, default it to verbose.
-                var traceLevel = Enum.IsDefined(typeof(PlatformTraceLevel), traceLevelInt) ?
-                    (PlatformTraceLevel)traceLevelInt :
-                    PlatformTraceLevel.Verbose;
+                var traceLevel = isTraceLevelArgValid ? (PlatformTraceLevel)traceLevelInt : PlatformTraceLevel.Verbose;
 
-                EqtTrace.Warning("DataCollectorMain.Run: Invalid trace level: {0}, defaulting to vebose tracelevel.", traceLevelInt);
+                // Initialize trace.
                 EqtTrace.InitializeTrace(logFile, traceLevel);
+
+                // Log warning in case tracelevel passed in arg is invalid
+                if (!isTraceLevelArgValid)
+                {
+                    EqtTrace.Warning("DataCollectorMain.Run: Invalid trace level: {0}, defaulting to verbose tracelevel.", traceLevelInt);
+                }
             }
             else
             {
