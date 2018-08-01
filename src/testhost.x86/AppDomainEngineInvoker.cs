@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Reflection;
     using System.Xml.Linq;
     using System.Collections.Generic;
+    using System.Globalization;
 
     /// <summary>
     /// Implementation for the Invoker which invokes engine in a new AppDomain
@@ -37,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
         }
+
 
         /// <summary>
         /// Invokes the Engine with the arguments
@@ -79,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // Set AppBase to TestAssembly location
             appDomainSetup.ApplicationBase = testSourceFolder;
             appDomainSetup.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+            appDomainSetup.AppDomainInitializer = SetAppDomainCulture;
 
             // Set User Config file as app domain config
             SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder);
@@ -165,6 +168,25 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 
             return configFile;
+        }
+
+        private static void SetAppDomainCulture(string[] args)
+        {
+            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
+            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
+            {
+                try
+                {
+                    CultureInfo info = new CultureInfo(userCultureSpecified);
+                    CultureInfo.DefaultThreadCurrentCulture = info;
+                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                }
+                // If an exception occurs, we'll just fall back to the system default.
+                catch (Exception)
+                {
+                    EqtTrace.Verbose("Invalid Culture Info '{0}:'", args[0]);
+                }
+            }
         }
 
         protected static XDocument MergeApplicationConfigFiles(XDocument userConfigDoc, XDocument testHostConfigDoc)

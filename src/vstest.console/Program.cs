@@ -44,12 +44,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         private static void SetCultureSpecifiedByUser()
         {
-            var userCultureSpecified = Environment.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE");
+            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
             if(!string.IsNullOrWhiteSpace(userCultureSpecified))
             {
                 try
                 {
                     CultureInfo info = new CultureInfo(userCultureSpecified);
+                    CultureInfo.DefaultThreadCurrentCulture = info;
                     CultureInfo.DefaultThreadCurrentUICulture = info;
                 }
                 catch(Exception)
