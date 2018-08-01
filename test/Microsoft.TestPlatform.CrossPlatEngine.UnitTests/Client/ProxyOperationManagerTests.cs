@@ -85,7 +85,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldCreateTimestampedLogFileForHost()
         {
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
-            EqtTrace.InitializeVerboseTrace("log.txt");
+            EqtTrace.InitializeTrace("log.txt", PlatformTraceLevel.Verbose);
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
@@ -117,6 +117,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                         It.IsAny<IEnumerable<string>>(),
                         null,
                         It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(Process.GetCurrentProcess().Id))));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldAddCorrectTraceLevelForTestHost()
+        {
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Info;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Info;
+#endif
+
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockTestHostManager.Verify(
+                th =>
+                    th.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        null,
+                        It.Is<TestRunnerConnectionInfo>(t => t.TraceLevel == (int)PlatformTraceLevel.Info)));
         }
 
         [TestMethod]

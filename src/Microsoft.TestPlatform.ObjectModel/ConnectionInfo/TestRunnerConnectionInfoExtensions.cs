@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             if (!string.IsNullOrEmpty(connectionInfo.LogFile))
             {
                 options += " --diag " + connectionInfo.LogFile;
+                options += " --tracelevel " + connectionInfo.TraceLevel;
             }
 
             return options;

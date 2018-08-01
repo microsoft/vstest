@@ -4,14 +4,17 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
-
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -102,6 +105,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private readonly IFileHelper fileHelper;
 
+        /// <summary>
+        /// Parameter for trace level
+        /// </summary>
+        public const string TraceLevelParam = "tracelevel";
+
         #region Constructor
 
         /// <summary>
@@ -123,34 +131,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
+            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+
+            // Throw error if argument is null or empty.
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
+                throw new CommandLineException(exceptionMessage);
             }
 
-            if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
-            {
-                // Throwing error if the argument is just path and not a file
-                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
-            }
+            // Get diag argument list.
+            var diagArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
 
-            // Create the base directory for logging if doesn't exist. Directory could be empty if just a
-            // filename is provided. E.g. log.txt
-            var logDirectory = Path.GetDirectoryName(argument);
-            if (!string.IsNullOrEmpty(logDirectory) && !this.fileHelper.DirectoryExists(logDirectory))
-            {
-                this.fileHelper.CreateDirectory(logDirectory);
-            }
+            // Get diag file path.
+            // Note: Even though semi colon is valid file path, we are not respecting the file name having semi-colon [As we are separating arguments based on semi colon].
+            var diagFilePathArg = diagArgumentList[0];
+            var diagFilePath = GetDiagFilePath(diagFilePathArg);
 
-            // Find full path and send this to testhost so that vstest and testhost create logs at same location.
-            argument = Path.GetFullPath(argument);
+            // Get diag parameters.
+            var diagParameterArgs = diagArgumentList.Skip(1);
+            var diagParameters = ArgumentProcessorUtilities.GetArgumentParameters(diagParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
 
-            // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of initialization.
-            if (!EqtTrace.InitializeVerboseTrace(argument))
-            {
-                if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
-                    ConsoleOutput.Instance.Warning(false, EqtTrace.ErrorOnInitialization);
-            }
+            // Initialize diag logging.
+            InitializeDiagLogging(diagFilePath, diagParameters);
         }
 
         /// <summary>
@@ -161,6 +163,90 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
+        }
+
+        /// <summary>
+        /// Initialize diag logging.
+        /// </summary>
+        /// <param name="diagFilePath">Diag file path.</param>
+        /// <param name="diagParameters">Diag parameters</param>
+        private void InitializeDiagLogging(string diagFilePath, Dictionary<string, string> diagParameters)
+        {
+            // Get trace level from diag parameters.
+            var traceLevel = GetDiagTraceLevel(diagParameters);
+
+            // Initialize trace.
+            // Trace initialized is false in case of any exception at time of initialization like Catch exception(UnauthorizedAccessException, PathTooLongException...)
+            var traceInitialized = EqtTrace.InitializeTrace(diagFilePath, traceLevel);
+
+            // Show console warning in case trace is not initialized.
+            if (!traceInitialized && !string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+            {
+                ConsoleOutput.Instance.Warning(false, EqtTrace.ErrorOnInitialization);
+            }
+        }
+
+        /// <summary>
+        /// Gets diag trace level.
+        /// </summary>
+        /// <param name="diagParameters">Diag parameters.</param>
+        /// <returns>Diag trace level.</returns>
+        private PlatformTraceLevel GetDiagTraceLevel(Dictionary<string, string> diagParameters)
+        {
+            // If diag parameters is null, set value of trace level as verbose.
+            if (diagParameters == null)
+            {
+                return PlatformTraceLevel.Verbose;
+            }
+
+            // Get trace level from diag parameters.
+            var traceLevelExists = diagParameters.TryGetValue(TraceLevelParam, out string traceLevelStr);
+            if (traceLevelExists && Enum.TryParse(traceLevelStr, true, out PlatformTraceLevel traceLevel))
+            {
+                return traceLevel;
+            }
+
+            // Default value of diag trace level is verbose.
+            return PlatformTraceLevel.Verbose;
+        }
+
+        /// <summary>
+        /// Gets diag file path.
+        /// </summary>
+        /// <param name="diagFilePathArgument">Diag file path argument.</param>
+        /// <returns>Diag file path.</returns>
+        private string GetDiagFilePath(string diagFilePathArgument)
+        {
+            // Remove double quotes if present.
+            diagFilePathArgument = diagFilePathArgument.Replace("\"", "");
+
+            // Throw error in case diag file path is not a valid file path
+            var fileExtension = Path.GetExtension(diagFilePathArgument);
+            if (string.IsNullOrWhiteSpace(fileExtension))
+            {
+                throw new CommandLineException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagFilePath, diagFilePathArgument));
+            }
+
+            // Create base directory for diag file path (if doesn't exist)
+            CreateDirectoryIfNotExists(diagFilePathArgument);
+
+            // return full diag file path. (This is done so that vstest and testhost create logs at same location.)
+            return Path.GetFullPath(diagFilePathArgument);
+        }
+
+        /// <summary>
+        /// Create directory if not exists.
+        /// </summary>
+        /// <param name="filePath">File path.</param>
+        private void CreateDirectoryIfNotExists(string filePath)
+        {
+            // Create the base directory of file path if doesn't exist.
+            // Directory could be empty if just a filename is provided. E.g. log.txt
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !this.fileHelper.DirectoryExists(directory))
+            {
+                this.fileHelper.CreateDirectory(directory);
+            }
         }
 
         #endregion

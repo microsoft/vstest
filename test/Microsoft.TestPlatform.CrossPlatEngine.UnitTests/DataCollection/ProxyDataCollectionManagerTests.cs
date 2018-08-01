@@ -118,22 +118,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             try
             {
-                EqtTrace.InitializeVerboseTrace("mylog.txt");
+                EqtTrace.InitializeTrace("mylog.txt", PlatformTraceLevel.Info);
                 this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
                 this.proxyDataCollectionManager.Initialize();
 
+                var expectedTraceLevel = (int)PlatformTraceLevel.Info;
                 this.mockDataCollectionLauncher.Verify(
                     x =>
                         x.LaunchDataCollector(
                             It.IsAny<IDictionary<string, string>>(),
-                            It.Is<IList<string>>(list => list.Contains("--diag"))),
+                            It.Is<IList<string>>(list => list.Contains("--diag") && list.Contains("--tracelevel") && list.Contains(expectedTraceLevel.ToString()))),
                     Times.Once);
             }
             finally
             {
                 // Restoring to initial state for EqtTrace
-                EqtTrace.InitializeVerboseTrace(traceFileName);
+                EqtTrace.InitializeTrace(traceFileName, PlatformTraceLevel.Verbose);
 #if NET451
                 EqtTrace.TraceLevel = traceLevel;
 #else

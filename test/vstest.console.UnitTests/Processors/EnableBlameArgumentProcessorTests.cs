@@ -159,7 +159,7 @@ namespace vstest.console.UnitTests.Processors
                                .Returns(PlatformArchitecture.X64);
 
             this.executor.Initialize(invalidString);
-            this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameInvalidFormat, invalidString), OutputLevel.Warning));
+            this.mockOutput.Verify(x => x.WriteLine(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, invalidString), OutputLevel.Warning));
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"blame\" enabled=\"True\">\r\n        <Configuration>\r\n          <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>C:\\dir\\TestResults</ResultsDirectory>\r\n  </RunConfiguration>\r\n  <LoggerRunSettings>\r\n    <Loggers>\r\n      <Logger friendlyName=\"blame\" enabled=\"True\" />\r\n    </Loggers>\r\n  </LoggerRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);

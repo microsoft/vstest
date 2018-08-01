@@ -1387,12 +1387,16 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
-        <target state="translated">--Diag|/Diag:&lt;Cesta k souboru protokolu&gt;
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
+        <target state="new">--Diag|/Diag:&lt;Cesta k souboru protokolu&gt;
       Povolí podrobné protokoly pro testovací platformu.
       Protokoly se zapisují do zadaného souboru.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; cesta k souboru protokolu &gt;
       Povolení podrobného protokolování pro testovací platformu.
@@ -1589,14 +1593,29 @@
         <target state="translated">Možnost CollectDump pro Blame není pro tuto platformu podporovaná.</target>
         <note />
       </trans-unit>
-      <trans-unit id="BlameInvalidFormat">
-        <source>The blame option specified '{0}' is not a valid format.  Please correct it and retry.</source>
-        <target state="new">The blame option specified '{0}' is not valid.  This will be ignored.</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
         <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidDiagFilePath">
+        <source>Diag file path '{0}' is not valid.</source>
+        <target state="new">Diag file path '{0}' is not valid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidBlameArgument">
+        <source>Blame argument '{0}' is not valid.</source>
+        <target state="new">Blame argument '{0}' in invalid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidDiagArgument">
+        <source>Diag argument '{0}' is not valid.</source>
+        <target state="new">Diag argument '{0}' is invalid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidLoggerArgument">
+        <source>Logger argument '{0}' is not valid.</source>
+        <target state="new">Logger argument '{0}' is invalid.</target>
         <note></note>
       </trans-unit>
     </body>

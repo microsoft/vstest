@@ -162,11 +162,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
+            return this.InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
+        }
+
+        /// <inheritdoc/>
+        public bool InitializeTrace(string customLogFile, PlatformTraceLevel platformTraceLevel)
+        {
             isInitialized = false;
 
             LogFile = customLogFile;
-            TraceLevel = TraceLevel.Verbose;
-            Source.Switch.Level = SourceLevels.All;
+            TraceLevel = this.MapPlatformTraceToTrace(platformTraceLevel);
+            Source.Switch.Level = TraceSourceLevelsMap[TraceLevel];
 
             // Ensure trace is initlized
             return EnsureTraceIsInitialized();
@@ -351,7 +357,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 catch (Exception e)
                 {
-                    UnInitializeVerboseTrace();
+                    UnInitializeTrace();
                     ErrorOnInitialization = e.ToString();
                     return false;
                 }
@@ -419,7 +425,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        private static void UnInitializeVerboseTrace()
+        private static void UnInitializeTrace()
         {
             isInitialized = false;
 
