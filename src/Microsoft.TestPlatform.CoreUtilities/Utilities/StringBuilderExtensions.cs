@@ -9,12 +9,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions
     public static class StringBuilderExtensions
     {
         /// <summary>
-        /// Add double quote around string. Useful in case of path which has white space in between.
+        /// Append given data from to string builder with new line.
         /// </summary>
         /// <param name="result">string builder</param>
-        /// /// <param name="data">data to be appended.</param>
+        /// <param name="data">data to be appended.</param>
         /// <returns></returns>
-
         public static void AppendSafeWithNewLine(this StringBuilder result, string data)
         {
             if (!string.IsNullOrEmpty(data))
@@ -25,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions
                     return;
                 }
 
-                // Add newline for readbility.
+                // Add newline for readability.
                 data += Environment.NewLine;
 
                 // Append sub string of data if appending all the data exceeds max capacity.
