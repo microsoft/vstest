@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using PlatformAbstractions.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
@@ -137,6 +138,23 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 }
 
                 Debugger.Break();
+            }
+        }
+
+        private static void SetCultureSpecifiedByUser()
+        {
+            var userCultureSpecified = Environment.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE");
+            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
+            {
+                try
+                {
+                    CultureInfo info = new CultureInfo(userCultureSpecified);
+                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                }
+                catch (Exception)
+                {
+                    ConsoleOutput.Instance.WriteLine(string.Format("Invalid Culture Info: {0}", userCultureSpecified), OutputLevel.Information);
+                }
             }
         }
 

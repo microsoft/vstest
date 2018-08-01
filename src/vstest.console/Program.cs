@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
+    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -36,7 +37,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 System.Diagnostics.Debugger.Break();
             }
 
+            SetCultureSpecifiedByUser();
+
             return new Executor(ConsoleOutput.Instance).Execute(args);
+        }
+
+        private static void SetCultureSpecifiedByUser()
+        {
+            var userCultureSpecified = Environment.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE");
+            if(!string.IsNullOrWhiteSpace(userCultureSpecified))
+            {
+                try
+                {
+                    CultureInfo info = new CultureInfo(userCultureSpecified);
+                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                }
+                catch(Exception)
+                {
+                    ConsoleOutput.Instance.WriteLine(string.Format("Invalid Culture Info: {0}", userCultureSpecified), OutputLevel.Information);
+                }
+            }
         }
     }
 }

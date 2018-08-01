@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-
+    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -52,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         public static void Run(string[] args)
         {
             WaitForDebuggerIfEnabled();
+            SetCultureSpecifiedByUser();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
             
             // Invoke the engine with arguments
@@ -101,6 +102,23 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
 
                 Debugger.Break();
+            }
+        }
+
+        private static void SetCultureSpecifiedByUser()
+        {
+            var userCultureSpecified = Environment.GetEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE");
+            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
+            {
+                try
+                {
+                    CultureInfo info = new CultureInfo(userCultureSpecified);
+                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                }
+                catch (Exception)
+                {
+                    ConsoleOutput.Instance.WriteLine(string.Format("Invalid Culture Info: {0}", userCultureSpecified), OutputLevel.Information);
+                }
             }
         }
     }
