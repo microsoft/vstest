@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
             // This is helpful in abnormal failure of testhost.
             EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
 
-            data.AppendToStringBuilderBasedOnMaxLength(testHostProcessStdError);
+            testHostProcessStdError.AppendSafeWithNewLine(data);
         }
 
         public static void ExitCallBack(

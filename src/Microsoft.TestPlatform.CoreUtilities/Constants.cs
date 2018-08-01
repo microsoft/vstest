@@ -25,8 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
 
         /// <summary>
         /// Number of character should be logged on child process exited with
-        /// error message on stadard error.
+        /// error message on standard error.
         /// </summary>
-        public const int StandardErrorMaxLength = 20480; // 20 KB
+        public const int StandardErrorMaxLength = 8192; // 8 KB
     }
 }

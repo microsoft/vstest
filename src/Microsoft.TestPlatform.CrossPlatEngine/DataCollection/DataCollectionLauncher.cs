@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // This is helpful in abnormal failure of datacollector.
             EqtTrace.Warning("DataCollectionLauncher.ErrorReceivedCallback datacollector standard error line: {0}", data);
 
-            data.AppendToStringBuilderBasedOnMaxLength(this.processStdError);
+            this.processStdError.AppendSafeWithNewLine(data);
         };
 
         /// <summary>

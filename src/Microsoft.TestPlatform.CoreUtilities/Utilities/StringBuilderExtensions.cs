@@ -6,19 +6,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions
     using System;
     using System.Text;
 
-    public static class StringExtensions
+    public static class StringBuilderExtensions
     {
         /// <summary>
         /// Add double quote around string. Useful in case of path which has white space in between.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="result">string builder</param>
+        /// /// <param name="data">data to be appended.</param>
         /// <returns></returns>
-        public static string AddDoubleQuote(this string value)
-        {
-            return "\"" + value + "\"";
-        }
 
-        public static void AppendToStringBuilderBasedOnMaxLength(this string data, StringBuilder result)
+        public static void AppendSafeWithNewLine(this StringBuilder result, string data)
         {
             if (!string.IsNullOrEmpty(data))
             {
