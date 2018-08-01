@@ -37,6 +37,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.fileHelper = fileHelper;
             this.environment = environment;
             this.nativeMethodsHelper = nativeMethodsHelper;
+            ProcessDumpUtility.procDumpExceptionsList = new List<string>()
+            {
+                "STACK_OVERFLOW",
+                "ACCESS_VIOLATION"
+            };
         }
 
     /// <inheritdoc/>
@@ -105,12 +110,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>Arguments</returns>
         private static string BuildProcDumpArgs(int processId, string filename, bool isFullDump = false)
         {
-            ProcessDumpUtility.procDumpExceptionsList = new List<string>()
-            {
-                "STACK_OVERFLOW",
-                "ACCESS_VIOLATION"
-            };
-
             // -accepteula: Auto accept end-user license agreement
             // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
             // -g: Run as a native debugger in a managed process (no interop).
@@ -129,7 +128,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             procDumpArgument.Append($"{processId} {filename}.dmp");
-            return procDumpArgument.ToString();
+            var argument = procDumpArgument.ToString();
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"ProcessDumpUtility : The procdump argument is {argument}");
+            }
+
+            return argument;
         }
 
         /// <summary>
@@ -150,18 +156,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // Launch procdump according to process architecture
                 if (this.environment.Architecture == PlatformArchitecture.X86)
                 {
-                    filename = Constants.ProcdumpProcessName;
+                    filename = Constants.ProcdumpProcess;
                 }
                 else
                 {
-                    if (this.nativeMethodsHelper.Is64Bit(this.processHelper.GetProcessHandleById(processId)))
-                    {
-                        filename = Constants.Procdump64ProcessName;
-                    }
-                    else
-                    {
-                        filename = Constants.ProcdumpProcessName;
-                    }
+                     filename = this.nativeMethodsHelper.Is64Bit(this.processHelper.GetProcessHandle(processId)) ?
+                     Constants.Procdump64Process : Constants.ProcdumpProcess;
                 }
 
                 var procDumpExe = Path.Combine(procdumpPath, filename);

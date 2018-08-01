@@ -109,6 +109,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// </summary>
         /// <param name="processId">process id</param>
         /// <returns>Process Handle</returns>
-        IntPtr GetProcessHandleById(int processId);
+        IntPtr GetProcessHandle(int processId);
     }
 }

@@ -226,7 +226,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X86);
-            this.mockProcessHelper.Setup(x => x.GetProcessHandleById(processId))
+            this.mockProcessHelper.Setup(x => x.GetProcessHandle(processId))
                                 .Returns(new IntPtr(0));
 
             var processDumpUtility = new ProcessDumpUtility(
@@ -250,7 +250,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             int processId = 1234;
             this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
 
-            this.mockProcessHelper.Setup(x => x.GetProcessHandleById(processId))
+            this.mockProcessHelper.Setup(x => x.GetProcessHandle(processId))
                                 .Returns(x64ProcessHandle);
             this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(x64ProcessHandle))
                                 .Returns(true);
@@ -276,7 +276,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             int processId = 12345;
             this.mockPlatformEnvironment.Setup(x => x.Architecture).Returns(PlatformArchitecture.X64);
 
-            this.mockProcessHelper.Setup(x => x.GetProcessHandleById(processId))
+            this.mockProcessHelper.Setup(x => x.GetProcessHandle(processId))
                                 .Returns(x86ProcessHandle);
             this.mockNativeMethodsHelper.Setup(x => x.Is64Bit(x86ProcessHandle))
                                 .Returns(false);

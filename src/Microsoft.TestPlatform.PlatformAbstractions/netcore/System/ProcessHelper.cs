@@ -17,8 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }
 
-        public IntPtr GetProcessHandleById(int processId)
+        /// <inheritdoc/>
+        public IntPtr GetProcessHandle(int processId)
         {
+            // An IntPtr representing the value of the handle field.
+            // If the handle has been marked invalid with SetHandleAsInvalid, this method still returns the original handle value, which can be a stale value.
             return Process.GetProcessById(processId).SafeHandle.DangerousGetHandle();
         }
     }

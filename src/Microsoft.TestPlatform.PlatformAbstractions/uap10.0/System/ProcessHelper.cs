@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             throw new NotImplementedException();
         }
 
-        public IntPtr GetProcessHandleById(int processId)
+        public IntPtr GetProcessHandle(int processId)
         {
             throw new NotImplementedException();
         }

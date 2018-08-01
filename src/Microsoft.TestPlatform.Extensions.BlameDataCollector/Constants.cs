@@ -46,12 +46,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Procdump 32 bit version
         /// </summary>
-        public const string ProcdumpProcessName = "procdump.exe";
+        public const string ProcdumpProcess = "procdump.exe";
 
         /// <summary>
         /// Procdump 64 bit version
         /// </summary>
-        public const string Procdump64ProcessName = "procdump64.exe";
+        public const string Procdump64Process = "procdump64.exe";
 
         ///<summary>
         /// Configuration key name for collect dump always

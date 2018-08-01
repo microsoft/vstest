@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             return Path.GetDirectoryName(this.GetCurrentProcessFileName());
         }
 
-        public IntPtr GetProcessHandleById(int processId)
+        public IntPtr GetProcessHandle(int processId)
         {
             return Process.GetProcessById(processId).Handle;
         }
