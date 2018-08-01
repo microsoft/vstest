@@ -38,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private const string PortOption = "--port";
         private const string DiagOption = "--diag";
         private const string ParentProcessIdOption = "--parentprocessid";
+        private const string TraceLevelOption = "--tracelevel";
         public const string DebugEnvironmentVaribleName = "VSTEST_DATACOLLECTOR_DEBUG";
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
@@ -299,6 +300,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 commandlineArguments.Add(DiagOption);
                 commandlineArguments.Add(this.GetTimestampedLogFile(EqtTrace.LogFile));
+
+                commandlineArguments.Add(TraceLevelOption);
+                commandlineArguments.Add(((int)EqtTrace.TraceLevel).ToString());
             }
 
             return commandlineArguments;

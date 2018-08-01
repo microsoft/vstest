@@ -3,15 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using vstest.console.UnitTests.TestDoubles;
-
-    using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Moq;
     using System;
+    using System.Globalization;
+
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
@@ -57,23 +56,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorInitializeWithNullOrEmptyArgumentsShouldThrowException()
+        [DataRow("  ")]
+        [DataRow(null)]
+        [DataRow("TestLoggerExtension;==;;;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1")]
+        public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed(string argument)
         {
             var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-            Assert.ThrowsException<CommandLineException>(() =>
+            try
             {
-                executor.Initialize(null);
-            });
-        }
-
-        [TestMethod]
-        public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed()
-        {
-            var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-            Assert.ThrowsException<CommandLineException>(() =>
+                executor.Initialize(argument);
+            }
+            catch (Exception e)
             {
-                executor.Initialize("TestLoggerExtension;==;;;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
-            });
+                string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.LoggerUriInvalid, argument);
+                Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
+                Assert.IsTrue(e.Message.Contains(exceptionMessage));
+            }
         }
 
         [TestMethod]
