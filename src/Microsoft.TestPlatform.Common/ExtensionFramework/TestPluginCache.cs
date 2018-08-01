@@ -97,9 +97,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             var extensions = this.GetFilteredExtensions(this.filterableExtensionPaths, endsWithPattern);
 
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
+            }
+
             if (!skipDefaultExtensions)
             {
                 extensions = extensions.Concat(this.defaultExtensionPaths);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, this.defaultExtensionPaths));
+                }
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, this.unfilterableExtensionPaths));
             }
 
             return extensions.Concat(this.unfilterableExtensionPaths).ToList();
@@ -123,6 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
             where TPluginInfo : TestPluginInformation
         {
+            EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: finding test extensions in assemblies endswith: {0} TPluginInfo: {1} TExtension: {2}", endsWithPattern, typeof(TPluginInfo), typeof(TExtension));
             // Return the cached value if cache is valid.
             if (this.TestExtensions != null && this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
             {
@@ -142,10 +160,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             try
             {
-                EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
+                EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Discovering the extensions using extension path.");
 
                 // Combine all the possible extensions - both default and additional.
                 var allExtensionPaths = this.GetExtensionPaths(endsWithPattern);
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
+                }
 
                 // Discover the test extensions from candidate assemblies.
                 pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
