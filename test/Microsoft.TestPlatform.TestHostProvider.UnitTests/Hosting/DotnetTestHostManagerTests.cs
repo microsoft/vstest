@@ -49,7 +49,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestableDotnetTestHostManager dotnetHostManager;
 
         private string errorMessage;
-        private int maxStdErrStringLength = 22;
 
         private int exitCode;
 
@@ -69,8 +68,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object, mockEnvironment.Object),
-                                         this.maxStdErrStringLength);
+                                         new DotnetHostHelper(this.mockFileHelper.Object, mockEnvironment.Object));
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
@@ -621,19 +619,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task DotNetCoreErrorMessageShouldBeTruncatedToMatchErrorLength()
-        {
-            var errorData = "Long Custom Error Strings";
-            this.ErrorCallBackTestHelper(errorData, -1);
-
-            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
-
-            // Ignore new line chars
-            Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
-            Assert.AreEqual(errorData.Substring(5), this.errorMessage);
-        }
-
-        [TestMethod]
         public async Task DotNetCoreNoErrorMessageIfExitCodeZero()
         {
             string errorData = string.Empty;
@@ -778,10 +763,12 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         internal class TestableDotnetTestHostManager : DotnetTestHostManager
         {
-            public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
+            public TestableDotnetTestHostManager(
+                IProcessHelper processHelper,
+                IFileHelper fileHelper,
+                IDotnetHostHelper dotnetTestHostHelper)
                 : base(processHelper, fileHelper, dotnetTestHostHelper)
             {
-                this.ErrorLength = errorLength;
             }
         }
     }

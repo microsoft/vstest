@@ -97,11 +97,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
         /// <summary>
-        /// Gets or sets the error length for runtime error stream.
-        /// </summary>
-        protected int ErrorLength { get; set; } = 4096;
-
-        /// <summary>
         /// Gets callback on process exit
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
@@ -367,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+            this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
             EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
             if (this.customTestHostLauncher == null)
