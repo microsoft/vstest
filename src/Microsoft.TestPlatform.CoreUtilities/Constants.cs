@@ -23,7 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
         /// </summary>
         public const string DatacollectorProcessName = "datacollector";
 
-
         /// <summary>
         /// Number of character should be logged on child process exited with
         /// error message on stadard error.
