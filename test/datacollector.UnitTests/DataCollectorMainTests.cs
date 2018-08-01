@@ -4,23 +4,22 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
-    using System.Globalization;
+    using System.Diagnostics;
+
     using CommunicationUtilities.DataCollection.Interfaces;
     using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
     using PlatformAbstractions.Interfaces;
     using TestPlatform.DataCollector;
 
-    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
-    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
-
     [TestClass]
     public class DataCollectorMainTests
     {
-        private readonly string[] args = {"--port", "1025", "--parentprocessid", "100" };
+        private readonly string[] args = {"--port", "1025", "--parentprocessid", "100", "--diag", "abc.txt",  "--tracelevel", "3" };
+        private readonly string[] argsWithEmptyDiagArg = { "--port", "1025", "--parentprocessid", "100", "--diag", "", "--tracelevel", "3" };
+        private readonly string[] argsWithInvalidTraceLevel = { "--port", "1025", "--parentprocessid", "100", "--diag", "abc.txt", "--tracelevel", "5" };
 
         private static readonly string TimoutErrorMessage =
             "datacollector process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
@@ -58,6 +57,54 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorMain.Run(args);
 
             this.mockDataCollectionRequestHandler.Verify(rh => rh.WaitForRequestSenderConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
+        }
+
+        [TestMethod]
+        public void RunShouldInitializeTraceWithTraceLevelOffIfDiagArgIsEmpty()
+        {
+            // Setting EqtTrace.TraceLevel to a value other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Verbose;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
+#endif
+            // Action
+            this.dataCollectorMain.Run(argsWithEmptyDiagArg); // Passing tracelevel as info and diag file path is empty.
+
+            // Verify
+            Assert.AreEqual(TraceLevel.Off, (TraceLevel)EqtTrace.TraceLevel);
+        }
+
+        [TestMethod]
+        public void RunShouldInitializeTraceWithVerboseTraceLevelIfInvalidTraceLevelPassed()
+        {
+            // Setting EqtTrace.TraceLevel to a value other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Info;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Info;
+#endif
+            // Action
+            this.dataCollectorMain.Run(argsWithInvalidTraceLevel);
+
+            // Verify
+            Assert.AreEqual(TraceLevel.Verbose, (TraceLevel)EqtTrace.TraceLevel);
+        }
+
+        [TestMethod]
+        public void RunShouldInitializeTraceWithCorrectVerboseTraceLevel()
+        {
+            // Setting EqtTrace.TraceLevel to a value other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Verbose;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
+#endif
+            // Action
+            this.dataCollectorMain.Run(args); // Trace level is set as info in args.
+
+            // Verify
+            Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
         }
 
         [TestMethod]

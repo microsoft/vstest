@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// Diagnostics argument for Vstest CLI
         /// Enables Diagnostic logging for Vstest CLI and TestHost - Optional
         /// </summary>
-        private const string DIAG_ARGUMENT = "/diag:{0}";
+        private const string DIAG_ARGUMENT = "/diag:{0};tracelevel={1}";
 
         private string vstestConsolePath;
         private object syncObject = new object();
@@ -134,8 +134,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if(!string.IsNullOrEmpty(parameters.LogFilePath))
             {
-                // Extra args: --diag|/diag:<PathToLogFile>
-                args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath));
+                // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
+                args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath, parameters.TraceLevel));
             }
 
             return args.ToArray();

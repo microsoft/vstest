@@ -39,6 +39,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             throw new NotImplementedException();
         }
 
+        public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
             throw new NotImplementedException();

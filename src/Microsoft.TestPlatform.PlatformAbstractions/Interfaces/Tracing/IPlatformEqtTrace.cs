@@ -38,6 +38,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         bool InitializeVerboseTrace(string customLogFile);
 
         /// <summary>
+        /// Initializes the tracing with custom log file and trace level.
+        /// Overrides if any trace is set before.
+        /// </summary>
+        /// <param name="customLogFile">Customr log file for trace messages.</param>
+        /// <param name="traceLevel">Trace level.</param>
+        /// <returns>Trace initialized flag.</returns>
+        bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel);
+
+        /// <summary>
         /// Gets a value indicating if tracing is enabled for a trace level.
         /// </summary>
         /// <param name="traceLevel">Trace level.</param>

@@ -230,8 +230,12 @@
   </data>
   <data name="EnableDiagUsage" xml:space="preserve">
     <value>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</value>
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</value>
   </data>
   <data name="EnableLoggersArgumentHelp" xml:space="preserve">
     <value>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
@@ -699,7 +703,16 @@
   <data name="BlameIncorrectOption" xml:space="preserve">
     <value>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</value>
   </data>
-  <data name="BlameInvalidFormat" xml:space="preserve">
-    <value>The blame option specified '{0}' is not a valid format.  Please correct it and retry.</value>
+  <data name="InvalidDiagFilePath" xml:space="preserve">
+    <value>Diag file path '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidBlameArgument" xml:space="preserve">
+    <value>Blame argument '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidDiagArgument" xml:space="preserve">
+    <value>Diag argument '{0}' is not valid.</value>
+  </data>
+  <data name="InvalidLoggerArgument" xml:space="preserve">
+    <value>Logger argument '{0}' is not valid.</value>
   </data>
 </root>

@@ -70,6 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
+            return this.InitializeTrace(customLogFile, PlatformTraceLevel.Verbose);
+        }
+
+        /// <inheritdoc/>
+        public bool InitializeTrace(string customLogFile, PlatformTraceLevel traceLevel)
+        {
             string logFileName = string.Empty;
             try
             {
@@ -81,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             LogFile = Path.Combine(Path.GetTempPath(), logFileName + ".TpTrace.log");
-            TraceLevel = PlatformTraceLevel.Verbose;
+            TraceLevel = traceLevel;
 
             return this.TraceInitialized();
         }
@@ -154,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 catch (Exception ex)
                 {
-                    this.UnInitializeVerboseTrace();
+                    this.UnInitializeTrace();
                     ErrorOnInitialization = ex.Message;
                     return false;
                 }
@@ -163,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        private void UnInitializeVerboseTrace()
+        private void UnInitializeTrace()
         {
             isInitialized = false;
             LogFile = null;
