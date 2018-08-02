@@ -103,5 +103,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// </summary>
         /// <param name="process">Reference to process</param>
         void WaitForProcessExit(object process);
+
+        /// <summary>
+        /// Gets the process handle for given process Id.
+        /// </summary>
+        /// <param name="processId">process id</param>
+        /// <returns>Process Handle</returns>
+        IntPtr GetProcessHandle(int processId);
     }
 }
