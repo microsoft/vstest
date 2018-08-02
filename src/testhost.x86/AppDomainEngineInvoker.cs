@@ -34,9 +34,23 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
 
             this.appDomain = CreateNewAppDomain(testSourcePath);
+
+            // Setting appbase later, as AppDomain needs to load testhost.exe into the new Domain, to have access to AppDomainInitializer method.
+            // If we set appbase to testsource folder, then if fails to find testhost.exe resulting in FileNotFoundException for testhost.exe
+            this.UpdateAppBaseToTestSourceLocation(testSourcePath);
             this.actualInvoker = CreateInvokerInAppDomain(appDomain);
 
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
+        }
+
+        private void UpdateAppBaseToTestSourceLocation(string testSourcePath)
+        {
+            // Set AppBase to TestAssembly location
+            var testSourceFolder = Path.GetDirectoryName(testSourcePath);
+            if (this.appDomain != null)
+            {
+                this.appDomain.SetData("APPBASE", testSourceFolder);
+            }
         }
 
 
@@ -78,8 +92,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             var appDomainSetup = new AppDomainSetup();
             var testSourceFolder = Path.GetDirectoryName(testSourcePath);
 
-            // Set AppBase to TestAssembly location
-            appDomainSetup.ApplicationBase = testSourceFolder;
             appDomainSetup.LoaderOptimization = LoaderOptimization.MultiDomainHost;
             appDomainSetup.AppDomainInitializer = SetAppDomainCulture;
 
