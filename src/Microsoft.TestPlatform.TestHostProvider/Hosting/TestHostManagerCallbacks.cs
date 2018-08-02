@@ -9,39 +9,17 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
     internal class TestHostManagerCallbacks
     {
         public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string data)
         {
-            if (!string.IsNullOrEmpty(data))
-            {
-                // Log all standard error message because on too much data we ignore starting part.
-                // This is helpful in abnormal failure of testhost.
-                EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
+            // Log all standard error message because on too much data we ignore starting part.
+            // This is helpful in abnormal failure of testhost.
+            EqtTrace.Warning("TestHostManagerCallbacks.ErrorReceivedCallback Test host standard error line: {0}", data);
 
-                // Add newline for readbility.
-                data += Environment.NewLine;
-
-                // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                if (data.Length > testHostProcessStdError.MaxCapacity)
-                {
-                    testHostProcessStdError.Clear();
-                    data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
-                }
-
-                // remove only what is required, from beginning of error stream
-                else
-                {
-                    int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
-                    if (required > 0)
-                    {
-                        testHostProcessStdError.Remove(0, required);
-                    }
-                }
-
-                testHostProcessStdError.Append(data);
-            }
+            testHostProcessStdError.AppendSafeWithNewLine(data);
         }
 
         public static void ExitCallBack(
