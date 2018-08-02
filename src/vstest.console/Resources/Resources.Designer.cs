@@ -816,7 +816,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10..
+        ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10..
         /// </summary>
         public static string InvalidFrameworkVersion
         {
