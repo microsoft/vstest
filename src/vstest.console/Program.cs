@@ -49,9 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 try
                 {
-                    CultureInfo info = new CultureInfo(userCultureSpecified);
-                    CultureInfo.DefaultThreadCurrentCulture = info;
-                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                    CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(userCultureSpecified);
                 }
                 catch(Exception)
                 {

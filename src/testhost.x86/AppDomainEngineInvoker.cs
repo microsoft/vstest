@@ -177,9 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 try
                 {
-                    CultureInfo info = new CultureInfo(userCultureSpecified);
-                    CultureInfo.DefaultThreadCurrentCulture = info;
-                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                    CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(userCultureSpecified);
                 }
                 // If an exception occurs, we'll just fall back to the system default.
                 catch (Exception)

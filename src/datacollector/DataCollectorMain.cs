@@ -149,9 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 try
                 {
-                    CultureInfo info = new CultureInfo(userCultureSpecified);
-                    CultureInfo.DefaultThreadCurrentCulture = info;
-                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                    CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(userCultureSpecified);
                 }
                 catch (Exception)
                 {

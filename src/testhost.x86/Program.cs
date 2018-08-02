@@ -112,9 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 try
                 {
-                    CultureInfo info = new CultureInfo(userCultureSpecified);
-                    CultureInfo.DefaultThreadCurrentCulture = info;
-                    CultureInfo.DefaultThreadCurrentUICulture = info;
+                    CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(userCultureSpecified);
                 }
                 catch (Exception)
                 {
