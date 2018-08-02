@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                 using (var fs = File.Open(trxFileName, FileMode.Create))
                 {
-                    using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize }))
+                    using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { NewLineHandling = NewLineHandling.Entitize, Indent = true }))
                     {
                         rootElement.OwnerDocument.Save(writer);
                         writer.Flush();
