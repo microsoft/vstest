@@ -29,11 +29,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private string mergedTempConfigFile = null;
 
-        public AppDomainEngineInvoker(string testSourcePath)
+        public AppDomainEngineInvoker(string testSourcePath, AppDomainInitializer initializer = null, string appBasePath = null)
         {
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
 
-            this.appDomain = CreateNewAppDomain(testSourcePath);
+            this.appDomain = CreateNewAppDomain(testSourcePath, initializer, appBasePath);
 
             // Setting appbase later, as AppDomain needs to load testhost.exe into the new Domain, to have access to AppDomainInitializer method.
             // If we set appbase to testsource folder, then if fails to find testhost.exe resulting in FileNotFoundException for testhost.exe
@@ -87,13 +87,21 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private AppDomain CreateNewAppDomain(string testSourcePath)
+        private AppDomain CreateNewAppDomain(string testSourcePath, AppDomainInitializer initializer, string appBasePath)
         {
             var appDomainSetup = new AppDomainSetup();
             var testSourceFolder = Path.GetDirectoryName(testSourcePath);
 
+            if (!string.IsNullOrEmpty(appBasePath))
+            {
+                appDomainSetup.ApplicationBase = appBasePath;
+            }
+            
             appDomainSetup.LoaderOptimization = LoaderOptimization.MultiDomainHost;
-            appDomainSetup.AppDomainInitializer = SetAppDomainCulture;
+
+            //Setup AppDomainInitialzier to set user defined Culture
+            appDomainSetup.AppDomainInitializer = initializer ?? SetAppDomainCulture;
+            appDomainSetup.AppDomainInitializerArguments = new string[] { };
 
             // Set User Config file as app domain config
             SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder);
@@ -194,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // If an exception occurs, we'll just fall back to the system default.
                 catch (Exception)
                 {
-                    EqtTrace.Verbose("Invalid Culture Info '{0}:'", args[0]);
+                    EqtTrace.Verbose("Invalid Culture Info '{0}:'", userCultureSpecified);
                 }
             }
         }

@@ -47,7 +47,7 @@ namespace testhost.UnitTests
         public void AppDomainEngineInvokerShouldCreateNewAppDomain()
         {
             var tempFile = Path.GetTempFileName();
-            var appDomainInvoker = new TestableEngineInvoker(tempFile);
+            var appDomainInvoker = new TestableEngineInvoker(tempFile, AppDomain.CurrentDomain.BaseDirectory);
 
             Assert.IsNotNull(appDomainInvoker.NewAppDomain, "New AppDomain must be created.");
             Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
@@ -59,7 +59,7 @@ namespace testhost.UnitTests
         public void AppDomainEngineInvokerShouldInvokeEngineInNewDomainAndUseTestHostConfigFile()
         {
             var tempFile = Path.GetTempFileName();
-            var appDomainInvoker = new TestableEngineInvoker(tempFile);
+            var appDomainInvoker = new TestableEngineInvoker(tempFile, AppDomain.CurrentDomain.BaseDirectory);
 
             var newAppDomain = appDomainInvoker.NewAppDomain;
 
@@ -200,7 +200,11 @@ namespace testhost.UnitTests
 
         private class TestableEngineInvoker : AppDomainEngineInvoker<MockEngineInvoker>
         {
-            public TestableEngineInvoker(string testSourcePath) : base(testSourcePath)
+            public TestableEngineInvoker(string testSourcePath, string appBasePath) : base(testSourcePath, SetAppDomainCultures, appBasePath)
+            {
+            }
+
+            private static void SetAppDomainCultures(string[] args)
             {
             }
 
