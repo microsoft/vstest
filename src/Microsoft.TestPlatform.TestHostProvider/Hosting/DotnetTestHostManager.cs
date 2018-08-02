@@ -114,11 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         internal bool MakeRunsettingsCompatible => this.hostPackageVersion.StartsWith("15.0.0-preview");
 
         /// <summary>
-        /// Gets or sets the error length for runtime error stream.
-        /// </summary>
-        protected int ErrorLength { get; set; } = 4096;
-
-        /// <summary>
         /// Gets callback on process exit
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
@@ -326,7 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+            this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
             if (this.customTestHostLauncher == null)
             {
                 EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
