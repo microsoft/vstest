@@ -283,6 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         public void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             // Create test run
+            // If abort occurs there is no call to TestResultHandler which results in testRun not created.
             if (this.testRun == null)
                 CreateTestRun();
 
