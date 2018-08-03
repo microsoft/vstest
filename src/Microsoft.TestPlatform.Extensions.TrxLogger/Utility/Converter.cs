@@ -461,15 +461,26 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                 // copy the source file to the target location
                 string targetFileName = FileHelper.GetNextIterationFileName(targetDirectory, Path.GetFileName(sourceFile), false);
-                CopyFile(sourceFile, targetFileName);
 
-                // Add the target file name to the collector files list.
-                // (Trx viewer automatically adds In\ to the collected file.
-                string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
-                Uri sourceFileUri = new Uri(fileName, UriKind.Relative);
-                TrxObjectModel.UriDataAttachment dataAttachment = new TrxObjectModel.UriDataAttachment(uriDataAttachment.Description, sourceFileUri);
+                try
+                {
+                    CopyFile(sourceFile, targetFileName);
 
-                uriDataAttachments.Add(dataAttachment);
+                    // Add the target file name to the collector files list.
+                    // (Trx viewer automatically adds In\ to the collected file.
+                    string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
+                    Uri sourceFileUri = new Uri(fileName, UriKind.Relative);
+                    TrxObjectModel.UriDataAttachment dataAttachment = new TrxObjectModel.UriDataAttachment(uriDataAttachment.Description, sourceFileUri);
+
+                    uriDataAttachments.Add(dataAttachment);
+                }
+                catch(Exception ex)
+                {
+                    if (ObjectModel.EqtTrace.IsErrorEnabled)
+                    {
+                        ObjectModel.EqtTrace.Error("Trxlogger: ToCollectorEntry: " + ex);
+                    }
+                }
             }
 
             return new CollectorDataEntry(
@@ -509,15 +520,25 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
                 string sourceFile = uriDataAttachment.Uri.LocalPath;
                 Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
-
                 // copy the source file to the target location
                 string targetFileName = FileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
-                CopyFile(sourceFile, targetFileName);
 
-                // Add the target file name to the result files list.
-                // (Trx viewer automatically adds In\<Guid> to the result file.
-                string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
-                resultFiles.Add(fileName);
+                try
+                {
+                    CopyFile(sourceFile, targetFileName);
+
+                    // Add the target file name to the result files list.
+                    // (Trx viewer automatically adds In\<Guid> to the result file.
+                    string fileName = Path.Combine(Environment.MachineName, Path.GetFileName(targetFileName));
+                    resultFiles.Add(fileName);
+                }
+                catch(Exception ex)
+                {
+                    if (ObjectModel.EqtTrace.IsErrorEnabled)
+                    {
+                        ObjectModel.EqtTrace.Error("Trxlogger: ToResultFiles: " + ex);
+                    }
+                }
             }
 
             return resultFiles;
