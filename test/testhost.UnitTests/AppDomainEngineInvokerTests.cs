@@ -6,6 +6,7 @@ namespace testhost.UnitTests
 #if NET451
     using Microsoft.VisualStudio.TestPlatform.TestHost;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
     using System;
     using System.IO;
     using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace testhost.UnitTests
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using System.Text;
+    using System.Globalization;
 
     [TestClass]
     public class AppDomainEngineInvokerTests
@@ -53,6 +55,52 @@ namespace testhost.UnitTests
             Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
             Assert.AreNotEqual(AppDomain.CurrentDomain.FriendlyName, appDomainInvoker.NewAppDomain.FriendlyName, 
                 "New AppDomain must be different from default one.");
+        }
+
+        [TestMethod]
+        public void AppDomainEngineInvokerShouldCreateNewAppDomainAndSetCultureAsPerUsersInput()
+        {
+            var cultureInfo = "fr-FR";
+            Environment.SetEnvironmentVariable(Constants.DotNetUserSpecifiedCulture, cultureInfo);
+            var tempFile = Path.GetTempFileName();
+            var appDomainInvoker = new TestableEngineInvoker(tempFile, AppDomain.CurrentDomain.BaseDirectory);
+            appDomainInvoker.Invoke(new Dictionary<string, string>());
+
+            Assert.IsNotNull(appDomainInvoker.NewAppDomain, "New AppDomain must be created.");
+            Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
+            
+            Assert.AreEqual((appDomainInvoker.ActualInvoker as MockEngineInvoker).CurrentCultureInfo, cultureInfo);
+        }
+
+        [TestMethod]
+        public void AppDomainEngineInvokerShouldCreateNewAppDomainAndSetAppBaseToSourceDirectory()
+        {
+            var cultureInfo = "fr-FR";
+            Environment.SetEnvironmentVariable(Constants.DotNetUserSpecifiedCulture, cultureInfo);
+            var tempFile = Path.GetTempFileName();
+            var appDomainInvoker = new TestableEngineInvoker(tempFile, AppDomain.CurrentDomain.BaseDirectory);
+
+            Assert.IsNotNull(appDomainInvoker.NewAppDomain, "New AppDomain must be created.");
+            Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
+            
+            Assert.AreEqual(appDomainInvoker.NewAppDomain.BaseDirectory, Path.GetDirectoryName(tempFile));
+        }
+
+        [TestMethod]
+        [DataRow("garbage-culture")]
+        [DataRow(" ")]
+        [DataRow(null)]
+        public void AppDomainEngineInvokerShouldCreateNewAppDomainAndSetCultureToEnglishIfUsersInputIncorrect(string cultureInfo)
+        {
+            Environment.SetEnvironmentVariable(Constants.DotNetUserSpecifiedCulture, cultureInfo);
+            var tempFile = Path.GetTempFileName();
+            var appDomainInvoker = new TestableEngineInvoker(tempFile, AppDomain.CurrentDomain.BaseDirectory);
+            appDomainInvoker.Invoke(new Dictionary<string, string>());
+
+            Assert.IsNotNull(appDomainInvoker.NewAppDomain, "New AppDomain must be created.");
+            Assert.IsNotNull(appDomainInvoker.ActualInvoker, "Invoker must be created.");
+
+            Assert.AreEqual((appDomainInvoker.ActualInvoker as MockEngineInvoker).CurrentCultureInfo, "en-US");
         }
 
         [TestMethod]
@@ -206,6 +254,18 @@ namespace testhost.UnitTests
 
             private static void SetAppDomainCultures(string[] args)
             {
+                var userCultureSpecified = Environment.GetEnvironmentVariable(Constants.DotNetUserSpecifiedCulture);
+                if (!string.IsNullOrWhiteSpace(userCultureSpecified))
+                {
+                    try
+                    {
+                        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(userCultureSpecified);
+                    }
+                    // If an exception occurs, we'll just fall back to the system default.
+                    catch (Exception)
+                    {
+                    }
+                }
             }
 
             public static XDocument MergeConfigXmls(string userConfigText, string testHostConfigText)
@@ -223,10 +283,11 @@ namespace testhost.UnitTests
         private class MockEngineInvoker : MarshalByRefObject, IEngineInvoker
         {
             public string DomainFriendlyName { get; private set; }
-
+            public string CurrentCultureInfo { get; set; }
             public void Invoke(IDictionary<string, string> argsDictionary)
             {
                 this.DomainFriendlyName = AppDomain.CurrentDomain.FriendlyName;
+                this.CurrentCultureInfo = CultureInfo.CurrentUICulture.Name;
             }
         }
     }
