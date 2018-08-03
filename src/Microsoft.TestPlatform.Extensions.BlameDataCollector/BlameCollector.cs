@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private DataCollectionEvents events;
         private DataCollectionLogger logger;
         private IProcessDumpUtility processDumpUtility;
-        private List<TestCase> testSequence;
+        private List<BlameTestObject> testSequence;
         private IBlameReaderWriter blameReaderWriter;
         private XmlElement configurationElement;
         private int testStartCount;
@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
             this.configurationElement = configurationElement;
-            this.testSequence = new List<TestCase>();
+            this.testSequence = new List<BlameTestObject>();
             this.logger = logger;
 
             // Subscribing to events
@@ -155,7 +155,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Info("Blame Collector : Test Case Start");
             }
 
-            this.testSequence.Add(e.TestElement);
+            this.testSequence.Add(new BlameTestObject(e.TestElement));
             this.testStartCount++;
         }
 
@@ -172,6 +172,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             this.testEndCount++;
+
+            foreach (var testObject in this.testSequence)
+            {
+                if (testObject.Id == e.TestElement.Id)
+                {
+                    testObject.IsCompleted = true;
+                }
+            }
         }
 
         /// <summary>

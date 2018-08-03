@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// The file Path.
         /// </param>
         /// <returns>File path</returns>
-        public string WriteTestSequence(List<TestCase> testSequence, string filePath)
+        public string WriteTestSequence(List<BlameTestObject> testSequence, string filePath)
         {
             ValidateArg.NotNull(testSequence, nameof(testSequence));
             ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
@@ -72,7 +72,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 var testElement = xmlDocument.CreateElement(Constants.BlameTestNode);
                 testElement.SetAttribute(Constants.TestNameAttribute, testCase.FullyQualifiedName);
+                testElement.SetAttribute(Constants.TestDisplayNameAttribute, testCase.DisplayName);
                 testElement.SetAttribute(Constants.TestSourceAttribute, testCase.Source);
+                testElement.SetAttribute(Constants.TestCompletedAttribute, testCase.IsCompleted.ToString());
 
                 blameTestRoot.AppendChild(testElement);
             }

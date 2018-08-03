@@ -23,8 +23,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private TestableXmlReaderWriter xmlReaderWriter;
         private Mock<IFileHelper> mockFileHelper;
         private Mock<Stream> mockStream;
-        private List<TestCase> testCaseList;
-        private TestCase testcase;
+        private List<BlameTestObject> testCaseList;
+        private BlameTestObject testcase;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlReaderWriterTests"/> class.
@@ -34,10 +34,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper = new Mock<IFileHelper>();
             this.xmlReaderWriter = new TestableXmlReaderWriter(this.mockFileHelper.Object);
             this.mockStream = new Mock<Stream>();
-            this.testCaseList = new List<TestCase>();
-            this.testcase = new TestCase
+            this.testCaseList = new List<BlameTestObject>();
+            this.testcase = new BlameTestObject
             {
-                Id = Guid.NewGuid(),
+                ExecutorUri = new Uri("test:/abc"),
                 FullyQualifiedName = "TestProject.UnitTest.TestMethod",
                 Source = "abc.dll"
             };
