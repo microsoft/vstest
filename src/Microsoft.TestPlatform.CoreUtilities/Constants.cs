@@ -28,5 +28,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
         /// error message on standard error.
         /// </summary>
         public const int StandardErrorMaxLength = 8192; // 8 KB
+
+        /// <summary>
+        /// Environment Variable Specified by user to setup Culture.
+        /// </summary>
+        public const string DotNetUserSpecifiedCulture = "DOTNET_CLI_UI_LANGUAGE";
     }
 }
