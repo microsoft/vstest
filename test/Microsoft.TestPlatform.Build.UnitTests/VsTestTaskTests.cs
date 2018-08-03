@@ -283,5 +283,14 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:")));
         }
+
+        [TestMethod]
+        public void CreateArgumentShouldAddNoLogoOptionIfSpecifiedByUser()
+        {
+            this.vsTestTask.VSTestNoLogo = "--nologo";
+            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--nologo")));
+        }
     }
 }
