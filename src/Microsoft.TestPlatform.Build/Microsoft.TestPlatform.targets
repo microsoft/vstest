@@ -47,6 +47,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestCollect="$(VSTestCollect)"
       VSTestBlame="$(VSTestBlame)"
       VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
+      VSTestNoLogo="$(VSTestNoLogo)"
     />
   </Target>
 
@@ -87,6 +88,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestCollect = $(VSTestCollect)" Importance="low" />
     <Message Text="VSTestBlame = $(VSTestBlame)" Importance="low" />
     <Message Text="VSTestTraceDataCollectorDirectoryPath = $(TraceDataCollectorDirectoryPath)" Importance="low" />
+    <Message Text="VSTestNoLogo = $(VSTestNoLogo)" Importance="low" />
   </Target>
 
 </Project>
