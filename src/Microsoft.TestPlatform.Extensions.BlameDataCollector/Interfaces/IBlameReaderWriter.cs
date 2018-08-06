@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -11,16 +12,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Writes tests to document
         /// </summary>
-        /// <param name="testSequence">List of tests in sequence</param>
+        /// <param name="testSequence">List of test guid in sequence</param>
+        /// <param name="testObjectDictionary">Dictionary of test objects</param>
         /// <param name="filePath">The path of file</param>
         /// <returns>File Path</returns>
-        string WriteTestSequence(List<BlameTestObject> testSequence, string filePath);
+        string WriteTestSequence(List<Guid> testSequence, Dictionary<Guid, BlameTestObject> testObjectDictionary, string filePath);
 
         /// <summary>
         /// Reads all tests from file
         /// </summary>
         /// <param name="filePath">The path of saved file</param>
         /// <returns>All tests</returns>
-        List<TestCase> ReadTestSequence(string filePath);
+        List<BlameTestObject> ReadTestSequence(string filePath);
     }
 }

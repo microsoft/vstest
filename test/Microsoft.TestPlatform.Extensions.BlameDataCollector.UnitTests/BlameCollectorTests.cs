@@ -91,14 +91,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
 
             // Setup and Raise TestCaseStart and Session End Event
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>()))
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
             this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify WriteTestSequence Call
-            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>()), Times.Once);
+            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()), Times.Once);
         }
 
         /// <summary>
@@ -118,13 +118,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
 
             // Setup and Raise TestCaseStart and Session End Event
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>())).Returns(this.filepath);
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>())).Returns(this.filepath);
             this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
             this.mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify WriteTestSequence Call
-            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), this.filepath), Times.Never);
+            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), this.filepath), Times.Never);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>()))
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
             // Raise
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>()))
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
             // Raise
@@ -198,7 +198,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Setup
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(this.filepath);
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>()))
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
 
             // Raise
@@ -224,7 +224,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Setup and raise events
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<BlameTestObject>>(), It.IsAny<string>()))
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
             this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Throws(new FileNotFoundException());
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));

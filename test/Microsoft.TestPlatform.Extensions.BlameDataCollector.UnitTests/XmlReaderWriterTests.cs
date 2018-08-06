@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-
+    using System.Linq;
     using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -23,8 +23,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private TestableXmlReaderWriter xmlReaderWriter;
         private Mock<IFileHelper> mockFileHelper;
         private Mock<Stream> mockStream;
-        private List<BlameTestObject> testCaseList;
-        private BlameTestObject testcase;
+        private List<Guid> testCaseList;
+        private Dictionary<Guid, BlameTestObject> testObjectDictionary;
+        private BlameTestObject blameTestObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlReaderWriterTests"/> class.
@@ -34,13 +35,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockFileHelper = new Mock<IFileHelper>();
             this.xmlReaderWriter = new TestableXmlReaderWriter(this.mockFileHelper.Object);
             this.mockStream = new Mock<Stream>();
-            this.testCaseList = new List<BlameTestObject>();
-            this.testcase = new BlameTestObject
+            this.testCaseList = new List<Guid>();
+            this.testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
+            var testcase = new TestCase
             {
                 ExecutorUri = new Uri("test:/abc"),
                 FullyQualifiedName = "TestProject.UnitTest.TestMethod",
                 Source = "abc.dll"
             };
+            this.blameTestObject = new BlameTestObject(testcase);
         }
 
         /// <summary>
@@ -49,11 +52,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void WriteTestSequenceShouldThrowExceptionIfFilePathIsNull()
         {
-            this.testCaseList.Add(this.testcase);
+            this.testCaseList.Add(this.blameTestObject.Id);
+            this.testObjectDictionary.Add(this.blameTestObject.Id, this.blameTestObject);
 
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.xmlReaderWriter.WriteTestSequence(this.testCaseList, null);
+                this.xmlReaderWriter.WriteTestSequence(this.testCaseList, this.testObjectDictionary, null);
             });
         }
 
@@ -63,11 +67,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void WriteTestSequenceShouldThrowExceptionIfFilePathIsEmpty()
         {
-            this.testCaseList.Add(this.testcase);
+            this.testCaseList.Add(this.blameTestObject.Id);
+            this.testObjectDictionary.Add(this.blameTestObject.Id, this.blameTestObject);
 
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.xmlReaderWriter.WriteTestSequence(this.testCaseList, string.Empty);
+                this.xmlReaderWriter.WriteTestSequence(this.testCaseList, this.testObjectDictionary, string.Empty);
             });
         }
 
@@ -129,13 +134,66 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockStream.Setup(x => x.CanWrite).Returns(true);
             this.mockStream.Setup(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
 
-            this.xmlReaderWriter.WriteTestSequence(this.testCaseList, "path");
+            this.xmlReaderWriter.WriteTestSequence(this.testCaseList, this.testObjectDictionary, "path");
 
             // Verify Call to fileHelper
             this.mockFileHelper.Verify(x => x.GetStream("path.xml", FileMode.Create, FileAccess.ReadWrite));
 
             // Verify Call to stream write
             this.mockStream.Verify(x => x.Write(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
+        }
+
+        /// <summary>
+        /// Verify Write and Read test sequence to check file contents if test completed is false.
+        /// </summary>
+        [TestMethod]
+        public void WriteTestSequenceShouldWriteCorrectFileContentsIfTestCompletedIsFalse()
+        {
+            var xmlReaderWriter = new XmlReaderWriter();
+            var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"));
+            var testSequence = new List<Guid>
+            {
+                testObject.Id
+            };
+            var testObjectDictionary = new Dictionary<Guid, BlameTestObject>
+            {
+                { testObject.Id, testObject }
+            };
+
+            var filePath = xmlReaderWriter.WriteTestSequence(testSequence, testObjectDictionary, Path.GetTempPath());
+            var testCaseList = xmlReaderWriter.ReadTestSequence(filePath);
+            File.Delete(filePath);
+
+            Assert.AreEqual(testCaseList.First().FullyQualifiedName, "Abc.UnitTest1");
+            Assert.AreEqual(testCaseList.First().Source, "Abc.dll");
+            Assert.AreEqual(testCaseList.First().IsCompleted, false);
+        }
+
+        /// <summary>
+        /// Verify Write and Read test sequence to check file contents if test completed is true.
+        /// </summary>
+        [TestMethod]
+        public void WriteTestSequenceShouldWriteCorrectFileContentsIfTestCompletedIsTrue()
+        {
+            var xmlReaderWriter = new XmlReaderWriter();
+            var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"));
+            var testSequence = new List<Guid>
+            {
+                testObject.Id
+            };
+            var testObjectDictionary = new Dictionary<Guid, BlameTestObject>
+            {
+                { testObject.Id, testObject }
+            };
+
+            testObjectDictionary[testObject.Id].IsCompleted = true;
+            var filePath = xmlReaderWriter.WriteTestSequence(testSequence, testObjectDictionary, Path.GetTempPath());
+            var testCaseList = xmlReaderWriter.ReadTestSequence(filePath);
+            File.Delete(filePath);
+
+            Assert.AreEqual(testCaseList.First().FullyQualifiedName, "Abc.UnitTest1");
+            Assert.AreEqual(testCaseList.First().Source, "Abc.dll");
+            Assert.AreEqual(testCaseList.First().IsCompleted, true);
         }
 
         /// <summary>

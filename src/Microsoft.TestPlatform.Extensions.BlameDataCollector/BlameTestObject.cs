@@ -78,11 +78,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         {
             get
             {
-                if (this.id == Guid.Empty)
-                {
-                    this.id = this.GetTestId();
-                }
-
                 return this.id;
             }
 
@@ -162,32 +157,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 this.displayName = value;
             }
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        /// <summary>
-        /// Creates a Id of TestCase
-        /// </summary>
-        /// <returns>Guid test id</returns>
-        private Guid GetTestId()
-        {
-            // To generate id hash "ExecutorUri + source + Name";
-            string source = this.Source;
-            try
-            {
-                // If source name is malformed, GetFileName API will throw exception, so use same input malformed string to generate ID
-                source = Path.GetFileName(source);
-            }
-            catch
-            {
-                // do nothing
-            }
-
-            string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;
-            return EqtHash.GuidFromString(testcaseFullName);
         }
 
         #endregion

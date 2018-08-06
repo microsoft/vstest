@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
@@ -46,18 +47,23 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         #endregion
 
         /// <summary>
-        /// Adds tests to document and saves document to file
+        /// Writes test Sequence to file.
+        /// Protected for testing purposes
         /// </summary>
         /// <param name="testSequence">
-        /// The test Sequence.
+        /// Sequence of Guids
+        /// </param>
+        /// <param name="testObjectDictionary">
+        /// Dictionary of test objects
         /// </param>
         /// <param name="filePath">
         /// The file Path.
         /// </param>
         /// <returns>File path</returns>
-        public string WriteTestSequence(List<BlameTestObject> testSequence, string filePath)
+        public string WriteTestSequence(List<Guid> testSequence, Dictionary<Guid, BlameTestObject> testObjectDictionary, string filePath)
         {
             ValidateArg.NotNull(testSequence, nameof(testSequence));
+            ValidateArg.NotNull(testObjectDictionary, nameof(testObjectDictionary));
             ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
 
             filePath = filePath + ".xml";
@@ -68,15 +74,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             var blameTestRoot = xmlDocument.CreateElement(Constants.BlameRootNode);
             xmlDocument.AppendChild(xmlDeclaration);
 
-            foreach (var testCase in testSequence)
+            foreach (var testGuid in testSequence)
             {
-                var testElement = xmlDocument.CreateElement(Constants.BlameTestNode);
-                testElement.SetAttribute(Constants.TestNameAttribute, testCase.FullyQualifiedName);
-                testElement.SetAttribute(Constants.TestDisplayNameAttribute, testCase.DisplayName);
-                testElement.SetAttribute(Constants.TestSourceAttribute, testCase.Source);
-                testElement.SetAttribute(Constants.TestCompletedAttribute, testCase.IsCompleted.ToString());
+                if (testObjectDictionary.ContainsKey(testGuid))
+                {
+                    var testObject = testObjectDictionary[testGuid];
 
-                blameTestRoot.AppendChild(testElement);
+                    var testElement = xmlDocument.CreateElement(Constants.BlameTestNode);
+                    testElement.SetAttribute(Constants.TestNameAttribute, testObject.FullyQualifiedName);
+                    testElement.SetAttribute(Constants.TestDisplayNameAttribute, testObject.DisplayName);
+                    testElement.SetAttribute(Constants.TestSourceAttribute, testObject.Source);
+                    testElement.SetAttribute(Constants.TestCompletedAttribute, testObject.IsCompleted.ToString());
+
+                    blameTestRoot.AppendChild(testElement);
+                }
             }
 
             xmlDocument.AppendChild(blameTestRoot);
@@ -93,7 +104,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         /// <param name="filePath">The path of test sequence file</param>
         /// <returns>Test Case List</returns>
-        public List<TestCase> ReadTestSequence(string filePath)
+        public List<BlameTestObject> ReadTestSequence(string filePath)
         {
             ValidateArg.NotNull(filePath, nameof(filePath));
 
@@ -102,7 +113,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 throw new FileNotFoundException();
             }
 
-            var testCaseList = new List<TestCase>();
+            var testCaseList = new List<BlameTestObject>();
             try
             {
                 // Reading test sequence
@@ -115,11 +126,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 var root = xmlDocument.LastChild;
                 foreach (XmlNode node in root)
                 {
-                    var testCase = new TestCase
+                    var testCase = new BlameTestObject
                                        {
                                            FullyQualifiedName =
                                                node.Attributes[Constants.TestNameAttribute].Value,
-                                           Source = node.Attributes[Constants.TestSourceAttribute].Value
+                                           Source = node.Attributes[Constants.TestSourceAttribute].Value,
+                                           DisplayName = node.Attributes[Constants.TestDisplayNameAttribute].Value,
+                                           IsCompleted = node.Attributes[Constants.TestCompletedAttribute].Value == "True" ? true : false
                                        };
                     testCaseList.Add(testCase);
                 }
