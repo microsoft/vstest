@@ -151,6 +151,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             var xmlReaderWriter = new XmlReaderWriter();
             var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"));
+            testObject.DisplayName = "UnitTest1";
             var testSequence = new List<Guid>
             {
                 testObject.Id
@@ -165,6 +166,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             File.Delete(filePath);
 
             Assert.AreEqual(testCaseList.First().FullyQualifiedName, "Abc.UnitTest1");
+            Assert.AreEqual(testCaseList.First().DisplayName, "UnitTest1");
             Assert.AreEqual(testCaseList.First().Source, "Abc.dll");
             Assert.AreEqual(testCaseList.First().IsCompleted, false);
         }
@@ -177,6 +179,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             var xmlReaderWriter = new XmlReaderWriter();
             var testObject = new BlameTestObject(new TestCase("Abc.UnitTest1", new Uri("test:/abc"), "Abc.dll"));
+            testObject.DisplayName = "UnitTest1";
             var testSequence = new List<Guid>
             {
                 testObject.Id
@@ -192,6 +195,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             File.Delete(filePath);
 
             Assert.AreEqual(testCaseList.First().FullyQualifiedName, "Abc.UnitTest1");
+            Assert.AreEqual(testCaseList.First().DisplayName, "UnitTest1");
             Assert.AreEqual(testCaseList.First().Source, "Abc.dll");
             Assert.AreEqual(testCaseList.First().IsCompleted, true);
         }

@@ -112,6 +112,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
         }
 
+        /// <summary>
+        /// Returns the testObjectDictionary
+        /// </summary>
+        /// <returns> testObjectDictionary </returns>
+        internal Dictionary<Guid, BlameTestObject> GetTestObjectDictionary()
+        {
+            return this.testObjectDictionary;
+        }
+
+        /// <summary>
+        /// Returns the testSequence for testing
+        /// </summary>
+        /// <returns> testSequence </returns>
+        internal List<Guid> GetTestSequence()
+        {
+            return this.testSequence;
+        }
+
         private void ValidateAndAddProcessDumpParameters(XmlElement collectDumpNode)
         {
             foreach (XmlAttribute attribute in collectDumpNode.Attributes)
