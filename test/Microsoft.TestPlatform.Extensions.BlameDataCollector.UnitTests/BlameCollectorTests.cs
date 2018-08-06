@@ -144,6 +144,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             TestCase testcase1 = new TestCase("TestProject.UnitTest.TestMethod1", new Uri("test:/abc"), "abc.dll");
             TestCase testcase2 = new TestCase("TestProject.UnitTest.TestMethod2", new Uri("test:/abc"), "abc.dll");
+            testcase1.DisplayName = "TestMethod1";
+            testcase2.DisplayName = "TestMethod2";
             var blameTestObject1 = new BlameTestObject(testcase1);
             var blameTestObject2 = new BlameTestObject(testcase2);
 
@@ -164,7 +166,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                     y[blameTestObject1.Id].IsCompleted == true && y[blameTestObject2.Id].IsCompleted == false &&
                     y[blameTestObject1.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod1" && y[blameTestObject2.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod2" &&
                     y[blameTestObject1.Id].Source == "abc.dll" && y[blameTestObject2.Id].Source == "abc.dll" &&
-                    y[blameTestObject1.Id].DisplayName == "TestProject.UnitTest.TestMethod1" && y[blameTestObject2.Id].DisplayName == "TestProject.UnitTest.TestMethod2"),
+                    y[blameTestObject1.Id].DisplayName == "TestMethod1" && y[blameTestObject2.Id].DisplayName == "TestMethod2"),
                 It.IsAny<string>()),
                 Times.Once);
         }
