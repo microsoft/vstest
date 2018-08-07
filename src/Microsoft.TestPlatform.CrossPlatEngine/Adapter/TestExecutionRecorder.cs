@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         private ITestCaseEventsHandler testCaseEventsHandler;
 
         /// <summary>
-        /// Contains TestCase Ids for test cases  that are in progress
+        /// Contains TestCase Ids for test cases that are in progress
         /// Start has been recorded but End has not yet been recorded.
         /// </summary>
         private HashSet<Guid> testCaseInProgressMap;
@@ -75,10 +75,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             {
                 lock (this.testCaseInProgressSyncObject)
                 {
-                    this.testCaseInProgressMap.Add(testCase.Id);
+                    // Do not send TestCaseStart for a test in progress
+                    if (!this.testCaseInProgressMap.Contains(testCase.Id))
+                    {
+                        this.testCaseInProgressMap.Add(testCase.Id);
+                        this.testCaseEventsHandler.SendTestCaseStart(testCase);
+                    }
                 }
-                
-                this.testCaseEventsHandler.SendTestCaseStart(testCase);
             }
         }
 
@@ -129,7 +132,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                     // TestCaseEnd must always be preceded by TestCaseStart for a given test case id
                     if (this.testCaseInProgressMap.Contains(testCase.Id))
                     {
-                        
                         // Send test case end event to handler.
                         this.testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
 

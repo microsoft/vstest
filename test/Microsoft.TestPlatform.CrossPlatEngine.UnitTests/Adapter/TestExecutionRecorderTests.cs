@@ -159,6 +159,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
+        public void RecordStartAndRecordEndShouldIgnoreRedundantTestCaseStartAndTestCaseEnd()
+        {
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(this.testCase), Times.Exactly(1));
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Exactly(1));
+        }
+
+        [TestMethod]
         public void RecordResultShouldPublishTestResultIfRecordStartAndRecordEndEventsAreNotPublished()
         {
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
