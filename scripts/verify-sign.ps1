@@ -51,7 +51,7 @@ function Verify-Assemblies
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
                     # For some dlls e.g. "Microsoft.DiaSymReader.dll", sign certificate is different signature. Skip such binaries.
-                    elseif ($signature.SignerCertificate.Thumbprint -eq "49D59D86505D82942A076388693F4FB7B21254EE") {
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "5EAD300DC7E4D637948ECB0ED829A072BD152E17") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
 					# For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.
