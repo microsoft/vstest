@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.XPath;
@@ -393,6 +392,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
                         ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
+                    }
+
+                    if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
+                    {
+                        EqtTrace.Info("TestRequestManager.UpdateRunSettingsIfRequired: Show warning message on /Framework:Framework35 option.");
+                        throw new TestPlatformException("/Frmaeowrk:Frameowrk35 not supported.");
                     }
 
                     if (EqtTrace.IsInfoEnabled)
