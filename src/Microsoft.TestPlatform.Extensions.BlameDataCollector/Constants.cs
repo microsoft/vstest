@@ -34,6 +34,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string TestSourceAttribute = "Source";
 
         /// <summary>
+        /// Test Completed Attribute.
+        /// </summary>
+        public const string TestCompletedAttribute = "Completed";
+
+        /// <summary>
+        /// Test Display Name Attribute.
+        /// </summary>
+        public const string TestDisplayNameAttribute = "DisplayName";
+
+        /// <summary>
         /// Friendly name of the data collector
         /// </summary>
         public const string BlameDataCollectorName = "Blame";
