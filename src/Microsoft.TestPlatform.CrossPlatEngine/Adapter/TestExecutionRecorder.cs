@@ -22,9 +22,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         private ITestRunCache testRunCache;
         private ITestCaseEventsHandler testCaseEventsHandler;
 
-        private HashSet<Guid> testCaseEndStatusMap;
-
-        private object testCaseEndStatusSyncObject = new object();
+        /// <summary>
+        /// Contains TestCase Ids for test cases  that are in progress
+        /// Start has been recorded but End has not yet been recorded.
+        /// </summary>
+        private HashSet<Guid> testCaseInProgressMap;
+        
+        private object testCaseInProgressSyncObject = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestExecutionRecorder"/> class.
@@ -43,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             // 3. Test Case Result.
             // If that is not that case.
             // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
-            this.testCaseEndStatusMap = new HashSet<Guid>();
+            this.testCaseInProgressMap = new HashSet<Guid>();
         }
 
         /// <summary>
@@ -69,11 +73,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 
             if (this.testCaseEventsHandler != null)
             {
-                lock (this.testCaseEndStatusSyncObject)
+                lock (this.testCaseInProgressSyncObject)
                 {
-                    this.testCaseEndStatusMap.Remove(testCase.Id);
+                    this.testCaseInProgressMap.Add(testCase.Id);
                 }
-
+                
                 this.testCaseEventsHandler.SendTestCaseStart(testCase);
             }
         }
@@ -94,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                 this.testCaseEventsHandler.SendTestResult(testResult);
             }
 
-            // Test Result should always be flushed, even if datacollecter attachement is missing
+            // Test Result should always be flushed, even if datacollecter attachment is missing
             this.testRunCache.OnNewTestResult(testResult);
         }
 
@@ -120,16 +124,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         {
             if (this.testCaseEventsHandler != null)
             {
-                lock (this.testCaseEndStatusSyncObject)
+                lock (this.testCaseInProgressSyncObject)
                 {
-                    // Do not support multiple - TestCaseEnds for a single TestCaseStart
                     // TestCaseEnd must always be preceded by TestCaseStart for a given test case id
-                    if (!this.testCaseEndStatusMap.Contains(testCase.Id))
+                    if (this.testCaseInProgressMap.Contains(testCase.Id))
                     {
-                        this.testCaseEndStatusMap.Add(testCase.Id);
-
+                        
                         // Send test case end event to handler.
                         this.testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
+
+                        // Remove it from map so that we send only one TestCaseEnd for every TestCaseStart.
+                        this.testCaseInProgressMap.Remove(testCase.Id);
                     }
                 }
             }
