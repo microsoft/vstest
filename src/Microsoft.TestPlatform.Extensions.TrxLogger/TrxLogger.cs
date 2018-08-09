@@ -282,72 +282,75 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         public void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            if (this.testRun != null)
+            // Create test run
+            // If abort occurs there is no call to TestResultHandler which results in testRun not created.
+            // This happens when some test aborts in the first batch of execution.
+            if (this.testRun == null)
+                CreateTestRun();
+
+            XmlPersistence helper = new XmlPersistence();
+            XmlTestStoreParameters parameters = XmlTestStoreParameters.GetParameters();
+            XmlElement rootElement = helper.CreateRootElement("TestRun");
+
+            // Save runId/username/creation time etc.
+            this.testRun.Finished = DateTime.UtcNow;
+            helper.SaveSingleFields(rootElement, this.testRun, parameters);
+
+            // Save test settings
+            helper.SaveObject(this.testRun.RunConfiguration, rootElement, "TestSettings", parameters);
+
+            // Save test results
+            helper.SaveIEnumerable(this.results.Values, rootElement, "Results", ".", null, parameters);
+
+            // Save test definitions
+            helper.SaveIEnumerable(this.testElements.Values, rootElement, "TestDefinitions", ".", null, parameters);
+
+            // Save test entries
+            helper.SaveIEnumerable(this.entries.Values, rootElement, "TestEntries", ".", "TestEntry", parameters);
+
+            // Save default categories
+            List<TestListCategory> categories = new List<TestListCategory>();
+            categories.Add(TestListCategory.UncategorizedResults);
+            categories.Add(TestListCategory.AllResults);
+            helper.SaveList<TestListCategory>(categories, rootElement, "TestLists", ".", "TestList", parameters);
+
+            // Save summary
+            if (this.testRunOutcome == TrxLoggerObjectModel.TestOutcome.Passed)
             {
-                XmlPersistence helper = new XmlPersistence();
-                XmlTestStoreParameters parameters = XmlTestStoreParameters.GetParameters();
-                XmlElement rootElement = helper.CreateRootElement("TestRun");
-
-                // Save runId/username/creation time etc.
-                this.testRun.Finished = DateTime.UtcNow;
-                helper.SaveSingleFields(rootElement, this.testRun, parameters);
-
-                // Save test settings
-                helper.SaveObject(this.testRun.RunConfiguration, rootElement, "TestSettings", parameters);
-
-                // Save test results
-                helper.SaveIEnumerable(this.results.Values, rootElement, "Results", ".", null, parameters);
-
-                // Save test definitions
-                helper.SaveIEnumerable(this.testElements.Values, rootElement, "TestDefinitions", ".", null, parameters);
-
-                // Save test entries
-                helper.SaveIEnumerable(this.entries.Values, rootElement, "TestEntries", ".", "TestEntry", parameters);
-
-                // Save default categories
-                List<TestListCategory> categories = new List<TestListCategory>();
-                categories.Add(TestListCategory.UncategorizedResults);
-                categories.Add(TestListCategory.AllResults);
-                helper.SaveList<TestListCategory>(categories, rootElement, "TestLists", ".", "TestList", parameters);
-
-                // Save summary
-                if (this.testRunOutcome == TrxLoggerObjectModel.TestOutcome.Passed)
-                {
-                    this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Completed;
-                }
-
-                List<string> errorMessages = new List<string>();
-                List<CollectorDataEntry> collectorEntries = Converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
-                IList<String> resultFiles = Converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
-
-                if (errorMessages.Count > 0)
-                {
-                    // Got some errors while attaching files, report them and set the outcome of testrun to be Error...
-                    this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Error;
-                    foreach (string msg in errorMessages)
-                    {
-                        RunInfo runMessage = new RunInfo(msg, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
-                        this.runLevelErrorsAndWarnings.Add(runMessage);
-                    }
-                }
-
-                TestRunSummary runSummary = new TestRunSummary(
-                    this.totalTests,
-                    this.passTests + this.failTests,
-                    this.passTests,
-                    this.failTests,
-                    this.testRunOutcome,
-                    this.runLevelErrorsAndWarnings,
-                    this.runLevelStdOut.ToString(),
-                    resultFiles,
-                    collectorEntries);
-
-                helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
-
-                //Save results to Trx file
-                this.DeriveTrxFilePath();
-                this.PopulateTrxFile(this.trxFilePath, rootElement);
+                this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Completed;
             }
+
+            List<string> errorMessages = new List<string>();
+            List<CollectorDataEntry> collectorEntries = Converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
+            IList<String> resultFiles = Converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
+
+            if (errorMessages.Count > 0)
+            {
+                // Got some errors while attaching files, report them and set the outcome of testrun to be Error...
+                this.testRunOutcome = TrxLoggerObjectModel.TestOutcome.Error;
+                foreach (string msg in errorMessages)
+                {
+                    RunInfo runMessage = new RunInfo(msg, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
+                    this.runLevelErrorsAndWarnings.Add(runMessage);
+                }
+            }
+
+            TestRunSummary runSummary = new TestRunSummary(
+                this.totalTests,
+                this.passTests + this.failTests,
+                this.passTests,
+                this.failTests,
+                this.testRunOutcome,
+                this.runLevelErrorsAndWarnings,
+                this.runLevelStdOut.ToString(),
+                resultFiles,
+                collectorEntries);
+
+            helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
+
+            //Save results to Trx file
+            this.DeriveTrxFilePath();
+            this.PopulateTrxFile(this.trxFilePath, rootElement);
         }
 
         /// <summary>

@@ -90,6 +90,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 EqtTrace.DoNotInitailize = true;
             }
 
+            SetCultureSpecifiedByUser();
+
             EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", string.Join(",", args));
 
             // Attach to exit of parent process
@@ -137,6 +139,22 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 }
 
                 Debugger.Break();
+            }
+        }
+
+        private static void SetCultureSpecifiedByUser()
+        {
+            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
+            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
+            {
+                try
+                {
+                    CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(userCultureSpecified);
+                }
+                catch (Exception)
+                {
+                    EqtTrace.Info(string.Format("Invalid Culture Info: {0}", userCultureSpecified));
+                }
             }
         }
 

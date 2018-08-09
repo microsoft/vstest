@@ -516,6 +516,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestRunCompleteHandlerShouldReportFailedOutcomeIfTestRunIsAborted()
+        {
+            string message = "The information to test";
+            TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
+
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            Assert.AreEqual(this.testableTrxLogger.TestResultOutcome, TrxLoggerObjectModel.TestOutcome.Failed);
+        }
+
+        [TestMethod]
         public void OutcomeOfRunWillBeFailIfAnyTestsFails()
         {
             ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
