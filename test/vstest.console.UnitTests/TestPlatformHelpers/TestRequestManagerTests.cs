@@ -871,7 +871,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
             var actualErrorMessage = Assert.ThrowsException<TestPlatformException>( () => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
 
-            Assert.AreEqual("Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 \"compatibly mode\".", actualErrorMessage);
+            Assert.AreEqual("Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".", actualErrorMessage);
         }
 
         [TestMethod]
