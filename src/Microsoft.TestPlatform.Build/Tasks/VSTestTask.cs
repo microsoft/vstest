@@ -115,6 +115,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestNoLogo
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -295,6 +301,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                         Console.WriteLine(Resources.UpdateTestSdkForCollectingCodeCoverage);
                     }
                 }
+            }
+
+            if(!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
+            {
+                allArgs.Add("--nologo");
             }
 
             return allArgs;

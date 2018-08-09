@@ -24,7 +24,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private DataCollectionEvents events;
         private DataCollectionLogger logger;
         private IProcessDumpUtility processDumpUtility;
-        private List<TestCase> testSequence;
+        private List<Guid> testSequence;
+        private Dictionary<Guid, BlameTestObject> testObjectDictionary;
         private IBlameReaderWriter blameReaderWriter;
         private XmlElement configurationElement;
         private int testStartCount;
@@ -88,7 +89,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
             this.configurationElement = configurationElement;
-            this.testSequence = new List<TestCase>();
+            this.testSequence = new List<Guid>();
+            this.testObjectDictionary = new Dictionary<Guid, BlameTestObject>();
             this.logger = logger;
 
             // Subscribing to events
@@ -155,7 +157,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Info("Blame Collector : Test Case Start");
             }
 
-            this.testSequence.Add(e.TestElement);
+            var blameTestObject = new BlameTestObject(e.TestElement);
+
+            // Add guid to list of test sequence to maintain the order.
+            this.testSequence.Add(blameTestObject.Id);
+
+            // Add the test object to the dictionary.
+            this.testObjectDictionary.Add(blameTestObject.Id, blameTestObject);
+
+            // Increment test start count.
             this.testStartCount++;
         }
 
@@ -172,6 +182,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             this.testEndCount++;
+
+            // Update the test object in the dictionary as the test has completed.
+            if (this.testObjectDictionary.ContainsKey(e.TestElement.Id))
+            {
+                this.testObjectDictionary[e.TestElement.Id].IsCompleted = true;
+            }
         }
 
         /// <summary>
@@ -192,7 +208,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             if (this.testStartCount > this.testEndCount)
             {
                 var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
-                filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
+                filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
                 var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
                 this.dataCollectionSink.SendFileAsync(fileTranferInformation);
             }

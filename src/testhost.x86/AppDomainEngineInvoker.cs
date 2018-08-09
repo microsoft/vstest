@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Reflection;
     using System.Xml.Linq;
     using System.Collections.Generic;
+    using System.Globalization;
 
     /// <summary>
     /// Implementation for the Invoker which invokes engine in a new AppDomain
@@ -28,15 +29,30 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private string mergedTempConfigFile = null;
 
-        public AppDomainEngineInvoker(string testSourcePath)
+        public AppDomainEngineInvoker(string testSourcePath, AppDomainInitializer initializer = null, string appBasePath = null)
         {
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
 
-            this.appDomain = CreateNewAppDomain(testSourcePath);
+            this.appDomain = CreateNewAppDomain(testSourcePath, initializer, appBasePath);
+
+            // Setting appbase later, as AppDomain needs to load testhost.exe into the new Domain, to have access to AppDomainInitializer method.
+            // If we set appbase to testsource folder, then if fails to find testhost.exe resulting in FileNotFoundException for testhost.exe
+            this.UpdateAppBaseToTestSourceLocation(testSourcePath);
             this.actualInvoker = CreateInvokerInAppDomain(appDomain);
 
             TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
         }
+
+        private void UpdateAppBaseToTestSourceLocation(string testSourcePath)
+        {
+            // Set AppBase to TestAssembly location
+            var testSourceFolder = Path.GetDirectoryName(testSourcePath);
+            if (this.appDomain != null)
+            {
+                this.appDomain.SetData("APPBASE", testSourceFolder);
+            }
+        }
+
 
         /// <summary>
         /// Invokes the Engine with the arguments
@@ -71,14 +87,21 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private AppDomain CreateNewAppDomain(string testSourcePath)
+        private AppDomain CreateNewAppDomain(string testSourcePath, AppDomainInitializer initializer, string appBasePath)
         {
             var appDomainSetup = new AppDomainSetup();
             var testSourceFolder = Path.GetDirectoryName(testSourcePath);
 
-            // Set AppBase to TestAssembly location
-            appDomainSetup.ApplicationBase = testSourceFolder;
+            if (!string.IsNullOrEmpty(appBasePath))
+            {
+                appDomainSetup.ApplicationBase = appBasePath;
+            }
+            
             appDomainSetup.LoaderOptimization = LoaderOptimization.MultiDomainHost;
+
+            //Setup AppDomainInitialzier to set user defined Culture
+            appDomainSetup.AppDomainInitializer = initializer ?? SetAppDomainCulture;
+            appDomainSetup.AppDomainInitializerArguments = new string[] { };
 
             // Set User Config file as app domain config
             SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder);
@@ -165,6 +188,23 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 
             return configFile;
+        }
+
+        private static void SetAppDomainCulture(string[] args)
+        {
+            var userCultureSpecified = Environment.GetEnvironmentVariable(CoreUtilities.Constants.DotNetUserSpecifiedCulture);
+            if (!string.IsNullOrWhiteSpace(userCultureSpecified))
+            {
+                try
+                {
+                    CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture(userCultureSpecified);
+                }
+                // If an exception occurs, we'll just fall back to the system default.
+                catch (Exception)
+                {
+                    EqtTrace.Verbose("Invalid Culture Info '{0}:'", userCultureSpecified);
+                }
+            }
         }
 
         protected static XDocument MergeApplicationConfigFiles(XDocument userConfigDoc, XDocument testHostConfigDoc)
