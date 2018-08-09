@@ -396,7 +396,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
                     {
-                        EqtTrace.Info("TestRequestManager.UpdateRunSettingsIfRequired: Show warning message on /Framework:Framework35 option.");
+                        EqtTrace.Error("TestRequestManager.UpdateRunSettingsIfRequired: throw exception on /Framework:Framework35 option.");
                         throw new TestPlatformException(Resources.Framework35NotSupported);
                     }
 

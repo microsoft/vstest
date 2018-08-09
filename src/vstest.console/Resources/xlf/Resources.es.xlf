@@ -740,12 +740,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Versión de .NET Framework&gt;
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;Versión de .NET Framework&gt;
       Versión de .NET Framework de destino que se usará para la ejecución de pruebas. 
       Los valores válidos son: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Otros valores admitidos son: Framework35, Framework40, Framework45, FrameworkCore10 y FrameworkUap10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; versión de Framework &gt;
       Trabajar en .net Framework versión que se utilizará para la ejecución de la prueba. 
@@ -764,7 +764,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
         <target state="new">Versión de .NET Framework no válida: {0}. Proporcione el nombre completo de TargetFramework. Otras versiones de .NET Framework admitidas son Framework35, Framework40, Framework45, FrameworkCore10 y FrameworkUap10.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
