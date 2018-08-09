@@ -95,10 +95,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 new TestPlatformOptions() { CollectMetrics = false },
                 this.discoveryEventHandler2);
 
-            Assert.AreEqual(1, this.discoveryEventHandler2.Messages.Count);
-            StringAssert.Contains(this.discoveryEventHandler2.Messages[0], "Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 \"compatibly mode\".");
-            Assert.AreEqual(1, this.discoveryEventHandler2.TestMessageLevels.Count);
-            Assert.AreEqual(TestMessageLevel.Error, this.discoveryEventHandler2.TestMessageLevels[0]);
+            Assert.AreEqual(1, this.discoveryEventHandler2.testMessages.Count);
+            StringAssert.Contains(this.discoveryEventHandler2.testMessages[0].message, "Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".");
+            Assert.AreEqual(TestMessageLevel.Error, this.discoveryEventHandler2.testMessages[0].testMessageLevel);
         }
 
         [TestMethod]

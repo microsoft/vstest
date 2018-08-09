@@ -50,6 +50,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         }
     }
 
+    public struct TestMessage
+    {
+        public TestMessageLevel testMessageLevel;
+        public string message;
+
+        public TestMessage(TestMessageLevel testMessageLevel, string message)
+        {
+            this.testMessageLevel = testMessageLevel;
+            this.message = message;
+        }
+    }
+
     /// <inheritdoc />
     public class DiscoveryEventHandler2 : ITestDiscoveryEventsHandler2
     {
@@ -58,9 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         /// </summary>
         public List<TestCase> DiscoveredTestCases { get; }
 
-        public List<TestMessageLevel> TestMessageLevels;
-
-        public List<string> Messages;
+        public List<TestMessage> testMessages;
 
         /// <summary>
         /// Gets the metrics.
@@ -70,8 +80,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public DiscoveryEventHandler2()
         {
             this.DiscoveredTestCases = new List<TestCase>();
-            this.TestMessageLevels = new List<TestMessageLevel>();
-            this.Messages = new List<string>();
+            this.testMessages = new List<TestMessage>();
         }
 
         public void HandleRawMessage(string rawMessage)
@@ -81,8 +90,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.TestMessageLevels.Add(level);
-            this.Messages.Add(message);
+            this.testMessages.Add(new TestMessage(level, message));
         }
 
         public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
