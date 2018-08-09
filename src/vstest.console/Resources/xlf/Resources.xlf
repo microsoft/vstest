@@ -814,6 +814,11 @@
         <target state="new">Logger argument '{0}' is invalid.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="Framework35NotSupported">
+        <source>Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</source>
+        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -276,6 +276,9 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>'{0}' not found.</value>
   </data>
+  <data name="Framework35NotSupported" xml:space="preserve">
+    <value>Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</value>
+  </data>
   <data name="FrameworkArgumentHelp" xml:space="preserve">
     <value>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 

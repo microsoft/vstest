@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 this.discoveryEventHandler2);
 
             Assert.AreEqual(1, this.discoveryEventHandler2.Messages.Count);
-            StringAssert.Contains(this.discoveryEventHandler2.Messages[0], "/Frmaeowrk:Frameowrk35 not supported.");
+            StringAssert.Contains(this.discoveryEventHandler2.Messages[0], "Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 \"compatibly mode\".");
             Assert.AreEqual(1, this.discoveryEventHandler2.TestMessageLevels.Count);
             Assert.AreEqual(TestMessageLevel.Error, this.discoveryEventHandler2.TestMessageLevels[0]);
         }

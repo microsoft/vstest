@@ -658,6 +658,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode"..
+        /// </summary>
+        public static string Framework35NotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("Framework35NotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.5.1&quot;.
         /// </summary>
         public static string FrameworkVersionRequired

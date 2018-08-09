@@ -237,7 +237,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void ExecuteTestsForFramework35ShouldPrintErrorMessage(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = @"/Frmaeowrk:Frameowrk35 not supported.";
+            var expectedWarningContains = "Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 \"compatibly mode\".";
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject.dll");
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
