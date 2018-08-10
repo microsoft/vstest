@@ -216,10 +216,19 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartIfDepsFileNotFoundAndTestHostFoundShouldNotThrowException()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+            var startInfo = this.GetDefaultStartInfo();
+            StringAssert.Contains(startInfo.Arguments, "testhost.dll");
+        }
+
+        [TestMethod]
         public void GetTestHostProcessStartIfRuntimeConfigAndDepsFilePresentAndTestHostNotFoundEvenInTestSourceDirShouldThrowException()
         {
             this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.dev.json")).Returns(false);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
