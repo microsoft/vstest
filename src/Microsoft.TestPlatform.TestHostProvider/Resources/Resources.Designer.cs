@@ -81,7 +81,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Unable to find test host at {0}. Please publish your test project and retry.
+        ///   Looks up a localized string similar to Unable to find {0}. Please publish your test project and retry..
         /// </summary>
         internal static string SuggestPublishTestProject {
             get {
