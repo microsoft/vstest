@@ -121,7 +121,10 @@
     <value>Multiple versions of same extension found. Selecting the highest version.
 {0}</value>
   </data>
-  <data name="NoTestHostFileExist" xml:space="preserve">
-    <value>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</value>
+  <data name="UnableToFindDepsFile" xml:space="preserve">
+    <value>Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</value>
+  </data>
+  <data name="SuggestPublishTestProject" xml:space="preserve">
+    <value>Unable to find {0}. Please publish your test project and retry.</value>
   </data>
 </root>

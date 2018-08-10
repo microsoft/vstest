@@ -206,6 +206,27 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartIfDepsFileAndTestHostNotFoundShouldThrowException()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
+
+            var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
+            Assert.AreEqual(ex.Message, "Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartIfRuntimeConfigAndDepsFilePresentAndTestHostNotFoundEvenInTestSourceDirShouldThrowException()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.dev.json")).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
+
+            var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
+            Assert.AreEqual(ex.Message, "Unable to find testhost.dll. Please publish your test project and retry.");
+        }
+
+        [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
         {
             var expectedProcessId = Process.GetCurrentProcess().Id;

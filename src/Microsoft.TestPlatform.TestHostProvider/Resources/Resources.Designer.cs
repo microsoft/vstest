@@ -72,11 +72,20 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to find tests for {0}. Make sure test project has a nuget reference of package &quot;Microsoft.NET.Test.Sdk&quot; and framework version settings are appropriate. Rerun with /diag option to diagnose further..
+        ///   Looks up a localized string similar to Unable to find {0}. Make sure test project has a nuget reference of package &quot;Microsoft.NET.Test.Sdk&quot;..
         /// </summary>
-        internal static string NoTestHostFileExist {
+        internal static string UnableToFindDepsFile {
             get {
-                return ResourceManager.GetString("NoTestHostFileExist", resourceCulture);
+                return ResourceManager.GetString("UnableToFindDepsFile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to find test host at {0}. Please publish your test project and retry.
+        /// </summary>
+        internal static string SuggestPublishTestProject {
+            get {
+                return ResourceManager.GetString("SuggestPublishTestProject", resourceCulture);
             }
         }
     }
