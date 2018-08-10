@@ -621,6 +621,85 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TrxFileNameShouldAutoIncrementIfOverWriteIsFalse()
+        {
+            var resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = resultsDir;
+            this.parameters[TrxLoggerConstants.OverwriteKey] = "false";
+
+            var trxFilePath = Path.Combine(resultsDir, this.parameters[TrxLoggerConstants.LogFileNameKey]);
+            Directory.CreateDirectory(resultsDir);
+            File.WriteAllText(trxFilePath, string.Empty);
+
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            Assert.AreEqual(this.testableTrxLogger.trxFile, Path.Combine(resultsDir, "logfilevalue[1].trx"));
+
+            Directory.Delete(resultsDir, true);
+        }
+
+        [TestMethod]
+        public void TrxFileNameShouldNotAutoIncrementIfOverWriteIsTrue()
+        {
+            var resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = resultsDir;
+            this.parameters[TrxLoggerConstants.OverwriteKey] = "true";
+
+            var trxFilePath = Path.Combine(resultsDir, this.parameters[TrxLoggerConstants.LogFileNameKey]);
+            Directory.CreateDirectory(resultsDir);
+            File.WriteAllText(trxFilePath, string.Empty);
+
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            Assert.AreEqual(this.testableTrxLogger.trxFile, Path.Combine(resultsDir, "logfilevalue.trx"));
+
+            Directory.Delete(resultsDir, true);
+        }
+
+        [TestMethod]
+        public void TrxFileNameShouldNotAutoIncrementIfOverWriteParamHasInvalidValue()
+        {
+            var resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = resultsDir;
+            this.parameters[TrxLoggerConstants.OverwriteKey] = "true-false";
+
+            var trxFilePath = Path.Combine(resultsDir, this.parameters[TrxLoggerConstants.LogFileNameKey]);
+            Directory.CreateDirectory(resultsDir);
+            File.WriteAllText(trxFilePath, string.Empty);
+
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            Assert.AreEqual(this.testableTrxLogger.trxFile, Path.Combine(resultsDir, "logfilevalue.trx"));
+
+            Directory.Delete(resultsDir, true);
+        }
+
+        [TestMethod]
+        public void TrxFileNameShouldNotAutoIncrementIfOverWriteParamNotPresent()
+        {
+            var resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = resultsDir;
+
+            var trxFilePath = Path.Combine(resultsDir, this.parameters[TrxLoggerConstants.LogFileNameKey]);
+            Directory.CreateDirectory(resultsDir);
+            File.WriteAllText(trxFilePath, string.Empty);
+
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            Assert.AreEqual(this.testableTrxLogger.trxFile, Path.Combine(resultsDir, "logfilevalue.trx"));
+
+            Directory.Delete(resultsDir, true);
+        }
+
+        [TestMethod]
         public void CustomTrxFileNameShouldConstructFromLogFileParameter()
         {
             this.MakeTestRunComplete();

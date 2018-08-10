@@ -447,7 +447,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
                 {
                     this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
-                    UpdateTrxFilePathIfOverwriteIsFalse(logFileNameValue);
+                    this.UpdateTrxFilePathIfOverwriteIsFalse(logFileNameValue);
                 }
                 else
                 {
