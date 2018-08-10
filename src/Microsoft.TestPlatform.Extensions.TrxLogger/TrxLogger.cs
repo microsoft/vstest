@@ -474,7 +474,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             {
                 this.trxFilePath = FileHelper.GetNextIterationFileName(this.testResultsDirPath, logFileNameValue, false);
             }
-            else if (isOverwriteValueValid)
+            else if (isOverwriteValueValid == false)
             {
                 EqtTrace.Warning("TrxLogger.UpdateTrxFilePathIfOverwriteIsFalse: invalid value: {0} found for: {1}" , overwriteValue, TrxLoggerConstants.OverwriteKey);
             }

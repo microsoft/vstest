@@ -215,7 +215,7 @@
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;;Overwrite=&lt;Defaults to true&gt;]
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
@@ -225,7 +225,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
+        <target state="new">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
       Určuje protokolovač pro výsledky testu. Pokud chcete například protokolovat výsledky 
       do souboru výsledků testů sady Visual Studio (TRX), použijte /logger:trx[;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
       Vytvoří soubor v adresáři TestResults s daným názvem LogFileName.
@@ -237,7 +237,7 @@
       Změna prefixu úrovně diagnostiky pro protokolovač konzoly, jak je uvedeno níže
       Příklad: /logger:console;prefix=&lt;Výchozí hodnota je false.&gt;
       Další informace o protokolovači konzoly: https://aka.ms/console-logger</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--protokoly | / logger: &lt; Uri/FriendlyName protokolovacího nástroje &gt;
       Zadejte protokolovací nástroj pro výsledky testů.  Výsledky do Visual Studio testovací výsledky souboru (TRX) použijte k přihlášení /logger:trx.
@@ -1564,7 +1564,7 @@
       <trans-unit id="EnableLoggerArgumentsInNetCore">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;;Overwrite=&lt;Defaults to true&gt;]
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
@@ -1574,7 +1574,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
+        <target state="new">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
       Určuje protokolovač pro výsledky testu. Pokud chcete například protokolovat výsledky 
       do souboru výsledků testů sady Visual Studio (TRX), použijte /logger:trx[;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
       Vytvoří soubor v adresáři TestResults s daným názvem LogFileName.
@@ -1586,7 +1586,7 @@
       Změna prefixu úrovně diagnostiky pro protokolovač konzoly, jak je uvedeno níže
       Příklad: /logger:console;prefix=&lt;Výchozí hodnota je false.&gt;
       Další informace o protokolovači konzoly: https://aka.ms/console-logger</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
