@@ -738,12 +738,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
       用于测试执行的目标 .Net Framework 版本。
       有效值为 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等。
       其他受支持的值为 Framework35、Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
       目标.Net Framework 版本以用于测试执行。
@@ -762,7 +762,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
         <target state="new">无效的 .Net Framework 版本: {0}。请提供 TargetFramework 的全名。其他支持的 .Net Framework 版本为 Framework35、Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -1616,6 +1616,11 @@
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
         <target state="new">Logger argument '{0}' is invalid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Framework35NotSupported">
+        <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
+        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
         <note></note>
       </trans-unit>
     </body>
