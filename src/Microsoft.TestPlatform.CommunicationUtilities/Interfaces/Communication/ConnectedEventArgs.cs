@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         public ICommunicationChannel Channel { get; private set; }
 
         /// <summary>
-        /// Gets true if it's connected.
+        /// Gets a value indicating whether channel is connected or not true if it's connected.
         /// </summary>
         public bool Connected { get; private set; }
 

@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 if (connectAsyncTask.IsFaulted)
                 {
-                    this.Disconnected.SafeInvoke(this, new DisconnectedEventArgs() { Error = connectAsyncTask.Exception }, "SocketClient: Server Failed to Connect");
+                    this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectAsyncTask.Exception), "SocketClient: Server Failed to Connect");
                     if (EqtTrace.IsVerboseEnabled)
                     {
                         EqtTrace.Verbose("Unable to connect to server, Exception occured : {0}", connectAsyncTask.Exception);

@@ -120,12 +120,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationEndpoint.Connected += (sender, args) =>
                 {
                     this.channel = args.Channel;
-                    this.connected.Set();
+
+                    if (args.Connected && this.channel != null)
+                    {
+                        this.connected.Set();
+                    }
                 };
             this.communicationEndpoint.Disconnected += (sender, args) =>
                 {
-                    // throw the exception accumulated from TCP/IP stack
-                    throw new TestPlatformException(args.Error.ToString());
+                    // If there's an disconnected event handler, call it
+                    this.onDisconnected?.Invoke(args);
                 };
 
             // Server start returns the listener port
