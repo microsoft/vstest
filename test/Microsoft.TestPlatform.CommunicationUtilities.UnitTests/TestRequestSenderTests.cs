@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System.Globalization;
     using System.Linq;
     using System.Net;
+    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -34,13 +35,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private readonly Mock<IDataSerializer> mockDataSerializer;
         private readonly Mock<ICommunicationChannel> mockChannel;
 
-        private readonly ConnectedEventArgs connectedEventArgs;
         private readonly List<string> pathToAdditionalExtensions = new List<string> { "Hello", "World" };
         private readonly Mock<ITestDiscoveryEventsHandler2> mockDiscoveryEventsHandler;
         private readonly Mock<ITestRunEventsHandler> mockExecutionEventsHandler;
         private readonly TestRunCriteriaWithSources testRunCriteriaWithSources;
         private TestHostConnectionInfo connectionInfo;
         private ITestRequestSender testRequestSender;
+        private ConnectedEventArgs connectedEventArgs;
 
         public TestRequestSenderTests()
         {
@@ -83,6 +84,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var connected = this.testRequestSender.WaitForRequestHandlerConnection(1, It.IsAny<CancellationToken>());
 
             Assert.IsTrue(connected);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionShouldNotConnectIfExceptionWasThrownByTcpLayer()
+        {
+            this.connectedEventArgs = new ConnectedEventArgs(new SocketException());
+            this.SetupFakeCommunicationChannel();
+
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(1, It.IsAny<CancellationToken>());
+
+            Assert.IsFalse(connected);
         }
 
         [TestMethod]
