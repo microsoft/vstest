@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using VisualStudio.TestPlatform.ObjectModel.Logging;
 
     [TestClass]
     public class DiscoverTests : AcceptanceTestBase
@@ -70,6 +71,33 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             // Assert.
             Assert.AreEqual(6, this.discoveryEventHandler2.DiscoveredTestCases.Count);
             Assert.AreEqual(0, this.discoveryEventHandler2.Metrics.Count);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void DiscoverTestsShouldFailForFramework35(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
+            this.Setup();
+
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                                    <RunSettings>
+                                        <RunConfiguration>
+                                            <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                            <DesignMode>true</DesignMode>
+                                        </RunConfiguration>
+                                    </RunSettings>";
+
+            this.vstestConsoleWrapper.DiscoverTests(
+                this.GetTestAssemblies(),
+                runSettingsXml,
+                new TestPlatformOptions() { CollectMetrics = false },
+                this.discoveryEventHandler2);
+
+            Assert.AreEqual(1, this.discoveryEventHandler2.testMessages.Count);
+            StringAssert.Contains(this.discoveryEventHandler2.testMessages[0].message, "Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".");
+            Assert.AreEqual(TestMessageLevel.Error, this.discoveryEventHandler2.testMessages[0].testMessageLevel);
         }
 
         [TestMethod]
