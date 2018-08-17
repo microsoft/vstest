@@ -132,5 +132,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
                 return ResourceManager.GetString("VersionCheckTimedout", resourceCulture);
             }
         }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test host process exited. Standard error: {0}.
+        /// </summary>
+        public static string TestHostProcessExited
+        {
+            get
+            {
+                return ResourceManager.GetString("TestHostProcessExited", resourceCulture);
+            }
+        }
     }
 }

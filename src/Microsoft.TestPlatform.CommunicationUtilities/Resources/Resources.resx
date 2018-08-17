@@ -141,4 +141,7 @@
   <data name="ConnectionTimeoutErrorMessage" xml:space="preserve">
     <value>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</value>
   </data>
+  <data name="TestHostProcessExited" xml:space="preserve">
+    <value>Test host process exited. Standard error: {0}</value>
+  </data>
 </root>

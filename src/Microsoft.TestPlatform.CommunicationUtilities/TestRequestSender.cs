@@ -362,6 +362,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                               stdError);
             }
 
+            if (stdError != string.Empty)
+            {
+                this.LogErrorMessage(string.Format(CommonResources.TestHostProcessExited, stdError));
+            }
+
             this.clientExitErrorMessage = stdError;
             this.clientExited.Set();
 
