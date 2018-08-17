@@ -198,6 +198,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockExecutionEventsHandler.Verify(eh => eh.HandleRawMessage(It.IsAny<string>()), Times.Never);
         }
 
+        [TestMethod]
+        public void OnClientProcessExitShouldSendErrorMessageIfStdErrorOnExit()
+        {
+            this.SetupFakeCommunicationChannel();
+            this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
+
+            this.testRequestSender.OnClientProcessExit("Dummy Stderr");
+
+            this.mockExecutionEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.Contains("Dummy Stderr"))), Times.Once);
+        }
+
         #region Version Check Tests
 
         [TestMethod]
