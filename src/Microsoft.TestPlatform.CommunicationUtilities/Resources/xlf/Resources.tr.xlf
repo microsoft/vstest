@@ -76,6 +76,11 @@
         <target state="translated">{0} işlemi, {2} saniye sonra {1} işlemine bağlanamadı. Bu durum makinenin yavaşlığından kaynaklanıyor olabilir, zaman aşımı süresini artırmak için lütfen ortam değişkenini {3} olarak ayarlayın.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostProcessExited">
+        <source>Test host process exited with error : {0}</source>
+        <target state="new">Test host process exited with error : {}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
