@@ -76,11 +76,6 @@
         <target state="translated">El proceso {0} no pudo conectar con el proceso {1} después de {2} segundos. Esto puede deberse a la lentitud de la máquina, configure la variable de entorno {3} para aumentar el tiempo de espera.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessExited">
-        <source>Test host process exited with error : {0}</source>
-        <target state="new">Test host process exited with error : {}</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -38,11 +38,6 @@
         <target state="new">{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="TestHostProcessExited">
-        <source>Test host process exited with error : {0}</source>
-        <target state="new">Test host process exited with error : {}</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

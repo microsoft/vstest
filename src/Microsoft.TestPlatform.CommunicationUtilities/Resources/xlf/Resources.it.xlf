@@ -76,11 +76,6 @@
         <target state="translated">Il processo {0} non è riuscito a connettersi al processo {1} dopo {2} secondi. Questo problema può verificarsi a causa della lentezza del computer. Impostare la variabile di ambiente {3} in modo da incrementare il timeout.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessExited">
-        <source>Test host process exited with error : {0}</source>
-        <target state="new">Test host process exited with error : {}</target>
-        <note></note>
-      </trans-unit>
     </body>
   </file>
 </xliff>
