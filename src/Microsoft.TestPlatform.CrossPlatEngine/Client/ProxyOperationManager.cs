@@ -192,8 +192,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.RequestSender.EndSession();
 
                     // We want to give test host a chance to safely close.
-                    // The upper bound for wait should be 100ms.
-                    this.testHostExited.Wait(100);
+                    // The default bound for wait should be 100ms.
+                    var closeTimeout = EnvironmentHelper.GetCloseTimeout();
+                    this.testHostExited.Wait(closeTimeout == 0 ? 100 : closeTimeout * 1000);
                 }
             }
             catch (Exception ex)
