@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -23,23 +22,18 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using System.Runtime.Versioning;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     using Moq;
 
     using vstest.console.UnitTests.TestDoubles;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
     [TestClass]
     public class TestRequestManagerTests
@@ -853,6 +847,34 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        public void RunTestsShouldThrowForFramework35()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
+            var actualErrorMessage = Assert.ThrowsException<TestPlatformException>( () => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
+
+            Assert.AreEqual("Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".", actualErrorMessage);
+        }
+
+        [TestMethod]
         public void RunTestsShouldPassSameProtocolConfigInRequestData()
         {
             var payload = new TestRunRequestPayload()
@@ -936,12 +958,21 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             {
                 Sources = new List<string>() { "a" },
                 RunSettings = @"<RunSettings>
-                                       <LegacySettings>
-	                                        <Deployment>
-                                                <DeploymentItem filename="".\test.txt"" />
-                                            </Deployment>
-                                            <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
-                                        </LegacySettings>
+                                    <LegacySettings>
+	                                    <Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
+                                            <DeploymentItem filename="".\test.txt"" />
+                                        </Deployment>
+                                        <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                        <Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
+                                            <Timeouts testTimeout=""120"" />
+                                            <TestTypeSpecific>
+                                                <UnitTestRunConfig>
+                                                    <AssemblyResolution />
+                                                </UnitTestRunConfig>
+                                            </TestTypeSpecific>
+                                            <Hosts />
+                                        </Execution>
+                                    </LegacySettings>
                                </RunSettings>"
             };
             var mockProtocolConfig = new ProtocolConfig { Version = 4 };
@@ -965,8 +996,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
             // Verify
-            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.LegacySettingElements, out var legacySettingsString));
-            StringAssert.Equals("Deployment, Scripts", legacySettingsString);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.Elements", out var legacySettingsNodes));
+            StringAssert.Equals("Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts", legacySettingsNodes);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.DeploymentAttributes", out var deploymentAttributes));
+            StringAssert.Equals("enabled, deploySatelliteAssemblies", deploymentAttributes);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.ExecutionAttributes", out var executionAttributes));
+            StringAssert.Equals("hostProcessPlatform, parallelTestCount", executionAttributes);
 
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
             Assert.IsFalse((bool)testSettingsUsed);

@@ -58,6 +58,55 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(assemblyVersion));
         }
 
+        [TestMethod]
+        public void ExecutorShouldNotPrintsSplashScreenIfNoLogoPassed()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("--nologo");
+
+            Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
+
+            // Verify that messages exist
+            Assert.IsTrue(mockOutput.Messages.Count == 1, "Executor should not print no valid arguments provided");
+
+            // Just check first 20 characters - don't need to check whole thing as assembly version is variable
+            Assert.IsFalse(
+                mockOutput.Messages.First()
+                    .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
+                "First Printed message must be Microsoft Copyright");
+        }
+
+        [TestMethod]
+        public void ExecutorShouldSanitizeNoLogoInput()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("--nologo");
+
+            Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
+
+            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(CommandLineResources.NoArgumentsProvided)));
+        }
+
+        [TestMethod]
+        public void ExecutorShouldSanitizeNoLogoInputAndShouldProcessOtherArgs()
+        {
+            // Create temp file for testsource dll to pass FileUtil.Exits()
+            var testSourceDllPath = Path.GetTempFileName();
+            string[] args = { testSourceDllPath, "/tests:Test1", "/testCasefilter:Test", "--nologo" };
+            var mockOutput = new MockOutput();
+
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
+
+            var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(CommandLineResources.InvalidTestCaseFilterValueForSpecificTests));
+            Assert.AreEqual(1, errorMessageCount, "Invalid Arguments Combination should display error.");
+            Assert.AreEqual(1, exitCode, "Invalid Arguments Combination execution should exit with error.");
+
+            Assert.IsFalse(mockOutput.Messages.First().Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
+                "First Printed message must be Microsoft Copyright");
+
+            File.Delete(testSourceDllPath);
+        }
+
 
         /// <summary>
         /// Executor should Print Error message and Help contents when no arguments are provided.

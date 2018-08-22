@@ -516,6 +516,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestRunCompleteHandlerShouldReportFailedOutcomeIfTestRunIsAborted()
+        {
+            string message = "The information to test";
+            TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
+
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            Assert.AreEqual(this.testableTrxLogger.TestResultOutcome, TrxLoggerObjectModel.TestOutcome.Failed);
+        }
+
+        [TestMethod]
         public void OutcomeOfRunWillBeFailIfAnyTestsFails()
         {
             ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
@@ -634,41 +646,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             listCategoriesExpected.Add("AsmLevel");
 
             CollectionAssert.AreEqual(listCategoriesExpected, listCategoriesActual);
-        }
-
-        /// <summary>
-        /// Unit test for assigning or populating test categories read to the unit test element.
-        /// </summary>
-        [TestMethod]
-        public void ToTestElementShouldAssignTestCategoryOfUnitTestElement()
-        {
-            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
-            TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
-
-            testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
-
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
-
-            object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
-
-            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x.ToString()).ToArray());
-        }
-
-        /// <summary>
-        /// Unit test for regression when there's no test categories.
-        /// </summary>
-        [TestMethod]
-        public void ToTestElementShouldNotFailWhenThereIsNoTestCategoreis()
-        {
-            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
-
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
-
-            object[] expected = Enumerable.Empty<Object>().ToArray();
-
-            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray());
         }
 
         [TestMethod]

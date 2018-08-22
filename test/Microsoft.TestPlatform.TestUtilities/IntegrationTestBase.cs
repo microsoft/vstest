@@ -50,6 +50,10 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.testEnvironment = new IntegrationTestEnvironment();
         }
 
+        public string StdOut => this.standardTestOutput;
+
+        public string StdErr => this.standardTestError;
+
         /// <summary>
         /// Prepare arguments for <c>vstest.console.exe</c>.
         /// </summary>
@@ -403,7 +407,19 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns></returns>
         public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
+            var logFileName = Path.GetFileName(Path.GetTempFileName());
+            var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
+
+            if (Directory.Exists(logFileDir) == false)
+            {
+                Directory.CreateDirectory(logFileDir);
+            }
+
+            var logFilePath = Path.Combine(logFileDir, logFileName);
+
+            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath(), new ConsoleParameters(){LogFilePath = logFilePath});
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
@@ -455,6 +471,9 @@ namespace Microsoft.TestPlatform.TestUtilities
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);
 
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 vstestconsole.Start();
                 vstestconsole.BeginOutputReadLine();
                 vstestconsole.BeginErrorReadLine();
@@ -468,6 +487,10 @@ namespace Microsoft.TestPlatform.TestUtilities
                     // Ensure async buffers are flushed
                     vstestconsole.WaitForExit();
                 }
+
+                stopwatch.Stop();
+
+                Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
 
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();

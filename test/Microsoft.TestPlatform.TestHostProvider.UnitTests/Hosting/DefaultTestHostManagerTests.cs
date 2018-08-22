@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestHostProvider.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.Hosting.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -40,7 +40,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private DefaultTestHostManager testHostManager;
         private TestableTestHostManager testableTestHostManager;
-        private int maxStdErrStringLength = 22;
         private string errorMessage;
         private int exitCode;
         private int testHostId;
@@ -344,7 +343,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework.DefaultFramework,
                 this.mockProcessHelper.Object,
                 true,
-                this.maxStdErrStringLength,
                 this.mockMessageLogger.Object);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -421,19 +419,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(errorData, this.errorMessage);
-        }
-
-        [TestMethod]
-        public async Task ErrorMessageShouldBeTruncatedToMatchErrorLength()
-        {
-            string errorData = "Long Custom Error Strings";
-            this.ErrorCallBackTestHelper(errorData, -1);
-
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
-
-            // Ignore new line chars
-            Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
-            Assert.AreEqual(errorData.Substring(5), this.errorMessage);
         }
 
         [TestMethod]
@@ -527,7 +512,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework.DefaultFramework,
                 this.mockProcessHelper.Object,
                 true,
-                this.maxStdErrStringLength,
                 this.mockMessageLogger.Object);
 
             this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
@@ -560,7 +544,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework.DefaultFramework,
                 this.mockProcessHelper.Object,
                 true,
-                this.maxStdErrStringLength,
                 this.mockMessageLogger.Object);
 
             this.testableTestHostManager.HostExited += this.TestableTestHostManagerHostExited;
@@ -596,11 +579,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework framework,
                 IProcessHelper processHelper,
                 bool shared,
-                int errorLength,
                 IMessageLogger logger)
                 : base(processHelper, new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
             {
-                this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             }
         }

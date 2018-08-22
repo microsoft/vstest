@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// <summary>
     /// Helper class to deal with process related functionality.
     /// </summary>
-    public class ProcessHelper : IProcessHelper
+    public partial class ProcessHelper : IProcessHelper
     {
         /// <inheritdoc/>
         public object LaunchProcess(
@@ -98,6 +98,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         /// <inheritdoc/>
         public void WaitForProcessExit(object process)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IntPtr GetProcessHandle(int processId)
         {
             throw new NotImplementedException();
         }

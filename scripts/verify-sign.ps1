@@ -30,7 +30,7 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 Write-Verbose "Setup build configuration."
 $TPB_SignCertificate = $Certificate
 $TPB_Configuration = $Configuration
-$TPB_AssembliesPattern = @("*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe", "QTAgent*.exe", "VsWebSite.Interop.dll", "Microsoft.VisualStudio*.dll", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll", "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll", "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe", "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll")
+$TPB_AssembliesPattern = @("*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe", "QTAgent*.exe", "VsWebSite.Interop.dll", "Microsoft.VisualStudio*.dll", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll", "Microsoft.IntelliTrace*.dll", "concrt140.dll", "msvcp140.dll", "vccorlib140.dll", "vcruntime140.dll", "codecoveragemessages.dll", "covrun32.dll", "msdia140.dll", "covrun64.dll", "IntelliTrace.exe", "ProcessSnapshotCleanup.exe", "TDEnvCleanup.exe", "CodeCoverage.exe", "Microsoft.ShDocVw.dll", "UIAComwrapper.dll", "Interop.UIAutomationClient.dll", "SettingsMigrator.exe")
 
 function Verify-Assemblies
 {
@@ -51,7 +51,7 @@ function Verify-Assemblies
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
                     # For some dlls e.g. "Microsoft.DiaSymReader.dll", sign certificate is different signature. Skip such binaries.
-                    elseif ($signature.SignerCertificate.Thumbprint -eq "49D59D86505D82942A076388693F4FB7B21254EE") {
+                    elseif ($signature.SignerCertificate.Thumbprint -eq "5EAD300DC7E4D637948ECB0ED829A072BD152E17") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
 					# For some dlls e.g. "Interop.UIAutomationClient.dll", sign certificate is different signature. Skip such binaries.

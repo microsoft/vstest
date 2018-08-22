@@ -2,17 +2,22 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="1392533617">
     <body>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
-        <target state="translated">No se encuentran pruebas para {0}. Asegúrese de que el proyecto de prueba tiene una referencia NuGet del paquete "Microsoft.NET.Test.Sdk" y de que la configuración de la versión de Framework es correcta. Vuelva a ejecutar con la opción /diag para realizar un diagnóstico más detallado.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.
 {0}</source>
         <target state="translated">Se encontraron varias versiones de la misma extensión. Seleccionando la versión más alta.
 {0}</target>
         <note />
+      </trans-unit>
+      <trans-unit id="UnableToFindDepsFile">
+        <source>Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</source>
+        <target state="new">Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestPublishTestProject">
+        <source>Unable to find {0}. Please publish your test project and retry.</source>
+        <target state="new">Unable to find {0}. Please publish your test project and retry.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

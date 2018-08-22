@@ -22,5 +22,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
         /// Datacollector process name, without file extension(.exe/.dll)
         /// </summary>
         public const string DatacollectorProcessName = "datacollector";
+
+        /// <summary>
+        /// Number of character should be logged on child process exited with
+        /// error message on standard error.
+        /// </summary>
+        public const int StandardErrorMaxLength = 8192; // 8 KB
+
+        /// <summary>
+        /// Environment Variable Specified by user to setup Culture.
+        /// </summary>
+        public const string DotNetUserSpecifiedCulture = "DOTNET_CLI_UI_LANGUAGE";
     }
 }

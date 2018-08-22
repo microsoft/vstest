@@ -115,6 +115,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestNoLogo
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -136,6 +142,28 @@ namespace Microsoft.TestPlatform.Build.Tasks
         }
 
         internal IEnumerable<string> CreateArgument()
+        {
+            var allArgs = this.AddArgs();
+
+            // VSTestCLIRunSettings should be last argument in allArgs as vstest.console ignore options after "--"(CLIRunSettings option).
+            this.AddCLIRunSettingsArgs(allArgs);
+
+            return allArgs;
+        }
+
+        private void AddCLIRunSettingsArgs(List<string> allArgs)
+        {
+            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
+            {
+                allArgs.Add("--");
+                foreach (var arg in this.VSTestCLIRunSettings)
+                {
+                    allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
+                }
+            }
+        }
+
+        private List<string> AddArgs()
         {
             var isConsoleLoggerEnabled = true;
             var isCollectCodeCoverageEnabled = false;
@@ -170,7 +198,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
             {
-                allArgs.Add("--testCaseFilter:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestCaseFilter));
+                allArgs.Add("--testCaseFilter:" +
+                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestCaseFilter));
             }
 
             if (this.VSTestLogger != null && this.VSTestLogger.Length > 0)
@@ -188,7 +217,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
             {
-                allArgs.Add("--resultsDirectory:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestResultsDirectory));
+                allArgs.Add("--resultsDirectory:" +
+                            ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestResultsDirectory));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))
@@ -213,8 +243,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
             if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && isConsoleLoggerEnabled)
             {
-                var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
-                var quietTestLogging = new List<string>() { "q", "quiet" };
+                var normalTestLogging = new List<string>() {"n", "normal", "d", "detailed", "diag", "diagnostic"};
+                var quietTestLogging = new List<string>() {"q", "quiet"};
 
                 string vsTestVerbosity = "minimal";
                 if (normalTestLogging.Contains(this.VSTestVerbosity))
@@ -229,13 +259,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
             }
 
-            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
+            if (!string.IsNullOrEmpty(this.VSTestBlame))
             {
-                allArgs.Add("--");
-                foreach (var arg in this.VSTestCLIRunSettings)
-                {
-                    allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
-                }
+                allArgs.Add("--Blame");
             }
 
             if (this.VSTestCollect != null && this.VSTestCollect.Length > 0)
@@ -246,13 +272,13 @@ namespace Microsoft.TestPlatform.Build.Tasks
                     {
                         isCollectCodeCoverageEnabled = true;
                     }
+
                     allArgs.Add("--collect:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
             }
 
             if (isCollectCodeCoverageEnabled || isRunSettingsEnabled)
             {
-
                 // Pass TraceDataCollector path to vstest.console as TestAdapterPath if --collect "Code Coverage"
                 // or --settings (User can enable code coverage from runsettings) option given.
                 // Not parsing the runsettings for two reason:
@@ -262,13 +288,24 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 // go code coverage x-plat.
                 if (!string.IsNullOrEmpty(this.VSTestTraceDataCollectorDirectoryPath))
                 {
-                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTraceDataCollectorDirectoryPath));
+                    allArgs.Add("--testAdapterPath:" +
+                                ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this
+                                    .VSTestTraceDataCollectorDirectoryPath));
+                }
+                else
+                {
+                    if (isCollectCodeCoverageEnabled)
+                    {
+                        // Not showing message in runsettings scenario, because we are not sure that code coverage is enabled.
+                        // User might be using older Microsoft.NET.Test.Sdk which don't have CodeCoverage infra.
+                        Console.WriteLine(Resources.UpdateTestSdkForCollectingCodeCoverage);
+                    }
                 }
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestBlame))
+            if(!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
             {
-                allArgs.Add("--Blame");
+                allArgs.Add("--nologo");
             }
 
             return allArgs;

@@ -172,10 +172,6 @@
         <target state="translated">Rejestrowanie diagnostyki TestHost w pliku: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">Przebieg testu jest anulowany, ponieważ zażądano anulowania.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Nie można uruchomić hosta testów. Błąd: {0}</target>
@@ -193,12 +189,17 @@
       </trans-unit>
       <trans-unit id="NonExistingExtensions">
         <source>Could not find extensions: {0}</source>
-        <target state="new">Could not find extensions: {0}</target>
-        <note></note>
+        <target state="translated">Nie można znaleźć rozszerzeń: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DeprecatedAdapterPath">
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
-        <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</target>
+        <target state="translated">Wyszukiwanie adaptera jest zmieniane, zobacz https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmapw celu uzyskania dalszych szczegółów.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="new">No test is available for testcase filter `{0}` in {1}</target>
         <note></note>
       </trans-unit>
     </body>

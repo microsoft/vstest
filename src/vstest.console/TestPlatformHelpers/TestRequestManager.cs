@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.XPath;
@@ -73,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestPlatformFactory.GetTestPlatform(),
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
-                  new InferHelper(new AssemblyMetadataProvider()),
+                  new InferHelper(AssemblyMetadataProvider.Instance),
                   MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
         {
         }
@@ -294,9 +293,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             requestData.MetricsCollection.Add(TelemetryDataConstants.TestSettingsUsed, InferRunSettingsHelper.IsTestSettingsEnabled(runsettings));
             
-            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out List<string> legacySettings))
+            if (InferRunSettingsHelper.TryGetLegacySettingElements(runsettings, out Dictionary<string, string> legacySettingsTelemetry))
             {
-                requestData.MetricsCollection.Add(TelemetryDataConstants.LegacySettingElements, string.Join(",", legacySettings));
+                foreach( var ciData in legacySettingsTelemetry)
+                {
+                    // We are collecting telemetry for the legacy nodes and attributes used in the runsettings.
+                    requestData.MetricsCollection.Add(string.Format("{0}.{1}", TelemetryDataConstants.LegacySettingPrefix, ciData.Key), ciData.Value);
+                }
             }
         }
 
@@ -389,6 +392,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
                         ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
+                    }
+
+                    if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
+                    {
+                        EqtTrace.Error("TestRequestManager.UpdateRunSettingsIfRequired: throw exception on /Framework:Framework35 option.");
+                        throw new TestPlatformException(Resources.Framework35NotSupported);
                     }
 
                     if (EqtTrace.IsInfoEnabled)

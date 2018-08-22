@@ -120,7 +120,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationEndpoint.Connected += (sender, args) =>
                 {
                     this.channel = args.Channel;
-                    this.connected.Set();
+
+                    if (args.Connected && this.channel != null)
+                    {
+                        this.connected.Set();
+                    }
                 };
             this.communicationEndpoint.Disconnected += (sender, args) =>
                 {

@@ -52,7 +52,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void ToCommandLineOptionsShouldIncludeDiagnosticsOptionIfEnabled()
+        public void ToCommandLineOptionsShouldNotIncludeDiagnosticsOptionIfNotEnabled()
         {
             var connectionInfo = default(TestRunnerConnectionInfo);
 
@@ -62,13 +62,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void ToCommandLineOptionsShouldNotIncludeDiagnosticsOptionIfNotEnabled()
+        public void ToCommandLineOptionsShouldIncludeDiagnosticsOptionIfEnabled()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { LogFile = "log.txt" };
+            var connectionInfo = new TestRunnerConnectionInfo { LogFile = "log.txt", TraceLevel = 3 };
 
             var options = connectionInfo.ToCommandLineOptions();
 
-            StringAssert.EndsWith(options, "--diag log.txt");
+            StringAssert.EndsWith(options, "--diag log.txt --tracelevel 3");
         }
     }
 #pragma warning restore SA1600

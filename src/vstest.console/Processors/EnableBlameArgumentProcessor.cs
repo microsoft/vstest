@@ -4,17 +4,22 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
     using System.Xml;
 
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
     {
@@ -30,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableBlameArgumentProcessor"/> class.
         /// </summary>
-        public EnableBlameArgumentProcessor() 
+        public EnableBlameArgumentProcessor()
         {
         }
 
@@ -131,36 +136,111 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            bool isDumpEnabled = false;
+            var enableDump = false;
+            var exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidBlameArgument, argument);
+            Dictionary<string, string> collectDumpParameters = null;
 
-            if (!string.IsNullOrWhiteSpace(argument) && argument.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(argument))
             {
-                if (this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
-                    this.environment.Architecture != PlatformArchitecture.ARM64 &&
-                    this.environment.Architecture != PlatformArchitecture.ARM)
-                {
-                    isDumpEnabled = true;
-                }
-                else
-                {
-                    Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
-                }
+                // Get blame argument list.
+                var blameArgumentList = ArgumentProcessorUtilities.GetArgumentList(argument, ArgumentProcessorUtilities.SemiColonArgumentSeparator, exceptionMessage);
+
+                // Get collect dump key.
+                var collectDumpKey = blameArgumentList[0];
+                bool isCollectDumpKeyValid = ValidateCollectDumpKey(collectDumpKey);
+
+                // Check if dump should be enabled or not.
+                enableDump = isCollectDumpKeyValid && IsDumpCollectionSupported();
+
+                // Get collect dump parameters.
+                var collectDumpParameterArgs = blameArgumentList.Skip(1);
+                collectDumpParameters = ArgumentProcessorUtilities.GetArgumentParameters(collectDumpParameterArgs, ArgumentProcessorUtilities.EqualNameValueSeparator, exceptionMessage);
             }
 
+            // Initialize blame.
+            InitializeBlame(enableDump, collectDumpParameters);
+        }
+
+        /// <summary>
+        /// Executes the argument processor.
+        /// </summary>
+        /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
+        public ArgumentProcessorResult Execute()
+        {
+            // Nothing to do since we updated the logger and data collector list in initialize
+            return ArgumentProcessorResult.Success;
+        }
+
+        /// <summary>
+        /// Initialize blame.
+        /// </summary>
+        /// <param name="enableDump">Enable dump.</param>
+        /// <param name="blameParameters">Blame parameters.</param>
+        private void InitializeBlame(bool enableDump, Dictionary<string, string> collectDumpParameters)
+        {
             // Add Blame Logger
-            EnableLoggerArgumentExecutor.AddLoggerToRunSettings(BlameFriendlyName, this.runSettingsManager);
+            LoggerUtilities.AddLoggerToRunSettings(BlameFriendlyName, null, this.runSettingsManager);
 
             // Add Blame Data Collector
             CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);
 
+
+            // Add default run settings if required.
+            if (this.runSettingsManager.ActiveRunSettings?.SettingsXml == null)
+            {
+                this.runSettingsManager.AddDefaultRunSettings(); ;
+            }
+            var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
+
             // Get results directory from RunSettingsManager
-            var runSettings = this.runSettingsManager.ActiveRunSettings;
+            var resultsDirectory = GetResultsDirectory(settings);
+
+            // Get data collection run settings. Create if not present.
+            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
+            if (dataCollectionRunSettings == null)
+            {
+                dataCollectionRunSettings = new DataCollectionRunSettings();
+            }
+
+            // Create blame configuration element.
+            var XmlDocument = new XmlDocument();
+            var outernode = XmlDocument.CreateElement("Configuration");
+            var node = XmlDocument.CreateElement("ResultsDirectory");
+            outernode.AppendChild(node);
+            node.InnerText = resultsDirectory;
+
+            // Add collect dump node in configuration element.
+            if (enableDump)
+            {
+                AddCollectDumpNode(collectDumpParameters, XmlDocument, outernode);
+            }
+
+            // Add blame configuration element to blame collector.
+            foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
+            {
+                if (item.FriendlyName.Equals(BlameFriendlyName))
+                {
+                    item.Configuration = outernode;
+                }
+            }
+
+            // Update run settings.
+            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+        }
+
+        /// <summary>
+        /// Get results directory.
+        /// </summary>
+        /// <param name="settings">Settings xml.</param>
+        /// <returns>Results directory.</returns>
+        private string GetResultsDirectory(string settings)
+        {
             string resultsDirectory = null;
-            if (runSettings != null)
+            if (settings != null)
             {
                 try
                 {
-                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings.SettingsXml);
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settings);
                     resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
                 }
                 catch (SettingsException se)
@@ -172,51 +252,63 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
             }
 
-            // Add configuration element
-            var settings = runSettings?.SettingsXml;
-            if (settings == null)
-            {
-                runSettingsManager.AddDefaultRunSettings();
-                settings = runSettings?.SettingsXml;
-            }
-
-            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
-            if (dataCollectionRunSettings == null)
-            {
-                dataCollectionRunSettings = new DataCollectionRunSettings();
-            }
-
-            var XmlDocument = new XmlDocument();
-            var outernode = XmlDocument.CreateElement("Configuration");
-            var node = XmlDocument.CreateElement("ResultsDirectory");
-            outernode.AppendChild(node);
-            node.InnerText = resultsDirectory;
-
-            if (isDumpEnabled)
-            {
-                var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
-                outernode.AppendChild(dumpNode);
-            }
-
-            foreach (var item in dataCollectionRunSettings.DataCollectorSettingsList)
-            {
-                if( item.FriendlyName.Equals(BlameFriendlyName))
-                {
-                    item.Configuration = outernode;
-                }
-            }
-
-            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+            return resultsDirectory;
         }
 
         /// <summary>
-        /// Executes the argument processor.
+        /// Checks if dump collection is supported.
         /// </summary>
-        /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
-        public ArgumentProcessorResult Execute()
+        /// <returns>Dump collection supported flag.</returns>
+        private bool IsDumpCollectionSupported()
         {
-            // Nothing to do since we updated the logger and data collector list in initialize
-            return ArgumentProcessorResult.Success;
+            var dumpCollectionSupported = this.environment.OperatingSystem == PlatformOperatingSystem.Windows &&
+                    this.environment.Architecture != PlatformArchitecture.ARM64 &&
+                    this.environment.Architecture != PlatformArchitecture.ARM;
+
+            if (!dumpCollectionSupported)
+            {
+                Output.Warning(false, CommandLineResources.BlameCollectDumpNotSupportedForPlatform);
+            }
+
+            return dumpCollectionSupported;
+        }
+
+        /// <summary>
+        /// Check if collect dump key is valid.
+        /// </summary>
+        /// <param name="collectDumpKey">Collect dump key.</param>
+        /// <returns>Flag for collect dump key valid or not.</returns>
+        private bool ValidateCollectDumpKey(string collectDumpKey)
+        {
+            var isCollectDumpKeyValid = collectDumpKey != null && collectDumpKey.Equals(Constants.BlameCollectDumpKey, StringComparison.OrdinalIgnoreCase);
+
+            if (!isCollectDumpKeyValid)
+            {
+                Output.Warning(false, string.Format(CultureInfo.CurrentUICulture, CommandLineResources.BlameIncorrectOption, collectDumpKey));
+            }
+
+            return isCollectDumpKeyValid;
+        }
+
+        /// <summary>
+        /// Adds collect dump node in outer node.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        /// <param name="XmlDocument">Xml document.</param>
+        /// <param name="outernode">Outer node.</param>
+        private void AddCollectDumpNode(Dictionary<string, string> parameters, XmlDocument XmlDocument, XmlElement outernode)
+        {
+            var dumpNode = XmlDocument.CreateElement(Constants.BlameCollectDumpKey);
+            if (parameters != null && parameters.Count > 0)
+            {
+                foreach (KeyValuePair<string, string> entry in parameters)
+                {
+                    var attribute = XmlDocument.CreateAttribute(entry.Key);
+                    attribute.Value = entry.Value;
+                    dumpNode.Attributes.Append(attribute);
+                }
+            }
+            outernode.AppendChild(dumpNode);
         }
 
         #endregion

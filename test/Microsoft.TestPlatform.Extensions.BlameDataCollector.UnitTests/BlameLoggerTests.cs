@@ -11,8 +11,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -139,10 +137,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.blameLogger.Initialize(loggerEvents, (string)null);
 
             var testCaseList =
-                    new List<TestCase>
+                    new List<BlameTestObject>
                         {
-                        new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath"),
-                        new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath")
+                        new BlameTestObject(new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath")),
+                        new BlameTestObject(new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath"))
                         };
 
             // Setup and Raise event

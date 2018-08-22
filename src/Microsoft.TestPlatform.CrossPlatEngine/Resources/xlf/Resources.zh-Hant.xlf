@@ -172,10 +172,6 @@
         <target state="translated">在檔案 {0} 中記錄 TestHost 診斷</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">正在依取消的要求而取消測試回合。</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">無法啟動測試主機。錯誤: {0}</target>
@@ -193,12 +189,17 @@
       </trans-unit>
       <trans-unit id="NonExistingExtensions">
         <source>Could not find extensions: {0}</source>
-        <target state="new">Could not find extensions: {0}</target>
-        <note></note>
+        <target state="translated">找不到延伸模組: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DeprecatedAdapterPath">
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
-        <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</target>
+        <target state="translated">目前正在變更配接器查閱，請遵循 https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap，以取得詳細資料。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="new">No test is available for testcase filter `{0}` in {1}</target>
         <note></note>
       </trans-unit>
     </body>

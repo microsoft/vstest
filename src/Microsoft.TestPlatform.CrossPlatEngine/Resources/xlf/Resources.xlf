@@ -83,10 +83,6 @@
         <target state="new">Logging TestHost Diagnostics in file: {0}</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="new">Canceling test run as cancelation requested.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="new">Failed to launch testhost with error: {0}</target>
@@ -110,6 +106,11 @@
       <trans-unit id="DeprecatedAdapterPath">
         <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
         <target state="new">Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="new">No test is available for testcase filter `{0}` in {1}</target>
         <note></note>
       </trans-unit>
     </body>

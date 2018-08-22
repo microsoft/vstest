@@ -85,7 +85,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldCreateTimestampedLogFileForHost()
         {
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
-            EqtTrace.InitializeVerboseTrace("log.txt");
+            EqtTrace.InitializeTrace("log.txt", PlatformTraceLevel.Verbose);
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
@@ -117,6 +117,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                         It.IsAny<IEnumerable<string>>(),
                         null,
                         It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(Process.GetCurrentProcess().Id))));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldAddCorrectTraceLevelForTestHost()
+        {
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Info;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Info;
+#endif
+
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockTestHostManager.Verify(
+                th =>
+                    th.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        null,
+                        It.Is<TestRunnerConnectionInfo>(t => t.TraceLevel == (int)PlatformTraceLevel.Info)));
         }
 
         [TestMethod]
@@ -235,7 +255,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void SetupChannelShouldThrowIfRequestCancelled()
+        public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelled()
         {
             SetupTestHostLaunched(true);
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
@@ -244,7 +264,37 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
 
             cancellationTokenSource.Cancel();
-            Assert.ThrowsException<OperationCanceledException>(() => operationManager.SetupChannel(Enumerable.Empty<string>()));
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
+            StringAssert.Equals("Cancelling the operation as requested.", message);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledDuringLaunchOfTestHost()
+        {
+            SetupTestHostLaunched(true);
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+
+            this.mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => Task.Run(() => { throw new OperationCanceledException(); }));
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
+
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
+            StringAssert.Equals("Cancelling the operation as requested.", message);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledPostHostLaunchDuringWaitForHandlerConnection()
+        {
+            SetupTestHostLaunched(true);
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            this.mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => cancellationTokenSource.Cancel());
+            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
+
+            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
+            StringAssert.Equals("Cancelling the operation as requested.", message);
         }
 
         [TestMethod]

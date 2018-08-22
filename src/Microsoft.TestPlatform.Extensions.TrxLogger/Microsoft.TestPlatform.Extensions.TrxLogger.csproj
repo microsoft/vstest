@@ -8,6 +8,7 @@
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger</AssemblyName>
     <WarningsAsErrors>true</WarningsAsErrors>
     <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.5</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\TrxResource.resx" />
