@@ -156,7 +156,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.EndSession();
 
-            this.mockDataSerializer.Verify(ds => ds.SerializeMessage(MessageType.SessionEnd), Times.Once);
+            this.mockDataSerializer.Verify(ds => ds.SerializeMessage(MessageType.SessionEnd), Times.Never);
         }
 
         [DataTestMethod]
@@ -167,11 +167,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeCommunicationChannel();
             this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
-
             this.testRequestSender.OnClientProcessExit(stderr);
 
             var expectedErrorMessage = "Reason: " + stderr;
             this.RaiseClientDisconnectedEvent();
+
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.EndsWith(expectedErrorMessage))), Times.Once);
         }
 
@@ -179,10 +179,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void OnClientProcessExitShouldNotSendErrorMessageIfOperationNotStarted()
         {
             this.SetupFakeCommunicationChannel();
-
             this.testRequestSender.OnClientProcessExit("Dummy Stderr");
-
             this.RaiseClientDisconnectedEvent();
+
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.Contains("Dummy Stderr"))), Times.Never);
         }
 
@@ -196,6 +195,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.RaiseClientDisconnectedEvent();
             this.mockDataSerializer.Verify(ds => ds.SerializePayload(MessageType.TestMessage, It.Is<TestMessagePayload>(p => p.Message.Contains("Dummy Stderr"))), Times.Never);
             this.mockExecutionEventsHandler.Verify(eh => eh.HandleRawMessage(It.IsAny<string>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void OnClientProcessExitShouldSendErrorMessageIfStdErrorOnExit()
+        {
+            this.SetupFakeCommunicationChannel();
+            this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
+
+            this.testRequestSender.OnClientProcessExit("Dummy Stderr");
+
+            this.mockExecutionEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.Contains("Dummy Stderr"))), Times.Once);
         }
 
         #region Version Check Tests
@@ -698,7 +708,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.SetupFakeCommunicationChannel();
             this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
             this.testRequestSender.OnClientProcessExit("Dummy Stderr");
-
             this.RaiseClientDisconnectedEvent();
 
             var expectedErrorMessage = "Reason: Dummy Stderr";

@@ -365,6 +365,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.clientExitErrorMessage = stdError;
             this.clientExited.Set();
 
+            if (!this.IsOperationComplete() && stdError != string.Empty)
+            {
+                // Log error if any.
+                this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, stdError));
+                this.SetOperationComplete();
+            }
+
             // Break communication loop. In somecases(E.g: When tests creates child processes to testhost) communication channel won't break if testhost exits.
             this.communicationEndpoint.Stop();
         }
