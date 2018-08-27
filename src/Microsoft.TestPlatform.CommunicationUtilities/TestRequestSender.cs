@@ -45,8 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private ITestMessageEventHandler messageEventHandler;
 
-        private ITestRunEventsHandler testRunEventsHandler;
-
         private string clientExitErrorMessage;
 
         // Set default to 1, if protocol version check does not happen
@@ -272,7 +270,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
         {
             this.messageEventHandler = eventHandler;
-            this.testRunEventsHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
                     this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
@@ -297,7 +294,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
         {
             this.messageEventHandler = eventHandler;
-            this.testRunEventsHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
                     this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
@@ -369,10 +365,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.clientExitErrorMessage = stdError;
             this.clientExited.Set();
 
-            if (this.testRunEventsHandler != null && stdError != string.Empty)
+            if (!this.IsOperationComplete() && stdError != string.Empty)
             {
                 // Log error if any.
-                this.OnTestRunAbort(this.testRunEventsHandler, null, true);
+                this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, stdError));
+                this.SetOperationComplete();
             }
 
             // Break communication loop. In somecases(E.g: When tests creates child processes to testhost) communication channel won't break if testhost exits.
