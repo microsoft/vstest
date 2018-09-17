@@ -215,7 +215,7 @@
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;;Overwrite=&lt;Defaults to true&gt;]
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
@@ -225,7 +225,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
+        <target state="new">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
       テスト結果のロガーを指定します。たとえば、結果を 
       Visual Studio テスト結果ファイル (TRX) に記録する場合は、/logger:trx[;LogFileName=&lt;既定値は一意のファイル名&gt;]
       TestResults ディレクトリに指定した LogFileName でファイルを作成します。
@@ -237,7 +237,7 @@
       コンソール ロガーの診断レベルのプレフィックスを次のように変更します。
       例: /logger:console;prefix=&lt;既定値は "false"&gt;
       コンソール ロガーの詳細については、https://aka.ms/console-logger をご覧ください。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--ロガー |/ロガー: &lt; ロガー Uri と FriendlyName &gt;
       テスト結果を logger を指定します。 などの結果に、Visual Studio テスト結果ファイル (トランザクション ・) は、ログに記録する、/logger:trx を使用します。
@@ -1564,7 +1564,7 @@
       <trans-unit id="EnableLoggerArgumentsInNetCore">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;;Overwrite=&lt;Defaults to true&gt;]
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
@@ -1574,7 +1574,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
+        <target state="new">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
       テスト結果のロガーを指定します。たとえば、結果を 
       Visual Studio テスト結果ファイル (TRX) に記録する場合は、/logger:trx[;LogFileName=&lt;既定値は一意のファイル名&gt;]
       TestResults ディレクトリに指定した LogFileName でファイルを作成します。
@@ -1586,7 +1586,7 @@
       コンソール ロガーの診断レベルのプレフィックスを次のように変更します。
       例: /logger:console;prefix=&lt;既定値は "false"&gt;
       コンソール ロガーの詳細については、https://aka.ms/console-logger をご覧ください。</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>

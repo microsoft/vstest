@@ -215,7 +215,7 @@
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;;Overwrite=&lt;Defaults to true&gt;]
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
@@ -225,7 +225,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;identyfikator URI/przyjazna nazwa rejestratora&gt;
+        <target state="new">--logger|/logger:&lt;identyfikator URI/przyjazna nazwa rejestratora&gt;
       Określa rejestrator dla wyników testu. Aby na przykład rejestrować wyniki testu 
       do pliku wyników testu (TRX) programu Visual Studio, użyj parametru /logger:trx [;LogFileName=&lt;wartość domyślna to unikatowa nazwa pliku&gt;]
       Tworzy w katalogu TestResults plik z podaną nazwą LogFileName.
@@ -236,7 +236,7 @@
        Zmień prefiks poziomu diagnostyki dla rejestratora konsoli, jak pokazano poniżej
       Przykład: /logger:console;prefix=&lt;wartość domyślna to „false”&gt;
       Więcej informacji o rejestratorze konsoli: https://aka.ms/console-logger</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--rejestratora | / rejestratora: &lt; identyfikator Uri rejestratora/FriendlyName &gt;
       Określ Rejestrator dla wyników badań.  Na przykład do rejestrowania wyników do programu Visual Studio Test wyniki pliku (TRX) używać/Logger: trx.
@@ -1563,7 +1563,7 @@
       <trans-unit id="EnableLoggerArgumentsInNetCore">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;;Overwrite=&lt;Defaults to true&gt;]
       Creates file in TestResults directory with given LogFileName.
 
       Change the verbosity level in log messages for console logger as shown below
@@ -1573,7 +1573,7 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;identyfikator URI/przyjazna nazwa rejestratora&gt;
+        <target state="new">--logger|/logger:&lt;identyfikator URI/przyjazna nazwa rejestratora&gt;
       Określa rejestrator dla wyników testu. Aby na przykład rejestrować wyniki testu 
       do pliku wyników testu (TRX) programu Visual Studio, użyj parametru /logger:trx [;LogFileName=&lt;wartość domyślna to unikatowa nazwa pliku&gt;]
       Tworzy w katalogu TestResults plik z podaną nazwą LogFileName.
@@ -1584,7 +1584,7 @@
        Zmień prefiks poziomu diagnostyki dla rejestratora konsoli, jak pokazano poniżej
       Przykład: /logger:console;prefix=&lt;wartość domyślna to „false”&gt;
       Więcej informacji o rejestratorze konsoli: https://aka.ms/console-logger</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>

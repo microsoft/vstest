@@ -447,6 +447,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
                 {
                     this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                    this.UpdateTrxFilePathIfOverwriteIsFalse(logFileNameValue);
                 }
                 else
                 {
@@ -456,6 +457,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             else
             {
                 this.SetDefaultTrxFilePath();
+            }
+        }
+
+        private void UpdateTrxFilePathIfOverwriteIsFalse(string logFileNameValue)
+        {
+            var isOverwriteKeyExists =
+                this.parametersDictionary.TryGetValue(TrxLoggerConstants.OverwriteKey, out string overwriteValue);
+            if (isOverwriteKeyExists == false)
+            {
+                return;
+            }
+
+            var isOverwriteValueValid = bool.TryParse(overwriteValue, out bool overwrite);
+            if (isOverwriteValueValid && overwrite == false)
+            {
+                this.trxFilePath = FileHelper.GetNextIterationFileName(this.testResultsDirPath, logFileNameValue, false);
+            }
+            else if (isOverwriteValueValid == false)
+            {
+                EqtTrace.Warning("TrxLogger.UpdateTrxFilePathIfOverwriteIsFalse: invalid value: {0} found for: {1}" , overwriteValue, TrxLoggerConstants.OverwriteKey);
             }
         }
 
