@@ -49,10 +49,15 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="new">Prawidłowe użycie: SettingsMigrator.exe &lt;pełna ścieżka do pliku testsettings lub runsettings do zmigrowania&gt;
-Przykład: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Przykład: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">Prawidłowe użycie:
+SettingsMigrator.exe &lt;pełna ścieżka do pliku testsettings lub runsettings do zmigrowania&gt;
+SettingsMigrator.exe &lt;pełna ścieżka do pliku testsettings lub runsettings do zmigrowania&gt; &lt;pełna ścieżka do pliku runsettings do utworzenia&gt;
+Przykłady:
+SettingsMigrator.exe  E:\MójTest\UstawieniaMojegoTestu.testsettings
+SettingsMigrator.exe  E:\MójTest\UstawieniaMojegoStaregoPrzebiegu.runsettings
+SettingsMigrator.exe  E:\MójTest\UstawieniaMojegoTestu.testsettings E:\MójTest\UstawieniaMojegoNowegoPrzebiegu.runsettings
+SettingsMigrator.exe  E:\MójTest\UstawieniaMojegoStaregoPrzebiegu.runsettings E:\MójTest\UstawieniaMojegoNowegoPrzebiegu.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>

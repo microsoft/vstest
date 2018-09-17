@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework のバージョン&gt;
-      テストの実行に使用する対象の .Net Framework バージョンです。
-     有効な値は ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" などです。
-      その他のサポートされる値は Framework35、Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
-        <note></note>
+        <target state="translated">--Framework|/Framework:&lt;Framework のバージョン&gt;
+      テスト実行に使用するターゲット .Net Framework のバージョンです。 
+      有効な値は ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" などです。
+      その他のサポートされている値は Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--フレームワーク |/フレームワーク: &lt; フレームワーク バージョン &gt;
       対象の .Net Framework のバージョンをテストの実行に使用します。
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">.Net Framework バージョンが無効です: {0}。TargetFramework の完全な名前を指定してください。その他のサポートされる .Net Framework バージョンは Framework35、Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
-        <note></note>
+        <target state="translated">.Net Framework バージョンが無効です: {0}。TargetFramework の完全な名前を指定してください (例: .NETCoreApp,Version=v2.0)。その他のサポートされる .Net Framework バージョンは Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">無効な .Net Framework のバージョン: {0}.、TargetFramework のフルネームを指定してください。サポートされているその他の .Net Framework のバージョンは、Framework35、Framework40 および Framework45。</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;ログ ファイルのパス&gt;
-      テスト プラットフォームの詳細ログを有効にします。
-      ログは指定されたファイルに書き込まれます。</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;ログ ファイルのパス&gt;
+      テスト プラットフォームのログを有効にします。
+      ログは指定されたファイルに書き込まれます。
+
+      ログのトレース レベルを以下のように変更します
+      例: /Diag:&lt;ログ ファイルのパス&gt;;tracelevel=&lt;既定値は "verbose"&gt;
+      tracelevel に指定できる値は、off、error、warning、info、verbose です。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Diag | または Diag: &lt; ログ ファイルへのパス &gt;
       テスト プラットフォームの詳細なログを有効にします。
@@ -1455,7 +1459,7 @@
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="translated">/InIsolation フラグは推奨されていません。テストは常に別個のプロセスで実行されます</target>
+        <target state="translated">/InIsolation フラグは非推奨です。テストは常に別個のプロセスで実行されます</target>
         <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      変更履歴モードでテストを実行します。このオプションは、テスト ホストのクラッシュの原因となる問題のあるテストを分離する場合に役立ちます。現在のディレクトリに、クラッシュする前のテスト実行順序を示す出力ファイル "Sequence.xml" が作成されます。</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      テストを Blame モードで実行します。このオプションは、テスト ホストのクラッシュを引き起こしているテストを分離するのに役立ちます。
+      現在のディレクトリに "Sequence.xml" という出力ファイルを作成し、
+      そのファイルにクラッシュ前のテストの実行順序をキャプチャします。
+      必要に応じて、テスト ホストのプロセス ダンプを収集することもできます。
+      ダンプを収集するように選択すると、既定ではクラッシュ時にミニ ダンプが収集されます。
+      この既定の動作を次のオプション パラメーターでオーバーライドすることもできます:
+      CollectAlways - クラッシュが発生していなくても終了時にダンプを収集します (true/false) 
+      DumpType - ダンプの種類を指定します (mini/full)。
+      例: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1541,7 +1555,7 @@
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
         <source>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</source>
-        <target state="translated">/UseVsixExtensions は使用されなくなりました。代わりに /TestAdapterPath を使用してください。</target>
+        <target state="translated">/UseVsixExtensions は非推奨になりました。代わりに /TestAdapterPath を使用してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="DisableAutoFakesUsage">
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">blame で指定された blame パラメーター {0} は無効です。このパラメーターは無視されます。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">Diag ファイル パス '{0}' は無効です。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">Blame 引数 '{0}' は無効です。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Diag 引数 '{0}' は無効です。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Logger 引数 '{0}' は無効です。</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">Framework35 はサポートされていません。.Net Framework 3.5 を対象とするプロジェクトでは、Framework40 を使用して CLR 4.0 の "互換モード" でテストを実行してください。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
