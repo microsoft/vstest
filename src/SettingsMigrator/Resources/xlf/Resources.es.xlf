@@ -49,10 +49,15 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="new">Uso válido: SettingsMigrator.exe &lt;Ruta de acceso completa al archivo testsettings o runsettings que se migrará&gt;
-Ejemplo: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Ejemplo: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">Uso válido:
+SettingsMigrator.exe &lt;Ruta de acceso completa a los archivos testsettings o runsettings que se van a migrar&gt;
+SettingsMigrator.exe &lt;Ruta de acceso completa a los archivos testsettings o runsettings que se van a migrar&gt; &lt;Ruta de acceso completa al archivo runsettings que se va a crear&gt;
+Ejemplos:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>

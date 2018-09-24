@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Versione framework&gt;
+        <target state="translated">--Framework|/Framework:&lt;Versione framework&gt;
       Versione di .NET Framework di destinazione da usare per l'esecuzione dei test. 
       Valori validi: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" e così via.
-      Altri valori supportati: Framework35, Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
-        <note></note>
+      Altri valori supportati: Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; versione Framework &gt;
       Destinazione di .net Framework versione da utilizzare per l'esecuzione del test. 
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">La versione di .NET Framework {0} non è valida. Specificare il nome completo della versione di .NET Framework di destinazione. Altre versioni di .NET Framework supportate: Framework35, Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
-        <note></note>
+        <target state="translated">La versione di .NET Framework {0} non è valida. Specificare il nome completo della versione di .NET Framework di destinazione ad esempio .NETCoreApp,Version=v2.0. Altre versioni di .NET Framework supportate: Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">.Net valida versione Framework: {0}. assegnare fullname del TargetFramework. Altro supportato di .net Framework versioni sono Framework35, Framework40 e Framework45.</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;Percorso dei file di log&gt;
-      Abilita i log dettagliati per la piattaforma di test.
-      I log vengono scritti nel file specificato.</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;percorso del file di log&gt;
+      Abilita i log per la piattaforma di test.
+      I log vengono scritti nel file specificato.
+
+      Modifica il livello di traccia per i log come illustrato di seguito:
+      Esempio: /Diag:&lt;percorso del file di logfile&gt;;tracelevel=&lt;impostazione predefinita: "verbose"&gt;
+      Valori consentiti per tracelevel: off, error, warning, info e verbose.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; percorso file registro &gt;
       Attiva log dettagliato per la piattaforma di test.
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      Esegue il test in modalità di segnalazione errore. Questa opzione è utile per isolare il test problematico che causa l'arresto anomalo dell'host dei test. Crea nella directory corrente un file di output denominato "Sequence.xml", in cui viene acquisito l'ordine di esecuzione del test prima dell'arresto anomalo.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Valore];[DumpType]=[Valore]
+      Esegue il test in modalità di segnalazione errore. Questa opzione è utile per isolare il test problematico che causa l'arresto anomalo di Test Host.
+      Crea nella directory corrente un file di output "Sequence.xml", che
+      acquisisce l'ordine di esecuzione del test prima dell'arresto anomalo.
+      Si può scegliere di raccogliere il dump del processo per Test Host.
+      Quando si sceglie di raccogliere il dump, per impostazione predefinita viene raccolto un minidump in caso di arresto anomalo.
+      Si può anche scegliere di eseguire l'override di questo comportamento predefinito usando alcuni parametri facoltativi:
+      CollectAlways: per raccogliere il dump all'uscita anche in assenza di arresto anomalo (true/false) 
+      DumpType: per specificare il tipo di dump (mini/full).
+      Esempio: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">Il parametro di Blame specificato con Blame {0} non è valido e verrà ignorato.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">Il percorso '{0}' del file di Diag non è valido.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">L'argomento '{0}' di Blame non è valido.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">L'argomento '{0}' di Diag non è valido.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">L'argomento '{0}' di Logger non è valido.</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">Framework35 non è supportato. Per i progetti destinati a .NET Framework 3.5, usare Framework40 per eseguire i test nella modalità di compatibilità di CLR 4.0.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -37,23 +37,23 @@
       </trans-unit>
       <trans-unit id="BlameParameterKeyIncorrect">
         <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
-        <target state="new">The blame parameter key {0} is not valid. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">指定的 blame 參數索引鍵 {0} 無效。即將忽略此索引鍵。</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">blame 參數索引鍵 {0} 僅支援值 {1\}/{2}。即將忽略此索引鍵。</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
-        <target state="new">Could not start process dump: {0}</target>
-        <note></note>
+        <target state="translated">無法啟動處理序傾印: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpNotGenerated">
         <source>CollectDump was enabled but dump file was not generated.</source>
-        <target state="new">CollectDump was enabled but dump file was not generated.</target>
-        <note></note>
+        <target state="translated">CollectDump 已啟用，但未產生傾印檔案。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -199,8 +199,8 @@
       </trans-unit>
       <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
         <source>No test matches the given testcase filter `{0}` in {1}</source>
-        <target state="new">No test is available for testcase filter `{0}` in {1}</target>
-        <note></note>
+        <target state="translated">Ninguna prueba coincide con el filtro de casos de prueba proporcionado "{0}" en {1}</target>
+        <note />
       </trans-unit>
     </body>
   </file>
