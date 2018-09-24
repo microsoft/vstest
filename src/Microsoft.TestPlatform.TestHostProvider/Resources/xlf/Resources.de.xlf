@@ -11,13 +11,13 @@
       </trans-unit>
       <trans-unit id="UnableToFindDepsFile">
         <source>Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</source>
-        <target state="new">Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</target>
-        <note></note>
+        <target state="translated">"{0}" wurde nicht gefunden. Stellen Sie sicher, dass das Testprojekt einen NuGet-Verweis des Pakets "Microsoft.NET.Test.Sdk" aufweist.</target>
+        <note />
       </trans-unit>
       <trans-unit id="SuggestPublishTestProject">
         <source>Unable to find {0}. Please publish your test project and retry.</source>
-        <target state="new">Unable to find {0}. Please publish your test project and retry.</target>
-        <note></note>
+        <target state="translated">"{0}" wurde nicht gefunden. Veröffentlichen Sie Ihr Testprojekt, und versuchen Sie es noch mal.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
