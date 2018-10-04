@@ -7,9 +7,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
 
-    public class BuildLogTask : Task
+    public class VSTestLogsTask : Task
     {
-        public bool BuildStarted
+        public string LogType
         {
             get;
             set;
@@ -17,15 +17,24 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         public override bool Execute()
         {
-            if (BuildStarted)
+            if (string.Equals(LogType, "BuildStarted", StringComparison.OrdinalIgnoreCase))
             {
                 Console.WriteLine(Resources.BuildStarted);
             }
-            else
+            else if (string.Equals(LogType, "BuildCompleted", StringComparison.OrdinalIgnoreCase))
             {
                 Console.WriteLine(Resources.BuildCompleted);
                 Console.WriteLine();
             }
+            else if (string.Equals(LogType, "NoIsTestProjectProperty", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Please restore or Add Microsoft.NET.Test.Sdk package or Add IsTestProject property to your project");
+            }
+            else
+            {
+                return false;
+            }
+
             return true;
         }
     }
