@@ -40,6 +40,11 @@
         <target state="translated">Warnung: Aktualisieren Sie die Microsoft.NET.Test.Sdk-Paketreferenz auf Version 15.8.0 oder höher, um von Code Coverage zu profitieren.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoIsTestProjectProperty">
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
+        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
