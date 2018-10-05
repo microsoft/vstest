@@ -17,7 +17,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
-  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.BuildLogTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
+  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
 
   <!--
     ============================================================
@@ -25,8 +25,8 @@ Copyright (c) .NET Foundation. All rights reserved.
     Main entry point for running tests through vstest.console.exe
     ============================================================
   -->
-  <Target Name="VSTest" Condition="'$(IsTestProject)' == 'true'">
-    <CallTarget Condition="'$(VSTestNoBuild)' != 'true'" Targets="BuildProject" />
+  <Target Name="VSTest" DependsOnTargets="ShowInfoMessageIfProjectHasNoIsTestProjectProperty">
+    <CallTarget Condition="'$(VSTestNoBuild)' != 'true' AND '$(IsTestProject)' == 'true'" Targets="BuildProject" />
     
     <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
 
@@ -48,15 +48,20 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestBlame="$(VSTestBlame)"
       VSTestTraceDataCollectorDirectoryPath="$(TraceDataCollectorDirectoryPath)"
       VSTestNoLogo="$(VSTestNoLogo)"
+      Condition="'$(IsTestProject)' == 'true'"
     />
+  </Target>
+
+  <Target Name="ShowInfoMessageIfProjectHasNoIsTestProjectProperty" Condition="'$(IsTestProject)' != 'true'">
+    <Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask LogType="NoIsTestProjectProperty" ProjectFilePath="$(MSBuildProjectFullPath)" />
   </Target>
 
   <Target Name="BuildProject">
     <CallTarget Targets="ShowMsbuildWithParameter" />
 
-    <Microsoft.TestPlatform.Build.Tasks.BuildLogTask BuildStarted="True" />
+    <Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask LogType="BuildStarted" />
     <MSBuild Projects ="$(MSBuildProjectFullPath)" />
-    <Microsoft.TestPlatform.Build.Tasks.BuildLogTask />
+    <Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask LogType="BuildCompleted" />
 
     <Message Text="Done Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low" />
   </Target>

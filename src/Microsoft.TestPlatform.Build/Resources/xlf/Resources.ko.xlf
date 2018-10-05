@@ -40,6 +40,11 @@
         <target state="translated">경고: 코드 검사를 수집하려면 Microsoft.NET.Test.Sdk 패키지 참조를 버전 15.8.0 이상으로 업데이트하세요.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoIsTestProjectProperty">
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
+        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
