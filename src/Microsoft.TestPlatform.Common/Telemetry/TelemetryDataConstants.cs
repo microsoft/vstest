@@ -19,6 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
 
         public static string TestSettingsUsed = "VS.TestRun.IsTestSettingsUsed";
 
+        public static string DisableAppDomain = "VS.TestRun.DisableAppDomain";
+
         // All data related to legacy settings nodes will be prefixed with this.
         public static string LegacySettingPrefix = "VS.TestRun.LegacySettings";
 

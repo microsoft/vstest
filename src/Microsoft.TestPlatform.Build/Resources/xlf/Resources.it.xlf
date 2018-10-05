@@ -40,6 +40,11 @@
         <target state="translated">Avviso: per raccogliere i dati di code coverage, aggiornare il riferimento al pacchetto Microsoft.NET.Test.Sdk alla versione 15.8.0 o successiva.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoIsTestProjectProperty">
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
+        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -40,6 +40,11 @@
         <target state="translated">Внимание. Для сбора данных об объеме протестированного кода обновите пакет Microsoft.NET.Test.Sdk по ссылке как минимум до версии 15.8.0.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NoIsTestProjectProperty">
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
+        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
