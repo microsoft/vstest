@@ -15,6 +15,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string ProjectFilePath
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             if (string.Equals(LogType, "BuildStarted", StringComparison.OrdinalIgnoreCase))
@@ -28,7 +34,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
             else if (string.Equals(LogType, "NoIsTestProjectProperty", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("Please restore or Add Microsoft.NET.Test.Sdk package or Add IsTestProject property to your project");
+                Console.WriteLine(Resources.NoIsTestProjectProperty, ProjectFilePath);
             }
             else
             {

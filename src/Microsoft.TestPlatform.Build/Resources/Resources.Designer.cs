@@ -80,6 +80,15 @@ namespace Microsoft.TestPlatform.Build.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Skipping running test for project {0}. To run tests with dotnet test add &quot;&lt;IsTestProject&gt;true&lt;IsTestProject&gt;&quot; property to project file..
+        /// </summary>
+        internal static string NoIsTestProjectProperty {
+            get {
+                return ResourceManager.GetString("NoIsTestProjectProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Test run for {0}({1}).
         /// </summary>
         internal static string TestRunningSummary {
@@ -87,7 +96,7 @@ namespace Microsoft.TestPlatform.Build.Resources {
                 return ResourceManager.GetString("TestRunningSummary", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage..
         /// </summary>
