@@ -49,10 +49,15 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="new">Platné použití: SettingsMigrator.exe &lt;kompletní cesta k souboru testsettings nebo runsettings, který se má migrovat&gt;
-Příklad: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Příklad: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">Platné použití:
+SettingsMigrator.exe &lt;Úplná cesta k souboru testsettings nebo runsettings určenému k migraci&gt;
+SettingsMigrator.exe &lt;Úplná cesta k souboru testsettings nebo runsettings určenému k migraci&gt; &lt;Úplná cesta k souboru runsettings určenému k migraci&gt;
+Příklady:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>

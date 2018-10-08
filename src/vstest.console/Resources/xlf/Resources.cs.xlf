@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Verze rozhraní&gt;
+        <target state="translated">--Framework|/Framework:&lt;Verze rozhraní&gt;
       Cílová verze rozhraní .NET Framework, která se použije k provedení testu. 
-      Platné hodnoty jsou ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" atd.
-      Další podporované hodnoty jsou Framework35, Framework40, Framework45, FrameworkCore10 a FrameworkUap10.</target>
-        <note></note>
+      Platné hodnoty jsou .NETFramework,Version=v4.5.1, .NETCoreApp,Version=v1.0 atd.
+      Další podporované hodnoty jsou Framework40, Framework45, FrameworkCore10 a FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework verze &gt;
       Cílové rozhraní .net Framework verze pro spuštění testu. 
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Neplatná verze rozhraní .NET Framework: {0}. Zadejte prosím úplný název cílového rozhraní. Další podporované verze jsou Framework35, Framework40, Framework45, FrameworkCore10 a FrameworkUap10.</target>
-        <note></note>
+        <target state="translated">Neplatná verze rozhraní .NET Framework: {0}. Zadejte prosím úplný název cílového rozhraní (příklad: .NETCoreApp,Version=v2.0). Další podporované verze jsou Framework40, Framework45, FrameworkCore10 a FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatné rozhraní .net Framework verze: {0}. uveďte, prosím, fullname TargetFramework. Ostatní podporované rozhraní .net Framework verze jsou Framework35, Framework40 a Framework45.</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;Cesta k souboru protokolu&gt;
-      Povolí podrobné protokoly pro testovací platformu.
-      Protokoly se zapisují do zadaného souboru.</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;Cesta k souboru protokolu&gt;
+      Povolí protokoly pro testovací platformu.
+      Protokoly se zapisují do zadaného souboru.
+
+      Změní u protokolů úroveň trasování, jak je uvedeno níže.
+      Příklad: /Diag:&lt;Cesta k souboru protokolu&gt;;tracelevel=&lt;Výchozí hodnota verbose&gt;
+      Povolené hodnoty pro úroveň trasování: off, error, warning, info a verbose</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; cesta k souboru protokolu &gt;
       Povolení podrobného protokolování pro testovací platformu.
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      Spustí test v režimu blame. Tato možnost je užitečná pro izolování problematického testu, který způsobuje chybové ukončení hostitele testů. V aktuálním adresáři se vytvoří výstupní soubor Sequence.xml, do kterého se zaznamená pořadí provádění testů před chybovým ukončením.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Spustí test v režimu blame. Tato možnost je užitečná při izolaci problematického testu, který způsobuje jeho chybové ukončení.
+      Vytvoří výstupní soubor v aktuálním adresáři jako Sequence.xml,
+      který zachytí pořadí provádění testu před chybovým ukončením.
+      Volitelně se můžete rozhodnout pro shromáždění výpisu procesu pro hostitele testu.
+      Pokud se rozhodnete pro shromáždění výpisu, shromáždí se ve výchozím nastavení při chybovém ukončení minivýpis.
+      Toto výchozí chování můžete také přepsat pomocí určitých volitelných parametrů:
+      CollectAlways – Pro shromáždění výpisu při ukončení, pokud nedojde k chybovému ukončení (true/false) 
+      DumpType – Pro zadání typu výpisu (mini/full)
+      Příklad: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">Zadaný parametr blame {0} není platný. Tento parametr se bude ignorovat.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">Cesta k souboru diag {0} není platná.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">Argument blame {0} není platný.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Argument diag {0} není platný.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Argument logger {0} není platný.</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">Zadání Framework35 není podporováno. U projektů mířících na .Net Framework 3.5 prosím použijte Framework40, aby testy v CLR 4.0 běžely v režimu kompatibility.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
