@@ -49,10 +49,15 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="new">有效用法: SettingsMigrator.exe &lt;要迁移的 testsettings 文件或 runsettings 文件的完整路径&gt;
-示例: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Example: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">有效用法:
+SettingsMigrator.exe &lt;要迁移的 testsettings 文件或 runsettings 文件的完整路径&gt;
+SettingsMigrator.exe &lt;要迁移的 testsettings 文件或 runsettings 文件的完整路径&gt; &lt;要创建的 runsettings 文件的完整路径&gt;
+示例:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>
