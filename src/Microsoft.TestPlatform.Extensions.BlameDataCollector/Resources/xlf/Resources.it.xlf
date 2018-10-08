@@ -37,23 +37,23 @@
       </trans-unit>
       <trans-unit id="BlameParameterKeyIncorrect">
         <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
-        <target state="new">The blame parameter key {0} is not valid. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">La chiave specificata {0} del parametro di Blame non è valida e verrà ignorata.</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">La chiave {0} del parametro di Blame può supportare solo valori {1}/{2}. Questa chiave verrà ignorata.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
-        <target state="new">Could not start process dump: {0}</target>
-        <note></note>
+        <target state="translated">Non è stato possibile avviare il dump del processo: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpNotGenerated">
         <source>CollectDump was enabled but dump file was not generated.</source>
-        <target state="new">CollectDump was enabled but dump file was not generated.</target>
-        <note></note>
+        <target state="translated">CollectDump è stato abilitato ma non è stato generato alcun file di dump.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

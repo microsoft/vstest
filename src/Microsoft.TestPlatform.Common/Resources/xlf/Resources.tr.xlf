@@ -266,8 +266,8 @@
       </trans-unit>
       <trans-unit id="CancellationRequested">
         <source>Cancelling the operation as requested.</source>
-        <target state="new">Cancelling the operation as requested.</target>
-        <note></note>
+        <target state="translated">İşlem istek üzerine iptal ediliyor.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

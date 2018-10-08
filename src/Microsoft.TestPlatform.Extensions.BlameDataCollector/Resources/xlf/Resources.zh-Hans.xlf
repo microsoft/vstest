@@ -37,23 +37,23 @@
       </trans-unit>
       <trans-unit id="BlameParameterKeyIncorrect">
         <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
-        <target state="new">The blame parameter key {0} is not valid. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">指定的追责参数键 {0} 无效。忽略此键。</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">追责参数键 {0} 只支持值 {1}/{2}。忽略此键。</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
-        <target state="new">Could not start process dump: {0}</target>
-        <note></note>
+        <target state="translated">无法启动进程转储: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpNotGenerated">
         <source>CollectDump was enabled but dump file was not generated.</source>
-        <target state="new">CollectDump was enabled but dump file was not generated.</target>
-        <note></note>
+        <target state="translated">CollectDump 已启用，但是未生成转储文件。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

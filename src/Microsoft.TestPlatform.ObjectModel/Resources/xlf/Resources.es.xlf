@@ -614,8 +614,8 @@
       </trans-unit>
       <trans-unit id="TestCaseFilterEscapeException">
         <source>Filter string '{0}' includes unrecognized escape sequence.</source>
-        <target state="new">Filter string '{0}' includes unrecognized escape sequence.</target>
-        <note></note>
+        <target state="translated">La cadena de filtro "{0}" incluye una secuencia de escape no reconocida.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

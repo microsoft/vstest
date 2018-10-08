@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework Sürümü&gt;
+        <target state="translated">--Framework|/Framework:&lt;Framework Sürümü&gt;
       Test yürütmesi için kullanılacak hedef .NET Framework sürümü. 
       Geçerli değerler ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" vb.
-      Framework35, Framework40, Framework45, FrameworkCore10 ve FrameworkUap10 desteklenen diğer değerlerdir.</target>
-        <note></note>
+      Framework40, Framework45, FrameworkCore10 ve FrameworkUap10 desteklenen diğer değerlerdir.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework sürüm &gt;
       Hedef .net Framework sürümünü test yürütmesi için kullanılacak. 
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Geçersiz .NET Framework sürümü: {0}. Lütfen TargetFramework tam adını belirtin. Desteklenen diğer .NET Framework sürümleri Framework35, Framework40, Framework45, FrameworkCore10 ve FrameworkUap10’dur.</target>
-        <note></note>
+        <target state="translated">Geçersiz .NET Framework sürümü:{0}. Lütfen TargetFramework tam adını (Örnek: .NETCoreApp,Sürüm=v2.0) belirtin. Desteklenen diğer .NET Framework sürümleri Framework40, Framework45, FrameworkCore10 and FrameworkUap10’dur.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz .net Framework sürümü: {0}. Lütfen fullname in TargetFramework verin. Diğer desteklenen .net Framework sürümleri şunlardır: Framework35, Framework40 ve Framework45.</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;Günlük dosyasının yolu&gt;
-      Test platformuna yönelik ayrıntılı günlükleri etkinleştirir.
-      Günlükler belirtilen dosyaya yazılır.</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;Günlük dosyasının yolu&gt;
+      Test platformu için günlükleri etkinleştirin.
+      Günlükler belirtilen dosyaya yazılır.
+
+      Günlüklerin izleme düzeyini aşağıda gösterildiği şekilde değiştirin
+      Örnek: /Diag:&lt;Günlük dosyasının yolu&gt;;tracelevel=&lt;Varsayılan "verbose"&gt;
+      tracelevel için izin verilen değerler: off, error, warning, info ve verbose.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Diag | / Diag: &lt; günlük dosyası yolu &gt;
       Test platformu için ayrıntılı günlüklerini etkinleştirir.
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      Testi blame modunda çalıştırır. Bu seçenek, test konağı kilitlenmesine neden olan sorunlu testi belirlemek için kullanışlıdır. Geçerli dizinde testin kilitlenmeden önceki çalıştırılma sırasını yakalayan "Sequence.xml" adlı bir çıkış dosyası oluşturur.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Testi blame modunda çalıştırır. Bu seçenek, test ana bilgisayarının kilitlenmesine neden olan sorunlu testin ayrı tutulmasını sağlar.
+      Geçerli dizinde, kilitlenmeden önce testin yürütülme düzenini yakalayan,
+      “Sequence.xml” adlı bir çıkış dosyası oluşturur. 
+      İsteğe bağlı olarak test ana bilgisayarının işlem dökümünü çıkarmayı seçebilirsiniz.
+      Dökümü çıkarmayı seçtiğinizde, kilitlenme durumunda varsayılan olarak bir mini döküm çıkarılır.
+      Dilerseniz bazı isteğe bağlı parametrelerle bu varsayılan davranışı geçersiz kılabilirsiniz:
+      CollectAlways - Kilitlenme olmasa da her çıkışta döküm çıkarma (true/false) 
+      DumpType - Döküm türünü belirtme (mini/full).
+      Örnek: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">Blame ile belirtilen blame parametresi {0} geçerli değil. Bu parametre yoksayılıyor.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">Diag dosya yolu '{0}' geçerli değil.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">Blame bağımsız değişkeni '{0}' geçerli değil.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Diag bağımsız değişkeni '{0}' geçerli değil.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Logger bağımsız değişkeni '{0}' geçerli değil.</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">Framework35 desteklenmiyor. .NET Framework 3.5’i hedefleyen projeler için lütfen Framework40 kullanarak testleri CLR 4.0’ın “uyumluluk modunda” çalıştırın.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
