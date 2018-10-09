@@ -1637,6 +1637,11 @@
         <target state="translated">Framework35 n'est pas pris en charge. Pour les projets ciblant .Net Framework 3.5, utilisez Framework40 pour exécuter les tests dans CLR 4.0 en "mode compatibilité".</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConflictInFrameworkPlatform">
+        <source>Conflicts in framework/platform identifier of provided sources.</source>
+        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1637,6 +1637,11 @@
         <target state="translated">Framework35 desteklenmiyor. .NET Framework 3.5’i hedefleyen projeler için lütfen Framework40 kullanarak testleri CLR 4.0’ın “uyumluluk modunda” çalıştırın.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConflictInFrameworkPlatform">
+        <source>Conflicts in framework/platform identifier of provided sources.</source>
+        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

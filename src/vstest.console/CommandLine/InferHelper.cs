@@ -27,9 +27,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Architecture from sources.
         /// </summary>
-        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms)
+        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out bool isArchitectureIncompatible)
         {
             Architecture architecture = Constants.DefaultPlatform;
+            isArchitectureIncompatible = false;
             try
             {
                 if (sources != null && sources.Count > 0)
@@ -66,6 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         {
                             finalArch = Constants.DefaultPlatform;
                             EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
+                            isArchitectureIncompatible = true;
                         }
                     }
 
@@ -91,21 +93,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Framework from sources.
         /// </summary>
-        public Framework AutoDetectFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
+        public Framework AutoDetectFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out bool isFrameworkIncompatible)
         {
             Framework framework = Framework.DefaultFramework;
+            isFrameworkIncompatible = false;
             try
             {
                 if (sources != null && sources.Count > 0)
                 {
                     var finalFx = DetermineFrameworkName(sources, sourceFrameworkVersions, out var conflictInFxIdentifier);
                     framework = Framework.FromString(finalFx.FullName);
-                    if (conflictInFxIdentifier && EqtTrace.IsInfoEnabled)
+
+                    if (conflictInFxIdentifier)
                     {
-                        // TODO Log to console and client.
-                        EqtTrace.Info(
-                            "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
-                            framework);
+                        isFrameworkIncompatible = true;
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            // TODO Log to console and client.
+                            EqtTrace.Info(
+                                "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
+                                framework);
+                        }
                     }
                 }
             }

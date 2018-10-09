@@ -1635,6 +1635,11 @@
         <target state="translated">Não há suporte para Framework35. Para projetos com .Net Framework 3.5 de destino, use o Framework40 para executar testes em “modo de compatibilidade” CLR 4.0. </target>
         <note />
       </trans-unit>
+      <trans-unit id="ConflictInFrameworkPlatform">
+        <source>Conflicts in framework/platform identifier of provided sources.</source>
+        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

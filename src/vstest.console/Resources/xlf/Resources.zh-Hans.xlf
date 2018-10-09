@@ -1637,6 +1637,11 @@
         <target state="translated">Framework35 不受支持。对于面向 .Net Framework 3.5 的项目，请使用 Framework40 在 CLR 4.0“兼容性模式”下运行测试。</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConflictInFrameworkPlatform">
+        <source>Conflicts in framework/platform identifier of provided sources.</source>
+        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

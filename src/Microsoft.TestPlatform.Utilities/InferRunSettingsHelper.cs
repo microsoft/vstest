@@ -612,18 +612,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
         /// </summary>
-        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning, out bool incompatibilityErrorFound)
         {
             incompatibleSettingWarning = string.Empty;
+            bool incompatibilityFound = false;
+            incompatibilityErrorFound = false;
             List<String> compatibleSources = new List<String>();
             StringBuilder warnings = new StringBuilder();
             warnings.AppendLine();
-            bool incompatiblityFound = false;
+
             foreach (var source in sourcePlatforms.Keys)
             {
                 Architecture actualPlatform = sourcePlatforms[source];
                 Framework actualFramework = sourceFrameworks[source];
                 bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
+                incompatibilityErrorFound = IsFrameworkRuntimeIncompatible(actualFramework, chosenFramework) || IsPlatformArchitectureIncompatible(actualPlatform, chosenPlatform);
                 if (isSettingIncompatible)
                 {
                     string incompatiblityMessage;
@@ -632,15 +635,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
 
                     warnings.AppendLine(incompatiblityMessage);
-                    incompatiblityFound = true;
+                    incompatibilityFound = true;
                 }
                 else
                 {
                     compatibleSources.Add(source);
                 }
             }
-
-            if (incompatiblityFound)
+            if (incompatibilityFound || incompatibilityErrorFound)
             {
                 incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
             }
@@ -684,6 +686,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return false;
             }
             return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Returns true if source platform is incompatible with target platform.
+        /// </summary>
+        private static bool IsPlatformArchitectureIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
+        {
+            if (sourcePlatform == Architecture.X86 && targetPlatform == Architecture.X64 ||
+                sourcePlatform == Architecture.X64 && targetPlatform == Architecture.X86)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if source Framework Runtime is incompatible with target Framework.
+        /// </summary>
+        private static bool IsFrameworkRuntimeIncompatible(Framework sourceFramework, Framework targetFramework)
+        {
+            string sourceFrameworkName = sourceFramework.Name.Split(',')[0];
+            string targetFrameworkName = targetFramework.Name.Split(',')[0];
+
+            if(sourceFrameworkName.Equals(".NETFramework",StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) ||
+               sourceFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETFramework", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

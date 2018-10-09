@@ -718,4 +718,7 @@
   <data name="InvalidLoggerArgument" xml:space="preserve">
     <value>Logger argument '{0}' is not valid.</value>
   </data>
+  <data name="ConflictInFrameworkPlatform" xml:space="preserve">
+    <value>Conflicts in framework/platform identifier of provided sources.</value>
+  </data>
 </root>

@@ -1637,6 +1637,11 @@
         <target state="translated">Zadání Framework35 není podporováno. U projektů mířících na .Net Framework 3.5 prosím použijte Framework40, aby testy v CLR 4.0 běžely v režimu kompatibility.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ConflictInFrameworkPlatform">
+        <source>Conflicts in framework/platform identifier of provided sources.</source>
+        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

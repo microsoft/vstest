@@ -26,6 +26,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         private readonly Framework frameworkCore11 = Framework.FromString(".NETCoreApp,Version=1.1");
         private IDictionary<string, Framework> sourceFrameworks;
         private IDictionary<string, Architecture> sourceArchitectures;
+        bool isArchitectureIncompatible;
+        bool isFrameworkIncompatible;
 
         public InferHelperTests()
         {
@@ -33,51 +35,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             inferHelper = new InferHelper(this.mockAssemblyHelper.Object);
             sourceFrameworks = new Dictionary<string, Framework>();
             sourceArchitectures = new Dictionary<string, Architecture>();
+            this.isArchitectureIncompatible = false;
+            this.isFrameworkIncompatible = false;
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullSources()
         {
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(null, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(null, sourceArchitectures, out this.isArchitectureIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnEmptySources()
         {
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>(0), sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>(0), sourceArchitectures, out this.isArchitectureIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnNullItemInSources()
         {
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>(){null}, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>(){null}, sourceArchitectures, out this.isArchitectureIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldReturnDefaultArchitectureOnWhiteSpaceItemInSources()
         {
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { " "}, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { " "}, sourceArchitectures, out this.isArchitectureIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldReturnCorrectArchForOneSource()
         {
             this.mockAssemblyHelper.Setup(ah => ah.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X86);
-            Assert.AreEqual(Architecture.X86, inferHelper.AutoDetectArchitecture(new List<string>(){"1.dll"}, sourceArchitectures));
+            Assert.AreEqual(Architecture.X86, inferHelper.AutoDetectArchitecture(new List<string>(){"1.dll"}, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()));
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldReturnCorrectDefaultArchForNotDotNetAssembly()
         {
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Never);
         }
 
         [TestMethod]
         public void AutoDetectArchitectureShouldSetAnyCpuArchForNotDotNetAssembly()
         {
-            inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, sourceArchitectures);
+            inferHelper.AutoDetectArchitecture(new List<string>() { "NotDotNetAssebly.appx" }, sourceArchitectures, out this.isArchitectureIncompatible);
             Assert.AreEqual(Architecture.AnyCPU, sourceArchitectures["NotDotNetAssebly.appx"]);
         }
 
@@ -86,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU);
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "AnyCPU3.dll" }, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "AnyCPU3.dll" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -95,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X86);
-            Assert.AreEqual(Architecture.X86, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "x86.dll" }, sourceArchitectures));
+            Assert.AreEqual(Architecture.X86, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "AnyCPU2.exe", "x86.dll" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -104,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.ARM).Returns(Architecture.ARM).Returns(Architecture.ARM);
-            Assert.AreEqual(Architecture.ARM, inferHelper.AutoDetectArchitecture(new List<string>() { "ARM1.dll", "ARM2.dll", "ARM3.dll" }, sourceArchitectures));
+            Assert.AreEqual(Architecture.ARM, inferHelper.AutoDetectArchitecture(new List<string>() { "ARM1.dll", "ARM2.dll", "ARM3.dll" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -113,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.AnyCPU).Returns(Architecture.AnyCPU).Returns(Architecture.X64);
-            Assert.AreEqual(Architecture.X64, inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64.dll" }, sourceArchitectures));
+            Assert.AreEqual(Architecture.X64, inferHelper.AutoDetectArchitecture(new List<string>() { "x64.dll", "AnyCPU2.exe", "x64.dll" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -122,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.AnyCPU).Returns(Architecture.X64).Returns(Architecture.X86);
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -132,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.AnyCPU).Returns(Architecture.X64).Returns(Architecture.X86);
 
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "x64.exe", "x86.dll" }, sourceArchitectures, out this.isArchitectureIncompatible));
             Assert.AreEqual(3, sourceArchitectures.Count);
             Assert.AreEqual(Architecture.AnyCPU, sourceArchitectures["AnyCPU1.dll"]);
             Assert.AreEqual(Architecture.X64, sourceArchitectures["x64.exe"]);
@@ -146,32 +150,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.SetupSequence(ah => ah.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.AnyCPU);
-            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "NotDotNetAssebly.appx" }, sourceArchitectures));
+            Assert.AreEqual(Constants.DefaultPlatform, inferHelper.AutoDetectArchitecture(new List<string>() { "AnyCPU1.dll", "NotDotNetAssebly.appx" }, sourceArchitectures, out this.isArchitectureIncompatible));
             this.mockAssemblyHelper.Verify(ah => ah.GetArchitecture(It.IsAny<string>()), Times.Exactly(1));
         }
 
         [TestMethod]
         public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnNullSources()
         {
-            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(null, sourceFrameworks));
+            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(null, sourceFrameworks, out this.isFrameworkIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnEmptySources()
         {
-            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(new List<string>(0), sourceFrameworks));
+            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(new List<string>(0), sourceFrameworks, out this.isFrameworkIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnNullItemInSources()
         {
-            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(new List<string>(){null}, sourceFrameworks));
+            Assert.AreEqual(defaultFramework, inferHelper.AutoDetectFramework(new List<string>(){null}, sourceFrameworks, out this.isFrameworkIncompatible));
         }
 
         [TestMethod]
         public void AutoDetectFrameworkShouldReturnDefaultFrameworkOnEmptyItemInSources()
         {
-            Assert.AreEqual(defaultFramework.Name, inferHelper.AutoDetectFramework(new List<string>() { string.Empty }, sourceFrameworks).Name);
+            Assert.AreEqual(defaultFramework.Name, inferHelper.AutoDetectFramework(new List<string>() { string.Empty }, sourceFrameworks, out this.isFrameworkIncompatible).Name);
         }
 
         [TestMethod]
@@ -221,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
                 .Returns(new FrameworkName(frameworkNet46.Name))
                 .Returns(new FrameworkName(frameworkNet47.Name))
                 .Returns(new FrameworkName(frameworkNet45.Name));
-            Assert.AreEqual(frameworkNet47.Name, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, sourceFrameworks).Name);
+            Assert.AreEqual(frameworkNet47.Name, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, sourceFrameworks, out this.isFrameworkIncompatible).Name);
             this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()),Times.Exactly(3));
         }
 
@@ -233,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
                 .Returns(new FrameworkName(frameworkNet47.Name))
                 .Returns(new FrameworkName(frameworkNet45.Name));
 
-            Assert.AreEqual(frameworkNet47.Name, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, sourceFrameworks).Name);
+            Assert.AreEqual(frameworkNet47.Name, inferHelper.AutoDetectFramework(new List<string>() { "net46.dll", "net47.exe", "net45.dll" }, sourceFrameworks, out this.isFrameworkIncompatible).Name);
 
             Assert.AreEqual(3, sourceFrameworks.Count);
             Assert.AreEqual(frameworkNet46.Name, sourceFrameworks["net46.dll"].Name);
@@ -249,7 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
                 .Returns(new FrameworkName(frameworkCore10.Name))
                 .Returns(new FrameworkName(frameworkCore11.Name))
                 .Returns(new FrameworkName(frameworkCore10.Name));
-            Assert.AreEqual(frameworkCore11.Name, inferHelper.AutoDetectFramework(new List<string>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }, sourceFrameworks).Name);
+            Assert.AreEqual(frameworkCore11.Name, inferHelper.AutoDetectFramework(new List<string>() { "netcore10_1.dll", "netcore11.dll", "netcore10_2.dll" }, sourceFrameworks, out this.isFrameworkIncompatible).Name);
             this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(It.IsAny<string>()), Times.Exactly(3));
         }
 
@@ -257,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             this.mockAssemblyHelper.Setup(sh => sh.GetFrameWork(assemblyName))
                 .Returns(new FrameworkName(fx.Name));
-            Assert.AreEqual(fx.Name, inferHelper.AutoDetectFramework(new List<string>() { assemblyName }, sourceFrameworks).Name);
+            Assert.AreEqual(fx.Name, inferHelper.AutoDetectFramework(new List<string>() { assemblyName }, sourceFrameworks, out this.isFrameworkIncompatible).Name);
             if (verify)
             {
                 this.mockAssemblyHelper.Verify(ah => ah.GetFrameWork(assemblyName));

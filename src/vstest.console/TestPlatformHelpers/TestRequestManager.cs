@@ -363,12 +363,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var navigator = document.CreateNavigator();
 
-                    var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+                    var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks, out var isFrameworkIncompatible);
                     Framework chosenFramework;
-                    var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+                    var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms, out var isPlatformIncompatible);
                     Architecture chosenPlatform;
 
-                    // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
+                    if (isFrameworkIncompatible || isPlatformIncompatible)
+                    {
+                        throw new TestPlatformException(Resources.ConflictInFrameworkPlatform);
+                        // throw new TestPlatformException("Conflicts in framework/platform identifier of provided sources.");
+                    }
+
+                    // Update framework and platform if required. For commandline scenario update happens in ArgumentProcessor.
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
@@ -386,11 +392,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         settingsUpdated = true;
                     }
 
-                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning, out var incompatibiltyErrorFound);
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
+                        if(incompatibiltyErrorFound)
+                        {
+                            throw new TestPlatformException(incompatibleSettingWarning);
+                        }
                         ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
                     }
 
