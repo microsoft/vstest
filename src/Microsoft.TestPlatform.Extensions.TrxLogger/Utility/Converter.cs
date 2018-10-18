@@ -52,7 +52,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             foreach (var trait in rockSteadyTestCase.Traits)
             {
-                if (trait.Name == "Description" || trait.Name == "Priority" || trait.Name == "Owner" || trait.Name == "WorkItem")
+                if (trait.Name == "Description" || trait.Name == "Priority" || trait.Name == "Owner" || trait.Name == "WorkItem" || 
+                    trait.Name == "CssIteration" || trait.Name == "CssProjectStructure")
                     continue; //Traits also contain the above properties which are handled seperately
                     testElement.TestProperties.Add(trait.Name, trait.Value);
                 }
