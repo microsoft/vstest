@@ -349,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                                     yield return tokenBuilder.ToString();
                                     tokenBuilder.Clear();
                                 }
-                                // Determine if this is a "!=" or just a single "!" or "!~".
+                                // Determine if this is a "!=" or "!~" or just a single "!".
                                 var next = i + 1;
                                 if (next < s.Length && s[next] == '=')
                                 {
