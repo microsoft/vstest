@@ -24,6 +24,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected string name;
         protected string owner;
         protected string description;
+        protected string cssProjectStructure;
+        protected string cssIteration;
         protected string storage;
         protected string adapter;
         protected int priority;
@@ -95,6 +97,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 EqtAssert.ParameterNotNull(value, "Description");
                 this.description = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the CSS Project Structure.
+        /// </summary>
+        public string CssProjectStructure
+        {
+            get { return this.cssProjectStructure; }
+
+            set
+            {
+                this.cssProjectStructure = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the CSS Iteration.
+        /// </summary>
+        public string CssIteration
+        {
+            get { return this.cssIteration; }
+
+            set
+            {
+                this.cssIteration = value;
             }
         }
 
@@ -259,6 +287,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             h.SaveSimpleField(element, "@name", this.name, null);
             h.SaveSimpleField(element, "@storage", this.storage, string.Empty);
             h.SaveSimpleField(element, "@priority", this.priority, DefaultPriority);
+            if (this.cssProjectStructure != null || this.cssIteration != null)
+            {
+                h.SaveSimpleField(element, "Css/@projectStructure", this.cssProjectStructure, string.Empty);
+                h.SaveSimpleField(element, "Css/@iteration", this.cssIteration, string.Empty);
+            }
             h.SaveSimpleField(element, "Description", this.description, string.Empty);
             h.SaveSimpleField(element, "Owners/Owner/@name", this.owner, string.Empty);
             h.SaveObject(this.testCategories, element, "TestCategory", parameters);

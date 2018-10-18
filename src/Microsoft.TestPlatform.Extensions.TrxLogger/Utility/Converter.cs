@@ -46,6 +46,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             testElement.Priority = GetPriority(rockSteadyTestCase);
             testElement.Owner = GetOwner(rockSteadyTestCase);
             testElement.Description = GetDescription(rockSteadyTestCase);
+            testElement.CssProjectStructure = GetCssProjectStructure(rockSteadyTestCase);
+            testElement.CssIteration = GetCssIteration(rockSteadyTestCase);
             testElement.ExecutionId = new TestExecId(executionId);
             testElement.ParentExecutionId = new TestExecId(parentExecutionId);
             testElement.WorkItemIds = GetWorkItemIds(rockSteadyTestCase);
@@ -619,7 +621,39 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return owner ?? string.Empty;
         }
 
-        /// Gets description of test.
+        /// <summary>
+        /// Gets CssProjectStructure of test.
+        /// </summary>
+        /// <param name="rockSteadyTestCase"></param>
+        /// <returns>CssProjectStructure</returns>
+        private static string GetCssProjectStructure(ObjectModel.TestCase rockSteadyTestCase)
+        {
+            string cssProjectStructure = null;
+
+            ObjectModel.Trait cssProjectStructureTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("CssProjectStructure"));
+            if (cssProjectStructureTrait != null)
+                cssProjectStructure = cssProjectStructureTrait.Value;
+
+            return cssProjectStructure;
+        }
+
+        /// <summary>
+        /// Gets CssPIteration of test.
+        /// </summary>
+        /// <param name="rockSteadyTestCase"></param>
+        /// <returns>CssPIteration</returns>
+        private static string GetCssIteration(ObjectModel.TestCase rockSteadyTestCase)
+        {
+            string cssIteration = null;
+
+            ObjectModel.Trait cssIterationTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("CssIteration"));
+            if (cssIterationTrait != null)
+                cssIteration = cssIterationTrait.Value;
+
+            return cssIteration;
+        }
+
+        /// Gets work item ids of test.
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Work item ids</returns>
