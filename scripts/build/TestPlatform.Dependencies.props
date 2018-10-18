@@ -22,7 +22,7 @@
 
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
-    <TestPlatformExternalsVersion>16.0.0-preview-2104254</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>16.0.0-preview-2131072</TestPlatformExternalsVersion>
 
   </PropertyGroup>
 </Project>
