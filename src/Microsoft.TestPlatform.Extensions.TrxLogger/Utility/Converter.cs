@@ -622,7 +622,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// Gets description of test.
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
-        /// <returns>Description</returns>
+        /// <returns>Work item ids</returns>
         private static IList<string> GetWorkItemIds(ObjectModel.TestCase rockSteadyTestCase)
         {
             var items = rockSteadyTestCase.Traits?.Where(t => t.Name.Equals("WorkItem")).Select(w=>w.Value)?.ToList();
