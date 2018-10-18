@@ -46,13 +46,12 @@
 
   <!--
      Note that this must run before every invocation of CoreCompile to ensure that all
-     compiler runs see the generated Program file. Furthermore, we  must run *after*
-     PrepareForBuild to ensure that the intermediate directory has been created.
+     compiler runs see the generated Program file.
   -->
 
   <Target Name="GenerateProgramFile"
           BeforeTargets="CoreCompile"
-          DependsOnTargets="PrepareForBuild;CoreGenerateProgramFile"
+          DependsOnTargets="CoreGenerateProgramFile"
           Condition="'$(GenerateProgramFile)' == 'true'" />
 
   <Target Name="CoreGenerateProgramFile"
