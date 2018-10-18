@@ -44,32 +44,15 @@
     <GenerateBindingRedirectsOutputType Condition="'$(GenerateBindingRedirectsOutputType)' == ''">true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
-  <!--
-     Note that this must run before every invocation of CoreCompile to ensure that all
-     compiler runs see the generated Program file.
-  -->
+  <ItemGroup Condition="('$(GenerateProgramFile)' == 'true') and ('$(Language)'=='VB' or '$(Language)'=='C#')">
+    <Compile Include="$(GeneratedProgramFile)"/>
+  </ItemGroup>
 
-  <Target Name="GenerateProgramFile"
-          BeforeTargets="CoreCompile"
-          DependsOnTargets="CoreGenerateProgramFile"
-          Condition="'$(GenerateProgramFile)' == 'true'" />
+  <ItemGroup Condition="'$(GenerateProgramFile)' == 'true' and '$(Language)'=='F#'">
+    <ProgramCompiles Include="@(Compile)" Condition=" '%(Identity)' == 'Program.fs' "/>
+    <CompileAfter Include="$(GeneratedProgramFile)" Condition="@(ProgramCompiles-&gt;Count()) == 0"/>
+  </ItemGroup>
 
-  <Target Name="CoreGenerateProgramFile"
-          Condition="'$(Language)'=='VB' or '$(Language)'=='C#' or '$(Language)'=='F#'"
-          Inputs="$(MSBuildAllProjects)">
+  <Warning Condition=" @(ProgramCompiles-&gt;Count()) != 0 " Text="A 'Program.fs' file can be automatically generated for F# .NET Core test projects. To fix this warning, either delete the file from the project, or set the &lt;GenerateProgramFile&gt; property to 'false'." />
 
-    <!--
-    Compile Include the generated Program File
-    -->
-    <ItemGroup Condition="'$(Language)'!='F#'">
-      <Compile Include="$(GeneratedProgramFile)"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(Language)'=='F#'">
-      <ProgramCompiles Include="@(Compile)" Condition=" '%(Identity)' == 'Program.fs' "/>
-      <CompileAfter Include="$(GeneratedProgramFile)" Condition="@(ProgramCompiles-&gt;Count()) == 0"/>
-    </ItemGroup>
-
-    <Warning Condition=" @(ProgramCompiles-&gt;Count()) != 0 " Text="A 'Program.fs' file can be automatically generated for F# .NET Core test projects. To fix this warning, either delete the file from the project, or set the &lt;GenerateProgramFile&gt; property to 'false'." />
-  </Target>
 </Project>
