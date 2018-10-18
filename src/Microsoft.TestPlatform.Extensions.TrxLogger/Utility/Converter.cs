@@ -45,20 +45,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             testElement.Storage = rockSteadyTestCase.Source;
             testElement.Priority = GetPriority(rockSteadyTestCase);
             testElement.Owner = GetOwner(rockSteadyTestCase);
+            testElement.Description = GetDescription(rockSteadyTestCase);
             testElement.ExecutionId = new TestExecId(executionId);
             testElement.ParentExecutionId = new TestExecId(parentExecutionId);
+            testElement.WorkItemIds = GetWorkItemIds(rockSteadyTestCase);
 
             foreach (var trait in rockSteadyTestCase.Traits)
             {
-                if (trait.Name == "WorkItem")
-                {
-                    testElement.WorkItemIds.Add(trait.Value);
-                }
-                else
-                {
+                if (trait.Name == "Description" || trait.Name == "Priority" || trait.Name == "Owner" || trait.Name == "WorkItem")
+                    continue; //Traits also contain the above properties which are handled seperately
                     testElement.TestProperties.Add(trait.Name, trait.Value);
                 }
-            }
 
             var testCategories = GetCustomPropertyValueFromTestCase(rockSteadyTestCase, "MSTestDiscoverer.TestCategory");
             foreach (string testCategory in testCategories)
@@ -603,6 +600,32 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 owner = ownerTrait.Value;
 
             return owner ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Gets description of test.
+        /// </summary>
+        /// <param name="rockSteadyTestCase"></param>
+        /// <returns>Description</returns>
+        private static string GetDescription(ObjectModel.TestCase rockSteadyTestCase)
+        {
+            string owner = null;
+
+            ObjectModel.Trait descriptionTrait = rockSteadyTestCase.Traits?.FirstOrDefault(t => t.Name.Equals("Description"));
+            if (descriptionTrait != null)
+                owner = descriptionTrait.Value;
+
+            return owner ?? string.Empty;
+        }
+
+        /// Gets description of test.
+        /// </summary>
+        /// <param name="rockSteadyTestCase"></param>
+        /// <returns>Description</returns>
+        private static IList<string> GetWorkItemIds(ObjectModel.TestCase rockSteadyTestCase)
+        {
+            var items = rockSteadyTestCase.Traits?.Where(t => t.Name.Equals("WorkItem")).Select(w=>w.Value)?.ToList();
+            return items ?? new List<string>();
         }
 
         /// <summary>

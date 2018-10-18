@@ -23,6 +23,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected TestId id;
         protected string name;
         protected string owner;
+        protected string description;
         protected string storage;
         protected string adapter;
         protected int priority;
@@ -80,6 +81,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 EqtAssert.ParameterNotNull(value, "Owner");
                 this.owner = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the description.
+        /// </summary>
+        public string Description
+        {
+            get { return this.description; }
+
+            set
+            {
+                EqtAssert.ParameterNotNull(value, "Description");
+                this.description = value;
             }
         }
 
@@ -168,7 +183,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             get { return this.testProperties; }
             set
             {
-                EqtAssert.ParameterNotNull(value, "value");
+                EqtAssert.ParameterNotNull(value, "TestProperties");
                 this.testProperties = value;
             }
         }
@@ -178,7 +193,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             get { return this.workItemIds; }
             set
             {
-                EqtAssert.ParameterNotNull(value, "value");
+                EqtAssert.ParameterNotNull(value, "WorkItemIds");
                 this.workItemIds = value;
             }
         }
@@ -244,6 +259,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             h.SaveSimpleField(element, "@name", this.name, null);
             h.SaveSimpleField(element, "@storage", this.storage, string.Empty);
             h.SaveSimpleField(element, "@priority", this.priority, DefaultPriority);
+            h.SaveSimpleField(element, "Description", this.description, string.Empty);
             h.SaveSimpleField(element, "Owners/Owner/@name", this.owner, string.Empty);
             h.SaveObject(this.testCategories, element, "TestCategory", parameters);
 
