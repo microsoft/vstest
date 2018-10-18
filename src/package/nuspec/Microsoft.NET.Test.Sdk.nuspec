@@ -36,8 +36,14 @@
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp1.0\" />
     <file src="Microsoft.NET.Test.Sdk.targets" target="build\netcoreapp1.0\" />
+    <file src="Microsoft.NET.Test.Sdk.cs" target="build\netcoreapp1.0\" />
+    <file src="Microsoft.NET.Test.Sdk.vb" target="build\netcoreapp1.0\" />
+    <file src="Microsoft.NET.Test.Sdk.fs" target="build\netcoreapp1.0\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\net45\" />
     <file src="Microsoft.NET.Test.Sdk.targets" target="build\net45\" />
+    <file src="Microsoft.NET.Test.Sdk.cs" target="build\net45\" />
+    <file src="Microsoft.NET.Test.Sdk.vb" target="build\net45\" />
+    <file src="Microsoft.NET.Test.Sdk.fs" target="build\net45\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\uap10.0\" />
   </files>
 </package>
