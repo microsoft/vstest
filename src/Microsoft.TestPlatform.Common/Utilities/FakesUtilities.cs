@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private const string ConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
 
-        private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=15.0.0.0, Culture=neutral";
+        private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=16.0.0.0, Culture=neutral";
 
         /// <summary>
         /// Dynamically compute the Fakes data collector settings, given a set of test assemblies
@@ -202,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             /// <summary>
             /// Gets the assembly qualified name of the data collector type
             /// </summary>
-            public const string DataCollectorAssemblyQualifiedName = "Microsoft.VisualStudio.TraceCollector.UnitTestIsolationDataCollector, Microsoft.VisualStudio.TraceCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+            public const string DataCollectorAssemblyQualifiedName = "Microsoft.VisualStudio.TraceCollector.UnitTestIsolationDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
         }
     }
 }
