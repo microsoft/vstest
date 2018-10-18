@@ -30,7 +30,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected TestExecId executionId;
         protected TestExecId parentExecutionId;
         protected TestCategoryItemCollection testCategories;
+        protected TestPropertyItemCollection testProperties;
         protected TestListCategoryId catId;
+        private System.Collections.Generic.IList<string> workItemIds;
 
         public TestElement(Guid id, string name, string adapter)
         {
@@ -161,6 +163,26 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             }
         }
 
+        public TestPropertyItemCollection TestProperties
+        {
+            get { return this.testProperties; }
+            set
+            {
+                EqtAssert.ParameterNotNull(value, "value");
+                this.testProperties = value;
+            }
+        }
+
+        public System.Collections.Generic.IList<string> WorkItemIds
+        {
+            get { return this.workItemIds; }
+            set
+            {
+                EqtAssert.ParameterNotNull(value, "value");
+                this.workItemIds = value;
+            }
+        }
+
         /// <summary>
         /// Gets the adapter name.
         /// </summary>
@@ -229,7 +251,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 h.SaveGuid(element, "Execution/@id", this.executionId.Id);
             if (this.parentExecutionId != null)
                 h.SaveGuid(element, "Execution/@parentId", this.parentExecutionId.Id);
-
+            h.SaveObject(this.testProperties, element, "Properties", parameters);
+            h.SaveIEnumerable(this.workItemIds, element, "WorkItemIDs", "@id", "WorkItem", parameters);
             XmlTestStoreParameters testIdParameters = XmlTestStoreParameters.GetParameters();
             testIdParameters[TestId.IdLocationKey] = "@id";
             h.SaveObject(this.id, element, testIdParameters);
@@ -245,6 +268,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             this.executionId = TestExecId.Empty;
             this.parentExecutionId = TestExecId.Empty;
             this.testCategories = new TestCategoryItemCollection();
+            this.testProperties = new TestPropertyItemCollection();
+            this.workItemIds = new System.Collections.Generic.List<string>();
             this.isRunnable = true;
             this.catId = TestListCategoryId.Uncategorized;
         }

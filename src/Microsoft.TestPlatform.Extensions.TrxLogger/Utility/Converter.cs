@@ -48,6 +48,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             testElement.ExecutionId = new TestExecId(executionId);
             testElement.ParentExecutionId = new TestExecId(parentExecutionId);
 
+            foreach (var trait in rockSteadyTestCase.Traits)
+            {
+                if (trait.Name == "WorkItem")
+                {
+                    testElement.WorkItemIds.Add(trait.Value);
+                }
+                else
+                {
+                    testElement.TestProperties.Add(trait.Name, trait.Value);
+                }
+            }
+
             var testCategories = GetCustomPropertyValueFromTestCase(rockSteadyTestCase, "MSTestDiscoverer.TestCategory");
             foreach (string testCategory in testCategories)
             {

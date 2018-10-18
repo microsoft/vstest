@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         #region Fields
         protected Hashtable container; 
 
-        private string childElementName;
+        protected string childElementName;
         #endregion
 
         #region Constructors
