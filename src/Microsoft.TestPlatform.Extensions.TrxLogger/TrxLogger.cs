@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     /// </summary>
     [FriendlyName(TrxLoggerConstants.FriendlyName)]
     [ExtensionUri(TrxLoggerConstants.ExtensionUri)]
-    public class TrxLogger : ITestLoggerWithParameters
+    internal class TrxLogger : ITestLoggerWithParameters
     {
         #region Fields
 
@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// Event args
         /// </param>
-        internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
+        public void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
@@ -220,7 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// The eventArgs.
         /// </param>
-        internal void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
+        public void TestResultHandler(object sender, ObjectModel.Logging.TestResultEventArgs e)
         {
             // Create test run
             if (this.testRun == null)
@@ -280,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <param name="e">
         /// Test run complete events arguments.
         /// </param>
-        internal void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
+        public void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             // Create test run
             // If abort occurs there is no call to TestResultHandler which results in testRun not created.
