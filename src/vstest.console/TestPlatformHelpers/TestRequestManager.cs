@@ -371,7 +371,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     if (isFrameworkIncompatible || isPlatformIncompatible)
                     {
                         throw new TestPlatformException(Resources.ConflictInFrameworkPlatform);
-                        // throw new TestPlatformException("Conflicts in framework/platform identifier of provided sources.");
                     }
 
                     // Update framework and platform if required. For commandline scenario update happens in ArgumentProcessor.

@@ -217,7 +217,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = @"Following DLL(s) do not match framework/platform settings. SimpleTestProject3.dll is built for Framework 4.5.1 and Platform X64";
+            var expectedErrorContains = @"Conflicts in framework/platform identifier of provided sources.";
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
@@ -225,11 +225,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 0, 0);
-            this.ExitCodeEquals(0);
+            this.ValidateSummaryStatus(0, 0, 0);
 
-            // When both x64 & x86 DLL is passed x64 dll will be ignored.
-            this.StdOutputContains(expectedWarningContains);
+            // When both x64 & x86 DLL is passed the run should abort with error message.
+            this.StdErrorContains(expectedErrorContains);
         }
 
         [TestMethod]
