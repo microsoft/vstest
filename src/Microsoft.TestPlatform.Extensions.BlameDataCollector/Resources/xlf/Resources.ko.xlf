@@ -37,23 +37,23 @@
       </trans-unit>
       <trans-unit id="BlameParameterKeyIncorrect">
         <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
-        <target state="new">The blame parameter key {0} is not valid. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">지정된 blame 매개 변수 키 {0}이(가) 잘못되었습니다. 이 키를 무시합니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="new">The blame parameter key  {0} can only support values {1}/{2}. Ignoring this parameter.</target>
-        <note></note>
+        <target state="translated">blame 매개 변수 키 {0}은(는) {1}/{2} 값만 지원할 수 있습니다. 이 키를 무시합니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">
         <source>Could not start process dump: {0}</source>
-        <target state="new">Could not start process dump: {0}</target>
-        <note></note>
+        <target state="translated">프로세스 덤프를 시작할 수 없음: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="ProcDumpNotGenerated">
         <source>CollectDump was enabled but dump file was not generated.</source>
-        <target state="new">CollectDump was enabled but dump file was not generated.</target>
-        <note></note>
+        <target state="translated">CollectDump가 사용하도록 설정되었지만 덤프 파일이 생성되지 않았습니다.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

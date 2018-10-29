@@ -70,6 +70,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public const string TmiTestIdPropertyIdentifier = "MSTestDiscoverer.TmiTestId";
 
         /// <summary>
+        /// Mstest adapter string
+        /// </summary>
+        public const string MstestAdapterString = "mstestadapter";
+
+        /// <summary>
         /// Ordered test type guid
         /// </summary>
         public static readonly Guid OrderedTestTypeGuid = new Guid("ec4800e8-40e5-4ab3-8510-b8bf29b1904d");

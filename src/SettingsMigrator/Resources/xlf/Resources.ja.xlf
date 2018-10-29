@@ -49,10 +49,15 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="new">有効な使用法: SettingsMigrator.exe &lt;移行する testsettings ファイルまたは runsettings ファイルの完全なパス&gt;
-例: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-例: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">有効な使用方法:
+SettingsMigrator.exe &lt;移行する testsettings ファイルまたは runsettings ファイルのフルパス&gt;
+SettingsMigrator.exe &lt;移行する testsettings ファイルまたは runsettings ファイルのフルパス&gt; &lt;作成する runsettings ファイルのフルパス&gt;
+例:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>

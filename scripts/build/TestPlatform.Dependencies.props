@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <VSSdkBuildToolsVersion>15.0.26201</VSSdkBuildToolsVersion>
+    <VSSdkBuildToolsVersion>15.8.3247</VSSdkBuildToolsVersion>
 
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <NETTestSdkPreviousVersion>15.5.0</NETTestSdkPreviousVersion>
@@ -22,7 +22,7 @@
 
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
-    <TestPlatformExternalsVersion>15.8.0-preview-1831095</TestPlatformExternalsVersion>
+    <TestPlatformExternalsVersion>16.0.0-preview-2148743</TestPlatformExternalsVersion>
 
   </PropertyGroup>
 </Project>

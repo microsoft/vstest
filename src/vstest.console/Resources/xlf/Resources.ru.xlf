@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;версия платформы&gt;
-      Целевая версия .NET Framework для выполнения тестов. 
-      Допустимые значения: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" и т. д.
-      Другие поддерживаемые значения: Framework35, Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
-        <note></note>
+        <target state="translated">--Framework|/Framework:&lt;версия платформы&gt;
+      Целевая версия .Net Framework для выполнения тестов. 
+      Допустимые значения: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" и т. д.
+      Другие поддерживаемые значения: Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework версии &gt;
       Целевой .net Framework версии, используемый для выполнения теста. 
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы. Другие поддерживаемые версии .NET Framework: Framework35, Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
-        <note></note>
+        <target state="translated">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы (например: .NETCoreApp,Version=v2.0). Другие поддерживаемые версии .NET Framework: Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Недопустимый .net Framework версии: {0}. Укажите имя fullname TargetFramework. Другие поддерживаемые .net Framework версии, Framework35, Framework40 и Framework45.</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;путь к файлу журнала&gt;
-      Включение подробных журналов для платформы тестирования.
-      Журналы записываются в указанный файл.</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;путь к файлу журнала&gt;
+      Включает журналы для платформы тестирования.
+      Журналы записываются в указанный файл.
+
+      Изменить уровень трассировки журналов можно, как показано ниже
+      Пример: /Diag:&lt;путь к файлу журнала&gt;;tracelevel=&lt;по умолчанию "verbose"&gt;
+      Допустимые значения для tracelevel: off (отключено), error (ошибка), warning (предупреждение), info (информация) и verbose (подробная).</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Diag | / Diag: &lt; путь к файлу журнала &gt;
       Включение подробных журналов для тестовой платформы.
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      Запускает тест в режиме обвинения. Этот параметр нужен, чтобы изолировать проблемный тест, вызывающий сбой хоста для тестов. Он создает файл выходных данных в текущем каталоге (Sequence.xml), в котором записывается порядок выполнения теста перед сбоем.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[&lt;значение&gt;];[DumpType]=[&lt;значение&gt;]
+      Выполняет тест в blame-режиме. Этот вариант помогает изолировать проблемный тест, вызывающий сбой хоста для тестов.
+      В текущем каталоге создается выходной файл "Sequence.xml",
+      который записывает порядок выполнения теста перед сбоем.
+      При необходимости вы можете выполнить сбор дампа процессов хоста для тестов.
+      В этом случае по умолчанию при сбое будет собран мини-дамп.
+      Вы также можете переопределить поведение по умолчанию с помощью дополнительных параметров:
+      CollectAlways — собирает дамп по завершении даже при отсутствии сбоев (true/false) 
+      DumpType — задает тип дампа, mini (мини-дамп) или full (полный).
+      Пример: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">Указанный с Blame параметр {0} недопустим. Он будет пропущен.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">Путь к файлу диагностики "{0}" недопустим.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">Аргумент Blame "{0}" недопустим.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Аргумент диагностики "{0}" недопустим.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Аргумент средства ведения журнала "{0}" недопустим.</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">Framework35 не поддерживается. В проектах для .Net Framework 3.5 запускайте тесты в режиме совместимости CLR 4.0 с использованием Framework40.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

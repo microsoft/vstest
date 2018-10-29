@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;프레임워크 버전&gt;
+        <target state="translated">--Framework|/Framework:&lt;프레임워크 버전&gt;
       테스트 실행에 사용할 대상 .NET Framework 버전입니다. 
       유효한 값은 ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" 등입니다.
-      지원되는 기타 값은 Framework35, Framework40, Framework45, FrameworkCore10 및 FrameworkUap10입니다.</target>
-        <note></note>
+      지원되는 기타 값은 Framework40, Framework45, FrameworkCore10 및 FrameworkUap10입니다.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-프레임 워크 | / 프레임 워크: &lt; 프레임 워크 버전 &gt;
       대상.Net Framework 버전 테스트 실행에 사용할 수 있습니다. 
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">.NET Framework 버전 {0}이(가) 잘못되었습니다. TargetFramework의 전체 경로를 지정하세요. 지원되는 다른 .NET Framework 버전은 Framework35, Framework40, Framework45, FrameworkCore10 및 FrameworkUap10입니다.</target>
-        <note></note>
+        <target state="translated">.NET Framework 버전 {0}이(가) 잘못되었습니다. TargetFramework의 전체 이름을 지정하세요(예: .NETCoreApp,Version=v2.0). 지원되는 다른 .NET Framework 버전은 Framework40, Framework45, FrameworkCore10 및 FrameworkUap10입니다.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">잘못 된.Net Framework 버전: {0}. fullname은 TargetFramework의 이름을 입력 하십시오. 지원 되는 다른.Net Framework 버전은 Framework35, Framework40 및 Framework45.</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;로그 파일 경로&gt;
-      테스트 플랫폼에 대해 자세한 정보 표시 로그를 사용하도록 설정합니다.
-      로그가 제공된 파일에 기록됩니다.</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;로그 파일 경로&gt;
+      테스트 플랫폼에 대해 로그를 사용하도록 설정합니다.
+      로그가 제공된 파일에 기록됩니다.
+
+      로그에 대한 추적 수준을 아래와 같이 변경
+      예: /Diag:&lt;로그 파일 경로&gt;;tracelevel=&lt;"verbose"를 기본값으로 설정&gt;
+      tracelevel에 허용되는 값: off, error, warning, info 및 verbose.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-진단 | / 진단: &lt; 로그 파일 경로 &gt;
       테스트 플랫폼에 대 한 자세한 정보 표시 로그를 활성화 합니다.
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      테스트를 원인 모드로 실행합니다. 이 옵션은 테스트 호스트 작동을 중단시키는 문제 있는 테스트를 격리하는 데 유용합니다. 이 경우 현재 디렉터리에 "Sequence.xml"이라는 출력 파일을 만들며, 이 파일에는 작동 중단 이전 테스트 실행 순서가 캡처되어 있습니다.</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      원인 모드에서 테스트를 실행합니다. 이 옵션은 테스트 호스트 크래시를 유발하는 문제 있는 테스트를 격리하는 데 유용합니다.
+      이 경우 현재 디렉터리에 "Sequence.xml"라는 출력 파일을 만들며,
+      이 파일에는 크래시 이전 테스트 실행 순서가 캡처되어 있습니다.
+      필요에 따라 테스트 호스트에 대한 프로세스 덤프를 수집하도록 선택할 수 있습니다.
+      덤프를 수집하도록 선택하는 경우 기본적으로 크래시에 대한 미니 덤프가 수집됩니다.
+      다음과 같은 몇 가지 선택적 매개 변수로 이 기본 동작을 재정의하도록 선택할 수도 있습니다.
+      CollectAlways - 크래시가 없는 경우에도 종료 시 덤프를 수집함(true/false) 
+      DumpType - 덤프 유형을 지정함(mini/full).
+      예: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">blame으로 지정된 blame 매개 변수 {0}이(가) 잘못되었습니다. 이 매개 변수를 무시합니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">Diag 파일 경로 '{0}'이(가) 잘못되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">Blame 인수 '{0}'이(가) 잘못되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Diag 인수 '{0}'이(가) 잘못되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">Logger 인수 '{0}'이(가) 잘못되었습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">Framework35는 지원되지 않습니다. .NET Framework 3.5를 대상으로 하는 프로젝트의 경우 Framework40을 사용하여 CLR 4.0 "호환 모드"에서 테스트를 실행하세요.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
