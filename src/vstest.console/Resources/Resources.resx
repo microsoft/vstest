@@ -719,6 +719,6 @@
     <value>Logger argument '{0}' is not valid.</value>
   </data>
   <data name="ConflictInFrameworkPlatform" xml:space="preserve">
-    <value>Conflicts in framework/platform identifier of provided sources.</value>
+    <value>The given test sources target multiple frameworks/platforms that are incompatible. Please make sure the sources target the same framework and platform.</value>
   </data>
 </root>

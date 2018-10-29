@@ -217,7 +217,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsole(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedErrorContains = @"Conflicts in framework/platform identifier of provided sources.";
+            var expectedErrorContains = @"The given test sources target multiple frameworks/platforms that are incompatible. Please make sure the sources target the same framework and platform.";
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll", "SimpleTestProjectx86.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
