@@ -9,7 +9,7 @@ The Test Platform currently ships as part Visual Studio 2017, and in the .NET Co
 |**master**  |[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Windows_NT_Debug)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug/)|[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Windows_NT_Release)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release/)|
 
 ### Contributing
-There are many ways to contribute to VSTest
+There are many ways to contribute to VSTest.
 - [Submit issues](https://github.com/Microsoft/vstest/issues) and help verify fixes as they are checked in.
 - Review the [source code changes](https://github.com/Microsoft/vstest/pulls).
 - [Contribute features and fixes](https://github.com/Microsoft/vstest-docs/blob/master/docs/contribute.md).
@@ -50,7 +50,7 @@ VSTest can be built from within Visual Studio or from the CLI.
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ### License
-VSTest platform is licensed under the [MIT license](https://github.com/Microsoft/vstest/blob/master/LICENSE)
+VSTest platform is licensed under the [MIT license](https://github.com/Microsoft/vstest/blob/master/LICENSE).
 
 ### Issue Tracking
 Please see [issue tracking](https://github.com/Microsoft/vstest-docs/blob/master/issuetracking.md) for a description of the workflow we use to process issues.
