@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         Equal,
         NotEqual,
         Contains,
+        NotContains
     }
 
     /// <summary>
@@ -148,6 +149,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         }
                     }
                     break;
+
+                case Operation.NotContains:
+                    // all values in multi-valued property should not contain 'this.Value' for NotContains to evaluate true.
+                    result = true;
+
+                    if (null != multiValue)
+                    {
+                        foreach (string propertyValue in multiValue)
+                        {
+                            Debug.Assert(null != propertyValue, "PropertyValue can not be null.");
+                            result = result && propertyValue.IndexOf(Value, StringComparison.OrdinalIgnoreCase) == -1;
+                            if (!result)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    break;
             }
             return result;
         } 
@@ -251,6 +270,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
                 case "~":
                     return Operation.Contains;
+
+                case "!~":
+                    return Operation.NotContains;
             }
             throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString)));
         }
@@ -327,13 +349,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                                     yield return tokenBuilder.ToString();
                                     tokenBuilder.Clear();
                                 }
-                                // Determine if this is a "!=" or just a single "!".
+                                // Determine if this is a "!=" or "!~" or just a single "!".
                                 var next = i + 1;
                                 if (next < s.Length && s[next] == '=')
                                 {
                                     i = next;
                                     current = '=';
                                     yield return "!=";
+                                }
+                                else if (next < s.Length && s[next] == '~')
+                                {
+                                    i = next;
+                                    current = '~';
+                                    yield return "!~";
                                 }
                                 else
                                 {

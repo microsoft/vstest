@@ -42,6 +42,15 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
+        public void NotContainsOperationShouldNotCreateFastFilter()
+        {
+            var filterExpressionWrapper = new FilterExpressionWrapper("Name!~TestClass1");
+            var fastFilter = filterExpressionWrapper.fastFilter;
+
+            Assert.IsTrue(fastFilter == null);
+        }
+
+        [TestMethod]
         public void AndOperatorAndEqualsOperationShouldNotCreateFastFilter()
         {
             var filterExpressionWrapper = new FilterExpressionWrapper("Name=Test1&Name=Test2");
