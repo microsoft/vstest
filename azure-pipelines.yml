@@ -11,9 +11,6 @@ queue:
   - msbuild
   - visualstudio
 
-variables:
-  BuildConfiguration: 'release'
-  BuildTargetRuntime: 'win7-x64'
 steps:
 
 - task: BatchScript@1
@@ -23,7 +20,6 @@ steps:
     arguments: '-verbose -configuration release'
     modifyEnvironment: false
     failOnStandardError: true
-
 
 - task: CmdLine@1
   displayName: 'Delete stale pdb files'
@@ -48,3 +44,4 @@ steps:
     testResultsFormat: VSTest
     testResultsFiles: '**\*.trx'
   condition: succeededOrFailed()
+  
