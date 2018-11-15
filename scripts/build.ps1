@@ -571,16 +571,14 @@ function Create-NugetPackages
                      "Microsoft.TestPlatform.Portable.nuspec",
                      "Microsoft.CodeCoverage.nuspec")
 
-    $targetFiles = @("Microsoft.Net.Test.Sdk.targets", "Microsoft.CodeCoverage.targets")
+    $targetFiles = @("Microsoft.CodeCoverage.targets")
     $propFiles = @("Microsoft.Net.Test.Sdk.props", "Microsoft.CodeCoverage.props")
-    $entryPointFiles = @("Microsoft.NET.Test.Sdk.Program.cs",
-                         "Microsoft.NET.Test.Sdk.Program.fs",
-                         "Microsoft.NET.Test.Sdk.Program.vb")
+    $contentDirs = @("netcoreapp", "netfx")
 
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
-    foreach ($file in $nuspecFiles + $targetFiles + $propFiles + $entryPointFiles) {
-        Copy-Item $tpNuspecDir\$file $stagingDir -Force
+    foreach ($item in $nuspecFiles + $targetFiles + $propFiles + $contentDirs) {
+        Copy-Item $tpNuspecDir\$item $stagingDir -Force -Recurse
     }
 
     # Copy empty and third patry notice file
