@@ -565,6 +565,7 @@ function Create-NugetPackages
                      "TestPlatform.TestHost.nuspec",
                      "TestPlatform.CLI.nuspec",
                      "TestPlatform.Build.nuspec",
+                     "TestPlatform.Extensions.TrxLogger.nuspec", 
                      "Microsoft.Net.Test.Sdk.nuspec",
                      "Microsoft.TestPlatform.nuspec",
                      "Microsoft.TestPlatform.Portable.nuspec",
