@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         protected TestCategoryItemCollection testCategories;
         protected TestPropertyItemCollection testProperties;
         protected TestListCategoryId catId;
-        private System.Collections.Generic.IList<string> workItemIds;
+        protected System.Collections.Generic.IList<string> workItemIds;
 
         public TestElement(Guid id, string name, string adapter)
         {
