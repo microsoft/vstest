@@ -42,7 +42,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 value = String.Empty;
             }
 
-
             this.key = key;
             this.value = value;
         }
@@ -93,7 +92,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         /// <summary>
         /// Convert the property name to a hashcode
         /// </summary>
-        /// <returns>Hashcode of the cagegory.</returns>
+        /// <returns>Hashcode of the category.</returns>
         public override int GetHashCode()
         {
             return this.key.ToUpperInvariant().GetHashCode() ^ this.value.GetHashCode();
