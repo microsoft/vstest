@@ -63,7 +63,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   variables:
-      buildConfiguration: 'debug'
+      buildConfiguration: 'release'
   steps:
   - script: ./build.sh -c $(buildConfiguration)
     displayName: './build.sh -c $(buildConfiguration)'
