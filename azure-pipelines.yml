@@ -10,7 +10,7 @@ jobs:
     - msbuild
     - visualstudio
   variables:
-    buildConfiguration: 'release'
+    buildConfiguration: 'Release'
   steps:
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
@@ -63,7 +63,7 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   variables:
-      buildConfiguration: 'release'
+      buildConfiguration: 'Release'
   steps:
   - script: ./build.sh -c $(buildConfiguration)
     displayName: './build.sh -c $(buildConfiguration)'
