@@ -2,10 +2,7 @@
 
 jobs:
 - job: Windows
-  resources:
-  - repo: self
-    clean: true
-  queue:
+  pool:
     name: VSEng-MicroBuildVS2017
     demands: 
     - DotNetFramework
@@ -63,8 +60,8 @@ jobs:
     condition: succeededOrFailed()
     
 - job: Linux
-  pools:
-  vmImage: 'ubuntu-16.04'
+  pool:
+    vmImage: 'ubuntu-16.04'
   variables:
       buildConfiguration: 'Release'
   steps:
