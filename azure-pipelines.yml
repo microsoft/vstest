@@ -1,47 +1,76 @@
 # Pipeline YAML for PR
 
-resources:
-- repo: self
-  clean: true
-queue:
-  name: VSEng-MicroBuildVS2017
-  demands: 
-  - DotNetFramework
-  - Cmd
-  - msbuild
-  - visualstudio
+jobs:
+- job: Windows
+  resources:
+  - repo: self
+    clean: true
+  queue:
+    name: VSEng-MicroBuildVS2017
+    demands: 
+    - DotNetFramework
+    - Cmd
+    - msbuild
+    - visualstudio
+  variables:
+    buildConfiguration: 'release'
+  steps:
+  - task: BatchScript@1
+    displayName: 'Run script build.cmd'
+    inputs:
+      filename: build.cmd
+      arguments: '-verbose -configuration $(buildConfiguration)'
+      modifyEnvironment: false
+      failOnStandardError: true
 
-steps:
-
-- task: BatchScript@1
-  displayName: 'Run script build.cmd'
-  inputs:
-    filename: build.cmd
-    arguments: '-verbose -configuration release'
-    modifyEnvironment: false
-    failOnStandardError: true
-
-- task: CmdLine@1
-  displayName: 'Delete stale pdb files'
-  inputs:
-    filename: del
-    arguments: '/S /F *.pdb'
-    workingFolder: '$(SystemRoot)'
-  continueOnError: true
-  condition: always()
-
-- task: BatchScript@1
-  displayName: 'Run script test.cmd'
-  inputs:
-    filename: test.cmd
-    arguments: '-verbose -configuration $(BuildConfiguration)'
-    modifyEnvironment: false
-    failOnStandardError: true
-
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results **\*.trx'
-  inputs:
-    testResultsFormat: VSTest
-    testResultsFiles: '**\*.trx'
-  condition: succeededOrFailed()
-  
+  - task: BatchScript@1
+    displayName: 'Run script test.cmd'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration)'
+      modifyEnvironment: false
+      failOnStandardError: true
+      
+  - task: BatchScript@1
+    displayName: 'Run Acceptance Tests'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -p AcceptanceTests -v -f net451'
+      modifyEnvironment: false
+      failOnStandardError: true
+      
+  - task: BatchScript@1
+    displayName: 'Run Platform Tests'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -p platformtests'
+      modifyEnvironment: false
+      failOnStandardError: true
+            
+  - task: BatchScript@1
+    displayName: 'Run Smoke Tests'
+    inputs:
+      filename: test.cmd
+      arguments: '-verbose -configuration $(buildConfiguration) -p smoke'
+      modifyEnvironment: false
+      failOnStandardError: true
+      
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **\*.trx'
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '**\*.trx'
+    condition: succeededOrFailed()
+    
+- job: Linux
+  pools:
+  vmImage: 'ubuntu-16.04'
+  variables:
+      buildConfiguration: 'Release'
+  steps:
+  - script: sh ./build.sh -c $(buildConfiguration)
+      displayName: 'sh ./build.sh -c $(buildConfiguration)'
+  - script: sh ./test.sh -c $(buildConfiguration)
+      displayName: 'sh ./test.sh -c $(buildConfiguration)'
+  - task: PublishTestResults@2
+    
