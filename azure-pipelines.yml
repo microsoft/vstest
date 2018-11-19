@@ -21,7 +21,7 @@ jobs:
       failOnStandardError: true
 
   - task: BatchScript@1
-    displayName: 'Run script test.cmd'
+    displayName: 'Run Unit Tests'
     inputs:
       filename: test.cmd
       arguments: '-verbose -configuration $(buildConfiguration)'
@@ -65,9 +65,9 @@ jobs:
   variables:
       buildConfiguration: 'Release'
   steps:
-  - script: sh ./build.sh -c $(buildConfiguration)
-    displayName: 'sh ./build.sh -c $(buildConfiguration)'
-  - script: sh ./test.sh -c $(buildConfiguration)
-    displayName: 'sh ./test.sh -c $(buildConfiguration)'
+  - script: ./build.sh -c $(buildConfiguration)
+    displayName: './build.sh -c $(buildConfiguration)'
+  - script: ./test.sh -c $(buildConfiguration)
+    displayName: './test.sh -c $(buildConfiguration)'
   - task: PublishTestResults@2
     
