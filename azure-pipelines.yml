@@ -10,7 +10,7 @@ jobs:
     - msbuild
     - visualstudio
   variables:
-    buildConfiguration: 'release'
+    buildConfiguration: 'debug'
   steps:
   - task: BatchScript@1
     displayName: 'Run script build.cmd'
