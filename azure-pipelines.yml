@@ -69,8 +69,8 @@ jobs:
       buildConfiguration: 'Release'
   steps:
   - script: sh ./build.sh -c $(buildConfiguration)
-      displayName: 'sh ./build.sh -c $(buildConfiguration)'
+    displayName: 'sh ./build.sh -c $(buildConfiguration)'
   - script: sh ./test.sh -c $(buildConfiguration)
-      displayName: 'sh ./test.sh -c $(buildConfiguration)'
+    displayName: 'sh ./test.sh -c $(buildConfiguration)'
   - task: PublishTestResults@2
     
