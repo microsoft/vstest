@@ -3,12 +3,7 @@
 jobs:
 - job: Windows
   pool:
-    name: VSEng-MicroBuildVS2017
-    demands: 
-    - DotNetFramework
-    - Cmd
-    - msbuild
-    - visualstudio
+    vmImage: 'vs2017-win2016'
   variables:
     buildConfiguration: 'Release'
   steps:
