@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -22,6 +23,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         private IVsTestConsoleWrapper consoleWrapper;
 
         private Mock<IProcessManager> mockProcessManager;
+
+        private Mock<IProcessHelper> mockProcessHelper;
 
         private Mock<ITranslationLayerRequestSender> mockRequestSender;
 
@@ -42,11 +45,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.mockProcessManager = new Mock<IProcessManager>();
+            this.mockProcessHelper = new Mock<IProcessHelper>();
             this.consoleWrapper = new VsTestConsoleWrapper(
                 this.mockRequestSender.Object,
                 this.mockProcessManager.Object,
                 this.consoleParameters,
-                new Mock<ITestPlatformEventSource>().Object);
+                new Mock<ITestPlatformEventSource>().Object,
+                this.mockProcessHelper.Object);
 
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
@@ -124,9 +129,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void InitializeExtensionsShouldThrowExceptionOnBadConnection()
         {
+            this.mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
+            var exception = Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
+            Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", exception.Message);
             this.mockRequestSender.Verify(rs => rs.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
 
@@ -158,9 +165,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldThrowExceptionOnBadConnection()
         {
+            this.mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
+            var exception = Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
+            Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", exception.Message);
             this.mockRequestSender.Verify(rs => rs.DiscoverTests(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
         }
 
