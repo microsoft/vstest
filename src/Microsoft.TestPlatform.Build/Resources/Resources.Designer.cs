@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.Build.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Skipping running test for project {0}. To run tests with dotnet test add &quot;&lt;IsTestProject&gt;true&lt;IsTestProject&gt;&quot; property to project file..
+        ///   Looks up a localized string similar to Skipping running test for project {0}. To run tests with dotnet test add &quot;&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;&quot; property to project file..
         /// </summary>
         internal static string NoIsTestProjectProperty {
             get {
