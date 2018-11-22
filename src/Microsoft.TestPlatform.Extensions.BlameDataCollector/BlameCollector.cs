@@ -240,6 +240,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
+            // Terminate the proc dump process
+            this.processDumpUtility.TerminateProcessDump();
             this.DeregisterEvents();
         }
 
