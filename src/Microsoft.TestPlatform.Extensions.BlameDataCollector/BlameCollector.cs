@@ -240,8 +240,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
             }
 
-            // Terminate the proc dump process
-            this.processDumpUtility.TerminateProcessDump();
+            // Attempt to terminate the proc dump process if proc dump was enabled
+            if (this.processDumpEnabled)
+            {
+                this.processDumpUtility.TerminateProcessDump();
+            }
+
             this.DeregisterEvents();
         }
 
