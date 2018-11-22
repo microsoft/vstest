@@ -292,6 +292,28 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
         }
 
+        /// <summary>
+        /// Ensure terminate process calls terminate on proc dump process
+        /// </summary>
+        [TestMethod]
+        public void TerminateProcessDumpShouldCallTerminateOnProcDumpProcess()
+        {
+            var processDumpUtility = new ProcessDumpUtility(
+            this.mockProcessHelper.Object,
+            this.mockFileHelper.Object,
+            this.mockPlatformEnvironment.Object,
+            this.mockNativeMethodsHelper.Object);
+
+            // Mock process helper
+            this.mockProcessHelper.Setup(x => x.TerminateProcess(It.IsAny<object>()));
+
+            // Raise
+            processDumpUtility.TerminateProcess();
+
+            // Verify
+            this.mockProcessHelper.Verify(x => x.TerminateProcess(It.IsAny<object>()), Times.Once);
+        }
+
         [TestCleanup]
         public void TestCleanup()
         {
