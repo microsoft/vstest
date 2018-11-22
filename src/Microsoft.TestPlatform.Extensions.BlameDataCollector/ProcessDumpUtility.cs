@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
             catch (Exception e)
             {
-                EqtTrace.Info($"ProcessDumpUtility : Failed to kill proc dump process with exception {e}");
+                EqtTrace.Warning($"ProcessDumpUtility : Failed to kill proc dump process with exception {e}");
             }
         }
 
