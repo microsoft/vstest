@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void TerminateProcessDump()
+        public void TerminateProcess()
         {
             try
             {

@@ -33,6 +33,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Terminate the proc dump process
         /// </summary>
-        void TerminateProcessDump();
+        void TerminateProcess();
     }
 }

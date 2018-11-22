@@ -308,7 +308,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockProcessHelper.Setup(x => x.TerminateProcess(It.IsAny<object>()));
 
             // Raise
-            processDumpUtility.TerminateProcessDump();
+            processDumpUtility.TerminateProcess();
 
             // Verify
             this.mockProcessHelper.Verify(x => x.TerminateProcess(It.IsAny<object>()), Times.Once);

@@ -214,13 +214,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.context);
 
             // Mock proc dump utility terminate process call
-            this.mockProcessDumpUtility.Setup(x => x.TerminateProcessDump());
+            this.mockProcessDumpUtility.Setup(x => x.TerminateProcess());
 
             // Raise
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify GetDumpFiles Call
-            this.mockProcessDumpUtility.Verify(x => x.TerminateProcessDump(), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.TerminateProcess(), Times.Once);
         }
 
         /// <summary>
