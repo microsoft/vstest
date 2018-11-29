@@ -300,9 +300,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
             this.testHostProcessStdError = e.Data;
-
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
+            // Invoke cancel on the cancellation token. this is required if the testhost exits unexpectedly
+            // Cancel the current request, and stop trying to connect in SetupChannel.
+            this.CancellationTokenSource.Cancel();
             this.testHostExited.Set();
         }
 
