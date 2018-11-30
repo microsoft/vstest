@@ -155,7 +155,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     connTimeout *= 5;
                 }
 
-                // Wait for a timeout for the client to connect.
+                // If TestHost does not launch then throw exception
+                // If Testhost launches, wait for connection.
                 if (!this.testHostLaunched ||
                     !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
@@ -300,7 +301,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
             this.testHostProcessStdError = e.Data;
-
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
