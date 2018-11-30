@@ -285,13 +285,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
 
         [TestMethod]
-        public void SetupChannelShouldThrowTestPlatformExceptionIfHostExitsPostLaunchDuringWaitForHandlerConnection()
+        public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledPostHostLaunchDuringWaitForHandlerConnection()
         {
             SetupTestHostLaunched(true);
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
 
             var cancellationTokenSource = new CancellationTokenSource();
-            this.mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => this.mockTestHostManager.Raise(x => x.HostExited += null, new HostProviderEventArgs("")));
+            this.mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => cancellationTokenSource.Cancel());
 
             var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
 
