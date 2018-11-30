@@ -155,7 +155,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     connTimeout *= 5;
                 }
 
-                // Wait for a timeout for the client to connect.
+                // If TestHost does not launch then throw exception
+                // If Testhost launches, wait for connection.
                 if (!this.testHostLaunched ||
                     !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
@@ -302,9 +303,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostProcessStdError = e.Data;
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
-            // Invoke cancel on the cancellation token. this is required if the testhost exits unexpectedly
-            // Cancel the current request, and stop trying to connect in SetupChannel.
-            this.CancellationTokenSource.Cancel();
             this.testHostExited.Set();
         }
 

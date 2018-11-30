@@ -283,19 +283,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             StringAssert.Equals("Cancelling the operation as requested.", message);
         }
 
-        [TestMethod]
-        public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledPostHostLaunchDuringWaitForHandlerConnection()
-        {
-            SetupTestHostLaunched(true);
-            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout, It.IsAny<CancellationToken>())).Returns(false);
-
-            var cancellationTokenSource = new CancellationTokenSource();
-            this.mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => cancellationTokenSource.Cancel());
-            var operationManager = new TestableProxyOperationManager(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, cancellationTokenSource);
-
-            var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>())).Message;
-            StringAssert.Equals("Cancelling the operation as requested.", message);
-        }
 
         [TestMethod]
         public void SetupChannelShouldThrowTestPlatformExceptionIfHostExitsPostLaunchDuringWaitForHandlerConnection()
