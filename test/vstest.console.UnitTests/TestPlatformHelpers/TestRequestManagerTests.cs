@@ -1622,7 +1622,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains("Framework"));
+            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains("<TargetFrameworkVersion>"));
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
         }
 
