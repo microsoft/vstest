@@ -5,14 +5,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
@@ -27,6 +33,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private readonly IProcessManager vstestConsoleProcessManager;
 
         private readonly ITranslationLayerRequestSender requestSender;
+
+        private readonly IProcessHelper processHelper;
 
         private bool sessionStarted;
 
@@ -63,7 +71,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="vstestConsolePath">Path to the test runner <c>vstest.console.exe</c>.</param>
         /// <param name="consoleParameters">The parameters to be passed onto the runner process</param>
         public VsTestConsoleWrapper(string vstestConsolePath, ConsoleParameters consoleParameters) :
-            this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath), consoleParameters, TestPlatformEventSource.Instance)
+            this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath), consoleParameters, TestPlatformEventSource.Instance, new ProcessHelper())
         {
         }
 
@@ -74,12 +82,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="processManager">Process manager.</param>
         /// <param name="consoleParameters">The parameters to be passed onto the runner process</param>
         /// <param name="testPlatformEventSource">Performance event source</param>
-        internal VsTestConsoleWrapper(ITranslationLayerRequestSender requestSender, IProcessManager processManager, ConsoleParameters consoleParameters, ITestPlatformEventSource testPlatformEventSource)
+        /// <param name="processHelper">Helper for process related utilities</param>
+        internal VsTestConsoleWrapper(ITranslationLayerRequestSender requestSender, IProcessManager processManager, ConsoleParameters consoleParameters, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper)
         {
             this.requestSender = requestSender;
             this.vstestConsoleProcessManager = processManager;
             this.consoleParameters = consoleParameters;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.processHelper = processHelper;
             this.pathToAdditionalExtensions = new List<string>();
 
             this.vstestConsoleProcessManager.ProcessExited += (sender, args) => this.requestSender.OnProcessExited();
@@ -263,20 +273,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started.");
                 this.sessionStarted = this.WaitForConnection();
             }
-
-            if (!this.sessionStarted)
-            {
-                throw new TransationLayerException("Error connecting to Vstest Command Line");
-            }
         }
 
         private bool WaitForConnection()
         {
             EqtTrace.Info("VsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
-            var connected = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
-            this.testPlatformEventSource.TranslationLayerInitializeStop();
 
-            return connected;
+            var timeout = EnvironmentHelper.GetConnectionTimeout();
+            if (!this.requestSender.WaitForRequestHandlerConnection(timeout * 1000))
+            {
+                var processName = this.processHelper.GetCurrentProcessFileName();
+                throw new TransationLayerException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                        processName,
+                        CoreUtilitiesConstants.VstestConsoleProcessName,
+                        timeout,
+                        EnvironmentHelper.VstestConnectionTimeout)
+                    );
+            }
+
+            this.testPlatformEventSource.TranslationLayerInitializeStop();
+            return true;
         }
     }
 }

@@ -3,8 +3,6 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    using System.Collections.Generic;
-
     public interface IProcessDumpUtility
     {
         /// <summary>
@@ -31,5 +29,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Is full dump enabled
         /// </param>
         void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
+
+        /// <summary>
+        /// Terminate the proc dump process
+        /// </summary>
+        void TerminateProcess();
     }
 }

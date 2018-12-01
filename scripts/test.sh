@@ -18,7 +18,6 @@ CONFIGURATION="Debug"
 TARGET_RUNTIME="ubuntu.16.04-x64"
 FAIL_FAST=false
 VERBOSE=false
-PROJECT_NAME_PATTERNS=**Unit*bin*Debug*netcoreapp1.0*UnitTests*dll
 
 while [ $# -gt 0 ]; do
     lowerI="$(echo ${1:-} | awk '{print tolower($0)}')"
@@ -49,6 +48,7 @@ done
 #
 # Variables
 #
+PROJECT_NAME_PATTERNS=**Unit*bin*$CONFIGURATION*netcoreapp1.0*UnitTests*dll
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
 TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"

@@ -98,14 +98,33 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void WaitForRequestHandlerConnectionWithInfiniteTimeoutShouldReturnImmediatelyWhenCancellationRequested()
+        public void WaitForRequestHandlerConnectionWithTimeoutShouldReturnImmediatelyWhenCancellationRequested()
         {
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.Cancel();
 
-            var connected = this.testRequestSender.WaitForRequestHandlerConnection(-1, cancellationTokenSource.Token);
+            var connectionTimeout = 5000;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(connectionTimeout, cancellationTokenSource.Token);
+            watch.Stop();
 
             Assert.IsFalse(connected);
+            Assert.IsTrue(watch.ElapsedMilliseconds < connectionTimeout);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionWithTimeoutShouldReturnImmediatelyIfHostExitedUnexpectedly()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            this.testRequestSender.OnClientProcessExit("DummyError");
+
+            var connectionTimeout = 5000;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(connectionTimeout, cancellationTokenSource.Token);
+            watch.Stop();
+
+            Assert.IsFalse(connected);
+            Assert.IsTrue(watch.ElapsedMilliseconds < connectionTimeout);
         }
 
         [TestMethod]

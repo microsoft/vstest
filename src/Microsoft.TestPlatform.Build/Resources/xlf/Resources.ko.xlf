@@ -41,9 +41,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NoIsTestProjectProperty">
-        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
-        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
-        <note></note>
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
+        <target state="translated">프로젝트 {0}의 테스트 실행을 건너뜁니다. dotnet test로 테스트를 실행하려면 "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" 속성을 프로젝트 파일에 추가하세요.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

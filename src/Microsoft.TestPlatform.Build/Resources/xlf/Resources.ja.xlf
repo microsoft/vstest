@@ -41,9 +41,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NoIsTestProjectProperty">
-        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
-        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
-        <note></note>
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
+        <target state="translated">プロジェクト {0} のテストの実行をスキップしています。dotnet test を使用してテストを実行するには、プロジェクト ファイルに "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" プロパティを追加します。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
