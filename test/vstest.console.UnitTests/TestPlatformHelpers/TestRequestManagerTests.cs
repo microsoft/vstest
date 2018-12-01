@@ -809,42 +809,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldThrowTestPlatformExceptionIfSourceAndTargetPlatformsAreIncompatible()
-        {
-            var payload = new DiscoveryRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll" },
-                RunSettings =
-                    @"<?xml version=""1.0"" encoding=""utf-8""?>
-                <RunSettings>
-                     <RunConfiguration>
-                     </RunConfiguration>
-                </RunSettings>"
-            };
-            this.commandLineOptions.TargetArchitecture = Architecture.X64;
-            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
-                .Returns(Architecture.X86);
-
-            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
-                .Returns(new FrameworkName(Framework.DefaultFramework.Name));
-
-            DiscoveryCriteria actualDiscoveryCriteria = null;
-            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            this.mockTestPlatform
-                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>()))
-                .Callback(
-                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options) =>
-                    {
-                        actualDiscoveryCriteria = discoveryCriteria;
-                    }).Returns(mockDiscoveryRequest.Object);
-
-            var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.DiscoverTests(payload,
-                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig)).Message;
-
-            Assert.IsTrue(actualErrorMessage.Contains("Following DLL(s) do not match framework/platform settings"));
-        }
-
-        [TestMethod]
         public void DiscoverTestsShouldPublishMetrics()
         {
             var payload = new DiscoveryRequestPayload()
@@ -972,35 +936,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFrameworkCore10));
-            var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
-
-            Assert.IsTrue(actualErrorMessage.Contains("Following DLL(s) do not match framework/platform settings"));
-        }
-
-        [TestMethod]
-        public void RunTestsShouldThrowTestPlatformExceptionIfSourceAndTargetArchitecturesAreIncompatible()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a.dll" },
-                RunSettings =
-                    @"<?xml version=""1.0"" encoding=""utf-8""?>
-                <RunSettings>
-                     <RunConfiguration>
-                       <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
-                     </RunConfiguration>
-                </RunSettings>"
-            };
-
-            this.commandLineOptions.TargetArchitecture = Architecture.X86;
-            TestRunCriteria actualTestRunCriteria = null;
-            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
-                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
-                {
-                    actualTestRunCriteria = runCriteria;
-                }).Returns(mockDiscoveryRequest.Object);
-            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>())).Returns(Architecture.X64);
             var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
 
             Assert.IsTrue(actualErrorMessage.Contains("Following DLL(s) do not match framework/platform settings"));

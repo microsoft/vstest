@@ -363,40 +363,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var navigator = document.CreateNavigator();
 
-                    var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks, out var isFrameworkIncompatible);
+                    var isFrameworkIncompatible = inferHelper.TryGetCompatibleFramework(sources, sourceFrameworks, out var inferredFramework);
                     Framework chosenFramework;
-                    var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms, out var isPlatformIncompatible);
+                    var isPlatformIncompatible = inferHelper.TryGetCompatibleArchitecture(sources, sourcePlatforms, out var inferredPlatform);
                     Architecture chosenPlatform;
 
                     if (isFrameworkIncompatible || isPlatformIncompatible)
                     {
                         throw new TestPlatformException(Resources.ConflictInFrameworkPlatform);
                     }
-
                     // Update framework and platform if required. For commandline scenario update happens in ArgumentProcessor.
                     bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
                     bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
 
                     if (updateFramework)
                     {
-                        InferRunSettingsHelper.UpdateTargetFramework(document, inferedFramework?.ToString(), overwrite: true);
-                        chosenFramework = inferedFramework;
+                        InferRunSettingsHelper.UpdateTargetFramework(document, inferredFramework?.ToString(), overwrite: true);
+                        chosenFramework = inferredFramework;
                         settingsUpdated = true;
                     }
 
                     if (updatePlatform)
                     {
-                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferedPlatform.ToString(), overwrite: true);
-                        chosenPlatform = inferedPlatform;
+                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferredPlatform.ToString(), overwrite: true);
+                        chosenPlatform = inferredPlatform;
                         settingsUpdated = true;
                     }
 
-                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning, out var incompatibiltyErrorFound);
+                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+                    var isSettingIncompatible = InferRunSettingsHelper.TryGetSettingIncompatibility(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks);
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
-                        if(incompatibiltyErrorFound)
+                        if(isSettingIncompatible)
                         {
                             throw new TestPlatformException(incompatibleSettingWarning);
                         }

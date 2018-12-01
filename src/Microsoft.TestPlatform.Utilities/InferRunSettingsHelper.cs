@@ -612,11 +612,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
         /// </summary>
-        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning, out bool incompatibilityErrorFound)
+        public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
         {
             incompatibleSettingWarning = string.Empty;
             bool incompatibilityFound = false;
-            incompatibilityErrorFound = false;
             List<String> compatibleSources = new List<String>();
             StringBuilder warnings = new StringBuilder();
             warnings.AppendLine();
@@ -625,8 +624,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 Architecture actualPlatform = sourcePlatforms[source];
                 Framework actualFramework = sourceFrameworks[source];
-                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
-                incompatibilityErrorFound = IsFrameworkRuntimeIncompatible(actualFramework, chosenFramework) || IsPlatformArchitectureIncompatible(actualPlatform, chosenPlatform);
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework) || IsFrameworkRuntimeIncompatible(actualFramework, chosenFramework);
                 if (isSettingIncompatible)
                 {
                     string incompatiblityMessage;
@@ -642,7 +640,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     compatibleSources.Add(source);
                 }
             }
-            if (incompatibilityFound || incompatibilityErrorFound)
+            if (incompatibilityFound)
             {
                 incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
             }
@@ -651,9 +649,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Returns true if source settings are incomaptible with target settings.
+        /// Returns true if framework runtime of target framework is incompatible with any source framework
         /// </summary>
-        private static bool IsSettingIncompatible(Architecture sourcePlatform,
+        public static bool TryGetSettingIncompatibility(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks)
+        {
+            bool isSettingIncompatible = false;
+            foreach (var source in sourcePlatforms.Keys)
+            {
+                Architecture actualPlatform = sourcePlatforms[source];
+                Framework actualFramework = sourceFrameworks[source];
+                isSettingIncompatible = IsFrameworkRuntimeIncompatible(actualFramework, chosenFramework);
+            }
+
+            return isSettingIncompatible;
+        }
+
+            /// <summary>
+            /// Returns true if source settings are incompatible with target settings.
+            /// </summary>
+            private static bool IsSettingIncompatible(Architecture sourcePlatform,
             Architecture targetPlatform,
             Framework sourceFramework,
             Framework targetFramework)
@@ -686,20 +700,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return false;
             }
             return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Returns true if source platform is incompatible with target platform.
-        /// </summary>
-        private static bool IsPlatformArchitectureIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
-        {
-            if (sourcePlatform == Architecture.X86 && targetPlatform == Architecture.X64 ||
-                sourcePlatform == Architecture.X64 && targetPlatform == Architecture.X86)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
