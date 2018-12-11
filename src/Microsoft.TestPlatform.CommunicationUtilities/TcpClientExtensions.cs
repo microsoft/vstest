@@ -30,13 +30,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var localEndPoint = string.Empty;
             try
             {
-                remoteEndPoint = client.Client.RemoteEndPoint.ToString();
-                localEndPoint = client.Client.LocalEndPoint.ToString();
+                remoteEndPoint = client.Client.RemoteEndPoint?.ToString();
+                localEndPoint = client.Client.LocalEndPoint?.ToString();
             }
             catch (SocketException socketException)
             {
                 EqtTrace.Error(
-                        "TcpClientExtensions.MessageLoopAsync: failed to access endpoint of the socket {0}",
+                        "Failed to access the endpoint due to socket error: {0}",
                         socketException);
             }
 
