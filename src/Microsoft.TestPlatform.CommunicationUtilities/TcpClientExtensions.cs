@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             catch (SocketException socketException)
             {
                 EqtTrace.Error(
-                        "Failed to access the endpoint due to socket error: {0}",
+                        "TcpClientExtensions.MessageLoopAsync: Failed to access the endpoint due to socket error: {0}",
                         socketException);
             }
 
