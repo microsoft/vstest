@@ -566,13 +566,13 @@ function Create-NugetPackages
                      "TestPlatform.CLI.nuspec",
                      "TestPlatform.Build.nuspec",
                      "TestPlatform.Extensions.TrxLogger.nuspec", 
-                     "Microsoft.Net.Test.Sdk.nuspec",
+                     "Microsoft.NET.Test.Sdk.nuspec",
                      "Microsoft.TestPlatform.nuspec",
                      "Microsoft.TestPlatform.Portable.nuspec",
                      "Microsoft.CodeCoverage.nuspec")
 
     $targetFiles = @("Microsoft.CodeCoverage.targets")
-    $propFiles = @("Microsoft.Net.Test.Sdk.props", "Microsoft.CodeCoverage.props")
+    $propFiles = @("Microsoft.NET.Test.Sdk.props", "Microsoft.CodeCoverage.props")
     $contentDirs = @("netcoreapp", "netfx")
 
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
