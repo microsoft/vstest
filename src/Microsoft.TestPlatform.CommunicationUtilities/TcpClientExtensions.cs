@@ -25,8 +25,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 CancellationToken cancellationToken)
         {
             Exception error = null;
-            var remoteEndPoint = client.Client.RemoteEndPoint?.ToString();
-            var localEndPoint = client.Client.LocalEndPoint?.ToString();
+
+            var remoteEndPoint = string.Empty;
+            var localEndPoint = string.Empty;
+            try
+            {
+                remoteEndPoint = client.Client.RemoteEndPoint?.ToString();
+                localEndPoint = client.Client.LocalEndPoint?.ToString();
+            }
+            catch (SocketException socketException)
+            {
+                EqtTrace.Error(
+                        "TcpClientExtensions.MessageLoopAsync: Failed to access the endpoint due to socket error: {0}",
+                        socketException);
+            }
 
             // Set read timeout to avoid blocking receive raw message
             while (channel != null && !cancellationToken.IsCancellationRequested)
