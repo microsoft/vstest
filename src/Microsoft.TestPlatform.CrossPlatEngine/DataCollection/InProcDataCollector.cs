@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
+                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(Environment.ExpandEnvironmentVariables(codeBase));
             }
             catch (Exception ex)
             {
