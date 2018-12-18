@@ -163,6 +163,20 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(settingsXml, xmlDocument.OuterXml);
         }
 
+        [TestMethod]
+        public void AppendOrModifyChildShouldAppendANewNodeWithEscapingSpecialChars()
+        {
+            var settingsXml = @"<RunSettings></RunSettings>";
+            var xmlDocument = this.GetXmlDocument(settingsXml);
+
+            XmlUtilities.AppendOrModifyChild(xmlDocument, @"/RunSettings/RC", "RC", "a&b<c>d\"e'f");
+
+            var rcxmlDocument = xmlDocument.SelectSingleNode(@"/RunSettings/RC");
+            Assert.IsNotNull(rcxmlDocument);
+            Assert.AreEqual("a&amp;b&lt;c&gt;d\"e'f", rcxmlDocument.InnerXml);
+            Assert.AreEqual("a&b<c>d\"e'f", rcxmlDocument.InnerText);
+        }
+
         #endregion
 
         #region RemoveChildNode tests
