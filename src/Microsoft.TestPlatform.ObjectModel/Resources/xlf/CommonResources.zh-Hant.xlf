@@ -30,7 +30,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
-        <source>The specified framework {0} and platform {1} is incompatible with the target framework/platform of test assemblies. Following DLL(s) do not match framework/platform settings.{2}Go to {3} for more details on managing these settings.
+        <source>The specified framework {0} and platform {1} is incompatible with the target framework/platform of test assemblies. Following DLL(s) do not match framework/platform settings.{2}Ensure that the target framework and platform of the test assemblies match the specified value. Go to {3} for more details on managing these settings.
 </source>
         <target state="new">測試回合將使用替架構 {0} 與平台 {1} 所建置的 DLL。下列 DLL 將不包含在測試回合中: {2}如需如何管理這些設定的詳細資料，請前往 {3}。
 </target>

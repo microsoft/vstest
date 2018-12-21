@@ -668,7 +668,7 @@
                /Blame:CollectDump;CollectAlways=true;DumpType=full</value>
   </data>
   <data name="TestRunAborted" xml:space="preserve">
-    <value>Test Run Aborted.</value>
+    <value>Test Run Aborted. {0}</value>
   </data>
   <data name="TestRunCanceled" xml:space="preserve">
     <value>Test Run Canceled.</value>

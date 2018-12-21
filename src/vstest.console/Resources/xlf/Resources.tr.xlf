@@ -1517,9 +1517,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
-        <source>Test Run Aborted.</source>
-        <target state="translated">Test Çalıştırması Durduruldu.</target>
-        <note />
+        <source>Test Run Aborted. {0}</source>
+        <target state="new">Test Çalıştırması Durduruldu.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>

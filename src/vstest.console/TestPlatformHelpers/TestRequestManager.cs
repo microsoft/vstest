@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -398,7 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         EqtTrace.Info(incompatibleSettingWarning);
                         if(isSettingIncompatible)
                         {
-                            throw new TestPlatformException(incompatibleSettingWarning);
+                            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.TestRunAborted, incompatibleSettingWarning));
                         }
                         ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
                     }

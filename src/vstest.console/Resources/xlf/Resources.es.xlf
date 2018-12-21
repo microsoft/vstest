@@ -1522,9 +1522,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
-        <source>Test Run Aborted.</source>
-        <target state="translated">Serie de pruebas anulada.</target>
-        <note />
+        <source>Test Run Aborted. {0}</source>
+        <target state="new">Serie de pruebas anulada.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
