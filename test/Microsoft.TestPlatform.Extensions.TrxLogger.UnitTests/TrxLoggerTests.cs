@@ -637,7 +637,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             this.MakeTestRunComplete();
 
-            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue), this.testableTrxLogger.trxFile, "Wrong Trx file name");
+            string expectedFileNameWithoutTimestamp = Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue);
+            string fileName = Path.GetFileNameWithoutExtension(this.testableTrxLogger.trxFile);
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Replace(fileName, fileName.Split('_')[0]);
+
+            Assert.AreNotEqual(expectedFileNameWithoutTimestamp, this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(expectedFileNameWithoutTimestamp, actualFileNameWithoutTimestamp, "Trx file name should construct from log file parameter");
         }
 
         /// <summary>
