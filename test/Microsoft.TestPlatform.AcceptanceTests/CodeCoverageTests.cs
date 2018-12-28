@@ -59,14 +59,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = CreateArguments(runnerInfo, targetPlatform, withRunsettings, out var trxFilePath);
+            var trxFileName = Guid.NewGuid().ToString();
+            var trxFileNamePattern = trxFileName + "*.trx";
+            var arguments = CreateArguments(runnerInfo, targetPlatform, withRunsettings, trxFileName);
 
+            // Delete existing trx files
+            var dir = new DirectoryInfo(this.resultsDirectory);
+            if (dir.Exists)
+            {
+                foreach (var file in dir.EnumerateFiles(trxFileNamePattern))
+                {
+                    file.Delete();
+                }
+            }
+
+            // Invoke tests
             this.InvokeVsTest(arguments);
 
+            // Validate
             this.ValidateSummaryStatus(1, 1, 1);
-
-            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFilePath, resultsDirectory);
-            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile: {trxFilePath}");
+            var actualCoverageFile = CodeCoverageTests.GetCoverageFileNameFromTrx(trxFileNamePattern, this.resultsDirectory);
+            Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {resultsDirectory} trxfile pattern: {trxFileNamePattern}");
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
             // Microsoft.VisualStudio.Coverage.Analysis assembly not avaialble for .NET Core.
@@ -76,8 +89,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Directory.Delete(this.resultsDirectory, true);
         }
 
-        private string CreateArguments(RunnerInfo runnerInfo, string targetPlatform, bool withRunsettings,
-            out string trxFilePath)
+        private string CreateArguments(RunnerInfo runnerInfo, string targetPlatform, bool withRunsettings, string trxFileName)
         {
             var assemblyPaths = this.GetAssetFullPath(assemblyName);
             string runSettings = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
@@ -93,7 +105,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 $" /TestAdapterPath:{traceDataCollectorDir}");
             arguments = string.Concat(arguments, $" /Platform:{targetPlatform}");
 
-            trxFilePath = Path.Combine(this.resultsDirectory, Guid.NewGuid() + ".trx");
+            var trxFilePath = Path.Combine(this.resultsDirectory, trxFileName + ".trx");
             arguments = string.Concat(arguments, " /logger:trx;logfilename=" + trxFilePath);
 
             if (withRunsettings)
@@ -148,9 +160,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 #endif
 
-        private static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
+        private static string GetCoverageFileNameFromTrx(string trxFileNamePattern, string resultsDirectory)
         {
-            Assert.IsTrue(File.Exists(trxFilePath), "Trx file not found: {0}", trxFilePath);
+            var trxFiles = Directory.EnumerateFiles(resultsDirectory, trxFileNamePattern);
+            Assert.IsTrue(trxFiles.Any(), "Trx file with pattern: {0} not found", trxFileNamePattern);
+            var trxFilePath = trxFiles.First();
             XmlDocument doc = new XmlDocument();
             using (var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read))
             {
