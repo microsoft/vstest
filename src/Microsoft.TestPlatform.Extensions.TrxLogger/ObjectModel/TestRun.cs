@@ -191,7 +191,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             // We use custom format string to make sure that runs are sorted in the same way on all intl machines.
             // This is both for directory names and for Data Warehouse.
-            return timeStamp.ToString("yyyy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo);
+            return timeStamp.ToString("yyyy-MM-dd HH:mm:ss:fff", DateTimeFormatInfo.InvariantInfo);
         }
 
         private void Initialize()
