@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private static JsonSerializer payloadSerializer;
         private static JsonSerializer payloadSerializer2;
+        private static JsonSerializer messageSerializer;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
@@ -36,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
 
+            messageSerializer = JsonSerializer.Create();
             payloadSerializer = JsonSerializer.Create(jsonSettings);
             payloadSerializer2 = JsonSerializer.Create(jsonSettings);
 
@@ -72,7 +74,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // Convert to VersionedMessage
             // Message can be deserialized to VersionedMessage where version will be 0
-            return JsonConvert.DeserializeObject<VersionedMessage>(rawMessage);
+            using (var stringReader = new StringReader(rawMessage))
+            using (var jsonReader = new JsonTextReader(stringReader))
+            {
+                return messageSerializer.Deserialize<VersionedMessage>(jsonReader);
+            }
         }
 
         /// <summary>
@@ -117,7 +123,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializeMessage(string messageType)
         {
-            return JsonConvert.SerializeObject(new Message { MessageType = messageType });
+            using (var stringWriter = new StringWriter())
+            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            {
+                messageSerializer.Serialize(jsonWriter, new Message { MessageType = messageType });
+                return stringWriter.ToString();
+            }
         }
 
         /// <summary>
@@ -130,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
-            return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });
+            return this.SerializePayload(messageType, payload, 1);
         }
 
         /// <summary>
@@ -149,7 +160,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload } :
             new Message { MessageType = messageType, Payload = serializedPayload };
 
-            return JsonConvert.SerializeObject(message);
+            using (var stringWriter = new StringWriter())
+            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            {
+                messageSerializer.Serialize(jsonWriter, message);
+                return stringWriter.ToString();
+            }
         }
 
         /// <inheritdoc/>
