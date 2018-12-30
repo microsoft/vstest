@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
+    using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
     using Microsoft.TestPlatform.Build.Resources;
 
@@ -25,16 +26,15 @@ namespace Microsoft.TestPlatform.Build.Tasks
         {
             if (string.Equals(LogType, "BuildStarted", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine(Resources.BuildStarted);
+                Log.LogMessage(MessageImportance.Normal, Resources.BuildStarted);
             }
             else if (string.Equals(LogType, "BuildCompleted", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine(Resources.BuildCompleted);
-                Console.WriteLine();
+                Log.LogMessage(MessageImportance.Normal, Resources.BuildCompleted + Environment.NewLine);
             }
             else if (string.Equals(LogType, "NoIsTestProjectProperty", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine(Resources.NoIsTestProjectProperty, ProjectFilePath);
+                Log.LogMessage(MessageImportance.Low, Resources.NoIsTestProjectProperty);
             }
             else
             {
