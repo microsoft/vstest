@@ -121,8 +121,7 @@
     <value>The parameter cannot be null or empty.</value>
   </data>
   <data name="DisplayChosenSettings" xml:space="preserve">
-    <value>The specified framework {0} and platform {1} is incompatible with the target framework/platform of test assemblies. Following DLL(s) do not match framework/platform settings.{2}Ensure that the target framework and platform of the test assemblies match the specified value. Go to {3} for more details on managing these settings.
-</value>
+    <value>The following DLL(s) do not match the specified framework {0} and platform {1} settings.{2}Ensure that the test assemblies target the specified framework/platform settings. Go to {3} for more details on managing these settings.</value>
   </data>
   <data name="MalformedRunSettingsFile" xml:space="preserve">
     <value>Settings file provided does not conform to required format.</value>

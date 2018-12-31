@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             this.InvokeVsTest(arguments);
 
-            this.StdErrorContains("Following DLL(s) do not match framework/platform settings.");
+            this.StdErrorContains("The following DLL(s) do not match framework");
         }
     }
 }

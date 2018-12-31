@@ -392,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
 
                     var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
-                    var isSettingIncompatible = InferRunSettingsHelper.TryGetSettingIncompatibility(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks);
+                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(chosenFramework, sourceFrameworks);
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {

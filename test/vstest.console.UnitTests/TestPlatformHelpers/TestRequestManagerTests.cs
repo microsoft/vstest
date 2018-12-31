@@ -805,7 +805,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.DiscoverTests(payload,
                 new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig)).Message;
 
-            Assert.IsTrue(actualErrorMessage.Contains("Following DLL(s) do not match framework/platform settings"));
+            Assert.IsTrue(actualErrorMessage.Contains("Test Run Aborted."));
         }
 
         [TestMethod]
@@ -938,7 +938,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFrameworkCore10));
             var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
 
-            Assert.IsTrue(actualErrorMessage.Contains("Following DLL(s) do not match framework/platform settings"));
+            Assert.IsTrue(actualErrorMessage.Contains("Test Run Aborted."));
         }
 
         [TestMethod]

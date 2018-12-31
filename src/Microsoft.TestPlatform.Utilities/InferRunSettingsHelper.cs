@@ -624,7 +624,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 Architecture actualPlatform = sourcePlatforms[source];
                 Framework actualFramework = sourceFrameworks[source];
-                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework) || IsFrameworkRuntimeIncompatible(actualFramework, chosenFramework);
+                bool isSettingIncompatible = IsSettingIncompatible(actualPlatform, chosenPlatform, actualFramework, chosenFramework);
                 if (isSettingIncompatible)
                 {
                     string incompatiblityMessage;
@@ -649,30 +649,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Returns true if framework runtime of target framework is incompatible with any source framework
+        /// Returns true if target framework is incompatible with any source framework, that is run needs to be aborted
         /// </summary>
-        public static bool TryGetSettingIncompatibility(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks)
+        public static bool IsFrameworkIncompatible(Framework chosenFramework, IDictionary<String, Framework> sourceFrameworks)
         {
             bool isSettingIncompatible = false;
-            foreach (var source in sourcePlatforms.Keys)
+            foreach (var source in sourceFrameworks.Keys)
             {
-                Architecture actualPlatform = sourcePlatforms[source];
                 Framework actualFramework = sourceFrameworks[source];
-                isSettingIncompatible = IsFrameworkRuntimeIncompatible(actualFramework, chosenFramework);
+                string sourceFrameworkName = actualFramework.Name.Split(',')[0];
+                string targetFrameworkName = chosenFramework.Name.Split(',')[0];
+
+                if (sourceFrameworkName.Equals(".NETFramework", StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) ||
+                   sourceFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETFramework", StringComparison.OrdinalIgnoreCase))
+                {
+                    isSettingIncompatible = true;
+                }
             }
 
             return isSettingIncompatible;
         }
 
-            /// <summary>
-            /// Returns true if source settings are incompatible with target settings.
-            /// </summary>
-            private static bool IsSettingIncompatible(Architecture sourcePlatform,
-            Architecture targetPlatform,
-            Framework sourceFramework,
-            Framework targetFramework)
+        /// <summary>
+        /// Returns true if source settings are incompatible with target settings.
+        /// </summary>
+        private static bool IsSettingIncompatible(Architecture sourcePlatform,
+        Architecture targetPlatform,
+        Framework sourceFramework,
+        Framework targetFramework)
         {
-            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
+            var res =  IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
+            return res;
         }
 
 
@@ -695,27 +702,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
         {
-            if (sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-            return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// Returns true if source Framework Runtime is incompatible with target Framework.
-        /// </summary>
-        private static bool IsFrameworkRuntimeIncompatible(Framework sourceFramework, Framework targetFramework)
-        {
             string sourceFrameworkName = sourceFramework.Name.Split(',')[0];
             string targetFrameworkName = targetFramework.Name.Split(',')[0];
 
-            if(sourceFrameworkName.Equals(".NETFramework",StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) ||
-               sourceFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETFramework", StringComparison.OrdinalIgnoreCase))
+            bool isFrameworkIncompatible = false;
+
+            if (sourceFrameworkName.Equals(".NETFramework", StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) ||
+                  sourceFrameworkName.Equals(".NETCoreApp", StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(".NETFramework", StringComparison.OrdinalIgnoreCase))
             {
-                return true;
+                isFrameworkIncompatible = true;
             }
-            return false;
+
+            var isFrameworkVersionIncompatible = !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+            return isFrameworkIncompatible || isFrameworkVersionIncompatible;
         }
     }
 }
