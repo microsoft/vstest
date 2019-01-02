@@ -72,8 +72,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Message"/> instance.</returns>
         public Message DeserializeMessage(string rawMessage)
         {
-            // Convert to VersionedMessage
-            // Message can be deserialized to VersionedMessage where version will be 0
             using (var stringReader = new StringReader(rawMessage))
             using (var jsonReader = new JsonTextReader(stringReader))
             {
@@ -123,12 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializeMessage(string messageType)
         {
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                messageSerializer.Serialize(jsonWriter, new Message { MessageType = messageType });
-                return stringWriter.ToString();
-            }
+            return this.SerializeMessage(new Message { MessageType = messageType });
         }
 
         /// <summary>
@@ -139,8 +132,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
-
             return this.SerializePayload(messageType, payload, 1);
         }
 
@@ -156,16 +147,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var serializer = this.GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, serializer);
 
-            var message = version > 1 ?
-            new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload } :
-            new Message { MessageType = messageType, Payload = serializedPayload };
-
-            using (var stringWriter = new StringWriter())
-            using (var jsonWriter = new JsonTextWriter(stringWriter))
-            {
-                messageSerializer.Serialize(jsonWriter, message);
-                return stringWriter.ToString();
-            }
+            return version > 1 ?
+                this.SerializeMessage(new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                this.SerializeMessage(new Message { MessageType = messageType, Payload = serializedPayload });
         }
 
         /// <inheritdoc/>
@@ -196,6 +180,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 serializer.Serialize(jsonWriter, data);
 
+                return stringWriter.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Serialize a message.
+        /// </summary>
+        /// <typeparam name="T">Type of message to serialize.</typeparam>
+        /// <param name="message">Message.</param>
+        /// <returns>Serialized message.</returns>
+        private string SerializeMessage<T>(T message)
+        {
+            using (var stringWriter = new StringWriter())
+            using (var jsonWriter = new JsonTextWriter(stringWriter))
+            {
+                messageSerializer.Serialize(jsonWriter, message);
                 return stringWriter.ToString();
             }
         }
