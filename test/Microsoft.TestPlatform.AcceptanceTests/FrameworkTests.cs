@@ -41,7 +41,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             this.InvokeVsTest(arguments);
 
-            this.StdErrorContains("The following DLL(s) do not match framework");
+            this.StdErrorContains("Test Run Aborted. The following DLL(s) do not match the specified framework");
         }
     }
 }
