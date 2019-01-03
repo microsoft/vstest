@@ -19,8 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     {
         private static JsonDataSerializer instance;
 
-        private static JsonSerializer payloadSerializer;
-        private static JsonSerializer payloadSerializer2;
+        private static JsonSerializer payloadSerializer; // payload serializer for version <= 1
+        private static JsonSerializer payloadSerializer2; // payload serializer for version >= 2
+        private static JsonSerializer serializer; // generic serializer
 
         /// <summary>
         /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
@@ -36,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
 
+            serializer = JsonSerializer.Create();
             payloadSerializer = JsonSerializer.Create(jsonSettings);
             payloadSerializer2 = JsonSerializer.Create(jsonSettings);
 
@@ -70,9 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Message"/> instance.</returns>
         public Message DeserializeMessage(string rawMessage)
         {
-            // Convert to VersionedMessage
-            // Message can be deserialized to VersionedMessage where version will be 0
-            return JsonConvert.DeserializeObject<VersionedMessage>(rawMessage);
+            return this.Deserialize<VersionedMessage>(serializer, rawMessage);
         }
 
         /// <summary>
@@ -83,13 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>The deserialized payload.</returns>
         public T DeserializePayload<T>(Message message)
         {
-            T retValue = default(T);
-
             var versionedMessage = message as VersionedMessage;
-            var serializer = this.GetPayloadSerializer(versionedMessage?.Version);
-
-            retValue = message.Payload.ToObject<T>(serializer);
-            return retValue;
+            var payloadSerializer = this.GetPayloadSerializer(versionedMessage?.Version);
+            return this.Deserialize<T>(payloadSerializer, message.Payload);
         }
 
         /// <summary>
@@ -101,13 +97,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>An instance of <see cref="T"/>.</returns>
         public T Deserialize<T>(string json, int version = 1)
         {
-            var serializer = this.GetPayloadSerializer(version);
-
-            using (var stringReader = new StringReader(json))
-            using (var jsonReader = new JsonTextReader(stringReader))
-            {
-                return serializer.Deserialize<T>(jsonReader);
-            }
+            var payloadSerializer = this.GetPayloadSerializer(version);
+            return this.Deserialize<T>(payloadSerializer, json);
         }
 
         /// <summary>
@@ -117,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializeMessage(string messageType)
         {
-            return JsonConvert.SerializeObject(new Message { MessageType = messageType });
+            return this.Serialize(serializer, new Message { MessageType = messageType });
         }
 
         /// <summary>
@@ -128,9 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
-
-            return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });
+            return this.SerializePayload(messageType, payload, 1);
         }
 
         /// <summary>
@@ -142,14 +131,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload, int version)
         {
-            var serializer = this.GetPayloadSerializer(version);
-            var serializedPayload = JToken.FromObject(payload, serializer);
+            var payloadSerializer = this.GetPayloadSerializer(version);
+            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
-            var message = version > 1 ?
-            new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload } :
-            new Message { MessageType = messageType, Payload = serializedPayload };
+            return version > 1 ?
+                this.Serialize(serializer, new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+                this.Serialize(serializer, new Message { MessageType = messageType, Payload = serializedPayload });
+        }
 
-            return JsonConvert.SerializeObject(message);
+        /// <summary>
+        /// Serialize an object to JSON using default serialization settings.
+        /// </summary>
+        /// <typeparam name="T">Type of object to serialize.</typeparam>
+        /// <param name="data">Instance of the object to serialize.</param>
+        /// <param name="version">Version to be stamped.</param>
+        /// <returns>JSON string.</returns>
+        public string Serialize<T>(T data, int version = 1)
+        {
+            var payloadSerializer = this.GetPayloadSerializer(version);
+            return this.Serialize(payloadSerializer, data);
         }
 
         /// <inheritdoc/>
@@ -165,23 +165,48 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <summary>
-        /// Serialize an object to JSON using default serialization settings.
+        /// Serialize data.
         /// </summary>
-        /// <typeparam name="T">Type of object to serialize.</typeparam>
-        /// <param name="data">Instance of the object to serialize.</param>
-        /// <param name="version">Version to be stamped.</param>
-        /// <returns>JSON string.</returns>
-        public string Serialize<T>(T data, int version = 1)
+        /// <typeparam name="T">Type of data.</typeparam>
+        /// <param name="serializer">Serializer.</param>
+        /// <param name="data">Data to be serialized.</param>
+        /// <returns>Serialized data.</returns>
+        private string Serialize<T>(JsonSerializer serializer, T data)
         {
-            var serializer = this.GetPayloadSerializer(version);
-
             using (var stringWriter = new StringWriter())
             using (var jsonWriter = new JsonTextWriter(stringWriter))
             {
                 serializer.Serialize(jsonWriter, data);
-
                 return stringWriter.ToString();
             }
+        }
+
+        /// <summary>
+        /// Deserialize data.
+        /// </summary>
+        /// <typeparam name="T">Type of data.</typeparam>
+        /// <param name="serializer">Serializer.</param>
+        /// <param name="data">Data to be deserialized.</param>
+        /// <returns>Deserialized data.</returns>
+        private T Deserialize<T>(JsonSerializer serializer, string data)
+        {
+            using (var stringReader = new StringReader(data))
+            using (var jsonReader = new JsonTextReader(stringReader))
+            {
+                return serializer.Deserialize<T>(jsonReader);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize JToken object to T object.
+        /// </summary>
+        /// <typeparam name="T">Type of data.</typeparam>
+        /// <param name="serializer">Serializer.</param>
+        /// <param name="jToken">JToken to be deserialized.</param>
+        /// <returns>Deserialized data.</returns>
+        private T Deserialize<T>(JsonSerializer serializer, JToken jToken)
+        {
+            return jToken.ToObject<T>(serializer);
         }
 
         private JsonSerializer GetPayloadSerializer(int? version)
