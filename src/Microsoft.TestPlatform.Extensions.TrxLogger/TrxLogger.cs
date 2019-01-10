@@ -441,17 +441,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private void DeriveTrxFilePath()
         {
-            if (this.parametersDictionary != null)
+            if (this.parametersDictionary != null &&
+                this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue) &&
+                !string.IsNullOrWhiteSpace(logFileNameValue))
             {
-                var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue);
-                if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
-                {
-                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
-                }
-                else
-                {
-                    this.SetDefaultTrxFilePath();
-                }
+                string logFileNameWithoutExt = Path.GetFileNameWithoutExtension(logFileNameValue);
+                logFileNameValue = logFileNameValue.Replace(logFileNameWithoutExt, logFileNameWithoutExt + DateTime.Now.ToString("_yyyy-MM-dd_HH-mm-ss-fff", DateTimeFormatInfo.InvariantInfo));
+                this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
             }
             else
             {

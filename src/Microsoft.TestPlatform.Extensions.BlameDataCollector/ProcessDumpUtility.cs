@@ -44,8 +44,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             };
         }
 
-    /// <inheritdoc/>
-     public string GetDumpFile()
+        /// <inheritdoc/>
+        public string GetDumpFile()
         {
             if (this.procDumpProcess == null)
             {
@@ -93,6 +93,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             null,
                                             null,
                                             null) as Process;
+        }
+
+        /// <inheritdoc/>
+        public void TerminateProcess()
+        {
+            try
+            {
+                EqtTrace.Info("ProcessDumpUtility : Attempting to kill proc dump process.");
+                this.processHelper.TerminateProcess(this.procDumpProcess);
+            }
+            catch (Exception e)
+            {
+                EqtTrace.Warning($"ProcessDumpUtility : Failed to kill proc dump process with exception {e}");
+            }
         }
 
         /// <summary>

@@ -202,45 +202,56 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Info("Blame Collector : Session End");
             }
 
-            // If the last test crashes, it will not invoke a test case end and therefore
-            // In case of crash testStartCount will be greater than testEndCount and we need to write the sequence
-            // And send the attachment
-            if (this.testStartCount > this.testEndCount)
+            try
             {
-                var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
-                filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
-                var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
-                this.dataCollectionSink.SendFileAsync(fileTranferInformation);
-            }
-
-            if (this.processDumpEnabled)
-            {
-                // If there was a test case crash or if we need to collect dump on process exit.
-                if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
+                // If the last test crashes, it will not invoke a test case end and therefore
+                // In case of crash testStartCount will be greater than testEndCount and we need to write the sequence
+                // And send the attachment
+                if (this.testStartCount > this.testEndCount)
                 {
-                    try
+                    var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName + "_" + this.attachmentGuid);
+                    filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, this.testObjectDictionary, filepath);
+                    var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
+                    this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                }
+
+                if (this.processDumpEnabled)
+                {
+                    // If there was a test case crash or if we need to collect dump on process exit.
+                    if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
                     {
-                        var dumpFile = this.processDumpUtility.GetDumpFile();
-                        if (!string.IsNullOrEmpty(dumpFile))
+                        try
                         {
-                            var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
-                            this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                            var dumpFile = this.processDumpUtility.GetDumpFile();
+                            if (!string.IsNullOrEmpty(dumpFile))
+                            {
+                                var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                                this.dataCollectionSink.SendFileAsync(fileTranferInformation);
+                            }
+                            else
+                            {
+                                EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
+                                this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
+                            }
                         }
-                        else
+                        catch (FileNotFoundException ex)
                         {
-                            EqtTrace.Warning("BlameCollector.SessionEnded_Handler: blame:CollectDump was enabled but dump file was not generated.");
-                            this.logger.LogWarning(args.Context, Resources.Resources.ProcDumpNotGenerated);
+                            EqtTrace.Warning(ex.Message);
+                            this.logger.LogWarning(args.Context, ex.Message);
                         }
-                    }
-                    catch (FileNotFoundException ex)
-                    {
-                        EqtTrace.Warning(ex.Message);
-                        this.logger.LogWarning(args.Context, ex.Message);
                     }
                 }
             }
+            finally
+            {
+                // Attempt to terminate the proc dump process if proc dump was enabled
+                if (this.processDumpEnabled)
+                {
+                    this.processDumpUtility.TerminateProcess();
+                }
 
-            this.DeregisterEvents();
+                this.DeregisterEvents();
+            }
         }
 
         /// <summary>

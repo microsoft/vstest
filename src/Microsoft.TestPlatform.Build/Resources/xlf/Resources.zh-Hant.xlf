@@ -41,9 +41,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NoIsTestProjectProperty">
-        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
-        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
-        <note></note>
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
+        <target state="translated">即將跳過為專案 {0} 執行測試。若要使用 dotnet 測試來執行測試，請在專案檔中新增 "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" 屬性。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

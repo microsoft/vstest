@@ -41,9 +41,9 @@
         <note />
       </trans-unit>
       <trans-unit id="NoIsTestProjectProperty">
-        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</source>
-        <target state="new">Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;IsTestProject&gt;" property to project file.</target>
-        <note></note>
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
+        <target state="translated">Spuštění testu pro projekt {0} se přeskočí. Pokud chcete spustit testy s testem dotnet, přidejte do souboru projektu vlastnost &lt;IsTestProject&gt;true&lt;/IsTestProject&gt;.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -15,7 +15,7 @@
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <dependencies>
       <group targetFramework="net451">
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.3.0, )" />
+        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.1.0, )" />
         <dependency id="System.Reflection.Metadata" version="[1.3.0, )" />
       </group>
       <group targetFramework="netstandard1.5">

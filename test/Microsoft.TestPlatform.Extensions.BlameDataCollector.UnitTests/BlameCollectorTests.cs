@@ -200,6 +200,30 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// The trigger session ended handler should ensure proc dump process is terminated when no crash is detected
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldEnsureProcDumpProcessIsTerminated()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Mock proc dump utility terminate process call
+            this.mockProcessDumpUtility.Setup(x => x.TerminateProcess());
+
+            // Raise
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify GetDumpFiles Call
+            this.mockProcessDumpUtility.Verify(x => x.TerminateProcess(), Times.Once);
+        }
+
+        /// <summary>
         /// The trigger session ended handler should not dump files if proc dump was enabled and test host did not crash
         /// </summary>
         [TestMethod]
