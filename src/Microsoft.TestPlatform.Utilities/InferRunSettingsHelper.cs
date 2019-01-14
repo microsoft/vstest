@@ -613,23 +613,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Returns true if target framework is incompatible with any source framework, that is run needs to be aborted
         /// </summary>
-        public static bool IsFrameworkIncompatible(Framework chosenFramework, IDictionary<String, Framework> sourceFrameworks)
+        public static bool IsFrameworkIncompatible(Framework chosenFramework, HashSet<Framework> sourceFrameworks)
         {
-            bool isFrameworkIncompatible = false;
-            foreach (var source in sourceFrameworks.Keys)
+            foreach (var actualFramework in sourceFrameworks)
             {
-                Framework actualFramework = sourceFrameworks[source];
-                string sourceFrameworkName = actualFramework.Name.Split(',')[0];
-                string targetFrameworkName = chosenFramework.Name.Split(',')[0];
-
-                if (sourceFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) ||
-                   sourceFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase))
+                if (IsFrameworkIncompatible(actualFramework, chosenFramework, false))
                 {
-                    isFrameworkIncompatible = true;
+                    return true;
                 }
             }
 
-            return isFrameworkIncompatible;
+            return false;
         }
 
         /// <summary>
@@ -673,30 +667,50 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Returns true if source settings are incompatible with target settings.
-        /// Returns true if either source Platform is incompatible with target platform or source FrameworkVersion is incompatible with target FrameworkVersion.
+        /// Returns true if source settings are incomaptible with target settings.
         /// </summary>
         private static bool IsSettingIncompatible(Architecture sourcePlatform,
-        Architecture targetPlatform,
-        Framework sourceFramework,
-        Framework targetFramework)
+            Architecture targetPlatform,
+            Framework sourceFramework,
+            Framework targetFramework)
         {
-            bool isFrameworkSettingIncompatible = false;
-            bool isPlatformSettingIncompatible = false;
+            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework, true);
+        }
 
+
+        /// <summary>
+        /// Returns true if source Platform is incompatible with target platform.
+        /// </summary>
+        private static bool IsPlatformIncompatible(Architecture sourcePlatform, Architecture targetPlatform)
+        {
             if (sourcePlatform == Architecture.Default ||
-               sourcePlatform == Architecture.AnyCPU)
+                sourcePlatform == Architecture.AnyCPU)
             {
-                isPlatformSettingIncompatible = false;
-            }
-            else
-            {
-                isPlatformSettingIncompatible = sourcePlatform != targetPlatform ? true : false;
+                return false;
             }
 
-            isFrameworkSettingIncompatible = !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+            return sourcePlatform != targetPlatform;
+        }
 
-            return isPlatformSettingIncompatible || isFrameworkSettingIncompatible;
+        /// <summary>
+        /// Returns true if source Framework or version is incompatible with target Framework or version.
+        /// </summary>
+        public static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework, bool versionCheckRequired)
+        {
+            if (versionCheckRequired)
+            {
+                return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+            }
+
+            string sourceFrameworkName = sourceFramework.Name.Split(',')[0];
+            string targetFrameworkName = targetFramework.Name.Split(',')[0];
+
+            if (sourceFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) ||
+                  sourceFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -25,6 +25,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         }
 
         /// <summary>
+        /// Gets list of frameworks from sources
+        /// </summary>
+        public HashSet<Framework> GetFrameworksList(IDictionary<string, Framework> sourceFrameworks)
+        {
+            var frameworkList = new HashSet<Framework>();
+            foreach (var source in sourceFrameworks.Keys)
+            {
+                frameworkList.Add(sourceFrameworks[source]);
+            }
+            return frameworkList;
+        }
+
+        /// <summary>
         /// Determines Architecture from sources and returns true if source architectures are incompatible
         /// </summary>
         public bool TryGetAutoDetectCompatibleArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture inferredArchitecture)
