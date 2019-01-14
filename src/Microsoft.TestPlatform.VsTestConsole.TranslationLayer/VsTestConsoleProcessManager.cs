@@ -77,8 +77,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void StartProcess(ConsoleParameters consoleParameters)
         {
             this.process = new Process();
-            process.StartInfo.FileName = vstestConsolePath;
-            process.StartInfo.Arguments = string.Join(" ", BuildArguments(consoleParameters));
+
+            //if vstest console path ends in dll, vstest needs to be started with dotnet cli
+            if (vstestConsolePath.EndsWith(".dll"))
+            {
+                process.StartInfo.FileName = "dotnet";
+                process.StartInfo.Arguments = vstestConsolePath + string.Join(" ", BuildArguments(consoleParameters));
+            }
+            else
+            {
+                process.StartInfo.FileName = vstestConsolePath;
+                process.StartInfo.Arguments = string.Join(" ", BuildArguments(consoleParameters));
+            }
 
             //process.StartInfo.WorkingDirectory = WorkingDirectory;
             process.StartInfo.UseShellExecute = false;
