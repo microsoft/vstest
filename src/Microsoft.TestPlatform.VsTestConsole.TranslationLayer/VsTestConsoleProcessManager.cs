@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Globalization;
 
     /// <summary>
-    /// Vstest.console.exe process manager
+    /// Vstest.console process manager
     /// </summary>
     internal class VsTestConsoleProcessManager : IProcessManager
     {
@@ -72,7 +72,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <summary>
-        /// Call xUnit.console.exe with the parameters previously specified
+        /// Call vstest.console with the parameters previously specified
         /// </summary>
         public void StartProcess(ConsoleParameters consoleParameters)
         {
@@ -128,11 +128,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             var args = new List<string>();
 
-            // Start Vstest.console.exe with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
+            // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
             args.Add(string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId));
             args.Add(string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber));
 
-            if(!string.IsNullOrEmpty(parameters.LogFilePath))
+            if (!string.IsNullOrEmpty(parameters.LogFilePath))
             {
                 // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
                 args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath, parameters.TraceLevel));
