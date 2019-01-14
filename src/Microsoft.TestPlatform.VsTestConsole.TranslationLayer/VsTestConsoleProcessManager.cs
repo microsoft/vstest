@@ -50,7 +50,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Creates an instance of VsTestConsoleProcessManager class.
         /// </summary>
-        /// <param name="vstestConsolePath">The fullpath to vstest.console.exe</param>
+        /// <param name="vstestConsolePath">The fullpath to vstest.console</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
             this.vstestConsolePath = vstestConsolePath;
@@ -82,7 +82,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             if (vstestConsolePath.EndsWith(".dll"))
             {
                 process.StartInfo.FileName = "dotnet";
-                process.StartInfo.Arguments = vstestConsolePath + string.Join(" ", BuildArguments(consoleParameters));
+                process.StartInfo.Arguments = vstestConsolePath + " " + string.Join(" ", BuildArguments(consoleParameters));
             }
             else
             {
