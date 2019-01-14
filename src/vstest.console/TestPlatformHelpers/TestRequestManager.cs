@@ -364,9 +364,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var navigator = document.CreateNavigator();
 
-                    var isFrameworkIncompatible = inferHelper.TryGetCompatibleFramework(sources, sourceFrameworks, out var inferredFramework);
+                    var isFrameworkIncompatible = inferHelper.TryGetAutoDetectCompatibleFramework(sources, sourceFrameworks, out var inferredFramework);
                     Framework chosenFramework;
-                    var isPlatformIncompatible = inferHelper.TryGetCompatibleArchitecture(sources, sourcePlatforms, out var inferredPlatform);
+                    var isPlatformIncompatible = inferHelper.TryGetAutoDetectCompatibleArchitecture(sources, sourcePlatforms, out var inferredPlatform);
                     Architecture chosenPlatform;
 
                     if (isFrameworkIncompatible || isPlatformIncompatible)

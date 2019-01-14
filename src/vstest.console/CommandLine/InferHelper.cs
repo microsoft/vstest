@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Architecture from sources and returns true if source architectures are incompatible
         /// </summary>
-        public bool TryGetCompatibleArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture inferredArchitecture)
+        public bool TryGetAutoDetectCompatibleArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture inferredArchitecture)
         {
             inferredArchitecture = Constants.DefaultPlatform;
             bool isArchitectureIncompatible = false;
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         /// <summary>
         /// Determines Framework from sources and returns true if source frameworks are incompatible
         /// </summary>
-        public bool TryGetCompatibleFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out Framework inferredFramework)
+        public bool TryGetAutoDetectCompatibleFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out Framework inferredFramework)
         {
             inferredFramework = Framework.DefaultFramework;
             bool isFrameworkIncompatible = false;
