@@ -9,6 +9,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System.Runtime.Serialization;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Serialization;
     using VisualStudio.TestPlatform.ObjectModel;
     using TestResult = VisualStudio.TestPlatform.ObjectModel.TestResult;
 
@@ -20,6 +22,40 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public JsonDataSerializerTests()
         {
             this.jsonDataSerializer = JsonDataSerializer.Instance;
+        }
+
+        [TestMethod]
+        public void SerializePayloadShouldNotPickDefaultSettings()
+        {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            };
+
+            var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
+            classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
+            classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
+
+            string serializedPayload = this.jsonDataSerializer.SerializePayload("dummy", classWithSelfReferencingLoop);
+            Assert.AreEqual(serializedPayload, "{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
+        }
+
+        [TestMethod]
+        public void DeserializeMessageShouldNotPickDefaultSettings()
+        {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            };
+
+            Message message = this.jsonDataSerializer.DeserializeMessage("{\"MessageType\":\"dummy\",\"Payload\":{\"InfiniteRefernce\":{}}}");
+            Assert.AreEqual(message?.MessageType, "dummy");
         }
 
         [TestMethod]
