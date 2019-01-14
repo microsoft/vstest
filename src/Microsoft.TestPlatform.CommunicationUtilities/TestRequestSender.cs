@@ -146,9 +146,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
             }
 
-            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle }, connectionTimeout);
+            // Wait until either connection is successful, handled by connected.WaitHandle
+            // or operation is cancelled, handled by cancellationToken.WaitHandle
+            // or testhost exits unexpectedly, handled by clientExited.WaitHandle
+            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle }, connectionTimeout);
 
-            // Return true if wait is because of waitHandle.
+            // Return true if connection was successful.
             return waitIndex == 0;
         }
 

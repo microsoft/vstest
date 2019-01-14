@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System.IO;
+    using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -16,18 +17,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            var trxFileName = "TestResults.trx";
+            var trxFileName = "TestResultsbla.trx";
+            var trxFileNamePattern = "TestResultsbla*.trx";
             var resultsDir = Path.GetTempPath();
-            var trxFilePath = Path.Combine(resultsDir, trxFileName);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
 
             // Delete if already exists
-            File.Delete(trxFilePath);
+            var dir = new DirectoryInfo(resultsDir);
+            foreach (var file in dir.EnumerateFiles(trxFileNamePattern))
+            {
+                file.Delete();
+            }
 
             this.InvokeVsTest(arguments);
 
-            Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
+            Assert.IsTrue(Directory.EnumerateFiles(resultsDir, trxFileNamePattern).Any(), $"Expected Trx file with pattern: {trxFileNamePattern} not created in results directory");
         }
 
         [TestMethod]
@@ -39,10 +44,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
+            var trxFileNamePattern = "TestResults*.trx";
             var relativeDirectory = @"relative\directory";
             var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), relativeDirectory);
 
-            var trxFilePath = Path.Combine(resultsDirectory , trxFileName);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{relativeDirectory}");
 
@@ -53,7 +58,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
 
-            Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
+            Assert.IsTrue(Directory.EnumerateFiles(resultsDirectory, trxFileNamePattern).Any(), $"Expected Trx file with pattern: { trxFileNamePattern} not created in results directory");
         }
     }
 }

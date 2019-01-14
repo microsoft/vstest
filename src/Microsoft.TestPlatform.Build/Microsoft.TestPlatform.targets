@@ -52,7 +52,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     />
   </Target>
 
-  <Target Name="ShowInfoMessageIfProjectHasNoIsTestProjectProperty" Condition="'$(IsTestProject)' != 'true'">
+  <Target Name="ShowInfoMessageIfProjectHasNoIsTestProjectProperty" Condition="'$(IsTestProject)' == ''">
     <Microsoft.TestPlatform.Build.Tasks.VSTestLogsTask LogType="NoIsTestProjectProperty" ProjectFilePath="$(MSBuildProjectFullPath)" />
   </Target>
 
