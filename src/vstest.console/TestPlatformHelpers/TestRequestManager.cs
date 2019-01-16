@@ -400,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     // isSettingIncompatible wil be true if run needs to be aborted due to incompatibility in source and target frameworks
                     var frameworkList = inferHelper.GetFrameworksList(sourceFrameworks);
-                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(chosenFramework, frameworkList);
+                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(frameworkList, chosenFramework, false);
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {

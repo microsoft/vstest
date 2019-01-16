@@ -610,22 +610,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return XmlUtilities.IsValidNodeXmlValue(frameworkXml, validator);
         }
 
-        /// <summary>
-        /// Returns true if target framework is incompatible with any source framework, that is run needs to be aborted
-        /// </summary>
-        public static bool IsFrameworkIncompatible(Framework chosenFramework, HashSet<Framework> sourceFrameworks)
-        {
-            foreach (var actualFramework in sourceFrameworks)
-            {
-                if (IsFrameworkIncompatible(actualFramework, chosenFramework, false))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
+        
         /// <summary>
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
@@ -674,7 +659,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Framework sourceFramework,
             Framework targetFramework)
         {
-            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework, true);
+            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(new HashSet<Framework>() { sourceFramework }, targetFramework);
         }
 
 
@@ -695,21 +680,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Returns true if source Framework or version is incompatible with target Framework or version.
         /// </summary>
-        public static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework, bool versionCheckRequired)
+        public static bool IsFrameworkIncompatible(HashSet<Framework> sourceFrameworks, Framework targetFramework, bool versionCheckRequired = true)
         {
-            if (versionCheckRequired)
+            foreach (var actualFramework in sourceFrameworks)
             {
-                return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+                if (versionCheckRequired)
+                {
+                    return !actualFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+                }
+
+                string sourceFrameworkName = actualFramework.Name.Split(',')[0];
+                string targetFrameworkName = targetFramework.Name.Split(',')[0];
+
+                if (sourceFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) ||
+                      sourceFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
             }
 
-            string sourceFrameworkName = sourceFramework.Name.Split(',')[0];
-            string targetFrameworkName = targetFramework.Name.Split(',')[0];
-
-            if (sourceFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) ||
-                  sourceFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
             return false;
         }
     }

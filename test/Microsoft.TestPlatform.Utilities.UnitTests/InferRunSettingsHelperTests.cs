@@ -469,6 +469,36 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
+        public void IsFrameworkIncompatibleShouldReturnTrueIfNoVersionCheckAndFrameworksIncompatible()
+        {
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet45, frameworkNet47 };
+            Framework targetFramework = Framework.FromString(".NETCoreApp,Version=1.0");
+
+            bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, false);
+            Assert.IsTrue(isFrameworkIncompatible);
+        }
+
+        [TestMethod]
+        public void IsFrameworkIncompatibleShouldReturnFalseIfNoVersionCheckAndFrameworksHaveDifferentVersions()
+        {
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet45, frameworkNet47 };
+            Framework targetFramework = frameworkNet46;
+
+            bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, false);
+            Assert.IsFalse(isFrameworkIncompatible);
+        }
+
+        [TestMethod]
+        public void IsFrameworkIncompatibleShouldReturnTrueIfVersionCheckAndFrameworksHaveDifferentVersions()
+        {
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet45, frameworkNet47 };
+            Framework targetFramework = frameworkNet46;
+
+            bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, true);
+            Assert.IsTrue(isFrameworkIncompatible);
+        }
+
+        [TestMethod]
         public void IsTestSettingsEnabledShouldReturnTrueIfRunsettingsHasTestSettings()
         {
             string runsettingsString = @"<RunSettings>
