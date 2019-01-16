@@ -409,7 +409,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         {
                             throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.TestRunAborted, incompatibleSettingWarning));
                         }
-                        // If run need not be aborted, raise warning messages
+                        // If run does not need to be aborted, raise warning messages
                         ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
                     }
 
