@@ -94,19 +94,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", info.FileName, info.Arguments);
 
             process = Process.Start(info);
-            process.OutputDataReceived += Process_OutputDataReceived;
-            process.ErrorDataReceived += Process_ErrorDataReceived;
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            process.EnableRaisingEvents = true;
-            process.Exited += Process_Exited;
 
             lock (syncObject)
             {
                 vstestConsoleExited = false;
                 vstestConsoleStarted = true;
             }
+
+            process.EnableRaisingEvents = true;
+            process.Exited += Process_Exited;
+
+            process.OutputDataReceived += Process_OutputDataReceived;
+            process.ErrorDataReceived += Process_ErrorDataReceived;
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
         }
 
         /// <summary>
