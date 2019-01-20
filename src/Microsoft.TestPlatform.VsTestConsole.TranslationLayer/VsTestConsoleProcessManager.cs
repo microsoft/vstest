@@ -34,10 +34,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         private const string DIAG_ARGUMENT = "/diag:{0};tracelevel={1}";
 
+        /// <summary>
+        /// Name of the xplat dotnet cli tool
+        /// </summary>
+        private const string DOTNET_EXECUTABLE = "dotnet";
+
         private string vstestConsolePath;
         private object syncObject = new object();
         private bool vstestConsoleStarted = false;
         private bool vstestConsoleExited = false;
+        private readonly bool isNetCoreRunner;
         private Process process;
 
         #endregion
@@ -54,6 +60,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
             this.vstestConsolePath = vstestConsolePath;
+            isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
         }
 
         #endregion Constructor
@@ -76,31 +83,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public void StartProcess(ConsoleParameters consoleParameters)
         {
-            this.process = new Process();
-
-            //if vstest console path ends in dll, vstest needs to be started with dotnet cli
-            if (vstestConsolePath.EndsWith(".dll"))
+            var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
             {
-                process.StartInfo.FileName = "dotnet";
-                process.StartInfo.Arguments = vstestConsolePath + " " + string.Join(" ", BuildArguments(consoleParameters));
-            }
-            else
-            {
-                process.StartInfo.FileName = vstestConsolePath;
-                process.StartInfo.Arguments = string.Join(" ", BuildArguments(consoleParameters));
-            }
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
 
-            //process.StartInfo.WorkingDirectory = WorkingDirectory;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
+            EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", info.FileName, info.Arguments);
 
-            //process.StartInfo.RedirectStandardOutput = true;
-            //process.StartInfo.RedirectStandardError = true;
+            process = Process.Start(info);
+            process.OutputDataReceived += Process_OutputDataReceived;
+            process.ErrorDataReceived += Process_ErrorDataReceived;
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
 
-            EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", process.StartInfo.FileName,
-                process.StartInfo.Arguments);
-
-            process.Start();
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;
 
@@ -119,8 +117,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Ideally process should die by itself
             if (IsProcessInitialized())
             {
-                this.process.Kill();
-                this.process.Dispose();
+                vstestConsoleExited = true;
+                process.OutputDataReceived -= Process_OutputDataReceived;
+                process.ErrorDataReceived -= Process_ErrorDataReceived;
+                process.Dispose();
                 this.process = null;
             }
         }
@@ -129,18 +129,36 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             lock (syncObject)
             {
-                vstestConsoleExited = true;
+                ShutdownProcess();
+
                 this.ProcessExited?.Invoke(sender, e);
+            }
+        }
+
+        private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                EqtTrace.Error(e.Data);
+            }
+        }
+
+        private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                EqtTrace.Verbose(e.Data);
             }
         }
 
         private string[] BuildArguments(ConsoleParameters parameters)
         {
-            var args = new List<string>();
-
-            // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
-            args.Add(string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId));
-            args.Add(string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber));
+            var args = new List<string>
+            {
+                // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
+                string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId),
+                string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber)
+            };
 
             if (!string.IsNullOrEmpty(parameters.LogFilePath))
             {
@@ -148,7 +166,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath, parameters.TraceLevel));
             }
 
+            if (isNetCoreRunner)
+            {
+                args.Insert(0, vstestConsolePath);
+            }
+
             return args.ToArray();
+        }
+
+        private string GetConsoleRunner()
+        {
+            return isNetCoreRunner ? DOTNET_EXECUTABLE : vstestConsolePath;
         }
     }
 }
