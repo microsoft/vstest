@@ -3,20 +3,15 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Collections.Generic;
+    using System.Linq;
 
     [TestClass]
     public class LiveUnitTestingTests : AcceptanceTestBase
     {
-        private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
-
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler discoveryEventHandler;
         private DiscoveryEventHandler2 discoveryEventHandler2;
@@ -43,7 +38,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -69,7 +63,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>

@@ -3,6 +3,12 @@
 
 namespace Microsoft.TestPlatform.TestUtilities
 {
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -11,13 +17,6 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
-
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// Base class for integration tests.
@@ -379,7 +378,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (this.IsNetCoreRunner())
             {
-                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+                consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
             }
             else
             {
@@ -419,7 +418,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath(), new ConsoleParameters(){LogFilePath = logFilePath});
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath(), new ConsoleParameters() { LogFilePath = logFilePath });
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;

@@ -3,18 +3,16 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
+    using global::TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading;
-
-    using global::TestPlatform.TestUtilities;
-
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// The Run Tests using VsTestConsoleWrapper API's
@@ -22,9 +20,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
-        private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
-
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
@@ -46,7 +41,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
@@ -70,7 +64,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -130,7 +123,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");
@@ -163,7 +155,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var sources = new List<string>
