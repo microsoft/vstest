@@ -659,7 +659,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Framework sourceFramework,
             Framework targetFramework)
         {
-            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(new HashSet<Framework>() { sourceFramework }, targetFramework);
+            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(new List<Framework>() { sourceFramework }, targetFramework);
         }
 
 
@@ -680,7 +680,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Returns true if source Framework or version is incompatible with target Framework or version.
         /// </summary>
-        public static bool IsFrameworkIncompatible(HashSet<Framework> sourceFrameworks, Framework targetFramework, bool versionCheckRequired = true)
+        public static bool IsFrameworkIncompatible(IEnumerable<Framework> sourceFrameworks, Framework targetFramework, bool versionCheckRequired = true)
         {
             foreach (var actualFramework in sourceFrameworks)
             {

@@ -399,8 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
 
                     // isSettingIncompatible wil be true if run needs to be aborted due to incompatibility in source and target frameworks
-                    var frameworkList = inferHelper.GetFrameworksList(sourceFrameworks);
-                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(frameworkList, chosenFramework, false);
+                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks.Values.Distinct(), chosenFramework, false);
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
