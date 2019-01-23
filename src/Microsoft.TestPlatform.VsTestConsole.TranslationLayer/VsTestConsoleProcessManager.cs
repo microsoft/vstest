@@ -117,6 +117,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 vstestConsoleExited = true;
                 process.OutputDataReceived -= Process_OutputDataReceived;
                 process.ErrorDataReceived -= Process_ErrorDataReceived;
+                process.Kill();
                 process.Dispose();
                 this.process = null;
             }
