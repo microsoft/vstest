@@ -40,6 +40,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private bool vstestConsoleStarted = false;
         private bool vstestConsoleExited = false;
         private readonly bool isNetCoreRunner;
+        private string dotnetExePath;
         private Process process;
 
         #endregion
@@ -57,6 +58,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.vstestConsolePath = vstestConsolePath;
             isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
+        }
+
+        public VsTestConsoleProcessManager(string vstestConsolePath, string dotnetExePath) : this(vstestConsolePath)
+        {
+            this.dotnetExePath = dotnetExePath;
         }
 
         #endregion Constructor
@@ -89,7 +95,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", info.FileName, info.Arguments);
 
-            process = Process.Start(info);
+            this.process = Process.Start(info);
+            this.process.Start();
 
             lock (syncObject)
             {
@@ -97,13 +104,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 vstestConsoleStarted = true;
             }
 
-            process.EnableRaisingEvents = true;
-            process.Exited += Process_Exited;
+            this.process.EnableRaisingEvents = true;
+            this.process.Exited += Process_Exited;
 
-            process.OutputDataReceived += Process_OutputDataReceived;
-            process.ErrorDataReceived += Process_ErrorDataReceived;
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+            this.process.OutputDataReceived += Process_OutputDataReceived;
+            this.process.ErrorDataReceived += Process_ErrorDataReceived;
+            this.process.BeginOutputReadLine();
+            this.process.BeginErrorReadLine();
         }
 
         /// <summary>
@@ -115,11 +122,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             if (IsProcessInitialized())
             {
                 vstestConsoleExited = true;
-                process.OutputDataReceived -= Process_OutputDataReceived;
-                process.ErrorDataReceived -= Process_ErrorDataReceived;
-                process.Kill();
-                process.Dispose();
+                this.process.OutputDataReceived -= Process_OutputDataReceived;
+                this.process.ErrorDataReceived -= Process_ErrorDataReceived;
+                SafelyTerminateProcess();
+                this.process.Dispose();
                 this.process = null;
+            }
+        }
+
+        private void SafelyTerminateProcess()
+        {
+            try
+            {
+                if (this.process != null && !this.process.HasExited)
+                {
+                    this.process.Kill();
+                }
+            }
+            catch (InvalidOperationException)
+            {
             }
         }
 
@@ -174,7 +195,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private string GetConsoleRunner()
         {
-            return isNetCoreRunner ? new DotnetHostHelper().GetDotnetPath() : vstestConsolePath;
+            return isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : vstestConsolePath;
         }
     }
 }
