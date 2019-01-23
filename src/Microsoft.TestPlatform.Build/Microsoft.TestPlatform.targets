@@ -25,7 +25,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     Main entry point for running tests through vstest.console.exe
     ============================================================
   -->
-  <Target Name="VSTest" >
+  <Target Name="VSTest" Condition="'$(IsTestProject)' == 'true'">
     <CallTarget Condition="'$(VSTestNoBuild)' != 'true'" Targets="BuildProject" />
     
     <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
