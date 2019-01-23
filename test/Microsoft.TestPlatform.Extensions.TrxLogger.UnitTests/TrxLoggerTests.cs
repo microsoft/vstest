@@ -325,6 +325,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldChangeGuidAndDisplayNameForMsTestResultIfParentNotPresentButTestResultNamePresent()
+        {
+            this.ValidateTestIdAndNameInTrx(true);
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldNotChangeGuidAndDisplayNameForNonMsTestResultIfParentNotPresentButTestResultNamePresent()
+        {
+            this.ValidateTestIdAndNameInTrx(false);
+        }
+
+        [TestMethod]
         public void TestResultHandlerShouldAddHierarchicalResultsIfParentTestResultIsPresent()
         {
             ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
@@ -625,7 +637,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             this.MakeTestRunComplete();
 
-            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue), this.testableTrxLogger.trxFile, "Wrong Trx file name");
+            string expectedFileNameWithoutTimestamp = Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue);
+            string fileName = Path.GetFileNameWithoutExtension(this.testableTrxLogger.trxFile);
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Replace(fileName, fileName.Split('_')[0]);
+
+            Assert.AreNotEqual(expectedFileNameWithoutTimestamp, this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(expectedFileNameWithoutTimestamp, actualFileNameWithoutTimestamp, "Trx file name should construct from log file parameter");
         }
 
         /// <summary>
@@ -691,6 +708,48 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                     var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
                     ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
                     ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
+                }
+            }
+        }
+
+        private void ValidateTestIdAndNameInTrx(bool isMstestAdapter)
+        {
+            ObjectModel.TestCase testCase = CreateTestCase("TestCase");
+            testCase.ExecutorUri = isMstestAdapter ? new Uri("some://mstestadapteruri") : new Uri("some://uri");
+
+            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+            result.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            if (isMstestAdapter)
+            {
+                result.DisplayName = "testDisplayName";
+            }
+
+            Mock<TestResultEventArgs> resultEventArg = new Mock<TestResultEventArgs>(result);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg.Object);
+            var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+            this.ValidateResultAttributesInTrx(this.testableTrxLogger.trxFile, testCase.Id, testCase.DisplayName, isMstestAdapter);
+        }
+
+        private void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            {
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    XDocument document = XDocument.Load(reader);
+                    var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+                    if (isMstestAdapter)
+                    {
+                        Assert.AreNotEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
+                        Assert.AreNotEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
+                        Assert.AreEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+                    }
                 }
             }
         }

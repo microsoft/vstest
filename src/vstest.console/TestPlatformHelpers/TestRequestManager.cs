@@ -639,6 +639,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             // Collecting TargetOS
             requestData.MetricsCollection.Add(TelemetryDataConstants.TargetOS, new PlatformEnvironment().OperatingSystemVersion);
+
+            //Collecting DisableAppDomain
+            requestData.MetricsCollection.Add(TelemetryDataConstants.DisableAppDomain, runConfiguration.DisableAppDomain);
+
         }
 
         /// <summary>

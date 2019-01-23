@@ -268,6 +268,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                                     <MaxCpuCount>2</MaxCpuCount>
                                     <TargetPlatform>x86</TargetPlatform>
                                     <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                    <DisableAppDomain>True</DisableAppDomain>
                                 </RunConfiguration>
                                 <MSPhoneTest>
                                   <TargetDevice>169.254.193.190</TargetDevice>
@@ -296,15 +297,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
             // Verify.
-            object targetDevice;
-            object maxcount;
-            object targetPlatform;
+            object targetDevice, maxcount, targetPlatform, disableAppDomain;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out disableAppDomain));
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
+            Assert.AreEqual(true, disableAppDomain);
         }
 
         [TestMethod]
@@ -1062,6 +1063,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                                     <MaxCpuCount>2</MaxCpuCount>
                                     <TargetPlatform>x86</TargetPlatform>
                                     <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                    <DisableAppDomain>True</DisableAppDomain>
                                 </RunConfiguration>
                                 <MSPhoneTest>
                                   <TargetDevice>169.254.193.190</TargetDevice>
@@ -1089,16 +1091,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
             // Verify
-            // Verify.
-            object targetDevice;
-            object maxcount;
-            object targetPlatform;
+            object targetDevice, maxcount, targetPlatform, disableAppDomain;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out disableAppDomain));
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
+            Assert.AreEqual(true, disableAppDomain);
         }
 
         [TestMethod]

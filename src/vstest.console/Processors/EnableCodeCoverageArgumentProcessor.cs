@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #region Default  CodeCoverage Settings String
 
         private static string codeCoverageCollectorSettingsTemplate =
-@"      <DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=15.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
+@"      <DataCollector uri=""datacollector://microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=16.0.0.0 " + @", Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"" friendlyName=""Code Coverage"">" + Environment.NewLine +
 @"        <Configuration>" + Environment.NewLine +
 @"          <CodeCoverage>" + Environment.NewLine +
 @"            <ModulePaths>" + Environment.NewLine +

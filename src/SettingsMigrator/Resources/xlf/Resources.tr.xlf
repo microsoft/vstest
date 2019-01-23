@@ -49,10 +49,15 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="new">Geçerli kullanım: SettingsMigrator.exe &lt;Geçirilecek testsettings dosyasının veya runsettings dosyasının tam yolu&gt;
-Örnek: SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings 
-Örnek: SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings</target>
-        <note></note>
+        <target state="translated">Geçerli kullanım:
+SettingsMigrator.exe &lt;Geçirilecek testsettings veya runsettings dosyalarının tam yolu&gt;
+SettingsMigrator.exe &lt;Geçirilecek testsettings veya runsettings dosyalarının tam yolu&gt; &lt;Oluşturulacak runsettings dosyasının tam yolu&gt;
+Örnekler:
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
+SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</target>
+        <note />
       </trans-unit>
     </body>
   </file>

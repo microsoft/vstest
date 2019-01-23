@@ -739,11 +739,11 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework 版本&gt;
+        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
       要用於測試執行的目標 .Net Framework 版本。 
-      有效值為 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等等
-      其他支援的值為 Framework35、Framework40、Framework45、FrameworkCore10 與 FrameworkUap10。</target>
-        <note></note>
+      有效值為 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等等。
+      其他支援的值為 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
       目标.Net Framework 版本以用于测试执行。
@@ -763,8 +763,8 @@
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">.Net Framework 版本無效:{0}。請提供 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40、Framework45、FrameworkCore10 以及 FrameworkUap10。</target>
-        <note></note>
+        <target state="translated">.Net Framework 版本無效:{0}。請提供 TargetFramework 的全名 (例如: .NETCoreApp,Version=v2.0)。其他支援的 .Net Framework 版本為 Framework40、Framework45、FrameworkCore10 以及 FrameworkUap10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">无效的.Net Framework 版本︰ {0}。 请给 TargetFramework 的全名。其他受支持的.Net Framework 版本是 Framework35、 Framework40 和 Framework45。</target>
         </alt-trans>
@@ -1393,10 +1393,14 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="new">--Diag|/Diag:&lt;記錄檔的路徑&gt;
-      啟用測試平台的詳細資訊記錄檔。
-      記錄會寫入提供的檔案中。</target>
-        <note></note>
+        <target state="translated">--Diag|/Diag:&lt;記錄檔的路徑&gt;
+      啟用測試平台的記錄。
+      記錄已寫入提供的檔案。
+
+      根據以下範例變更記錄的追蹤層級
+      範例: /Diag:&lt;記錄檔的路徑&gt;;tracelevel=&lt;預設為 "verbose"&gt;
+      tracelevel 允許的值: off、error、warning、info 和 verbose。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-诊断 | / 诊断︰ &lt; 日志文件路径 &gt;
       启用详细日志中的测试平台。
@@ -1498,9 +1502,19 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame
-      在 Blame 模式中執行測試。此選項有助於隔離造成測試主機損毀的問題測試。其會在目前的目錄中建立 "Sequence.xml" 這樣的輸出檔案，以擷取損毀前執行測試的順序。</target>
-        <note></note>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      以 blame 模式執行測試。此選項在隔離造成測試主機當機的問題測試時相當實用。
+      它會在目前的目錄建立輸出檔案 "Sequence.xml"，
+      該檔案會擷取當機前的測試執行順序。
+      您也可以選擇收集測試主機的處理序傾印。
+      當您選擇收集傾印時，預設會在當機時收集迷你傾印／
+      您也可以選擇使用一些選用參數來覆寫此預設行為:
+      CollectAlways - 即使沒有當機，也在離開時收集傾印 (true/false) 
+      DumpType - 指定傾印類型 (mini/full)。
+      範例: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
         <source>Test Run Aborted.</source>
@@ -1595,33 +1609,33 @@
       </trans-unit>
       <trans-unit id="BlameIncorrectOption">
         <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
-        <target state="new">The option specified with blame, {0} is invalid. This will be ignored.</target>
-        <note></note>
+        <target state="translated">以 blame 指定的 blame 參數 {0} 無效，即將忽略此參數。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagFilePath">
         <source>Diag file path '{0}' is not valid.</source>
-        <target state="new">Diag file path '{0}' is not valid.</target>
-        <note></note>
+        <target state="translated">診斷檔案路徑 '{0}' 無效。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidBlameArgument">
         <source>Blame argument '{0}' is not valid.</source>
-        <target state="new">Blame argument '{0}' in invalid.</target>
-        <note></note>
+        <target state="translated">Blame 引數 '{0}' 無效。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidDiagArgument">
         <source>Diag argument '{0}' is not valid.</source>
-        <target state="new">Diag argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">診斷引數 '{0}' 無效。</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidLoggerArgument">
         <source>Logger argument '{0}' is not valid.</source>
-        <target state="new">Logger argument '{0}' is invalid.</target>
-        <note></note>
+        <target state="translated">記錄器引數 '{0}' 無效。</target>
+        <note />
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 not supported. Use Framework40 or above to run tests in CLR 4.0 "compatibly mode".</target>
-        <note></note>
+        <target state="translated">不支援 Framework35。若為以 .Net Framework 3.5 為目標的專案，請使用 Framework40 在 CLR 4.0「相容模式」中執行測試。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

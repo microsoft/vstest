@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
                 // key value pairs.
                 foreach (var property in properties.Values<JToken>())
                 {
-                    var testProperty = property["Key"].ToObject<TestProperty>();
+                    var testProperty = property["Key"].ToObject<TestProperty>(serializer);
 
                     // Let the null values be passed in as null data
                     var token = property["Value"];
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
                         // If the property is already a string. No need to convert again.
                         if (token.Type == JTokenType.String)
                         {
-                            propertyData = token.ToObject<string>();
+                            propertyData = token.ToObject<string>(serializer);
                         }
                         else
                         {

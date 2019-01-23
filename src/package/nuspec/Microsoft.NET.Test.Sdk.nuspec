@@ -33,11 +33,13 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="netcoreapp\*" target="build\netcoreapp1.0\" />
+    <file src="netfx\*" target="build\net40\" />
+
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.Sdk.targets" target="build\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="build\net45\" />
-    <file src="Microsoft.NET.Test.Sdk.targets" target="build\net45\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\net40\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\uap10.0\" />
+
   </files>
 </package>

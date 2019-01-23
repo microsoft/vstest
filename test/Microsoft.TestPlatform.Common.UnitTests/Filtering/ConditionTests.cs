@@ -97,6 +97,17 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
+        public void ParseShouldHandleEscapedNotTilde()
+        {
+            var conditionString = @"FullyQualifiedName!~TestClass1\(""\!\~""\).TestMethod\(1.5\)";
+
+            Condition condition = Condition.Parse(conditionString);
+            Assert.AreEqual("FullyQualifiedName", condition.Name);
+            Assert.AreEqual(Operation.NotContains, condition.Operation);
+            Assert.AreEqual(@"TestClass1(""!~"").TestMethod(1.5)", condition.Value);
+        }
+
+        [TestMethod]
         public void ParseStringWithSingleUnescapedBangThrowsFormatException1()
         {
 
@@ -183,6 +194,19 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
             Assert.AreEqual("FullyQualifiedName", tokens[0]);
             Assert.AreEqual("~", tokens[1]);
             Assert.AreEqual(@"TestMethod\(""\~""\)", tokens[2]);
+        }
+
+        [TestMethod]
+        public void TokenizeConditionShouldHandleEscapedNotTilde()
+        {
+            var conditionString = @"FullyQualifiedName!~TestMethod\(""\!\~""\)";
+
+            var tokens = Condition.TokenizeFilterConditionString(conditionString).ToArray();
+
+            Assert.AreEqual(3, tokens.Length);
+            Assert.AreEqual("FullyQualifiedName", tokens[0]);
+            Assert.AreEqual("!~", tokens[1]);
+            Assert.AreEqual(@"TestMethod\(""\!\~""\)", tokens[2]);
         }
 
         [TestMethod]

@@ -237,7 +237,7 @@ function Invoke-Test
                         $testContainerPath
                     }
                 }
-                $trxLogFileName  =  [System.String]::Format("Parallel_{0}_{1}", $fx, $Script:TPT_DefaultTrxFileName)
+                $trxLogFileName  =  [System.String]::Format("Parallel_{0}_{1}_{2}", $TPT_Pattern, $fx, $Script:TPT_DefaultTrxFileName)
 
                 # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break
                 $fullTrxFilePath = Join-Path $Script:TPT_TestResultsDir $trxLogFileName

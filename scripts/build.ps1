@@ -384,7 +384,7 @@ function Publish-Package
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     # Copy IntelliTrace components.
-    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\15.8.0-preview-20180702-05\tools"
+    $intellitraceSourceDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Intellitrace\16.0.0-preview-20181010-02\tools"
     $intellitraceTargetDirectory = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Intellitrace"
 
     if (-not (Test-Path $intellitraceTargetDirectory)) {
@@ -565,17 +565,20 @@ function Create-NugetPackages
                      "TestPlatform.TestHost.nuspec",
                      "TestPlatform.CLI.nuspec",
                      "TestPlatform.Build.nuspec",
-                     "Microsoft.Net.Test.Sdk.nuspec",
+                     "TestPlatform.Extensions.TrxLogger.nuspec", 
+                     "Microsoft.NET.Test.Sdk.nuspec",
                      "Microsoft.TestPlatform.nuspec",
                      "Microsoft.TestPlatform.Portable.nuspec",
                      "Microsoft.CodeCoverage.nuspec")
 
-    $targetFiles = @("Microsoft.Net.Test.Sdk.targets", "Microsoft.CodeCoverage.targets")
-    $propFiles = @("Microsoft.Net.Test.Sdk.props", "Microsoft.CodeCoverage.props")
+    $targetFiles = @("Microsoft.CodeCoverage.targets")
+    $propFiles = @("Microsoft.NET.Test.Sdk.props", "Microsoft.CodeCoverage.props")
+    $contentDirs = @("netcoreapp", "netfx")
+
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
-    foreach ($file in $nuspecFiles + $targetFiles + $propFiles) {
-        Copy-Item $tpNuspecDir\$file $stagingDir -Force
+    foreach ($item in $nuspecFiles + $targetFiles + $propFiles + $contentDirs) {
+        Copy-Item $tpNuspecDir\$item $stagingDir -Force -Recurse
     }
 
     # Copy empty and third patry notice file
