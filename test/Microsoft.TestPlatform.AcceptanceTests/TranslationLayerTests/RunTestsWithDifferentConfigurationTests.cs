@@ -29,6 +29,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             this.runEventHandler = new RunEventHandler();
         }
 
+        public override string GetConsoleRunnerPath()
+        {
+            if (this.IsNetCoreRunner())
+            {
+                var consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+                Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+                return consoleRunnerPath;
+            }
+
+            return base.GetConsoleRunnerPath();
+        }
+
         [TestCleanup]
         public void Cleanup()
         {
@@ -163,24 +175,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                               };
 
             string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
+            int expectedNumOfProcessCreated = 1;
             if (this.IsDesktopTargetFramework())
             {
                 testhostProcessName = "testhost";
-                expectedNumOfProcessCreated = 1;
             }
             else
             {
                 testhostProcessName = "dotnet";
-                if (this.IsDesktopRunner())
-                {
-                    expectedNumOfProcessCreated = 1;
-                }
-                else
-                {
-                    // Include launcher dotnet.exe
-                    expectedNumOfProcessCreated = 2;
-                }
             }
 
             var cts = new CancellationTokenSource();
