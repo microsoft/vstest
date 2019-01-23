@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.Collections.Generic;
@@ -33,11 +34,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// Enables Diagnostic logging for Vstest CLI and TestHost - Optional
         /// </summary>
         private const string DIAG_ARGUMENT = "/diag:{0};tracelevel={1}";
-
-        /// <summary>
-        /// Name of the xplat dotnet cli tool
-        /// </summary>
-        private const string DOTNET_EXECUTABLE = "dotnet";
 
         private string vstestConsolePath;
         private object syncObject = new object();
@@ -177,7 +173,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private string GetConsoleRunner()
         {
-            return isNetCoreRunner ? DOTNET_EXECUTABLE : vstestConsolePath;
+            return isNetCoreRunner ? new DotnetHostHelper().GetDotnetPath() : vstestConsolePath;
         }
     }
 }
