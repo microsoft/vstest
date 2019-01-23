@@ -682,11 +682,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         public static bool IsFrameworkIncompatible(IEnumerable<Framework> sourceFrameworks, Framework targetFramework, bool versionCheckRequired = true)
         {
+            bool isFrameworkInCompatible = false;
+
             foreach (var actualFramework in sourceFrameworks)
             {
                 if (versionCheckRequired)
                 {
-                    return !actualFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+                    isFrameworkInCompatible = isFrameworkInCompatible || !actualFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
                 }
 
                 string sourceFrameworkName = actualFramework.Name.Split(',')[0];
@@ -695,11 +697,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 if (sourceFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) ||
                       sourceFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase))
                 {
-                    return true;
+                    isFrameworkInCompatible = true;
                 }
             }
 
-            return false;
+            return isFrameworkInCompatible;
         }
     }
 }

@@ -471,8 +471,8 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         [TestMethod]
         public void IsFrameworkIncompatibleShouldReturnTrueIfNoVersionCheckAndFrameworksIncompatible()
         {
-            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet45, frameworkNet47 };
             Framework targetFramework = Framework.FromString(".NETCoreApp,Version=1.0");
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { targetFramework , frameworkNet45, frameworkNet47 };
 
             bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, false);
             Assert.IsTrue(isFrameworkIncompatible);
@@ -481,7 +481,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         [TestMethod]
         public void IsFrameworkIncompatibleShouldReturnFalseIfNoVersionCheckAndFrameworksHaveDifferentVersions()
         {
-            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet45, frameworkNet47 };
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet46, frameworkNet45, frameworkNet47 };
             Framework targetFramework = frameworkNet46;
 
             bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, false);
