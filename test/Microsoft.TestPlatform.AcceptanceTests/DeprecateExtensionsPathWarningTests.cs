@@ -76,7 +76,7 @@
             this.StdOutputContains("Adapter lookup is being changed, please follow");
         }
 
-        public override string GetConsoleRunnerPath(bool isVsTestConsoleDLLScenario = false)
+        public override string GetConsoleRunnerPath()
         {
             DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent;
 

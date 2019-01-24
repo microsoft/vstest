@@ -368,7 +368,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns>
         /// Full path to test runner
         /// </returns>
-        public virtual string GetConsoleRunnerPath(bool isVsTestConsoleDLLScenario = false)
+        public virtual string GetConsoleRunnerPath()
         {
             string consoleRunnerPath = string.Empty;
 
@@ -378,8 +378,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (this.IsNetCoreRunner())
             {
-                consoleRunnerPath = isVsTestConsoleDLLScenario ? Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll") :
-                Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
             }
             else
             {
@@ -405,7 +404,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper(bool isVsTestConsoleDLLScenario = false)
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
             var logFileName = Path.GetFileName(Path.GetTempFileName());
             var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
@@ -419,7 +418,18 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             Console.WriteLine($"Logging diagnostics in {logFilePath}");
 
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath(isVsTestConsoleDLLScenario), Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe"), new ConsoleParameters() { LogFilePath = logFilePath });
+            string consoleRunnerPath;
+
+            if (this.IsNetCoreRunner())
+            {
+                consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+            }
+            else
+            {
+                consoleRunnerPath = this.GetConsoleRunnerPath();
+            }
+
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe"), new ConsoleParameters() { LogFilePath = logFilePath });
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;

@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Discovery was aborted..
         /// </summary>
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("AbortedTestsDiscovery", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The active Tests Run was aborted..
         /// </summary>
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Failed to receive message from vstest.console process.
         /// </summary>
@@ -87,7 +87,16 @@ namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Res
                 return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to File {0} does not exists.
+        /// </summary>
+        public static string InvalidFilePath {
+            get {
+                return ResourceManager.GetString("InvalidFilePath", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to vstest.console process exited abnormally.
         /// </summary>

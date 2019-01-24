@@ -6,10 +6,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
     /// <summary>
     /// Vstest.console process manager
@@ -43,6 +46,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private string dotnetExePath;
         private Process process;
 
+        internal IFileHelper FileHelper { get; set; }
+
         #endregion
 
         /// <inheritdoc/>
@@ -56,12 +61,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="vstestConsolePath">The fullpath to vstest.console</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
+            if (!this.FileHelper.Exists(vstestConsolePath))
+            {
+                EqtTrace.Error("Invalid File Path: {0}", vstestConsolePath);
+                throw new Exception(string.Format(CultureInfo.CurrentCulture, Resources.InvalidFilePath, vstestConsolePath));
+            }
             this.vstestConsolePath = vstestConsolePath;
             isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
+            this.FileHelper = new FileHelper();
         }
 
         public VsTestConsoleProcessManager(string vstestConsolePath, string dotnetExePath) : this(vstestConsolePath)
         {
+            if (!this.FileHelper.Exists(dotnetExePath))
+            {
+                EqtTrace.Error("Invalid File Path: {0}", dotnetExePath);
+                throw new Exception( string.Format( CultureInfo.CurrentCulture, Resources.InvalidFilePath, dotnetExePath));
+            }
             this.dotnetExePath = dotnetExePath;
         }
 
@@ -93,7 +109,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 RedirectStandardError = true
             };
 
-            EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", info.FileName, info.Arguments);
+            EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
             this.process = Process.Start(info);
             this.process.Start();
@@ -139,8 +155,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     this.process.Kill();
                 }
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
+                EqtTrace.Info("VsTestCommandLineWrapper: Error While Terminating Process {0} ", ex.Message);
             }
         }
 
