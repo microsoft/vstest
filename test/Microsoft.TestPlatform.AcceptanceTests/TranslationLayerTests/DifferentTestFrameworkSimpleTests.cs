@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(this.IsNetCoreRunner());
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.runEventHandler = new RunEventHandler();
         }
 

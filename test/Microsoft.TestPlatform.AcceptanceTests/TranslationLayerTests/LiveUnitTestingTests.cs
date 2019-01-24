@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         public void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(this.IsNetCoreRunner());
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
             this.discoveryEventHandler = new DiscoveryEventHandler();
             this.discoveryEventHandler2 = new DiscoveryEventHandler2();
             this.runEventHandler = new RunEventHandler();
