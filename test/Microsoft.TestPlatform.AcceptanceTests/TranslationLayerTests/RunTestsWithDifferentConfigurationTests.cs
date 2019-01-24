@@ -20,25 +20,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunTestsWithDifferentConfigurationTests : AcceptanceTestBase
     {
+        private const string Netcoreapp = "netcoreapp";
+        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
+
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(this.IsNetCoreRunner());
             this.runEventHandler = new RunEventHandler();
-        }
-
-        public override string GetConsoleRunnerPath()
-        {
-            if (this.IsNetCoreRunner())
-            {
-                var consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
-                Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
-                return consoleRunnerPath;
-            }
-
-            return base.GetConsoleRunnerPath();
         }
 
         [TestCleanup]
@@ -87,24 +78,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                     </RunSettings>";
 
             string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
+            int expectedNumOfProcessCreated = 2;
             if (this.IsDesktopTargetFramework())
             {
                 testhostProcessName = "testhost.x86";
-                expectedNumOfProcessCreated = 2;
             }
             else
             {
                 testhostProcessName = "dotnet";
-                if (this.IsDesktopRunner())
-                {
-                    expectedNumOfProcessCreated = 2;
-                }
-                else
-                {
-                    // Include launcher dotnet.exe
-                    expectedNumOfProcessCreated = 3;
-                }
             }
 
             var cts = new CancellationTokenSource();
@@ -135,6 +116,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTestSettings(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var testsettingsFile = Path.Combine(Path.GetTempPath(), "tempsettings.testsettings");

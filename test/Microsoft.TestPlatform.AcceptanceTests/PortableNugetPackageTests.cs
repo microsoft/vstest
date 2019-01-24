@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ExitCodeEquals(0);
         }
 
-        public override string GetConsoleRunnerPath()
+        public override string GetConsoleRunnerPath(bool isVsTestConsoleDLLScenario = false)
         {
             string consoleRunnerPath = string.Empty;
 
