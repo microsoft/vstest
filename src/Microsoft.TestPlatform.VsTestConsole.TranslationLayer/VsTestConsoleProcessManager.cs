@@ -61,6 +61,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="vstestConsolePath">The fullpath to vstest.console</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
+            this.FileHelper = new FileHelper();
             if (!this.FileHelper.Exists(vstestConsolePath))
             {
                 EqtTrace.Error("Invalid File Path: {0}", vstestConsolePath);
@@ -68,16 +69,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             this.vstestConsolePath = vstestConsolePath;
             isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
-            this.FileHelper = new FileHelper();
         }
 
         public VsTestConsoleProcessManager(string vstestConsolePath, string dotnetExePath) : this(vstestConsolePath)
         {
-            if (!this.FileHelper.Exists(dotnetExePath))
-            {
-                EqtTrace.Error("Invalid File Path: {0}", dotnetExePath);
-                throw new Exception( string.Format( CultureInfo.CurrentCulture, Resources.InvalidFilePath, dotnetExePath));
-            }
             this.dotnetExePath = dotnetExePath;
         }
 
