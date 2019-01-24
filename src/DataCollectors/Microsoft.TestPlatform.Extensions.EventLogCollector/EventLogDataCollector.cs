@@ -575,7 +575,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 catch (Exception ex)
                 {
                     this.logger.LogError(
-                        null,
+                        this.dataCollectorContext,
                         new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.ReadError, eventLogName, Environment.MachineName), ex));
                 }
             }
