@@ -277,7 +277,7 @@
     <value>'{0}' not found.</value>
   </data>
   <data name="Framework35NotSupported" xml:space="preserve">
-    <value>Framework35 is not supported. For projects targeting .Net Framework 3.5, tests are running in "compatibility mode".</value>
+    <value>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</value>
   </data>
   <data name="FrameworkArgumentHelp" xml:space="preserve">
     <value>--Framework|/Framework:&lt;Framework Version&gt;

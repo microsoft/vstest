@@ -658,7 +658,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Framework35 is not supported. For projects targeting .Net Framework 3.5, tests are running in &quot;compatibility mode&quot;..
+        ///  Looks up a localized string similar to Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 &quot;compatibility mode&quot;..
         /// </summary>
         public static string Framework35NotSupported
         {
