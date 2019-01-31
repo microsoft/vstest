@@ -848,7 +848,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void RunTestsShouldThrowForFramework35()
+        public void RunTestsShouldNotThrowForFramework35()
         {
             var payload = new TestRunRequestPayload()
             {
@@ -870,9 +870,14 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     actualTestRunCriteria = runCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
-            var actualErrorMessage = Assert.ThrowsException<TestPlatformException>( () => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
 
-            Assert.AreEqual("Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".", actualErrorMessage);
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+
+            mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStart(), Times.Once);
+            mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStop(), Times.Once);
         }
 
         [TestMethod]
