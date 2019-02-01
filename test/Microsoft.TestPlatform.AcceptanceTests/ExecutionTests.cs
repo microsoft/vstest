@@ -245,7 +245,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
 
-            this.ValidateSummaryStatus(1, 0, 0);
+            this.ValidateSummaryStatus(1, 1, 1);
             this.ExitCodeEquals(0);
 
             this.StdOutputContains(expectedWarningContains);
