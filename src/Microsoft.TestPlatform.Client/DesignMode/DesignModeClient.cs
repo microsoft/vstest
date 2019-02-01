@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -14,22 +15,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     /// <summary>
     /// The design mode client.
     /// </summary>
     public class DesignModeClient : IDesignModeClient
     {
-        /// <summary>
-        /// The timeout for the client to connect to the server.
-        /// </summary>
-        private const int ClientListenTimeOut = 5 * 1000;
-
         private readonly ICommunicationManager communicationManager;
 
         private readonly IDataSerializer dataSerializer;
@@ -96,17 +95,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
             this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
+            var connectionTimeout = EnvironmentHelper.GetConnectionTimeout();
+
             // Wait for the connection to the server and listen for requests.
-            if (this.communicationManager.WaitForServerConnection(ClientListenTimeOut))
+            if (this.communicationManager.WaitForServerConnection(connectionTimeout))
             {
                 this.communicationManager.SendMessage(MessageType.SessionConnected);
                 this.ProcessRequests(testRequestManager);
             }
             else
             {
-                EqtTrace.Info("Client timed out while connecting to the server.");
+                EqtTrace.Error("DesignModeClient : ConnectToClientAndProcessRequests : Client timed out while connecting to the server.");
                 this.Dispose();
-                throw new TimeoutException();
+                throw new TimeoutException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                        CoreUtilitiesConstants.VstestConsoleProcessName,
+                        "translation layer",
+                        connectionTimeout,
+                        EnvironmentHelper.VstestConnectionTimeout)
+                    );
             }
         }
 

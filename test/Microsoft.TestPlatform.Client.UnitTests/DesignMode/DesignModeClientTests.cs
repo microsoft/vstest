@@ -252,7 +252,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+            var ex = Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+            Assert.AreEqual("vstest.console process failed to connect to translation layer process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", ex.Message);
 
             this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
