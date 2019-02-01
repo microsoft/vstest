@@ -231,24 +231,5 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // When both x64 & x86 DLL is passed x64 dll will be ignored.
             this.StdOutputContains(expectedWarningContains);
         }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource(useCoreRunner:false)]
-        public void ExecuteTestsForFramework35ShouldPrintWarningMessage(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = "Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 \"compatibility mode\".";
-            var assemblyPaths = this.GetAssetFullPath("SimpleTestProject.dll");
-
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, " /Framework:.NETFramework,Version=v3.5");
-
-            this.InvokeVsTest(arguments);
-
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ExitCodeEquals(0);
-
-            this.StdOutputContains(expectedWarningContains);
-        }
     }
 }
