@@ -28,8 +28,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     {
         #region Private Members
 
-        private const int ConnectionTimeout = 30 * 1000;
-
         private readonly IProcessManager vstestConsoleProcessManager;
 
         private readonly ITranslationLayerRequestSender requestSender;
