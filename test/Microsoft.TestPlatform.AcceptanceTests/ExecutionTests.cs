@@ -234,10 +234,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource(useCoreRunner:false)]
-        public void ExecuteTestsForFramework35ShouldPrintErrorMessage(RunnerInfo runnerInfo)
+        public void ExecuteTestsForFramework35ShouldPrintWarningMessage(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = "Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".";
+            var expectedWarningContains = "Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 \"compatibility mode\".";
             var assemblyPaths = this.GetAssetFullPath("SimpleTestProject.dll");
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
@@ -245,9 +245,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
 
-            this.ExitCodeEquals(1);
+            this.ValidateSummaryStatus(1, 0, 0);
+            this.ExitCodeEquals(0);
 
-            this.StdErrorContains(expectedWarningContains);
+            this.StdOutputContains(expectedWarningContains);
         }
     }
 }
