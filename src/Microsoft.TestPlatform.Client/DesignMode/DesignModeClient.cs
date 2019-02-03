@@ -95,10 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
             this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
-            var connectionTimeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
+            var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
 
             // Wait for the connection to the server and listen for requests.
-            if (this.communicationManager.WaitForServerConnection(connectionTimeout))
+            if (this.communicationManager.WaitForServerConnection(connectionTimeoutInSecs * 1000))
             {
                 this.communicationManager.SendMessage(MessageType.SessionConnected);
                 this.ProcessRequests(testRequestManager);
@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
                         CoreUtilitiesConstants.VstestConsoleProcessName,
                         "translation layer",
-                        connectionTimeout,
+                        connectionTimeoutInSecs,
                         EnvironmentHelper.VstestConnectionTimeout)
                     );
             }
