@@ -172,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            var connectionTimeout = EnvironmentHelper.GetConnectionTimeout();
+            var connectionTimeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
             do
             {
                 try
