@@ -3,9 +3,6 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -13,9 +10,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
-    using MSTest.TestFramework.AssertExtensions;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 
     [TestClass]
     public class VsTestConsoleWrapperTests

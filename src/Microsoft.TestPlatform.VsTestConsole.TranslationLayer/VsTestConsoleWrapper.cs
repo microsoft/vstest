@@ -75,6 +75,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
+        /// Defined for testing
+        /// </summary>
+        /// <param name="vstestConsolePath">Path to the test runner <c>vstest.console.exe</c>.</param>
+        /// <param name="dotnetExePath">Path to dotnet exe, needed for CI builds</param>
+        /// <param name="consoleParameters">The parameters to be passed onto the runner process</param>
+        internal VsTestConsoleWrapper(string vstestConsolePath, string dotnetExePath, ConsoleParameters consoleParameters) :
+            this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath, dotnetExePath), consoleParameters, TestPlatformEventSource.Instance, new ProcessHelper())
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
         /// </summary>
         /// <param name="requestSender">Sender for test messages.</param>
         /// <param name="processManager">Process manager.</param>

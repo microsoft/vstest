@@ -18,6 +18,11 @@
         <source>vstest.console process exited abnormally</source>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidFilePath">
+        <source>File {0} does not exists</source>
+        <target state="new">File {0} does not exists</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
