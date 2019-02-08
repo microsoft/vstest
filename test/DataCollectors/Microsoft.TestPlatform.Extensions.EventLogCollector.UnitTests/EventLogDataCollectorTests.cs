@@ -49,6 +49,22 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         }
 
         [TestMethod]
+        public void EventLoggerLogsErrorForInvalidEventSources()
+        {
+            string configurationString =
+            @"<Configuration><Setting name=""EventLogs"" value=""MyEventName"" /></Configuration>";
+            XmlDocument expectedXmlDoc = new XmlDocument();
+            expectedXmlDoc.LoadXml(configurationString);
+            var mockCollector = new Mock<DataCollectionLogger>();
+            mockCollector.Setup(m => m.LogError(It.IsAny<DataCollectionContext>(), It.Is<string>(s => s.Contains(@"The event log 'MyEventName' on computer '.' does not exist.")), It.IsAny<Exception>()));
+
+            var eventLogDataCollector = new EventLogDataCollector();
+            eventLogDataCollector.Initialize(expectedXmlDoc.DocumentElement, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, mockCollector.Object, this.dataCollectionEnvironmentContext);
+
+            mockCollector.Verify(m => m.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>(), It.IsAny<Exception>()), Times.Once);
+        }
+
+        [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(
