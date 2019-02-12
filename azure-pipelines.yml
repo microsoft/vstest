@@ -2,6 +2,7 @@
 
 jobs:
 - job: Windows
+  timeoutInMinutes: 120
   pool:
     vmImage: 'vs2017-win2016'
   variables:

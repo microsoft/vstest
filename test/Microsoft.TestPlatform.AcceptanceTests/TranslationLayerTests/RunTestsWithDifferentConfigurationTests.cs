@@ -3,18 +3,16 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
+    using global::TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading;
-
-    using global::TestPlatform.TestUtilities;
-
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// The Run Tests using VsTestConsoleWrapper API's
@@ -46,7 +44,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTestAdapterPath(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var testAdapterPath = Directory.EnumerateFiles(this.GetTestAdapterPath(), "*.TestAdapter.dll").ToList();
@@ -70,7 +67,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithRunSettingsWithParallel(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -82,24 +78,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                     </RunSettings>";
 
             string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
+            int expectedNumOfProcessCreated = 2;
             if (this.IsDesktopTargetFramework())
             {
                 testhostProcessName = "testhost.x86";
-                expectedNumOfProcessCreated = 2;
             }
             else
             {
                 testhostProcessName = "dotnet";
-                if (this.IsDesktopRunner())
-                {
-                    expectedNumOfProcessCreated = 2;
-                }
-                else
-                {
-                    // Include launcher dotnet.exe
-                    expectedNumOfProcessCreated = 3;
-                }
             }
 
             var cts = new CancellationTokenSource();
@@ -163,7 +149,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithX64Source(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var sources = new List<string>
@@ -172,24 +157,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                               };
 
             string testhostProcessName = string.Empty;
-            int expectedNumOfProcessCreated = 0;
+            int expectedNumOfProcessCreated = 1;
             if (this.IsDesktopTargetFramework())
             {
                 testhostProcessName = "testhost";
-                expectedNumOfProcessCreated = 1;
             }
             else
             {
                 testhostProcessName = "dotnet";
-                if (this.IsDesktopRunner())
-                {
-                    expectedNumOfProcessCreated = 1;
-                }
-                else
-                {
-                    // Include launcher dotnet.exe
-                    expectedNumOfProcessCreated = 2;
-                }
             }
 
             var cts = new CancellationTokenSource();

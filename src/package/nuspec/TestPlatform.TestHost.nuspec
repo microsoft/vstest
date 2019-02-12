@@ -37,6 +37,7 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netstandard1.5\" />
+    <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.TestPlatform.Utilities.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.deps.json" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x86\msdia140.dll" target="lib\netstandard1.5\x86\" />

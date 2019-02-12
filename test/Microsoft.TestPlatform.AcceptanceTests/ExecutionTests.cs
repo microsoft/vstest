@@ -230,23 +230,5 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // When both x64 & x86 DLL is passed the run should abort with error message.
             this.StdErrorContains(expectedErrorContains);
         }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource(useCoreRunner:false)]
-        public void ExecuteTestsForFramework35ShouldPrintErrorMessage(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            var expectedWarningContains = "Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".";
-            var assemblyPaths = this.GetAssetFullPath("SimpleTestProject.dll");
-
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
-            arguments = string.Concat(arguments, " /Framework:.NETFramework,Version=v3.5");
-
-            this.InvokeVsTest(arguments);
-
-            this.ExitCodeEquals(1);
-
-            this.StdErrorContains(expectedWarningContains);
-        }
     }
 }
