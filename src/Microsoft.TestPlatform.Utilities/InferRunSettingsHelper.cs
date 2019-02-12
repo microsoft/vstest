@@ -49,8 +49,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string LegacyElementsString = "Elements";
         private const string DeploymentAttributesString = "DeploymentAttributes";
         private const string ExecutionAttributesString = "ExecutionAttributes";
-        private const string DotNetFrameworkString = ".NETFramework";
-        private const string DotNetCoreString = ".NETCoreApp";
         private static readonly List<string> ExecutionNodesPaths = new List<string> { @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts" };
 
         /// <summary>
@@ -689,15 +687,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 if (versionCheckRequired)
                 {
                     isFrameworkInCompatible = isFrameworkInCompatible || !actualFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+
+                    if (isFrameworkInCompatible)
+                    {
+                        return true;
+                    }
                 }
-
-                string sourceFrameworkName = actualFramework.Name.Split(',')[0];
-                string targetFrameworkName = targetFramework.Name.Split(',')[0];
-
-                if (sourceFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) ||
-                      sourceFrameworkName.Equals(DotNetCoreString, StringComparison.OrdinalIgnoreCase) && targetFrameworkName.Equals(DotNetFrameworkString, StringComparison.OrdinalIgnoreCase))
+                else
                 {
-                    isFrameworkInCompatible = true;
+                    string sourceFrameworkName = actualFramework.Name.Split(',')[0];
+                    string targetFrameworkName = targetFramework.Name.Split(',')[0];
+
+                    if (!sourceFrameworkName.Equals(targetFrameworkName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        isFrameworkInCompatible = true;
+                    }
                 }
             }
 
