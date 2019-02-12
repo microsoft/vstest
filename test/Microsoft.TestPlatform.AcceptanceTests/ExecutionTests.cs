@@ -252,4 +252,3 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
     }
 }
-}
