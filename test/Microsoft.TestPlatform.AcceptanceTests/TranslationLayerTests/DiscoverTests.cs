@@ -3,23 +3,19 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using VisualStudio.TestPlatform.ObjectModel.Logging;
 
     [TestClass]
     public class DiscoverTests : AcceptanceTestBase
     {
-        private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
-
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private DiscoveryEventHandler discoveryEventHandler;
         private DiscoveryEventHandler2 discoveryEventHandler2;
@@ -44,7 +40,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.discoveryEventHandler);
@@ -59,7 +54,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.DiscoverTests(
@@ -75,38 +69,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void DiscoverTestsShouldFailForFramework35(RunnerInfo runnerInfo)
-        {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            this.Setup();
-
-            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
-                                    <RunSettings>
-                                        <RunConfiguration>
-                                            <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
-                                            <DesignMode>true</DesignMode>
-                                        </RunConfiguration>
-                                    </RunSettings>";
-
-            this.vstestConsoleWrapper.DiscoverTests(
-                this.GetTestAssemblies(),
-                runSettingsXml,
-                new TestPlatformOptions() { CollectMetrics = false },
-                this.discoveryEventHandler2);
-
-            Assert.AreEqual(1, this.discoveryEventHandler2.testMessages.Count);
-            StringAssert.Contains(this.discoveryEventHandler2.testMessages[0].message, "Framework35 is not supported. For projects targeting .Net Framework 3.5, please use Framework40 to run tests in CLR 4.0 \"compatibility mode\".");
-            Assert.AreEqual(TestMessageLevel.Error, this.discoveryEventHandler2.testMessages[0].testMessageLevel);
-        }
-
-        [TestMethod]
-        [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
         public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.DiscoverTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), new TestPlatformOptions() { CollectMetrics = true }, this.discoveryEventHandler2);
@@ -126,7 +92,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
@@ -155,7 +120,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             var discoveryEventHandlerForBatchSize = new DiscoveryEventHandlerForBatchSize();
@@ -183,7 +147,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.DiscoverTests(

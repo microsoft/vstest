@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
@@ -19,11 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class SocketCommunicationManager : ICommunicationManager
     {
-        /// <summary>
-        /// Time for which the client wait for executor/runner process to start, and host server
-        /// </summary>
-        private const int CONNECTIONRETRYTIMEOUT = 50 * 1000;
-
         /// <summary>
         /// The server stream read timeout constant (in microseconds).
         /// </summary>
@@ -176,10 +172,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             Stopwatch watch = new Stopwatch();
             watch.Start();
+            var connectionTimeout = EnvironmentHelper.GetConnectionTimeout() * 1000;
             do
             {
                 try
                 {
+                    EqtTrace.Verbose("SocketCommunicationManager : SetupClientAsync : Attempting to connect to the server.");
                     await this.tcpClient.ConnectAsync(endpoint.Address, endpoint.Port);
 
                     if (this.tcpClient.Connected)
@@ -201,10 +199,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Verbose("Connection Failed with error {0}, retrying", ex.ToString());
+                    EqtTrace.Error("Connection Failed with error {0}, retrying", ex.ToString());
                 }
             }
-            while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);
+            while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < connectionTimeout);
         }
 
         /// <summary>
