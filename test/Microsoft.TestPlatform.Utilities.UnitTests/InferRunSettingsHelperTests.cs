@@ -391,7 +391,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
-        public void FilterCompatibleSourcesShouldIdentifyIncomaptiableSourcesAndConstructWarningMessage()
+        public void FilterCompatibleSourcesShouldIdentifyIncompatibleSourcesAndConstructWarningMessage()
         {
             #region Arrange
             sourceArchitectures["AnyCPU1net46.dll"] = Architecture.AnyCPU;
@@ -466,6 +466,36 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(Architecture.X64, frameworkNet45, sourceArchitectures, sourceFrameworks, out warningMessage);
 
             Assert.IsTrue(string.IsNullOrEmpty(warningMessage));
+        }
+
+        [TestMethod]
+        public void IsFrameworkIncompatibleShouldReturnTrueIfNoVersionCheckAndFrameworksIncompatible()
+        {
+            Framework targetFramework = Framework.FromString(".NETCoreApp,Version=1.0");
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { targetFramework , frameworkNet45, frameworkNet47 };
+
+            bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, false);
+            Assert.IsTrue(isFrameworkIncompatible);
+        }
+
+        [TestMethod]
+        public void IsFrameworkIncompatibleShouldReturnFalseIfNoVersionCheckAndFrameworksHaveDifferentVersions()
+        {
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet46, frameworkNet45, frameworkNet47 };
+            Framework targetFramework = frameworkNet46;
+
+            bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, false);
+            Assert.IsFalse(isFrameworkIncompatible);
+        }
+
+        [TestMethod]
+        public void IsFrameworkIncompatibleShouldReturnTrueIfVersionCheckAndFrameworksHaveDifferentVersions()
+        {
+            HashSet<Framework> sourceFrameworks = new HashSet<Framework>() { frameworkNet45, frameworkNet47 };
+            Framework targetFramework = frameworkNet46;
+
+            bool isFrameworkIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks, targetFramework, true);
+            Assert.IsTrue(isFrameworkIncompatible);
         }
 
         [TestMethod]

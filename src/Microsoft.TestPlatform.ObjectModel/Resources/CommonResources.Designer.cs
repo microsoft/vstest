@@ -69,9 +69,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("CannotBeNullOrEmpty", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings..
+        ///   Looks up a localized string similar to The following DLL(s) do not match the specified framework {0} and platform {1} settings.{2}Ensure that the test assemblies target the specified framework/platform settings. Go to {3} for more details on managing these settings..
         /// </summary>
         public static string DisplayChosenSettings {
             get {

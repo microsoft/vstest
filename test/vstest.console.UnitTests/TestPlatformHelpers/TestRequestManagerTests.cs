@@ -671,7 +671,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
-                     <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
+                     <TargetFrameworkVersion>{new FrameworkName(Framework.DefaultFramework.Name)}</TargetFrameworkVersion>
                      <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
                      </RunConfiguration>
                 </RunSettings>"
@@ -680,7 +680,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.X86);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
-                .Returns(new FrameworkName(Constants.DotNetFramework451));
+                .Returns(new FrameworkName(Framework.DefaultFramework.Name));
             DiscoveryCriteria actualDiscoveryCriteria = null;
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -694,7 +694,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Never);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Never);
 
-            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Framework.DefaultFramework.Name));
             Assert.IsTrue(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
         }
 
@@ -751,7 +751,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.ARM);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
-                .Returns(new FrameworkName(Constants.DotNetFramework46));
+                .Returns(new FrameworkName(Framework.DefaultFramework.Name));
+
             DiscoveryCriteria actualDiscoveryCriteria = null;
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             this.mockTestPlatform
@@ -767,8 +768,44 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-            Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains("<TargetFrameworkVersion>"));
             Assert.IsFalse(actualDiscoveryCriteria.RunSettings.Contains(Architecture.ARM.ToString()));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldThrowTestPlatformExceptionIfSourceAndTargetFrameworkRuntimesAreIncompatible()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+            this.commandLineOptions.TargetFrameworkVersion = Framework.FromString(Constants.DotNetFramework45);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
+                .Returns(Architecture.X86);
+
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
+                .Returns(new FrameworkName(Constants.DotNetFrameworkCore10));
+
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform
+                .Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>()))
+                .Callback(
+                    (IRequestData requestData, DiscoveryCriteria discoveryCriteria, TestPlatformOptions options) =>
+                    {
+                        actualDiscoveryCriteria = discoveryCriteria;
+                    }).Returns(mockDiscoveryRequest.Object);
+
+            var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.DiscoverTests(payload,
+                new Mock<ITestDiscoveryEventsRegistrar>().Object, this.protocolConfig)).Message;
+
+            Assert.IsTrue(actualErrorMessage.Contains("Test Run Aborted."));
         }
 
         [TestMethod]
@@ -878,6 +915,35 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStart(), Times.Once);
             mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStop(), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldThrowTestPlatformExceptionIfSourceAndTargetFrameworksAreIncompatible()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            this.commandLineOptions.TargetFrameworkVersion = Framework.FromString(Constants.DotNetFramework45);
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFrameworkCore10));
+            var actualErrorMessage = Assert.ThrowsException<TestPlatformException>(() => this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig)).Message;
+
+            Assert.IsTrue(actualErrorMessage.Contains("Test Run Aborted."));
         }
 
         [TestMethod]
@@ -1422,7 +1488,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                     $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
-                         <TargetFrameworkVersion>{Constants.DotNetFramework46}</TargetFrameworkVersion>
+                         <TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>
                          <TargetPlatform>{Architecture.ARM.ToString()}</TargetPlatform>
                      </RunConfiguration>
                 </RunSettings>"
@@ -1432,7 +1498,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.X86);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
-                .Returns(new FrameworkName(Constants.DotNetFramework451));
+                .Returns(new FrameworkName(Framework.DefaultFramework.Name));
+
             TestRunCriteria actualTestRunCriteria = null;
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1446,7 +1513,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Framework.DefaultFramework.Name));
             Assert.IsTrue(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
         }
 
@@ -1546,7 +1613,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Setup(a => a.GetArchitecture(It.IsAny<string>()))
                 .Returns(Architecture.ARM);
             this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>()))
-                .Returns(new FrameworkName(Constants.DotNetFramework46));
+                .Returns(new FrameworkName(Framework.DefaultFramework.Name));
             TestRunCriteria actualTestRunCriteria = null;
             var mockTestRunRequest = new Mock<ITestRunRequest>();
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
@@ -1560,7 +1627,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockAssemblyMetadataProvider.Verify(a => a.GetArchitecture(It.IsAny<string>()), Times.Once);
             this.mockAssemblyMetadataProvider.Verify(a => a.GetFrameWork(It.IsAny<string>()), Times.Once);
 
-            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Constants.DotNetFramework46));
+            Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains("<TargetFrameworkVersion>"));
             Assert.IsFalse(actualTestRunCriteria.TestRunSettings.Contains(Architecture.ARM.ToString()));
         }
 

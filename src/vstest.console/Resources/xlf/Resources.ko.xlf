@@ -1517,9 +1517,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
-        <source>Test Run Aborted.</source>
-        <target state="translated">테스트 실행이 중단되었습니다.</target>
-        <note />
+        <source>Test Run Aborted. {0}</source>
+        <target state="new">테스트 실행이 중단되었습니다.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
@@ -1635,6 +1635,12 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="new">Framework35는 지원되지 않습니다. .NET Framework 3.5를 대상으로 하는 프로젝트의 경우 Framework40을 사용하여 CLR 4.0 "호환 모드"에서 테스트를 실행하세요.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ConflictInFrameworkPlatform">
+        <source>
+The given test sources target multiple frameworks/platforms that are incompatible. Please make sure the sources target the same framework and platform.</source>
+        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
         <note></note>
       </trans-unit>
     </body>
