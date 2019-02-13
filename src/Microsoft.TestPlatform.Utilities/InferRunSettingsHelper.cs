@@ -608,6 +608,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return XmlUtilities.IsValidNodeXmlValue(frameworkXml, validator);
         }
 
+        
         /// <summary>
         /// Returns the sources matching the specified platform and framework settings.
         /// For incompatible sources, warning is added to incompatibleSettingWarning.
@@ -615,10 +616,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         public static IEnumerable<String> FilterCompatibleSources(Architecture chosenPlatform, Framework chosenFramework, IDictionary<String, Architecture> sourcePlatforms, IDictionary<String, Framework> sourceFrameworks, out String incompatibleSettingWarning)
         {
             incompatibleSettingWarning = string.Empty;
+            bool incompatibilityFound = false;
             List<String> compatibleSources = new List<String>();
             StringBuilder warnings = new StringBuilder();
             warnings.AppendLine();
-            bool incompatiblityFound = false;
+
             foreach (var source in sourcePlatforms.Keys)
             {
                 Architecture actualPlatform = sourcePlatforms[source];
@@ -632,15 +634,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
 
                     warnings.AppendLine(incompatiblityMessage);
-                    incompatiblityFound = true;
+                    incompatibilityFound = true;
                 }
                 else
                 {
                     compatibleSources.Add(source);
                 }
             }
-
-            if (incompatiblityFound)
+            if (incompatibilityFound)
             {
                 incompatibleSettingWarning = string.Format(CultureInfo.CurrentCulture, OMResources.DisplayChosenSettings, chosenFramework, chosenPlatform, warnings.ToString(), multiTargettingForwardLink);
             }
@@ -656,7 +657,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Framework sourceFramework,
             Framework targetFramework)
         {
-            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(sourceFramework, targetFramework);
+            return IsPlatformIncompatible(sourcePlatform, targetPlatform) || IsFrameworkIncompatible(new List<Framework>() { sourceFramework }, targetFramework);
         }
 
 
@@ -675,15 +676,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
-        /// Returns true if source FrameworkVersion is incompatible with target FrameworkVersion.
+        /// Returns true if source Framework or version is incompatible with target Framework or version.
         /// </summary>
-        private static bool IsFrameworkIncompatible(Framework sourceFramework, Framework targetFramework)
+        public static bool IsFrameworkIncompatible(IEnumerable<Framework> sourceFrameworks, Framework targetFramework, bool versionCheckRequired = true)
         {
-            if (sourceFramework.Name.Equals(Framework.DefaultFramework.Name, StringComparison.OrdinalIgnoreCase))
+            foreach (var actualFramework in sourceFrameworks)
             {
-                return false;
+                if (versionCheckRequired)
+                {
+                    if (!actualFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    string sourceFrameworkName = actualFramework.Name.Split(',')[0];
+                    string targetFrameworkName = targetFramework.Name.Split(',')[0];
+
+                    if (!sourceFrameworkName.Equals(targetFrameworkName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
             }
-            return !sourceFramework.Name.Equals(targetFramework.Name, StringComparison.OrdinalIgnoreCase);
+
+            return false;
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -363,34 +364,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var navigator = document.CreateNavigator();
 
-                    var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+                    // Automatically detect frameworks and platforms from sources and return true if any incompatibility
+                    var isFrameworkIncompatible = inferHelper.TryGetAutoDetectCompatibleFramework(sources, sourceFrameworks, out var inferredFramework);
+                    var isPlatformIncompatible = inferHelper.TryGetAutoDetectCompatibleArchitecture(sources, sourcePlatforms, out var inferredPlatform);
+                    
+                    // Throw exception if conflicts found in framework/platform
+                    if (isFrameworkIncompatible || isPlatformIncompatible)
+                    {
+                        throw new TestPlatformException(Resources.ConflictInFrameworkPlatform);
+                    }
+
+                    // Update framework and platform if required. For commandline scenario update happens in ArgumentProcessor.
                     Framework chosenFramework;
-                    var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+                    bool updateFramework = IsAutoFrameworkUpdateRequired(navigator, out chosenFramework);
                     Architecture chosenPlatform;
+                    bool updatePlatform = IsAutoPlatformUpdateRequired(navigator, out chosenPlatform);
 
-                    // Update frmaework and platform if required. For commandline scenario update happens in ArgumentProcessor.
-                    bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
-                    bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
-
+                    // Update framework and platform
                     if (updateFramework)
                     {
-                        InferRunSettingsHelper.UpdateTargetFramework(document, inferedFramework?.ToString(), overwrite: true);
-                        chosenFramework = inferedFramework;
+                        InferRunSettingsHelper.UpdateTargetFramework(document, inferredFramework?.ToString(), overwrite: true);
+                        chosenFramework = inferredFramework;
                         settingsUpdated = true;
                     }
 
                     if (updatePlatform)
                     {
-                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferedPlatform.ToString(), overwrite: true);
-                        chosenPlatform = inferedPlatform;
+                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferredPlatform.ToString(), overwrite: true);
+                        chosenPlatform = inferredPlatform;
                         settingsUpdated = true;
                     }
 
+                    // Get compatible sources and construct warning messages if any incompatibilty found
                     var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+
+                    // isSettingIncompatible wil be true if run needs to be aborted due to incompatibility in source and target frameworks
+                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks.Values.Distinct(), chosenFramework, false);
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
+                        if(isSettingIncompatible)
+                        {
+                            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.TestRunAborted, incompatibleSettingWarning));
+                        }
+                        // If run does not need to abort, raise warning messages
                         ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
                     }
 
@@ -557,7 +575,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator, out Framework chosenFramework)
+        private bool IsAutoFrameworkUpdateRequired(XPathNavigator navigator, out Framework chosenFramework)
         {
             bool required = true;
             chosenFramework = null;
@@ -580,7 +598,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return required;
         }
 
-        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator, out Architecture chosenPlatform)
+        private bool IsAutoPlatformUpdateRequired(XPathNavigator navigator, out Architecture chosenPlatform)
         {
             bool required = true;
             chosenPlatform = Architecture.Default;
