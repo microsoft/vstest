@@ -45,6 +45,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegacySettingsUnitTestProje
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewtonSoftDependency", "..\NewtonSoftDependency\NewtonSoftDependency.csproj", "{79EDA259-5EA0-45F0-990A-F078427E198A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTestProjectFramework35", "..\SimpleTestProjectFramework35\SimpleTestProjectFramework35.csproj", "{A0029789-09AA-4430-89FB-175CD4CF689F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{79EDA259-5EA0-45F0-990A-F078427E198A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79EDA259-5EA0-45F0-990A-F078427E198A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79EDA259-5EA0-45F0-990A-F078427E198A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0029789-09AA-4430-89FB-175CD4CF689F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0029789-09AA-4430-89FB-175CD4CF689F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0029789-09AA-4430-89FB-175CD4CF689F}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0029789-09AA-4430-89FB-175CD4CF689F}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

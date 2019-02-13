@@ -13,5 +13,11 @@ namespace SimpleTestProjectFramework35
         {
             Assert.AreEqual(2, 2);
         }
+
+        [TestMethod]
+        public void FailingTest()
+        {
+            Assert.AreEqual(2, 1);
+        }
     }
 }
