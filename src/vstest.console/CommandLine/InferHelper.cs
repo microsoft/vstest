@@ -25,11 +25,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
         }
 
         /// <summary>
-        /// Determines Architecture from sources.
+        /// Determines Architecture from sources and returns true if source architectures are incompatible
         /// </summary>
-        public Architecture AutoDetectArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms)
+        public bool TryGetAutoDetectCompatibleArchitecture(List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture inferredArchitecture)
         {
-            Architecture architecture = Constants.DefaultPlatform;
+            inferredArchitecture = Constants.DefaultPlatform;
+            bool isArchitectureIncompatible = false;
             try
             {
                 if (sources != null && sources.Count > 0)
@@ -66,60 +67,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLineUtilities
                         {
                             finalArch = Constants.DefaultPlatform;
                             EqtTrace.Info("Conflict in platform architecture, using default platform:{0}", finalArch);
+                            isArchitectureIncompatible = true;
                         }
                     }
 
                     if (finalArch != null)
                     {
-                        architecture = (Architecture)finalArch;
+                        inferredArchitecture = (Architecture)finalArch;
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, architecture);
+                EqtTrace.Error("Failed to determine platform: {0}, using default: {1}", ex, inferredArchitecture);
             }
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Determined platform for all sources: {0}", architecture);
+                EqtTrace.Info("Determined platform for all sources: {0}", inferredArchitecture);
             }
 
-            return architecture;
+            return isArchitectureIncompatible;
         }
 
         /// <summary>
-        /// Determines Framework from sources.
+        /// Determines Framework from sources and returns true if source frameworks are incompatible
         /// </summary>
-        public Framework AutoDetectFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions)
+        public bool TryGetAutoDetectCompatibleFramework(List<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out Framework inferredFramework)
         {
-            Framework framework = Framework.DefaultFramework;
+            inferredFramework = Framework.DefaultFramework;
+            bool isFrameworkIncompatible = false;
             try
             {
                 if (sources != null && sources.Count > 0)
                 {
                     var finalFx = DetermineFrameworkName(sources, sourceFrameworkVersions, out var conflictInFxIdentifier);
-                    framework = Framework.FromString(finalFx.FullName);
-                    if (conflictInFxIdentifier && EqtTrace.IsInfoEnabled)
+                    inferredFramework = Framework.FromString(finalFx.FullName);
+
+                    if (conflictInFxIdentifier)
                     {
-                        // TODO Log to console and client.
-                        EqtTrace.Info(
-                            "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
-                            framework);
+                        isFrameworkIncompatible = true;
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info(
+                                "conflicts in Framework indentifier of provided sources(test assemblies), using default framework:{0}",
+                                inferredFramework);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Failed to determine framework:{0}, using defaulf: {1}", ex, framework);
+                EqtTrace.Error("Failed to determine framework:{0}, using defaulf: {1}", ex, inferredFramework);
             }
 
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("Determined framework for all sources: {0}", framework);
+                EqtTrace.Info("Determined framework for all sources: {0}", inferredFramework);
             }
 
-            return framework;
+            return isFrameworkIncompatible;
         }
 
         private FrameworkName DetermineFrameworkName(IEnumerable<string> sources, IDictionary<string, Framework> sourceFrameworkVersions, out bool conflictInFxIdentifier)
