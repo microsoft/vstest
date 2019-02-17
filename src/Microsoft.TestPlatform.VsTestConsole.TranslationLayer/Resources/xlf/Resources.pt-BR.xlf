@@ -58,8 +58,8 @@
       </trans-unit>
       <trans-unit id="InvalidFilePath">
         <source>File {0} does not exists</source>
-        <target state="new">File {0} does not exists</target>
-        <note></note>
+        <target state="translated">O arquivo {0} não existe</target>
+        <note />
       </trans-unit>
     </body>
   </file>
