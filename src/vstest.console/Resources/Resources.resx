@@ -668,7 +668,7 @@
                /Blame:CollectDump;CollectAlways=true;DumpType=full</value>
   </data>
   <data name="TestRunAborted" xml:space="preserve">
-    <value>Test Run Aborted.</value>
+    <value>Test Run Aborted. {0}</value>
   </data>
   <data name="TestRunCanceled" xml:space="preserve">
     <value>Test Run Canceled.</value>
@@ -717,5 +717,9 @@
   </data>
   <data name="InvalidLoggerArgument" xml:space="preserve">
     <value>Logger argument '{0}' is not valid.</value>
+  </data>
+  <data name="ConflictInFrameworkPlatform" xml:space="preserve">
+    <value>
+The given test sources target multiple frameworks/platforms that are incompatible. Please make sure the sources target the same framework and platform.</value>
   </data>
 </root>

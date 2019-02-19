@@ -1634,8 +1634,8 @@
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Zadání Framework35 není podporováno. U projektů mířících na .Net Framework 3.5 prosím použijte Framework40, aby testy v CLR 4.0 běžely v režimu kompatibility.</target>
-        <note></note>
+        <target state="translated">Framework35 není podporován. Pro projekty sestavované pro .Net Framework 3.5 poběží test v režimu kompatibility pomocí CLR 4.0.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
