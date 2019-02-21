@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             const int IMAGE_FILE_MACHINE_ARM = 0x01c0; // ARM Little-Endian
             const int IMAGE_FILE_MACHINE_THUMB = 0x01c2; // ARM Thumb/Thumb-2 Little-Endian
             const int IMAGE_FILE_MACHINE_ARMNT = 0x01c4; // ARM Thumb-2 Little-Endian
-
+            const int IMAGE_FILE_MACHINE_ARM64 = 0xAA64; // ARM64 Little-Endian
 
             try
             {
@@ -234,6 +234,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                                 case IMAGE_FILE_MACHINE_THUMB:
                                 case IMAGE_FILE_MACHINE_ARMNT:
                                     archType = Architecture.ARM;
+                                    break;
+                                case IMAGE_FILE_MACHINE_ARM64:
+                                    archType = Architecture.ARM64;
                                     break;
                             }
                         }

@@ -520,6 +520,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 return;
             }
+            if (architecture == Architecture.ARM && osArchitecture == Architecture.ARM64)
+            {
+                return;
+            }
 
             if (architecture == osArchitecture)
             {

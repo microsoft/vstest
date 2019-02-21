@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         X86,
         X64,
         ARM,
-        AnyCPU
+        AnyCPU,
+        ARM64
     }
 }

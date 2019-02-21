@@ -744,7 +744,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             try
                             {
                                 archType = (Architecture)Enum.Parse(typeof(Architecture), value, true);
-                                if (archType != Architecture.X64 && archType != Architecture.X86 && archType != Architecture.ARM)
+                                if (archType != Architecture.X64 && archType != Architecture.X86 && archType != Architecture.ARM && archType != Architecture.ARM64)
                                 {
                                     throw new SettingsException(
                                         string.Format(

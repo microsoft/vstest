@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var validPlatform = Enum.TryParse(argument, true, out platform);
             if (validPlatform)
             {
-                validPlatform = platform == Architecture.X86 || platform == Architecture.X64 || platform == Architecture.ARM;
+                validPlatform = platform == Architecture.X86 || platform == Architecture.X64 || platform == Architecture.ARM || platform == Architecture.ARM64;
             }
 
             if (validPlatform)
