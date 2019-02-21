@@ -516,11 +516,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             var osArchitecture = XmlRunSettingsUtilities.OSArchitecture;
 
-            if (architecture == Architecture.X86 && osArchitecture == Architecture.X64)
+            if (architecture == Architecture.X86 && (osArchitecture == Architecture.X64 || osArchitecture == Architecture.ARM64))
             {
                 return;
             }
-            if (architecture == Architecture.ARM && osArchitecture == Architecture.ARM64)
+            if ((architecture == Architecture.ARM || architecture == Architecture.X86) && osArchitecture == Architecture.ARM64)
             {
                 return;
             }
