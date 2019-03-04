@@ -1967,16 +1967,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("DataCollectorFriendlyNameInvalid", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   ConflictInFrameworkPlatform
-        /// </summary>
-        public static string ConflictInFrameworkPlatform
-        {
-            get
-            {
-                return ResourceManager.GetString("ConflictInFrameworkPlatform", resourceCulture);
-            }
-        }
     }
 }

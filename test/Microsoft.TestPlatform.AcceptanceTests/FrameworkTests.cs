@@ -41,7 +41,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             this.InvokeVsTest(arguments);
 
-            this.StdErrorContains("Test Run Aborted. The following DLL(s) do not match the specified framework");
+            if (runnerInfo.TargetFramework.Contains("netcore"))
+            {
+                this.StdOutputContains("No test is available");
+            }
+            else
+            {
+                this.StdErrorContains("Test Run Aborted.");
+            }
         }
     }
 }
