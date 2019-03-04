@@ -1516,9 +1516,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
-        <source>Test Run Aborted. {0}</source>
-        <target state="new">Przebieg testu został przerwany.</target>
-        <note></note>
+        <source>Test Run Aborted.</source>
+        <target state="translated">Przebieg testu został przerwany.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunCanceled">
         <source>Test Run Canceled.</source>
@@ -1633,12 +1633,6 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="new">Wersja Framework35 nie jest obsługiwana. W przypadku projektów przeznaczonych dla programu .Net Framework 3.5 użyj wersji Framework40 do uruchamiania testów w „trybie zgodności” CLR 4.0.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="ConflictInFrameworkPlatform">
-        <source>
-The given test sources target multiple frameworks/platforms that are incompatible. Please make sure the sources target the same framework and platform.</source>
-        <target state="new">Conflicts in framework/platform identifier of provided sources.</target>
         <note></note>
       </trans-unit>
     </body>
