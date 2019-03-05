@@ -6,6 +6,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Common.PlatformTests</AssemblyName>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
