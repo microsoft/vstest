@@ -364,12 +364,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
                     var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
 
-                    settingsUpdated |= UpdateFrameworkIfRequired(document, navigator, sources, sourceFrameworks, out Framework chosenFramework);
-                    settingsUpdated |= UpdatePlatformIfRequired(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
+                    settingsUpdated |= UpdateFramework(document, navigator, sources, sourceFrameworks, out Framework chosenFramework);
+                    settingsUpdated |= UpdatePlatform(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
                     CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks);
-                    settingsUpdated |= UpdateDesignModeIfRequired(document, runConfiguration);
-                    settingsUpdated |= UpdateCollectSourceInformationIfRequired(document, runConfiguration);
-                    settingsUpdated |= UpdateTargetDeviceIfRequired(navigator, document, runConfiguration);
+                    settingsUpdated |= UpdateDesignMode(document, runConfiguration);
+                    settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
+                    settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
                     settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
@@ -395,7 +395,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return !designMode || consoleLoggerUpdated;
         }
 
-        private bool UpdateTargetDeviceIfRequired(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
+        private bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
         {
             bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
             if (updateRequired)
@@ -405,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private bool UpdateCollectSourceInformationIfRequired(XmlDocument document, RunConfiguration runConfiguration)
+        private bool UpdateCollectSourceInformation(XmlDocument document, RunConfiguration runConfiguration)
         {
             bool updateRequired = !runConfiguration.CollectSourceInformationSet;
             if (updateRequired)
@@ -415,7 +415,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private bool UpdateDesignModeIfRequired(XmlDocument document, RunConfiguration runConfiguration)
+        private bool UpdateDesignMode(XmlDocument document, RunConfiguration runConfiguration)
         {
             // If user is already setting DesignMode via runsettings or CLI args; we skip.
             bool updateRequired = !runConfiguration.DesignModeSet;
@@ -446,7 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdatePlatformIfRequired(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture chosenPlatform)
+        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture chosenPlatform)
         {
             // Get platform from sources
             var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
@@ -464,7 +464,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updatePlatform;
         }
 
-        private bool UpdateFrameworkIfRequired(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Framework> sourceFrameworks, out Framework chosenFramework)
+        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Framework> sourceFrameworks, out Framework chosenFramework)
         {
             // Get framework from sources
             var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
