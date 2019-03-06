@@ -364,13 +364,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
                     var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
 
-                    settingsUpdated |= UpdateFramework(document, navigator, sources, sourceFrameworks, out Framework chosenFramework);
-                    settingsUpdated |= UpdatePlatform(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
-                    CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks);
-                    settingsUpdated |= UpdateDesignMode(document, runConfiguration);
-                    settingsUpdated |= UpdateCollectSourceInformation(document, runConfiguration);
-                    settingsUpdated |= UpdateTargetDevice(navigator, document, runConfiguration);
-                    settingsUpdated |= AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
+                    settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, out Framework chosenFramework);
+                    settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
+                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks);
+                    settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
+                    settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
+                    settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
+                    settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
                 }
@@ -382,13 +382,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private bool AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, LoggerRunSettings loggerRunSettings)
         {
             // Update console logger settings
-            bool consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, loggerRunSettings);
+            bool consoleLoggerUpdated = this.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
             // In case of CLI, add console logger if not already present.
             bool designMode = runConfiguration.DesignModeSet ? runConfiguration.DesignMode : this.commandLineOptions.IsDesignMode;
             if (!designMode && !consoleLoggerUpdated)
             {
-                AddConsoleLogger(document, loggerRunSettings);
+                this.AddConsoleLogger(document, loggerRunSettings);
             }
 
             // Update is required 1) in case of CLI 2) in case of design mode if console logger is present in runsettings.
