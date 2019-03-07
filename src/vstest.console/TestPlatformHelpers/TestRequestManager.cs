@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), discoveryEventsRegistrar, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, testRunEventsRegistrar, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, ITestEventsLogger logger, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -391,13 +391,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
                         EqtTrace.Info(incompatibleSettingWarning);
-                        ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
+                        logger.LogWarning(incompatibleSettingWarning);
                     }
 
                     if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
                     {
                         EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
-                        ConsoleLogger.RaiseTestRunWarning(Resources.Framework35NotSupported);
+                        logger.LogWarning(Resources.Framework35NotSupported);
                     }
 
                     if (EqtTrace.IsInfoEnabled)

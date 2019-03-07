@@ -4,12 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
-    public interface ITestRunEventsRegistrar
+    public interface ITestRunEventsRegistrar : ITestEventsLogger
     {
         /// <summary>
         /// Registers to receive events from the provided test run request.
