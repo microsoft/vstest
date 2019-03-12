@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         // This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
-        internal static bool DoNotInitialize
+        public bool DoNotInitialize
         {
             get;
             set;
@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            if (DoNotInitialize)
+            if (this.DoNotInitialize)
             {
                 return false;
             }

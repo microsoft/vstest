@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
+        private bool skipDefaultAdapters;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -77,9 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
+        /// <param name="skipDefaultAdapters">Skip default adapters flag.</param>
         /// </summary>
-        public virtual void Initialize()
+        public virtual void Initialize(bool skipDefaultAdapters)
         {
+            this.skipDefaultAdapters = skipDefaultAdapters;
             this.IsInitialized = true;
         }
 
@@ -257,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern);
+            var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 

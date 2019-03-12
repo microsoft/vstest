@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
                 else
                 {
-                    remoteEqtTrace.DoNotInitialize = true;
+                    this.DoNotInitialize = true;
                 }
             }
         }

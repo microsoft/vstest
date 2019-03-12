@@ -184,6 +184,21 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             CollectionAssert.AreEquivalent(expectedExtensions, extensions);
         }
 
+        [TestMethod]
+        public void GetExtensionPathsShouldSkipDefaultExtensionsIfSetTrue()
+        {
+            var expectedExtensions = new[] { "filter.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
+            InvokeGetExtensionPaths(expectedExtensions, true);
+        }
+
+        [TestMethod]
+        public void GetExtensionPathsShouldNotSkipDefaultExtensionsIfSetFalse()
+        {
+            var expectedExtensions = new[] { "filter.dll", "unfilter.dll" }.Select(Path.GetFullPath).ToList();
+            expectedExtensions.Add("default.dll");
+            InvokeGetExtensionPaths(expectedExtensions, false);
+        }
+
         #endregion
 
         #region GetDefaultResolutionPaths tests
@@ -409,6 +424,17 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         #endregion
+
+        private void InvokeGetExtensionPaths(List<string> expectedExtensions, bool skipDefaultExtensions)
+        {
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"filter.dll", @"other.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new[] { @"unfilter.dll" }, true);
+            TestPluginCache.Instance.DefaultExtensionPaths = new[] { "default.dll" };
+
+            var extensions = TestPluginCache.Instance.GetExtensionPaths("filter.dll", skipDefaultExtensions);
+
+            CollectionAssert.AreEquivalent(expectedExtensions, extensions);
+        }
     }
 
     #region Testable implementation
@@ -428,7 +454,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
         }
 
-        protected override List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        protected override IEnumerable<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
         {
             this.Action?.Invoke();
             return extensions;

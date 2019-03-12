@@ -3,6 +3,7 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -240,6 +241,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldNotInitializeDefaultAdaptersIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyDiscoverTests(true);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldInitializeDefaultAdaptersIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyDiscoverTests(false);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldNotIntializeTestHost()
         {
             // Setup mocks.
@@ -449,6 +462,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(mtdeh => mtdeh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once);
+        }
+
+        private void InvokeAndVerifyDiscoverTests(bool skipDefaultAdapters)
+        {
+            TestPluginCache.Instance = null;
+            TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
+
+            try
+            {
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
+
+                this.testDiscoveryManager.Initialize(skipDefaultAdapters);
+                this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
+
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(expectedResult), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
         }
 
         //private void SetupAndInitializeTestRequestSender()

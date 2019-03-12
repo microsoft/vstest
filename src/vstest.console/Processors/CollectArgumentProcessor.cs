@@ -144,21 +144,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
-        private static void DisableUnConfiguredDataCollectors(DataCollectionRunSettings dataCollectionRunSettings)
-        {
-            foreach (var dataCollectorSetting in dataCollectionRunSettings.DataCollectorSettingsList)
-            {
-                if (EnabledDataCollectors.Contains(dataCollectorSetting.FriendlyName.ToLower()))
-                {
-                    dataCollectorSetting.IsEnabled = true;
-                }
-                else
-                {
-                    dataCollectorSetting.IsEnabled = false;
-                }
-            }
-        }
-
         private static bool DoesDataCollectorSettingsExist(string friendlyName,
             DataCollectionRunSettings dataCollectionRunSettings,
             out DataCollectorSettings dataCollectorSettings)
@@ -191,12 +176,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (dataCollectionRunSettings == null)
             {
                 dataCollectionRunSettings = new DataCollectionRunSettings();
-            }
-            else
-            {
-                // By default, all data collectors present in run settings are enabled, if enabled attribute is not specified.
-                // So explicitely disable those data collectors and enable those which are specified. 
-                DisableUnConfiguredDataCollectors(dataCollectionRunSettings);
             }
 
             // Add data collectors if not already present, enable if already present.

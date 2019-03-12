@@ -23,6 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     using Moq;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     [TestClass]
     public class ProxyExecutionManagerTests : ProxyBaseManagerTests
@@ -208,6 +209,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             {
                 TestPluginCache.Instance = null;
             }
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldNotInitializeDefaultAdaptersIfSkipDefaultAdaptersIsTrue()
+        {
+            InvokeAndVerifyStartTestRun(true);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldInitializeDefaultAdaptersIfSkipDefaultAdaptersIsFalse()
+        {
+            InvokeAndVerifyStartTestRun(false);
         }
 
         [TestMethod]
@@ -631,6 +644,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Task.Delay(200).Wait();
 
             manualResetEvent.Set();
+        }
+
+        private void InvokeAndVerifyStartTestRun(bool skipDefaultAdapters)
+        {
+            TestPluginCache.Instance = null;
+            TestPluginCache.Instance.DefaultExtensionPaths = new List<string> { "default1.dll", "default2.dll" };
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "filterTestAdapter.dll" }, false);
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "unfilter.dll" }, true);
+
+            try
+            {
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) => extensions);
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                var expectedResult = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, skipDefaultAdapters);
+
+                this.testExecutionManager.Initialize(skipDefaultAdapters);
+                this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
+
+                this.mockRequestSender.Verify(s => s.InitializeExecution(expectedResult), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
         }
 
         //private void SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize()
