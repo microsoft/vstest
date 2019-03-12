@@ -45,13 +45,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 {
                     // Converting Json data to array of KeyValuePairs with duplicate keys.
                     var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TraitObject[]));
-                    var listOfTraitObjects = serializer.ReadObject(stream) as TraitObject[];                                        
+                    var listOfTraitObjects = serializer.ReadObject(stream) as TraitObject[];
 
-                    return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();;
+                    return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();
                 }
             }
 
-            return base.ConvertFrom(context, culture, value);
+            return null;
         }
 
         [System.Runtime.Serialization.DataContract]

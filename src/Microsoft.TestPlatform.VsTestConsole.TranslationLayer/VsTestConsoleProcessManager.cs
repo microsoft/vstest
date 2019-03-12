@@ -4,14 +4,18 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using Resources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
     /// <summary>
-    /// Vstest.console.exe process manager
+    /// Vstest.console process manager
     /// </summary>
     internal class VsTestConsoleProcessManager : IProcessManager
     {
@@ -32,13 +36,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// Diagnostics argument for Vstest CLI
         /// Enables Diagnostic logging for Vstest CLI and TestHost - Optional
         /// </summary>
-        private const string DIAG_ARGUMENT = "/diag:{0}";
+        private const string DIAG_ARGUMENT = "/diag:{0};tracelevel={1}";
 
         private string vstestConsolePath;
         private object syncObject = new object();
         private bool vstestConsoleStarted = false;
         private bool vstestConsoleExited = false;
+        private readonly bool isNetCoreRunner;
+        private string dotnetExePath;
         private Process process;
+
+        internal IFileHelper FileHelper { get; set; }
 
         #endregion
 
@@ -50,10 +58,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Creates an instance of VsTestConsoleProcessManager class.
         /// </summary>
-        /// <param name="vstestConsolePath">The fullpath to vstest.console.exe</param>
+        /// <param name="vstestConsolePath">The fullpath to vstest.console</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
+            this.FileHelper = new FileHelper();
+            if (!this.FileHelper.Exists(vstestConsolePath))
+            {
+                EqtTrace.Error("Invalid File Path: {0}", vstestConsolePath);
+                throw new Exception(string.Format(CultureInfo.CurrentCulture, Resources.InvalidFilePath, vstestConsolePath));
+            }
             this.vstestConsolePath = vstestConsolePath;
+            isNetCoreRunner = vstestConsolePath.EndsWith(".dll");
+        }
+
+        public VsTestConsoleProcessManager(string vstestConsolePath, string dotnetExePath) : this(vstestConsolePath)
+        {
+            this.dotnetExePath = dotnetExePath;
         }
 
         #endregion Constructor
@@ -72,33 +92,36 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <summary>
-        /// Call xUnit.console.exe with the parameters previously specified
+        /// Call vstest.console with the parameters previously specified
         /// </summary>
         public void StartProcess(ConsoleParameters consoleParameters)
         {
-            this.process = new Process();
-            process.StartInfo.FileName = vstestConsolePath;
-            process.StartInfo.Arguments = string.Join(" ", BuildArguments(consoleParameters));
+            var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
 
-            //process.StartInfo.WorkingDirectory = WorkingDirectory;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
+            EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
-            //process.StartInfo.RedirectStandardOutput = true;
-            //process.StartInfo.RedirectStandardError = true;
-
-            EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", process.StartInfo.FileName,
-                process.StartInfo.Arguments);
-
-            process.Start();
-            process.EnableRaisingEvents = true;
-            process.Exited += Process_Exited;
+            this.process = Process.Start(info);
+            this.process.Start();
 
             lock (syncObject)
             {
                 vstestConsoleExited = false;
                 vstestConsoleStarted = true;
             }
+
+            this.process.EnableRaisingEvents = true;
+            this.process.Exited += Process_Exited;
+
+            this.process.OutputDataReceived += Process_OutputDataReceived;
+            this.process.ErrorDataReceived += Process_ErrorDataReceived;
+            this.process.BeginOutputReadLine();
+            this.process.BeginErrorReadLine();
         }
 
         /// <summary>
@@ -109,9 +132,27 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Ideally process should die by itself
             if (IsProcessInitialized())
             {
-                this.process.Kill();
+                vstestConsoleExited = true;
+                this.process.OutputDataReceived -= Process_OutputDataReceived;
+                this.process.ErrorDataReceived -= Process_ErrorDataReceived;
+                SafelyTerminateProcess();
                 this.process.Dispose();
                 this.process = null;
+            }
+        }
+
+        private void SafelyTerminateProcess()
+        {
+            try
+            {
+                if (this.process != null && !this.process.HasExited)
+                {
+                    this.process.Kill();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                EqtTrace.Info("VsTestCommandLineWrapper: Error While Terminating Process {0} ", ex.Message);
             }
         }
 
@@ -119,26 +160,54 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             lock (syncObject)
             {
-                vstestConsoleExited = true;
+                ShutdownProcess();
+
                 this.ProcessExited?.Invoke(sender, e);
+            }
+        }
+
+        private void Process_ErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                EqtTrace.Error(e.Data);
+            }
+        }
+
+        private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                EqtTrace.Verbose(e.Data);
             }
         }
 
         private string[] BuildArguments(ConsoleParameters parameters)
         {
-            var args = new List<string>();
-
-            // Start Vstest.console.exe with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
-            args.Add(string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId));
-            args.Add(string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber));
-
-            if(!string.IsNullOrEmpty(parameters.LogFilePath))
+            var args = new List<string>
             {
-                // Extra args: --diag|/diag:<PathToLogFile>
-                args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath));
+                // Start Vstest.console with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
+                string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId),
+                string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber)
+            };
+
+            if (!string.IsNullOrEmpty(parameters.LogFilePath))
+            {
+                // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
+                args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath, parameters.TraceLevel));
+            }
+
+            if (isNetCoreRunner)
+            {
+                args.Insert(0, vstestConsolePath);
             }
 
             return args.ToArray();
+        }
+
+        private string GetConsoleRunner()
+        {
+            return isNetCoreRunner ? ( string.IsNullOrEmpty(this.dotnetExePath) ? new DotnetHostHelper().GetDotnetPath() : this.dotnetExePath) : vstestConsolePath;
         }
     }
 }

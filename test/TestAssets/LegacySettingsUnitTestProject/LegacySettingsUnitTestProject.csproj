@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project InitialTargets="CopyFiles" Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
+    <TestProject>true</TestProject>
+  </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
+  <Import Project="..\..\..\scripts\build\TestAssets.props" />
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+    <TargetFramework>net451</TargetFramework>
+    <AssemblyName>LegacySettingsUnitTestProject</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DependencyAssemblyForTest">
+      <HintPath>DependencyAssembly\DependencyAssemblyForTest.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.QualityTools">
+      <Version>$(TestPlatformExternalsVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <Target Name="CopyFiles">
+    <Copy SourceFiles="DeploymentFile.xml" DestinationFolder="$(OutputPath)\Deployment" ContinueOnError="false" />
+  </Target>
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+</Project>

@@ -67,8 +67,13 @@
         <note />
       </trans-unit>
       <trans-unit id="VersionCheckTimedout">
-        <source>Failed to negotiate protocol. Wait for response timed out.</source>
-        <target state="translated">Nepovedlo se vyjednat protokol. Při čekání na odpověď vypršel časový limit.</target>
+        <source>Failed to negotiate protocol, waiting for response timed out after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
+        <target state="translated">Nepodařilo se vyjednat protokol. Po {0} s vypršel časový limit čekání na odezvu. Důvodem může být pomalý počítač. Nastavením proměnné prostředí {1} prosím časový limit prodlužte.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ConnectionTimeoutErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
+        <target state="translated">Procesu {0} se nepovedlo připojit k procesu {1} ani po {2} s. Důvodem může být pomalý počítač. Nastavením proměnné prostředí {3} prosím časový limit prodlužte.</target>
         <note />
       </trans-unit>
     </body>

@@ -27,13 +27,33 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">Wymagana zmienna środowiskowa PROCDUMP_PATH miała wartość null lub była pusta. Ustaw zmienną PROCDUMP_PATH na ścieżkę lub folder zawierające odpowiedni plik wykonywalny procdump.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">Zbieranie zrzutów zostało włączone, ale nie wygenerowano żadnego pliku zrzutu.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
+        <target state="translated">Podany klucz parametru blame {0} nie jest prawidłowy. Ten klucz jest ignorowany.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">Klucz parametru blame {0} może obsługiwać tylko wartości {1}/{2}. Ten klucz jest ignorowany.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpCouldNotStart">
+        <source>Could not start process dump: {0}</source>
+        <target state="translated">Nie można rozpocząć zrzutu procesu: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpNotGenerated">
+        <source>CollectDump was enabled but dump file was not generated.</source>
+        <target state="translated">Opcja CollectDump została włączona, ale nie wygenerowano pliku zrzutu.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

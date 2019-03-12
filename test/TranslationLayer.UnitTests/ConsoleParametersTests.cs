@@ -3,10 +3,12 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
+    using System.Diagnostics;
+
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
 
     [TestClass]
@@ -25,6 +27,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             string result = sut.LogFilePath;
 
             Assert.IsTrue(result.StartsWith("\""));
+        }
+
+        [TestMethod]
+        public void TraceLevelShouldHaveVerboseAsDefaultValue()
+        {
+            var consoleParameters = new ConsoleParameters(new FileHelper());
+            Assert.AreEqual(consoleParameters.TraceLevel, TraceLevel.Verbose);
         }
     }
 }

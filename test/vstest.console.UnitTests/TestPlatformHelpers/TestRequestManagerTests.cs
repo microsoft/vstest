@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -23,23 +22,18 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using System.Runtime.Versioning;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     using Moq;
 
     using vstest.console.UnitTests.TestDoubles;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
     [TestClass]
     public class TestRequestManagerTests
@@ -106,6 +100,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void Cleanup()
         {
             CommandLineOptions.Instance.Reset();
+
+            // Opt out the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
         
         [TestMethod]
@@ -271,6 +268,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                                     <MaxCpuCount>2</MaxCpuCount>
                                     <TargetPlatform>x86</TargetPlatform>
                                     <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                    <DisableAppDomain>True</DisableAppDomain>
                                 </RunConfiguration>
                                 <MSPhoneTest>
                                   <TargetDevice>169.254.193.190</TargetDevice>
@@ -299,18 +297,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, mockProtocolConfig);
 
             // Verify.
-            object targetDevice;
-            object maxcount;
-            object targetPlatform;
+            object targetDevice, maxcount, targetPlatform, disableAppDomain;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out disableAppDomain));
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+            Assert.AreEqual(true, disableAppDomain);
         }
 
         [TestMethod]
@@ -353,9 +348,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             object targetDevice;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.AreEqual("Local Machine", targetDevice);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -398,9 +390,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             object targetDevice;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.AreEqual("Device", targetDevice);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -443,9 +432,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             object targetDevice;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.AreEqual("Emulator 8.1 U1 WVGA 4 inch 512MB", targetDevice);
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -500,9 +486,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.IsTrue(commandLineArray.Contains("/InIsolation"));
             Assert.IsTrue(commandLineArray.Contains("/UseVsixExtensions"));
             Assert.IsTrue(commandLineArray.Contains("/settings//.RunSettings"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -549,9 +532,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var commandLineArray = commandLineSwitches.ToString();
 
             Assert.IsTrue(commandLineArray.Contains("/settings//.TestSettings"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -598,9 +578,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var commandLineArray = commandLineSwitches.ToString();
 
             Assert.IsTrue(commandLineArray.Contains("/settings//.vsmdi"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -647,9 +624,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var commandLineArray = commandLineSwitches.ToString();
 
             Assert.IsTrue(commandLineArray.Contains("/settings//.testrunConfig"));
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
         }
 
         [TestMethod]
@@ -815,44 +789,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void CancelTestRunShouldWaitForCreateTestRunRequest()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
-
-            bool createTestRunRequestCalled = false;
-            bool cancelCalledPostTestRunRequest = false;
-
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
-               (IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options) =>
-               {
-                   createTestRunRequestCalled = true;
-               }).Returns(mockRunRequest.Object);
-
-            // Run request should not complete before the abort
-            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
-
-            mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
-            {
-                cancelCalledPostTestRunRequest = createTestRunRequestCalled;
-            });
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var cancelTask = Task.Run(() => this.testRequestManager.CancelTestRun());
-            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig));
-
-            Task.WaitAll(cancelTask, runTask);
-
-            Assert.IsTrue(cancelCalledPostTestRunRequest, "CancelRequest must execute after create run request");
-        }
-
-        [TestMethod]
         public void CancelShouldNotThrowExceptionIfTestRunRequestHasBeenDisposed()
         {
             var payload = new TestRunRequestPayload()
@@ -885,44 +821,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void AbortTestRunShouldWaitForCreateTestRunRequest()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a", "b" },
-                RunSettings = DefaultRunsettings
-            };
-            
-            bool createTestRunRequestCalled = false;
-            bool abortCalledPostTestRunRequest = false;
-
-            var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
-                (IRequestData requestData, TestRunCriteria testRunCriteria, TestPlatformOptions options) =>
-                {
-                    createTestRunRequestCalled = true;
-                }).Returns(mockRunRequest.Object);
-
-            // Run request should not complete before the abort
-            mockRunRequest.Setup(mr => mr.WaitForCompletion(It.IsAny<int>())).Callback(() => { Thread.Sleep(20); });
-
-            mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
-            {
-                abortCalledPostTestRunRequest = createTestRunRequestCalled;
-            });
-
-            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
-            var mockCustomlauncher = new Mock<ITestHostLauncher>();
-
-            var cancelTask = Task.Run(() => this.testRequestManager.AbortTestRun());
-            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig));
-
-            Task.WaitAll(cancelTask, runTask);
-
-            Assert.IsTrue(abortCalledPostTestRunRequest, "Abort Request must execute after create run request");
-        }
-
-        [TestMethod]
         public void RunTestsShouldReadTheBatchSizeFromSettingsAndSetItForTestRunCriteria()
         {
             var payload = new TestRunRequestPayload()
@@ -947,6 +845,39 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, this.protocolConfig);
             Assert.AreEqual(15, actualTestRunCriteria.FrequencyOfRunStatsChangeEvent);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotThrowForFramework35()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a.dll" },
+                RunSettings =
+                    @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualTestRunCriteria = runCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+            this.mockAssemblyMetadataProvider.Setup(a => a.GetFrameWork(It.IsAny<string>())).Returns(new FrameworkName(Constants.DotNetFramework35));
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
+
+            mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStart(), Times.Once);
+            mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStop(), Times.Once);
         }
 
         [TestMethod]
@@ -1021,9 +952,106 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.IsTrue(commandLineArray.Contains("/InIsolation"));
             Assert.IsTrue(commandLineArray.Contains("/UseVsixExtensions"));
             Assert.IsTrue(commandLineArray.Contains("/settings//.RunSettings"));
+        }
 
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+        [TestMethod]
+        public void RunTestsShouldCollectTelemetryForLegacySettings()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings = @"<RunSettings>
+                                    <LegacySettings>
+	                                    <Deployment enabled=""true"" deploySatelliteAssemblies=""true"" >
+                                            <DeploymentItem filename="".\test.txt"" />
+                                        </Deployment>
+                                        <Scripts setupScript="".\setup.bat"" cleanupScript="".\cleanup.bat"" />
+                                        <Execution hostProcessPlatform=""MSIL"" parallelTestCount=""4"">
+                                            <Timeouts testTimeout=""120"" />
+                                            <TestTypeSpecific>
+                                                <UnitTestRunConfig>
+                                                    <AssemblyResolution />
+                                                </UnitTestRunConfig>
+                                            </TestTypeSpecific>
+                                            <Hosts />
+                                        </Execution>
+                                    </LegacySettings>
+                               </RunSettings>"
+            };
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualRequestData = requestData;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+            
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.Elements", out var legacySettingsNodes));
+            StringAssert.Equals("Deployment, Scripts, Execution, AssemblyResolution, Timeouts, Hosts", legacySettingsNodes);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.DeploymentAttributes", out var deploymentAttributes));
+            StringAssert.Equals("enabled, deploySatelliteAssemblies", deploymentAttributes);
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue("VS.TestRun.LegacySettings.ExecutionAttributes", out var executionAttributes));
+            StringAssert.Equals("hostProcessPlatform, parallelTestCount", executionAttributes);
+
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
+            Assert.IsFalse((bool)testSettingsUsed);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldCollectTelemetryForTestSettingsEmbeddedInsideRunSettings()
+        {
+            // Opt in the Telemetry
+            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings = @"<RunSettings>
+                                       <MSTest>
+                                            <ForcedLegacyMode>true</ForcedLegacyMode>
+                                            <SettingsFile>..\..\Foo.testsettings</SettingsFile>
+                                       </MSTest>
+                               </RunSettings>"
+            };
+            var mockProtocolConfig = new ProtocolConfig { Version = 4 };
+            IRequestData actualRequestData = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Callback(
+                (IRequestData requestData, TestRunCriteria runCriteria, TestPlatformOptions options) =>
+                {
+                    actualRequestData = requestData;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            this.testRequestManager = new TestRequestManager(
+                CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object,
+                this.inferHelper,
+                this.mockMetricsPublisherTask);
+
+            // Act.
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
+
+            // Verify
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TestSettingsUsed, out var testSettingsUsed));
+            Assert.IsTrue((bool)testSettingsUsed);
         }
 
         [TestMethod]
@@ -1040,6 +1068,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                                     <MaxCpuCount>2</MaxCpuCount>
                                     <TargetPlatform>x86</TargetPlatform>
                                     <TargetFrameworkVersion>Framework35</TargetFrameworkVersion>
+                                    <DisableAppDomain>True</DisableAppDomain>
                                 </RunConfiguration>
                                 <MSPhoneTest>
                                   <TargetDevice>169.254.193.190</TargetDevice>
@@ -1067,19 +1096,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, mockProtocolConfig);
 
             // Verify
-            // Verify.
-            object targetDevice;
-            object maxcount;
-            object targetPlatform;
+            object targetDevice, maxcount, targetPlatform, disableAppDomain;
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetDevice, out targetDevice));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.MaxCPUcount, out maxcount));
             Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.TargetPlatform, out targetPlatform));
+            Assert.IsTrue(actualRequestData.MetricsCollection.Metrics.TryGetValue(TelemetryDataConstants.DisableAppDomain, out disableAppDomain));
             Assert.AreEqual("Other", targetDevice);
             Assert.AreEqual(2, maxcount);
             Assert.AreEqual("X86", targetPlatform.ToString());
-
-            // Opt out the Telemetry
-            Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
+            Assert.AreEqual(true, disableAppDomain);
         }
 
         [TestMethod]

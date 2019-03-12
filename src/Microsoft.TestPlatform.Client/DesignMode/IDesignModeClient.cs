@@ -3,9 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
+    using System;
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System;
 
     /// <summary>
     /// The interface for design mode client.
@@ -28,7 +29,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// Send a custom host launch message to IDE
         /// </summary>
         /// <param name="defaultTestHostStartInfo">Default TestHost Start Info</param>
-        int LaunchCustomHost(TestProcessStartInfo defaultTestHostStartInfo);
+        /// <param name="cancellationToken">The cancellation Token.</param>
+        /// <returns>Process id of the launched test host.</returns>
+        int LaunchCustomHost(TestProcessStartInfo defaultTestHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>
         /// Handles parent process exit

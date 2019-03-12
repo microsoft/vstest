@@ -5,8 +5,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Net;
+    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -18,6 +20,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     [TestClass]
@@ -26,20 +29,19 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private const int DUMMYPROTOCOLVERSION = 42;
         private const int DEFAULTPROTOCOLVERSION = 1;
         private const int DUMMYNEGOTIATEDPROTOCOLVERSION = 41;
-        private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
+        private static readonly string TimoutErrorMessage = "Failed to negotiate protocol, waiting for response timed out after 0 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.";
 
         private readonly Mock<ICommunicationEndPoint> mockServer;
         private readonly Mock<IDataSerializer> mockDataSerializer;
         private readonly Mock<ICommunicationChannel> mockChannel;
 
-        private readonly ConnectedEventArgs connectedEventArgs;
         private readonly List<string> pathToAdditionalExtensions = new List<string> { "Hello", "World" };
         private readonly Mock<ITestDiscoveryEventsHandler2> mockDiscoveryEventsHandler;
         private readonly Mock<ITestRunEventsHandler> mockExecutionEventsHandler;
         private readonly TestRunCriteriaWithSources testRunCriteriaWithSources;
         private TestHostConnectionInfo connectionInfo;
         private ITestRequestSender testRequestSender;
-        private ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
+        private ConnectedEventArgs connectedEventArgs;
 
         public TestRequestSenderTests()
         {
@@ -60,6 +62,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null, null);
         }
 
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, string.Empty);
+        }
+
         [TestMethod]
         public void InitializeCommunicationShouldHostServerAndAcceptClient()
         {
@@ -73,9 +81,50 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.SetupFakeCommunicationChannel();
 
-            var connected = this.testRequestSender.WaitForRequestHandlerConnection(1);
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(1, It.IsAny<CancellationToken>());
 
             Assert.IsTrue(connected);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionShouldNotConnectIfExceptionWasThrownByTcpLayer()
+        {
+            this.connectedEventArgs = new ConnectedEventArgs(new SocketException());
+            this.SetupFakeCommunicationChannel();
+
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(1, It.IsAny<CancellationToken>());
+
+            Assert.IsFalse(connected);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionWithTimeoutShouldReturnImmediatelyWhenCancellationRequested()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            var connectionTimeout = 5000;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(connectionTimeout, cancellationTokenSource.Token);
+            watch.Stop();
+
+            Assert.IsFalse(connected);
+            Assert.IsTrue(watch.ElapsedMilliseconds < connectionTimeout);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionWithTimeoutShouldReturnImmediatelyIfHostExitedUnexpectedly()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            this.testRequestSender.OnClientProcessExit("DummyError");
+
+            var connectionTimeout = 5000;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var connected = this.testRequestSender.WaitForRequestHandlerConnection(connectionTimeout, cancellationTokenSource.Token);
+            watch.Stop();
+
+            Assert.IsFalse(connected);
+            Assert.IsTrue(watch.ElapsedMilliseconds < connectionTimeout);
         }
 
         [TestMethod]
@@ -203,6 +252,18 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
         }
 
+        [TestMethod]
+        public void CheckVersionWithTestHostShouldThrowIfProtocolNegotiationTimeouts()
+        {
+            Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "0");
+
+            this.SetupFakeCommunicationChannel();
+
+            var message = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost()).Message;
+
+            Assert.AreEqual(message, TestRequestSenderTests.TimoutErrorMessage);
+        }
+
         #endregion
 
         #region Discovery Protocol Tests
@@ -287,6 +348,20 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.RaiseMessageReceivedEvent();
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleDiscoveryComplete(It.Is<DiscoveryCompleteEventArgs>(dc => dc.IsAborted == false && dc.TotalCount == 10), null));
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldStopServerOnCompleteMessageReceived()
+        {
+            var completePayload = new DiscoveryCompletePayload { TotalTests = 10, IsAborted = false };
+            this.SetupDeserializeMessage(MessageType.DiscoveryComplete, completePayload);
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
+
+            this.RaiseMessageReceivedEvent();
+
+            this.mockServer.Verify(ms => ms.Stop());
         }
 
         [TestMethod]
@@ -503,6 +578,25 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                     testRunCompletePayload.RunAttachments,
                     It.IsAny<ICollection<string>>()),
                 Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldStopServerOnRunCompleteMessageReceived()
+        {
+            var testRunCompletePayload = new TestRunCompletePayload
+            {
+                TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.MaxValue),
+                LastRunTests = new TestRunChangedEventArgs(null, null, null),
+                RunAttachments = new List<AttachmentSet>()
+            };
+            this.SetupDeserializeMessage(MessageType.ExecutionComplete, testRunCompletePayload);
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
+
+            this.RaiseMessageReceivedEvent();
+
+            this.mockServer.Verify(ms => ms.Stop());
         }
 
         [TestMethod]

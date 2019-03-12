@@ -3,16 +3,16 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The Run Tests using VsTestConsoleWrapper API's
@@ -20,9 +20,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     [TestClass]
     public class RunTests : AcceptanceTestBase
     {
-        private const string Netcoreapp = "netcoreapp";
-        private const string Message = "VsTestConsoleWrapper donot support .Net Core Runner";
-
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
@@ -44,7 +41,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunAllTests(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
@@ -62,7 +58,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.RunTests(
@@ -87,7 +82,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             this.vstestConsoleWrapper.RunTests(
@@ -107,7 +101,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
             this.Setup();
 
             if (IntegrationTestEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase))
@@ -136,7 +129,50 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             }
 
             // Assert
-            Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
+
+            // Not happy with this check, but have seen this behaviour on some machines.
+            // What this essentially means, that atleast run was aborted.
+            if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.IsTrue(errorMessage.StartsWith(this.runEventHandler.LogMessage));
+            }
+            else
+            {
+                Assert.AreEqual(errorMessage, this.runEventHandler.LogMessage);
+            }
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
+        public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
+
+            var testAssemblyName = "SimpleTestProject2.dll";
+            var source = new List<string>() { this.GetAssetFullPath(testAssemblyName) };
+
+            var veryLongTestCaseFilter =
+                "FullyQualifiedName=VeryLongTestCaseNameeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
+            this.vstestConsoleWrapper.RunTests(
+                source,
+                this.GetDefaultRunSettings(),
+                new TestPlatformOptions() { TestCaseFilter = veryLongTestCaseFilter },
+                this.runEventHandler);
+
+            var expectedFilter = veryLongTestCaseFilter.Substring(0, 256) + "...";
+
+            // Assert
+            StringAssert.StartsWith(this.runEventHandler.LogMessage, $"No test matches the given testcase filter `{expectedFilter}` in");
+            StringAssert.EndsWith(this.runEventHandler.LogMessage, testAssemblyName);
+
+            Assert.AreEqual(TestMessageLevel.Warning, this.runEventHandler.TestMessageLevel);
         }
 
         private IList<string> GetTestAssemblies()

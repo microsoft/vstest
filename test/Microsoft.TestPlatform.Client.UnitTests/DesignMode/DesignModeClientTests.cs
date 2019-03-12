@@ -252,7 +252,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+            var ex = Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+            Assert.AreEqual("vstest.console process failed to connect to translation layer process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", ex.Message);
 
             this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
@@ -285,7 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 Callback(() => Task.Run(sendMessageAction));
 
             var info = new TestProcessStartInfo();
-            var processId = testableDesignModeClient.LaunchCustomHost(info);
+            var processId = testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None);
 
             Assert.AreEqual(expectedProcessId, processId);
         }
@@ -309,7 +310,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 .Callback(() => Task.Run(sendMessageAction));
 
             var info = new TestProcessStartInfo();
-            testableDesignModeClient.LaunchCustomHost(info);
+            testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(TestPlatformException))]
+        public void DesignModeClientLaunchCustomHostMustThrowIfCancellationOccursBeforeHostLaunch()
+        {
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
+
+            var info = new TestProcessStartInfo();
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            testableDesignModeClient.LaunchCustomHost(info, cancellationTokenSource.Token);
         }
 
         [TestMethod]

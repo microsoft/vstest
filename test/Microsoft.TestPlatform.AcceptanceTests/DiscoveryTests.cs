@@ -69,5 +69,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 File.Delete(this.dummyFilePath);
             }
         }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var assetFullPath = this.GetAssetFullPath("SimpleTestProject2.dll");
+            var arguments = PrepareArguments(assetFullPath, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, this.testEnvironment.InIsolationValue);
+            arguments = string.Concat(arguments, " /listtests" );
+            arguments = string.Concat(arguments, " /testcasefilter:NonExistTestCaseName");
+            arguments = string.Concat(arguments, " /logger:\"console;prefix=true\"");
+            this.InvokeVsTest(arguments);
+
+            StringAssert.Contains(this.StdOut, "Warning: No test matches the given testcase filter `NonExistTestCaseName` in");
+
+            StringAssert.Contains(this.StdOut, "SimpleTestProject2.dll");
+
+            this.ExitCodeEquals(0);
+        }
     }
 }

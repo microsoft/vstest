@@ -35,6 +35,16 @@
         <target state="translated">Testovací běh pro: {0}({1})</target>
         <note />
       </trans-unit>
+      <trans-unit id="UpdateTestSdkForCollectingCodeCoverage">
+        <source>Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage.</source>
+        <target state="translated">Upozornění: Aktualizujte odkaz na balíček Microsoft.NET.Test.Sdk na verzi 15.8.0 nebo novější, aby se získalo pokrytí kódu.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoIsTestProjectProperty">
+        <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
+        <target state="translated">Spuštění testu pro projekt {0} se přeskočí. Pokud chcete spustit testy s testem dotnet, přidejte do souboru projektu vlastnost &lt;IsTestProject&gt;true&lt;/IsTestProject&gt;.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

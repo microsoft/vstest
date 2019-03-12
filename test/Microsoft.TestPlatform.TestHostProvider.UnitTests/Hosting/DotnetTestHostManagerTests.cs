@@ -49,7 +49,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestableDotnetTestHostManager dotnetHostManager;
 
         private string errorMessage;
-        private int maxStdErrStringLength = 22;
 
         private int exitCode;
 
@@ -69,8 +68,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object, mockEnvironment.Object),
-                                         this.maxStdErrStringLength);
+                                         new DotnetHostHelper(this.mockFileHelper.Object, mockEnvironment.Object));
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
@@ -208,10 +206,40 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartIfDepsFileAndTestHostNotFoundShouldThrowException()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
+
+            var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
+            Assert.AreEqual(ex.Message, "Unable to find test.deps.json. Make sure test project has a nuget reference of package \"Microsoft.NET.Test.Sdk\".");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartIfDepsFileNotFoundAndTestHostFoundShouldNotThrowException()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
+            var startInfo = this.GetDefaultStartInfo();
+            StringAssert.Contains(startInfo.Arguments, "testhost.dll");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartIfRuntimeConfigAndDepsFilePresentAndTestHostNotFoundEvenInTestSourceDirShouldThrowException()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
+
+            var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
+            Assert.AreEqual(ex.Message, "Unable to find testhost.dll. Please publish your test project and retry.");
+        }
+
+        [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
         {
             var expectedProcessId = Process.GetCurrentProcess().Id;
-            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
             this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
@@ -252,7 +280,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             processId.Wait();
 
             Assert.IsTrue(processId.Result);
-            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables))), Times.Once);
+            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables)), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
@@ -366,14 +394,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
 
-            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
+            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs)), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
         public void LaunchTestHostShouldSetExitCallBackInCaseCustomHost()
         {
             var expectedProcessId = Process.GetCurrentProcess().Id;
-            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(expectedProcessId);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
             var startInfo = this.GetDefaultStartInfo();
@@ -621,19 +649,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task DotNetCoreErrorMessageShouldBeTruncatedToMatchErrorLength()
-        {
-            var errorData = "Long Custom Error Strings";
-            this.ErrorCallBackTestHelper(errorData, -1);
-
-            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
-
-            // Ignore new line chars
-            Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
-            Assert.AreEqual(errorData.Substring(5), this.errorMessage);
-        }
-
-        [TestMethod]
         public async Task DotNetCoreNoErrorMessageIfExitCodeZero()
         {
             string errorData = string.Empty;
@@ -778,10 +793,12 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         internal class TestableDotnetTestHostManager : DotnetTestHostManager
         {
-            public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
+            public TestableDotnetTestHostManager(
+                IProcessHelper processHelper,
+                IFileHelper fileHelper,
+                IDotnetHostHelper dotnetTestHostHelper)
                 : base(processHelper, fileHelper, dotnetTestHostHelper)
             {
-                this.ErrorLength = errorLength;
             }
         }
     }

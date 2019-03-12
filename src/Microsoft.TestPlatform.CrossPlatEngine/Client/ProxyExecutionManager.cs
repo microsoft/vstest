@@ -7,11 +7,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -21,8 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-    using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
@@ -31,11 +30,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
-        private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
         private IRequestData requestData;
         private ITestRunEventsHandler baseTestRunEventsHandler;
         private bool skipDefaultAdapters;
+        private readonly IFileHelper fileHelper;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -49,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
         public ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : 
-            this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
+            this(requestData, requestSender, testHostManager, JsonDataSerializer.Instance, new FileHelper())
         {
         }
 
@@ -61,15 +60,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
         /// <param name="dataSerializer"></param>
-        /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
-        internal ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
-            : base(requestData, requestSender, testHostManager, clientConnectionTimeout)
+        internal ProxyExecutionManager(IRequestData requestData, ITestRequestSender requestSender,
+            ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, IFileHelper fileHelper)
+            : base(requestData, requestSender, testHostManager)
         {
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;
-            this.cancellationTokenSource = new CancellationTokenSource();
             this.isCommunicationEstablished = false;
             this.requestData = requestData;
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -102,24 +101,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
                 }
-
                 var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
                                                     // If the test execution is with a test filter, group them by sources
                                                     testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
-                this.isCommunicationEstablished = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
+                this.isCommunicationEstablished = this.SetupChannel(testPackages);
 
                 if (this.isCommunicationEstablished)
                 {
-                    if (this.cancellationTokenSource.IsCancellationRequested)
-                    {
-                        if (EqtTrace.IsVerboseEnabled)
-                        {
-                            EqtTrace.Verbose("ProxyExecutionManager.StartTestRun: Canceling the current run after getting cancelation request.");
-                        }
-                        throw new TestPlatformException(Resources.Resources.CancelationRequested);
-                    }
-
+                    this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                    
                     this.InitializeExtensions(testPackages);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
@@ -141,13 +132,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     if (testRunCriteria.HasSpecificSources)
                     {
                         var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, runsettings, executionContext, testPackages);
-
                         this.RequestSender.StartTestRun(runRequest, this);
                     }
                     else
                     {
                         var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, runsettings, executionContext, testPackages);
-
                         this.RequestSender.StartTestRun(runRequest, this);
                     }
                 }
@@ -157,9 +146,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
 
                 // Log error message to design mode and CLI.
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.ToString() };
+                // TestPlatformException is expected exception, log only the message
+                // For other exceptions, log the stacktrace as well
+                var errorMessage = exception is TestPlatformException ? exception.Message : exception.ToString();
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = errorMessage };
                 this.HandleRawMessage(this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload));
-                this.LogMessage(TestMessageLevel.Error, exception.ToString());
+                this.LogMessage(TestMessageLevel.Error, errorMessage);
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
@@ -187,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // Cancel fast, try to stop testhost deployment/launch
-            this.cancellationTokenSource.Cancel();
+            this.CancellationTokenSource.Cancel();
             if (this.isCommunicationEstablished)
             {
                 this.RequestSender.SendTestRunCancel();
@@ -212,7 +204,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.baseTestRunEventsHandler = eventHandler;
             }
 
-            this.RequestSender.SendTestRunAbort();
+            // Cancel fast, try to stop testhost deployment/launch
+            this.CancellationTokenSource.Cancel();
+
+            if (this.isCommunicationEstablished)
+            {
+                this.RequestSender.SendTestRunAbort();
+            }
         }
 
         /// <inheritdoc/>
@@ -261,8 +259,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var extensions = TestPluginCache.Instance.GetExtensionPaths(TestPlatformConstants.TestAdapterEndsWithPattern, this.skipDefaultAdapters);
+
+            // Filter out non existing extensions
+            var nonExistingExtensions = extensions.Where(extension => !this.fileHelper.Exists(extension));
+            if (nonExistingExtensions.Any())
+            {
+                this.LogMessage(TestMessageLevel.Warning, string.Format(Resources.Resources.NonExistingExtensions, string.Join(",", nonExistingExtensions)));
+            }
+
             var sourceList = sources.ToList();
-            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
+            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions.Except(nonExistingExtensions));
 
             // Only send this if needed.
             if (platformExtensions.Any())

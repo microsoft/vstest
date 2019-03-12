@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">Si è verificata un'eccezione durante l'inizializzazione del logger con URI '{0}'. Il logger non verrà usato. Eccezione: {1}</target>
-        <note></note>
+        <target state="translated">Si è verificata un'eccezione durante l'inizializzazione del logger con {0}: '{1}'. Il logger non verrà usato. Eccezione: {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Eccezione durante l'inizializzazione del logger con URI '{0}'.  Non verrà utilizzato il logger.  Eccezione: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">Non è stato trovato alcun logger di test con URI o nome descrittivo '{0}'.</target>
-        <note></note>
+        <target state="translated">Non è stato trovato alcun logger di test con AssemblyQualifiedName, URI o FriendlyName '{0}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossibile trovare un logger di test con l'URI o FriendlyName '{0}'.</target>
         </alt-trans>
@@ -262,6 +262,11 @@
       <trans-unit id="FastFilterException">
         <source>An error occured while creating Fast filter.</source>
         <target state="translated">Si è verificato un errore durante la creazione del filtro Fast.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CancellationRequested">
+        <source>Cancelling the operation as requested.</source>
+        <target state="translated">L'operazione verrà annullata come richiesto.</target>
         <note />
       </trans-unit>
     </body>

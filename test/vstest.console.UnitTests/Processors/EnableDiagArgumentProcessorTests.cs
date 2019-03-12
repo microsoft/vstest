@@ -3,7 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
+    using System;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -48,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void Cleanup()
         {
             // Restoring to initial state for EqtTrace
-            EqtTrace.InitializeVerboseTrace(traceFileName);
+            EqtTrace.InitializeTrace(traceFileName, PlatformTraceLevel.Verbose);
 #if NET451
             EqtTrace.TraceLevel = traceLevel;
 #else
@@ -71,10 +73,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorThrowsIfFileNameIsNullOrEmpty()
+        [DataRow(null)]
+        [DataRow("  ")]
+        [DataRow("")]
+        public void EnableDiagArgumentProcessorExecutorThrowsIfDiagArgumentIsNullOrEmpty(string argument)
         {
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(null));
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(string.Empty));
+            string exceptionMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidDiagArgument, argument);
+            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
         }
 
         [TestMethod]
@@ -86,9 +91,62 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorShouldThrowIfAPathIsProvided()
+        [DataRow("abs;dfsdc.txt;verbosity=normal", "abs")] // ; in file path is not supported
+        [DataRow("\"abst;dfsdc.txt\";verbosity=normal", "abst")] // Even though in escaped double quotes, semi colon is not supported in file path
+        [DataRow("foo", "foo")]
+        public void EnableDiagArgumentProcessorExecutorShouldThrowIfDirectoryPathIsProvided(string argument, string filePath)
         {
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize("foo"));
+            var exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagFilePath, filePath);
+
+            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
+        }
+
+        [TestMethod]
+        [DataRow("abc.txt;verbosity=normal=verbose")] // Multiple '=' in parameter
+        [DataRow("abc.txt;verbosity;key1=value1")] // No '=' in parameter
+        public void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument)
+        {
+            string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidDiagArgument, argument);
+            EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(argument, exceptionMessage);
+        }
+
+        [TestMethod]
+        [DataRow("abc.txt")]
+        [DataRow("abc.txt;verbosity=normal")]
+        [DataRow("abc.txt;tracelevel=info;newkey=newvalue")]
+        [DataRow("\"abc.txt\";verbosity=normal;newkey=newvalue")] //escaped double quotes are allowed for file path.
+        [DataRow(";;abc.txt;;;;verbosity=normal;;;;")]
+        public void EnableDiagArgumentProcessorExecutorShouldNotThrowIfValidArgument(string argument)
+        {
+            try
+            {
+                this.diagProcessor.Executor.Value.Initialize(argument);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail("Expected no exception, but got: " + ex.Message);
+            }
+        }
+
+        [TestMethod]
+        [DataRow("abc.txt;tracelevel=info;newkey=newvalue")]
+        [DataRow("abc.txt;tracelevel=info;")]
+        [DataRow("abc.txt;tracelevel=INfO")]
+        [DataRow("abc.txt;traCELevel=info")]
+        [DataRow("abc.txt;traCELevel=INfO")]
+        public void EnableDiagArgumentProcessorExecutorShouldInitializeTraceWithCorrectTraceLevel(string argument)
+        {
+            // Setting any trace level  other than info.
+#if NET451
+            EqtTrace.TraceLevel = TraceLevel.Verbose;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
+#endif
+
+            this.diagProcessor.Executor.Value.Initialize(argument);
+
+            Assert.AreEqual(TraceLevel.Info, (TraceLevel)EqtTrace.TraceLevel);
+            Assert.IsTrue(EqtTrace.LogFile.Contains("abc.txt"));
         }
 
         [TestMethod]
@@ -129,6 +187,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             public TestableEnableDiagArgumentProcessor(IFileHelper fileHelper)
                 : base(fileHelper)
             {
+            }
+        }
+
+        private void EnableDiagArgumentProcessorExecutorShouldThrowIfInvalidArgument(string argument, string exceptionMessage)
+        {
+            try
+            {
+                this.diagProcessor.Executor.Value.Initialize(argument);
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
+                Assert.IsTrue(e.Message.Contains(exceptionMessage));
             }
         }
     }

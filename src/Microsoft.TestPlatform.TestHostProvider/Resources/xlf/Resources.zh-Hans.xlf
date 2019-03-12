@@ -2,16 +2,21 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-1038642004">
     <body>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Unable to find tests for {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate. Rerun with /diag option to diagnose further.</source>
-        <target state="new">{0} 中没有可用的测试。请确保测试项目具有包“Microsoft.NET.Test.Sdk”的 nuget 参考并确保框架版本设置适当，然后重试。</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="MultipleFileVersions">
         <source>Multiple versions of same extension found. Selecting the highest version.
 {0}</source>
         <target state="translated">找到多个具有相同扩展的版本。请选择最高版本。
 {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UnableToFindDepsFile">
+        <source>Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</source>
+        <target state="translated">无法找到 {0}。确保测试项目具有包 "Microsoft.NET.Test.Sdk" 的 nuget 引用。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SuggestPublishTestProject">
+        <source>Unable to find {0}. Please publish your test project and retry.</source>
+        <target state="translated">无法找到 {0}。请发布测试项目并重试。</target>
         <note />
       </trans-unit>
     </body>

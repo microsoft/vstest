@@ -17,6 +17,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Telemetry
         // Total time taken to complete one test run request
         public static string TimeTakenInSecForRun = "VS.TestRun.TimeTakenInSec";
 
+        public static string TestSettingsUsed = "VS.TestRun.IsTestSettingsUsed";
+
+        public static string DisableAppDomain = "VS.TestRun.DisableAppDomain";
+
+        // All data related to legacy settings nodes will be prefixed with this.
+        public static string LegacySettingPrefix = "VS.TestRun.LegacySettings";
+
         public static string DataCollectorsEnabled = "VS.TestRun.DataCollectorsEnabled";
 
         public static string RunState = "VS.TestRun.RunState";

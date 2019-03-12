@@ -225,28 +225,19 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;URI или понятное имя средства ведения журнала&gt;
-      Укажите средство ведения журнала для результатов теста. Например, чтобы записывать результаты в 
-      файл результатов теста Visual Studio (TRX), введите /logger:trx[;LogFileName=&lt;по умолчанию — уникальное имя файла&gt;]
-      Создает файл в каталоге TestResults с указанным именем журнала LogFileName.
+        <target state="translated">--logger|/logger:&lt;URI или понятное имя средства ведения журнала&gt;
+      Укажите средство ведения журнала для результатов теста. Например, для записи результатов в 
+      файл результатов теста Visual Studio (TRX) введите /logger:trx[;LogFileName=&lt;по умолчанию — уникальное имя файла&gt;]
+      В каталоге TestResults будет создан файл с указанным именем LogFileName.
 
-      Измените уровень детализации в средстве ведения журналов консоли, как показано ниже
-      Пример: /logger:console;verbosity=&lt;по умолчанию — minimal (минимальная)&gt;
-      Допустимые значения детализации: quiet (тихий режим), minimal (минимальная) и normal (обычная).
+      Измените уровень детализации сообщений в средстве ведения журнала консоли, как показано ниже
+      Пример: /logger:console;verbosity=&lt;по умолчанию — normal (обычная)&gt;
+      Допустимые значения детализации: quiet (отсутствует), minimal (минимальная), normal (обычная) и detailed (подробная).
 
       Измените префикс уровня диагностики для средства ведения журнала консоли, как показано ниже
       Пример: /logger:console;prefix=&lt;по умолчанию — false (ложь)&gt;
-      Дополнительные сведения о средстве ведения журнала консоли: https://aka.ms/console-logger
-
-      Чтобы опубликовать результаты теста в Team Foundation Server, используйте TfsPublisher, как показано ниже
-      Пример: /logger:TfsPublisher;
-                Collection=&lt;URL коллекции командных проектов&gt;;
-                BuildName=&lt;имя сборки&gt;;
-                TeamProject=&lt;имя командного проекта&gt;
-                [;Platform=&lt;по умолчанию — Any CPU (Любой ЦП)&gt;]
-                [;Flavor=&lt;по умолчанию — Debug (Отладка)&gt;]
-                [;RunTitle=&lt;название&gt;]</target>
-        <note></note>
+      Дополнительные сведения о средстве ведения журнала консоли: https://aka.ms/console-logger</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--средства ведения журнала | / logger: &lt; Uri средство ведения журнала и FriendlyName &gt;
       Укажите средство ведения журнала для результатов тестов.  Например для регистрации результатов в Visual Studio теста результаты файла (TRX) используется /logger:trx.
@@ -747,12 +738,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;версия платформы&gt;
-      Целевая версия .NET Framework для выполнения тестов. 
-      Допустимые значения: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" и т. д.
-      Другие поддерживаемые значения: Framework35, Framework40, Framework45 и FrameworkCore10.</target>
-        <note></note>
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="translated">--Framework|/Framework:&lt;версия платформы&gt;
+      Целевая версия .Net Framework для выполнения тестов. 
+      Допустимые значения: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" и т. д.
+      Другие поддерживаемые значения: Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework версии &gt;
       Целевой .net Framework версии, используемый для выполнения теста. 
@@ -771,9 +762,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы. Другие поддерживаемые версии .NET Framework: Framework35, Framework40, Framework45 и FrameworkCore10.</target>
-        <note></note>
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="translated">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы (например: .NETCoreApp,Version=v2.0). Другие поддерживаемые версии .NET Framework: Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Недопустимый .net Framework версии: {0}. Укажите имя fullname TargetFramework. Другие поддерживаемые .net Framework версии, Framework35, Framework40 и Framework45.</target>
         </alt-trans>
@@ -1396,11 +1387,19 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
         <target state="translated">--Diag|/Diag:&lt;путь к файлу журнала&gt;
-      Включение подробных журналов для платформы тестирования.
-      Журналы записываются в указанный файл.</target>
+      Включает журналы для платформы тестирования.
+      Журналы записываются в указанный файл.
+
+      Изменить уровень трассировки журналов можно, как показано ниже
+      Пример: /Diag:&lt;путь к файлу журнала&gt;;tracelevel=&lt;по умолчанию "verbose"&gt;
+      Допустимые значения для tracelevel: off (отключено), error (ошибка), warning (предупреждение), info (информация) и verbose (подробная).</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Diag | / Diag: &lt; путь к файлу журнала &gt;
@@ -1491,10 +1490,30 @@
         <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
-        <source>--Blame|/Blame
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="translated">--Blame|/Blame
-      Запускает тест в режиме обвинения. Этот параметр нужен, чтобы изолировать проблемный тест, вызывающий сбой хоста для тестов. Он создает файл выходных данных в текущем каталоге (Sequence.xml), в котором записывается порядок выполнения теста перед сбоем.</target>
+        <source>--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[&lt;значение&gt;];[DumpType]=[&lt;значение&gt;]
+      Выполняет тест в blame-режиме. Этот вариант помогает изолировать проблемный тест, вызывающий сбой хоста для тестов.
+      В текущем каталоге создается выходной файл "Sequence.xml",
+      который записывает порядок выполнения теста перед сбоем.
+      При необходимости вы можете выполнить сбор дампа процессов хоста для тестов.
+      В этом случае по умолчанию при сбое будет собран мини-дамп.
+      Вы также можете переопределить поведение по умолчанию с помощью дополнительных параметров:
+      CollectAlways — собирает дамп по завершении даже при отсутствии сбоев (true/false) 
+      DumpType — задает тип дампа, mini (мини-дамп) или full (полный).
+      Пример: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
@@ -1569,32 +1588,53 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Creates file in TestResults directory with given LogFileName.
+        <target state="translated">--logger|/logger:&lt;URI или понятное имя средства ведения журнала&gt;
+      Укажите средство ведения журнала для результатов теста. Например, для записи результатов в 
+      файл результатов теста Visual Studio (TRX) введите /logger:trx[;LogFileName=&lt;по умолчанию — уникальное имя файла&gt;]
+      В каталоге TestResults будет создан файл с указанным именем LogFileName.
 
-      Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal, normal and detailed.
+      Измените уровень детализации сообщений в средстве ведения журнала консоли, как показано ниже
+      Пример: /logger:console;verbosity=&lt;по умолчанию — minimal (минимальная)&gt;
+      Допустимые значения детализации: quiet (отсутствует), minimal (минимальная), normal (обычная) и detailed (подробная).
 
-      Change the diagnostic level prefix for console logger as shown below
-      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      Измените префикс уровня диагностики для средства ведения журнала консоли, как показано ниже
+      Пример: /logger:console;prefix=&lt;по умолчанию — false (ложь)&gt;
+      Дополнительные сведения о средстве ведения журнала консоли: https://aka.ms/console-logger</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
+        <target state="translated">Параметр CollectDump для Blame не поддерживается на этой платформе.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameIncorrectOption">
+        <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
+        <target state="translated">Указанный с Blame параметр {0} недопустим. Он будет пропущен.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidDiagFilePath">
+        <source>Diag file path '{0}' is not valid.</source>
+        <target state="translated">Путь к файлу диагностики "{0}" недопустим.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidBlameArgument">
+        <source>Blame argument '{0}' is not valid.</source>
+        <target state="translated">Аргумент Blame "{0}" недопустим.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidDiagArgument">
+        <source>Diag argument '{0}' is not valid.</source>
+        <target state="translated">Аргумент диагностики "{0}" недопустим.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidLoggerArgument">
+        <source>Logger argument '{0}' is not valid.</source>
+        <target state="translated">Аргумент средства ведения журнала "{0}" недопустим.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Framework35NotSupported">
+        <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
+        <target state="new">Framework35 не поддерживается. В проектах для .Net Framework 3.5 запускайте тесты в режиме совместимости CLR 4.0 с использованием Framework40.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -46,6 +46,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string CodeCoverageFriendlyName = "Code Coverage";
         private const string FakesFriendlyName = "UnitTestIsolation";
 
+        private const string LegacyElementsString = "Elements";
+        private const string DeploymentAttributesString = "DeploymentAttributes";
+        private const string ExecutionAttributesString = "ExecutionAttributes";
+        private static readonly List<string> ExecutionNodesPaths = new List<string> { @"/RunSettings/LegacySettings/Execution/TestTypeSpecific/UnitTestRunConfig/AssemblyResolution", @"/RunSettings/LegacySettings/Execution/Timeouts", @"/RunSettings/LegacySettings/Execution/Hosts" };
+
         /// <summary>
         /// Make runsettings compatible with testhost of version 15.0.0-preview
         /// Due to bug https://github.com/Microsoft/vstest/issues/970 we need this function
@@ -283,6 +288,93 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Returns true if legacy settings node is present in runsettings
+        /// </summary>
+        /// <param name="runsettingsXml">The run settings xml string</param>
+        /// <param name="legacySettingsTelemetry">The telemetry data that needs to be captured</param>
+        /// <returns></returns>
+        public static bool TryGetLegacySettingElements(string runsettingsXml, out Dictionary<string, string> legacySettingsTelemetry)
+        {
+            legacySettingsTelemetry = new Dictionary<string, string>();
+            try
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    var node = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings");
+                    if (node == null)
+                    {
+                        return false;
+                    }
+
+                    var childNodes = node.SelectChildren(XPathNodeType.Element);
+
+                    var legacySettingElements = new List<string>();
+                    while (childNodes.MoveNext())
+                    {
+                        legacySettingElements.Add(childNodes.Current.Name);
+                    }
+
+                    foreach (var executionNodePath in ExecutionNodesPaths)
+                    {
+                        var executionNode = runSettingsNavigator.SelectSingleNode(executionNodePath);
+                        if (executionNode != null)
+                        {
+                            legacySettingElements.Add(executionNode.Name);
+                        }
+                    }
+
+                    if(legacySettingElements.Count > 0)
+                    {
+                        legacySettingsTelemetry.Add(LegacyElementsString, string.Join(", ", legacySettingElements));
+                    }
+                    
+                    var deploymentNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Deployment");
+                    var deploymentAttributes = GetNodeAttributes(deploymentNode);
+                    if (deploymentAttributes != null)
+                    {
+                        legacySettingsTelemetry.Add(DeploymentAttributesString, string.Join(", ", deploymentAttributes));
+                    }
+
+                    var executiontNode = runSettingsNavigator.SelectSingleNode(@"/RunSettings/LegacySettings/Execution");
+                    var executiontAttributes = GetNodeAttributes(executiontNode);
+                    if (executiontAttributes != null)
+                    {
+                        legacySettingsTelemetry.Add(ExecutionAttributesString, string.Join(", ", executiontAttributes));
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                EqtTrace.Error("Error while trying to read legacy settings. Message: {0}", ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        private static List<string> GetNodeAttributes(XPathNavigator node)
+        {
+            if (node != null && node.HasAttributes)
+            {
+                var attributes = new List<string>();
+                node.MoveToFirstAttribute();
+                attributes.Add(node.Name);
+                while (node.MoveToNextAttribute())
+                {
+                    attributes.Add(node.Name);
+                }
+                return attributes;
+            }
+
+            return null;
         }
 
         /// <summary>

@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     {
         private const string TestSettingsFileXPath = "RunSettings/MSTest/SettingsFile";
         private const string ResultsDirectoryXPath = "RunSettings/RunConfiguration/ResultsDirectory";
+        private const string RunsettingsDirectory = "RunSettingsDirectory";
 
         /// <summary>
         /// Converts the relative paths in a runsetting file to absolue ones.
@@ -35,6 +36,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             string root = Path.GetDirectoryName(path);
+
+            AddRunSettingsDirectoryNode(xmlDocument, root);
+
             var testRunSettingsNode = xmlDocument.SelectSingleNode(TestSettingsFileXPath);
             if (testRunSettingsNode != null)
             {
@@ -46,6 +50,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 FixNodeFilePath(resultsDirectoryNode, root);
             }
+        }
+
+        private static void AddRunSettingsDirectoryNode(XmlDocument doc, string path)
+        {
+            var node = doc.CreateNode(XmlNodeType.Element, RunsettingsDirectory, string.Empty);
+            node.InnerXml = path;
+            doc.DocumentElement.AppendChild(node);
         }
 
         private static void FixNodeFilePath(XmlNode node, string root)

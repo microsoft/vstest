@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">Ocorreu uma exceção durante a inicialização do agente com URI '{0}'. O agente não será usado. Exceção: {1}</target>
-        <note></note>
+        <target state="translated">Ocorreu uma exceção durante a inicialização do agente com {0}: ‘{1}’. O agente não será usado. Exceção: {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ocorreu uma exceção durante a inicialização do agente de log com URI '{0}'.  O agente de log não será usado.  Exceção: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">Não foi possível localizar um agente de teste com o URI ou o FriendlyName '{0}'.</target>
-        <note></note>
+        <target state="translated">Não foi possível localizar um agente de teste com o AssemblyQualifiedName, o URI ou o FriendlyName '{0}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Não foi possível localizar um agente de log de teste com URI ou FriendlyName '{0}'.</target>
         </alt-trans>
@@ -262,6 +262,11 @@
       <trans-unit id="FastFilterException">
         <source>An error occured while creating Fast filter.</source>
         <target state="translated">Ocorreu um erro ao criar o filtro Rápido.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CancellationRequested">
+        <source>Cancelling the operation as requested.</source>
+        <target state="translated">Cancelando a operação conforme solicitado.</target>
         <note />
       </trans-unit>
     </body>

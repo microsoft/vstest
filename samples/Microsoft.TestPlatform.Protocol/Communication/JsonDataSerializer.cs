@@ -10,20 +10,21 @@ namespace Microsoft.TestPlatform.Protocol
     using Newtonsoft.Json.Serialization;
 
     /// <summary>
-    /// JsonDataSerializes serializes and deserializes data using Json format
+    /// JsonDataSerializer serializes and deserializes data using Json format
     /// </summary>
     public class JsonDataSerializer
     {
         private static JsonDataSerializer instance;
-
-        private static JsonSerializer serializer;
+        private static JsonSerializer payloadSerializer; // used when data to be serialized/deserialized contains payload
+        private static JsonSerializer serializer; // generic serializer
 
         /// <summary>
         /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
         /// </summary>
         private JsonDataSerializer()
         {
-            serializer = JsonSerializer.Create(
+            serializer = JsonSerializer.Create();
+            payloadSerializer = JsonSerializer.Create(
                             new JsonSerializerSettings
                             {
                                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -35,7 +36,7 @@ namespace Microsoft.TestPlatform.Protocol
 #if DEBUG
             // MemoryTraceWriter can help diagnose serialization issues. Enable it for
             // debug builds only.
-            serializer.TraceWriter = new MemoryTraceWriter();
+            payloadSerializer.TraceWriter = new MemoryTraceWriter();
 #endif
         }
 
@@ -68,20 +69,9 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>The deserialized payload.</returns>
         public T DeserializePayload<T>(Message message)
         {
-            T retValue = default(T);
-
-            // TODO: Currently we use json serializer auto only for non-testmessage types
-            // CHECK: Can't we just use auto for everything
-            if (Microsoft.TestPlatform.Protocol.MessageType.TestMessage.Equals(message.MessageType))
-            {
-                retValue = message.Payload.ToObject<T>();
-            }
-            else
-            {
-                retValue = message.Payload.ToObject<T>(serializer);
-            }
-
-            return retValue;
+            return MessageType.TestMessage.Equals(message.MessageType) ?
+                message.Payload.ToObject<T>(serializer) :
+                message.Payload.ToObject<T>(payloadSerializer);
         }
 
         /// <summary>
@@ -95,7 +85,7 @@ namespace Microsoft.TestPlatform.Protocol
             using (var stringReader = new StringReader(json))
             using (var jsonReader = new JsonTextReader(stringReader))
             {
-                return serializer.Deserialize<T>(jsonReader);
+                return payloadSerializer.Deserialize<T>(jsonReader);
             }
         }
 
@@ -117,18 +107,9 @@ namespace Microsoft.TestPlatform.Protocol
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            JToken serializedPayload = null;
-
-            // TODO: Currently we use json serializer auto only for non-testmessage types
-            // CHECK: Can't we just use auto for everything
-            if (MessageType.TestMessage.Equals(messageType))
-            {
-                serializedPayload = JToken.FromObject(payload);
-            }
-            else
-            {
-                serializedPayload = JToken.FromObject(payload, serializer);
-            }
+            JToken serializedPayload = MessageType.TestMessage.Equals(messageType) ?
+                JToken.FromObject(payload, serializer) :
+                JToken.FromObject(payload, payloadSerializer);
 
             return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });
         }
@@ -144,7 +125,7 @@ namespace Microsoft.TestPlatform.Protocol
             using (var stringWriter = new StringWriter())
             using (var jsonWriter = new JsonTextWriter(stringWriter))
             {
-                serializer.Serialize(jsonWriter, data);
+                payloadSerializer.Serialize(jsonWriter, data);
 
                 return stringWriter.ToString();
             }

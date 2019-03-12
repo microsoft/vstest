@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -22,8 +23,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     public class VsTestConsoleWrapperAsync : IVsTestConsoleWrapperAsync
     {
         #region Private Members
-
-        private const int ConnectionTimeout = 30 * 1000;
 
         private readonly IProcessManager vstestConsoleProcessManager;
 
@@ -93,8 +92,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
+            var timeout = EnvironmentHelper.GetConnectionTimeout();
             // Start communication
-            var port = await this.requestSender.InitializeCommunicationAsync(ConnectionTimeout);
+            var port = await this.requestSender.InitializeCommunicationAsync(timeout * 1000);
 
             if (port > 0)
             {

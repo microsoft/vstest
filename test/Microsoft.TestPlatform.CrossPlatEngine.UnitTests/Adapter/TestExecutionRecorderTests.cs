@@ -120,40 +120,62 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void SendTestCaseEndShouldInovkeTestCaseEndEventIfTestCaseStartWasCalledBefore()
+        public void RecordEndShouldInovkeTestCaseEndEventOnlyIfTestCaseStartWasCalledBefore()
         {
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
 
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
         }
 
         [TestMethod]
-        public void SendTestCaseEndShouldNotInvokeTestCaseEndEventInCaseOfAMissingTestCaseStartInDataDrivenScenario()
+        public void RecordEndShouldNotInovkeTestCaseEndEventIfTestCaseStartWasNotCalledBefore()
+        {
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Never);
+        }
+
+        [TestMethod]
+        public void RecordEndShouldNotInvokeTestCaseEndEventInCaseOfAMissingTestCaseStartInDataDrivenScenario()
         {
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Failed);
 
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Failed), Times.Never);
         }
-
+        
         [TestMethod]
         public void RecordEndShouldInvokeSendTestCaseEndMultipleTimesInDataDrivenScenario()
         {
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Failed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
 
-            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Exactly(2));
         }
 
         [TestMethod]
-        public void RecordResultShouldPublishTestCaseResultEventIfTestCaseStartAndTestCaseEndEventsAreNotPublished()
+        public void RecordStartAndRecordEndShouldIgnoreRedundantTestCaseStartAndTestCaseEnd()
+        {
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(this.testCase), Times.Exactly(1));
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Exactly(1));
+        }
+
+        [TestMethod]
+        public void RecordResultShouldPublishTestResultIfRecordStartAndRecordEndEventsAreNotPublished()
         {
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
 
-            this.mockTestCaseEventsHandler.Verify(x => x.SendTestResult(this.testResult), Times.Never);
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestResult(this.testResult), Times.Once);
         }
 
         [TestMethod]
@@ -167,7 +189,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldFlushIfTestCaseEndWasCalledBefore()
+        public void RecordResultShouldFlushIfRecordEndWasCalledBefore()
         {
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
@@ -178,15 +200,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void RecordResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
+        public void RecordResultShouldSendTestCaseEndEventAndFlushIfRecordEndWasCalledAfterRecordResult()
         {
+            this.testResult.Outcome = TestOutcome.Passed;
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
-            this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
-            Assert.IsFalse(this.testableTestRunCache.TestResultList.Contains(this.testResult));
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, this.testResult.Outcome);
 
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
             Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
         }
+
+        [TestMethod]
+        public void RecordResultShouldSendTestCaseEndEventIfRecordEndWasNotCalled()
+        {
+            this.testResult.Outcome = TestOutcome.Passed;
+            this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
+            this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
+
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
+            Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
+        }
+
         #endregion
     }
 }

@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -20,16 +19,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 
-    public class TestRequestHandler : IDisposable, ITestRequestHandler
+    public class TestRequestHandler : ITestRequestHandler
     {
         private readonly IDataSerializer dataSerializer;
         private ITestHostManagerFactory testHostManagerFactory;
         private ICommunicationEndPoint communicationEndPoint;
+        private ICommunicationEndpointFactory communicationEndpointFactory;
         private int protocolVersion = 1;
 
-        private TestHostConnectionInfo connectionInfo;
+        public TestHostConnectionInfo ConnectionInfo { get; set; }
 
         private int highestSupportedVersion = 2;
         private JobQueue<Action> jobQueue;
@@ -43,16 +42,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private Action<Message> onAckMessageRecieved;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRequestHandler2" />.
+        /// Initializes a new instance of the <see cref="TestRequestHandler" />.
         /// </summary>
-        public TestRequestHandler(TestHostConnectionInfo connectionInfo) : this(connectionInfo, JsonDataSerializer.Instance)
+        public TestRequestHandler() : this(JsonDataSerializer.Instance, new CommunicationEndpointFactory())
         {
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndPoint communicationEndpoint, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
+        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, ICommunicationEndpointFactory communicationEndpointFactory, IDataSerializer dataSerializer, JobQueue<Action> jobQueue, Action<Message> onAckMessageRecieved)
         {
-            this.communicationEndPoint = communicationEndpoint;
-            this.connectionInfo = connectionInfo;
+            this.communicationEndpointFactory = communicationEndpointFactory;
+            this.ConnectionInfo = connectionInfo;
             this.dataSerializer = dataSerializer;
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
@@ -61,16 +60,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.jobQueue = jobQueue;
         }
 
-        protected TestRequestHandler(TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
+        protected TestRequestHandler(IDataSerializer dataSerializer, ICommunicationEndpointFactory communicationEndpointFactory)
         {
-            this.connectionInfo = connectionInfo;
             this.dataSerializer = dataSerializer;
+            this.communicationEndpointFactory = communicationEndpointFactory;
             this.requestSenderConnected = new ManualResetEventSlim(false);
             this.sessionCompleted = new ManualResetEventSlim(false);
             this.testHostManagerFactoryReady = new ManualResetEventSlim(false);
             this.onAckMessageRecieved = (message) => { throw new NotImplementedException(); };
-
-            this.SetCommunicationEndPoint();
 
             this.jobQueue = new JobQueue<Action>(
                 (action) => { action(); },
@@ -84,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public virtual void InitializeCommunication()
         {
+            this.communicationEndPoint = this.communicationEndpointFactory.Create(this.ConnectionInfo.Role);
             this.communicationEndPoint.Connected += (sender, connectedArgs) =>
             {
                 if (!connectedArgs.Connected)
@@ -96,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 requestSenderConnected.Set();
             };
 
-            this.communicationEndPoint.Start(connectionInfo.Endpoint);
+            this.communicationEndPoint.Start(this.ConnectionInfo.Endpoint);
         }
 
         /// <inheritdoc />
@@ -131,14 +129,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
             var data = this.dataSerializer.SerializePayload(MessageType.TestCasesFound, discoveredTestCases, this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
             var data = this.dataSerializer.SerializePayload(MessageType.TestRunStatsChange, testRunChangedArgs, this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -148,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     MessageType.TestMessage,
                     new TestMessagePayload { MessageLevel = messageLevel, Message = message },
                     this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -168,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         ExecutorUris = executorUris
                     },
                     this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -184,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         Metrics = discoveryCompleteEventArgs.Metrics
                     },
                     this.protocolVersion);
-            this.channel.Send(data);
+            this.SendData(data);
         }
 
         /// <inheritdoc />
@@ -201,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var data = dataSerializer.SerializePayload(MessageType.LaunchAdapterProcessWithDebuggerAttached,
                 testProcessStartInfo, protocolVersion);
 
-            this.channel.Send(data);
+            this.SendData(data);
 
             EqtTrace.Verbose("Waiting for LaunchAdapterProcessWithDebuggerAttached ack");
             waitHandle.Wait();
@@ -242,7 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         EqtTrace.Info("Discovery Session Initialize.");
                         this.testHostManagerFactoryReady.Wait();
-                        var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
+                        var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
@@ -254,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         EqtTrace.Info("Discovery started.");
                         this.testHostManagerFactoryReady.Wait();
                         var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                        var discoveryCriteria = message.Payload.ToObject<DiscoveryCriteria>();
+                        var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager()
@@ -267,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         EqtTrace.Info("Execution Session Initialize.");
                         this.testHostManagerFactoryReady.Wait();
-                        var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
+                        var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
@@ -279,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         EqtTrace.Info("Execution started.");
                         var testRunEventsHandler = new TestRunEventsHandler(this);
                         this.testHostManagerFactoryReady.Wait();
-                        var testRunCriteriaWithSources = message.Payload.ToObject<TestRunCriteriaWithSources>();
+                        var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
                         jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager()
@@ -369,25 +367,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             return testCaseEventsHandler;
         }
 
-        private void SetCommunicationEndPoint()
+        private void SendData(string data)
         {
-            if (this.connectionInfo.Role == ConnectionRole.Host)
-            {
-                this.communicationEndPoint = new SocketServer();
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("TestRequestHanlder is acting as server");
-                }
-            }
-            else
-            {
-                this.communicationEndPoint = new SocketClient();
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("TestRequestHanlder is acting as client");
-                }
-            }
+            EqtTrace.Verbose("TestRequestHandler.SendData:  sending data from testhost: {0}", data);
+            this.channel.Send(data);
         }
-
     }
 }

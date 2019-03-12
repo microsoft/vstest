@@ -191,7 +191,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             // We use custom format string to make sure that runs are sorted in the same way on all intl machines.
             // This is both for directory names and for Data Warehouse.
-            return timeStamp.ToString("yyyy-MM-dd HH:mm:ss", DateTimeFormatInfo.InvariantInfo);
+            return timeStamp.ToString("yyyy-MM-dd HH:mm:ss:fff", DateTimeFormatInfo.InvariantInfo);
         }
 
         private void Initialize()
@@ -209,10 +209,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             {
                 this.runUser = string.Empty;
             }
-            this.created = DateTime.Now.ToUniversalTime();
-            this.queued = DateTime.Now.ToUniversalTime();
-            this.started = DateTime.Now.ToUniversalTime();
-            this.finished = DateTime.Now.ToUniversalTime();
+            this.created = DateTime.UtcNow;
+            this.queued = DateTime.UtcNow;
+            this.started = DateTime.UtcNow;
+            this.finished = DateTime.UtcNow;
         }
     }
 }

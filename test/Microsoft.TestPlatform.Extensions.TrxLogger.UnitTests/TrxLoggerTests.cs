@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
     using System;
@@ -10,6 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     using System.IO;
     using System.Linq;
     using System.Xml;
+    using System.Xml.Linq;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -41,6 +43,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
             this.parameters[TrxLoggerConstants.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (!string.IsNullOrEmpty(this.testableTrxLogger?.trxFile) && File.Exists(this.testableTrxLogger.trxFile))
+            {
+                File.Delete(this.testableTrxLogger.trxFile);
+            }
         }
 
         [TestMethod]
@@ -314,6 +325,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldChangeGuidAndDisplayNameForMsTestResultIfParentNotPresentButTestResultNamePresent()
+        {
+            this.ValidateTestIdAndNameInTrx(true);
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldNotChangeGuidAndDisplayNameForNonMsTestResultIfParentNotPresentButTestResultNamePresent()
+        {
+            this.ValidateTestIdAndNameInTrx(false);
+        }
+
+        [TestMethod]
         public void TestResultHandlerShouldAddHierarchicalResultsIfParentTestResultIsPresent()
         {
             ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
@@ -505,6 +528,18 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestRunCompleteHandlerShouldReportFailedOutcomeIfTestRunIsAborted()
+        {
+            string message = "The information to test";
+            TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
+
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            Assert.AreEqual(this.testableTrxLogger.TestResultOutcome, TrxLoggerObjectModel.TestOutcome.Failed);
+        }
+
+        [TestMethod]
         public void OutcomeOfRunWillBeFailIfAnyTestsFails()
         {
             ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
@@ -602,7 +637,12 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             this.MakeTestRunComplete();
 
-            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue), this.testableTrxLogger.trxFile, "Wrong Trx file name");
+            string expectedFileNameWithoutTimestamp = Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue);
+            string fileName = Path.GetFileNameWithoutExtension(this.testableTrxLogger.trxFile);
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Replace(fileName, fileName.Split('_')[0]);
+
+            Assert.AreNotEqual(expectedFileNameWithoutTimestamp, this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(expectedFileNameWithoutTimestamp, actualFileNameWithoutTimestamp, "Trx file name should construct from log file parameter");
         }
 
         /// <summary>
@@ -625,39 +665,115 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             CollectionAssert.AreEqual(listCategoriesExpected, listCategoriesActual);
         }
 
-        /// <summary>
-        /// Unit test for assigning or populating test categories read to the unit test element.
-        /// </summary>
         [TestMethod]
-        public void ToTestElementShouldAssignTestCategoryOfUnitTestElement()
+        public void CRLFCharactersShouldGetRetainedInTrx()
         {
-            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
-            ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
-            TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
+            // To create default trx file, If LogFileName parameter not passed
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
-            testCase.SetPropertyValue(testProperty, new[] { "AsmLevel", "ClassLevel", "MethodLevel" });
+            string message = $"one line{ Environment.NewLine }second line\r\nthird line";
+            var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock("Pass1", new List<TestResultMessage> { new TestResultMessage(TestResultMessage.StandardOutCategory, message) });
 
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
 
-            object[] expected = new[] { "MethodLevel", "ClassLevel", "AsmLevel" };
+            var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray().OrderByDescending(x => x.ToString()).ToArray());
+            Assert.IsTrue(File.Exists(this.testableTrxLogger.trxFile), string.Format("TRX file: {0}, should have got created.", this.testableTrxLogger.trxFile));
+
+            string actualMessage = GetElementValueFromTrx(this.testableTrxLogger.trxFile, "StdOut");
+
+            Assert.IsNotNull(actualMessage);
+            Assert.IsTrue(string.Equals(message, actualMessage), string.Format("StdOut messages do not match. Expected:{0}, Actual:{1}", message, actualMessage));
         }
 
-        /// <summary>
-        /// Unit test for regression when there's no test categories.
-        /// </summary>
         [TestMethod]
-        public void ToTestElementShouldNotFailWhenThereIsNoTestCategoreis()
+        public void TestRunInformationShouldContainUtcDateTime()
         {
-            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
+            this.MakeTestRunComplete();
+            this.ValidateDateTimeInTrx(this.testableTrxLogger.trxFile);
+        }
+
+        private void ValidateDateTimeInTrx(string trxFileName)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            {
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    XDocument document = XDocument.Load(reader);
+                    var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value));
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value));
+                    var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value));
+                    ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value));
+                }
+            }
+        }
+
+        private void ValidateTestIdAndNameInTrx(bool isMstestAdapter)
+        {
+            ObjectModel.TestCase testCase = CreateTestCase("TestCase");
+            testCase.ExecutorUri = isMstestAdapter ? new Uri("some://mstestadapteruri") : new Uri("some://uri");
+
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
+            result.SetPropertyValue<Guid>(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+            if (isMstestAdapter)
+            {
+                result.DisplayName = "testDisplayName";
+            }
 
-            var unitTestElement = Converter.ToTestElement(testCase.Id, Guid.Empty, Guid.Empty, testCase.DisplayName, TrxLoggerConstants.UnitTestType, testCase);
+            Mock<TestResultEventArgs> resultEventArg = new Mock<TestResultEventArgs>(result);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg.Object);
+            var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-            object[] expected = Enumerable.Empty<Object>().ToArray();
+            this.ValidateResultAttributesInTrx(this.testableTrxLogger.trxFile, testCase.Id, testCase.DisplayName, isMstestAdapter);
+        }
 
-            CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray());
+        private void ValidateResultAttributesInTrx(string trxFileName, Guid testId, string testName, bool isMstestAdapter)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            {
+                using (XmlReader reader = XmlReader.Create(file))
+                {
+                    XDocument document = XDocument.Load(reader);
+                    var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
+                    if (isMstestAdapter)
+                    {
+                        Assert.AreNotEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
+                        Assert.AreNotEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(resultNode.Attributes("testId").FirstOrDefault().Value, testId.ToString());
+                        Assert.AreEqual(resultNode.Attributes("testName").FirstOrDefault().Value, testName);
+                    }
+                }
+            }
+        }
+
+        private void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime)
+        {
+            Assert.IsTrue(dateTime.UtcDateTime.Subtract(DateTime.UtcNow) < new TimeSpan(0, 0, 0, 60));
+        }
+
+        private string GetElementValueFromTrx(string trxFileName, string fieldName)
+        {
+            using (FileStream file = File.OpenRead(trxFileName))
+            using (XmlReader reader = XmlReader.Create(file))
+            {
+                while(reader.Read())
+                {
+                    if(reader.Name.Equals(fieldName) && reader.NodeType == XmlNodeType.Element)
+                    {
+                        return reader.ReadElementContentAsString();
+                    }
+                }
+            }
+
+            return null;
         }
 
         private static TestCase CreateTestCase(string testCaseName)
@@ -672,10 +788,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             return testRunCompleteEventArgs;
         }
 
-        private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock()
+        private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock(string testCaseName = "Pass1", List<TestResultMessage> testResultMessages = null)
         {
-            TestCase passTestCase = CreateTestCase("Pass1");
+            TestCase passTestCase = CreateTestCase(testCaseName);
             var passResult = new ObjectModel.TestResult(passTestCase);
+
+            if (testResultMessages != null && testResultMessages.Any())
+            {
+                foreach (var message in testResultMessages)
+                {
+                    passResult.Messages.Add(message);
+                }
+            }
+
             return new Mock<TestResultEventArgs>(passResult);
         }
 
@@ -694,6 +819,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         internal override void PopulateTrxFile(string trxFileName, XmlElement rootElement)
         {
             this.trxFile = trxFileName;
+            base.PopulateTrxFile(trxFile, rootElement);
         }
     }
 }

@@ -27,13 +27,33 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">所需环境变量 PROCDUMP_PATH 为空。请将 PROCDUMP_PATH 设为包含适当的可执行进程转储的文件夹路径。</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">收集转储已启用，但是未生成转储文件。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
+        <target state="translated">指定的追责参数键 {0} 无效。忽略此键。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">追责参数键 {0} 只支持值 {1}/{2}。忽略此键。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpCouldNotStart">
+        <source>Could not start process dump: {0}</source>
+        <target state="translated">无法启动进程转储: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpNotGenerated">
+        <source>CollectDump was enabled but dump file was not generated.</source>
+        <target state="translated">CollectDump 已启用，但是未生成转储文件。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

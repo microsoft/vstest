@@ -172,10 +172,6 @@
         <target state="translated">{0} 파일에 TestHost Diagnostics 로깅 중</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">취소가 요청되어 테스트 실행을 취소합니다.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">Testhost를 시작하지 못했습니다(오류: {0}).</target>
@@ -191,9 +187,19 @@
         <target state="translated">이전 버전의 Microsoft.NET.Test.Sdk를 사용하고 있습니다. 15.3.0 이상 버전으로 이동하세요.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process.</source>
-        <target state="translated">datacollector 프로세스에 연결하지 못했습니다.</target>
+      <trans-unit id="NonExistingExtensions">
+        <source>Could not find extensions: {0}</source>
+        <target state="translated">확장을 찾을 수 없음: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DeprecatedAdapterPath">
+        <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
+        <target state="translated">어댑터 조회가 변경됩니다. 자세한 내용은 https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap을 참조하세요.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="translated">{1}에 지정된 테스트 사례 필터 `{0}`과(와) 일치하는 테스트가 없습니다.</target>
         <note />
       </trans-unit>
     </body>

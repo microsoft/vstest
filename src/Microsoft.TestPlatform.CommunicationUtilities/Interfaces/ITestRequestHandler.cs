@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
+    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -13,8 +14,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
     /// <summary>
     /// Defines the contract for handling test platform requests
     /// </summary>
-    public interface ITestRequestHandler
+    public interface ITestRequestHandler : IDisposable
     {
+        /// <summary>
+        /// Gets or sets connection info for to start server/client.
+        /// </summary>
+        TestHostConnectionInfo ConnectionInfo { get; set; }
+
         /// <summary>
         /// Setups client based on port
         /// </summary>

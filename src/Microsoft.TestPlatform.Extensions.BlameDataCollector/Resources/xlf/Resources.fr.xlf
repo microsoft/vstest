@@ -27,13 +27,33 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">La variable d'environnement exigée PROCDUMP_PATH était null ou vide. Affectez à PROCDUMP_PATH le chemin du dossier contenant l'exécutable procdump approprié.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">La collecte de fichiers dump a été activée, mais aucun fichier dump n'a été généré.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
+        <target state="translated">La clé de paramètre blame spécifiée {0} n'est pas valide. Cette clé est ignorée.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">La clé de paramètre blame {0} peut prendre en charge uniquement les valeurs {1}/{2}. Cette clé est ignorée.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpCouldNotStart">
+        <source>Could not start process dump: {0}</source>
+        <target state="translated">Impossible de démarrer le fichier dump du processus : {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpNotGenerated">
+        <source>CollectDump was enabled but dump file was not generated.</source>
+        <target state="translated">CollectDump a été activé, mais le fichier dump n'a pas été généré.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

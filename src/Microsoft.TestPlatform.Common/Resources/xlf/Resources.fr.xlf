@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">Une exception s'est produite durant l'initialisation de l'enregistreur d'événements avec l'URI '{0}'. L'enregistreur d'événements ne sera pas utilisé. Exception : {1}</target>
-        <note></note>
+        <target state="translated">Une exception s'est produite durant l'initialisation de l'enregistreur d'événements avec {0} : '{1}'. L'enregistreur d'événements ne sera pas utilisé. Exception : {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Exception s’est produite lors de l’initialisation du journal avec un URI '{0}'.  Le journal ne sera pas utilisé.  Exception : {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">Impossible de localiser un enregistreur d'événements de tests ayant pour URI ou FriendlyName '{0}'.</target>
-        <note></note>
+        <target state="translated">Impossible de localiser un enregistreur d'événements de test ayant pour AssemblyQualifiedName, URI ou FriendlyName '{0}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Un journal de test avec un URI ou FriendlyName '{0}' est introuvable.</target>
         </alt-trans>
@@ -262,6 +262,11 @@
       <trans-unit id="FastFilterException">
         <source>An error occured while creating Fast filter.</source>
         <target state="translated">Une erreur s'est produite lors de la création du filtre rapide.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CancellationRequested">
+        <source>Cancelling the operation as requested.</source>
+        <target state="translated">Annulation de l'opération, comme demandé.</target>
         <note />
       </trans-unit>
     </body>

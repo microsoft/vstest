@@ -54,9 +54,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     //if(appDomain != null)
                     //{
-                        // Donot unload appdomain as there are lot is issues reported against appdomain unload
-                        // any ways the process is going to die off.
-                        // AppDomain.Unload(appDomain);
+                    // Donot unload appdomain as there are lot is issues reported against appdomain unload
+                    // any ways the process is going to die off.
+                    // AppDomain.Unload(appDomain);
                     //}
 
                     if (!string.IsNullOrWhiteSpace(this.mergedTempConfigFile) && File.Exists(mergedTempConfigFile))
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
             // Create Invoker object in new appdomain
             var invokerType = typeof(T);
-            return (IEngineInvoker) appDomain.CreateInstanceFromAndUnwrap(
+            return (IEngineInvoker)appDomain.CreateInstanceFromAndUnwrap(
                     invokerType.Assembly.Location,
                     invokerType.FullName,
                     false,

@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
@@ -169,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </summary>
         /// <param name="fileExtensions"> The file Extensions. </param>
         /// <param name="defaultExecutorUri"> The default Executor Uri. </param>
-        public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri)
+        public TestDiscovererMetadata(IReadOnlyCollection<string> fileExtensions, string defaultExecutorUri, AssemblyType assemblyType = default(AssemblyType))
         {
             if (fileExtensions != null && fileExtensions.Count > 0)
             {
@@ -180,6 +181,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 this.DefaultExecutorUri = new Uri(defaultExecutorUri);
             }
+
+            this.AssemblyType = assemblyType;
         }
 
         /// <summary>
@@ -195,6 +198,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets the default executor Uri for this discoverer
         /// </summary>
         public Uri DefaultExecutorUri
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets assembly type supported by the discoverer.
+        /// </summary>
+        public AssemblyType AssemblyType
         {
             get;
             private set;

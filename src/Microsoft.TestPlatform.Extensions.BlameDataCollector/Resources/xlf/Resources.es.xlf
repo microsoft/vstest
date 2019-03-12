@@ -27,13 +27,33 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">La variable de entorno PROCDUMP_PATH requerida era NULL o estaba vacía. Establezca PROCDUMP_PATH en la ruta de acceso de la carpeta que contiene el ejecutable procdump correcto.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">La opción para recopilar un volcado de memoria estaba habilitada, pero no se generó ningún archivo de volcado de memoria.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
+        <target state="translated">La clave de parámetro blame especificada {0} no es válida. Se omitirá esta clave.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">La clave de parámetro blame {0} solo puede admitir valores {1}/{2}. Se omitirá esta clave.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpCouldNotStart">
+        <source>Could not start process dump: {0}</source>
+        <target state="translated">No se ha podido iniciar el volcado de proceso: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpNotGenerated">
+        <source>CollectDump was enabled but dump file was not generated.</source>
+        <target state="translated">CollectDump estaba habilitado pero no se ha generado el archivo de volcado.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

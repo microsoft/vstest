@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             // Cycle through the messages that the datacollector sends.
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-            while (!isDataCollectionComplete)
+            while (!isDataCollectionComplete && !isCancelled)
             {
                 var message = this.communicationManager.ReceiveMessage();
 

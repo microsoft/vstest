@@ -5,30 +5,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+    using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     /// <summary>
     /// The design mode client.
     /// </summary>
     public class DesignModeClient : IDesignModeClient
     {
-        /// <summary>
-        /// The timeout for the client to connect to the server.
-        /// </summary>
-        private const int ClientListenTimeOut = 5 * 1000;
-
         private readonly ICommunicationManager communicationManager;
 
         private readonly IDataSerializer dataSerializer;
@@ -95,17 +95,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
             this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
+            var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
+
             // Wait for the connection to the server and listen for requests.
-            if (this.communicationManager.WaitForServerConnection(ClientListenTimeOut))
+            if (this.communicationManager.WaitForServerConnection(connectionTimeoutInSecs * 1000))
             {
                 this.communicationManager.SendMessage(MessageType.SessionConnected);
                 this.ProcessRequests(testRequestManager);
             }
             else
             {
-                EqtTrace.Info("Client timed out while connecting to the server.");
+                EqtTrace.Error("DesignModeClient : ConnectToClientAndProcessRequests : Client timed out while connecting to the server.");
                 this.Dispose();
-                throw new TimeoutException();
+                throw new TimeoutException(
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommunicationUtilitiesResources.ConnectionTimeoutErrorMessage,
+                        CoreUtilitiesConstants.VstestConsoleProcessName,
+                        "translation layer",
+                        connectionTimeoutInSecs,
+                        EnvironmentHelper.VstestConnectionTimeout)
+                    );
             }
         }
 
@@ -235,10 +245,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="testProcessStartInfo">
         /// The test Process Start Info.
         /// </param>
+        /// <param name="cancellationToken">
+        /// The cancellation token.
+        /// </param>
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo)
+        public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo, CancellationToken cancellationToken)
         {
             lock (ackLockObject)
             {
@@ -257,7 +270,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
                 // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
                 // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
-                waitHandle.WaitOne();
+                WaitHandle.WaitAny(new WaitHandle[] { waitHandle, cancellationToken.WaitHandle });
+
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
+
                 this.onAckMessageReceived = null;
 
                 var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);

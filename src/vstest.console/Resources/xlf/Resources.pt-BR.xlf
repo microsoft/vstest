@@ -225,28 +225,18 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Especifique um agente para resultados de teste. Por exemplo, para registrar os resultados em um
-      TRX (Arquivos de Resultados de Teste) do Visual Studio, use/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Cria um arquivo no diretório TestResults directory com o LogFileName fornecido.
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Especifique um agente para os resultados do teste. Por exemplo, para registrar os resultados em um TRX (Arquivo de Resultados de Teste) do Visual Studio use /logger:trx[;LogFileName=&lt;O padrão é o nome do arquivo exclusivo&gt;]
+      Cria o arquivo no diretório TestResults com o LogFileName fornecido.
 
-      Altere o nível de detalhamento nas mensagens de registro do agente do console, conforme mostrado abaixo
-      Exemplo: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Valores permitidos para nível de detalhes: quiet, minimal e normal.
+      Altere o nível de detalhes nas mensagens de log do agente do console, como é mostrado abaixo
+      Exemplo: /logger:console;verbosity=&lt;O padrão é "normal"&gt;
+      Valores permitidos para os detalhes: quiet, minimal, normal e detailed.
 
-      Altere o prefixo do nível de diagnóstico para o agente do console, conforme mostrado abaixo
-      Exemplo: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      Mais informações sobre o Agente do Console aqui: https://aka.ms/console-logger
-
-      Para publicar os resultados de teste no Team Foundation Server, use TfsPublisher conforme mostrado abaixo
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      Altere o prefixo do nível de diagnóstico do agente do console como é mostrado abaixo
+      Exemplo: /logger:console;prefix=&lt;O padrão é "false"&gt;
+      Veja mais informações sobre o Agente do Console aqui: https://aka.ms/console-logger</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Uri/FriendlyName do agente de log &gt;
       Especifica um agente de log para resultados de teste.  Por exemplo, para registrar em log os resultados em um Visual Studio Test resultados arquivo (TRX) usam /logger:trx.
@@ -747,12 +737,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
-      A versão do .Net Framework de destino a ser usada para a execução de teste.
-      Os valores válidos são ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Outros valores com suporte são Framework35, Framework40, Framework45 e FrameworkCore10.</target>
-        <note></note>
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="translated">--Framework|/Framework:&lt;Versão do Framework&gt;
+      Versão do .Net Framework de destino a ser usada para a execução do teste. 
+      Valores váidos são ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
+      Outros valores com suporte são Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; versão do Framework &gt;
       Direcionar o .net Framework versão a ser usada para a execução do teste. 
@@ -771,9 +761,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">Versão inválida do .Net Framework: {0}. Forneça o nome completo do TargetFramework. Outras versões com suporte do .Net Framework são Framework35, Framework40, Framework45 e FrameworkCore10.</target>
-        <note></note>
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="translated">Versão inválida do .Net Framework: {0}. Forneça o nome completo do TargetFramework(Exemplo: .NETCoreApp,Version=v2.0). Outras versões compatíveis do .Net Framework são Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Inválido .net Framework versão: {0}. Forneça o fullname do TargetFramework. Outro suporte para .net Framework versões são Framework35, Framework40 e Framework45.</target>
         </alt-trans>
@@ -1396,11 +1386,19 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
-        <target state="translated">--Diag|/Diag:&lt;Path to log file&gt;
-      Habilitar logs detalhados para a plataforma de teste.
-      Os logs são gravados no arquivo fornecido.</target>
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
+        <target state="translated">--Diag|/Diag:&lt;Caminho para o arquivo de log&gt;
+      Habilita logs na plataforma de teste.
+      Os logs são gravados no arquivo fornecido.
+
+      Altera o nível de rastreamento para logs conforme abaixo
+      Exemplo: /Diag:&lt;Caminho para o arquivo de log&gt;;tracelevel=&lt;Padrão como "verbose"&gt;
+      Valores permitidos para tracelevel: off, error, warning, info e verbose.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; caminho para arquivo de log &gt;
@@ -1491,10 +1489,30 @@
         <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
-        <source>--Blame|/Blame
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="translated">--Blame|/Blame
-      Executa o teste em modo de acusação. Essa opção é útil para isolar o teste problemático causando uma falha no host de teste. Ele cria um arquivo de saída no diretório atual como "Sequence.xml", que captura a ordem de execução do teste antes da falha.</target>
+        <source>--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Executa o teste em modo blame. Essa opção é útil para isolar o teste com problema causando falha no host de teste .
+     Ele cria um arquivo de saída no diretório atual como "Sequence.xml",
+      que captura a ordem de execução do teste antes da falha.
+      Você pode optar por coletar o processo de despejo para o host de teste.
+      Ao optar por coletar despejo, por padrão, um mini despejo será coletado em uma falha.
+     Você também pode optar por sobrescrever este comportamento padrão por alguns parâmetros opcionais:
+      CollectAlways - Para coletar despejo na saída mesmo que não haja falha (true/false) 
+      DumpType - Para especificar o tipo de despejo (mini/full).
+      Exemplo: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
@@ -1569,32 +1587,52 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Creates file in TestResults directory with given LogFileName.
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Especifique um agente para os resultados do teste. Por exemplo, para registrar os resultados em um TRX (Arquivo de Resultados de Teste) do Visual Studio use /logger:trx[;LogFileName=&lt;O padrão é o nome do arquivo exclusivo&gt;]
+      Cria o arquivo no diretório TestResults com o LogFileName fornecido.
 
-      Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal, normal and detailed.
+      Altere o nível de detalhes nas mensagens de log do agente do console, como é mostrado abaixo
+      Exemplo: /logger:console;verbosity=&lt;O padrão é "minimal"&gt;
+      Valores permitidos para os detalhes: quiet, minimal, normal e detailed.
 
-      Change the diagnostic level prefix for console logger as shown below
-      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      Altere o prefixo do nível de diagnóstico do agente do console como é mostrado abaixo
+      Exemplo: /logger:console;prefix=&lt;O padrão é "false"&gt;
+      Veja mais informações sobre o Agente do Console aqui: https://aka.ms/console-logger</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
+        <target state="translated">A opção CollectDump para Blame não é compatível com esta plataforma.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameIncorrectOption">
+        <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
+        <target state="translated">O parâmetro blame especificado com blame, {0} é inválido. Ignorando este parâmetro.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidDiagFilePath">
+        <source>Diag file path '{0}' is not valid.</source>
+        <target state="translated">O caminho para o arquivo diag '{0}' não é válido.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidBlameArgument">
+        <source>Blame argument '{0}' is not valid.</source>
+        <target state="translated">O argumento blame '{0}' não é válido.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidDiagArgument">
+        <source>Diag argument '{0}' is not valid.</source>
+        <target state="translated">O argumento diag '{0}' não é válido.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidLoggerArgument">
+        <source>Logger argument '{0}' is not valid.</source>
+        <target state="translated">O argumento logger '{0}' não é válido.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Framework35NotSupported">
+        <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
+        <target state="new">Não há suporte para Framework35. Para projetos com .Net Framework 3.5 de destino, use o Framework40 para executar testes em “modo de compatibilidade” CLR 4.0. </target>
         <note></note>
       </trans-unit>
     </body>

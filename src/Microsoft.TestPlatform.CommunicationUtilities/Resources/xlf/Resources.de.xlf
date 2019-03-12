@@ -67,8 +67,13 @@
         <note />
       </trans-unit>
       <trans-unit id="VersionCheckTimedout">
-        <source>Failed to negotiate protocol. Wait for response timed out.</source>
-        <target state="translated">Fehler beim Verhandeln des Protokolls. Timeout beim Warten auf Antwort.</target>
+        <source>Failed to negotiate protocol, waiting for response timed out after {0} seconds. This may occur due to machine slowness, please set environment variable {1} to increase timeout.</source>
+        <target state="translated">Fehler beim Verhandeln des Protokolls. Timeout beim Warten auf Antwort nach {0} Sekunden. Möglicherweise ist der Computer langsam. Legen Sie die Umgebungsvariable "{1}" fest, um den Timeoutwert zu erhöhen.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ConnectionTimeoutErrorMessage">
+        <source>{0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout.</source>
+        <target state="translated">Fehler beim Herstellen einer Verbindung des Prozesses "{0}" mit dem Prozess "{1}" nach {2} Sekunden. Möglicherweise ist der Computer langsam. Legen Sie die Umgebungsvariable "{3}" fest, um den Timeoutwert zu erhöhen.</target>
         <note />
       </trans-unit>
     </body>

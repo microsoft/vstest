@@ -3,6 +3,12 @@
 
 namespace Microsoft.TestPlatform.TestUtilities
 {
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -11,13 +17,6 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
-
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// Base class for integration tests.
@@ -49,6 +48,10 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             this.testEnvironment = new IntegrationTestEnvironment();
         }
+
+        public string StdOut => this.standardTestOutput;
+
+        public string StdErr => this.standardTestError;
 
         /// <summary>
         /// Prepare arguments for <c>vstest.console.exe</c>.
@@ -403,7 +406,30 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns></returns>
         public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
         {
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(this.GetConsoleRunnerPath());
+            var logFileName = Path.GetFileName(Path.GetTempFileName());
+            var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
+
+            if (Directory.Exists(logFileDir) == false)
+            {
+                Directory.CreateDirectory(logFileDir);
+            }
+
+            var logFilePath = Path.Combine(logFileDir, logFileName);
+
+            Console.WriteLine($"Logging diagnostics in {logFilePath}");
+
+            string consoleRunnerPath;
+
+            if (this.IsNetCoreRunner())
+            {
+                consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+            }
+            else
+            {
+                consoleRunnerPath = this.GetConsoleRunnerPath();
+            }
+
+            var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe"), new ConsoleParameters() { LogFilePath = logFilePath });
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
@@ -455,6 +481,9 @@ namespace Microsoft.TestPlatform.TestUtilities
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);
 
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 vstestconsole.Start();
                 vstestconsole.BeginOutputReadLine();
                 vstestconsole.BeginErrorReadLine();
@@ -469,9 +498,16 @@ namespace Microsoft.TestPlatform.TestUtilities
                     vstestconsole.WaitForExit();
                 }
 
+                stopwatch.Stop();
+
+                Console.WriteLine($"IntegrationTestBase.Execute: Total execution time: {stopwatch.Elapsed.Duration()}");
+
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
                 exitCode = vstestconsole.ExitCode;
+
+                Console.WriteLine("IntegrationTestBase.Execute: stdError = {0}", stdError);
+                Console.WriteLine("IntegrationTestBase.Execute: stdOut = {0}", stdOut);
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", exitCode);
             }
         }

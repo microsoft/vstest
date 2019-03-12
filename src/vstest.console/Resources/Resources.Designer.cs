@@ -236,6 +236,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   The blame parameter specified with blame, {0} is invalid. Ignoring this parameter..
+        /// </summary>
+        public static string BlameIncorrectOption
+        {
+            get
+            {
+                return ResourceManager.GetString("BlameIncorrectOption", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///      The directory containing the temporary outputs..
         /// </summary>
@@ -475,8 +486,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
 
         /// <summary>
         ///   Looks up a localized string similar to --Diag|/Diag:&lt;Path to log file&gt;
-        ///      Enable verbose logs for test platform.
-        ///      Logs are written to the provided file..
+        ///      Enable logs for test platform.
+        ///      Logs are written to the provided file.
+        ///
+        ///      Change the trace level for logs as shown below
+        ///      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+        ///      Allowed values for tracelevel: off, error, warning, info and verbose.
         /// </summary>
         public static string EnableDiagUsage
         {
@@ -643,6 +658,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///  Looks up a localized string similar to Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 &quot;compatibility mode&quot;..
+        /// </summary>
+        public static string Framework35NotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("Framework35NotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.5.1&quot;.
         /// </summary>
         public static string FrameworkVersionRequired
@@ -746,6 +772,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Blame argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidBlameArgument
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidBlameArgument", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The given configuration is invalid..
         /// </summary>
         public static string InvalidConfiguration
@@ -753,6 +790,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("InvalidConfiguration", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Diag argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidDiagArgument
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidDiagArgument", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Diag file path &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidDiagFilePath
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidDiagFilePath", resourceCulture);
             }
         }
 
@@ -768,7 +827,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10..
+        ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10..
         /// </summary>
         public static string InvalidFrameworkVersion
         {
@@ -786,6 +845,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("InvalidInIsolationCommand", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Logger argument &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string InvalidLoggerArgument
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidLoggerArgument", resourceCulture);
             }
         }
 

@@ -24,20 +24,22 @@
       </group>
       <group targetFramework="netcoreapp1.0">
         <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
-        <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+        <dependency id="Microsoft.CodeCoverage" version="$Version$" />
       </group>
       <group targetFramework="net45">
         <!-- TestHost gets shipped with vstest.console -->
-        <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
+        <dependency id="Microsoft.CodeCoverage" version="$Version$" />
       </group>
     </dependencies>
   </metadata>
   <files>
+    <file src="netcoreapp\*" target="build\netcoreapp1.0\" />
+    <file src="netfx\*" target="build\net40\" />
+
     <file src="Microsoft.NET.Test.Sdk.props" target="buildMultiTargeting\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.Sdk.targets" target="build\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.Sdk.props" target="build\net45\" />
-    <file src="Microsoft.NET.Test.Sdk.targets" target="build\net45\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\net40\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\uap10.0\" />
+
   </files>
 </package>

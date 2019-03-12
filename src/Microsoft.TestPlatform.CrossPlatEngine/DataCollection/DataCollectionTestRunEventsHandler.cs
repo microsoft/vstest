@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -24,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     {
         private IProxyDataCollectionManager proxyDataCollectionManager;
         private ITestRunEventsHandler testRunEventsHandler;
+        private CancellationToken cancellationToken;
         private IDataSerializer dataSerializer;
         private Collection<AttachmentSet> dataCollectionAttachmentSets;
 
@@ -36,8 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="proxyDataCollectionManager">
         /// The proxy Data Collection Manager.
         /// </param>
-        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager)
-            : this(baseTestRunEventsHandler, proxyDataCollectionManager, JsonDataSerializer.Instance)
+        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken)
+            : this(baseTestRunEventsHandler, proxyDataCollectionManager, cancellationToken, JsonDataSerializer.Instance)
         {
         }
 
@@ -53,10 +55,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataSerializer">
         /// The data Serializer.
         /// </param>
-        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer)
+        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, CancellationToken cancellationToken, IDataSerializer dataSerializer)
         {
             this.proxyDataCollectionManager = proxyDataCollectionManager;
             this.testRunEventsHandler = baseTestRunEventsHandler;
+            this.cancellationToken = cancellationToken;
             this.dataSerializer = dataSerializer;
         }
 
@@ -87,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
-                this.dataCollectionAttachmentSets = this.proxyDataCollectionManager?.AfterTestRunEnd(false, this);
+                this.dataCollectionAttachmentSets = this.proxyDataCollectionManager?.AfterTestRunEnd(this.cancellationToken.IsCancellationRequested, this);
 
                 if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
                 {

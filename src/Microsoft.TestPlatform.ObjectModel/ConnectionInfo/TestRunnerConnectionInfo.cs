@@ -99,6 +99,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets the trace level of logs.
+        /// </summary>
+        public int TraceLevel
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the runner process id.
         /// </summary>
         public int RunnerProcessId

@@ -7,13 +7,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Collections.Generic;
     using System.Globalization;
     using System.Threading;
-
+    using CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -96,11 +96,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="protocolConfig">Protocol configuration.</param>
         /// <param name="clientExitedWaitTime">Time to wait for client process exit.</param>
         internal TestRequestSender(
-                ICommunicationEndPoint communicationEndPoint,
-                TestHostConnectionInfo connectionInfo,
-                IDataSerializer serializer,
-                ProtocolConfig protocolConfig,
-                int clientExitedWaitTime)
+            ICommunicationEndPoint communicationEndPoint,
+            TestHostConnectionInfo connectionInfo,
+            IDataSerializer serializer,
+            ProtocolConfig protocolConfig,
+            int clientExitedWaitTime)
             : this(connectionInfo, serializer, protocolConfig, clientExitedWaitTime)
         {
             this.communicationEndpoint = communicationEndPoint;
@@ -120,7 +120,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationEndpoint.Connected += (sender, args) =>
                 {
                     this.channel = args.Channel;
-                    this.connected.Set();
+
+                    if (args.Connected && this.channel != null)
+                    {
+                        this.connected.Set();
+                    }
                 };
             this.communicationEndpoint.Disconnected += (sender, args) =>
                 {
@@ -135,14 +139,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public bool WaitForRequestHandlerConnection(int connectionTimeout)
+        public bool WaitForRequestHandlerConnection(int connectionTimeout, CancellationToken cancellationToken)
         {
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.WaitForRequestHandlerConnection: waiting for connection with timeout: {0}", connectionTimeout);
             }
 
-            return this.connected.Wait(connectionTimeout);
+            // Wait until either connection is successful, handled by connected.WaitHandle
+            // or operation is cancelled, handled by cancellationToken.WaitHandle
+            // or testhost exits unexpectedly, handled by clientExited.WaitHandle
+            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle }, connectionTimeout);
+
+            // Return true if connection was successful.
+            return waitIndex == 0;
         }
 
         /// <inheritdoc />
@@ -198,9 +208,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.channel.Send(data);
 
                 // Wait for negotiation response
-                if (!protocolNegotiated.WaitOne(60 * 1000))
+                var timeout = EnvironmentHelper.GetConnectionTimeout();
+                if (!protocolNegotiated.WaitOne(timeout * 1000))
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout));
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, EnvironmentHelper.VstestConnectionTimeout));
                 }
             }
             finally
@@ -559,8 +570,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
                     reason = this.clientExitErrorMessage;
                 }
-
-                EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+                else
+                {
+                    EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+                }
             }
 
             return reason;
@@ -596,6 +609,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Verbose("TestRequestSender.SetOperationComplete: Setting operation complete.");
             }
 
+            this.communicationEndpoint.Stop();
             Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
         }
 

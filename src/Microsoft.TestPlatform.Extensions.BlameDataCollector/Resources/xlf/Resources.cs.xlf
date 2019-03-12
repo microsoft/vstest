@@ -27,13 +27,33 @@
       </trans-unit>
       <trans-unit id="ProcDumpEnvVarEmpty">
         <source>Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.</source>
-        <target state="new">Required environment variable PROCDUMP_PATH was null or empty.</target>
-        <note></note>
+        <target state="translated">Vyžadovaná proměnná prostředí PROCDUMP_PATH má hodnotu Null nebo je prázdná. Nastavte pro ni cestu ke složce obsahující příslušný spustitelný soubor ProcDump.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DumpFileNotGeneratedErrorMessage">
         <source>Collect dump was enabled but no dump file was generated.</source>
-        <target state="new">Collect dump was enabled but no dump file was generated.</target>
-        <note></note>
+        <target state="translated">Bylo povoleno shromáždění výpisu, ale nebyl vygenerován žádný soubor výpisu.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterKeyIncorrect">
+        <source>The blame parameter key specified {0} is not valid. Ignoring this key.</source>
+        <target state="translated">Zadaný klíč parametru blame {0} není platný. Tento klíč se bude ignorovat.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameParameterValueIncorrect">
+        <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
+        <target state="translated">Klíč parametru blame {0} dokáže podporovat jen hodnoty {1}/{2}. Tento klíč se bude ignorovat.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpCouldNotStart">
+        <source>Could not start process dump: {0}</source>
+        <target state="translated">Nešlo spustit výpis procesu: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ProcDumpNotGenerated">
+        <source>CollectDump was enabled but dump file was not generated.</source>
+        <target state="translated">Byla povolena funkce CollectDump, ale soubor výpisu nebyl vygenerován.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

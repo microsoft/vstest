@@ -172,10 +172,6 @@
         <target state="translated">Registrando diagnóstico de TestHost en el archivo: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">Cancelando la serie de pruebas de acuerdo con la cancelación solicitada.</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">No se pudo iniciar el host de prueba con el error: {0}</target>
@@ -191,9 +187,19 @@
         <target state="translated">Está utilizando una versión anterior de Microsoft.NET.Test.Sdk. Cámbiese a una versión igual o superior a 15.3.0.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process.</source>
-        <target state="translated">No se pudo conectar con el proceso del recopilador de datos.</target>
+      <trans-unit id="NonExistingExtensions">
+        <source>Could not find extensions: {0}</source>
+        <target state="translated">No se pudieron encontrar las extensiones {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DeprecatedAdapterPath">
+        <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
+        <target state="translated">Se está cambiando la búsqueda de adaptador. Siga https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap para obtener más detalles.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="translated">Ninguna prueba coincide con el filtro de casos de prueba proporcionado "{0}" en {1}</target>
         <note />
       </trans-unit>
     </body>

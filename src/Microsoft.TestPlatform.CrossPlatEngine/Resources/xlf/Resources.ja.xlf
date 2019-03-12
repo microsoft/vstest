@@ -172,10 +172,6 @@
         <target state="translated">次のファイルで TestHost 診断をログ記録しています: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CancelationRequested">
-        <source>Canceling test run as cancelation requested.</source>
-        <target state="translated">取り消しが要求されたため、テスト実行を取り消しています。</target>
-      </trans-unit>
       <trans-unit id="FailedToLaunchTestHost">
         <source>Failed to launch testhost with error: {0}</source>
         <target state="translated">エラーが発生したため、TestHost を起動できませんでした: {0}</target>
@@ -191,9 +187,19 @@
         <target state="translated">Microsoft.NET.Test.Sdk の古いバージョンを使用しています。15.3.0 以降のバージョンに移行することをお勧めします。</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToConnectDataCollector">
-        <source>Failed to connect to datacollector process.</source>
-        <target state="translated">datacollector プロセスに接続できませんでした。</target>
+      <trans-unit id="NonExistingExtensions">
+        <source>Could not find extensions: {0}</source>
+        <target state="translated">拡張機能が見つかりませんでした: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DeprecatedAdapterPath">
+        <source>Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details.</source>
+        <target state="translated">アダプター検索は変更中です。詳細については、https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap をご覧ください。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableForGivenTestCaseFilter">
+        <source>No test matches the given testcase filter `{0}` in {1}</source>
+        <target state="translated">指定のテストケース フィルター `{0}` に一致するテストは {1} にありません</target>
         <note />
       </trans-unit>
     </body>

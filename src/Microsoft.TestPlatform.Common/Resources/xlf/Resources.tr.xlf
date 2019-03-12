@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with {0}: '{1}'.  The logger will not be used.  Exception: {2}</source>
-        <target state="new">Günlükçü, '{0}' URI’si ile başlatılırken özel durum oluştu. Günlükçü kullanılmayacak. Özel durum: {1}</target>
-        <note></note>
+        <target state="translated">Günlükçü, '{0}' ile başlatılırken özel durum oluştu: '{1}'.  Günlükçü kullanılmayacak. Özel durum: {2}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI '{0}' ile Günlükçü başlatılırken özel durum oluştu.  Günlükçü kullanılmayacak.  Özel durum: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with AssemblyQualifiedName, URI or FriendlyName '{0}'.</source>
-        <target state="new">URI veya FriendlyName değeri '{0}' olan bir test günlükçüsü bulunamadı.</target>
-        <note></note>
+        <target state="translated">AssemblyQualifiedName, URI veya FriendlyName değeri '{0}' olan bir test günlükçüsü bulunamadı.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI veya FriendlyName '{0}' olan bir test Günlükçü bulunamadı.</target>
         </alt-trans>
@@ -262,6 +262,11 @@
       <trans-unit id="FastFilterException">
         <source>An error occured while creating Fast filter.</source>
         <target state="translated">Hızlı filtre oluşturulurken bir hata oluştu.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CancellationRequested">
+        <source>Cancelling the operation as requested.</source>
+        <target state="translated">İşlem istek üzerine iptal ediliyor.</target>
         <note />
       </trans-unit>
     </body>

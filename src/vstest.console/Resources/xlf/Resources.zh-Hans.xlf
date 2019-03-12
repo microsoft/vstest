@@ -225,28 +225,19 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       为测试结果指定记录器。例如，若要将结果记录到
       Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx[;LogFileName=&lt;默认为唯一文件名&gt;]
       使用给定的 LogFileName 在 TestResults 目录中创建文件。
 
       更改控制台记录器的日志消息的详细级别，如下所示
-      例如: /logger:console;verbosity=&lt;默认为“最小”&gt;
-      允许的详细程度值: 最简单、最小和正常。
+      例如: /logger:console;verbosity=&lt;默认为 "正常"&gt;
+      允许的详细程度值: 最简单、最小、正常和详细。
 
       更改控制台记录器的诊断级别前缀，如下所示
       示例: /logger:console;prefix=&lt;默认为 "false"&gt;
-      在此处查看控制台记录器的详细信息: https://aka.ms/console-logger
-
-      要将测试结果发布到 Team Foundation Server，请如下使用 TfsPublisher
-      示例: /logger:TfsPublisher;
-                Collection=&lt;团队项目集合 URL&gt;;
-                BuildName=&lt;生成名称&gt;;
-                TeamProject=&lt;团队项目名称&gt;
-                [;Platform=&lt;默认为“任何 CPU”&gt;]
-                [;Flavor=&lt;默认为“调试”&gt;]
-                [;RunTitle=&lt;标题&gt;]</target>
-        <note></note>
+      在此处查看控制台记录器的详细信息: https://aka.ms/console-logger</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
       指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。
@@ -747,12 +738,12 @@
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
       用于测试执行的目标 .Net Framework 版本。
       有效值为 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等。
-      其他受支持的值为 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
-        <note></note>
+      其他受支持的值为 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
       目标.Net Framework 版本以用于测试执行。
@@ -771,9 +762,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="new">无效的 .Net Framework 版本: {0}。请提供 TargetFramework 的全名。其他支持的 .Net Framework 版本为 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
-        <note></note>
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework(Example: .NETCoreApp,Version=v2.0). Other supported .Net Framework versions are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
+        <target state="translated">无效的 .Net Framework 版本: {0}。请提供 TargetFramework 的全名(示例: .NETCoreApp,Version=v2.0)。其他支持的 .Net Framework 版本为 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">无效的.Net Framework 版本︰ {0}。 请给 TargetFramework 的全名。其他受支持的.Net Framework 版本是 Framework35、 Framework40 和 Framework45。</target>
         </alt-trans>
@@ -1396,11 +1387,19 @@
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</source>
-        <target state="translated">--Diag|/Diag:&lt;Path to log file&gt;
-      为测试平台启用详细日志。
-      日志写入到所提供的文件。</target>
+      Enable logs for test platform.
+      Logs are written to the provided file.
+
+      Change the trace level for logs as shown below
+      Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      Allowed values for tracelevel: off, error, warning, info and verbose.</source>
+        <target state="translated">--Diag|/Diag:&lt;日志文件路径&gt;
+      为测试平台启用日志。
+      日志写入到提供的文件中。
+
+      如下所示更改日志的跟踪级别
+      示例: /Diag:&lt;日志文件路径&gt;;tracelevel=&lt;默认为“详细”&gt;
+      跟踪级别允许的值: 关、错误、警告、信息和详细。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-诊断 | / 诊断︰ &lt; 日志文件路径 &gt;
@@ -1491,10 +1490,30 @@
         <note />
       </trans-unit>
       <trans-unit id="EnableBlameUsage">
-        <source>--Blame|/Blame
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
-        <target state="translated">--Blame|/Blame
-      在追责模式下运行测试。此选项有助于隔离有问题的测试，以免导致测试主机崩溃。它会在当前目录中创建一个输出文件 "Sequence.xml"，用于在崩溃之前捕获测试的执行顺序。</target>
+        <source>--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      在追责模式下运行测试。此选项有助于隔离导致测试主机崩溃的问题测试。
+      它会在当前目录中创建一个输出文件 "Sequence.xml"，
+      用于在崩溃之前捕获测试的执行顺序。
+      可以根据需要选择收集测试主机的进程转储。
+      选择收集转储时，默认情况下，将在崩溃时收集小型转储。
+      还可选择通过一些可选参数覆盖此默认行为:
+      CollectAlways - 若无崩溃则在退出时收集转储(true/false)
+      DumpType - 指定转储类型(小型/完整)。
+      Example: /Blame
+               /Blame:CollectDump
+               /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunAborted">
@@ -1569,32 +1588,53 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results. For example, to log results into a 
-      Visual Studio Test Results File (TRX) use /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
-      Creates file in TestResults directory with given LogFileName.
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      为测试结果指定记录器。例如，若要将结果记录到
+      Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx[;LogFileName=&lt;默认为唯一文件名&gt;]
+      使用给定的 LogFileName 在 TestResults 目录中创建文件。
 
-      Change the verbosity level in log messages for console logger as shown below
-      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
-      Allowed values for verbosity: quiet, minimal, normal and detailed.
+      更改控制台记录器的日志消息的详细级别，如下所示
+      例如: /logger:console;verbosity=&lt;默认为 "最小"&gt;
+      允许的详细程度值: 最简单、最小、正常和详细。
 
-      Change the diagnostic level prefix for console logger as shown below
-      Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
-      More info on Console Logger here : https://aka.ms/console-logger
-
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+      更改控制台记录器的诊断级别前缀，如下所示
+      示例: /logger:console;prefix=&lt;默认为 "false"&gt;
+      在此处查看控制台记录器的详细信息: https://aka.ms/console-logger</target>
+        <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
         <source>CollectDump option for Blame is not supported for this platform.</source>
-        <target state="new">CollectDump option for Blame is not supported for this platform.</target>
+        <target state="translated">此平台不支持用于追责的 CollectDump 选项。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BlameIncorrectOption">
+        <source>The blame parameter specified with blame, {0} is invalid. Ignoring this parameter.</source>
+        <target state="translated">追责时指定的追责参数 {0} 无效。忽略此参数。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidDiagFilePath">
+        <source>Diag file path '{0}' is not valid.</source>
+        <target state="translated">诊断文件路径“{0}”无效。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidBlameArgument">
+        <source>Blame argument '{0}' is not valid.</source>
+        <target state="translated">追责参数“{0}”无效。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidDiagArgument">
+        <source>Diag argument '{0}' is not valid.</source>
+        <target state="translated">诊断参数“{0}”无效。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidLoggerArgument">
+        <source>Logger argument '{0}' is not valid.</source>
+        <target state="translated">记录器参数“{0}”无效。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Framework35NotSupported">
+        <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
+        <target state="new">Framework35 不受支持。对于面向 .Net Framework 3.5 的项目，请使用 Framework40 在 CLR 4.0“兼容性模式”下运行测试。</target>
         <note></note>
       </trans-unit>
     </body>

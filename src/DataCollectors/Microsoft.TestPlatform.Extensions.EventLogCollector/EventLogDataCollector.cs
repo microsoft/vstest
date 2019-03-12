@@ -272,7 +272,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
                 "Event Log",
                 Environment.MachineName,
-                DateTime.Now);
+                DateTime.UtcNow);
 
             string eventLogDirPath = Path.Combine(Path.GetTempPath(), eventLogDirName);
 
@@ -413,7 +413,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
             }
 
-            this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.Now);
+            this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.UtcNow);
         }
 
         private void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
@@ -450,7 +450,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     e.TestOutcome);
             }
 
-            this.WriteCollectedEventLogEntries(e.Context, false, TimeSpan.MaxValue, DateTime.Now);
+            this.WriteCollectedEventLogEntries(e.Context, false, TimeSpan.MaxValue, DateTime.UtcNow);
         }
 
         #endregion
@@ -575,7 +575,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 catch (Exception ex)
                 {
                     this.logger.LogError(
-                        null,
+                        this.dataCollectorContext,
                         new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.ReadError, eventLogName, Environment.MachineName), ex));
                 }
             }

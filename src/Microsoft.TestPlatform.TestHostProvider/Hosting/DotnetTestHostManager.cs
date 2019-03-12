@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private IFileHelper fileHelper;
 
-        private ITestHostLauncher testHostLauncher;
+        private ITestHostLauncher customTestHostLauncher;
 
         private Process testHostProcess;
 
@@ -114,11 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         internal bool MakeRunsettingsCompatible => this.hostPackageVersion.StartsWith("15.0.0-preview");
 
         /// <summary>
-        /// Gets or sets the error length for runtime error stream.
-        /// </summary>
-        protected int ErrorLength { get; set; } = 4096;
-
-        /// <summary>
         /// Gets callback on process exit
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
@@ -144,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
-            this.testHostLauncher = customLauncher;
+            this.customTestHostLauncher = customLauncher;
         }
 
         /// <inheritdoc/>
@@ -219,17 +214,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
             var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
 
-            if (this.fileHelper.Exists(testHostPath))
-            {
-                EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
-                args += " " + testHostPath.AddDoubleQuote() + " " + connectionInfo.ToCommandLineOptions();
-            }
-            else
-            {
-                string message = string.Format(CultureInfo.CurrentCulture, Resources.NoTestHostFileExist, sourcePath);
-                EqtTrace.Verbose("DotnetTestHostmanager: " + message);
-                throw new FileNotFoundException(message);
-            }
+            EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
+            args += " " + testHostPath.AddDoubleQuote() + " " + connectionInfo.ToCommandLineOptions();
 
             // Create a additional probing path args with Nuget.Client
             // args += "--additionalprobingpath xxx"
@@ -326,28 +312,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            try
+            this.testHostProcessStdError = new StringBuilder(0, CoreUtilities.Constants.StandardErrorMaxLength);
+            if (this.customTestHostLauncher == null)
             {
-                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-                if (this.testHostLauncher == null)
-                {
-                    EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+                EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-                    cancellationToken.ThrowIfCancellationRequested();
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
-                }
-                else
-                {
-                    var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
-                    this.testHostProcess = Process.GetProcessById(processId);
-                    this.processHelper.SetExitCallback(processId, this.ExitCallBack);
-                }
+                cancellationToken.ThrowIfCancellationRequested();
+                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
             }
-            catch (OperationCanceledException ex)
+            else
             {
-                EqtTrace.Error("DotnetTestHostManager.LaunchHost: Failed to launch testhost: {0}", ex);
-                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.ToString());
-                return false;
+                var processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo, cancellationToken);
+                this.testHostProcess = Process.GetProcessById(processId);
+                this.processHelper.SetExitCallback(processId, this.ExitCallBack);
             }
 
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
@@ -359,73 +336,89 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         {
             string testHostPackageName = "microsoft.testplatform.testhost";
             string testHostPath = string.Empty;
+            string errorMessage = null;
 
-            if (this.fileHelper.Exists(runtimeConfigDevPath) && this.fileHelper.Exists(depsFilePath))
+            if (this.fileHelper.Exists(depsFilePath))
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: Reading file {0} to get path of testhost.dll", depsFilePath);
-
-                // Get testhost relative path
-                using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open, FileAccess.Read))
+                if (this.fileHelper.Exists(runtimeConfigDevPath))
                 {
-                    var context = new DependencyContextJsonReader().Read(stream);
-                    var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                    EqtTrace.Verbose("DotnetTestHostmanager: Reading file {0} to get path of testhost.dll", depsFilePath);
 
-                    if (testhostPackage != null)
+                    // Get testhost relative path
+                    using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open, FileAccess.Read))
                     {
-                        foreach (var runtimeAssemblyGroup in testhostPackage.RuntimeAssemblyGroups)
+                        var context = new DependencyContextJsonReader().Read(stream);
+                        var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                        if (testhostPackage != null)
                         {
-                            foreach (var path in runtimeAssemblyGroup.AssetPaths)
+                            foreach (var runtimeAssemblyGroup in testhostPackage.RuntimeAssemblyGroups)
                             {
-                                if (path.EndsWith("testhost.dll", StringComparison.OrdinalIgnoreCase))
+                                foreach (var path in runtimeAssemblyGroup.AssetPaths)
                                 {
-                                    testHostPath = path;
-                                    break;
+                                    if (path.EndsWith("testhost.dll", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        testHostPath = path;
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
-                        testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
-                        this.hostPackageVersion = testhostPackage.Version;
-                        EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
+                            testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
+                            this.hostPackageVersion = testhostPackage.Version;
+                            EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
+                        }
                     }
-                }
 
-                // Get probing path
-                using (StreamReader file = new StreamReader(this.fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open, FileAccess.Read)))
-                using (JsonTextReader reader = new JsonTextReader(file))
-                {
-                    JObject context = (JObject)JToken.ReadFrom(reader);
-                    JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions");
-                    JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths");
-                    foreach (var x in additionalProbingPaths)
+                    // Get probing path
+                    using (StreamReader file = new StreamReader(this.fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open, FileAccess.Read)))
+                    using (JsonTextReader reader = new JsonTextReader(file))
                     {
-                        EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.ToString());
-                        string testHostFullPath;
-                        try
+                        JObject context = (JObject)JToken.ReadFrom(reader);
+                        JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions");
+                        JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths");
+                        foreach (var x in additionalProbingPaths)
                         {
-                            testHostFullPath = Path.Combine(x.ToString(), testHostPath);
-                        }
-                        catch (ArgumentException)
-                        {
-                            // https://github.com/Microsoft/vstest/issues/847
-                            // skip any invalid paths and continue checking the others
-                            continue;
-                        }
+                            EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.ToString());
+                            string testHostFullPath;
+                            try
+                            {
+                                testHostFullPath = Path.Combine(x.ToString(), testHostPath);
+                            }
+                            catch (ArgumentException)
+                            {
+                                // https://github.com/Microsoft/vstest/issues/847
+                                // skip any invalid paths and continue checking the others
+                                continue;
+                            }
 
-                        if (this.fileHelper.Exists(testHostFullPath))
-                        {
-                            return testHostFullPath;
+                            if (this.fileHelper.Exists(testHostFullPath))
+                            {
+                                return testHostFullPath;
+                            }
                         }
                     }
                 }
             }
+            else
+            {
+                errorMessage = string.Format(CultureInfo.CurrentCulture, Resources.UnableToFindDepsFile, depsFilePath);
+            }
 
-            // If we are here it means it couldnt resolve testhost.dll from nuget chache.
+            // If we are here it means it couldnt resolve testhost.dll from nuget cache.
             // Try resolving testhost from output directory of test project. This is required if user has published the test project
             // and is running tests in an isolated machine. A second scenario is self test: test platform unit tests take a project
             // dependency on testhost (instead of nuget dependency), this drops testhost to output path.
             testHostPath = Path.Combine(sourceDirectory, "testhost.dll");
             EqtTrace.Verbose("DotnetTestHostManager: Assume published test project, with test host path = {0}.", testHostPath);
+
+            if (!this.fileHelper.Exists(testHostPath))
+            {
+                // If deps file is not found, suggest adding Microsoft.Net.Test.Sdk reference to the project
+                // Otherwise, suggest publishing the test project so that test host gets dropped next to the test source.
+                errorMessage = errorMessage ?? string.Format(CultureInfo.CurrentCulture, Resources.SuggestPublishTestProject, testHostPath);
+                throw new TestPlatformException(errorMessage);
+            }
 
             return testHostPath;
         }

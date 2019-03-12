@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.TestHostProvider.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.Hosting.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -40,7 +40,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private DefaultTestHostManager testHostManager;
         private TestableTestHostManager testableTestHostManager;
-        private int maxStdErrStringLength = 22;
         private string errorMessage;
         private int exitCode;
         private int testHostId;
@@ -211,7 +210,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestPlatformExtensionsShouldExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
+        public void GetTestPlatformExtensionsShouldNotExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
         {
             List<string> sourcesDir = new List<string> { @"C:\Source1" };
             List<string> sources = new List<string> { @"C:\Source1\source1.dll" };
@@ -219,8 +218,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
 
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[0])).Returns(new Version(2, 0));
+            this.mockFileHelper.Setup(fh => fh.GetFileVersion(extensionsList1[1])).Returns(new Version(5, 5));
+
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TestAdaptersPaths>C:\\Foo</TestAdaptersPaths></RunConfiguration> </RunSettings>");
-            List<string> currentList = new List<string> { @"FooExtension.dll" };
+            List<string> currentList = new List<string> { @"FooExtension.dll", @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
 
             // Act
             var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();
@@ -341,7 +343,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework.DefaultFramework,
                 this.mockProcessHelper.Object,
                 true,
-                this.maxStdErrStringLength,
                 this.mockMessageLogger.Object);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -368,13 +369,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
             var currentProcess = Process.GetCurrentProcess();
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
 
             this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
 
             Task<bool> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None);
             pid.Wait();
-            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.IsTrue(pid.Result);
             Assert.AreEqual(currentProcess.Id, this.testHostId);
@@ -386,7 +387,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
             var currentProcess = Process.GetCurrentProcess();
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(currentProcess.Id);
             this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None).Wait();
 
             this.mockProcessHelper.Verify(ph => ph.SetExitCallback(currentProcess.Id, It.IsAny<Action<object>>()));
@@ -418,19 +419,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(errorData, this.errorMessage);
-        }
-
-        [TestMethod]
-        public async Task ErrorMessageShouldBeTruncatedToMatchErrorLength()
-        {
-            string errorData = "Long Custom Error Strings";
-            this.ErrorCallBackTestHelper(errorData, -1);
-
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
-
-            // Ignore new line chars
-            Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
-            Assert.AreEqual(errorData.Substring(5), this.errorMessage);
         }
 
         [TestMethod]
@@ -524,7 +512,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework.DefaultFramework,
                 this.mockProcessHelper.Object,
                 true,
-                this.maxStdErrStringLength,
                 this.mockMessageLogger.Object);
 
             this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
@@ -557,7 +544,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework.DefaultFramework,
                 this.mockProcessHelper.Object,
                 true,
-                this.maxStdErrStringLength,
                 this.mockMessageLogger.Object);
 
             this.testableTestHostManager.HostExited += this.TestableTestHostManagerHostExited;
@@ -593,11 +579,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 Framework framework,
                 IProcessHelper processHelper,
                 bool shared,
-                int errorLength,
                 IMessageLogger logger)
                 : base(processHelper, new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
             {
-                this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             }
         }

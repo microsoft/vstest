@@ -85,5 +85,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual("key1", data[1].Key);
             Assert.AreEqual("val2", data[1].Value);
         }
+
+        [TestMethod]
+        public void CustomKeyValueConverterShouldDeserializeNullValue()
+        {
+            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, null) as KeyValuePair<string, string>[];
+
+            Assert.AreEqual(null, data);
+        }
     }
 }

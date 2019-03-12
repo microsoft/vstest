@@ -62,20 +62,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Canceling test run as cancelation requested..
-        /// </summary>
-        internal static string CancelationRequested {
-            get {
-                return ResourceManager.GetString("CancelationRequested", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to DataCollector debugging is enabled. Please attach debugger to datacollector process to continue..
         /// </summary>
         internal static string DataCollectorDebuggerWarning {
             get {
                 return ResourceManager.GetString("DataCollectorDebuggerWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adapter lookup is being changed, please follow https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0022-User-Specified-TestAdapter-Lookup.md#roadmap for more details..
+        /// </summary>
+        internal static string DeprecatedAdapterPath {
+            get {
+                return ResourceManager.GetString("DeprecatedAdapterPath", resourceCulture);
             }
         }
         
@@ -130,15 +130,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string ExecutionThreadApartmentStateNotSupportedForFramework {
             get {
                 return ResourceManager.GetString("ExecutionThreadApartmentStateNotSupportedForFramework", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to connect to datacollector process..
-        /// </summary>
-        internal static string FailedToConnectDataCollector {
-            get {
-                return ResourceManager.GetString("FailedToConnectDataCollector", resourceCulture);
             }
         }
         
@@ -211,6 +202,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string NoMatchingExecutor {
             get {
                 return ResourceManager.GetString("NoMatchingExecutor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find extensions: {0}.
+        /// </summary>
+        internal static string NonExistingExtensions {
+            get {
+                return ResourceManager.GetString("NonExistingExtensions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No test matches the given testcase filter `{0}` in {1}.
+        /// </summary>
+        internal static string NoTestsAvailableForGivenTestCaseFilter {
+            get {
+                return ResourceManager.GetString("NoTestsAvailableForGivenTestCaseFilter", resourceCulture);
             }
         }
         
