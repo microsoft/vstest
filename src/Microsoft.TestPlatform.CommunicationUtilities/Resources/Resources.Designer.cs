@@ -98,6 +98,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Test Host process exited during the execution of tests..
+        /// </summary>
+        public static string TestHostProcessExitedDuringExecution {
+            get {
+                return ResourceManager.GetString("TestHostProcessExitedDuringExecution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to communicate with test host process..
         /// </summary>
         public static string UnableToCommunicateToTestHost {

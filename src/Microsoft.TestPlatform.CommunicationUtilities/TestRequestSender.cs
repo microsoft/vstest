@@ -116,21 +116,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // this.clientExitCancellationSource = new CancellationTokenSource();
             this.clientExitErrorMessage = string.Empty;
-
             this.communicationEndpoint.Connected += (sender, args) =>
+            {
+                this.channel = args.Channel;
+                if (args.Connected && this.channel != null)
                 {
-                    this.channel = args.Channel;
+                    this.connected.Set();
+                }
+            };
 
-                    if (args.Connected && this.channel != null)
-                    {
-                        this.connected.Set();
-                    }
-                };
             this.communicationEndpoint.Disconnected += (sender, args) =>
-                {
-                    // If there's an disconnected event handler, call it
-                    this.onDisconnected?.Invoke(args);
-                };
+            {
+                // If there's an disconnected event handler, call it
+                this.onDisconnected?.Invoke(args);
+            };
 
             // Server start returns the listener port
             // return int.Parse(this.communicationServer.Start());
@@ -274,9 +273,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
-                {
-                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
-                };
+            {
+                this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
+            };
+
             this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
 
@@ -298,9 +298,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
-                {
-                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
-                };
+            {
+                this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
+            };
+
             this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
 
@@ -361,8 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // provides the crash call stack.
             if (EqtTrace.IsInfoEnabled)
             {
-                EqtTrace.Info("TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: " +
-                              stdError);
+                EqtTrace.Info($"TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: {stdError}");
             }
 
             this.clientExitErrorMessage = stdError;
@@ -563,15 +563,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
 
-                // Set a default message and wait for test host to exit for a moment
-                reason = CommonResources.UnableToCommunicateToTestHost;
+                // Wait for test host to exit for a moment
                 if (this.clientExited.Wait(this.clientExitedWaitTime))
                 {
+                    // Set a default message of test host process exited and additionally specify the error if present
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
-                    reason = this.clientExitErrorMessage;
+                    reason = CommonResources.TestHostProcessExitedDuringExecution;
+                    if (!string.IsNullOrWhiteSpace(this.clientExitErrorMessage))
+                    {
+                        reason = $"{reason} : {this.clientExitErrorMessage}";
+                    }
                 }
                 else
                 {
+                    reason = CommonResources.UnableToCommunicateToTestHost;
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
                 }
             }
