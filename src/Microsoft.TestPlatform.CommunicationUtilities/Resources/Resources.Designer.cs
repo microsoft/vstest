@@ -100,9 +100,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Test host process crashed.
         /// </summary>
-        public static string TestHostProcessExitedDuringExecution {
+        public static string TestHostProcessCrashed {
             get {
-                return ResourceManager.GetString("TestHostProcessExitedDuringExecution", resourceCulture);
+                return ResourceManager.GetString("TestHostProcessCrashed", resourceCulture);
             }
         }
         

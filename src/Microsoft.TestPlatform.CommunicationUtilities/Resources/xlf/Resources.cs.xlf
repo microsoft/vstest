@@ -76,9 +76,9 @@
         <target state="translated">Procesu {0} se nepovedlo připojit k procesu {1} ani po {2} s. Důvodem může být pomalý počítač. Nastavením proměnné prostředí {3} prosím časový limit prodlužte.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessExitedDuringExecution">
+      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
-        <target state="new">Test host process crashed </target>
+        <target state="new">Test host process crashed</target>
         <note></note>
       </trans-unit>
     </body>

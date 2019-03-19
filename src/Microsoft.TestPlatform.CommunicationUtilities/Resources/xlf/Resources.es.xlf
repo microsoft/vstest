@@ -76,9 +76,9 @@
         <target state="translated">El proceso {0} no pudo conectar con el proceso {1} después de {2} segundos. Esto puede deberse a la lentitud de la máquina, configure la variable de entorno {3} para aumentar el tiempo de espera.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessExitedDuringExecution">
+      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
-        <target state="new">Test host process crashed </target>
+        <target state="new">Test host process crashed</target>
         <note></note>
       </trans-unit>
     </body>

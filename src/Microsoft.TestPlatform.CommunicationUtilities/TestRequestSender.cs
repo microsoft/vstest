@@ -568,7 +568,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 {
                     // Set a default message of test host process exited and additionally specify the error if present
                     EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
-                    reason = CommonResources.TestHostProcessExitedDuringExecution;
+                    reason = CommonResources.TestHostProcessCrashed;
                     if (!string.IsNullOrWhiteSpace(this.clientExitErrorMessage))
                     {
                         reason = $"{reason} : {this.clientExitErrorMessage}";

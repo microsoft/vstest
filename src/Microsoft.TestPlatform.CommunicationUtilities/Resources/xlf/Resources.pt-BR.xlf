@@ -76,9 +76,9 @@
         <target state="translated">O processo {0} falha ao se conectar ao processo {1} após {2} segundos. Isso pode ocorrer devido à lentidão do computador. Defina a variável de ambiente {3} para aumentar o tempo limite.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessExitedDuringExecution">
+      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
-        <target state="new">Test host process crashed </target>
+        <target state="new">Test host process crashed</target>
         <note></note>
       </trans-unit>
     </body>

@@ -76,9 +76,9 @@
         <target state="translated">Процесс {0} не смог подключиться к процессу {1} по прошествии {2} с. Это может происходить из-за медленной работы компьютера. Увеличьте время ожидания в переменной среды {3}.</target>
         <note />
       </trans-unit>
-      <trans-unit id="TestHostProcessExitedDuringExecution">
+      <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
-        <target state="new">Test host process crashed </target>
+        <target state="new">Test host process crashed</target>
         <note></note>
       </trans-unit>
     </body>
