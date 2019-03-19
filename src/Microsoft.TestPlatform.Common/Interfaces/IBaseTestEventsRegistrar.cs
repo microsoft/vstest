@@ -5,6 +5,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
     public interface IBaseTestEventsRegistrar
     {
+        /// <summary>
+        /// Log warning message before request is created.
+        /// </summary>
+        /// <param name="message">message string</param>
         void LogWarning(string message);
     }
 }

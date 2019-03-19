@@ -42,8 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <summary>
         /// Send the test session messages to IDE
         /// </summary>
-        /// /// <param name="level"></param>
-        /// <param name="message"></param>
+        /// <param name="level">Level for the message</param>
+        /// <param name="message">Actual message string</param>
         void SendTestMessage(TestMessageLevel level, string message);
     }
 }
