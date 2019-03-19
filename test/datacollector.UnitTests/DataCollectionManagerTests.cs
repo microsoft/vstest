@@ -185,7 +185,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var runSettings = string.Format(this.defaultRunSettings, string.Empty);
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
-            var result = this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            var result = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             Assert.IsFalse(result);
         }
@@ -201,7 +202,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
-            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             Assert.IsTrue(isStartInvoked);
             Assert.IsFalse(areTestCaseEventsSubscribed);
@@ -217,7 +219,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
-            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             Assert.IsTrue(areTestCaseEventsSubscribed);
         }
@@ -232,7 +235,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
-            var result = this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            var result = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             Assert.IsFalse(result);
         }
@@ -240,7 +244,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionStartedShouldReturnFalseIfDataCollectorsAreNotInitialized()
         {
-            var result = this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            var result = this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             Assert.IsFalse(result);
         }
@@ -265,7 +270,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             var result = this.dataCollectionManager.SessionEnded();
 
@@ -301,7 +307,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             });
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             var result = this.dataCollectionManager.SessionEnded();
 
@@ -312,7 +319,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         public void SessionEndedShouldCancelProcessingAttachmentRequestsIfSessionIsCancelled()
         {
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
-            this.dataCollectionManager.SessionStarted();
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             var result = this.dataCollectionManager.SessionEnded(true);
 

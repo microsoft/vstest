@@ -265,20 +265,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public bool SessionStarted()
-        {
-            // If datacollectors are not configured or datacollection is not enabled, return false.
-            if (!this.isDataCollectionEnabled || this.RunDataCollectors.Count == 0)
-            {
-                return false;
-            }
-
-            this.SendEvent(new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
-
-            return this.events.AreTestCaseEventsSubscribed();
-        }
-
-        /// <inheritdoc/>
         public bool SessionStarted(SessionStartEventArgs sessionStartEventArgs)
         {
             // If datacollectors are not configured or datacollection is not enabled, return false.
@@ -287,6 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return false;
             }
 
+            sessionStartEventArgs.Context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId);
             this.SendEvent(sessionStartEventArgs);
 
             return this.events.AreTestCaseEventsSubscribed();
