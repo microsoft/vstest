@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, ITestEventsLogger logger, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, IBaseTestEventsRegistrar registrar, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -390,14 +390,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     if (!string.IsNullOrEmpty(incompatibleSettingWarning))
                     {
-                        EqtTrace.Info(incompatibleSettingWarning);
-                        logger.LogWarning(incompatibleSettingWarning);
+                        EqtTrace.Warning(incompatibleSettingWarning);
+                        registrar.LogWarning(incompatibleSettingWarning);
                     }
 
                     if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
                     {
                         EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
-                        logger.LogWarning(Resources.Framework35NotSupported);
+                        registrar.LogWarning(Resources.Framework35NotSupported);
                     }
 
                     if (EqtTrace.IsInfoEnabled)

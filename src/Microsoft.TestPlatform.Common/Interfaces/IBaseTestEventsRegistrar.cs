@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
-    public interface ITestEventsLogger
+    public interface IBaseTestEventsRegistrar
     {
         void LogWarning(string message);
     }

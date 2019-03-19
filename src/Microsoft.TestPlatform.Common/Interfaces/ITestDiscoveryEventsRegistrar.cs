@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-    public interface ITestDiscoveryEventsRegistrar : ITestEventsLogger
+    public interface ITestDiscoveryEventsRegistrar : IBaseTestEventsRegistrar
     {
         /// <summary>
         /// Registers to receive discovery events from discovery request.

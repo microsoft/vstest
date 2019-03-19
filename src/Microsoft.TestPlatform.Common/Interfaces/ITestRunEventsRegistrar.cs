@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-    public interface ITestRunEventsRegistrar : ITestEventsLogger
+    public interface ITestRunEventsRegistrar : IBaseTestEventsRegistrar
     {
         /// <summary>
         /// Registers to receive events from the provided test run request.
