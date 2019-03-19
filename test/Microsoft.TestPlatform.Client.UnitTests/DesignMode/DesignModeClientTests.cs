@@ -429,7 +429,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             
             this.designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message);
 
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, testPayload), Times.Once());
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
         }
 
         private class TestableDesignModeClient : DesignModeClient
