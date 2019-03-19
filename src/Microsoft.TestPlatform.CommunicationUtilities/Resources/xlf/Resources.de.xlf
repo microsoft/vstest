@@ -76,6 +76,11 @@
         <target state="translated">Fehler beim Herstellen einer Verbindung des Prozesses "{0}" mit dem Prozess "{1}" nach {2} Sekunden. Möglicherweise ist der Computer langsam. Legen Sie die Umgebungsvariable "{3}" fest, um den Timeoutwert zu erhöhen.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostProcessExitedDuringExecution">
+        <source>Test host process crashed</source>
+        <target state="new">Test host process crashed </target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

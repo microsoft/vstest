@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test Host process exited during the execution of tests..
+        ///   Looks up a localized string similar to Test host process crashed.
         /// </summary>
         public static string TestHostProcessExitedDuringExecution {
             get {
