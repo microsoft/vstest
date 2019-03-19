@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private IDictionary<string, string> dataCollectionEnvironmentVariables;
         private int dataCollectionPort;
         private IRequestData requestData;
+        private TestRunCriteria testRunCriteria;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
@@ -38,10 +39,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestData">
         /// The request data for providing execution services and data.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager)
+        /// <param name="testRunCriteria">
+        /// The test run criteria for given test run
+        /// </param>
+        public ProxyExecutionManagerWithDataCollection(IRequestData requestData, ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager, TestRunCriteria testRunCriteria)
             : base(requestData, requestSender, testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
+            this.testRunCriteria = testRunCriteria;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.requestData = requestData;
             this.dataCollectionEnvironmentVariables = new Dictionary<string, string>();
@@ -81,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 var dataCollectionParameters = this.ProxyDataCollectionManager.BeforeTestRunStart(
+                                                   this.testRunCriteria,
                                                    resetDataCollectors: true,
                                                    isRunStartingNow: true,
                                                    runEventsHandler: this.DataCollectionRunEventsHandler);

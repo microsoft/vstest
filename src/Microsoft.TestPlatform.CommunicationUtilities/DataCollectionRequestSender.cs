@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -109,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler, TestRunCriteria testRunCriteria)
         {
             var isDataCollectionStarted = false;
             BeforeTestRunStartResult result = null;
@@ -119,7 +120,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Send BeforeTestRunStart message with settingsXml: {0}", settingsXml);
             }
 
-            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, settingsXml);
+            var payload = new BeforeTestRunStartPayload
+            {
+                SettingsXml = settingsXml,
+                Sources = testRunCriteria.Sources
+            };
+
+            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);
 
             while (!isDataCollectionStarted)
             {

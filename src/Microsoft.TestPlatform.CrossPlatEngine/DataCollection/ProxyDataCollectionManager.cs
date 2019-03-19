@@ -141,6 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Invoked before starting of test run
         /// </summary>
+        /// <param name="testRunCriteria">
+        /// The test run criteria.
+        /// </param>
         /// <param name="resetDataCollectors">
         /// The reset Data Collectors.
         /// </param>
@@ -154,6 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// BeforeTestRunStartResult object
         /// </returns>
         public DataCollectionParameters BeforeTestRunStart(
+            TestRunCriteria testRunCriteria,
             bool resetDataCollectors,
             bool isRunStartingNow,
             ITestMessageEventHandler runEventsHandler)
@@ -166,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler, testRunCriteria);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 

@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager.GetTestHostConnectionInfo());
 
-                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings))
+                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings), testRunCriteria)
                                                 : new ProxyExecutionManager(requestData, requestSender, hostManager);
             };
 

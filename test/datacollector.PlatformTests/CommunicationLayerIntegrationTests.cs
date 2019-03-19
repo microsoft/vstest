@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             {
                 proxyDataCollectionManager.Initialize();
 
-                var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+                var result = proxyDataCollectionManager.BeforeTestRunStart(It.IsAny<TestRunCriteria>(), true, true, this.mockTestMessageEventHandler.Object);
 
                 Assert.AreEqual(1, result.EnvironmentVariables.Count);
             }
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             {
                 proxyDataCollectionManager.Initialize();
 
-                proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+                proxyDataCollectionManager.BeforeTestRunStart(It.IsAny<TestRunCriteria>(), true, true, this.mockTestMessageEventHandler.Object);
 
                 var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
 
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, this.runSettings, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher))
             {
                 proxyDataCollectionManager.Initialize();
-                proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+                proxyDataCollectionManager.BeforeTestRunStart(It.IsAny<TestRunCriteria>(), true, true, this.mockTestMessageEventHandler.Object);
 
                 var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcessId);
                 Assert.IsNotNull(result);

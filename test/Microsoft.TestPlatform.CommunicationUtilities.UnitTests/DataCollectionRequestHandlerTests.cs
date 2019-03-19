@@ -51,7 +51,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart).Returns(this.afterTestRunEnd);
 
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
         }
 
         [TestCleanup]
@@ -64,18 +64,18 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-                {
-                    DataCollectionRequestHandler.Create(null, this.mockMessageSink.Object);
-                });
+            {
+                DataCollectionRequestHandler.Create(null, this.mockMessageSink.Object);
+            });
         }
 
         [TestMethod]
         public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-                {
-                    DataCollectionRequestHandler.Create(this.mockCommunicationManager.Object, null);
-                });
+            {
+                DataCollectionRequestHandler.Create(this.mockCommunicationManager.Object, null);
+            });
         }
 
         [TestMethod]
@@ -100,9 +100,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<IPEndPoint>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.InitializeCommunication(123);
-                });
+            {
+                this.requestHandler.InitializeCommunication(123);
+            });
         }
 
         [TestMethod]
@@ -119,9 +119,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.WaitForRequestSenderConnection(0);
-                });
+            {
+                this.requestHandler.WaitForRequestSenderConnection(0);
+            });
         }
 
         [TestMethod]
@@ -141,9 +141,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var message = new DataCollectionMessageEventArgs(TestMessageLevel.Error, "message");
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.SendDataCollectionMessage(message);
-                });
+            {
+                this.requestHandler.SendDataCollectionMessage(message);
+            });
         }
 
         [TestMethod]
@@ -160,9 +160,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.Close();
-                });
+            {
+                this.requestHandler.Close();
+            });
         }
 
         [TestMethod]
@@ -183,7 +183,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                                                                                 .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
                                                                                 .Returns(this.afterTestRunEnd);
 
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
             this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestHostLaunchedPayload>(It.Is<Message>(y => y.MessageType == MessageType.TestHostLaunched)))
                                    .Returns(testHostLaunchedPayload);
@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Once);
 
             // Verify SessionStarted events
-            this.mockDataCollectionManager.Verify(x => x.SessionStarted(), Times.Once);
+            this.mockDataCollectionManager.Verify(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>()), Times.Once);
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
 
             // Verify TestHostLaunched events
@@ -256,7 +256,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldNotInitializeTestCaseEventHandlerIfTestCaseLevelEventsAreNotEnabled()
         {
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(false);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(false);
 
             this.requestHandler.ProcessRequests();
 
