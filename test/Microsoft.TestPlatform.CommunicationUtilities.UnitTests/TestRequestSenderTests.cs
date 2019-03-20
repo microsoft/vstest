@@ -189,7 +189,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.OnClientProcessExit(stderr);
 
-            var expectedErrorMessage = "Reason: " + stderr;
+            var expectedErrorMessage = "Reason: Test host process crashed";
             this.RaiseClientDisconnectedEvent();
             this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.EndsWith(expectedErrorMessage))), Times.Once);
         }
@@ -198,7 +198,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void OnClientProcessExitShouldNotSendErrorMessageIfOperationNotStarted()
         {
             this.SetupFakeCommunicationChannel();
-
             this.testRequestSender.OnClientProcessExit("Dummy Stderr");
 
             this.RaiseClientDisconnectedEvent();
@@ -720,7 +719,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.RaiseClientDisconnectedEvent();
 
-            var expectedErrorMessage = "Reason: Dummy Stderr";
+            var expectedErrorMessage = "Reason: Test host process crashed : Dummy Stderr";
             this.mockExecutionEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.Contains(expectedErrorMessage))), Times.Once);
         }
 
