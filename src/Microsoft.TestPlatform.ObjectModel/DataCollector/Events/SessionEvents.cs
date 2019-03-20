@@ -77,9 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         {
             ValidateArg.NotNullOrEmpty(property, "property");
 
-            T value = this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
-
-            return value;
+            return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
         }
 
         /// <summary>

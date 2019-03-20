@@ -44,7 +44,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
         private IProcessHelper processHelper;
-        private TestRunCriteria testRunCriteria;
+        private string settingsXml;
+        private IEnumerable<string> sources;
         private IRequestData requestData;
         private int dataCollectionPort;
         private int dataCollectionProcessId;
@@ -55,11 +56,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="requestData">
         /// Request Data providing common execution/discovery services.
         /// </param>
-        /// <param name="testRunCriteria">
-        ///     The test run criteria of the specified run.
+        /// <param name="settingsXml">
+        ///     Runsettings that contains the datacollector related configuration.
         /// </param>
-        public ProxyDataCollectionManager(IRequestData requestData, TestRunCriteria testRunCriteria)
-            : this(requestData, testRunCriteria, new ProcessHelper())
+        /// <param name="sources">
+        ///     Test Run sources
+        /// </param>
+        public ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IEnumerable<string> sources)
+            : this(requestData, settingsXml, sources, new ProcessHelper())
         {
         }
 
@@ -69,13 +73,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="requestData">
         ///     Request Data providing common execution/discovery services.
         /// </param>
-        /// <param name="testRunCriteria">
-        ///     The test run criteria.
+        /// <param name="settingsXml">
+        ///     The settings xml.
+        /// </param>
+        /// <param name="sources">
+        ///     Test Run sources
         /// </param>
         /// <param name="processHelper">
         ///     The process helper.
         /// </param>
-        internal ProxyDataCollectionManager(IRequestData requestData, TestRunCriteria testRunCriteria, IProcessHelper processHelper) : this(requestData, testRunCriteria, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, testRunCriteria.TestRunSettings))
+        internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IEnumerable<string> sources, IProcessHelper processHelper) : this(requestData, settingsXml, sources, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
         {
         }
 
@@ -85,8 +92,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="requestData">
         ///     Request Data providing common execution/discovery services.
         /// </param>
-        /// <param name="testRunCriteria">
-        ///     The test run criteria.
+        /// <param name="settingsXml">
+        ///     Runsettings that contains the datacollector related configuration.
+        /// </param>
+        /// <param name="sources">
+        ///     Test Run sources
         /// </param>
         /// <param name="dataCollectionRequestSender">
         ///     Handles communication with datacollector process.
@@ -97,16 +107,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionLauncher">
         ///     Launches datacollector process.
         /// </param>
-        internal ProxyDataCollectionManager(IRequestData requestData, TestRunCriteria testRunCriteria,
+        internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml,
+            IEnumerable<string> sources,
             IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper,
             IDataCollectionLauncher dataCollectionLauncher)
         {
             // DataCollector process needs the information of the Extensions folder
             // Add the Extensions folder path to runsettings.
-            this.testRunCriteria = testRunCriteria;
-            var settingsXml = UpdateExtensionsFolderInRunSettings(testRunCriteria.TestRunSettings);
-            this.testRunCriteria = new TestRunCriteria(testRunCriteria.Sources, testRunCriteria.FrequencyOfRunStatsChangeEvent, testRunCriteria.KeepAlive, settingsXml);
+            this.settingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
+            this.sources = sources;
             this.requestData = requestData;
+
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.processHelper = processHelper;
@@ -167,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.testRunCriteria, runEventsHandler);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, this.sources, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
@@ -362,7 +373,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 return;
             }
 
-            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.testRunCriteria.TestRunSettings);
+            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.settingsXml);
 
             if (dataCollectionSettings == null || !dataCollectionSettings.IsCollectionEnabled)
             {

@@ -98,12 +98,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void InitializeShouldSaveExceptionMessagesIfThrownByDataCollectionProcess()
         {
             var mockRequestSender = new Mock<IDataCollectionRequestSender>();
-            mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
+            var testSources = new List<string>() { "abc.dll", "efg.dll" };
+            mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
             mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
-            var testRunCriteria = new TestRunCriteria(new List<string> { "test1.dll" }, 100, true);
-            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, testRunCriteria, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
+            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, testSources, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize(false);

@@ -256,6 +256,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             var sessionStartEventArgs = new SessionStartEventArgs();
+
+            Assert.AreEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));
+
             this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
 
             Assert.AreNotEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));

@@ -4,9 +4,11 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.Linq;
     using System.Net;
 
     using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
@@ -311,6 +313,21 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionManager.Verify(x => x.InitializeDataCollectors("settingsxml"), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessRequestShouldCallSessionStartWithCorrectTestSources()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll", "test2.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockDataCollectionManager.Verify(x => x.SessionStarted(It.Is<SessionStartEventArgs>(
+                y => y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test1.dll") &&
+                y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test2.dll"))));
         }
     }
 }

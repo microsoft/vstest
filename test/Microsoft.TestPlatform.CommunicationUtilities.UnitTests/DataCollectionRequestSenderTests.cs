@@ -62,11 +62,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void SendBeforeTestRunStartAndGetResultShouldBeforeTestRunStartMessageWithPayload()
+        public void SendBeforeTestRunStartAndGetResultShouldSendBeforeTestRunStartMessageAndPayload()
         {
-            var testRunCriteria = new TestRunCriteria(new List<string>() { "test1.dll" }, 100);
+            var testSources = new List<string>() { "test1.dll" };
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
-            this.requestSender.SendBeforeTestRunStartAndGetResult(testRunCriteria, null);
+            this.requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, null);
 
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.IsAny<BeforeTestRunStartPayload>()));
         }
