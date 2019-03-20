@@ -102,7 +102,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockRequestSender.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
-            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, It.IsAny<TestRunCriteria>(), mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "test1.dll" }, 100, true);
+            var proxyDataCollectonManager = new ProxyDataCollectionManager(this.mockRequestData.Object, testRunCriteria, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestData.Object, this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize(false);
