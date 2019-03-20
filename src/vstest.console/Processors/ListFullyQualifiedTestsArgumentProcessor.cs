@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
@@ -246,6 +247,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.options = cmdOptions;
             }
 
+            public void LogWarning(string message)
+            {
+                ConsoleLogger.RaiseTestRunWarning(message);
+            }
+            
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
                 discoveryRequest.OnDiscoveredTests += this.discoveryRequest_OnDiscoveredTests;

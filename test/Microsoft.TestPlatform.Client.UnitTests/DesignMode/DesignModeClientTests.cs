@@ -422,6 +422,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()), Times.Once());
         }
 
+        [TestMethod]
+        public void DesignModeClientSendTestMessageShouldSendTestMessage()
+        {
+            var testPayload = new TestMessagePayload { MessageLevel = ObjectModel.Logging.TestMessageLevel.Error, Message = "DummyMessage" };
+            
+            this.designModeClient.SendTestMessage(testPayload.MessageLevel, testPayload.Message);
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+        }
+
         private class TestableDesignModeClient : DesignModeClient
         {
             internal TestableDesignModeClient(

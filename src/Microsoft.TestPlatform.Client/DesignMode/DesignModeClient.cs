@@ -298,6 +298,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.communicationManager.SendRawMessage(rawMessage);
         }
 
+        /// <inheritdoc />
+        public void SendTestMessage(TestMessageLevel level, string message)
+        {
+            var payload = new TestMessagePayload { MessageLevel = level, Message = message };
+            this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+        }
+
         private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool skipTestHostLaunch)
         {
             Task.Run(
