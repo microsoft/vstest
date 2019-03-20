@@ -286,12 +286,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             properties.Add(CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources);
             var eventArgs = new SessionStartEventArgs(properties);
 
-            // var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);
-            var properties2 = new Dictionary<string, object>();
-            var sources = new List<string>() { "abc.dll", "qrst.dll" };
-            properties2.Add(CoreUtilitiesConstants.TestSourcesKeyName, sources);
-            var eventArgs2 = new SessionStartEventArgs(properties2);
-            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs2);
+            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);
 
             // Open a socket communication port for test level events.
             var testCaseEventsPort = 0;
