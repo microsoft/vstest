@@ -76,6 +76,11 @@
         <target state="translated">Proces {0} nie mógł połączyć się z procesem {1} w ciągu {2} sekund. Przyczyną może być wolne działanie maszyny. Zwiększ limit czasu, ustawiając zmienną środowiskową {3}.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostProcessCrashed">
+        <source>Test host process crashed</source>
+        <target state="new">Test host process crashed</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
