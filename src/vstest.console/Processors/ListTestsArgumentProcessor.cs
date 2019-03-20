@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -230,6 +231,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             public DiscoveryEventsRegistrar(IOutput output)
             {
                 this.output = output;
+            }
+
+            public void LogWarning(string message)
+            {
+                ConsoleLogger.RaiseTestRunWarning(message);
             }
 
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)

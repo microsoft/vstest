@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), discoveryEventsRegistrar, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, testRunEventsRegistrar, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, IBaseTestEventsRegistrar registrar, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -364,9 +364,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
                     var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
 
-                    settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, out Framework chosenFramework);
+                    settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
-                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks);
+                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
                     settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
                     settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
                     settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
@@ -426,7 +426,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updateRequired;
         }
 
-        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks)
+        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
         {
             // Find compatible sources
             var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
@@ -434,8 +434,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Raise warnings for incompatible sources
             if (!string.IsNullOrEmpty(incompatibleSettingWarning))
             {
-                EqtTrace.Info(incompatibleSettingWarning);
-                ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
+                EqtTrace.Warning(incompatibleSettingWarning);
+                registrar.LogWarning(incompatibleSettingWarning);
             }
 
             // Log compatible sources
@@ -464,7 +464,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return updatePlatform;
         }
 
-        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Framework> sourceFrameworks, out Framework chosenFramework)
+        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar, out Framework chosenFramework)
         {
             // Get framework from sources
             var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
@@ -483,7 +483,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
             {
                 EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
-                ConsoleLogger.RaiseTestRunWarning(Resources.Framework35NotSupported);
+                registrar.LogWarning(Resources.Framework35NotSupported);
             }
 
             return updateFramework;
