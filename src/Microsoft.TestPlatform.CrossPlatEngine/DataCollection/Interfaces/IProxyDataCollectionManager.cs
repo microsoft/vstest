@@ -23,9 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// <summary>
         /// Invoked before starting of test run
         /// </summary>
-        /// <param name="testRunCriteria">
-        /// The test run criteria.
-        /// </param>
         /// <param name="resetDataCollectors">
         /// Bool value to reset and reinitialize datacollectors.
         /// </param>
@@ -39,7 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// BeforeTestRunStartResult object
         /// </returns>
         DataCollectionParameters BeforeTestRunStart(
-            TestRunCriteria testRunCriteria,
             bool resetDataCollectors,
             bool isRunStartingNow,
             ITestMessageEventHandler runEventsHandler);

@@ -22,10 +22,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
         /// </summary>
         /// <remarks>
-        /// Default constructor with default DataCollectionContext.
+        /// Default constructor with empty properties and default DataCollectionContext.
         /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
         /// </remarks>
-        public SessionStartEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)))
+        public SessionStartEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)), new Dictionary<string, object>())
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
+        /// </summary>
+        /// <remarks>
+        /// constructor with properties and default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
+        public SessionStartEventArgs(IDictionary<string, object> properties) : this(new DataCollectionContext(new SessionId(Guid.Empty)), properties)
         {
 
         }
@@ -36,10 +48,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="context">
         /// Context information for the session
         /// </param>
-        public SessionStartEventArgs(DataCollectionContext context)
+        public SessionStartEventArgs(DataCollectionContext context, IDictionary<string, object> properties)
             : base(context)
         {
-            this.Properties = new Dictionary<string, object>();
+            this.Properties = properties;
             Debug.Assert(!context.HasTestCase, "Session event has test a case context");
         }
 
@@ -48,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Public Methods
 
         /// <summary>
-        /// Returns the Session Start Properties currently specified.
+        /// Gets session start properties enumerator
         /// </summary>
         public IEnumerator<KeyValuePair<string, object>> GetProperties()
         {
@@ -56,39 +68,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Returns the property value
+        /// Gets property value
         /// </summary>
-        /// <param name="value">
-        /// Value of the property
-        /// </param>
         /// <param name="property">
-        /// Name of the property
+        /// Property name
         /// </param>
         public T GetPropertyValue<T>(string property)
         {
             ValidateArg.NotNullOrEmpty(property, "property");
 
-            T value;
-            if (this.Properties.TryGetValue(property, out object propertyValue) && propertyValue != null)
-            {
-                value = (T)propertyValue;
-            }
-            else
-            {
-                value = default(T);
-            }
+            T value = this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
 
             return value;
         }
 
         /// <summary>
-        /// Returns the property value
+        /// Gets property value
         /// </summary>
-        /// <param name="value">
-        /// Value of the property
-        /// </param>
         /// <param name="property">
-        /// Name of the property
+        /// Property name
         /// </param>
         public object GetPropertyValue(string property)
         {
@@ -97,25 +95,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             this.Properties.TryGetValue(property, out object propertyValue);
 
             return propertyValue;
-        }
-
-        /// <summary>
-        /// Sets the property value
-        /// </summary>
-        /// <param name="property">
-        /// Name of the property
-        /// </param>
-        /// <param name="value">
-        /// Value of the property
-        /// </param>
-        internal void SetPropertyValue(string property, object value)
-        {
-            ValidateArg.NotNull(property, "property");
-
-            if (value != null)
-            {
-                this.Properties.Add(property, value);
-            }
         }
 
         #endregion

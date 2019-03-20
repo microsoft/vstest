@@ -22,7 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -239,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
                 if (customTestAdaptersPaths != null)
                 {
-                    var fileHelper = new Utilities.Helpers.FileHelper();
+                    var fileHelper = new FileHelper();
 
                     List<string> extensionAssemblies = new List<string>();
                     foreach (var customTestAdaptersPath in customTestAdaptersPaths)
@@ -283,9 +282,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             var envVariables = this.dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
 
-            var eventArgs = new SessionStartEventArgs();
-            eventArgs.SetPropertyValue(CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources);
-            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);
+            var properties = new Dictionary<string, object>();
+            properties.Add(CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources);
+            var eventArgs = new SessionStartEventArgs(properties);
+
+            // var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);
+            var properties2 = new Dictionary<string, object>();
+            var sources = new List<string>() { "abc.dll", "qrst.dll" };
+            properties2.Add(CoreUtilitiesConstants.TestSourcesKeyName, sources);
+            var eventArgs2 = new SessionStartEventArgs(properties2);
+            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs2);
 
             // Open a socket communication port for test level events.
             var testCaseEventsPort = 0;

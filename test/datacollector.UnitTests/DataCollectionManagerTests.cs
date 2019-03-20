@@ -251,6 +251,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
+        public void SessionStartedShouldHaveCorrectSessionContext()
+        {
+            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
+
+            var sessionStartEventArgs = new SessionStartEventArgs();
+            this.dataCollectionManager.SessionStarted(sessionStartEventArgs);
+
+            Assert.AreNotEqual(sessionStartEventArgs.Context.SessionId, new SessionId(Guid.Empty));
+        }
+
+        [TestMethod]
         public void SessionEndedShouldReturnEmptyCollectionIfDataCollectionIsNotEnabled()
         {
             var runSettings = string.Format(this.defaultRunSettings, string.Empty);

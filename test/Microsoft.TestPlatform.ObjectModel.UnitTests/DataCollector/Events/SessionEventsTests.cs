@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Collections.Generic;
 
     [TestClass]
     public class SessionEventsTests
@@ -13,15 +14,16 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
         public SessionEventsTests()
         {
-            this.sessionStartEventArgs = new SessionStartEventArgs();
+            var properties = new Dictionary<string, object>();
+            properties.Add("property1", 1);
+            properties.Add("property2", 2);
+
+            this.sessionStartEventArgs = new SessionStartEventArgs(properties);
         }
 
         [TestMethod]
         public void SessionStartEventArgsGetPropertiesShouldGetPropertiesEnumerator()
         {
-            this.sessionStartEventArgs.SetPropertyValue("property1", 1);
-            this.sessionStartEventArgs.SetPropertyValue("property2", 2);
-
             var properties = this.sessionStartEventArgs.GetProperties();
             int propertiesCount = 0;
             while (properties.MoveNext())
@@ -35,9 +37,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void SessionStartEventArgsGetPropertyValueShouldGetPropertyValue()
         {
-            this.sessionStartEventArgs.SetPropertyValue("property1", 1);
-            this.sessionStartEventArgs.SetPropertyValue("property2", 2);
-
             var value = this.sessionStartEventArgs.GetPropertyValue<int>("property1");
 
             Assert.AreEqual(1, value);
@@ -46,28 +45,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void SessionStartEventArgsGetPropertyValueShouldGetPropertyValueInObject()
         {
-            this.sessionStartEventArgs.SetPropertyValue("property1", 1);
-            this.sessionStartEventArgs.SetPropertyValue("property2", 2);
-
             var value = this.sessionStartEventArgs.GetPropertyValue("property1");
 
-            Assert.AreEqual(1, value);
-        }
-
-        [TestMethod]
-        public void SessionStartEventArgsSetPropertyValueShouldCorrectlySetPropertyValue()
-        {
-            this.sessionStartEventArgs.SetPropertyValue("property1", 1);
-
-            var properties = this.sessionStartEventArgs.GetProperties();
-            int propertiesCount = 0;
-            while (properties.MoveNext())
-            {
-                propertiesCount++;
-            }
-
-            var value = this.sessionStartEventArgs.GetPropertyValue<int>("property1");
-            Assert.AreEqual(1, propertiesCount);
             Assert.AreEqual(1, value);
         }
     }

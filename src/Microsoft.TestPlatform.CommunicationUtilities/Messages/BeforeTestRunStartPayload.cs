@@ -1,26 +1,23 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Payloads
+namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
 {
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
     /// <summary>
-    /// Class used to define the BeforeTestRunStartPayload sent by the Vstest.console to datacollector
+    /// The before test run start payload
     /// </summary>
     public class BeforeTestRunStartPayload
     {
         /// <summary>
-        /// Run settings xml.
+        /// Gets or sets run settings xml.
         /// </summary>
-        [DataMember]
         public string SettingsXml { get; set; }
 
         /// <summary>
-        /// List of test sources.
+        /// Gets or sets list of test sources.
         /// </summary>
-        [DataMember]
         public IEnumerable<string> Sources { get; set; }
     }
 }

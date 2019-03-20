@@ -50,7 +50,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            var testRunCriteria = new TestRunCriteria(new List<string>() { "test1.dll" }, 100);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, testRunCriteria, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
         }
 
         [TestCleanup]
@@ -146,9 +147,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void SendTestHostInitiazliedShouldPassProcessIdToRequestSender()
         {
-            string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
-
             this.proxyDataCollectionManager.TestHostLaunched(1234);
 
             this.mockDataCollectionRequestSender.Verify(x => x.SendTestHostLaunched(It.Is<TestHostLaunchedPayload>(y => y.ProcessId == 1234)));
@@ -157,30 +155,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void BeforeTestRunStartShouldPassRunSettingsWithExtensionsFolderUpdatedAsTestAdapterPath()
         {
-            string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
-
             BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
-            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>(), It.IsAny<TestRunCriteria>())).Returns(res);
+            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
-            var result = this.proxyDataCollectionManager.BeforeTestRunStart(It.IsAny<TestRunCriteria>(), true, true, null);
+            var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
             var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
             var expectedSettingsXML = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration><TestAdaptersPaths>{extensionsFolderPath}</TestAdaptersPaths></RunConfiguration></RunSettings>";
             this.mockDataCollectionRequestSender.Verify(
-                x => x.SendBeforeTestRunStartAndGetResult(expectedSettingsXML, It.IsAny<ITestMessageEventHandler>(), It.IsAny<TestRunCriteria>()), Times.Once);
+                x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
 
         [TestMethod]
         public void BeforeTestRunStartShouldReturnDataCollectorParameters()
         {
             BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
-            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>(), It.IsAny<TestRunCriteria>())).Returns(res);
+            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
-            var result = this.proxyDataCollectionManager.BeforeTestRunStart(It.IsAny<TestRunCriteria>(), true, true, null);
+            var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
             this.mockDataCollectionRequestSender.Verify(
-                x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>(), It.IsAny<TestRunCriteria>()), Times.Once);
+                x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
             Assert.IsNotNull(result);
             Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
             Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
@@ -191,15 +186,33 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var mockRunEventsHandler = new Mock<ITestMessageEventHandler>();
             this.mockDataCollectionRequestSender.Setup(
-                    x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>(), It.IsAny<TestRunCriteria>()))
+                    x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>()))
                 .Throws<Exception>();
 
-            var result = this.proxyDataCollectionManager.BeforeTestRunStart(It.IsAny<TestRunCriteria>(), true, true, mockRunEventsHandler.Object);
+            var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
 
             mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.IsRegex("Exception of type 'System.Exception' was thrown..*")), Times.Once);
             Assert.AreEqual(0, result.EnvironmentVariables.Count);
             Assert.AreEqual(false, result.AreTestCaseLevelEventsRequired);
             Assert.AreEqual(0, result.DataCollectionEventsPort);
+        }
+
+        [TestMethod]
+        public void SendBeforeTestRunStartAndGetResultShouldBeInvokedWithCorrectTestRunCriteria()
+        {
+            var testRunCriteria = new TestRunCriteria(new List<string>() { "abc.dll", "efg.dll" }, 100);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, testRunCriteria, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+
+            BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
+            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<TestRunCriteria>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
+
+            var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
+
+            this.mockDataCollectionRequestSender.Verify(
+                x => x.SendBeforeTestRunStartAndGetResult(testRunCriteria, It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
+            Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
         }
 
         [TestMethod]
@@ -248,9 +261,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
              </DataCollectionRunSettings>
            </RunSettings>";
 
+            var testRunCriteria = new TestRunCriteria(new List<string>() { "test1.dll" }, 1, true, settings);
             this.mockRequestData.Setup(rd => rd.IsTelemetryOptedIn).Returns(true);
 
-            var proxyExecutionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, settings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            var proxyExecutionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, testRunCriteria, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
 
             var resultString = "{ FriendlyName = Code Coverage, Uri = datacollector://microsoft/CodeCoverage/2.0 }";
             this.mockMetricsCollection.Verify(rd => rd.Add(TelemetryDataConstants.DataCollectorsEnabled, resultString), Times.Once);

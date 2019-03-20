@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
-
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.context = new DataCollectionContext(testCase);
 
             this.events.SessionStart += this.SessionStartMessageHandler;
-            var eventArgs = new SessionStartEventArgs(this.context);
+            var eventArgs = new SessionStartEventArgs(this.context, new Dictionary<string, object>());
             this.events.RaiseEvent(eventArgs);
 
             Assert.IsTrue(this.isEventRaised);
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var testCase = new TestCase();
             this.context = new DataCollectionContext(testCase);
 
-            var eventArgs = new SessionStartEventArgs(this.context);
+            var eventArgs = new SessionStartEventArgs(this.context, new Dictionary<string, object>());
             this.events.RaiseEvent(eventArgs);
 
             Assert.IsFalse(this.isEventRaised);
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.events.SessionStart += this.SessionStartMessageHandler;
             this.events.SessionStart -= this.SessionStartMessageHandler;
-            var eventArgs = new SessionStartEventArgs(this.context);
+            var eventArgs = new SessionStartEventArgs(this.context, new Dictionary<string, object>());
             this.events.RaiseEvent(eventArgs);
 
             Assert.IsFalse(this.isEventRaised);
