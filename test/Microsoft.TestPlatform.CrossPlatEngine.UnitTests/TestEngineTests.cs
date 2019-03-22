@@ -3,13 +3,16 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
 
     using Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -490,6 +493,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
 
             this.mockMetricsCollection.Verify(mc => mc.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, It.IsAny<object>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProxyDataCollectionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsSourceList()
+        {
+            var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+
+            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+
+            Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("1.dll"));
+        }
+
+        [TestMethod]
+        public void ProxyDataCollectionManagerShouldBeInitialzedWithCorrectTestSourcesWhenTestRunCriteriaContainsTestCaseList()
+        {
+            var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+
+            var testCaseList = new List<TestCase> { new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll") };
+            var testRunCriteria = new TestRunCriteria(testCaseList, 100, false, settingXml);
+
+            var executionManager = this.testEngine.GetExecutionManager(this.mockRequestData.Object, this.testableTestRuntimeProvider, testRunCriteria);
+
+            Assert.IsTrue((executionManager as ProxyExecutionManagerWithDataCollection).ProxyDataCollectionManager.Sources.Contains("x.dll"));
         }
 
         /// <summary>

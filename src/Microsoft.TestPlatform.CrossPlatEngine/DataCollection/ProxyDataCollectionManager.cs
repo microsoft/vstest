@@ -44,11 +44,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
         private IProcessHelper processHelper;
-        private string settingsXml;
-        private IEnumerable<string> sources;
         private IRequestData requestData;
         private int dataCollectionPort;
         private int dataCollectionProcessId;
+
+        /// <summary>
+        /// The settings xml
+        /// </summary>
+        public string SettingsXml { get; }
+
+        /// <summary>
+        /// List of test sources
+        /// </summary>
+        public IEnumerable<string> Sources { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
@@ -114,8 +122,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             // DataCollector process needs the information of the Extensions folder
             // Add the Extensions folder path to runsettings.
-            this.settingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
-            this.sources = sources;
+            this.SettingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
+            this.Sources = sources;
             this.requestData = requestData;
 
             this.dataCollectionRequestSender = dataCollectionRequestSender;
@@ -178,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, this.sources, runEventsHandler);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.SettingsXml, this.Sources, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
@@ -373,7 +381,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 return;
             }
 
-            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.settingsXml);
+            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.SettingsXml);
 
             if (dataCollectionSettings == null || !dataCollectionSettings.IsCollectionEnabled)
             {
