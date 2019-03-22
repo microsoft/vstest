@@ -3,10 +3,11 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System;
     using Timer = System.Timers.Timer;
 
-    public class ProgressIndicator
+    public class ProgressIndicator : IProgressIndicator
     {
         const string testRunProgressString = "Test run in progress...";
         private object syncObject = new object();
@@ -14,6 +15,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private Timer timer;
         private bool isRunning;
         private DateTime startTime;
+
+        public IOutput ConsoleOutput { get; private set; }
+
+        public ProgressIndicator(IOutput output)
+        {
+            ConsoleOutput = output;
+        }
 
         public void Start()
         {
@@ -23,10 +31,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     timer = new Timer(1000);
                     timer.Elapsed += Timer_Elapsed;
-                    timer.Enabled = true;
+                    timer.Start();
                 }
                 startTime = DateTime.Now;
-                Console.Write(testRunProgressString.Substring(0, testRunProgressString.Length + dotCounter - 2));
+                ConsoleOutput.Write(testRunProgressString.Substring(0, testRunProgressString.Length + dotCounter - 2), OutputLevel.Information);
                 isRunning = true;
             }
         }
@@ -35,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             var currentLineCursor = Console.CursorTop;
             Console.SetCursorPosition(startPos, Console.CursorTop);
-            Console.Write(new string(' ', Console.WindowWidth - startPos));
+            ConsoleOutput.Write(new string(' ', Console.WindowWidth - startPos), OutputLevel.Information);
             Console.SetCursorPosition(startPos, currentLineCursor);
         }
 
@@ -62,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             if (isRunning)
             {
-                Console.Write(".");
+                ConsoleOutput.Write(".", OutputLevel.Information);
                 dotCounter = ++dotCounter % 3;
                 if (dotCounter == 0)
                 {

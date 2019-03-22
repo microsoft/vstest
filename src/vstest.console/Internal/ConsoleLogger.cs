@@ -98,9 +98,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Constructor added for testing purpose
         /// </summary>
         /// <param name="output"></param>
-        internal ConsoleLogger(IOutput output)
+        internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator)
         {
             ConsoleLogger.Output = output;
+            this.progressIndicator = progressIndicator;
         }
 
         #endregion
@@ -117,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             private set;
         }
 
-        private ProgressIndicator progressIndicator = new ProgressIndicator();
+        private IProgressIndicator progressIndicator;
 
         /// <summary>
         /// Get the verbosity level for the console logger
@@ -145,6 +146,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 ConsoleLogger.Output = ConsoleOutput.Instance;
             }
 
+            if (this.progressIndicator == null)
+            {
+                // Progress indicator needs to be displayed only for cli experience.
+                // Use the no operation progress indicator is the standard out is getting redirected.
+                if (Console.IsOutputRedirected)
+                {
+                    this.progressIndicator = new NoOpProgressIndicator();
+                }
+                else
+                {
+                    this.progressIndicator = new ProgressIndicator(Output);
+                }
+            }
+            
             // Register for the events.
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
