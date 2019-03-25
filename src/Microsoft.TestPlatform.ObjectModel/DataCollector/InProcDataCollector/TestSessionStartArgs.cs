@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// The test session start args.
@@ -21,6 +22,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSessionStartArgs"/> class.
         /// </summary>
+        /// <param name="sources">
+        /// The configuration.
+        /// </param>
+        public TestSessionStartArgs(IEnumerable<string> sources)
+        {
+            this.Configuration = String.Empty;
+            this.Sources = sources;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestSessionStartArgs"/> class.
+        /// </summary>
         /// <param name="configuration">
         /// The configuration.
         /// </param>
@@ -33,5 +46,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// Gets or sets the configuration.
         /// </summary>
         public string Configuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets the test sources.
+        /// </summary>
+        private IEnumerable<string> Sources;
     }
 }

@@ -9,13 +9,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
@@ -85,6 +89,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
+                InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, adapterSourceMap);
+
                 this.activeTestRun = new RunTestsWithSources(this.requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
@@ -119,6 +125,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
+                InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, tests);
+                 
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
@@ -193,6 +201,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 {
                     EqtTrace.Warning("TestExecutorWebService: Exception occured while calling test connection. {0}", ex);
                 }
+            }
+        }
+
+        private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, IEnumerable<TestCase> tests)
+        {
+            // Initialize data collectors if declared in run settings.
+            if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
+            {
+                var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
+            }
+
+            if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
+            {
+                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, tests.Select(tc => tc.Source).Distinct());
+            }
+        }
+
+        private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, Dictionary<string, IEnumerable<string>> adapterSourceMap)
+        {
+            IEnumerable<string> sources = new List<string>();
+            sources = adapterSourceMap?.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
+
+            // Initialize data collectors if declared in run settings.
+            if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
+            {
+                var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
+            }
+
+            if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
+            {
+                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, sources);
             }
         }
 

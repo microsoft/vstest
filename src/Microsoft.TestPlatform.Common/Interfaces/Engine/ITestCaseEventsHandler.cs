@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Collections.Generic;
 
     /// <summary>
     /// The Test Case level events.
@@ -33,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Send session start event.
         /// The purpose of this is to perform any initialization before the test case level events are sent.
         /// </summary>
-        void SendSessionStart();
+        void SendSessionStart(IDictionary<string, object> properties);
 
         /// <summary>
         /// Sends session end event.

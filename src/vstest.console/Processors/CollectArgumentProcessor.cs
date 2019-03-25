@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
 
     using System.Globalization;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -182,11 +182,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+
+            // Add inproc data collector to runsetings if coverlet code coverage is enabled
+            if (string.Equals(argument, Constants.CoverletDataCollectorFriendlyName, StringComparison.OrdinalIgnoreCase))
+            {
+                runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, GetInprocDataCollectorSettings().InnerXml);
+            }
         }
 
         internal static void AddDataCollectorFriendlyName(string friendlyName)
         {
             EnabledDataCollectors.Add(friendlyName.ToLower());
+        }
+
+        private static XmlElement GetInprocDataCollectorSettings()
+        {
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement(Constants.InProcDataCollectionRunSettingsName);
+            XmlElement subRoot = doc.CreateElement(Constants.InProcDataCollectorsSettingName);
+            XmlElement inprocRoot = doc.CreateElement(Constants.InProcDataCollectorSettingName);
+
+            AppendAttribute(doc, inprocRoot, "codebase", Constants.CoverletDataCollectorCodebase);
+            AppendAttribute(doc, inprocRoot, "friendlyName", Constants.CoverletDataCollectorFriendlyName);
+            AppendAttribute(doc, inprocRoot, "assemblyQualifiedName", Constants.CoverletDataCollectorAssemblyQualifiedName);
+            AppendAttribute(doc, inprocRoot, "uri", Constants.CoverletDataCollectorUri);
+
+            subRoot.AppendChild(inprocRoot);
+            root.AppendChild(subRoot);
+
+            return root;
+        }
+
+        private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)
+        {
+            if (string.IsNullOrWhiteSpace(attributeValue))
+            {
+                return;
+            }
+
+            XmlAttribute attribute = doc.CreateAttribute(attributeName);
+            attribute.Value = attributeValue;
+            owner.Attributes.Append(attribute);
         }
     }
 }

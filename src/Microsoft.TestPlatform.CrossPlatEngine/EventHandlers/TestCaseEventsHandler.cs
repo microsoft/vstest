@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -51,9 +52,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         }
 
         /// <inheritdoc />
-        public void SendSessionStart()
+        public void SendSessionStart(IDictionary<string, object> properties)
         {
-            this.SessionStart.SafeInvoke(this, new SessionStartEventArgs(), "TestCaseEventsHandler.RaiseSessionStart");
+            this.SessionStart.SafeInvoke(this, new SessionStartEventArgs(properties), "TestCaseEventsHandler.RaiseSessionStart");
         }
 
         /// <inheritdoc />

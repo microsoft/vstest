@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -23,6 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private IEnumerable<TestCase> testCases;
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
+
+        private ITestCaseEventsHandler testCaseEventsHandler;
 
         public RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
             : this(requestData, testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
@@ -45,6 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.testCases = testCases;
             this.executorUriVsTestList = executorUriVsTestList;
+            this.testCaseEventsHandler = testCaseEventsHandler;
         }
 
         protected override void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
@@ -65,6 +68,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUri, RunContext runContext, IFrameworkHandle frameworkHandle)
         {
             executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
+        }
+
+        protected override void SendSessionEnd()
+        {
+            this.testCaseEventsHandler?.SendSessionEnd();
+        }
+
+        protected override void SendSessionStart()
+        {
+            var properties = new Dictionary<string, object>();
+            properties.Add("TestSources", this.testCases.Select(tc => tc.Source).Distinct());
+            this.testCaseEventsHandler?.SendSessionStart(properties);
         }
 
         /// <summary>

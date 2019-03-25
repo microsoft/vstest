@@ -176,6 +176,18 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
+        [TestMethod]
+        public void InitializeShouldAddInprocCollectorWhenXPlatCodeCoverageIsEnabled()
+        {
+            var runsettingsString = string.Format(DefaultRunSettings, string.Empty);
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            this.settingsProvider.SetActiveRunSettings(runsettings);
+            this.executor.Initialize("XPlat Code Coverage");
+
+            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"XPlat Code Coverage\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n  <InProcDataCollectionRunSettings>\r\n    <InProcDataCollectors>\r\n      <InProcDataCollector codebase=\"coverletinprocdatacollector.dll\" friendlyName=\"XPlat Code Coverage\" assemblyQualifiedName=\"Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" uri=\"datacollector://microsoft/CoverletCodeCoverage/1.0\" />\r\n    </InProcDataCollectors>\r\n  </InProcDataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
         #endregion
     }
 }

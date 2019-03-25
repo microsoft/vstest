@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri,string>, IEnumerable<string>> executorUriVsSourceList;
 
+        private ITestCaseEventsHandler testCaseEventsHandler;
+
         public RunTestsWithSources(IRequestData requestData, Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
             : this(requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
         {
@@ -52,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.adapterSourceMap = adapterSourceMap;
             this.executorUriVsSourceList = executorUriVsSourceList;
+            this.testCaseEventsHandler = testCaseEventsHandler;
         }
 
         protected override void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
@@ -202,6 +205,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
 
             return testCaseFilterToShow;
+        }
+
+        protected override void SendSessionEnd()
+        {
+            this.testCaseEventsHandler?.SendSessionEnd();
+        }
+
+        protected override void SendSessionStart()
+        {
+            var properties = new Dictionary<string, object>();
+
+            IEnumerable<string> sources = new List<string>();
+            sources = adapterSourceMap?.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
+
+            properties.Add("TestSources", sources);
+            this.testCaseEventsHandler?.SendSessionStart(properties);
         }
     }
 }
