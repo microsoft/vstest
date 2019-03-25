@@ -804,6 +804,53 @@ public class TrxLoggerTests
         ValidateDateTimeInTrx(_testableTrxLogger.TrxFile);
     }
 
+    [TestMethod]
+    public void TraitsForTestCaseShouldBeOutputtedInTrx()
+    {
+        ObjectModel.TestCase testCase = CreateTestCase("TestCaseWithTraits");
+        testCase.Traits.Add("Trait1", "Value1");
+        testCase.Traits.Add("Trait2", "Value2");
+
+        var result = new ObjectModel.TestResult(testCase);
+        var resultEventArg1 = new Mock<TestResultEventArgs>(result);
+
+        _testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+        var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+        _testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+
+        Assert.IsTrue(File.Exists(_testableTrxLogger.TrxFile), string.Format("TRX file: {0}, should have got created.", _testableTrxLogger.TrxFile));
+
+        // Validate TRX output - we expect something like this:
+        /*
+        <Properties>
+            <Property>
+                <Key>Trait1</Key>
+                <Value>Value1</Value>
+            </Property>
+            <Property>
+                <Key>Trait2</Key>
+                <Value>Value2</Value>
+            </Property>
+        </Properties>
+        */
+
+        using FileStream file = File.OpenRead(_testableTrxLogger.TrxFile);
+        using XmlReader reader = XmlReader.Create(file);
+        XDocument document = XDocument.Load(reader);
+        XNamespace ns = document.Root.GetDefaultNamespace();
+        var testDefinitionsElement = document.Descendants(ns.GetName("TestDefinitions")).FirstOrDefault();
+        var unitTestElement = testDefinitionsElement.Element(ns.GetName("UnitTest"));
+
+        Assert.IsNotNull(unitTestElement, "Unable to find UnitTest element in TRX");
+
+        var propertiesElement = unitTestElement.Element(ns.GetName("Properties"));
+        Assert.IsNotNull(propertiesElement, "Unable to find Properties element for UnitTest element in TRX");
+
+        var propertyElements = propertiesElement.Elements(ns.GetName("Property"));
+        Assert.AreEqual(2, propertyElements.Count(), "We should have two properties logged in TRX");
+    }
+
     private void ValidateDateTimeInTrx(string trxFileName)
     {
         using FileStream file = File.OpenRead(trxFileName);

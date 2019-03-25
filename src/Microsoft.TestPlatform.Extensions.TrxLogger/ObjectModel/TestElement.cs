@@ -249,6 +249,7 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
         h.SaveSimpleField(element, "@priority", _priority, DefaultPriority);
         h.SaveSimpleField(element, "Owners/Owner/@name", _owner, string.Empty);
         h.SaveObject(_testCategories, element, "TestCategory", parameters);
+        h.SaveObject(_testProperties, element, "Properties", parameters);
 
         if (_executionId != null)
             h.SaveGuid(element, "Execution/@id", _executionId.Id);
@@ -273,7 +274,7 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
         _parentExecutionId = TestExecId.Empty;
         _testCategories = new TestCategoryItemCollection();
         _workItems = new WorkItemCollection();
-		_testProperties = new TestPropertyItemCollection();
+        _testProperties = new TestPropertyItemCollection();
         _isRunnable = true;
         _catId = TestListCategoryId.Uncategorized;
     }
