@@ -33,5 +33,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities
         /// Environment Variable Specified by user to setup Culture.
         /// </summary>
         public const string DotNetUserSpecifiedCulture = "DOTNET_CLI_UI_LANGUAGE";
+
+        /// <summary>
+        /// Test sources key name
+        /// </summary>
+        public const string TestSourcesKeyName = "TestSources";
     }
 }

@@ -44,10 +44,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
         private IProcessHelper processHelper;
-        private string settingsXml;
         private IRequestData requestData;
         private int dataCollectionPort;
         private int dataCollectionProcessId;
+
+        /// <summary>
+        /// The settings xml
+        /// </summary>
+        public string SettingsXml { get; }
+
+        /// <summary>
+        /// List of test sources
+        /// </summary>
+        public IEnumerable<string> Sources { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
@@ -58,8 +67,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="settingsXml">
         ///     Runsettings that contains the datacollector related configuration.
         /// </param>
-        public ProxyDataCollectionManager(IRequestData requestData, string settingsXml)
-            : this(requestData, settingsXml, new ProcessHelper())
+        /// <param name="sources">
+        ///     Test Run sources
+        /// </param>
+        public ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IEnumerable<string> sources)
+            : this(requestData, settingsXml, sources, new ProcessHelper())
         {
         }
 
@@ -72,10 +84,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="settingsXml">
         ///     The settings xml.
         /// </param>
+        /// <param name="sources">
+        ///     Test Run sources
+        /// </param>
         /// <param name="processHelper">
         ///     The process helper.
         /// </param>
-        internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IProcessHelper processHelper) : this(requestData, settingsXml, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
+        internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml, IEnumerable<string> sources, IProcessHelper processHelper) : this(requestData, settingsXml, sources, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
         {
         }
 
@@ -88,6 +103,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="settingsXml">
         ///     Runsettings that contains the datacollector related configuration.
         /// </param>
+        /// <param name="sources">
+        ///     Test Run sources
+        /// </param>
         /// <param name="dataCollectionRequestSender">
         ///     Handles communication with datacollector process.
         /// </param>
@@ -98,12 +116,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         ///     Launches datacollector process.
         /// </param>
         internal ProxyDataCollectionManager(IRequestData requestData, string settingsXml,
+            IEnumerable<string> sources,
             IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper,
             IDataCollectionLauncher dataCollectionLauncher)
         {
             // DataCollector process needs the information of the Extensions folder
             // Add the Extensions folder path to runsettings.
-            this.settingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
+            this.SettingsXml = UpdateExtensionsFolderInRunSettings(settingsXml);
+            this.Sources = sources;
             this.requestData = requestData;
 
             this.dataCollectionRequestSender = dataCollectionRequestSender;
@@ -166,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             () =>
             {
                 EqtTrace.Info("ProxyDataCollectionManager.BeforeTestRunStart: Get env variable and port for datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.SettingsXml, this.Sources, runEventsHandler);
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
@@ -361,7 +381,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 return;
             }
 
-            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.settingsXml);
+            var dataCollectionSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.SettingsXml);
 
             if (dataCollectionSettings == null || !dataCollectionSettings.IsCollectionEnabled)
             {

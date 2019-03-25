@@ -50,8 +50,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <summary>
         /// Raises SessionStart event to all data collectors configured for run.
         /// </summary>
+        /// <param name="sessionStartEventArgs">
+        /// The session start Event Args.
+        /// </param>
         /// <returns>bolean value specifying whether test case events are subscribed by datacollectors. Based on this execution process will decide whether to send TestCaseStart and TestCaseEnd events to dataCollector process.</returns>
-        bool SessionStarted();
+        bool SessionStarted(SessionStartEventArgs sessionStartEventArgs);
 
         /// <summary>
         /// Raises SessionEnd event to all data collectors configured for run.

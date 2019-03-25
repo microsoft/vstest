@@ -277,11 +277,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private void HandleBeforeTestRunStart(Message message)
         {
             // Initialize datacollectors and get enviornment variables.
-            var settingXml = this.dataSerializer.DeserializePayload<string>(message);
-            this.AddExtensionAssemblies(settingXml);
+            var payload = this.dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
+            this.AddExtensionAssemblies(payload.SettingsXml);
 
-            var envVariables = this.dataCollectionManager.InitializeDataCollectors(settingXml);
-            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted();
+            var envVariables = this.dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
+
+            var properties = new Dictionary<string, object>();
+            properties.Add(CoreUtilitiesConstants.TestSourcesKeyName, payload.Sources);
+            var eventArgs = new SessionStartEventArgs(properties);
+
+            var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted(eventArgs);
 
             // Open a socket communication port for test level events.
             var testCaseEventsPort = 0;
