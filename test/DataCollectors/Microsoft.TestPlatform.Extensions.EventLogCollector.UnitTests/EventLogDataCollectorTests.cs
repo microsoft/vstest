@@ -302,7 +302,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             var eventLogDataCollector = new EventLogDataCollector();
             eventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var testcase = new TestCase() { Id = Guid.NewGuid() };
-            this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
+            this.mockDataCollectionEvents.Raise(x => x.SessionStart += null, new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, new Dictionary<string, object>()));
             this.mockDataCollectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
             Assert.IsTrue(this.mockDataCollectionSink.IsSendFileAsyncInvoked);
         }

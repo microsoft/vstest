@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -11,6 +12,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -57,6 +59,16 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var attachmentSets = this.requestSender.SendAfterTestRunStartAndGetResult(null, true);
 
             Assert.IsNull(attachmentSets);
+        }
+
+        [TestMethod]
+        public void SendBeforeTestRunStartAndGetResultShouldSendBeforeTestRunStartMessageAndPayload()
+        {
+            var testSources = new List<string>() { "test1.dll" };
+            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.BeforeTestRunStartResult, Payload = null });
+            this.requestSender.SendBeforeTestRunStartAndGetResult(string.Empty, testSources, null);
+
+            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStart, It.IsAny<BeforeTestRunStartPayload>()));
         }
     }
 }

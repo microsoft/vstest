@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Net;
@@ -14,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
@@ -109,17 +109,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, IEnumerable<string> sources, ITestMessageEventHandler runEventsHandler)
         {
             var isDataCollectionStarted = false;
             BeforeTestRunStartResult result = null;
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Send BeforeTestRunStart message with settingsXml: {0}", settingsXml);
+                EqtTrace.Verbose("DataCollectionRequestSender.SendBeforeTestRunStartAndGetResult : Send BeforeTestRunStart message with settingsXml {0} and sources {1}: ", settingsXml, sources.ToString());
             }
 
-            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, settingsXml);
+            var payload = new BeforeTestRunStartPayload
+            {
+                SettingsXml = settingsXml,
+                Sources = sources
+            };
+
+            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);
 
             while (!isDataCollectionStarted)
             {
