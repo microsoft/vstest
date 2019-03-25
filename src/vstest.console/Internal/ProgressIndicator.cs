@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Timer = System.Timers.Timer;
 
-    public class ProgressIndicator : IProgressIndicator
+    internal class ProgressIndicator : IProgressIndicator
     {
         private object syncObject = new object();
         private int dotCounter;

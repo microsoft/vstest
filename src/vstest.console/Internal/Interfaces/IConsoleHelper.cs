@@ -3,14 +3,31 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
+    /// <summary>
+    /// Interface for wrapping the Console class
+    /// </summary>
     public interface IConsoleHelper
     {
+        /// <summary>
+        /// Returns the left position of the cursor
+        /// </summary>
         int CursorLeft { get; }
 
+        /// <summary>
+        /// Returns the right position of the cursor
+        /// </summary>
         int CursorTop { get; }
 
+        /// <summary>
+        /// Returns the width of the console window
+        /// </summary>
         int WindowWidth { get; }
 
-        void SetCursorPosition(int startPos, int cursorTop);
+        /// <summary>
+        /// Sets the cursor position based on the left and top values
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        void SetCursorPosition(int left, int top);
     }
 }
