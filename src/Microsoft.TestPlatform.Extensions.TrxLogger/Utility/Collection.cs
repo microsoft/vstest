@@ -61,7 +61,7 @@ internal class EqtBaseCollection<T> : ICollection<T>, IXmlTestStore
     #region Fields
     protected Hashtable _container;
 
-    private string _childElementName;
+    protected string _childElementName;
     #endregion
 
     #region Constructors
