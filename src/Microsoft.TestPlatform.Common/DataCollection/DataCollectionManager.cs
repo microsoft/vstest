@@ -265,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public bool SessionStarted()
+        public bool SessionStarted(SessionStartEventArgs sessionStartEventArgs)
         {
             // If datacollectors are not configured or datacollection is not enabled, return false.
             if (!this.isDataCollectionEnabled || this.RunDataCollectors.Count == 0)
@@ -273,7 +273,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return false;
             }
 
-            this.SendEvent(new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
+            sessionStartEventArgs.Context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId);
+            this.SendEvent(sessionStartEventArgs);
 
             return this.events.AreTestCaseEventsSubscribed();
         }

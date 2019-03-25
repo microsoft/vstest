@@ -4,8 +4,11 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.Linq;
     using System.Net;
 
     using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
@@ -37,7 +40,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private TestableDataCollectionRequestHandler requestHandler;
         private Mock<IDataSerializer> mockDataSerializer;
         private Message afterTestRunEnd = new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" };
-        private Message beforeTestRunStart = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = "settingsXml" };
+        private Message beforeTestRunStart = new Message()
+        {
+            MessageType = MessageType.BeforeTestRunStart,
+            Payload = JToken.FromObject(new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } })
+        };
 
         public DataCollectionRequestHandlerTests()
         {
@@ -51,7 +58,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart).Returns(this.afterTestRunEnd);
 
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
         }
 
         [TestCleanup]
@@ -64,18 +71,18 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-                {
-                    DataCollectionRequestHandler.Create(null, this.mockMessageSink.Object);
-                });
+            {
+                DataCollectionRequestHandler.Create(null, this.mockMessageSink.Object);
+            });
         }
 
         [TestMethod]
         public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-                {
-                    DataCollectionRequestHandler.Create(this.mockCommunicationManager.Object, null);
-                });
+            {
+                DataCollectionRequestHandler.Create(this.mockCommunicationManager.Object, null);
+            });
         }
 
         [TestMethod]
@@ -100,9 +107,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<IPEndPoint>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.InitializeCommunication(123);
-                });
+            {
+                this.requestHandler.InitializeCommunication(123);
+            });
         }
 
         [TestMethod]
@@ -119,9 +126,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.WaitForRequestSenderConnection(0);
-                });
+            {
+                this.requestHandler.WaitForRequestSenderConnection(0);
+            });
         }
 
         [TestMethod]
@@ -141,9 +148,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var message = new DataCollectionMessageEventArgs(TestMessageLevel.Error, "message");
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.SendDataCollectionMessage(message);
-                });
+            {
+                this.requestHandler.SendDataCollectionMessage(message);
+            });
         }
 
         [TestMethod]
@@ -160,9 +167,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-                {
-                    this.requestHandler.Close();
-                });
+            {
+                this.requestHandler.Close();
+            });
         }
 
         [TestMethod]
@@ -183,10 +190,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                                                                                 .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
                                                                                 .Returns(this.afterTestRunEnd);
 
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
             this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestHostLaunchedPayload>(It.Is<Message>(y => y.MessageType == MessageType.TestHostLaunched)))
                                    .Returns(testHostLaunchedPayload);
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunSTartPayload);
 
             this.requestHandler.ProcessRequests();
 
@@ -195,7 +205,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Once);
 
             // Verify SessionStarted events
-            this.mockDataCollectionManager.Verify(x => x.SessionStarted(), Times.Once);
+            this.mockDataCollectionManager.Verify(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>()), Times.Once);
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
 
             // Verify TestHostLaunched events
@@ -227,6 +237,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldInitializeTestCaseEventHandlerIfTestCaseLevelEventsAreEnabled()
         {
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunSTartPayload);
+
             this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Once);
@@ -237,6 +251,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldSetDefaultTimeoutIfNoEnvVarialbeSet()
         {
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunSTartPayload);
+
             this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(h => h.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000));
@@ -247,6 +265,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var timeout = 10;
             Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, timeout.ToString());
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunSTartPayload);
 
             this.requestHandler.ProcessRequests();
 
@@ -256,13 +277,57 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldNotInitializeTestCaseEventHandlerIfTestCaseLevelEventsAreNotEnabled()
         {
-            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(false);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(false);
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunSTartPayload);
 
             this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Never);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Never);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void ProcessRequestsShouldReceiveCorrectPayloadInBeforeTestRunStart()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockDataSerializer.Verify(x => x.DeserializePayload<BeforeTestRunStartPayload>(message), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessRequestShouldInitializeDataCollectorsWithCorrectSettings()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockDataCollectionManager.Verify(x => x.InitializeDataCollectors("settingsxml"), Times.Once);
+        }
+
+        [TestMethod]
+        public void ProcessRequestShouldCallSessionStartWithCorrectTestSources()
+        {
+            var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll", "test2.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunStartPayload);
+            var message = new Message() { MessageType = MessageType.BeforeTestRunStart, Payload = JToken.FromObject(beforeTestRunStartPayload) };
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(this.afterTestRunEnd);
+            this.requestHandler.ProcessRequests();
+
+            this.mockDataCollectionManager.Verify(x => x.SessionStarted(It.Is<SessionStartEventArgs>(
+                y => y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test1.dll") &&
+                y.GetPropertyValue<IEnumerable<string>>("TestSources").Contains("test2.dll"))));
         }
     }
 }
