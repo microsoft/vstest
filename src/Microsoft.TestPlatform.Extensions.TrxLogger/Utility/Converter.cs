@@ -75,6 +75,11 @@ internal class Converter
             testElement.WorkItems.Add(workItem);
         }
 
+        foreach (var trait in rockSteadyTestCase.Traits)
+        {
+            testElement.TestProperties.Add(trait.Name, trait.Value);
+        }
+
         return testElement;
     }
 

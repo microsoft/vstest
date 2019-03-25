@@ -34,6 +34,7 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
     protected TestExecId _parentExecutionId;
     protected TestCategoryItemCollection _testCategories;
     protected WorkItemCollection _workItems;
+    protected TestPropertyItemCollection _testProperties;
     protected TestListCategoryId _catId;
 
     public TestElement(Guid id, string name, string adapter)
@@ -178,6 +179,16 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
         }
     }
 
+    public TestPropertyItemCollection TestProperties
+    {
+        get { return _testProperties; }
+        set
+        {
+            EqtAssert.ParameterNotNull(value, "TestProperties");
+            _testProperties = value;
+        }
+    }
+
     /// <summary>
     /// Gets the adapter name.
     /// </summary>
@@ -262,6 +273,7 @@ internal abstract class TestElement : ITestElement, IXmlTestStore
         _parentExecutionId = TestExecId.Empty;
         _testCategories = new TestCategoryItemCollection();
         _workItems = new WorkItemCollection();
+		_testProperties = new TestPropertyItemCollection();
         _isRunnable = true;
         _catId = TestListCategoryId.Uncategorized;
     }
