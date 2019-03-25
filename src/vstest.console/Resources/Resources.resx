@@ -719,6 +719,6 @@
     <value>Logger argument '{0}' is not valid.</value>
   </data>
   <data name="ProgressIndicatorString" xml:space="preserve">
-    <value>Test run in progress...</value>
+    <value>Test run in progress</value>
   </data>
 </root>

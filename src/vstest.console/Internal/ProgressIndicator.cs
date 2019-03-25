@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
     using System;
+    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Timer = System.Timers.Timer;
 
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ConsoleOutput = output;
             ConsoleHelper = consoleHelper;
-            testRunProgressString = Resources.Resources.ProgressIndicatorString;
+            testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
         }
 
         public void Start()
