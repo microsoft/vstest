@@ -52,7 +52,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (this.IsInProcDataCollectionEnabled)
             {
-                EqtTrace.Error("InProcDataCollectionExtensionManager: Enabled");
                 testEventsPublisher.TestCaseEnd += this.TriggerTestCaseEnd;
                 testEventsPublisher.TestCaseStart += this.TriggerTestCaseStart;
                 testEventsPublisher.TestResult += this.TriggerUpdateTestResult;
@@ -102,7 +101,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
         {           
-            EqtTrace.Error("InProcDataCollectionExtensionManager: source info : {0}", e.GetPropertyValue<IEnumerable<string>>("TestSources").FirstOrDefault());
             TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs(e.GetPropertyValue<IEnumerable<string>>("TestSources"));
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
@@ -194,9 +192,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
                     foreach (var inProcDc in this.inProcDataCollectorSettingsCollection)
                     {
-                        // inProcDc.CodeBase = Path.IsPathRooted(inProcDc.CodeBase) ? inProcDc.CodeBase : Path.Combine(defaultCodeBase, inProcDc.CodeBase);
-                        inProcDc.CodeBase = "E:\\CodeBase\\vstest\\test\\TestAssets\\SimpleDataCollector\\bin\\Debug\\net451\\SimpleDataCollector.dll";
-                        inProcDc.AssemblyQualifiedName = "SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=16.0.1.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a";
+                        inProcDc.CodeBase = Path.IsPathRooted(inProcDc.CodeBase) ? inProcDc.CodeBase : Path.Combine(defaultCodeBase, inProcDc.CodeBase);
+
                         var inProcDataCollector = this.CreateDataCollector(inProcDc, interfaceTypeInfo);
                         this.InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName] = inProcDataCollector;
                     }
