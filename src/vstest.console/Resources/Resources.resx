@@ -727,4 +727,7 @@
   <data name="TestRunSummarySkippedTests" xml:space="preserve">
     <value>    Skipped: {0}</value>
   </data>
+  <data name="ProgressIndicatorString" xml:space="preserve">
+    <value>Test run in progress</value>
+  </data>
 </root>

@@ -1637,6 +1637,11 @@
         <target state="new">Framework35는 지원되지 않습니다. .NET Framework 3.5를 대상으로 하는 프로젝트의 경우 Framework40을 사용하여 CLR 4.0 "호환 모드"에서 테스트를 실행하세요.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProgressIndicatorString">
+        <source>Test run in progress</source>
+        <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

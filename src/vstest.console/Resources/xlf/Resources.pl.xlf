@@ -1635,6 +1635,11 @@
         <target state="new">Wersja Framework35 nie jest obsługiwana. W przypadku projektów przeznaczonych dla programu .Net Framework 3.5 użyj wersji Framework40 do uruchamiania testów w „trybie zgodności” CLR 4.0.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProgressIndicatorString">
+        <source>Test run in progress</source>
+        <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

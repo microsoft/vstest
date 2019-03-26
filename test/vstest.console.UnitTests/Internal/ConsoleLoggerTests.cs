@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         private Mock<IMetricsCollection> mockMetricsCollection;
         private Mock<IOutput> mockOutput;
         private ConsoleLogger consoleLogger;
+        private Mock<IProgressIndicator> mockProgressIndicator;
 
         private const string PassedTestIndicator = "  \u2713 ";
         private const string FailedTestIndicator = "  X ";
@@ -154,6 +155,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             SpinWait.SpinUntil(() => count == 3, 300);
 
             this.AssertsForTestMessageHandler();
+            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(3));
+            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(3));
         }
 
         [TestMethod]
@@ -174,6 +177,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             SpinWait.SpinUntil(() => count == 3, 300);
 
             this.AssertsForTestMessageHandler();
+            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(3));
+            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(3));
         }
 
         private void AssertsForTestMessageHandler()
@@ -545,6 +550,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine("TestName [4m 5s]", OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.Write(SkippedTestIndicator, OutputLevel.Information), Times.Exactly(3));
             this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
+            this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(5));
+            this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
         }
 
         [TestMethod]
@@ -688,6 +695,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, 0), OutputLevel.Information), Times.Never());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, 0), OutputLevel.Information), Times.Never());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
+            this.mockProgressIndicator.Verify(pi => pi.Stop(), Times.Once);
         }
 
         [TestMethod]
@@ -918,7 +926,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
 
             this.mockOutput = new Mock<IOutput>();
-            this.consoleLogger = new ConsoleLogger(this.mockOutput.Object);
+            this.mockProgressIndicator = new Mock<IProgressIndicator>();
+            this.consoleLogger = new ConsoleLogger(this.mockOutput.Object, this.mockProgressIndicator.Object);
         }
 
         private List<ObjectModel.TestResult> GetTestResultsObject()

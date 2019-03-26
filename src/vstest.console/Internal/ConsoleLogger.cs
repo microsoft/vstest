@@ -118,9 +118,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Constructor added for testing purpose
         /// </summary>
         /// <param name="output"></param>
-        internal ConsoleLogger(IOutput output)
+        internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator)
         {
             ConsoleLogger.Output = output;
+            this.progressIndicator = progressIndicator;
         }
 
         #endregion
@@ -136,6 +137,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             get;
             private set;
         }
+
+        private IProgressIndicator progressIndicator;
 
         /// <summary>
         /// Get the verbosity level for the console logger
@@ -163,6 +166,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 ConsoleLogger.Output = ConsoleOutput.Instance;
             }
 
+            if (this.progressIndicator == null && !Console.IsOutputRedirected)
+            {
+                // Progress indicator needs to be displayed only for cli experience.
+                this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
+            }
+            
             // Register for the events.
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
@@ -357,6 +366,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
 
+            // Pause the progress indicator to print the message
+            this.progressIndicator?.Pause();
+
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
@@ -391,6 +403,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     EqtTrace.Warning("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
+
+            // Resume the progress indicator after printing the message
+            this.progressIndicator?.Start();
         }
 
         /// <summary>
@@ -400,6 +415,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
+
+            // Pause the progress indicator before displaying test result information
+            this.progressIndicator?.Pause();
 
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
@@ -482,6 +500,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         break;
                     }
             }
+
+            // Resume the progress indicator after displaying the test result information 
+            this.progressIndicator?.Start();
         }
 
         private string GetFormattedDurationString(TimeSpan duration)
@@ -521,6 +542,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
+            // Stop the progress indicator as we are about to print the summary
+            this.progressIndicator?.Stop();
             Output.WriteLine(string.Empty, OutputLevel.Information);
 
             // Printing Run-level Attachments
