@@ -149,7 +149,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (this.progressIndicator == null && !Console.IsOutputRedirected)
             {
                 // Progress indicator needs to be displayed only for cli experience.
-                // Use the no operation progress indicator is the standard out is getting redirected.
                 this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
             }
             

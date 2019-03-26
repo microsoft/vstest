@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
-    using System;
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Timer = System.Timers.Timer;
@@ -13,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private object syncObject = new object();
         private int dotCounter;
         private Timer timer;
-        private DateTime startTime;
         private string testRunProgressString;
 
         public IOutput ConsoleOutput { get; private set; }
@@ -24,27 +22,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         public ProgressIndicator(IOutput output, IConsoleHelper consoleHelper)
         {
-            ConsoleOutput = output;
-            ConsoleHelper = consoleHelper;
-            testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
+            this.ConsoleOutput = output;
+            this.ConsoleHelper = consoleHelper;
+            this.testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
         }
 
+        /// <inheritdoc />
         public void Start()
         {
             lock (syncObject)
             {
                 if (timer == null)
                 {
-                    timer = new Timer(1000);
-                    timer.Elapsed += Timer_Elapsed;
-                    timer.Start();
+                    this.timer = new Timer(1000);
+                    this.timer.Elapsed += Timer_Elapsed;
+                    this.timer.Start();
                 }
-                startTime = DateTime.Now;
 
                 // Print the string based on the previous state, that is dotCounter
                 // This is required for smooth transition
-                ConsoleOutput.Write(testRunProgressString.Substring(0, testRunProgressString.Length + dotCounter - 2), OutputLevel.Information);
-                IsRunning = true;
+                this.ConsoleOutput.Write(testRunProgressString.Substring(0, testRunProgressString.Length + dotCounter - 2), OutputLevel.Information);
+                this.IsRunning = true;
             }
         }
 
@@ -58,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             var currentLineCursor = this.ConsoleHelper.CursorTop;
             this.ConsoleHelper.SetCursorPosition(startPos, this.ConsoleHelper.CursorTop);
-            ConsoleOutput.Write(new string(' ', this.ConsoleHelper.WindowWidth - startPos), OutputLevel.Information);
+            this.ConsoleOutput.Write(new string(' ', this.ConsoleHelper.WindowWidth - startPos), OutputLevel.Information);
             this.ConsoleHelper.SetCursorPosition(startPos, currentLineCursor);
         }
 
@@ -69,8 +67,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             lock (syncObject)
             {
-                IsRunning = false;
-                Clear(0);
+                this.IsRunning = false;
+                this.Clear(0);
             }
         }
 
@@ -81,9 +79,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             lock (syncObject)
             {
-                IsRunning = false;
-                timer?.Stop();
-                Clear(0);
+                this.IsRunning = false;
+                this.timer?.Stop();
+                this.Clear(0);
             }
         }
 
@@ -92,14 +90,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (IsRunning)
             {
                 // If running, prints dot every second.
-                ConsoleOutput.Write(".", OutputLevel.Information);
+                this.ConsoleOutput.Write(".", OutputLevel.Information);
                 dotCounter = ++dotCounter % 3;
 
                 // When counter reaches 3, that is 3 dots have been printed
                 // Clear and start printing again
                 if (dotCounter == 0)
                 {
-                    Clear(this.ConsoleHelper.CursorLeft - 3);
+                    this.Clear(this.ConsoleHelper.CursorLeft - 3);
                 }
             }
         }

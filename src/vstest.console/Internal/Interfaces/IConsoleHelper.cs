@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     /// <summary>
     /// Interface for wrapping the Console class
     /// </summary>
-    public interface IConsoleHelper
+    internal interface IConsoleHelper
     {
         /// <summary>
         /// Returns the left position of the cursor

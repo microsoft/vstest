@@ -1639,7 +1639,7 @@
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
-        <target state="new">Test run in progress...</target>
+        <target state="new">Test run in progress</target>
         <note></note>
       </trans-unit>
     </body>

@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
-    public interface IProgressIndicator
+    internal interface IProgressIndicator
     {
         /// <summary>
         /// Marks the start of the progress indicator
