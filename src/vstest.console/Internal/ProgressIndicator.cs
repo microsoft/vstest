@@ -7,6 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Timer = System.Timers.Timer;
 
+    /// <summary>
+    /// Indicates the test run progress
+    /// </summary>
     internal class ProgressIndicator : IProgressIndicator
     {
         private object syncObject = new object();
@@ -14,10 +17,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private Timer timer;
         private string testRunProgressString;
 
+        /// <summary>
+        /// Used to output to the console
+        /// </summary>
         public IOutput ConsoleOutput { get; private set; }
 
+        /// <summary>
+        /// Wrapper over the System Console class
+        /// </summary>
         public IConsoleHelper ConsoleHelper { get; private set; }
 
+        /// <summary>
+        /// True is the indicator is to be displayed
+        /// </summary>
         public bool IsRunning { get; private set; }
 
         public ProgressIndicator(IOutput output, IConsoleHelper consoleHelper)
