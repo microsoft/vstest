@@ -1334,6 +1334,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Test run in progress.
+        /// </summary>
+        public static string ProgressIndicatorString
+        {
+            get
+            {
+                return ResourceManager.GetString("ProgressIndicatorString", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --Port|/Port:&lt;Port&gt;
         ///      The Port for socket connection and receiving the event messages..
         /// </summary>

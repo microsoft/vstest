@@ -1637,6 +1637,11 @@
         <target state="new">不支援 Framework35。若為以 .Net Framework 3.5 為目標的專案，請使用 Framework40 在 CLR 4.0「相容模式」中執行測試。</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProgressIndicatorString">
+        <source>Test run in progress</source>
+        <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
