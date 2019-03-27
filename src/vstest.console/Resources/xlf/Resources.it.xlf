@@ -1637,6 +1637,11 @@
         <target state="new">Framework35 non è supportato. Per i progetti destinati a .NET Framework 3.5, usare Framework40 per eseguire i test nella modalità di compatibilità di CLR 4.0.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ProgressIndicatorString">
+        <source>Test run in progress</source>
+        <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
