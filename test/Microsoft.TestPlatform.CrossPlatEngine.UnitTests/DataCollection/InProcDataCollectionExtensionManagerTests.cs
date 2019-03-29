@@ -4,14 +4,11 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
@@ -38,26 +35,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                 </RunSettings>";
         private Mock<ITestEventsPublisher> mockTestEventsPublisher;
         private TestableInProcDataCollectionExtensionManager inProcDataCollectionManager;
-        private List<string> testSources = new List<string>() { "E:\\repos\\MSTest\\src\\managed\\TestPlatform\\TestImpactListener.Tests\\bin\\Debug\\1.dll" };
+        private string defaultCodebase = "E:\\repos\\MSTest\\src\\managed\\TestPlatform\\TestImpactListener.Tests\\bin\\Debug";
 
         public InProcDataCollectionExtensionManagerTests()
         {
             this.mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object, this.testSources);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
         }
 
         [TestMethod]
         public void InProcDataCollectionExtensionManagerShouldLoadsDataCollectorsFromRunSettings()
         {
-
-            var dataCollectorSettings = (inProcDataCollectionManager.InProcDataCollectors.First().Value as MockDataCollector).DataCollectorSettings;
+            var dataCollector = inProcDataCollectionManager.InProcDataCollectors.First().Value as MockDataCollector;
 
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
             Assert.AreEqual(inProcDataCollectionManager.InProcDataCollectors.Count, 1, "One Datacollector must be registered");
 
-            Assert.IsTrue(string.Equals(dataCollectorSettings.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollectorSettings.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollectorSettings.Configuration.OuterXml.ToString(), @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector.Configuration.OuterXml.ToString(), @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
         }
 
         [TestMethod]
@@ -74,9 +70,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.testSources);
-            var dataCollectorSettings = (inProcDataCollectionManager.InProcDataCollectors.First().Value as MockDataCollector).DataCollectorSettings;
-            Assert.IsTrue(string.Equals(dataCollectorSettings.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll", StringComparison.OrdinalIgnoreCase));
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+
+            var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
+            Assert.AreEqual(codebase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll");
         }
 
         [TestMethod]
@@ -93,9 +90,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.testSources);
-            var dataCollectorSettings = (inProcDataCollectionManager.InProcDataCollectors.First().Value as MockDataCollector).DataCollectorSettings;
-            Assert.AreEqual(dataCollectorSettings.CodeBase, "\\\\DummyPath\\TestImpactListener.Tests.dll");
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+
+            var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
+            Assert.AreEqual(codebase, "\\\\DummyPath\\TestImpactListener.Tests.dll");
         }
 
         [TestMethod]
@@ -118,31 +116,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object, this.testSources);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
             bool secondOne = false;
-            DataCollectorSettings dataCollectorSettings1 = null;
-            DataCollectorSettings dataCollectorSettings2 = null;
+            MockDataCollector dataCollector1 = null;
+            MockDataCollector dataCollector2 = null;
 
             foreach (var inProcDC in inProcDataCollectionManager.InProcDataCollectors.Values)
             {
                 if (secondOne)
                 {
-                    dataCollectorSettings2 = (inProcDC as MockDataCollector).DataCollectorSettings;
+                    dataCollector2 = inProcDC as MockDataCollector;
                 }
                 else
                 {
-                    dataCollectorSettings1 = (inProcDC as MockDataCollector).DataCollectorSettings;
+                    dataCollector1 = inProcDC as MockDataCollector;
                     secondOne = true;
                 }
             }
 
-            Assert.IsTrue(string.Equals(dataCollectorSettings1.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollectorSettings1.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests1.dll", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollectorSettings1.Configuration.OuterXml.ToString(), @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector1.AssemblyQualifiedName, "TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector1.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests1.dll", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector1.Configuration.OuterXml.ToString(), @"<Configuration><Port>4312</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
 
-            Assert.IsTrue(string.Equals(dataCollectorSettings2.AssemblyQualifiedName, "TestImpactListener.Tests, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollectorSettings2.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests2.dll", StringComparison.OrdinalIgnoreCase));
-            Assert.IsTrue(string.Equals(dataCollectorSettings2.Configuration.OuterXml.ToString(), @"<Configuration><Port>4313</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector2.AssemblyQualifiedName, "TestImpactListener.Tests, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector2.CodeBase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests2.dll", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(string.Equals(dataCollector2.Configuration.OuterXml.ToString(), @"<Configuration><Port>4313</Port></Configuration>", StringComparison.OrdinalIgnoreCase));
         }
 
         [TestMethod]
@@ -160,7 +158,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, this.mockTestEventsPublisher.Object, this.testSources);
+            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
             Assert.IsFalse(manager.IsInProcDataCollectionEnabled, "InProcDataCollection must be disabled on invalid settings.");
         }
 
@@ -220,28 +218,38 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, IEnumerable<string> sources) : base(runSettings, mockTestEventsPublisher, sources)
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase) : base(runSettings, mockTestEventsPublisher, defaultCodebase)
             {
             }
 
-            protected override IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
+            protected override IInProcDataCollector CreateDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration, TypeInfo interfaceTypeInfo)
             {
-                return new MockDataCollector(dataCollectorSettings);
+                return new MockDataCollector(assemblyQualifiedName, codebase,configuration);
             }
         }
 
         public class MockDataCollector : IInProcDataCollector
         {
-            public MockDataCollector(DataCollectorSettings dataCollectorSettings)
+            public MockDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration)
             {
-                this.DataCollectorSettings = dataCollectorSettings;
+                this.AssemblyQualifiedName = assemblyQualifiedName;
+                this.CodeBase = codebase;
+                this.Configuration = configuration;
             }
 
-            public string AssemblyQualifiedName => this.DataCollectorSettings.AssemblyQualifiedName;
+            public string AssemblyQualifiedName
+            {
+                get;
+                private set;
+            }
 
-            public string CodeBase => this.DataCollectorSettings.CodeBase;
+            public string CodeBase
+            {
+                get;
+                private set;
+            }
 
-            public DataCollectorSettings DataCollectorSettings
+            public XmlElement Configuration
             {
                 get;
                 private set;

@@ -6,11 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
@@ -70,15 +71,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
         }
 
+        /// <summary>
+        /// Sends Session-End event on in-proc datacollectors
+        /// </summary>
         protected override void SendSessionEnd()
         {
             this.testCaseEventsHandler?.SendSessionEnd();
         }
 
+        /// <summary>
+        /// Sends Session-Start event on in-proc datacollectors
+        /// </summary>
         protected override void SendSessionStart()
         {
+            // Send session start with test sources in property bag for session start event args.
             var properties = new Dictionary<string, object>();
-            properties.Add("TestSources", this.testCases.Select(tc => tc.Source).Distinct());
+            properties.Add("TestSources", TestSourceDeterminer.GetSources(this.testCases));
+
             this.testCaseEventsHandler?.SendSessionStart(properties);
         }
 

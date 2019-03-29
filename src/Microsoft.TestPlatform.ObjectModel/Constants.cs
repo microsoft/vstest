@@ -31,26 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string InProcDataCollectorsSettingName = "InProcDataCollectors";
 
         /// <summary>
-        /// Coverlet data collector friendlyname
-        /// </summary>
-        public const string CoverletDataCollectorFriendlyName = "XPlat Code Coverage";
-
-        /// <summary>
-        /// Coverlet data collector assembly qualified name
-        /// </summary>
-        public const string CoverletDataCollectorAssemblyQualifiedName = "Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-
-        /// <summary>
-        /// Coverlet data collector uri
-        /// </summary>
-        public const string CoverletDataCollectorUri = "datacollector://microsoft/CoverletCodeCoverage/1.0";
-
-        /// <summary>
-        /// Coverlet data collector codebase
-        /// </summary>
-        public const string CoverletDataCollectorCodebase = "coverletinprocdatacollector.dll";
-
-        /// <summary>
         /// Name of collect dump option for blame.
         /// </summary>
         public const string BlameCollectDumpKey = "CollectDump";

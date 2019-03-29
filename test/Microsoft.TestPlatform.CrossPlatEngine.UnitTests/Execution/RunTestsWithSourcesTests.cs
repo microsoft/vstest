@@ -253,6 +253,50 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedMessage), Times.Once);
         }
 
+        [TestMethod]
+        public void SendSessionStartShouldCallSessionStartWithCorrectTestSources()
+        {
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+            adapterSourceMap.Add("a", new List<string> { "1.dll", "2.dll" });
+            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+
+            this.runTestsInstance = new TestableRunTestsWithSources(
+                adapterSourceMap,
+                null,
+                testExecutionContext,
+                mockTestCaseEventsHandler.Object,
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
+
+            this.runTestsInstance.CallSendSessionStart();
+
+            mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<String, object>>(
+                y => y.ContainsKey("TestSources") 
+                && ((IEnumerable<string>)y["TestSources"]).Contains("1.dll")
+                && ((IEnumerable<string>)y["TestSources"]).Contains("2.dll")
+            )));
+        }
+
+        [TestMethod]
+        public void SendSessionEndShouldCallSessionEnd()
+        {
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+            adapterSourceMap.Add("a", new List<string> { "1.dll", "2.dll" });
+            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+
+            this.runTestsInstance = new TestableRunTestsWithSources(
+                adapterSourceMap,
+                null,
+                testExecutionContext,
+                mockTestCaseEventsHandler.Object,
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
+
+            this.runTestsInstance.CallSendSessionEnd();
+
+            mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
+        }
+
         private void SetupForNoTestsAvailable(string testCaseFilter, out string sourcesString)
         {
             var testAssemblyLocation = typeof(TestCase).GetTypeInfo().Assembly.Location;
@@ -303,6 +347,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 IFrameworkHandle testExecutorFrameworkHandle, RunContext runContext)
             {
                 return this.GetExecutorUriExtensionMap(testExecutorFrameworkHandle, runContext);
+            }
+
+            public void CallSendSessionStart()
+            {
+                this.SendSessionStart();
+            }
+
+            public void CallSendSessionEnd()
+            {
+                this.SendSessionEnd();
             }
 
             public void CallInvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor,

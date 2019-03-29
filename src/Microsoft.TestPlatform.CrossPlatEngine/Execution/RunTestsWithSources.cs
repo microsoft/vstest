@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
@@ -207,19 +208,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return testCaseFilterToShow;
         }
 
+        /// <summary>
+        /// Sends Session-End event on in-proc datacollectors
+        /// </summary>
         protected override void SendSessionEnd()
         {
             this.testCaseEventsHandler?.SendSessionEnd();
         }
 
+        /// <summary>
+        /// Sends Session-Start event on in-proc datacollectors
+        /// </summary>
         protected override void SendSessionStart()
         {
+            // Send session start with test sources in property bag for session start event args.
             var properties = new Dictionary<string, object>();
+            properties.Add("TestSources", TestSourceDeterminer.GetSources(this.adapterSourceMap));
 
-            IEnumerable<string> sources = new List<string>();
-            sources = adapterSourceMap?.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
-
-            properties.Add("TestSources", sources);
             this.testCaseEventsHandler?.SendSessionStart(properties);
         }
     }
