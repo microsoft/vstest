@@ -241,10 +241,12 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodPass.</remarks>
         public void ValidatePassedTests(params string[] passedTests)
         {
+            // Convert the unicode character to its unicode value for assertion
+            this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
             foreach (var test in passedTests)
             {
-                var flag = this.standardTestOutput.Contains("Passed " + test)
-                           || this.standardTestOutput.Contains("Passed " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("\\u221a " + test)
+                           || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
             }
         }
@@ -261,8 +263,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             foreach (var test in failedTests)
             {
-                var flag = this.standardTestOutput.Contains("Failed " + test)
-                           || this.standardTestOutput.Contains("Failed " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("X " + test)
+                           || this.standardTestOutput.Contains("X " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
                 // Verify stack information as well.
@@ -279,8 +281,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             foreach (var test in skippedTests)
             {
-                var flag = this.standardTestOutput.Contains("Skipped " + test)
-                           || this.standardTestOutput.Contains("Skipped " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("! " + test)
+                           || this.standardTestOutput.Contains("! " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in skipped tests list.", test);
             }
         }

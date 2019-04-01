@@ -38,17 +38,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Unicode for tick
         /// </summary>
-        private const string PassedTestIndicator = "\u2713";
+        private const char PassedTestIndicator = '\u221a';
 
         /// <summary>
         /// Indicator for failed tests
         /// </summary>
-        private const string FailedTestIndicator = "X";
+        private const char FailedTestIndicator = 'X';
 
         /// <summary>
         /// Indicated skipped and not run tests
         /// </summary>
-        private const string SkippedTestIndicator = "!";
+        private const char SkippedTestIndicator = '!';
 
         /// <summary>
         /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
