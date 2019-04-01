@@ -25,7 +25,12 @@ namespace Microsoft.TestPlatform.TestUtilities
     {
         public const string DesktopRunnerFramework = "net451";
         public const string CoreRunnerFramework = "netcoreapp2.0";
-        private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
+
+        private const string TotalTestsMessage = "Total tests: {0}";
+        private const string PassedTestsMessage = " Passed: {0}";
+        private const string FailedTestsMessage = " Failed: {0}";
+        private const string SkippedTestsMessage = " Skipped: {0}";
+        private const string TestSummaryStatusMessageFormat = "Total tests: {0} Passed: {1} Failed: {2} Skipped: {3}";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
         private int runnerExitCode = -1;
@@ -177,12 +182,21 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else
             {
-                var summaryStatus = string.Format(
-                    TestSummaryStatusMessageFormat,
-                    totalTestCount,
-                    passedTestsCount,
-                    failedTestsCount,
-                    skippedTestsCount);
+                var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
+                if (passedTestsCount != 0)
+                {
+                    summaryStatus += string.Format(PassedTestsMessage, passedTestsCount);
+                }
+
+                if (failedTestsCount != 0)
+                {
+                    summaryStatus += string.Format(FailedTestsMessage, failedTestsCount);
+                }
+
+                if (skippedTestsCount != 0)
+                {
+                    summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
+                }
 
                 Assert.IsTrue(
                     this.standardTestOutput.Contains(summaryStatus),
