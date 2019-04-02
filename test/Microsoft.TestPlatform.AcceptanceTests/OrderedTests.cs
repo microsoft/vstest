@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class OrderedTests : AcceptanceTestBase
     {
-
+#if NET451
         /// <summary>
         /// Ordered Tests created using earlier versions of Visual Studio(i.e. before VS2017) should work fine.
         /// </summary>
@@ -52,6 +52,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // Parent test result should fail as inner results contain failing test.
             this.ValidateSummaryStatus(2, 2, 1);
         }
-
+#endif
     }
 }
