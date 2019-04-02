@@ -264,7 +264,7 @@
     <value>Exception occurred when instantiating extension '{0}': {1}</value>
   </data>
   <data name="ExecutionTimeFormatString" xml:space="preserve">
-    <value>Test execution time: {0:0.0000} {1}</value>
+    <value> Total time: {0:0.0000} {1}</value>
   </data>
   <data name="ExtensionUriFormat" xml:space="preserve">
     <value>        Uri: {0}</value>
@@ -583,8 +583,8 @@
   <data name="TestRunSuccessful" xml:space="preserve">
     <value>Test Run Successful.</value>
   </data>
-  <data name="TestRunSummary" xml:space="preserve">
-    <value>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</value>
+  <data name="TestRunSummaryTotalTests" xml:space="preserve">
+    <value>Total tests: {0}</value>
   </data>
   <data name="TestSettingsFrameworkMismatch" xml:space="preserve">
     <value>Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning.</value>
@@ -674,7 +674,7 @@
     <value>Test Run Canceled.</value>
   </data>
   <data name="TestRunSummaryForCanceledOrAbortedRun" xml:space="preserve">
-    <value>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</value>
+    <value>Total tests: Unknown</value>
   </data>
   <data name="UseVsixExtensionsDeprecation" xml:space="preserve">
     <value>/UseVsixExtensions is getting deprecated. Please use /TestAdapterPath instead.</value>
@@ -717,6 +717,15 @@
   </data>
   <data name="InvalidLoggerArgument" xml:space="preserve">
     <value>Logger argument '{0}' is not valid.</value>
+  </data>
+  <data name="TestRunSummaryFailedTests" xml:space="preserve">
+    <value>     Failed: {0}</value>
+  </data>
+  <data name="TestRunSummaryPassedTests" xml:space="preserve">
+    <value>     Passed: {0}</value>
+  </data>
+  <data name="TestRunSummarySkippedTests" xml:space="preserve">
+    <value>    Skipped: {0}</value>
   </data>
   <data name="ProgressIndicatorString" xml:space="preserve">
     <value>Test run in progress</value>

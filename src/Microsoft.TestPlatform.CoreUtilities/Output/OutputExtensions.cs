@@ -75,6 +75,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         }
 
         /// <summary>
+        /// Write string with a given console color
+        /// </summary>
+        /// <param name="output">Output instance the method is being invoked with.</param>
+        /// <param name="message">Message to be written</param>
+        /// <param name="level">OutputLevel</param>
+        /// <param name="foregroundColor">Console color for the output message</param>
+        public static void Write(this IOutput output, string message, OutputLevel level, ConsoleColor foregroundColor)
+        {
+            SetColorForAction(foregroundColor, () =>
+            {
+                output.Write(message, level);
+            });
+        }
+
+        /// <summary>
         /// Formats the message.
         /// </summary>
         /// <param name="output">An output instance to write the message.</param>
