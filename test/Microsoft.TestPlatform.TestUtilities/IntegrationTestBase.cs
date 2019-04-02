@@ -246,7 +246,9 @@ namespace Microsoft.TestPlatform.TestUtilities
             foreach (var test in passedTests)
             {
                 var flag = this.standardTestOutput.Contains("\\u221a " + test)
-                           || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test));
+                           || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test))
+                           || this.standardTestOutput.Contains("\\ufffd " + test)
+                           || this.standardTestOutput.Contains("\\ufffd " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
             }
         }
@@ -493,7 +495,11 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();
-                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                vstestconsole.OutputDataReceived += (sender, eventArgs) =>
+                {
+                    stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                };
+
                 vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
 
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
