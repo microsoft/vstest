@@ -222,10 +222,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void SendSessionStart()
         {
             // Send session start with test sources in property bag for session start event args.
-            var properties = new Dictionary<string, object>();
-            properties.Add("TestSources", TestSourceDeterminer.GetSources(this.adapterSourceMap));
+            if (this.testCaseEventsHandler == null)
+            {
+                return;
+            }
 
-            this.testCaseEventsHandler?.SendSessionStart(properties);
+            var properties = new Dictionary<string, object>();
+            properties.Add("TestSources", TestSourcesUtility.GetSources(this.adapterSourceMap));
+
+            this.testCaseEventsHandler.SendSessionStart(properties);
         }
     }
 }

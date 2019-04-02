@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IDataCollectionSink inProcDataCollectionSink;
 
-        private string defaultCodebase;
+        private string defaultCodeBase;
 
         /// <summary>
         /// Loaded in-proc datacollectors collection
@@ -41,14 +41,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="testEventsPublisher">
         /// The data collection test case event manager.
         /// </param>
-        /// <param name="defaultCodebase">
+        /// <param name="defaultCodeBase">
         /// The default codebase.
         /// </param>
-        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodebase)
+        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
-            this.defaultCodebase = defaultCodebase;
+            this.defaultCodeBase = defaultCodeBase;
 
             // Initialize InProcDataCollectors
             this.InitializeInProcDataCollectors(runSettings);
@@ -103,10 +103,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The e.
         /// </param>
         private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
-        {
-            var properties = new Dictionary<string, object>();
-            properties.Add(Constants.TestSourcesPropertyName, e.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName));
-            TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs(properties);
+        {            
+            TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs(this.GetSessionStartProperties(e));
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
 
@@ -223,7 +221,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns> Codebase </returns>
         private string GetCodebase(string codeBase)
         {
-            return Path.IsPathRooted(codeBase) ? codeBase : Path.Combine(this.defaultCodebase, codeBase);
+            return Path.IsPathRooted(codeBase) ? codeBase : Path.Combine(this.defaultCodeBase, codeBase);
+        }
+
+        private IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
+        {
+            var properties = new Dictionary<string, object>();
+            properties.Add(Constants.TestSourcesPropertyName, sessionStartEventArgs.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName));
+            return properties;
         }
 
         private void TriggerInProcDataCollectionMethods(string methodName, InProcDataCollectionArgs methodArg)

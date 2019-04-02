@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
-                this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourceDeterminer.GetDefaultCodebasePath(adapterSourceMap));
+                this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
 
                 this.activeTestRun = new RunTestsWithSources(this.requestData, adapterSourceMap, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
-                this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourceDeterminer.GetDefaultCodebasePath(tests));
+                this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
                  
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 

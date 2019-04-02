@@ -225,19 +225,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         internal static class CoverletConstants
         {
             /// <summary>
-            /// Coverlet data collector friendlyname
+            /// Coverlet inproc data collector friendlyname
             /// </summary>
             public const string CoverletDataCollectorFriendlyName = "XPlat Code Coverage";
 
             /// TODO : Finalize Name
             /// <summary>
-            /// Coverlet data collector assembly qualified name
+            /// Coverlet inproc data collector assembly qualified name
             /// </summary>
             public const string CoverletDataCollectorAssemblyQualifiedName = "Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
 
             /// TODO : Finalize codebase
             /// <summary>
-            /// Coverlet data collector codebase
+            /// Coverlet inproc data collector codebase
             /// </summary>
             public const string CoverletDataCollectorCodebase = "coverletinprocdatacollector.dll";
         }

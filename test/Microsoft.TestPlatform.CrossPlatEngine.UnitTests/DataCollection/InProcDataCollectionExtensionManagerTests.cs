@@ -4,6 +4,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Xml;
@@ -161,6 +162,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
             Assert.IsFalse(manager.IsInProcDataCollectionEnabled, "InProcDataCollection must be disabled on invalid settings.");
         }
+        [TestMethod]
+        public void TriggerSessionStartShouldBeCalledWithCorrectTestSources()
+        {
+            var properties = new Dictionary<string, object>();
+            properties.Add("TestSources", new List<string>() { "testsource1.dll", "testsource2.dll" });
+            
+            var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
+
+            this.mockTestEventsPublisher.Raise(x => x.SessionStart += null, new SessionStartEventArgs(properties));
+            Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 1), "TestSessionStart must be called on datacollector");
+
+            Assert.IsTrue(mockDataCollector.TestSources.Contains("testsource1.dll"));
+            Assert.IsTrue(mockDataCollector.TestSources.Contains("testsource2.dll"));
+        }
+
 
         [TestMethod]
         public void TriggerSessionStartShouldCallInProcDataCollector()
@@ -259,6 +275,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             public int TestSessionEndCalled { get; private set; }
             public int TestCaseStartCalled { get; private set; }
             public int TestCaseEndCalled { get; private set; }
+            public IEnumerable<string> TestSources
+            {
+                get;
+                private set;
+            }
 
             public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
             {
@@ -269,12 +290,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             {
                 switch (methodName)
                 {
-                    case Constants.TestSessionStartMethodName: TestSessionStartCalled++; break;
+                    case Constants.TestSessionStartMethodName: this.TestSessionStartMethodCalled(methodArg as TestSessionStartArgs); break;
                     case Constants.TestSessionEndMethodName: TestSessionEndCalled++; break;
                     case Constants.TestCaseStartMethodName: TestCaseStartCalled++; break;
                     case Constants.TestCaseEndMethodName: TestCaseEndCalled++; break;
                     default: break;
                 }
+            }
+
+            private void TestSessionStartMethodCalled(TestSessionStartArgs testSessionStartArgs)
+            {
+                TestSessionStartCalled++;
+                this.TestSources = testSessionStartArgs.GetPropertyValue<IEnumerable<string>>("TestSources");
             }
         }
     }
