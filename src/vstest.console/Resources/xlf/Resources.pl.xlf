@@ -1211,9 +1211,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
-        <source>Test execution time: {0:0.0000} {1}</source>
-        <target state="translated">Czas wykonywania testu: {0:0.0000} {1}.</target>
-        <note />
+        <source> Total time: {0:0.0000} {1}</source>
+        <target state="new">Czas wykonywania testu: {0:0.0000} {1}.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testowanie czas wykonania: {0:0.0000} {1}.</target>
         </alt-trans>
@@ -1335,15 +1335,6 @@
           <target state-qualifier="mt-suggestion">Pominięto {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
-      </trans-unit>
-      <trans-unit id="TestRunSummary">
-        <source>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</source>
-        <target state="translated">Łączna liczba testów: {0}. Zakończone pomyślnie: {1}. Zakończone niepowodzeniem: {2}. Pominięte: {3}.</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Suma testów: {0}. Passed: {1}. nie powiodło się: {2}. pominięty: {3}.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
         <source>Discovery failed for given sources. Exception : {0}</source>
@@ -1538,9 +1529,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
-        <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
-        <target state="translated">Łączna liczba testów: Nieznana. Zakończone powodzeniem: {0}. Zakończone niepowodzeniem: {1}. Pominięte: {2}.</target>
-        <note />
+        <source>Total tests: Unknown</source>
+        <target state="new">Łączna liczba testów: Nieznana. Zakończone powodzeniem: {0}. Zakończone niepowodzeniem: {1}. Pominięte: {2}.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1638,6 +1629,26 @@
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryTotalTests">
+        <source>Total tests: {0}</source>
+        <target state="new">Total tests: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryFailedTests">
+        <source>     Failed: {0}</source>
+        <target state="new">     Failed: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryPassedTests">
+        <source>     Passed: {0}</source>
+        <target state="new">     Passed: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummarySkippedTests">
+        <source>    Skipped: {0}</source>
+        <target state="new">    Skipped: {0}</target>
         <note></note>
       </trans-unit>
     </body>

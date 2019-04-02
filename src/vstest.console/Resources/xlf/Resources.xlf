@@ -513,7 +513,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
-        <source>Test execution time: {0:0.0000} {1}</source>
+        <source> Total time: {0:0.0000} {1}</source>
         <note></note>
       </trans-unit>
       <trans-unit id="Hours">
@@ -566,10 +566,6 @@
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
         <source>Skipped  {0}</source>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="TestRunSummary">
-        <source>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
@@ -712,7 +708,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
-        <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
+        <source>Total tests: Unknown</source>
         <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
         <note></note>
       </trans-unit>
@@ -822,6 +818,26 @@
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryTotalTests">
+        <source>Total tests: {0}</source>
+        <target state="new">Total tests: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryFailedTests">
+        <source>     Failed: {0}</source>
+        <target state="new">     Failed: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryPassedTests">
+        <source>     Passed: {0}</source>
+        <target state="new">     Passed: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummarySkippedTests">
+        <source>    Skipped: {0}</source>
+        <target state="new">    Skipped: {0}</target>
         <note></note>
       </trans-unit>
     </body>
