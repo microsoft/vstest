@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The e.
         /// </param>
         private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
-        {            
+        {
             TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs(this.GetSessionStartProperties(e));
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
