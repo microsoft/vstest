@@ -675,6 +675,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine("TestName " + expectedDuration, OutputLevel.Information), Times.Once());
         }
 
+        [DataTestMethod]
+        public void TestResultHandlerForTestResultWithDurationLessThanOneMsShouldPrintDurationInfo()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+            var TestResultWithHrMinSecMs = new ObjectModel.TestResult(new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource") { DisplayName = "TestName" })
+            {
+                Outcome = TestOutcome.Passed,
+                Duration = TimeSpan.FromTicks(50)
+            };
+
+            loggerEvents.RaiseTestResult(new TestResultEventArgs(TestResultWithHrMinSecMs));
+            loggerEvents.WaitForEventCompletion();
+
+            this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("TestName [< 1ms]", OutputLevel.Information), Times.Once());
+        }
+
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsPass()
         {

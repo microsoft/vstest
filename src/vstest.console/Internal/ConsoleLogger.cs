@@ -422,15 +422,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
 
-            string testDisplayName = e.Result.DisplayName;
+            var testDisplayName = e.Result.DisplayName;
+
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
             {
                 testDisplayName = e.Result.TestCase.DisplayName;
-                string formattedDuration = this.GetFormattedDurationString(e.Result.Duration);
-                if (!string.IsNullOrEmpty(formattedDuration))
-                {
-                    testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
-                }
+            }
+
+            string formattedDuration = this.GetFormattedDurationString(e.Result.Duration);
+            if (!string.IsNullOrEmpty(formattedDuration))
+            {
+                testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
             }
 
             switch (e.Result.Outcome)
@@ -507,34 +509,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         private string GetFormattedDurationString(TimeSpan duration)
         {
-            var time = new List<string>();
-            if (duration != default(TimeSpan))
+            if (duration == default(TimeSpan))
             {
-                if (duration.Hours > 0)
+                return null;
+            }
+
+            var time = new List<string>();
+            if (duration.Hours > 0)
+            {
+                time.Add(duration.Hours + "h");
+            }
+
+            if (duration.Minutes > 0)
+            {
+                time.Add(duration.Minutes + "m");
+            }
+
+            if (duration.Hours == 0)
+            {
+                if (duration.Seconds > 0)
                 {
-                    time.Add(duration.Hours + "h");
+                    time.Add(duration.Seconds + "s");
                 }
 
-                if (duration.Minutes > 0)
+                if (duration.Milliseconds > 0 && duration.Minutes == 0)
                 {
-                    time.Add(duration.Minutes + "m");
-                }
-
-                if (duration.Hours == 0)
-                {
-                    if (duration.Seconds > 0)
-                    {
-                        time.Add(duration.Seconds + "s");
-                    }
-
-                    if (duration.Milliseconds > 0 && duration.Minutes == 0)
-                    {
-                        time.Add(duration.Milliseconds + "ms");
-                    }
+                    time.Add(duration.Milliseconds + "ms");
                 }
             }
 
-            return string.Join(" ", time);
+            return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
         }
 
         /// <summary>

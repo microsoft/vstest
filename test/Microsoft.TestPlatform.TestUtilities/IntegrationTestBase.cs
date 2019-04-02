@@ -488,6 +488,8 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.StartInfo.RedirectStandardError = true;
                 vstestconsole.StartInfo.RedirectStandardOutput = true;
                 vstestconsole.StartInfo.CreateNoWindow = true;
+                vstestconsole.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                vstestconsole.StartInfo.StandardErrorEncoding = Encoding.UTF8;
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();

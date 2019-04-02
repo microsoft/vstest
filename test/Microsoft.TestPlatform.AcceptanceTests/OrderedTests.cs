@@ -20,6 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
         public void OlderOrderedTestsShouldWorkFine(RunnerInfo runnerInfo)
         {
+            System.Threading.Thread.Sleep(20000);
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             if (runnerInfo.RunnerFramework.StartsWith("netcoreapp"))
             {
