@@ -245,6 +245,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
             foreach (var test in passedTests)
             {
+                // Check for tick or ? both, in some cases as unicode charater for tick is not available
+                // in std out and gets replaced by ?
                 var flag = this.standardTestOutput.Contains("\\u221a " + test)
                            || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test))
                            || this.standardTestOutput.Contains("\\ufffd " + test)
