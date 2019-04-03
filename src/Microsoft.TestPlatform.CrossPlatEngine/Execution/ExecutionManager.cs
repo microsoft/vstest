@@ -210,12 +210,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         private void InitializeDataCollectors(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
         {
-            // Initialize data collectors if declared in run settings.
+            // Initialize outproc data collectors if declared in run settings.
             if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
             {
                 var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
             }
-
+             
+            // Initialize inproc data collectors if declared in run settings.
             if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {
                 var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase);

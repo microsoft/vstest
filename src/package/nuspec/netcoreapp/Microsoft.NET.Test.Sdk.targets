@@ -12,10 +12,6 @@
 
 <Project InitialTargets="GenerateProgramFile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup>
-    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-  </PropertyGroup>
-
   <!--
     Output type for .NET Core test projects should be exe.
     https://devdiv.visualstudio.com/DevDiv/_workitems?id=375688&_a=edit

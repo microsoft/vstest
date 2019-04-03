@@ -1212,9 +1212,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
-        <source>Test execution time: {0:0.0000} {1}</source>
-        <target state="translated">테스트 실행 시간: {0:0.0000} {1}</target>
-        <note />
+        <source> Total time: {0:0.0000} {1}</source>
+        <target state="new">테스트 실행 시간: {0:0.0000} {1}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 실행 시간: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1336,15 +1336,6 @@
           <target state-qualifier="mt-suggestion">건너뛴된 {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
-      </trans-unit>
-      <trans-unit id="TestRunSummary">
-        <source>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</source>
-        <target state="translated">총 테스트 수: {0}. 통과: {1}. 실패: {2}. 건너뜀: {3}.</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">총 테스트: {0}. 성공: {1}. 실패: {2}입니다. 생략 됨: {3}입니다.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
         <source>Discovery failed for given sources. Exception : {0}</source>
@@ -1539,9 +1530,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
-        <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
-        <target state="translated">총 테스트 : 알 수 없음. 통과: {0}. 실패: {1}. 건너뜀: {2}.</target>
-        <note />
+        <source>Total tests: Unknown</source>
+        <target state="new">총 테스트 : 알 수 없음. 통과: {0}. 실패: {1}. 건너뜀: {2}.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1640,6 +1631,26 @@
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="new">Test run in progress</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryTotalTests">
+        <source>Total tests: {0}</source>
+        <target state="new">Total tests: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryFailedTests">
+        <source>     Failed: {0}</source>
+        <target state="new">     Failed: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummaryPassedTests">
+        <source>     Passed: {0}</source>
+        <target state="new">     Passed: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummarySkippedTests">
+        <source>    Skipped: {0}</source>
+        <target state="new">    Skipped: {0}</target>
         <note></note>
       </trans-unit>
     </body>

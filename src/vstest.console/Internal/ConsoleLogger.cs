@@ -31,6 +31,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private const string TestMessageFormattingPrefix = " ";
 
         /// <summary>
+        /// Prefix used for formatting the result output
+        /// </summary>
+        private const string TestResultPrefix = "  ";
+
+        /// <summary>
+        /// Unicode for tick
+        /// </summary>
+        private const char PassedTestIndicator = '\u221a';
+
+        /// <summary>
+        /// Indicator for failed tests
+        /// </summary>
+        private const char FailedTestIndicator = 'X';
+
+        /// <summary>
+        /// Indicated skipped and not run tests
+        /// </summary>
+        private const char SkippedTestIndicator = '!';
+
+        /// <summary>
         /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
         /// </summary>
         internal static bool AppendPrefix;
@@ -255,6 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         private static void DisplayFullInformation(TestResult result)
         {
+
             // Add newline if it is not in given output data.
             var addAdditionalNewLine = false;
 
@@ -262,16 +283,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (!String.IsNullOrEmpty(result.ErrorMessage))
             {
                 addAdditionalNewLine = true;
-                Output.Information(false, ConsoleColor.Red, CommandLineResources.ErrorMessageBanner);
-                var errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
+                Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.ErrorMessageBanner));
+                var errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}{2}", TestResultPrefix, TestMessageFormattingPrefix, result.ErrorMessage);
                 Output.Information(false, ConsoleColor.Red, errorMessage);
             }
 
             if (!String.IsNullOrEmpty(result.ErrorStackTrace))
             {
                 addAdditionalNewLine = false;
-                Output.Information(false, ConsoleColor.Red, CommandLineResources.StacktraceBanner);
-                var stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}", result.ErrorStackTrace);
+                Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StacktraceBanner));
+                var stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestResultPrefix, result.ErrorStackTrace);
                 Output.Information(false, ConsoleColor.Red, stackTrace);
             }
 
@@ -283,7 +304,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(stdOutMessages))
                 {
-                    Output.Information(false, CommandLineResources.StdOutMessagesBanner);
+                    Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdOutMessagesBanner));
                     Output.Information(false, stdOutMessages);
                 }
             }
@@ -296,7 +317,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(stdErrMessages))
                 {
-                    Output.Information(false, ConsoleColor.Red, CommandLineResources.StdErrMessagesBanner);
+                    Output.Information(false, ConsoleColor.Red, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.StdErrMessagesBanner));
                     Output.Information(false, ConsoleColor.Red, stdErrMessages);
                 }
             }
@@ -309,7 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(dbgTrcMessages))
                 {
-                    Output.Information(false, CommandLineResources.DbgTrcMessagesBanner);
+                    Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.DbgTrcMessagesBanner));
                     Output.Information(false, dbgTrcMessages);
                 }
             }
@@ -322,7 +343,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(addnlInfoMessages))
                 {
-                    Output.Information(false, CommandLineResources.AddnlInfoMessagesBanner);
+                    Output.Information(false, string.Format("{0}{1}", TestResultPrefix, CommandLineResources.AddnlInfoMessagesBanner));
                     Output.Information(false, addnlInfoMessages);
                 }
             }
@@ -401,10 +422,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
 
-            string testDisplayName = e.Result.DisplayName;
+            var testDisplayName = e.Result.DisplayName;
+
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
             {
                 testDisplayName = e.Result.TestCase.DisplayName;
+            }
+
+            string formattedDuration = this.GetFormattedDurationString(e.Result.Duration);
+            if (!string.IsNullOrEmpty(formattedDuration))
+            {
+                testDisplayName = string.Format("{0} [{1}]", testDisplayName, formattedDuration);
             }
 
             switch (e.Result.Outcome)
@@ -417,8 +445,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
 
-                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, testDisplayName);
-                        Output.Warning(false, output);
+                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
+                        Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (this.verbosityLevel == Verbosity.Detailed)
                         {
                             DisplayFullInformation(e.Result);
@@ -434,9 +462,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         {
                             break;
                         }
-
-                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, testDisplayName);
-                        Output.Information(false, ConsoleColor.Red, output);
+                        
+                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
+                        Output.WriteLine(testDisplayName, OutputLevel.Information);
                         DisplayFullInformation(e.Result);
                         break;
                     }
@@ -446,8 +474,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         this.testsPassed++;
                         if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
-                            var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, testDisplayName);
-                            Output.Information(false, output);
+                            Output.Write(string.Format("{0}{1} ", TestResultPrefix, PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
+                            Output.WriteLine(testDisplayName, OutputLevel.Information);
                             if (this.verbosityLevel == Verbosity.Detailed)
                             {
                                 DisplayFullInformation(e.Result);
@@ -464,8 +492,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
 
-                        var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, testDisplayName);
-                        Output.Information(false, output);
+                        Output.Write(string.Format("{0}{1} ", TestResultPrefix, SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
+                        Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (this.verbosityLevel == Verbosity.Detailed)
                         {
                             DisplayFullInformation(e.Result);
@@ -477,6 +505,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Resume the progress indicator after displaying the test result information 
             this.progressIndicator?.Start();
+        }
+
+        private string GetFormattedDurationString(TimeSpan duration)
+        {
+            if (duration == default(TimeSpan))
+            {
+                return null;
+            }
+
+            var time = new List<string>();
+            if (duration.Hours > 0)
+            {
+                time.Add(duration.Hours + "h");
+            }
+
+            if (duration.Minutes > 0)
+            {
+                time.Add(duration.Minutes + "m");
+            }
+
+            if (duration.Hours == 0)
+            {
+                if (duration.Seconds > 0)
+                {
+                    time.Add(duration.Seconds + "s");
+                }
+
+                if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                {
+                    time.Add(duration.Milliseconds + "ms");
+                }
+            }
+
+            return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
         }
 
         /// <summary>
@@ -504,23 +566,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 Output.WriteLine(String.Empty, OutputLevel.Information);
             }
 
-            // Output a summary.
-            if (testsTotal > 0)
-            {
-                string testCountDetails;
-
-                if (e.IsAborted || e.IsCanceled)
-                {
-                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, this.testsPassed, this.testsFailed, this.testsSkipped);
-                }
-                else
-                {
-                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, this.testsTotal, this.testsPassed, this.testsFailed, this.testsSkipped);
-                }
-
-                Output.Information(false, testCountDetails);
-            }
-
             if (e.IsCanceled)
             {
                 Output.Error(false, CommandLineResources.TestRunCanceled);
@@ -536,6 +581,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             else if (testsTotal > 0)
             {
                 Output.Information(false, ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
+            }
+
+            // Output a summary.
+            if (testsTotal > 0)
+            {
+                string totalTestsformat = (e.IsAborted || e.IsCanceled) ? CommandLineResources.TestRunSummaryForCanceledOrAbortedRun : CommandLineResources.TestRunSummaryTotalTests;
+                Output.Information(false, string.Format(CultureInfo.CurrentCulture, totalTestsformat, testsTotal));
+
+                if (testsPassed > 0)
+                {
+                    Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassedTests, testsPassed));
+                }
+                if (testsFailed > 0)
+                {
+                    Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailedTests, testsFailed));
+                }
+                if (testsSkipped > 0)
+                {
+                    Output.Information(false, ConsoleColor.Yellow, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummarySkippedTests, testsSkipped));
+                }
             }
 
             if (testsTotal > 0)
