@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities
         internal static IEnumerable<string> GetSources(Dictionary<string, IEnumerable<string>> adapterSourceMap)
         {
             IEnumerable<string> sources = new List<string>();
-            return adapterSourceMap?.Values?.Aggregate(sources, (current, enumerable) => current.Concat(enumerable)).Distinct();
+            return adapterSourceMap?.Values?.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             adapterSourceMap.Add("adapter3", new List<string>() { "source1.dll"});
 
             var sources = TestSourcesUtility.GetSources(adapterSourceMap);
-            Assert.AreEqual(sources.Count(), 3);
+            Assert.AreEqual(sources.Count(), 5);
             Assert.IsTrue(sources.Contains("source1.dll"));
             Assert.IsTrue(sources.Contains("source2.dll"));
             Assert.IsTrue(sources.Contains("source3.dll"));
