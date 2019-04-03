@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
@@ -23,6 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private IEnumerable<TestCase> testCases;
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
+
+        private ITestCaseEventsHandler testCaseEventsHandler;
 
         public RunTestsWithTests(IRequestData requestData, IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
             : this(requestData, testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
@@ -45,6 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.testCases = testCases;
             this.executorUriVsTestList = executorUriVsTestList;
+            this.testCaseEventsHandler = testCaseEventsHandler;
         }
 
         protected override void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
@@ -65,6 +69,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUri, RunContext runContext, IFrameworkHandle frameworkHandle)
         {
             executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
+        }
+
+        /// <summary>
+        /// Sends Session-End event on in-proc datacollectors
+        /// </summary>
+        protected override void SendSessionEnd()
+        {
+            this.testCaseEventsHandler?.SendSessionEnd();
+        }
+
+        /// <summary>
+        /// Sends Session-Start event on in-proc datacollectors
+        /// </summary>
+        protected override void SendSessionStart()
+        {
+            // Send session start with test sources in property bag for session start event args.
+            if (this.testCaseEventsHandler == null)
+            {
+                return;
+            }
+
+            var properties = new Dictionary<string, object>();
+            properties.Add("TestSources", TestSourcesUtility.GetSources(this.testCases));
+
+            this.testCaseEventsHandler.SendSessionStart(properties);
         }
 
         /// <summary>

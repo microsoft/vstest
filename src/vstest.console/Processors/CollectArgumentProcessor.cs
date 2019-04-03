@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
 
     using System.Globalization;
-
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -144,6 +143,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
+        /// <summary>
+        /// Enables coverlet inproc datacollector
+        /// </summary>
+        internal static void EnableCoverletInProcDataCollector(string argument, DataCollectionRunSettings dataCollectionRunSettings)
+        {
+            DataCollectorSettings dataCollectorSettings = null;
+
+            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
+            {
+                // Create a new setting with deafult values
+                dataCollectorSettings = new DataCollectorSettings();
+                dataCollectorSettings.FriendlyName = argument;
+                dataCollectorSettings.AssemblyQualifiedName = CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
+                dataCollectorSettings.CodeBase = CoverletConstants.CoverletDataCollectorCodebase;
+                dataCollectorSettings.IsEnabled = true;
+                dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
+            }
+            else
+            {
+                // Set Assembly qualified name and codebase if not already set
+                dataCollectorSettings.AssemblyQualifiedName = dataCollectorSettings.AssemblyQualifiedName ?? CoverletConstants.CoverletDataCollectorAssemblyQualifiedName;
+                dataCollectorSettings.CodeBase = dataCollectorSettings.CodeBase ?? CoverletConstants.CoverletDataCollectorCodebase;
+                dataCollectorSettings.IsEnabled = true;
+            }
+        }
+
         private static bool DoesDataCollectorSettingsExist(string friendlyName,
             DataCollectionRunSettings dataCollectionRunSettings,
             out DataCollectorSettings dataCollectorSettings)
@@ -172,21 +197,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
             }
 
-            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
-            if (dataCollectionRunSettings == null)
-            {
-                dataCollectionRunSettings = new DataCollectionRunSettings();
-            }
+            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings) ?? new DataCollectionRunSettings();
+            var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(settings) 
+                ?? new DataCollectionRunSettings(
+                    Constants.InProcDataCollectionRunSettingsName,
+                    Constants.InProcDataCollectorsSettingName,
+                    Constants.InProcDataCollectorSettingName);
 
             // Add data collectors if not already present, enable if already present.
             EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
 
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+
+            if (string.Equals(argument, CoverletConstants.CoverletDataCollectorFriendlyName, StringComparison.OrdinalIgnoreCase))
+            {
+                // Add inproc data collector to runsetings if coverlet code coverage is enabled
+                EnableCoverletInProcDataCollector(argument, inProcDataCollectionRunSettings);
+                runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
+            }
         }
 
         internal static void AddDataCollectorFriendlyName(string friendlyName)
         {
             EnabledDataCollectors.Add(friendlyName.ToLower());
+        }
+
+        internal static class CoverletConstants
+        {
+            /// <summary>
+            /// Coverlet inproc data collector friendlyname
+            /// </summary>
+            public const string CoverletDataCollectorFriendlyName = "XPlat Code Coverage";
+
+            /// TODO : Finalize Name
+            /// <summary>
+            /// Coverlet inproc data collector assembly qualified name
+            /// </summary>
+            public const string CoverletDataCollectorAssemblyQualifiedName = "Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+
+            /// TODO : Finalize codebase
+            /// <summary>
+            /// Coverlet inproc data collector codebase
+            /// </summary>
+            public const string CoverletDataCollectorCodebase = "coverletinprocdatacollector.dll";
         }
     }
 }

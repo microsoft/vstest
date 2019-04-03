@@ -209,7 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     // Call Session-Start event on in-proc datacollectors
-                    this.testCaseEventsHandler?.SendSessionStart();
+                    this.SendSessionStart();
 
                     elapsedTime = this.RunTestsInternal();
 
@@ -230,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 finally
                 {
                     // Trigger Session End on in-proc datacollectors
-                    this.testCaseEventsHandler?.SendSessionEnd();
+                    this.SendSessionEnd();
 
                     try
                     {
@@ -288,6 +288,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected abstract void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle);
 
+        protected abstract void SendSessionStart();
+
+        protected abstract void SendSessionEnd();
+
         #endregion
 
         private void CancelTestRunInternal(ITestExecutor executor)
@@ -308,17 +312,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private void SetContext()
         {
             this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, this.testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
-
-            // Initialize data collectors if declared in run settings.
-            if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(this.runSettings))
-            {
-                var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, this.testEventsPublisher);
-            }
-
-            if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.runSettings))
-            {
-                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(this.runSettings, this.testEventsPublisher);
-            }
 
             this.runContext = new RunContext();
             this.runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings);

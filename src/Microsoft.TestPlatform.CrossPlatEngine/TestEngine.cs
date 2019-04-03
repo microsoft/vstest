@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -313,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>test sources</returns>
         private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
         {
-            return testRunCriteria.HasSpecificTests ? testRunCriteria.Tests.Select(tc => tc.Source).Distinct() : testRunCriteria.Sources;
+            return testRunCriteria.HasSpecificTests ? TestSourcesUtility.GetSources(testRunCriteria.Tests) : testRunCriteria.Sources;
         }
     }
 }
