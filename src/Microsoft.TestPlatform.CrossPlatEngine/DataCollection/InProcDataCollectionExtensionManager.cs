@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The data collection test case event manager.
         /// </param>
         /// <param name="defaultCodeBase">
-        /// The default codebase.
+        /// The default codebase to be used by inproc data collector
         /// </param>
         public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
         {
