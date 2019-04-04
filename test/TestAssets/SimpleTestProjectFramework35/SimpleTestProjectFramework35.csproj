@@ -1,6 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  
+  <!-- Package dependency versions -->
+  <PropertyGroup>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
+    <TestProject>true</TestProject>
+  </PropertyGroup>
+
+  <!-- Imports Common TestAssets props. -->
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
+  <Import Project="..\..\..\scripts\build\TestAssets.props" />
+  
   <PropertyGroup>
     <FrameworkPathOverride>$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v3.5\Profile\Client</FrameworkPathOverride>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -16,11 +27,13 @@
     <Deterministic>true</Deterministic>
     <OutputPath>bin\Debug\net451</OutputPath>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.QualityTools">
-      <Version>15.5.0-preview-1004187</Version>
+      <Version>$(TestPlatformExternalsVersion)</Version>
     </PackageReference>
   </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -29,10 +42,12 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
