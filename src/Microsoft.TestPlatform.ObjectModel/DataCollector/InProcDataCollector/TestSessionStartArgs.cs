@@ -4,18 +4,33 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// The test session start args.
     /// </summary>
     public class TestSessionStartArgs : InProcDataCollectionArgs
     {
+        private IDictionary<string, object> Properties;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestSessionStartArgs"/> class.
         /// </summary>
         public TestSessionStartArgs()
         {
             this.Configuration = String.Empty;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestSessionStartArgs"/> class.
+        /// </summary>
+        /// <param name="properties">
+        /// Properties.
+        /// </param>
+        public TestSessionStartArgs(IDictionary<string, object> properties)
+        {
+            this.Configuration = String.Empty;
+            this.Properties = properties;
         }
 
         /// <summary>
@@ -33,5 +48,41 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// Gets or sets the configuration.
         /// </summary>
         public string Configuration { get; set; }
+
+        /// <summary>
+        /// Gets session start properties enumerator
+        /// </summary>
+        public IEnumerator<KeyValuePair<string, object>> GetProperties()
+        {
+            return this.Properties.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Gets property value
+        /// </summary>
+        /// <param name="property">
+        /// Property name
+        /// </param>
+        public T GetPropertyValue<T>(string property)
+        {
+            ValidateArg.NotNullOrEmpty(property, "property");
+
+            return this.Properties.ContainsKey(property) ? (T)this.Properties[property] : default(T);
+        }
+
+        /// <summary>
+        /// Gets property value
+        /// </summary>
+        /// <param name="property">
+        /// Property name
+        /// </param>
+        public object GetPropertyValue(string property)
+        {
+            ValidateArg.NotNullOrEmpty(property, "property");
+
+            this.Properties.TryGetValue(property, out object propertyValue);
+
+            return propertyValue;
+        }
     }
 }

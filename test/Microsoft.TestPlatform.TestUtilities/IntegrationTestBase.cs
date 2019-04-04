@@ -25,7 +25,12 @@ namespace Microsoft.TestPlatform.TestUtilities
     {
         public const string DesktopRunnerFramework = "net451";
         public const string CoreRunnerFramework = "netcoreapp2.0";
-        private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
+
+        private const string TotalTestsMessage = "Total tests: {0}";
+        private const string PassedTestsMessage = " Passed: {0}";
+        private const string FailedTestsMessage = " Failed: {0}";
+        private const string SkippedTestsMessage = " Skipped: {0}";
+        private const string TestSummaryStatusMessageFormat = "Total tests: {0} Passed: {1} Failed: {2} Skipped: {3}";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
         private int runnerExitCode = -1;
@@ -177,12 +182,21 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else
             {
-                var summaryStatus = string.Format(
-                    TestSummaryStatusMessageFormat,
-                    totalTestCount,
-                    passedTestsCount,
-                    failedTestsCount,
-                    skippedTestsCount);
+                var summaryStatus = string.Format(TotalTestsMessage, totalTestCount);
+                if (passedTestsCount != 0)
+                {
+                    summaryStatus += string.Format(PassedTestsMessage, passedTestsCount);
+                }
+
+                if (failedTestsCount != 0)
+                {
+                    summaryStatus += string.Format(FailedTestsMessage, failedTestsCount);
+                }
+
+                if (skippedTestsCount != 0)
+                {
+                    summaryStatus += string.Format(SkippedTestsMessage, skippedTestsCount);
+                }
 
                 Assert.IsTrue(
                     this.standardTestOutput.Contains(summaryStatus),
@@ -227,10 +241,16 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodPass.</remarks>
         public void ValidatePassedTests(params string[] passedTests)
         {
+            // Convert the unicode character to its unicode value for assertion
+            this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"[^\x00-\x7F]", c => string.Format(@"\u{0:x4}", (int)c.Value[0]));
             foreach (var test in passedTests)
             {
-                var flag = this.standardTestOutput.Contains("Passed " + test)
-                           || this.standardTestOutput.Contains("Passed " + GetTestMethodName(test));
+                // Check for tick or ? both, in some cases as unicode charater for tick is not available
+                // in std out and gets replaced by ?
+                var flag = this.standardTestOutput.Contains("\\u221a " + test)
+                           || this.standardTestOutput.Contains("\\u221a " + GetTestMethodName(test))
+                           || this.standardTestOutput.Contains("\\ufffd " + test)
+                           || this.standardTestOutput.Contains("\\ufffd " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
             }
         }
@@ -247,8 +267,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             foreach (var test in failedTests)
             {
-                var flag = this.standardTestOutput.Contains("Failed " + test)
-                           || this.standardTestOutput.Contains("Failed " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("X " + test)
+                           || this.standardTestOutput.Contains("X " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
                 // Verify stack information as well.
@@ -265,8 +285,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             foreach (var test in skippedTests)
             {
-                var flag = this.standardTestOutput.Contains("Skipped " + test)
-                           || this.standardTestOutput.Contains("Skipped " + GetTestMethodName(test));
+                var flag = this.standardTestOutput.Contains("! " + test)
+                           || this.standardTestOutput.Contains("! " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in skipped tests list.", test);
             }
         }
@@ -472,10 +492,16 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.StartInfo.RedirectStandardError = true;
                 vstestconsole.StartInfo.RedirectStandardOutput = true;
                 vstestconsole.StartInfo.CreateNoWindow = true;
+                vstestconsole.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                vstestconsole.StartInfo.StandardErrorEncoding = Encoding.UTF8;
 
                 var stdoutBuffer = new StringBuilder();
                 var stderrBuffer = new StringBuilder();
-                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                vstestconsole.OutputDataReceived += (sender, eventArgs) =>
+                {
+                    stdoutBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
+                };
+
                 vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data).Append(Environment.NewLine);
 
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);

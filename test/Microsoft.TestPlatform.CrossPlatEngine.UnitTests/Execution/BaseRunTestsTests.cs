@@ -93,7 +93,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
                 null,
-                new PlatformThread(), 
+                new PlatformThread(),
                 this.mockDataSerializer.Object);
 
             TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
@@ -584,7 +584,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             const string package = @"C:\Porjects\UnitTestApp3\Debug\UnitTestApp3\UnitTestApp3.build.appxrecipe";
             this.mockDataSerializer.Setup(d => d.Clone<TestCase>(It.IsAny<TestCase>()))
                 .Returns<TestCase>(t => JsonDataSerializer.Instance.Clone<TestCase>(t));
-            this.SetUpTestRunEvents(package, setupHandleTestRunComplete:false);
+            this.SetUpTestRunEvents(package, setupHandleTestRunComplete: false);
 
             // Act.
             this.runTestsInstance.RunTests();
@@ -880,7 +880,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object,
                 null,
-                new PlatformThread(), 
+                new PlatformThread(),
                 this.mockDataSerializer.Object);
 
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
@@ -978,8 +978,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     platformThread,
                     dataSerializer)
             {
+                this.testCaseEventsHandler = testCaseEventsHandler;
             }
 
+            private ITestCaseEventsHandler testCaseEventsHandler;
 
             public Action<bool> BeforeRaisingTestRunCompleteCallback { get; set; }
 
@@ -1032,6 +1034,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
             {
                 this.InvokeExecutorCallback?.Invoke(executor, executorUriExtensionTuple, runContext, frameworkHandle);
+            }
+
+            protected override void SendSessionEnd()
+            {
+                this.testCaseEventsHandler?.SendSessionEnd();
+            }
+
+            protected override void SendSessionStart()
+            {
+                this.testCaseEventsHandler?.SendSessionStart(new Dictionary<string, object> { { "TestSources", new List<string>() { "1.dll" } } });
             }
         }
 

@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces
 {
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
@@ -47,13 +48,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="settingXml">
         /// Run settings for test run.
         /// </param>
+        /// <param name="sources">
+        /// Test run sources
+        /// </param>
         /// <param name="runEventsHandler">
         /// Test message event handler for handling messages.
         /// </param>
         /// <returns>
         /// BeforeTestRunStartResult containing environment variables
         /// </returns>
-        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler runEventsHandler);
+        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, IEnumerable<string> sources, ITestMessageEventHandler runEventsHandler);
 
         /// <summary>
         /// Sends the AfterTestRunStart event and waits for result

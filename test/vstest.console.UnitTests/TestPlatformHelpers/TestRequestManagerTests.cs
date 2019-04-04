@@ -876,6 +876,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, this.protocolConfig);
 
+            mockRunEventsRegistrar.Verify(lw => lw.LogWarning("Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 \"compatibility mode\"."), Times.Once);
             mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStart(), Times.Once);
             mockTestPlatformEventSource.Verify(mt => mt.ExecutionRequestStop(), Times.Once);
         }

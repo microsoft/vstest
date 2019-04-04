@@ -5,11 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
@@ -25,6 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IDataCollectionSink inProcDataCollectionSink;
 
+        private string defaultCodeBase;
+
         /// <summary>
         /// Loaded in-proc datacollectors collection
         /// </summary>
@@ -39,10 +41,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="testEventsPublisher">
         /// The data collection test case event manager.
         /// </param>
-        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher)
+        /// <param name="defaultCodeBase">
+        /// The default codebase to be used by inproc data collector
+        /// </param>
+        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
+            this.defaultCodeBase = defaultCodeBase;
 
             // Initialize InProcDataCollectors
             this.InitializeInProcDataCollectors(runSettings);
@@ -74,13 +80,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns>
         /// The <see cref="IInProcDataCollector"/>.
         /// </returns>
-        protected virtual IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
+        protected virtual IInProcDataCollector CreateDataCollector(string assemblyQualifiedName, string codebase, XmlElement configuration, TypeInfo interfaceTypeInfo)
         {
             var inProcDataCollector = new InProcDataCollector(
-                dataCollectorSettings.CodeBase,
-                dataCollectorSettings.AssemblyQualifiedName,
+                codebase,
+                assemblyQualifiedName,
                 interfaceTypeInfo,
-                dataCollectorSettings.Configuration.OuterXml);
+                configuration?.OuterXml);
 
             inProcDataCollector.LoadDataCollector(this.inProcDataCollectionSink);
 
@@ -98,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         private void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
         {
-            TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs();
+            TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs(this.GetSessionStartProperties(e));
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
 
@@ -172,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void InitializeInProcDataCollectors(string runSettings)
         {
             try
-            {
+            { 
                 // Check if runsettings contains in-proc datacollector element
                 var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(runSettings);
                 var inProcDataCollectionSettingsPresentInRunSettings = inProcDataCollectionRunSettings?.IsCollectionEnabled ?? false;
@@ -189,7 +195,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
                     foreach (var inProcDc in this.inProcDataCollectorSettingsCollection)
                     {
-                        var inProcDataCollector = this.CreateDataCollector(inProcDc, interfaceTypeInfo);
+                        var codeBase = this.GetCodebase(inProcDc.CodeBase);
+                        var assemblyQualifiedName = inProcDc.AssemblyQualifiedName;
+                        var configuration = inProcDc.Configuration;
+                        var inProcDataCollector = this.CreateDataCollector(assemblyQualifiedName, codeBase, configuration, interfaceTypeInfo);
                         this.InProcDataCollectors[inProcDataCollector.AssemblyQualifiedName] = inProcDataCollector;
                     }
                 }
@@ -202,6 +211,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 this.IsInProcDataCollectionEnabled = this.InProcDataCollectors.Any();
             }
+        }
+
+        /// <summary>
+        /// Gets codebase for inproc datacollector
+        /// Uses default codebase if given path is not absolute path of inproc datacollector
+        /// </summary>
+        /// <param name="codeBase">The run Settings.</param>
+        /// <returns> Codebase </returns>
+        private string GetCodebase(string codeBase)
+        {
+            return Path.IsPathRooted(codeBase) ? codeBase : Path.Combine(this.defaultCodeBase, codeBase);
+        }
+
+        private IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
+        {
+            var properties = new Dictionary<string, object>();
+            properties.Add(Constants.TestSourcesPropertyName, sessionStartEventArgs.GetPropertyValue<IEnumerable<string>>(Constants.TestSourcesPropertyName));
+            return properties;
         }
 
         private void TriggerInProcDataCollectionMethods(string methodName, InProcDataCollectionArgs methodArg)
@@ -263,5 +290,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The test case end method name.
         /// </summary>
         public const string TestCaseEndMethodName = "TestCaseEnd";
+
+        /// <summary>
+        /// Test sources property name
+        /// </summary>
+        public const string TestSourcesPropertyName = "TestSources";
     }
 }

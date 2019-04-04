@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -15,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -131,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 var requestSender = new TestRequestSender(requestData.ProtocolConfig, hostManager.GetTestHostConnectionInfo());
 
-                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings))
+                return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestData, requestSender, hostManager, new ProxyDataCollectionManager(requestData, testRunCriteria.TestRunSettings, GetSourcesFromTestRunCriteria(testRunCriteria)))
                                                 : new ProxyExecutionManager(requestData, requestSender, hostManager);
             };
 
@@ -304,6 +306,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                                                    : new NoOpMetricsCollection(),
                            IsTelemetryOptedIn = isTelemetryOptedIn
                        };
+        }
+
+        /// <summary>
+        /// Gets test sources from test run criteria
+        /// </summary>
+        /// <returns>test sources</returns>
+        private IEnumerable<string> GetSourcesFromTestRunCriteria(TestRunCriteria testRunCriteria)
+        {
+            return testRunCriteria.HasSpecificTests ? TestSourcesUtility.GetSources(testRunCriteria.Tests) : testRunCriteria.Sources;
         }
     }
 }
