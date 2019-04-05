@@ -146,6 +146,53 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             CollectionAssert.AreEqual(tests, receivedTests.ToList());
         }
 
+        [TestMethod]
+        public void SendSessionStartShouldCallSessionStartWithCorrectTestSources()
+        {
+            var tests = new List<TestCase>
+            {
+                new TestCase("A.C.M1", new Uri("e://d"), "s.dll")
+            };
+            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+
+            this.runTestsInstance = new TestableRunTestsWithTests(
+                tests,
+                null,
+                testExecutionContext,
+                mockTestCaseEventsHandler.Object,
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
+
+            this.runTestsInstance.CallSendSessionStart();
+
+            mockTestCaseEventsHandler.Verify(x => x.SendSessionStart(It.Is<IDictionary<String, object>>(
+                y => y.ContainsKey("TestSources")
+                && ((IEnumerable<string>)y["TestSources"]).Contains("s.dll")
+            )));
+        }
+
+        [TestMethod]
+        public void SendSessionEndShouldCallSessionEnd()
+        {
+            var tests = new List<TestCase>
+            {
+                new TestCase("A.C.M1", new Uri("e://d"), "s.dll")
+            };
+            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+
+            this.runTestsInstance = new TestableRunTestsWithTests(
+                tests,
+                null,
+                testExecutionContext,
+                mockTestCaseEventsHandler.Object,
+                this.mockTestRunEventsHandler.Object,
+                this.mockRequestData.Object);
+
+            this.runTestsInstance.CallSendSessionEnd();
+
+            mockTestCaseEventsHandler.Verify(x => x.SendSessionEnd());
+        }
+
         #region Testable Implemetations
 
         private class TestableRunTestsWithTests : RunTestsWithTests
@@ -176,6 +223,16 @@ requestData, testCases, null, runSettings, testExecutionContext,
                 Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
             {
                 this.InvokeExecutor(executor, executorUriExtensionTuple, runContext, frameworkHandle);
+            }
+
+            public void CallSendSessionStart()
+            {
+                this.SendSessionStart();
+            }
+
+            public void CallSendSessionEnd()
+            {
+                this.SendSessionEnd();
             }
         }
 

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -19,6 +20,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// Initializes proxy datacollection manager.
         /// </summary>
         void Initialize();
+
+        /// <summary>
+        /// The settings xml
+        /// </summary>
+        string SettingsXml { get; }
+
+        /// <summary>
+        /// List of test sources
+        /// </summary>
+        IEnumerable<string> Sources { get; }
 
         /// <summary>
         /// Invoked before starting of test run

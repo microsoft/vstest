@@ -5,10 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// Registers the discovery and test run events for designmode flow
@@ -59,6 +56,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         {
             // Directly send the data to translation layer instead of deserializing it here
             this.designModeClient.SendRawMessage(rawMessage);
+        }
+        
+        public void LogWarning(string message)
+        {
+            this.designModeClient.SendTestMessage(TestMessageLevel.Warning, message);
         }
     }
 }

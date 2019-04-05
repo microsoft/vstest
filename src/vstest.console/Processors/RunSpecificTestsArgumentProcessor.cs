@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -317,6 +318,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             public DiscoveryEventsRegistrar(EventHandler<DiscoveredTestsEventArgs> discoveredTestsHandler)
             {
                 this.discoveredTestsHandler = discoveredTestsHandler;
+            }
+
+            public void LogWarning(string message)
+            {
+                ConsoleLogger.RaiseTestRunWarning(message);
             }
 
             public void RegisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)

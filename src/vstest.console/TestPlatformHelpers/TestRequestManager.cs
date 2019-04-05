@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -144,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             var requestData = this.GetRequestData(protocolConfig);
-            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, discoveryPayload.Sources?.ToList(), discoveryEventsRegistrar, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -220,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Get sources to auto detect fx and arch for both run selected or run all scenario.
             var sources = GetSources(testRunRequestPayload);
 
-            if (this.UpdateRunSettingsIfRequired(runsettings, sources, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, sources, testRunEventsRegistrar, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -346,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, List<string> sources, IBaseTestEventsRegistrar registrar, out string updatedRunSettingsXml)
         {
             bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
@@ -361,104 +360,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 {
                     var document = new XmlDocument();
                     document.Load(reader);
-
                     var navigator = document.CreateNavigator();
-
-                    // Automatically detect frameworks and platforms from sources and return true if any incompatibility
-                    var isFrameworkIncompatible = inferHelper.TryGetAutoDetectCompatibleFramework(sources, sourceFrameworks, out var inferredFramework);
-                    var isPlatformIncompatible = inferHelper.TryGetAutoDetectCompatibleArchitecture(sources, sourcePlatforms, out var inferredPlatform);
-                    
-                    // Throw exception if conflicts found in framework/platform
-                    if (isFrameworkIncompatible || isPlatformIncompatible)
-                    {
-                        throw new TestPlatformException(Resources.ConflictInFrameworkPlatform);
-                    }
-
-                    // Update framework and platform if required. For commandline scenario update happens in ArgumentProcessor.
-                    Framework chosenFramework;
-                    bool updateFramework = IsAutoFrameworkUpdateRequired(navigator, out chosenFramework);
-                    Architecture chosenPlatform;
-                    bool updatePlatform = IsAutoPlatformUpdateRequired(navigator, out chosenPlatform);
-
-                    // Update framework and platform
-                    if (updateFramework)
-                    {
-                        InferRunSettingsHelper.UpdateTargetFramework(document, inferredFramework?.ToString(), overwrite: true);
-                        chosenFramework = inferredFramework;
-                        settingsUpdated = true;
-                    }
-
-                    if (updatePlatform)
-                    {
-                        InferRunSettingsHelper.UpdateTargetPlatform(document, inferredPlatform.ToString(), overwrite: true);
-                        chosenPlatform = inferredPlatform;
-                        settingsUpdated = true;
-                    }
-
-                    // Get compatible sources and construct warning messages if any incompatibilty found
-                    var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
-
-                    // isSettingIncompatible wil be true if run needs to be aborted due to incompatibility in source and target frameworks
-                    var isSettingIncompatible = InferRunSettingsHelper.IsFrameworkIncompatible(sourceFrameworks.Values.Distinct(), chosenFramework, false);
-
-                    if (!string.IsNullOrEmpty(incompatibleSettingWarning))
-                    {
-                        EqtTrace.Info(incompatibleSettingWarning);
-                        if(isSettingIncompatible)
-                        {
-                            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.TestRunAborted, incompatibleSettingWarning));
-                        }
-                        // If run does not need to abort, raise warning messages
-                        ConsoleLogger.RaiseTestRunWarning(incompatibleSettingWarning);
-                    }
-
-                    if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
-                    {
-                        EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
-                        ConsoleLogger.RaiseTestRunWarning(Resources.Framework35NotSupported);
-                    }
-
-                    if (EqtTrace.IsInfoEnabled)
-                    {
-                        EqtTrace.Info("Compatible sources list : ");
-                        EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
-                    }
-
-                    // If user is already setting DesignMode via runsettings or CLI args; we skip.
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+                    var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
 
-                    if (!runConfiguration.DesignModeSet)
-                    {
-                        InferRunSettingsHelper.UpdateDesignMode(document, this.commandLineOptions.IsDesignMode);
-                        settingsUpdated = true;
-                    }
-
-                    if (!runConfiguration.CollectSourceInformationSet)
-                    {
-                        InferRunSettingsHelper.UpdateCollectSourceInformation(document, this.commandLineOptions.ShouldCollectSourceInformation);
-                        settingsUpdated = true;
-                    }
-
-                    if (InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml))
-                    {
-                        InferRunSettingsHelper.UpdateTargetDevice(document, deviceXml);
-                        settingsUpdated = true;
-                    }
-
-                    var designMode = runConfiguration.DesignModeSet ?
-                        runConfiguration.DesignMode :
-                        this.commandLineOptions.IsDesignMode;
-
-                    // Add or update console logger.
-                    if (!designMode)
-                    {
-                        AddOrUpdateConsoleLogger(document, runsettingsXml);
-                        settingsUpdated = true;
-                    }
-                    else
-                    {
-                        settingsUpdated = UpdateConsoleLoggerIfExists(document, runsettingsXml) || settingsUpdated;
-                    }
+                    settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
+                    settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
+                    this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
+                    settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
+                    settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
+                    settingsUpdated |= this.UpdateTargetDevice(navigator, document, runConfiguration);
+                    settingsUpdated |= this.AddOrUpdateConsoleLogger(document, runConfiguration, loggerRunSettings);
 
                     updatedRunSettingsXml = navigator.OuterXml;
                 }
@@ -467,27 +379,122 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return settingsUpdated;
         }
 
-        /// <summary>
-        /// Add or update console logger in runsettings.
-        /// </summary>
-        /// <param name="document">Runsettings document.</param>
-        /// <param name="runsettingsXml">Runsettings xml.</param>
-        private void AddOrUpdateConsoleLogger(XmlDocument document, string runsettingsXml)
+        private bool AddOrUpdateConsoleLogger(XmlDocument document, RunConfiguration runConfiguration, LoggerRunSettings loggerRunSettings)
         {
-            var consoleLoggerUpdated = UpdateConsoleLoggerIfExists(document, runsettingsXml);
+            // Update console logger settings
+            bool consoleLoggerUpdated = this.UpdateConsoleLoggerIfExists(document, loggerRunSettings);
 
-            if (!consoleLoggerUpdated)
+            // In case of CLI, add console logger if not already present.
+            bool designMode = runConfiguration.DesignModeSet ? runConfiguration.DesignMode : this.commandLineOptions.IsDesignMode;
+            if (!designMode && !consoleLoggerUpdated)
             {
-                AddConsoleLogger(document, runsettingsXml);
+                this.AddConsoleLogger(document, loggerRunSettings);
             }
+
+            // Update is required 1) in case of CLI 2) in case of design mode if console logger is present in runsettings.
+            return !designMode || consoleLoggerUpdated;
+        }
+
+        private bool UpdateTargetDevice(XPathNavigator navigator, XmlDocument document, RunConfiguration runConfiguration)
+        {
+            bool updateRequired = InferRunSettingsHelper.TryGetDeviceXml(navigator, out string deviceXml);
+            if (updateRequired)
+            {
+                InferRunSettingsHelper.UpdateTargetDevice(document, deviceXml);
+            }
+            return updateRequired;
+        }
+
+        private bool UpdateCollectSourceInformation(XmlDocument document, RunConfiguration runConfiguration)
+        {
+            bool updateRequired = !runConfiguration.CollectSourceInformationSet;
+            if (updateRequired)
+            {
+                InferRunSettingsHelper.UpdateCollectSourceInformation(document, this.commandLineOptions.ShouldCollectSourceInformation);
+            }
+            return updateRequired;
+        }
+
+        private bool UpdateDesignMode(XmlDocument document, RunConfiguration runConfiguration)
+        {
+            // If user is already setting DesignMode via runsettings or CLI args; we skip.
+            bool updateRequired = !runConfiguration.DesignModeSet;
+            if (updateRequired)
+            {
+                InferRunSettingsHelper.UpdateDesignMode(document, this.commandLineOptions.IsDesignMode);
+            }
+            return updateRequired;
+        }
+
+        private void CheckSourcesForCompatibility(Framework chosenFramework, Architecture chosenPlatform, IDictionary<string, Architecture> sourcePlatforms, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar)
+        {
+            // Find compatible sources
+            var compatibleSources = InferRunSettingsHelper.FilterCompatibleSources(chosenPlatform, chosenFramework, sourcePlatforms, sourceFrameworks, out var incompatibleSettingWarning);
+
+            // Raise warnings for incompatible sources
+            if (!string.IsNullOrEmpty(incompatibleSettingWarning))
+            {
+                EqtTrace.Warning(incompatibleSettingWarning);
+                registrar.LogWarning(incompatibleSettingWarning);
+            }
+
+            // Log compatible sources
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Compatible sources list : ");
+                EqtTrace.Info(string.Join("\n", compatibleSources.ToArray()));
+            }
+        }
+
+        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture chosenPlatform)
+        {
+            // Get platform from sources
+            var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+
+            // Get platform from runsettings
+            bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
+
+            // Update platform if required. For commandline scenario update happens in ArgumentProcessor.
+            if (updatePlatform)
+            {
+                InferRunSettingsHelper.UpdateTargetPlatform(document, inferedPlatform.ToString(), overwrite: true);
+                chosenPlatform = inferedPlatform;
+            }
+
+            return updatePlatform;
+        }
+
+        private bool UpdateFramework(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Framework> sourceFrameworks, IBaseTestEventsRegistrar registrar, out Framework chosenFramework)
+        {
+            // Get framework from sources
+            var inferedFramework = inferHelper.AutoDetectFramework(sources, sourceFrameworks);
+
+            // Get framework from runsettings.
+            bool updateFramework = IsAutoFrameworkDetectRequired(navigator, out chosenFramework);
+
+            // Update framework if required. For commandline scenario update happens in ArgumentProcessor.
+            if (updateFramework)
+            {
+                InferRunSettingsHelper.UpdateTargetFramework(document, inferedFramework?.ToString(), overwrite: true);
+                chosenFramework = inferedFramework;
+            }
+
+            // Raise warnings for unsupported frameworks.
+            if (Constants.DotNetFramework35.Equals(chosenFramework.Name))
+            {
+                EqtTrace.Warning("TestRequestManager.UpdateRunSettingsIfRequired: throw warning on /Framework:Framework35 option.");
+                registrar.LogWarning(Resources.Framework35NotSupported);
+            }
+
+            return updateFramework;
         }
 
         /// <summary>
         /// Add console logger in runsettings.
         /// </summary>
         /// <param name="document">Runsettings document.</param>
-        /// <param name="runsettingsXml">Runsettings xml.</param>
-        private void AddConsoleLogger(XmlDocument document, string runsettingsXml)
+        /// <param name="loggerRunSettings">Logger run settings.</param>
+        private void AddConsoleLogger(XmlDocument document, LoggerRunSettings loggerRunSettings)
         {
             var consoleLogger = new LoggerSettings
             {
@@ -498,7 +505,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 IsEnabled = true
             };
 
-            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
             loggerRunSettings.LoggerSettingsList.Add(consoleLogger);
             RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(document, Constants.LoggerRunSettingsName, loggerRunSettings.ToXml().InnerXml);
         }
@@ -507,9 +513,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// Add console logger in runsettings if exists.
         /// </summary>
         /// <param name="document">Runsettings document.</param>
-        /// <param name="runsettingsXml">Runsettings xml.</param>
+        /// <param name="loggerRunSettings">Logger run settings.</param>
         /// <returns>True if updated console logger in runsettings successfully.</returns>
-        private bool UpdateConsoleLoggerIfExists(XmlDocument document, string runsettingsXml)
+        private bool UpdateConsoleLoggerIfExists(XmlDocument document, LoggerRunSettings loggerRunSettings)
         {
             var defaultConsoleLogger = new LoggerSettings
             {
@@ -517,7 +523,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 Uri = new Uri(ConsoleLogger.ExtensionUri)
             };
 
-            var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
             var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(defaultConsoleLogger);
 
             // Update assemblyQualifiedName and codeBase of existing logger.
@@ -575,7 +580,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool IsAutoFrameworkUpdateRequired(XPathNavigator navigator, out Framework chosenFramework)
+        private bool IsAutoFrameworkDetectRequired(XPathNavigator navigator, out Framework chosenFramework)
         {
             bool required = true;
             chosenFramework = null;
@@ -598,7 +603,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return required;
         }
 
-        private bool IsAutoPlatformUpdateRequired(XPathNavigator navigator, out Architecture chosenPlatform)
+        private bool IsAutoPlatformDetectRequired(XPathNavigator navigator, out Architecture chosenPlatform)
         {
             bool required = true;
             chosenPlatform = Architecture.Default;

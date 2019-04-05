@@ -12,10 +12,6 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup>
-    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-  </PropertyGroup>
-
   <!--
      Generate config file for test project targeting .NET Framework. This config file has binding redirect which is needed at time of running tests.
      Added below two lines because msbuild has following check:
