@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PEReaderHelper"/> class.
+        /// Initializes a new instance of the <see cref="AssemblyProperties"/> class.
         /// </summary>
         /// <param name="fileHelper">File helper.</param>
         public AssemblyProperties(IFileHelper fileHelper)
