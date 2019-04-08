@@ -98,6 +98,15 @@ namespace Microsoft.TestPlatform.Build.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: Update the test project template and add reference to Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector to collect xplat code coverage.
+        /// </summary>
+        internal static string UpdateTemplateForCollectingXPlatCodeCoverage {
+            get {
+                return ResourceManager.GetString("UpdateTemplateForCollectingXPlatCodeCoverage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning: Update the Microsoft.NET.Test.Sdk package reference to version 15.8.0 or later to collect code coverage..
         /// </summary>
         internal static string UpdateTestSdkForCollectingCodeCoverage {

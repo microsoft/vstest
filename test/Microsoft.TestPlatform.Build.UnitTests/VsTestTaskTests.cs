@@ -247,6 +247,19 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
+        public void CreateArgumentShouldAddXPlatCodeCoverageDataCollectorDirectoryPathAsTestAdapterForCodeCoverageCollect()
+        {
+            const string xplatDataCollectorDirectoryPath = @"c:\path\to\xplat datacollector";
+            this.vsTestTask.VSTestXPlatDataCollectorDirectoryPath = xplatDataCollectorDirectoryPath;
+            this.vsTestTask.VSTestCollect = new string[] { "xplat code coverage" };
+
+            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+
+            const string expectedArg = "--testAdapterPath:\"c:\\path\\to\\xplat datacollector\"";
+            CollectionAssert.Contains(allArguments, expectedArg, $"Expected argument: '''{expectedArg}''' not present in [{string.Join(", ", allArguments)}]");
+        }
+
+        [TestMethod]
         public void CreateArgumentShouldNotAddTraceCollectorDirectoryPathAsTestAdapterForNonCodeCoverageCollect()
         {
             const string traceDataCollectorDirectoryPath = @"c:\path\to\tracedata collector";
@@ -274,6 +287,18 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
         [TestMethod]
         public void CreateArgumentShouldNotAddTestAdapterPathIfVSTestTraceDataCollectorDirectoryPathIsEmpty()
+        {
+            this.vsTestTask.VSTestXPlatDataCollectorDirectoryPath = string.Empty;
+            this.vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
+            this.vsTestTask.VSTestCollect = new string[] { "xplat code coverage" };
+
+            var allArguments = this.vsTestTask.CreateArgument().ToArray();
+
+            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--testAdapterPath:")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldNotAddTestAdapterPathIfVSTestXPlatDataCollectorDirectoryPathIsEmpty()
         {
             this.vsTestTask.VSTestTraceDataCollectorDirectoryPath = string.Empty;
             this.vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
