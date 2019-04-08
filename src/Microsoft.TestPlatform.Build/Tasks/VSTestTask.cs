@@ -165,7 +165,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         private List<string> AddArgs()
         {
-            var isConsoleLoggerEnabled = true;
+            var isConsoleLoggerSpecifiedByUser = false;
             var isCollectCodeCoverageEnabled = false;
             var isRunSettingsEnabled = false;
             var allArgs = new List<string>();
@@ -210,7 +210,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
                     if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
                     {
-                        isConsoleLoggerEnabled = false;
+                        isConsoleLoggerSpecifiedByUser = true;
                     }
                 }
             }
@@ -241,7 +241,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
 
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && isConsoleLoggerEnabled)
+            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
             {
                 var normalTestLogging = new List<string>() {"n", "normal", "d", "detailed", "diag", "diagnostic"};
                 var quietTestLogging = new List<string>() {"q", "quiet"};
