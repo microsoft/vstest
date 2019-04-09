@@ -172,8 +172,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
         private List<string> AddArgs()
         {
             var isConsoleLoggerEnabled = true;
-            var isCollectCodeCoverageEnabled = false;
-            var isXPlatCollectCodeCoverageEnabled = false;
             var isRunSettingsEnabled = false;
             var allArgs = new List<string>();
 
@@ -275,15 +273,32 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach (var arg in this.VSTestCollect)
                 {
-                    isCollectCodeCoverageEnabled = arg.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase);
-                    isXPlatCollectCodeCoverageEnabled = arg.Equals("XPlat Code Coverage", StringComparison.OrdinalIgnoreCase);
+                    // Note:
+                    // Pass CodeCoverageDataCollector path to vstest.console as TestAdapterPath if --collect "Code Coverage" or --collect "XPlat Code Coverage"
+                    // or --settings (User can enable code coverage from runsettings) option given.
+                    // Not parsing the runsettings for two reason:
+                    //    1. To keep no knowledge of runsettings structure in VSTestTask.
+                    //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
+                    // This is required due to currently code coverage datacollector doesn't ship with dotnet sdk.
+                    if (arg.Equals("Code Coverage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.AddTestAdapterPathToArgs(this.VSTestTraceDataCollectorDirectoryPath, allArgs, true, Resources.UpdateTestSdkForCollectingCodeCoverage);
+                    }
+                    else if(arg.Equals("XPlat code Coverage", StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.AddTestAdapterPathToArgs(this.VSTestXPlatDataCollectorDirectoryPath, allArgs, true, Resources.UpdateTemplateForCollectingXPlatCodeCoverage);
+                    }
 
                     allArgs.Add("--collect:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
             }
 
-            this.AddCodeCoveragePathInTestAdapter(isCollectCodeCoverageEnabled, isRunSettingsEnabled, this.VSTestTraceDataCollectorDirectoryPath, allArgs, Resources.UpdateTestSdkForCollectingCodeCoverage);
-            this.AddCodeCoveragePathInTestAdapter(isXPlatCollectCodeCoverageEnabled, isRunSettingsEnabled, this.VSTestXPlatDataCollectorDirectoryPath, allArgs, Resources.UpdateTemplateForCollectingXPlatCodeCoverage);
+            // Pass CodeCoverageDataCollector path to vstest.console if --settings (User can enable code coverage from runsettings) option given.
+            if (isRunSettingsEnabled)
+            {
+                this.AddTestAdapterPathToArgs(this.VSTestTraceDataCollectorDirectoryPath, allArgs, false, string.Empty);
+                this.AddTestAdapterPathToArgs(this.VSTestXPlatDataCollectorDirectoryPath, allArgs, false, string.Empty);
+            }
 
             if (!string.IsNullOrWhiteSpace(this.VSTestNoLogo))
             {
@@ -294,29 +309,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
         }
 
         /// <summary>
-        /// Adds code coverage path in test adapter.
+        /// Adds TestAdapterPath To Args.
         /// </summary>
-        /// <param name="isCollectCodeCoverageEnabled"></param>
-        /// <param name="isRunSettingsEnabled"></param>
         /// <param name="adapterPath"></param>
         /// <param name="allArgs"></param>
+        /// <param name="isCollectCodeCoverageEnabled"></param>
         /// <param name="warningMessage"></param>
-        private void AddCodeCoveragePathInTestAdapter(bool isCollectCodeCoverageEnabled, bool isRunSettingsEnabled, string adapterPath, List<string> allArgs, string warningMessage)
+        private void AddTestAdapterPathToArgs(string adapterPath, List<string> allArgs, bool isCollectCodeCoverageEnabled, string warningMessage)
         {
-            // Note:
-            // Pass CodeCoverageDataCollector path to vstest.console as TestAdapterPath if --collect "Code Coverage" or --collect "XPlat Code Coverage"
-            // or --settings (User can enable code coverage from runsettings) option given.
-            // Not parsing the runsettings for two reason:
-            //    1. To keep no knowledge of runsettings structure in VSTestTask.
-            //    2. Impact of adding adapter path always is minimal. (worst case: loads additional data collector assembly in datacollector process.)
-            // This is required due to currently code coverage datacollector doesn't ship with dotnet sdk.
-
-            // Don't add code coverage in test adapter path if nither runsetting is mentioned, nor collect code coverage is mentioned.
-            if (!isCollectCodeCoverageEnabled && !isRunSettingsEnabled)
-            {
-                return;
-            }
-
             // Add code coverage path in test adapter path.
             if (!string.IsNullOrEmpty(adapterPath))
             {
