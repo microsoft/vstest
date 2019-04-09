@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.Build.Tasks
@@ -171,7 +171,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         private List<string> AddArgs()
         {
-            var isConsoleLoggerEnabled = true;
+            var isConsoleLoggerSpecifiedByUser = false;
             var isRunSettingsEnabled = false;
             var allArgs = new List<string>();
 
@@ -215,7 +215,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
                     if (arg.StartsWith("console", StringComparison.OrdinalIgnoreCase))
                     {
-                        isConsoleLoggerEnabled = false;
+                        isConsoleLoggerSpecifiedByUser = true;
                     }
                 }
             }
@@ -246,7 +246,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
 
             // Console logger was not specified by user, but verbosity was, hence add default console logger with verbosity as specified
-            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && isConsoleLoggerEnabled)
+            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) && !isConsoleLoggerSpecifiedByUser)
             {
                 var normalTestLogging = new List<string>() {"n", "normal", "d", "detailed", "diag", "diagnostic"};
                 var quietTestLogging = new List<string>() {"q", "quiet"};
