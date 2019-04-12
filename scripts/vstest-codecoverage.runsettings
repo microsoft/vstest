@@ -25,7 +25,7 @@
             </ModulePaths>
 
             <!-- We recommend you do not change the following values: -->
-            <UseVerifiableInstrumentation>True</UseVerifiableInstrumentation>
+            <UseVerifiableInstrumentation>False</UseVerifiableInstrumentation>
             <AllowLowIntegrityProcesses>True</AllowLowIntegrityProcesses>
             <CollectFromChildProcesses>True</CollectFromChildProcesses>
             <CollectAspDotNet>False</CollectAspDotNet>

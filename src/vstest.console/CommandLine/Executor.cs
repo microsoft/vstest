@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             this.testPlatformEventSource.VsTestConsoleStart();
 
-            // If User specifies --nologo via dotnet, donot print splat screen
+            // If User specifies --nologo via dotnet, donot print splash screen
             if (args != null && args.Length !=0 && args.Contains("--nologo"))
             {
                 // Sanitizing this list, as I don't think we should write Argument processor for this.
