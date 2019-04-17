@@ -388,6 +388,16 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestPlatformExtensionsShouldAddDataCollectorsExtensionsIfPresent()
+        {
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string> { "abc.datacollector.dll" });
+
+            Assert.AreEqual(1, extensions.Count());
+        }
+
+        [TestMethod]
         public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
         {
             var expectedArgs = "exec \"" + this.defaultTestHostPath + "\" --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";

@@ -225,7 +225,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
 
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterEndsWithPattern, TestPlatformConstants.TestLoggerEndsWithPattern, TestPlatformConstants.RunTimeEndsWithPattern));
+                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, 
+                        TestPlatformConstants.TestAdapterEndsWithPattern,
+                        TestPlatformConstants.TestLoggerEndsWithPattern,
+                        TestPlatformConstants.DataCollectorEndsWithPattern,
+                        TestPlatformConstants.RunTimeEndsWithPattern));
+
                     if (extensionAssemblies.Count > 0)
                     {
                         this.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);

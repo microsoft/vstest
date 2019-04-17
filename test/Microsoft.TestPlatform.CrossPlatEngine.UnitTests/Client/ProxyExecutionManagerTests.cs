@@ -275,6 +275,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartTestRunShouldInitializeExtensionsWithExistingExtensionsOnly()
         {
+            TestPluginCache.Instance = null;
             TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
             var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" };
 
@@ -299,7 +300,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Verify(s => s.InitializeExecution(expectedOutputPaths), Times.Once);
         }
 
-    [TestMethod]
+        [TestMethod]
+        public void StartTestRunShouldInitializeExtensionsWithExistingDataCOllectorExtensions()
+        {
+            TestPluginCache.Instance = null;
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "def.TestAdapter.dll", "xyz.TestAdapter.dll", "abc.DataCollector.dll" }, false);
+            var expectedOutputPaths = new[] { "abc.TestAdapter.dll", "xyz.TestAdapter.dll", "abc.DataCollector.dll" };
+
+            this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(true);
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns((IEnumerable<string> sources, IEnumerable<string> extensions) =>
+            {
+                return extensions.Select(extension => { return Path.GetFileName(extension); });
+            });
+
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns((string extensionPath) =>
+            {
+                return !extensionPath.Contains("def.TestAdapter.dll");
+            });
+
+            this.mockFileHelper.Setup(fh => fh.Exists("abc.TestAdapter.dll")).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.Exists("xyz.TestAdapter.dll")).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.Exists("abc.DataCollector.dll")).Returns(true);
+
+            var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            this.mockRequestSender.Verify(s => s.InitializeExecution(expectedOutputPaths), Times.Once);
+        }
+
+        [TestMethod]
         public void SetupChannelShouldThrowExceptionIfClientConnectionTimeout()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);

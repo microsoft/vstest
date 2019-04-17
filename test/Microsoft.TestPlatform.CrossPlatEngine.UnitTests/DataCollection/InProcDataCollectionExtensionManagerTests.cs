@@ -8,11 +8,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Linq;
     using System.Reflection;
     using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -37,11 +39,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<ITestEventsPublisher> mockTestEventsPublisher;
         private TestableInProcDataCollectionExtensionManager inProcDataCollectionManager;
         private string defaultCodebase = "E:\\repos\\MSTest\\src\\managed\\TestPlatform\\TestImpactListener.Tests\\bin\\Debug";
+        private Mock<IFileHelper> mockFileHelper;
 
-        public InProcDataCollectionExtensionManagerTests()
+        [TestInitialize]
+        public void TestInit()
         {
             this.mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+            this.mockFileHelper = new Mock<IFileHelper>();
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            TestPluginCache.Instance = null;
         }
 
         [TestMethod]
@@ -58,7 +69,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
-        public void InProcDataCollectionExtensionManagerLoadsDataCollectorFromDefaultCodebaseIfCodebaseIsRelative()
+        public void InProcDataCollectionExtensionManagerLoadsDataCollectorFromDefaultCodebaseIfExistsAndCodebaseIsRelative()
         {
             string settingsXml = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
@@ -71,10 +82,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+
+            this.mockFileHelper.Setup(fh => fh.Exists(@"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll")).Returns(true);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
             Assert.AreEqual(codebase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll");
+        }
+
+        [TestMethod]
+        public void InProcDataCollectionExtensionManagerLoadsDataCollectorFromTestPluginCacheIfExistsAndCodebaseIsRelative()
+        {
+            string settingsXml = @"<RunSettings>
+                                    <InProcDataCollectionRunSettings>
+                                        <InProcDataCollectors>
+                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='TestImpactListenerDataCollector.dll'>
+                                                <Configuration>
+                                                    <Port>4312</Port>
+                                                </Configuration>
+                                            </InProcDataCollector>
+                                        </InProcDataCollectors>
+                                    </InProcDataCollectionRunSettings>
+                                </RunSettings>";
+
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { @"E:\source\.nuget\TestImpactListenerDataCollector.dll" }, true);
+            this.mockFileHelper.Setup(fh => fh.Exists(@"E:\source\.nuget\TestImpactListenerDataCollector.dll")).Returns(true);
+
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
+
+            var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
+            Assert.AreEqual(codebase, @"E:\source\.nuget\TestImpactListenerDataCollector.dll");
         }
 
         [TestMethod]
@@ -91,7 +128,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
             Assert.AreEqual(codebase, "\\\\DummyPath\\TestImpactListener.Tests.dll");
@@ -117,7 +154,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
             bool secondOne = false;
             MockDataCollector dataCollector1 = null;
             MockDataCollector dataCollector2 = null;
@@ -234,7 +271,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase) : base(runSettings, mockTestEventsPublisher, defaultCodebase)
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, IFileHelper fileHelper) 
+                : base(runSettings, mockTestEventsPublisher, defaultCodebase, fileHelper)
             {
             }
 
