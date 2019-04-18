@@ -219,7 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             // Initialize inproc data collectors if declared in run settings.
             if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {
-                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase);
+                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher, defaultCodeBase, TestPluginCache.Instance);
             }
         }
 

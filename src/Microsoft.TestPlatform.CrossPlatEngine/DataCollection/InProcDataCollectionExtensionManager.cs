@@ -9,12 +9,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Linq;
     using System.Reflection;
     using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// The in process data collection extension manager.
@@ -25,7 +28,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IDataCollectionSink inProcDataCollectionSink;
 
+        private const string DataCollectorEndsWithPattern = @"Collector.dll";
+
         private string defaultCodeBase;
+
+        private List<string> codeBasePaths;
+
+        private IFileHelper fileHelper;
 
         /// <summary>
         /// Loaded in-proc datacollectors collection
@@ -44,11 +53,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="defaultCodeBase">
         /// The default codebase to be used by inproc data collector
         /// </param>
-        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
+        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache)
+            : this(runSettings, testEventsPublisher, defaultCodeBase, testPluginCache, new FileHelper())
+        {}
+
+        protected InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache, IFileHelper fileHelper)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
             this.defaultCodeBase = defaultCodeBase;
+            this.fileHelper = fileHelper;
+            this.codeBasePaths = new List<string> { this.defaultCodeBase };
+
+            // Get Datacollector codebase paths from test plugin cache
+            var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
+            foreach (var extensionPath in extensionPaths)
+            {
+                this.codeBasePaths.Add(Path.GetDirectoryName(extensionPath));
+            }
 
             // Initialize InProcDataCollectors
             this.InitializeInProcDataCollectors(runSettings);
@@ -215,13 +237,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         /// <summary>
         /// Gets codebase for inproc datacollector
-        /// Uses default codebase if given path is not absolute path of inproc datacollector
+        /// Uses all codebasePaths to check where the datacollector exists
         /// </summary>
-        /// <param name="codeBase">The run Settings.</param>
+        /// <param name="codeBase">The codebase.</param>
         /// <returns> Codebase </returns>
         private string GetCodebase(string codeBase)
         {
-            return Path.IsPathRooted(codeBase) ? codeBase : Path.Combine(this.defaultCodeBase, codeBase);
+            if (!Path.IsPathRooted(codeBase))
+            {
+                foreach (var extensionPath in this.codeBasePaths)
+                {
+                    var assemblyPath = Path.Combine(extensionPath, codeBase);
+                    if (this.fileHelper.Exists(assemblyPath))
+                    {
+                        return assemblyPath;
+                    }
+                }
+            }
+
+            return codeBase;
         }
 
         private IDictionary<string, object> GetSessionStartProperties(SessionStartEventArgs sessionStartEventArgs)
