@@ -53,11 +53,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="defaultCodeBase">
         /// The default codebase to be used by inproc data collector
         /// </param>
-        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase)
-            : this(runSettings, testEventsPublisher, defaultCodeBase, new FileHelper())
+        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache)
+            : this(runSettings, testEventsPublisher, defaultCodeBase, testPluginCache, new FileHelper())
         {}
 
-        protected InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, IFileHelper fileHelper)
+        protected InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher, string defaultCodeBase, TestPluginCache testPluginCache, IFileHelper fileHelper)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.codeBasePaths = new List<string> { this.defaultCodeBase };
 
             // Get Datacollector codebase paths from test plugin cache
-            var extensionPaths = TestPluginCache.Instance.GetExtensionPaths(DataCollectorEndsWithPattern);
+            var extensionPaths = testPluginCache.GetExtensionPaths(DataCollectorEndsWithPattern);
             foreach (var extensionPath in extensionPaths)
             {
                 this.codeBasePaths.Add(Path.GetDirectoryName(extensionPath));
@@ -247,10 +247,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 foreach (var extensionPath in this.codeBasePaths)
                 {
-                    var path = Path.Combine(extensionPath, codeBase);
-                    if (this.fileHelper.Exists(path))
+                    var assemblyPath = Path.Combine(extensionPath, codeBase);
+                    if (this.fileHelper.Exists(assemblyPath))
                     {
-                        return path;
+                        return assemblyPath;
                     }
                 }
             }

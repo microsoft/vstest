@@ -40,19 +40,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private TestableInProcDataCollectionExtensionManager inProcDataCollectionManager;
         private string defaultCodebase = "E:\\repos\\MSTest\\src\\managed\\TestPlatform\\TestImpactListener.Tests\\bin\\Debug";
         private Mock<IFileHelper> mockFileHelper;
+        private TestPluginCache testPluginCache;
 
         [TestInitialize]
         public void TestInit()
         {
             this.mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
             this.mockFileHelper = new Mock<IFileHelper>();
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            TestPluginCache.Instance = null;
+            this.testPluginCache = TestPluginCache.Instance;
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
         }
 
         [TestMethod]
@@ -84,7 +80,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                 </RunSettings>";
 
             this.mockFileHelper.Setup(fh => fh.Exists(@"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll")).Returns(true);
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
             Assert.AreEqual(codebase, @"E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll");
@@ -105,10 +101,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            TestPluginCache.Instance.UpdateExtensions(new List<string> { @"E:\source\.nuget\TestImpactListenerDataCollector.dll" }, true);
+            this.testPluginCache.UpdateExtensions(new List<string> { @"E:\source\.nuget\TestImpactListenerDataCollector.dll" }, true);
             this.mockFileHelper.Setup(fh => fh.Exists(@"E:\source\.nuget\TestImpactListenerDataCollector.dll")).Returns(true);
 
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
             Assert.AreEqual(codebase, @"E:\source\.nuget\TestImpactListenerDataCollector.dll");
@@ -128,7 +124,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
 
             var codebase = (inProcDataCollectionManager.InProcDataCollectors.Values.First() as MockDataCollector).CodeBase;
             Assert.AreEqual(codebase, "\\\\DummyPath\\TestImpactListener.Tests.dll");
@@ -154,7 +150,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.mockFileHelper.Object);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache, this.mockFileHelper.Object);
             bool secondOne = false;
             MockDataCollector dataCollector1 = null;
             MockDataCollector dataCollector2 = null;
@@ -196,7 +192,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase);
+            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, this.mockTestEventsPublisher.Object, this.defaultCodebase, this.testPluginCache);
             Assert.IsFalse(manager.IsInProcDataCollectionEnabled, "InProcDataCollection must be disabled on invalid settings.");
         }
         [TestMethod]
@@ -271,8 +267,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, IFileHelper fileHelper) 
-                : base(runSettings, mockTestEventsPublisher, defaultCodebase, fileHelper)
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher, string defaultCodebase, TestPluginCache testPluginCache, IFileHelper fileHelper) 
+                : base(runSettings, mockTestEventsPublisher, defaultCodebase, testPluginCache, fileHelper)
             {
             }
 
