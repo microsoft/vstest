@@ -4,9 +4,7 @@ The Visual Studio Test Platform is an open and extensible test platform that ena
 The Test Platform currently ships as part Visual Studio 2017, and in the .NET Core Tools Preview 3.
 
 ### Build status
-|            |Debug |Release |
-|:----------:|:----------------:|:------------------:|
-|**master**  |[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Windows_NT_Debug)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Debug/)|[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Windows_NT_Release)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Windows_NT_Release/)|
+[![Build Status](https://dev.azure.com/vstestplatform/TestPlatform/_apis/build/status/TestPlatform.CI?branchName=master)](https://dev.azure.com/vstestplatform/TestPlatform/_build/latest?definitionId=9&branchName=master)
 
 ### Contributing
 There are many ways to contribute to VSTest
@@ -56,4 +54,4 @@ VSTest platform is licensed under the [MIT license](https://github.com/Microsoft
 Please see [issue tracking](https://github.com/Microsoft/vstest-docs/blob/master/issuetracking.md) for a description of the workflow we use to process issues.
 
 ### Roadmap
-For information on shipped and upcoming features please refer to our [Releases Roadmap](https://github.com/Microsoft/vstest-docs/blob/master/docs/releases.md).
+For information on shipped and upcoming features please refer to our [Releases](https://github.com/Microsoft/vstest-docs/blob/master/docs/releases.md) and [Quarterly Checkin reports](https://github.com/Microsoft/vstest-docs/tree/master/Quarterly%20Checkins)
