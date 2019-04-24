@@ -19,7 +19,7 @@
     <file src="ThirdPartyNotices.txt" target="" />
     
     <!-- Intellitrace -->
-    <file src="Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\extension.vsixmanifest"	target="tools\net451\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\extension.vsixmanifest" />
+    <!-- <file src="Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\extension.vsixmanifest"	target="tools\net451\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\extension.vsixmanifest" /> -->
     <file src="Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe"	target="tools\net451\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe" />
     <file src="Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe.config"	target="tools\net451\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.exe.config" />
     <file src="Intellitrace\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.frontend.pkgdef"	target="tools\net451\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace\IntelliTrace.frontend.pkgdef" />
