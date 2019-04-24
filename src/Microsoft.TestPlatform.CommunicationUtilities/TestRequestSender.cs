@@ -320,6 +320,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void SendTestRunCancel()
         {
+            if (this.IsOperationComplete())
+            {
+                EqtTrace.Verbose("TestRequestSender: SendTestRunCancel: Operation is already complete. Skip error message.");
+                return;
+            }
+
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.SendTestRunCancel: Sending test run cancel.");
@@ -331,6 +337,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void SendTestRunAbort()
         {
+            if (this.IsOperationComplete())
+            {
+                EqtTrace.Verbose("TestRequestSender: SendTestRunAbort: Operation is already complete. Skip error message.");
+                return;
+            }
+
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("TestRequestSender.SendTestRunAbort: Sending test run abort.");

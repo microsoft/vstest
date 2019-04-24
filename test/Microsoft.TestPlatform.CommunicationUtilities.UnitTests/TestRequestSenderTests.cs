@@ -178,6 +178,30 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataSerializer.Verify(ds => ds.SerializeMessage(MessageType.SessionEnd), Times.Once);
         }
 
+        [TestMethod]
+        public void EndSessionShouldNotSendTestRunCancelMessageIfClientDisconnected()
+        {
+            this.SetupFakeCommunicationChannel();
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
+            this.RaiseClientDisconnectedEvent();
+
+            this.testRequestSender.SendTestRunCancel();
+
+            this.mockChannel.Verify(mockChannel => mockChannel.Send(MessageType.CancelTestRun), Times.Never);
+        }
+
+        [TestMethod]
+        public void EndSessionShouldNotSendTestRunAbortMessageIfClientDisconnected()
+        {
+            this.SetupFakeCommunicationChannel();
+            this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
+            this.RaiseClientDisconnectedEvent();
+
+            this.testRequestSender.SendTestRunAbort();
+
+            this.mockChannel.Verify(mockChannel => mockChannel.Send(MessageType.CancelTestRun), Times.Never);
+        }
+
         [DataTestMethod]
         [DataRow("")]
         [DataRow(" ")]
