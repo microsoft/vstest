@@ -424,7 +424,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </param>
         private void AddRunLevelInformationalMessage(string message)
         {
-            this.runLevelStdOut.Append(message);
+            this.runLevelStdOut.AppendLine(message);
         }
 
         // Handle the skipped test result
