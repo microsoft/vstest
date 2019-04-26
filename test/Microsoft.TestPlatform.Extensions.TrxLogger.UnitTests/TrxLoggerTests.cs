@@ -109,11 +109,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestMessageHandlerShouldAddMessageWhenItIsInformation()
         {
-            string message = "The information to test";
+            string message = "First message";
+            string message2 = "Second message";
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
             this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            Assert.IsTrue(this.testableTrxLogger.GetRunLevelInformationalMessage().Contains(message));
+            TestRunMessageEventArgs trme2 = new TestRunMessageEventArgs(TestMessageLevel.Informational, message2);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme2);
+
+            string expectedMessage = message + Environment.NewLine + message2 + Environment.NewLine;
+            Assert.AreEqual(expectedMessage, this.testableTrxLogger.GetRunLevelInformationalMessage());
         }
 
         [TestMethod]
@@ -234,7 +239,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             string expectedMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
 
-            Assert.AreEqual(String.Compare(this.testableTrxLogger.GetRunLevelInformationalMessage(), expectedMessage, true), 0);
+            Assert.AreEqual(expectedMessage + Environment.NewLine, this.testableTrxLogger.GetRunLevelInformationalMessage());
         }
 
         [TestMethod]
