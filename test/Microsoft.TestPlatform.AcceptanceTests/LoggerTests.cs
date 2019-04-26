@@ -8,7 +8,6 @@ using System.Xml;
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.Linq;
 
     [TestClass]
     public class LoggerTests : AcceptanceTestBase
@@ -21,7 +20,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
-            var trxFileNamePattern = "TestResults*.trx";
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             this.InvokeVsTest(arguments);
 
@@ -30,7 +28,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);
 
-            var trxLogFilePath = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "TestResults"), trxFileNamePattern).First();
+            var trxLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults",  trxFileName);
             Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
         }
 
@@ -42,7 +40,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
             var trxFileName = "TestResults.trx";
-            var trxFileNamePattern = "TestResults*.trx";
             arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFileName{trxFileName}\"");
             this.InvokeVsTest(arguments);
 
@@ -51,7 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);
 
-            var trxLogFilePath = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "TestResults"), trxFileNamePattern).First();
+            var trxLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", trxFileName);
             Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
         }
 
