@@ -7,7 +7,7 @@
     <License>License.rtf</License>
     <PackageId>Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI</PackageId>
   </Metadata>
-  <Installation AllUsers="true">
+  <Installation AllUsers="true" SystemComponent="true">
     <InstallationTarget Version="[16.0,17.0)" Id="Microsoft.VisualStudio.Community" />
     <InstallationTarget Version="[16.0,17.0)" Id="Microsoft.VisualStudio.Pro" />
     <InstallationTarget Version="[16.0,17.0)" Id="Microsoft.VisualStudio.Enterprise" />
