@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -246,14 +245,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             try
             {
                 var customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
-                customTestAdaptersPaths = customTestAdaptersPaths.Concat(payload.Sources.Select(x => Path.GetDirectoryName(x)).Distinct());
-                if (customTestAdaptersPaths != null)
+                var datacollectorSearchPaths = new List<string>();
+                foreach (var source in payload.Sources)
+                {
+                    datacollectorSearchPaths.Add(Path.GetDirectoryName(source));
+                }
+
+                datacollectorSearchPaths.AddRange(customTestAdaptersPaths);
+
+                if (datacollectorSearchPaths != null)
                 {
                     List<string> extensionAssemblies = new List<string>();
-                    foreach (var customTestAdaptersPath in customTestAdaptersPaths)
+                    foreach (var datacollectorSearchPath in datacollectorSearchPaths)
                     {
                         var adapterPath =
-                            Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
+                            Path.GetFullPath(Environment.ExpandEnvironmentVariables(datacollectorSearchPath));
                         if (!this.fileHelper.DirectoryExists(adapterPath))
                         {
                             EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
