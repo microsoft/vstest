@@ -100,6 +100,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.Utility
         }
 
         [TestMethod]
+        public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnIsSameAsTestName()
+        {
+            var expectedClassName = "TestProject1.Class1";
+            var fullyQualifiedName = expectedClassName + "." + "TestMethod1";
+            var testName = "TestProject1.Class1.TestMethod1";
+
+            ValidateTestMethodProperties(testName, fullyQualifiedName, expectedClassName);
+        }
+
+        [TestMethod]
         public void ToTestElementShouldContainExpectedTestMethodPropertiesIfFqnEndsWithTestName()
         {
             var expectedClassName = "TestProject1.Class1";

@@ -606,7 +606,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
             // In case, fullyQualifiedName ends with testName, className is checked within remaining value of fullyQualifiedName.
             // Example: In case, testName = TestMethod1(2, 3, 4.0d) and fullyQualifiedName = TestProject1.Class1.TestMethod1(2, 3, 4.0d), className will be checked within 'TestProject1.Class1.' only
-            var nameToCheck = fullyQualifiedName.EndsWith(testName) ?
+            var nameToCheck = !fullyQualifiedName.Equals(testName, StringComparison.OrdinalIgnoreCase) && fullyQualifiedName.EndsWith(testName) ?
                 fullyQualifiedName.Substring(0, fullyQualifiedName.Length - testName.Length) :
                 fullyQualifiedName;
 
