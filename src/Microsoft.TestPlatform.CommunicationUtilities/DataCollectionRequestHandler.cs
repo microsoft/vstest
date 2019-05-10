@@ -245,7 +245,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         {
             try
             {
-                IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
+                var customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
                 customTestAdaptersPaths = customTestAdaptersPaths.Concat(payload.Sources.Select(x => Path.GetDirectoryName(x)).Distinct());
                 if (customTestAdaptersPaths != null)
                 {
