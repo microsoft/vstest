@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
@@ -48,6 +49,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
         private IDataSerializer dataSerializer;
 
+        private IFileHelper fileHelper;
+
         /// <summary>
         /// Use to cancel data collection test case events monitoring if test run is cancelled.
         /// </summary>
@@ -65,7 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 messageSink,
                 DataCollectionManager.Create(messageSink),
                 new DataCollectionTestCaseEventHandler(),
-                JsonDataSerializer.Instance)
+                JsonDataSerializer.Instance,
+                new FileHelper())
         {
             this.messageSink = messageSink;
         }
@@ -88,12 +92,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="dataSerializer">
         /// Serializer for serialization and deserialization of the messages.
         /// </param>
+        /// <param name="fileHelper">
+        /// File Helper
+        /// </param>
         protected DataCollectionRequestHandler(
             ICommunicationManager communicationManager,
             IMessageSink messageSink,
             IDataCollectionManager dataCollectionManager,
             IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler,
-            IDataSerializer dataSerializer)
+            IDataSerializer dataSerializer,
+            IFileHelper fileHelper)
         {
             this.communicationManager = communicationManager;
             this.messageSink = messageSink;
@@ -101,6 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             this.dataSerializer = dataSerializer;
             this.dataCollectionTestCaseEventHandler = dataCollectionTestCaseEventHandler;
             this.cancellationTokenSource = new CancellationTokenSource();
+            this.fileHelper = fileHelper;
         }
 
         /// <summary>
@@ -137,7 +146,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             messageSink,
                             DataCollectionManager.Create(messageSink),
                             new DataCollectionTestCaseEventHandler(),
-                            JsonDataSerializer.Instance);
+                            JsonDataSerializer.Instance,
+                            new FileHelper());
                     }
                 }
             }
@@ -228,31 +238,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <summary>
         /// Update the test adapter paths provided through run settings to be used by the test plugin cache.
         /// </summary>
-        /// <param name="runSettings">
-        /// The run Settings.
+        /// <param name="payload">
+        /// The before test run start payload
         /// </param>
-        private void AddExtensionAssemblies(string runSettings)
+        private void AddExtensionAssemblies(BeforeTestRunStartPayload payload)
         {
             try
             {
-                IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
+                IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
+                customTestAdaptersPaths = customTestAdaptersPaths.Concat(payload.Sources.Select(x => Path.GetDirectoryName(x)).Distinct());
                 if (customTestAdaptersPaths != null)
                 {
-                    var fileHelper = new FileHelper();
-
                     List<string> extensionAssemblies = new List<string>();
                     foreach (var customTestAdaptersPath in customTestAdaptersPaths)
                     {
                         var adapterPath =
                             Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
-                        if (!fileHelper.DirectoryExists(adapterPath))
+                        if (!this.fileHelper.DirectoryExists(adapterPath))
                         {
                             EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
                             continue;
                         }
 
                         extensionAssemblies.AddRange(
-                            fileHelper.EnumerateFiles(
+                            this.fileHelper.EnumerateFiles(
                                 adapterPath,
                                 SearchOption.AllDirectories,
                                 TestPlatformConstants.DataCollectorEndsWithPattern));
@@ -278,7 +287,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         {
             // Initialize datacollectors and get enviornment variables.
             var payload = this.dataSerializer.DeserializePayload<BeforeTestRunStartPayload>(message);
-            this.AddExtensionAssemblies(payload.SettingsXml);
+            this.AddExtensionAssemblies(payload);
 
             var envVariables = this.dataCollectionManager.InitializeDataCollectors(payload.SettingsXml);
 

@@ -4,16 +4,16 @@
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Net;
 
     using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -21,6 +21,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -39,6 +40,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private Mock<IDataCollectionTestCaseEventHandler> mockDataCollectionTestCaseEventHandler;
         private TestableDataCollectionRequestHandler requestHandler;
         private Mock<IDataSerializer> mockDataSerializer;
+        private Mock<IFileHelper> mockFileHelper;
         private Message afterTestRunEnd = new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" };
         private Message beforeTestRunStart = new Message()
         {
@@ -54,7 +56,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockDataCollectionTestCaseEventHandler = new Mock<IDataCollectionTestCaseEventHandler>();
             this.mockDataCollectionTestCaseEventHandler.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object, this.mockDataSerializer.Object);
+            this.mockFileHelper = new Mock<IFileHelper>();
+            this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object, this.mockDataSerializer.Object, this.mockFileHelper.Object);
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart).Returns(this.afterTestRunEnd);
 
@@ -224,6 +227,33 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionManager.Verify(x => x.Dispose());
+        }
+
+        [TestMethod]
+        public void ProcessRequestsShouldAddSourceDirectoryToTestPluginCache()
+        {
+            var testHostLaunchedPayload = new TestHostLaunchedPayload();
+            testHostLaunchedPayload.ProcessId = 1234;
+
+            string runSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n</RunSettings>";
+
+            this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart)
+                                                                                .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
+                                                                                .Returns(this.afterTestRunEnd);
+
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
+            this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<TestHostLaunchedPayload>(It.Is<Message>(y => y.MessageType == MessageType.TestHostLaunched)))
+                                   .Returns(testHostLaunchedPayload);
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = runSettings, Sources = new List<string> { @"E:\dir1\test1.dll", @"E:\dir2\test2.dll" } };
+            this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+                                   .Returns(beforeTestRunSTartPayload);
+            this.mockFileHelper.Setup(x => x.DirectoryExists(@"E:\dir1")).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), SearchOption.AllDirectories, @"Collector.dll")).Returns(new List<string> { @"E:\dir1\abc.datacollector.dll" });
+
+            this.requestHandler.ProcessRequests();
+
+            Assert.IsTrue(TestPluginCache.Instance.GetExtensionPaths(@"Collector.dll").Contains(@"E:\dir1\abc.datacollector.dll"));
         }
 
         [TestMethod]
