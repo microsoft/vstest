@@ -16,6 +16,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -235,7 +236,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var testHostLaunchedPayload = new TestHostLaunchedPayload();
             testHostLaunchedPayload.ProcessId = 1234;
 
-            string runSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n</RunSettings>";
+            string runSettings = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(this.beforeTestRunStart)
                                                                                 .Returns(new Message() { MessageType = MessageType.TestHostLaunched, Payload = JToken.FromObject(testHostLaunchedPayload) })
@@ -245,14 +246,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionManager.Setup(x => x.TestHostLaunched(It.IsAny<int>()));
             this.mockDataSerializer.Setup(x => x.DeserializePayload<TestHostLaunchedPayload>(It.Is<Message>(y => y.MessageType == MessageType.TestHostLaunched)))
                                    .Returns(testHostLaunchedPayload);
-            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = runSettings, Sources = new List<string> { @"E:\dir1\test1.dll", @"E:\dir2\test2.dll" } };
+            var beforeTestRunSTartPayload = new BeforeTestRunStartPayload { SettingsXml = runSettings, Sources = new List<string> { @"E:\dir1\test1.dll", @"E:\dir2\test2.dll", @"E:\dir1\test2.dll" } };
             this.mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
                                    .Returns(beforeTestRunSTartPayload);
             this.mockFileHelper.Setup(x => x.DirectoryExists(@"E:\dir1")).Returns(true);
-            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), SearchOption.AllDirectories, @"Collector.dll")).Returns(new List<string> { @"E:\dir1\abc.datacollector.dll" });
+            this.mockFileHelper.Setup(x => x.EnumerateFiles("E:\\dir1", SearchOption.AllDirectories, @"Collector.dll")).Returns(new List<string> { @"E:\dir1\abc.datacollector.dll" });
 
             this.requestHandler.ProcessRequests();
 
+            this.mockFileHelper.Verify(x => x.EnumerateFiles("E:\\dir1", SearchOption.AllDirectories, @"Collector.dll"), Times.Once);
             Assert.IsTrue(TestPluginCache.Instance.GetExtensionPaths(@"Collector.dll").Contains(@"E:\dir1\abc.datacollector.dll"));
         }
 

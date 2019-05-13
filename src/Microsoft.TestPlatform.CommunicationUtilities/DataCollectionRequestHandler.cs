@@ -245,38 +245,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             try
             {
                 var customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(payload.SettingsXml);
-                var datacollectorSearchPaths = new List<string>();
+
+                // In case of dotnet vstest with code coverage, data collector needs to be picked up from publish folder.
+                // Therefore, adding source dll folders to search datacollectors in these.
+                var datacollectorSearchPaths = new HashSet<string>();
                 foreach (var source in payload.Sources)
                 {
                     datacollectorSearchPaths.Add(Path.GetDirectoryName(source));
                 }
 
-                datacollectorSearchPaths.AddRange(customTestAdaptersPaths);
-
-                if (datacollectorSearchPaths != null)
+                if (customTestAdaptersPaths != null)
                 {
-                    List<string> extensionAssemblies = new List<string>();
-                    foreach (var datacollectorSearchPath in datacollectorSearchPaths)
-                    {
-                        var adapterPath =
-                            Path.GetFullPath(Environment.ExpandEnvironmentVariables(datacollectorSearchPath));
-                        if (!this.fileHelper.DirectoryExists(adapterPath))
-                        {
-                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
-                            continue;
-                        }
+                    datacollectorSearchPaths.UnionWith(customTestAdaptersPaths);
+                }
 
-                        extensionAssemblies.AddRange(
-                            this.fileHelper.EnumerateFiles(
-                                adapterPath,
-                                SearchOption.AllDirectories,
-                                TestPlatformConstants.DataCollectorEndsWithPattern));
+                List<string> extensionAssemblies = new List<string>();
+                foreach (var datacollectorSearchPath in datacollectorSearchPaths)
+                {
+                    var adapterPath =
+                        Path.GetFullPath(Environment.ExpandEnvironmentVariables(datacollectorSearchPath));
+                    if (!this.fileHelper.DirectoryExists(adapterPath))
+                    {
+                        EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        continue;
                     }
 
-                    if (extensionAssemblies.Count > 0)
-                    {
-                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
-                    }
+                    extensionAssemblies.AddRange(
+                        this.fileHelper.EnumerateFiles(
+                            adapterPath,
+                            SearchOption.AllDirectories,
+                            TestPlatformConstants.DataCollectorEndsWithPattern));
+                }
+
+                if (extensionAssemblies.Count > 0)
+                {
+                    TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, skipExtensionFilters: false);
                 }
             }
             catch (Exception e)
