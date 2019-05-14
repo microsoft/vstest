@@ -16,22 +16,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Launch procdump process
         /// </summary>
-        /// <param name="processId">
-        /// Process ID of test host
+        /// <param name="procDumpConfig">
+        /// Configurations for proc dump
         /// </param>
-        /// <param name="dumpFileGuid">
-        /// Guid as postfix for dump file, testhost.exe_&lt;guid&gt;.dmp
-        /// </param>
-        /// <param name="testResultsDirectory">
-        /// Path to TestResults directory
-        /// </param>
-        /// <param name="includeFirstChanceExceptions">
-        /// Indicates whether proc dump should be configured to capture dumps on first chance exceptions.
-        /// </param>
-        /// <param name="isFullDump">
-        /// Is full dump enabled
-        /// </param>
-        void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool includeFirstChanceExceptions, bool isFullDump = false);
+        void StartProcessDump(ProcDumpConfig procDumpConfig);
 
         /// <summary>
         /// Terminate the proc dump process

@@ -321,7 +321,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true, false));
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == true && y.IsFullDump == false)));
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true, true));
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == true && y.IsFullDump == true)));
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true, true));
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == true && y.IsFullDump == true)));
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var tpex = new TestPlatformException("env var exception");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true, false))
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == true && y.IsFullDump == false)))
                                        .Throws(tpex);
 
             // Raise TestHostLaunched
@@ -494,14 +494,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var ex = new Exception("start process failed");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true, false))
+            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == true && y.IsFullDump == false)))
                                        .Throws(ex);
 
             // Raise TestHostLaunched
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify
-            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, ex.ToString()))), Times.Once);
+            this.mockLogger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.Is<string>(str => str == string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, ex.Message))), Times.Once);
         }
 
         [TestCleanup]

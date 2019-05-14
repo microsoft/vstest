@@ -284,7 +284,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.includeFirstChanceExceptions, this.processFullDumpEnabled);
+                this.processDumpUtility.StartProcessDump(
+                    new ProcDumpConfig(
+                        args.TestHostProcessId,
+                        this.attachmentGuid,
+                        this.GetResultsDirectory(),
+                        this.includeFirstChanceExceptions,
+                        this.processFullDumpEnabled));
             }
             catch (TestPlatformException e)
             {
@@ -302,7 +308,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     EqtTrace.Warning("BlameCollector.TestHostLaunched_Handler: Could not start process dump. {0}", e);
                 }
 
-                this.logger.LogWarning(args.Context, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.ProcDumpCouldNotStart, e.ToString()));
+                this.logger.LogWarning(args.Context, string.Format(Resources.Resources.ProcDumpCouldNotStart, e.Message));
             }
         }
 

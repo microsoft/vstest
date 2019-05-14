@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private IFileHelper fileHelper;
         private IEnvironment environment;
         private Process procDumpProcess;
-        private string testResultsDirectory;
+        private string dumpFileSaveLocation;
         private string dumpFileName;
         private INativeMethodsHelper nativeMethodsHelper;
 
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.processHelper.WaitForProcessExit(this.procDumpProcess);
 
             // Dump files can never be more than 1 because procdump will generate single file, but GetFiles function returns an array
-            var dumpFiles = this.fileHelper.GetFiles(this.testResultsDirectory, this.dumpFileName + "*", SearchOption.TopDirectoryOnly);
+            var dumpFiles = this.fileHelper.GetFiles(this.dumpFileSaveLocation, this.dumpFileName + "*", SearchOption.TopDirectoryOnly);
             if (dumpFiles.Length > 0)
             {
                 // Log to diagnostics if multiple files just in case
@@ -81,15 +81,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool includeFirstChanceExceptions, bool isFullDump = false)
+        public void StartProcessDump(ProcDumpConfig procDumpConfig)
         {
-            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
-            this.testResultsDirectory = testResultsDirectory;
+            this.dumpFileName = $"{this.processHelper.GetProcessName(procDumpConfig.ProcessId)}_{procDumpConfig.ProcessId}_{procDumpConfig.DumpFileGuid}";
+            this.dumpFileSaveLocation = procDumpConfig.DumpFileSaveLocation;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
-                                            this.GetProcDumpExecutable(processId),
-                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName, includeFirstChanceExceptions, isFullDump),
-                                            testResultsDirectory,
+                                            this.GetProcDumpExecutable(procDumpConfig.ProcessId),
+                                            this.BuildProcDumpArgs(procDumpConfig),
+                                            procDumpConfig.DumpFileSaveLocation,
                                             null,
                                             null,
                                             null) as Process;
@@ -112,20 +112,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Arguments for procdump.exe
         /// </summary>
-        /// <param name="processId">
-        /// Process Id
+        /// <param name="procDumpConfig">
+        /// Configurations related to proc dump
         /// </param>
-        /// <param name="filename">
-        /// Filename for dump file
-        /// </param>
-        /// <param name="includeFirstChanceExceptions">
-        /// Indicates whether proc dump should be configured to capture dumps on first chance exceptions.
-        /// </param>
-        /// <param name="isFullDump">
-        /// Is full dump enabled
-        /// </param>
-        /// <returns>Arguments</returns>
-        private static string BuildProcDumpArgs(int processId, string filename, bool includeFirstChanceExceptions, bool isFullDump = false)
+        /// <returns>arg string for proc dump</returns>
+        private string BuildProcDumpArgs(ProcDumpConfig procDumpConfig)
         {
             // -accepteula: Auto accept end-user license agreement
             // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
@@ -135,12 +126,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -f: Filter the exceptions.
             StringBuilder procDumpArgument = new StringBuilder("-accepteula -g -t -e");
 
-            if (includeFirstChanceExceptions)
+            if (procDumpConfig.IncludeFirstChanceExceptions)
             {
                 procDumpArgument.Append(" 1");
             }
 
-            if (isFullDump)
+            if (procDumpConfig.IsFullDump)
             {
                 procDumpArgument.Append(" -ma");
             }
@@ -150,7 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 procDumpArgument.Append($" -f {exceptionFilter}");
             }
 
-            procDumpArgument.Append($" {processId} {filename}.dmp");
+            procDumpArgument.Append($" {procDumpConfig.ProcessId} {this.dumpFileName}.dmp");
             var argument = procDumpArgument.ToString();
 
             if (EqtTrace.IsInfoEnabled)
