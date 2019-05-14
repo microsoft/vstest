@@ -70,6 +70,6 @@ jobs:
   variables:
       buildConfiguration: 'Release'
   steps:
-  - script: ./build.sh -DotNetBuildFromSource -DotNetCoreSdkDir /src/Tools/dotnetcli/ -c Release -r centos.7-x64 -v 15.9.0 -vs preview-20180807-05
+  - script: ./build.sh -DotNetBuildFromSource -c Release
     displayName: './build.sh -c $(buildConfiguration)'
    
