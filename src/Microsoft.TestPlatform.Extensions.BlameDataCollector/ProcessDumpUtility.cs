@@ -81,14 +81,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false)
+        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool includeFirstChanceExceptions, bool isFullDump = false)
         {
             this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
             this.testResultsDirectory = testResultsDirectory;
 
             this.procDumpProcess = this.processHelper.LaunchProcess(
                                             this.GetProcDumpExecutable(processId),
-                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName, isFullDump),
+                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName, includeFirstChanceExceptions, isFullDump),
                                             testResultsDirectory,
                                             null,
                                             null,
@@ -118,11 +118,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="filename">
         /// Filename for dump file
         /// </param>
+        /// <param name="includeFirstChanceExceptions">
+        /// Indicates whether proc dump should be configured to capture dumps on first chance exceptions.
+        /// </param>
         /// <param name="isFullDump">
         /// Is full dump enabled
         /// </param>
         /// <returns>Arguments</returns>
-        private static string BuildProcDumpArgs(int processId, string filename, bool isFullDump = false)
+        private static string BuildProcDumpArgs(int processId, string filename, bool includeFirstChanceExceptions, bool isFullDump = false)
         {
             // -accepteula: Auto accept end-user license agreement
             // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
@@ -130,18 +133,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             // -t: Write a dump when the process terminates.
             // -ma: Full dump argument.
             // -f: Filter the exceptions.
-            StringBuilder procDumpArgument = new StringBuilder("-accepteula -e 1 -g -t ");
+            StringBuilder procDumpArgument = new StringBuilder("-accepteula -g -t -e");
+
+            if (includeFirstChanceExceptions)
+            {
+                procDumpArgument.Append(" 1");
+            }
+
             if (isFullDump)
             {
-                procDumpArgument.Append("-ma ");
+                procDumpArgument.Append(" -ma");
             }
 
             foreach (var exceptionFilter in ProcessDumpUtility.procDumpExceptionsList)
             {
-                procDumpArgument.Append($"-f {exceptionFilter} ");
+                procDumpArgument.Append($" -f {exceptionFilter}");
             }
 
-            procDumpArgument.Append($"{processId} {filename}.dmp");
+            procDumpArgument.Append($" {processId} {filename}.dmp");
             var argument = procDumpArgument.ToString();
 
             if (EqtTrace.IsInfoEnabled)

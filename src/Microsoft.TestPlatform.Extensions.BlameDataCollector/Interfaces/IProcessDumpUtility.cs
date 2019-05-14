@@ -25,10 +25,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="testResultsDirectory">
         /// Path to TestResults directory
         /// </param>
+        /// <param name="includeFirstChanceExceptions">
+        /// Indicates whether proc dump should be configured to capture dumps on first chance exceptions.
+        /// </param>
         /// <param name="isFullDump">
         /// Is full dump enabled
         /// </param>
-        void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
+        void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool includeFirstChanceExceptions, bool isFullDump = false);
 
         /// <summary>
         /// Terminate the proc dump process

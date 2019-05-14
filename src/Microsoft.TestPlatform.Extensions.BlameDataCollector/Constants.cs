@@ -63,10 +63,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         public const string Procdump64Process = "procdump64.exe";
 
-        ///<summary>
+        /// <summary>
         /// Configuration key name for collect dump always
         /// </summary>
         public const string CollectDumpAlwaysKey = "CollectAlways";
+
+        /// <summary>
+        /// Configuration key name for proc dump to collect dumps on first chance exceptions
+        /// </summary>
+        public const string IncludeFirstChanceExceptionsKey = "IncludeFirstChanceExceptions";
 
         /// <summary>
         /// Configuration key name for dump type

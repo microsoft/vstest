@@ -34,6 +34,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private bool collectDumpAlways;
         private bool processFullDumpEnabled;
         private string attachmentGuid;
+        private bool includeFirstChanceExceptions = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollector"/> class.
@@ -107,6 +108,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     this.ValidateAndAddProcessDumpParameters(collectDumpNode);
                 }
+
+                var includeFirstChanceExceptions = this.configurationElement[Constants.IncludeFirstChanceExceptionsKey];
             }
 
             this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
@@ -136,6 +139,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     else
                     {
                         this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                    }
+                }
+                else if (string.Equals(attribute.Name, Constants.IncludeFirstChanceExceptionsKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.Equals(attribute.Value, "true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.includeFirstChanceExceptions = true;
+                    }
+                    else if (string.Equals(attribute.Value, "false", StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.includeFirstChanceExceptions = false;
+                    }
+                    else
+                    {
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, "true", "false"));
                     }
                 }
                 else
@@ -268,7 +286,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             try
             {
-                this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
+                this.processDumpUtility.StartProcessDump(args.TestHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.includeFirstChanceExceptions, this.processFullDumpEnabled);
             }
             catch (TestPlatformException e)
             {

@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockPlatformEnvironment.Object,
                 this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, true);
 
             var ex = Assert.ThrowsException<FileNotFoundException>(() => processDumpUtility.GetDumpFile());
             Assert.AreEqual(ex.Message, Resources.Resources.DumpFileNotGeneratedErrorMessage);
@@ -95,7 +95,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                  this.mockPlatformEnvironment.Object,
                  this.mockNativeMethodsHelper.Object);
 
-            Assert.ThrowsException<Exception>(() => processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory));
+            Assert.ThrowsException<Exception>(() => processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, true));
             Assert.AreEqual(string.Empty, processDumpUtility.GetDumpFile());
         }
 
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockPlatformEnvironment.Object,
                 this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, true);
             processDumpUtility.GetDumpFile();
 
             this.mockProcessHelper.Verify(x => x.WaitForProcessExit(It.IsAny<Process>()), Times.Once);
@@ -156,7 +156,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockPlatformEnvironment.Object,
                 this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, true);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
@@ -189,7 +189,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockPlatformEnvironment.Object,
                 this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, true, isFullDump: true);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
@@ -209,7 +209,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockPlatformEnvironment.Object,
                 this.mockNativeMethodsHelper.Object);
 
-            var ex = Assert.ThrowsException<TestPlatformException>(() => processDumpUtility.StartProcessDump(1234, "guid", "D:\\"));
+            var ex = Assert.ThrowsException<TestPlatformException>(() => processDumpUtility.StartProcessDump(1234, "guid", "D:\\", true));
             Assert.AreEqual(ex.Message, Resources.Resources.ProcDumpEnvVarEmpty);
         }
 
@@ -235,7 +235,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockPlatformEnvironment.Object,
                 this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory);
+            processDumpUtility.StartProcessDump(processId, guid, testResultsDirectory, true);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
         }
@@ -261,7 +261,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockPlatformEnvironment.Object,
             this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, "guid", "D:\\");
+            processDumpUtility.StartProcessDump(processId, "guid", "D:\\", true);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump64.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
         }
@@ -287,7 +287,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockPlatformEnvironment.Object,
             this.mockNativeMethodsHelper.Object);
 
-            processDumpUtility.StartProcessDump(processId, "guid", "D:\\");
+            processDumpUtility.StartProcessDump(processId, "guid", "D:\\", true);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
         }
