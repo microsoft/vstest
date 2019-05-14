@@ -108,8 +108,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 {
                     this.ValidateAndAddProcessDumpParameters(collectDumpNode);
                 }
-
-                var includeFirstChanceExceptions = this.configurationElement[Constants.IncludeFirstChanceExceptionsKey];
             }
 
             this.attachmentGuid = Guid.NewGuid().ToString().Replace("-", string.Empty);
