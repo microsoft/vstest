@@ -169,7 +169,6 @@ function usage()
 #
 function install_cli()
 {
-    if [[ $TP_USE_REPO_API = 0 ]]; then
         # Skip download of dotnet toolset if REPO API is enabled
         local failed=false
         local install_script="$TP_TOOLS_DIR/dotnet-install.sh"
@@ -198,7 +197,6 @@ function install_cli()
         $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/2.0.0" --version "2.0.0" --shared-runtime
         #log "install_cli: Get shared components which is compatible with dotnet cli version $DOTNET_CLI_VERSION..."
         #$install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "master" --version $DOTNET_RUNTIME_VERSION --shared-runtime
-    fi
 
     local dotnet_path=$(_get_dotnet_path)
     if [[ ! -e $dotnet_path ]]; then
