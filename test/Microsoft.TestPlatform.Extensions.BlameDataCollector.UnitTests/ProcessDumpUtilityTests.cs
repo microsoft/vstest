@@ -163,6 +163,39 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// StartProcessDump should start procdump binary with correct arguments, when first chance exception is disabled
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpWillStartProcDumpExeWithCorrectParamsWhenFirstChanceExceptionDisabled()
+        {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var filename = $"{process}_{processId}_{guid}.dmp";
+            var args = $"-accepteula -g -t -e -f STACK_OVERFLOW -f ACCESS_VIOLATION {processId} {filename}";
+            var testResultsDirectory = "D:\\TestResults";
+
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+                                  .Returns(this.mockProcDumpProcess.Object);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                                  .Returns(process);
+
+            this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
+                               .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
+
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
+
+            processDumpUtility.StartProcessDump(new ProcDumpConfig(processId, guid, testResultsDirectory, false));
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
+        }
+
+        /// <summary>
         /// StartProcessDump should start procdump binary with correct full dump arguments, while GetDumpFile returns full path
         /// </summary>
         [TestMethod]

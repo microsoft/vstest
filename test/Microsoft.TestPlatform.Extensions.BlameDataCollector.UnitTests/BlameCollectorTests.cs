@@ -325,6 +325,50 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// The trigger test host launched handler should start process dump utility with includeFirstChanceExceptions set to false if it is
+        /// present in the runsettings it is set to false
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityWithoutFirstChanceExceptionsIfOverridePresentInRunsettings()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(includeFirstChanceException: false),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify StartProcessDumpCall
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == false && y.IsFullDump == false)));
+        }
+
+        /// <summary>
+        /// The trigger test host launched handler should start process dump utility with includeFirstChanceExceptions set to true if it is
+        /// present in the runsettings it is set to true
+        /// </summary>
+        [TestMethod]
+        public void TriggerTestHostLaunchedHandlerShouldStartProcDumpUtilityWithoutFirstChanceExceptionsIfSetToTrueInRunsettings()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(includeFirstChanceException: true),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            // Raise TestHostLaunched
+            this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
+
+            // Verify StartProcessDumpCall
+            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(It.Is<ProcDumpConfig>(y => y.ProcessId == 1234 && y.IncludeFirstChanceExceptions == true && y.IsFullDump == false)));
+        }
+
+        /// <summary>
         /// The trigger test host launched handler should start process dump utility for full dump if full dump was enabled
         /// </summary>
         [TestMethod]
@@ -510,7 +554,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             File.Delete(this.filepath);
         }
 
-        private XmlElement GetDumpConfigurationElement(bool isFullDump = false, bool collectDumpOnExit = false)
+        private XmlElement GetDumpConfigurationElement(bool isFullDump = false, bool collectDumpOnExit = false, bool? includeFirstChanceException = null)
         {
             var xmldoc = new XmlDocument();
             var outernode = xmldoc.CreateElement("Configuration");
@@ -529,6 +573,21 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
                 fulldumpAttribute.Value = "true";
                 node.Attributes.Append(fulldumpAttribute);
+            }
+
+            if (includeFirstChanceException.HasValue)
+            {
+                var includeFirstChanceExceptionsAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.IncludeFirstChanceExceptionsKey);
+                if (includeFirstChanceException.Value == true)
+                {
+                    includeFirstChanceExceptionsAttribute.Value = "true";
+                }
+                else
+                {
+                    includeFirstChanceExceptionsAttribute.Value = "false";
+                }
+
+                node.Attributes.Append(includeFirstChanceExceptionsAttribute);
             }
 
             return outernode;
