@@ -219,10 +219,14 @@ function restore_package()
 	if [[ $TP_USE_REPO_API = 0 ]]; then
 		log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
 		$dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
-		if [ "$failed" = true ]; then
-			error "Failed to restore packages."
-			return 2
-		fi
+	else
+		log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj"
+		$dotnet restore $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
+	fi
+
+	if [ "$failed" = true ]; then
+		error "Failed to restore packages."
+		return 2
 	fi
 
     log "restore_package: Complete. Elapsed $(( SECONDS - start ))s."
