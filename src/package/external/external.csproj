@@ -23,7 +23,7 @@
     <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
     <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(DotNetBuildFromSource)' == '' OR  '$(DotNetBuildFromSource)' == 'false' ">
+  <ItemGroup Condition=" '$(DotNetBuildFromSource)' != 'true' ">
     <!-- This csproj restore external tools required for build process -->
     <PackageReference Include="NuGet.CommandLine">
       <Version>3.4.3</Version>
