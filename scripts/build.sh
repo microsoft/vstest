@@ -218,12 +218,18 @@ function restore_package()
     log "restore_package: Start restoring packages to $TP_PACKAGES_DIR."
     local start=$SECONDS
 
-    log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
-    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
-    if [ "$failed" = true ]; then
-        error "Failed to restore packages."
-        return 2
-    fi
+	if [[ $TP_USE_REPO_API = 0 ]]; then
+		log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
+		$dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
+	else
+		log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external_BuildFromSource.csproj"
+		$dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version  -p:DotNetBuildFromSource=true || failed=true
+	fi
+
+	if [ "$failed" = true ]; then
+		error "Failed to restore packages."
+		return 2
+	fi
 
     log "restore_package: Complete. Elapsed $(( SECONDS - start ))s."
 }
@@ -244,7 +250,7 @@ function invoke_build()
         if [[ $TP_USE_REPO_API = 0 ]]; then
             $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
         else
-            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
+            $dotnet build $TPB_Build_From_Source_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:DotNetBuildFromSource=true || failed=true
        fi
     else
         find . -name "$PROJECT_NAME_PATTERNS" | xargs -L 1 $dotnet build --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
