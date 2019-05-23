@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
+    using System.Collections.Specialized;
     using System.Diagnostics;
     using System.IO;
 
@@ -36,6 +37,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.fileHelper = fileHelper;
         }
+
+#if NET451
+
+        /// <summary>
+        /// TODO: Remove the #if when project is targeted to netstandard2.0
+        /// Environment variables to be set for the process
+        /// </summary>
+        public StringDictionary EnvironmentVariables { get; set; } = new StringDictionary();
+
+#endif
 
         /// <summary>
         /// Trace level for logs.
