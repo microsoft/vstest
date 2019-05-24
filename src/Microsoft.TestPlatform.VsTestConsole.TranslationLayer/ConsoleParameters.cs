@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
-    using System.Collections.Specialized;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
 
@@ -44,7 +44,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// TODO: Remove the #if when project is targeted to netstandard2.0
         /// Environment variables to be set for the process
         /// </summary>
-        public StringDictionary EnvironmentVariables { get; set; } = new StringDictionary();
+        public Dictionary<string, string> EnvironmentVariables { get; set; }
 
 #endif
 

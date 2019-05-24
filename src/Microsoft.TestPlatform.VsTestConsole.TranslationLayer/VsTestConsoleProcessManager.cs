@@ -108,10 +108,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
 #if NET451
-            info.EnvironmentVariables.Clear();
-            foreach (DictionaryEntry envVariable in consoleParameters.EnvironmentVariables)
+            if (consoleParameters.EnvironmentVariables != null)
             {
-                info.EnvironmentVariables.Add(envVariable.Key.ToString(), envVariable.Value.ToString());
+                info.EnvironmentVariables.Clear();
+                foreach (var envVariable in consoleParameters.EnvironmentVariables)
+                {
+                    if (envVariable.Key != null)
+                    {
+                        info.EnvironmentVariables.Add(envVariable.Key.ToString(), envVariable.Value?.ToString());
+                    }
+                }
             }
 #endif
             this.process = Process.Start(info);
