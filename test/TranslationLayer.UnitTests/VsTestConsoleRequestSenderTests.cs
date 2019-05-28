@@ -673,7 +673,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldAbortWhenProcessExited()
+        public void DiscoverTestsShouldLogErrorWhenProcessExited()
         {
             var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var sources = new List<string> { "1.dll" };
@@ -698,11 +698,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             manualEvent.WaitOne();
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
         }
 
         [TestMethod]
-        public async Task DiscoverTestsAsyncShouldAbortWhenProcessExited()
+        public async Task DiscoverTestsAsyncShouldLogErrorWhenProcessExited()
         {
             var mockHandler = new Mock<ITestDiscoveryEventsHandler2>();
             var sources = new List<string> { "1.dll" };
@@ -723,7 +722,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             await this.requestSenderAsync.DiscoverTestsAsync(sources, null, new TestPlatformOptions(), mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
         }
 
         #endregion
@@ -1840,7 +1838,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void StartTestRunShouldAbortOnProcessExited()
+        public void StartTestRunShouldLogErrorOnProcessExited()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var manualEvent = new ManualResetEvent(false);
@@ -1869,11 +1867,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             manualEvent.WaitOne();
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
         }
 
         [TestMethod]
-        public async Task StartTestRunAsyncShouldAbortOnProcessExited()
+        public async Task StartTestRunAsyncShouldLogErrorOnProcessExited()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var sources = new List<string> { "1.dll" };
@@ -1898,7 +1895,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             await this.requestSenderAsync.StartTestRunAsync(sources, null, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
         }
 
         #endregion

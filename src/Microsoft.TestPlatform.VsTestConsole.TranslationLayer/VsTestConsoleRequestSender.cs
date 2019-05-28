@@ -417,13 +417,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
-
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsDiscovery);
-
                 var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
-
-                CleanupCommunicationIfProcessExit();
             }
 
             this.testPlatformEventSource.TranslationLayerDiscoveryStop();
@@ -482,8 +478,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
-
-                CleanupCommunicationIfProcessExit();
             }
 
             this.testPlatformEventSource.TranslationLayerDiscoveryStop();
@@ -537,7 +531,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-                this.CleanupCommunicationIfProcessExit();
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
@@ -591,19 +584,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-                this.CleanupCommunicationIfProcessExit();
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
-        }
-
-        private void CleanupCommunicationIfProcessExit()
-        {
-            if (this.processExitCancellationTokenSource != null
-                && this.processExitCancellationTokenSource.IsCancellationRequested)
-            {
-                this.communicationManager.StopServer();
-            }
         }
 
         private Message TryReceiveMessage()
