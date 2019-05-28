@@ -366,9 +366,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
 
-            // Pause the progress indicator to print the message
-            this.progressIndicator?.Pause();
-
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
@@ -378,7 +375,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
 
+                        // Pause the progress indicator to print the message
+                        this.progressIndicator?.Pause();
+
                         Output.Information(AppendPrefix, e.Message);
+
+                        // Resume the progress indicator after printing the message
+                        this.progressIndicator?.Start();
+
                         break;
                     }
 
@@ -389,23 +393,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
 
+                        // Pause the progress indicator to print the message
+                        this.progressIndicator?.Pause();
+
                         Output.Warning(AppendPrefix, e.Message);
+
+                        // Resume the progress indicator after printing the message
+                        this.progressIndicator?.Start();
+
                         break;
                     }
 
                 case TestMessageLevel.Error:
                     {
+                        // Pause the progress indicator to print the message
+                        this.progressIndicator?.Pause();
+
                         this.testRunHasErrorMessages = true;
                         Output.Error(AppendPrefix, e.Message);
+
+                        // Resume the progress indicator after printing the message
+                        this.progressIndicator?.Start();
+
                         break;
                     }
                 default:
                     EqtTrace.Warning("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
-
-            // Resume the progress indicator after printing the message
-            this.progressIndicator?.Start();
         }
 
         /// <summary>
@@ -415,9 +430,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
-
-            // Pause the progress indicator before displaying test result information
-            this.progressIndicator?.Pause();
 
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
@@ -445,12 +457,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
 
+                        // Pause the progress indicator before displaying test result information
+                        this.progressIndicator?.Pause();
+
                         Output.Write(string.Format("{0}{1} ", TestResultPrefix, SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (this.verbosityLevel == Verbosity.Detailed)
                         {
                             DisplayFullInformation(e.Result);
                         }
+
+                        // Resume the progress indicator after displaying the test result information
+                        this.progressIndicator?.Start();
 
                         break;
                     }
@@ -463,9 +481,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
                         
+                        // Pause the progress indicator before displaying test result information
+                        this.progressIndicator?.Pause();
+
                         Output.Write(string.Format("{0}{1} ", TestResultPrefix, FailedTestIndicator), OutputLevel.Information, ConsoleColor.Red);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         DisplayFullInformation(e.Result);
+
+                        // Resume the progress indicator after displaying the test result information
+                        this.progressIndicator?.Start();
+
                         break;
                     }
 
@@ -474,12 +499,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         this.testsPassed++;
                         if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
+                            // Pause the progress indicator before displaying test result information
+                            this.progressIndicator?.Pause();
+
                             Output.Write(string.Format("{0}{1} ", TestResultPrefix, PassedTestIndicator), OutputLevel.Information, ConsoleColor.Green);
                             Output.WriteLine(testDisplayName, OutputLevel.Information);
                             if (this.verbosityLevel == Verbosity.Detailed)
                             {
                                 DisplayFullInformation(e.Result);
                             }
+
+                            // Resume the progress indicator after displaying the test result information
+                            this.progressIndicator?.Start();
                         }
 
                         break;
@@ -492,6 +523,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             break;
                         }
 
+                        // Pause the progress indicator before displaying test result information
+                        this.progressIndicator?.Pause();
+
                         Output.Write(string.Format("{0}{1} ", TestResultPrefix, SkippedTestIndicator), OutputLevel.Information, ConsoleColor.Yellow);
                         Output.WriteLine(testDisplayName, OutputLevel.Information);
                         if (this.verbosityLevel == Verbosity.Detailed)
@@ -499,12 +533,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             DisplayFullInformation(e.Result);
                         }
 
+                        // Resume the progress indicator after displaying the test result information
+                        this.progressIndicator?.Start();
+
                         break;
                     }
             }
-
-            // Resume the progress indicator after displaying the test result information 
-            this.progressIndicator?.Start();
         }
 
         private string GetFormattedDurationString(TimeSpan duration)
