@@ -417,13 +417,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
-
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsDiscovery);
-
                 var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
-                CleanupCommunicationIfProcessExit();
+                // Earlier we were closing the connection with vstest.console in case of exceptions
+                // Removing that code because vstest.console might be in a healthy state and letting the client
+                // know of the error, so that the TL can wait for the next instruction from the client itself.
+                // Also, connection termination might not kill the process which could result in files being locked by testhost.
             }
 
             this.testPlatformEventSource.TranslationLayerDiscoveryStop();
@@ -483,7 +484,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 var discoveryCompleteEventArgs = new DiscoveryCompleteEventArgs(-1, true);
                 eventHandler.HandleDiscoveryComplete(discoveryCompleteEventArgs, null);
 
-                CleanupCommunicationIfProcessExit();
+                // Earlier we were closing the connection with vstest.console in case of exceptions
+                // Removing that code because vstest.console might be in a healthy state and letting the client
+                // know of the error, so that the TL can wait for the next instruction from the client itself.
+                // Also, connection termination might not kill the process which could result in files being locked by testhost.
             }
 
             this.testPlatformEventSource.TranslationLayerDiscoveryStop();
@@ -537,7 +541,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-                this.CleanupCommunicationIfProcessExit();
+
+                // Earlier we were closing the connection with vstest.console in case of exceptions
+                // Removing that code because vstest.console might be in a healthy state and letting the client
+                // know of the error, so that the TL can wait for the next instruction from the client itself.
+                // Also, connection termination might not kill the process which could result in files being locked by testhost.
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
@@ -591,19 +599,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-                this.CleanupCommunicationIfProcessExit();
+
+                // Earlier we were closing the connection with vstest.console in case of exceptions
+                // Removing that code because vstest.console might be in a healthy state and letting the client
+                // know of the error, so that the TL can wait for the next instruction from the client itself.
+                // Also, connection termination might not kill the process which could result in files being locked by testhost.
             }
 
             this.testPlatformEventSource.TranslationLayerExecutionStop();
-        }
-
-        private void CleanupCommunicationIfProcessExit()
-        {
-            if (this.processExitCancellationTokenSource != null
-                && this.processExitCancellationTokenSource.IsCancellationRequested)
-            {
-                this.communicationManager.StopServer();
-            }
         }
 
         private Message TryReceiveMessage()
