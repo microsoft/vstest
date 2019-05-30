@@ -121,7 +121,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 #endif
             this.process = Process.Start(info);
-            this.process.Start();
 
             lock (syncObject)
             {
