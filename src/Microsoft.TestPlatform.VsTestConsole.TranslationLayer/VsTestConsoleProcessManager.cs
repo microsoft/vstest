@@ -107,7 +107,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
             this.process = Process.Start(info);
-            this.process.Start();
 
             lock (syncObject)
             {
