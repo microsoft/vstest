@@ -229,17 +229,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             /// </summary>
             public const string CoverletDataCollectorFriendlyName = "XPlat Code Coverage";
 
-            /// TODO : Finalize Name
             /// <summary>
             /// Coverlet inproc data collector assembly qualified name
             /// </summary>
-            public const string CoverletDataCollectorAssemblyQualifiedName = "Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector.CoverletCoverageDataCollector, Microsoft.TestPlatform.Extensions.CoverletCoverageDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+            public const string CoverletDataCollectorAssemblyQualifiedName = "Coverlet.Collector.DataCollection.CoverletInProcDataCollector, coverlet.collector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
 
-            /// TODO : Finalize codebase
             /// <summary>
             /// Coverlet inproc data collector codebase
             /// </summary>
-            public const string CoverletDataCollectorCodebase = "coverletinprocdatacollector.dll";
+            public const string CoverletDataCollectorCodebase = "coverlet.collector.dll";
         }
     }
 }
