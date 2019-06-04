@@ -82,6 +82,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.VaildateDataCollectorOutput();
         }
 
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void DataCollectorAssemblyLoadingShouldNotThrowError(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(GetAssetFullPath("TraceCollectorLoader.dll", "netcoreapp2.0"), string.Empty, string.Empty, this.FrameworkArgValue);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
         private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
         {
             var doc = new XmlDocument();
