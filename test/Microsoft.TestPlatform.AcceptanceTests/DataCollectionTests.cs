@@ -83,13 +83,24 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
-        public void DataCollectorAssemblyLoadingShouldNotThrowError(RunnerInfo runnerInfo)
+        public void DataCollectorAssemblyLoadingShouldNotThrowErrorForNetCore(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
-            var arguments = PrepareArguments(GetAssetFullPath("TraceCollectorLoader.dll", "netcoreapp2.0"), string.Empty, string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.0"), string.Empty, string.Empty, this.FrameworkArgValue);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue);
 
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);

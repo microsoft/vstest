@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 
-namespace TraceCollectorLoader
+namespace AppDomainGetAssembliesTestProject
 {
     [TestClass]
     public class UnitTest1
