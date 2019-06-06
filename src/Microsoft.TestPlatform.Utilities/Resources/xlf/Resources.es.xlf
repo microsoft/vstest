@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="1699279160">
+  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="-1816529201">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">49</count>
@@ -25,7 +25,7 @@
         <target state="translated">El archivo XML de parámetros de ejecución no contiene el nodo "RunSettings".</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ejecutar configuración XML no contiene el nodo de "RunSettings".</target>
+          <target state-qualifier="mt-suggestion">Einstellungen enthält XML nicht "RunSettings" Knoten.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">Parámetro '{0}' no válido. Se ha especificado un valor no válido ({1}) para '{2}'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">No válido establecer '{0}'. Valor no válido '{1}' especificado para '{2}'.</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung '{0}'. Ungültiger Wert '{1}' für '{2}' angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">No se encuentra el nodo 'RunSettings'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">No se pudo encontrar el nodo de 'RunSettings'.</target>
+          <target state-qualifier="mt-suggestion">'RunSettings'-Knoten konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">No se encuentra el nodo 'RunSettings'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">No se pudo encontrar el nodo de 'RunSettings'.</target>
+          <target state-qualifier="mt-suggestion">'RunSettings'-Knoten konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="1.25" curWordcount="1.25"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">Error al cargar la configuración. Error: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Se produjo un error al cargar la configuración.  Error: {0}.</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der Einstellungen.  Fehler: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">La configuración de plataforma de destino '{0}' es incompatible con la arquitectura del sistema '{1}'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Destino plataforma configuración incompatible '{0}' con la arquitectura de sistema '{1}'.</target>
+          <target state-qualifier="mt-suggestion">Inkompatible Target Platform Settings '{0}' mit Systemarchitektur '{1}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">Se ha especificado un archivo de configuración no esperado.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Archivo de configuración inesperado especificado.</target>
+          <target state-qualifier="mt-suggestion">Unerwarteter Einstellungsdatei angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>

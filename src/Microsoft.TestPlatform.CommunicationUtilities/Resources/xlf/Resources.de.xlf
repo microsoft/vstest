@@ -78,8 +78,9 @@
       </trans-unit>
       <trans-unit id="TestHostProcessCrashed">
         <source>Test host process crashed</source>
-        <target state="new">Test host process crashed</target>
-        <note></note>
+        <target state="translated">Der Testhostprozess ist abgestürzt.</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

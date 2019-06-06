@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx" build-num="1754111598">
+  <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx" build-num="-1247456046">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">178</count>
@@ -25,7 +25,7 @@
         <target state="translated">Raccolta dei dati: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Messaggio di adattatore dati di diagnostica: {0}</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter Meldung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">Messaggio '{0}' dell'agente di raccolta dati: {1}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Messaggio ('{0}') adattatore dati di diagnostica: {1}.</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter ('{0}') Meldung: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">L'URI dell'estensione di test '{0}' è duplicato. L'estensione duplicata verrà ignorata.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Duplicare l'estensione del test URI '{0}'.  Ignorando tale estensione.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Erweiterung URI '{0}'.  Die doppelte Erweiterung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">Il provider di impostazioni denominato '{0}' è duplicato. Il provider duplicato verrà ignorato.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Provider di impostazioni denominato '{0}' duplicato.  Ignorando il provider di duplicati.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Einstellungsanbieter mit dem Namen '{0}'.  Doppelten Provider werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">La sezione delle impostazioni esecuzione test denominata '{0}' è duplicata. Le impostazioni duplicate verranno ignorate.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Duplicare una sezione di impostazioni di esecuzione denominata '{0}'.  Ignorando le impostazioni di duplicati.</target>
+          <target state-qualifier="mt-suggestion">Dupliziert die Ausführung Abschnitt '{0}' gefunden.  Doppelten Einstellungen werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">Errore: parentesi vuote ( )</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Errore: Parentesi vuote)</target>
+          <target state-qualifier="mt-suggestion">Fehler: Leere Klammern)</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">Errore: condizione non valida '{0}'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Errore: Condizione non valida '{0}'</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültige Bedingung '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">L'URI '{0}' dell'estensione di test non è valido: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Estensione del test è un URI non valido: '{0}': {1}</target>
+          <target state-qualifier="mt-suggestion">Erweiterung ist einen ungültigen URI "{0}": {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">Errore: operatore non valido '{0}'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Errore: Operatore non valido '{0}'</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültiger Operator '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">Si è verificata un'eccezione durante l'inizializzazione del logger con {0}: '{1}'. Il logger non verrà usato. Eccezione: {2}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Eccezione durante l'inizializzazione del logger con URI '{0}'.  Non verrà utilizzato il logger.  Eccezione: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Initialisieren der Protokollierung mit URI '{0}'.  Die Protokollierung wird nicht verwendet.  Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">Non è stato trovato alcun logger di test con AssemblyQualifiedName, URI o FriendlyName '{0}'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Impossibile trovare un logger di test con l'URI o FriendlyName '{0}'.</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">Errore: manca ')'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Errore: Manca ')'</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ")"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">Errore: manca '('</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Errore: Manca ' ('</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ' ('</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">Errore: manca l'operando</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Errore: Operando mancante</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlender operand</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">Manca l'operatore '|' o '&amp;'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Manca l'operatore ' |' o '&amp;'</target>
+          <target state-qualifier="mt-suggestion">Fehlender Operator ' |' oder '&amp;'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">Le impostazioni esecuzione test sono già state caricate.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Le impostazioni di esecuzione sono già state caricate.</target>
+          <target state-qualifier="mt-suggestion">Run Settings wurden bereits geladen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">Errore durante il caricamento delle impostazioni esecuzione test. Errore: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Si è verificato un errore durante il caricamento delle impostazioni di esecuzione.  Errore: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der run Settings.  Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">Il nodo impostazioni specificato non è valido. La proprietà del nome del nodo impostazioni non deve essere vuota.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Nodo di impostazioni non valido specificato. La proprietà name del nodo di impostazioni deve essere non vuota.</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung angegebenen Knoten. Die Name-Eigenschaft eines Knotens Einstellung darf nicht leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -187,7 +187,7 @@
         <target state="translated">Si è verificato un errore durante l'inizializzazione del provider di impostazioni denominato '{0}'. Errore: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Si è verificato un errore durante l'inizializzazione del provider di impostazioni denominato '{0}'. Errore: {1}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Einstellungsanbieters mit dem Namen '{0}'. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -196,7 +196,7 @@
         <target state="translated">Il provider di impostazioni denominato '{0}' non è stato trovato. Non è possibile caricare le impostazioni.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Provider di impostazioni denominato '{0}' non trovata.  Le impostazioni non possono essere caricate.</target>
+          <target state-qualifier="mt-suggestion">Einstellungsanbieter mit dem Namen '{0}' wurde nicht gefunden.  Die Einstellung können nicht geladen werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -205,7 +205,7 @@
         <target state="translated">Il formato per TestCaseFilter {0} non è corretto. Specificare il formato corretto e riprovare. Se il formato non è corretto, potrebbe non essere eseguito alcun test.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Formato non valido per TestCaseFilter: {0}. Specificare il formato corretto e riprovare. Si noti che il formato non corretto può portare a nessun test eseguito il recupero.</target>
+          <target state-qualifier="mt-suggestion">Ungültiges Format für TestCaseFilter {0}. Geben Sie das richtige Format, und versuchen Sie es erneut. Beachten Sie, dass das falsche Format kein Test immer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>

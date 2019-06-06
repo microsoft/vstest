@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="pt-BR" original="../Resources.resx" build-num="-1581834744">
+  <file datatype="xml" source-language="en" target-language="pt-BR" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -50,9 +50,9 @@ SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
         <target state="translated">Uso válido:
-SettingsMigrator.exe &lt;Caminho completo para a migração do arquivo testsettings ou runsettings&gt;
-SettingsMigrator.exe &lt;Caminho completo para a migração do arquivo testsettings ou runsettings&gt; &lt;Caminho completo para a criação do arquivo runsettings&gt;
-Exemplos:
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt;
+SettingsMigrator.exe &lt;Full path to testsettings file or runsettings file to be migrated&gt; &lt;Full path to runsettings file to be created&gt;
+Examples:
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings

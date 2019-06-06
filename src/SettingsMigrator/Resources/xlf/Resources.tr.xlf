@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="2120988183">
+  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -50,8 +50,8 @@ SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
         <target state="translated">Geçerli kullanım:
-SettingsMigrator.exe &lt;Geçirilecek testsettings veya runsettings dosyalarının tam yolu&gt;
-SettingsMigrator.exe &lt;Geçirilecek testsettings veya runsettings dosyalarının tam yolu&gt; &lt;Oluşturulacak runsettings dosyasının tam yolu&gt;
+SettingsMigrator.exe &lt;Geçirilecek olan testsettings veya runsettings dosyasının tam yolu&gt;
+SettingsMigrator.exe &lt;Geçirilecek olan testsettings veya runsettings dosyasının tam yolu&gt; &lt;Oluşturulacak olan runsettings dosyasının tam yolu&gt;
 Örnekler:
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="1380117387">
+  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-1605532954">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">228</count>
@@ -25,7 +25,7 @@
         <target state="translated">將探索程式具現化時發生例外狀況: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">实例化 discoverer 时发生异常︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Instanziieren Entdecker: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">找到多個具有相同 URI '{0}' 的測試配接器。忽略配接器 '{1}'。請將衝突的配接器解除安裝，以避免這項警告。</target>
         <note>{0} is the unique identifier of test adapter. {1} is the name of the test adapter that shares a unique identifier with a previously loaded adapter.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找到与同一 uri"{0} 的多个测试适配器。将忽略适配器"{1}。请先卸载冲突的适配器，若要避免此警告。</target>
+          <target state-qualifier="mt-suggestion">Mehrere Testadapter mit demselben Uri '{0}' gefunden. Der Adapter '{1}' ignorieren. Deinstallieren Sie die Konflikt Adaptern um diese Warnung zu vermeiden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">忽略指定的重複來源 '{0}'。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">忽略指定的重复源"{0}。</target>
+          <target state-qualifier="mt-suggestion">Ignoriert die angegebene doppelte Quelle '{0}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">測試探索程式 '{0}' 載入測試時發生例外狀況。例外狀況: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试 discoverer"{0} 加载测试时出现异常。异常︰ {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Test Entdecker '{0}' Tests laden. Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">叫用執行程式 '{0}' 時發生例外狀況: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">调用的执行器"{0} 时出现异常︰ {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Aufrufen Executor '{0}': {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">找不到檔案 {0}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到文件 {0}。</target>
+          <target state-qualifier="mt-suggestion">Datei {0} konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">已啟用主機偵錯。請將偵錯工具附加到 testhost 處理序以繼續進行。</target>
         <note>Host, testhost are key words, it should not be localized</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">启用调试主机。请将调试器附加到 testhost 进程继续。</target>
+          <target state-qualifier="mt-suggestion">Host-Debuggen aktiviert ist. Testhost Prozess weiterhin zuordnen Sie Debugger.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">忽略對應到測試探索程式 {0} 的測試執行程式，因為探索程式沒有 DefaultExecutorUri 屬性。您可能必須重新安裝測試配接器增益集。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">忽略测试执行器来测试 discoverer {0}，因为 discoverer 没有 DefaultExecutorUri 属性相对应。您可能需要重新安装测试适配器加载项。</target>
+          <target state-qualifier="mt-suggestion">Ignorieren den Test Executor Entdecker {0} testen, da der Entdecker nicht das DefaultExecutorUri-Attribut entspricht. Sie müssen den Test Adapter Add-In erneut installieren.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">無法將用戶端 Proxy 初始化: 無法連接到測試處理序</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">客户端代理初始化失败︰ 无法连接到测试过程。</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Clientproxys: zum Testen nicht möglich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">這項作業不能用於非偵錯回合的內容中。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">在非调试运行的上下文中不允许此操作。</target>
+          <target state-qualifier="mt-suggestion">Dieser Vorgang kann nicht im Kontext zu einem nicht-Debug ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">找不到具有 URI '{0}' 的測試執行程式。請確定已安裝測試執行程式，且其支援 .NET 執行階段版本 {1}。</target>
         <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到测试执行器与 URI"{0}。 请确保测试执行器安装和支持.net 运行时版本 {1}。</target>
+          <target state-qualifier="mt-suggestion">Test Executor mit URI '{0}' konnte nicht gefunden werden.  Sicherstellen Sie, dass der Test Executor installiert ist und .net Runtime Version {1 unterstützt}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">指定的來源 '{0}' 皆無效。請修正上述錯誤/警告，並再試一次。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定源"{0} 不是有效的。解决上述错误警告，然后再试一次。</target>
+          <target state-qualifier="mt-suggestion">Keiner der angegebenen Quellen '{0}' ist ungültig. Die obigen Fehler/Warnung beheben, und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -143,7 +143,7 @@
         <target state="translated">因為篩選包含一或多個無效的屬性 ({0})，所以沒有符合篩選的測試。請指定包含有效屬性 ({1}) 的篩選運算式。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">没有测试匹配筛选器，因为它包含一个或多个属性无效 ({0})。指定筛选器表达式，其中包含有效的属性 ({1})，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Keine Tests entsprach dem Filter, da es eine oder mehrere Eigenschaften enthält, die nicht gültig ({0}). Filterausdruck mit gültigen Eigenschaften ({1}) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} 中沒有測試可用。請確定測試探索程式及執行程式已經註冊，且平台與架構的版本設定適當，然後再試一次。</target>
+        <target state="translated">{0} 中未提供任何測試。請確定已登錄了測試探索程式與執行程式，且平台與 Framework 版本設定皆正確，然後再試一次。</target>
         <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">

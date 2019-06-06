@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="-430993235">
+  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-508382432">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">27</count>
@@ -42,7 +42,7 @@
       </trans-unit>
       <trans-unit id="BlameParameterValueIncorrect">
         <source>The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key.</source>
-        <target state="translated">blame 參數索引鍵 {0} 僅支援值 {1\}/{2}。即將忽略此索引鍵。</target>
+        <target state="translated">blame 參數索引鍵 {0} 僅支援值 {1}/{2}。即將忽略此索引鍵。</target>
         <note />
       </trans-unit>
       <trans-unit id="ProcDumpCouldNotStart">

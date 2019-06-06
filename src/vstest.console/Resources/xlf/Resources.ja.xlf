@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="774927738">
+  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -25,7 +25,7 @@
         <target state="translated">重複するソース {0} が指定されています。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定されたソース {0} が重複してください。</target>
+          <target state-qualifier="mt-suggestion">Doppelte Quelle {0} angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">'{0}' が見つかりません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' は見つかりませんでした。</target>
+          <target state-qualifier="mt-suggestion">'{0}' wurde nicht gefunden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">次のテスト探索アドインを使用できます:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">次テストの検出と、アドインがあります。</target>
+          <target state-qualifier="mt-suggestion">Die folgende Tests Discovery Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -52,13 +52,13 @@
         <target state="translated">次のテスト実行アドインを使用できます:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">次テストの実行、アドインがあります。</target>
+          <target state-qualifier="mt-suggestion">Die folgende Test Execution Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -79,13 +79,13 @@
         <target state="translated">次のテスト ロガー アドインを使用できます:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">次テスト ロガーのアドインがあります。</target>
+          <target state-qualifier="mt-suggestion">Die folgende Tests Protokollierung Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableTestsFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -97,7 +97,7 @@
         <target state="translated">エラー: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">パラメーター "{0}" は一度しか指定できません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">パラメーター「{0}」を 1 回だけに提供する必要があります。</target>
+          <target state-qualifier="mt-suggestion">Der Parameter '{0}' sollte nur einmal erfolgen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">拡張をインスタンス化しているときに例外が発生しました: '{0}': {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">拡張子 '{0}' をインスタンス化するときに例外が発生しました: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Instanziieren Erweiterung '{0}': {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">次のテストを使用できます:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">次のテストがあります。</target>
+          <target state-qualifier="mt-suggestion">Die folgenden Tests sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">パラメーター "{0}" は認識されていません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">パラメーター「{0}」は認識されません。</target>
+          <target state-qualifier="mt-suggestion">Unbekannte Parameter '{0}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">指定されたテスト ソース ファイル "{0}" が見つかりませんでした。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">「{0}」が用意されているテストのソース ファイルが見つかりませんでした。</target>
+          <target state-qualifier="mt-suggestion">Quelldatei Test "{0}' bereitgestellt wurde nicht gefunden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">テスト ロガーの URI '{0}' は無効です。テスト ロガーは無視されます。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テスト ログ URI '{0}' が正しくありません。 テスト ログは無視されます。</target>
+          <target state-qualifier="mt-suggestion">Test Protokollierung URI '{0}' ist ungültig.  Die Test-Protokollierung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">情報: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">情報: {0}</target>
+          <target state-qualifier="mt-suggestion">Informationen: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">警告: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">警告: {0}</target>
+          <target state-qualifier="mt-suggestion">Warnung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -189,8 +189,8 @@
       この使用方法に関するメッセージを表示します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-?|-ヘルプ |/しますか? |/ヘルプ
-      この使い方に関するメッセージを表示します。</target>
+          <target state-qualifier="mt-suggestion">-?| --Hilfreiche | /? | / Help
+      Diesen Hilfetext anzeigen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -199,7 +199,7 @@
         <target state="translated">Copyright (c) Microsoft Corporation.  All rights reserved.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">著作権 (c) マイクロソフト株式会社。 無断転載を禁止します。</target>
+          <target state-qualifier="mt-suggestion">Copyright (c) Microsoft Corporation.  Alle Rechte vorbehalten.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -208,7 +208,7 @@
         <target state="translated">Microsoft (R) Test Execution Command Line Tool Version {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">バージョン {0} は、Microsoft (R) テストの実行コマンド ライン ツール。</target>
+          <target state-qualifier="mt-suggestion">Microsoft (R) Test Execution Command Line Tool Version {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -225,30 +225,30 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
-      テスト結果のロガーを指定します。たとえば、結果を 
-      Visual Studio テスト結果ファイル (TRX) に記録する場合は、/logger:trx[;LogFileName=&lt;既定値は一意のファイル名&gt;]
-      TestResults ディレクトリに指定した LogFileName でファイルを作成します。
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      テスト結果のロガーを指定します。たとえば、結果のログを
+      Visual Studio のテスト結果ファイル (TRX) に記録するには、/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;] を使用します
+      TestResults ディレクトリに、指定された LogFileName でファイルを作成します。
 
-      コンソール ロガーのログ メッセージの詳細レベルを次のように変更します。
-      例: /logger:console;verbosity=&lt;既定値は "normal"&gt;
-      指定できる詳細レベルの値: quiet、minimal、normal、detailed。
+      コンソール ロガーのログ メッセージの詳細レベルを、次のように変更します
+      例: /logger:console;verbosity=&lt;Defaults to "normal"&gt;
+      詳細レベルに使用できる値: quiet、minimal、normal、detailed。
 
-      コンソール ロガーの診断レベルのプレフィックスを次のように変更します。
-      例: /logger:console;prefix=&lt;既定値は "false"&gt;
-      コンソール ロガーの詳細については、https://aka.ms/console-logger をご覧ください。</target>
+      コンソール ロガーの診断レベルのプレフィックスを次のように変更します
+      例: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      コンソール ロガーの詳細についてはこちらをご覧ください: https://aka.ms/console-logger</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--ロガー |/ロガー: &lt; ロガー Uri と FriendlyName &gt;
-      テスト結果を logger を指定します。 などの結果に、Visual Studio テスト結果ファイル (トランザクション ・) は、ログに記録する、/logger:trx を使用します。
-      Team Foundation Server にテスト結果を発行するには、次のように TfsPublisher を使用します。
-      例:/logger:TfsPublisher。
-                コレクション &lt; チーム プロジェクト コレクションの url &gt; を = します。
-                BuildName &lt; ビルド名 &gt; を = します。
-                チーム = &lt; チーム プロジェクト名 &gt;
-                [;プラットフォーム = &lt; 既定値は、CPU &gt;]
-                [;フレーバー = &lt; 既定値は「デバッグ」&gt;]
-                [;RunTitle = &lt; タイトル &gt;]</target>
+          <target state-qualifier="mt-suggestion">-Protokollierung | / Logger: &lt; Logger Uri/FriendlyName &gt;
+      Geben Sie eine Protokollierung für Testergebnisse.  Z. B. protokollieren Ergebnisse in ein Visual Studio--Hardwareabstraktionsschicht (Test Ergebnisse Datei, TK) /logger:trx.
+      Verwenden Sie TfsPublisher zum Veröffentlichen von Testergebnissen in Team Foundation Server wie folgt
+      Beispiel: /logger:TfsPublisher;
+                Auflistung = &lt; Team Project Collection-Url &gt;;
+                BuildName = &lt; Buildnamen &gt;;
+                TeamProject = &lt; Team Projektname &gt;
+                [; Plattform = &lt; standardmäßig "Any CPU" &gt;]
+                [; Typ = &lt; standardmäßig "Debug" &gt;]
+                [; RunTitle = &lt; Title &gt;]</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="63" adjWordcount="53.55" curWordcount="53.55"</note>
       </trans-unit>
@@ -257,7 +257,7 @@
         <target state="translated">説明: 指定されたファイルからテストを実行します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">説明: 指定されたファイルからテストを実行します。</target>
+          <target state-qualifier="mt-suggestion">Beschreibung: Führt Tests aus den angegebenen Dateien.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -266,16 +266,16 @@
         <target state="translated">オプション:</target>
         <note>Section Header for subsequent command help listing</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">オプション：</target>
+          <target state-qualifier="mt-suggestion">Optionen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="translated">使い方: vstest.console.exe [引数] [オプション] [[--] &lt;RunSettings 引数&gt;...]]</target>
+        <target state="translated">使用法: vstest.console.exe [引数] [オプション] [[--] &lt;RunSettings arguments&gt;...]]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">使用法: vstest.console.exe [オプション] の [引数]</target>
+          <target state-qualifier="mt-suggestion">Syntax: vstest.console.exe [Optionen] [Argumente]</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -284,7 +284,7 @@
         <target state="translated">テスト ソース ファイルが指定されていません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストのソース ファイルが指定されていません。</target>
+          <target state-qualifier="mt-suggestion">Es wurden keine Quelldateien Test angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -293,7 +293,7 @@
         <target state="translated">引数が指定されていません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">引数が指定されていません。</target>
+          <target state-qualifier="mt-suggestion">Keine Argumente wurden angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -311,9 +311,9 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
-      指定したファイルからテストを実行します。複数のテスト ファイルを名前します。
-      スペースです。
-      例: mytestproject.dll
+      Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
+      durch Leerzeichen.
+      Beispiele: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
@@ -323,19 +323,19 @@
         <target state="translated">次の設定プロバイダー アドインを使用できます:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">次の設定プロバイダー アドインがあります。</target>
+          <target state-qualifier="mt-suggestion">Die folgende Einstellung Anbieter Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="RunSettingsArgumentHelp">
         <source>--Settings|/Settings:&lt;Settings File&gt;
       Settings to use when running tests.</source>
-        <target state="translated">--Settings|/Settings:&lt;設定ファイル&gt;
-      テストの実行時に使用する設定です。</target>
+        <target state="translated">--Settings|/Settings:&lt;Settings File&gt;
+      テストを実行する際に使用する設定です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--設定 |/設定: &lt; 設定ファイル &gt;
-      テストを実行するときに使用する設定です。</target>
+          <target state-qualifier="mt-suggestion">-Einstellungen | / Settings: &lt; Datei &gt;
+      Einstellungen Tests ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -344,7 +344,7 @@
         <target state="translated">/Settings パラメーターには、設定ファイルを指定する必要があります。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Settings パラメーターには、設定ファイルを指定する必要があります。</target>
+          <target state-qualifier="mt-suggestion">Der Parameter/Settings erfordert eine Einstellungsdatei bereitgestellt werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -353,7 +353,7 @@
         <target state="translated">設定ファイル '{0}' が見つかりませんでした。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">設定ファイル '{0}' が見つかりませんでした。</target>
+          <target state-qualifier="mt-suggestion">Die Einstellungsdatei '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -362,7 +362,7 @@
         <target state="translated">テストの実行に失敗しました。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの実行に失敗しました。</target>
+          <target state-qualifier="mt-suggestion">Der Testlauf ist fehlgeschlagen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -371,7 +371,7 @@
         <target state="translated">テストの実行に成功しました。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの実行が成功します。</target>
+          <target state-qualifier="mt-suggestion">Testlauf erfolgreich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -380,7 +380,7 @@
         <target state="translated">'InIsolation' コマンドでは、引数 {0} は適切ではありません。引数なしでコマンドを指定し (例: vstest.console.exe myTests.dll /InIsolation)、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">引数 {0} は、'InIsolation' コマンドでは想定されていません。引数がない場合、コマンドを指定する (例: vstest.console.exe myTests.dll/InIsolation) もう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'InIsolation'. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /InIsolation) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -389,7 +389,7 @@
         <target state="translated">/UseVsixExtensions パラメーターに値を指定する必要があります。'true' を指定すると、インストール済みの VSIX 拡張機能 (ある場合) がテストの実行で使用されます。false を指定すると、これらは無視されます。例: /UseVsixExtensions:true</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/UseVsixExtensions パラメーターには、値が必要です。'True' の場合、インストールされている VSIX 拡張機能 (存在する場合) は、テストの実行に使用されます。False の場合、それらは無視されます。  例:/UseVsixExtensions:true</target>
+          <target state-qualifier="mt-suggestion">Der /UseVsixExtensions-Parameter erfordert einen Wert. "True" werden der installierten VSIX-Erweiterung (falls vorhanden) im Testlauf verwendet. Wenn false, werden sie ignoriert.   Beispiel: /UseVsixExtensions:true</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -398,7 +398,7 @@
         <target state="translated">'UseVsixExtensions' コマンドでは、引数 {0} は適切ではありません。vsix 拡張機能を使用するのかスキップするのかを示すコマンドを指定し (例: vstest.console.exe myTests.dll /UseVsixExtensions:true)、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">引数 {0} は、'UseVsixExtensions' コマンドでは想定されていません。Vsix 拡張機能を使用するか、スキップするかどうかを示すコマンドを指定する (例: vstest.console.exe myTests.dll/UseVsixExtensions:true) し、再度実行してください。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'UseVsixExtensions'. Geben Sie den Befehl an, ob die VSIX-Erweiterung verwendet oder übersprungen werden (Beispiel: vstest.console.exe myTests.dll /UseVsixExtensions:true) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -413,8 +413,8 @@
       テストの速度が遅くなる場合があります。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/InIsolation
-      分離プロセスでテストを実行します。これは、ため、vstest.console.exe プロセスを停止、テストでエラーが発生する可能性が低く、テストの実行速度が低下する可能性があります。</target>
+          <target state-qualifier="mt-suggestion">/ InIsolation
+      Führt Tests in einem isolierten Prozess. Vstest.console.exe wird voraussichtlich auf Fehler in den Tests beendet jedoch Tests möglicherweise langsamer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
@@ -429,9 +429,9 @@
       例 /UseVsixExtensions:true</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/UseVsixExtensions
-      こうと、vstest.console.exe のプロセスを使用するか、テストの実行 (該当する場合) をインストールする VSIX 拡張機能をスキップします。
-      例/UseVsixExtensions:true</target>
+          <target state-qualifier="mt-suggestion">/ UseVsixExtensions
+      Das macht vstest.console.exe verwenden oder das VSIX-Extensions installiert (sofern vorhanden) in der überspringen. 
+      Beispiel /UseVsixExtensions:true</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -440,7 +440,7 @@
         <target state="translated">/BatchSize 引数には、バッチのサイズが必要です。例: /BatchSize:10</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/BatchSize 引数には、バッチのサイズが必要です。 例:/BatchSize:10</target>
+          <target state-qualifier="mt-suggestion">Das Argument /BatchSize muss die Größe des Stapels.  Beispiel: /BatchSize:10</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -449,7 +449,7 @@
         <target state="translated">バッチ サイズ {0} は無効です。バッチ サイズには、0 より大きい値を指定してください。例: /BatchSize:10</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">無効なバッチ サイズ {0} です。バッチ サイズを 0 より大きいことがあります。例:/BatchSize:10</target>
+          <target state-qualifier="mt-suggestion">Ungültige Batchgröße {0}. Die Batch-Größe muss größer als NULL sein. Beispiel: /BatchSize:10</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -460,15 +460,15 @@
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
         <target state="translated">  テストを実行する:
     &gt;vstest.console.exe tests.dll 
-  データ コレクターなどの追加設定を指定してテストを実行する:
+  テストをデータ コレクターなどの追加設定を指定して実行する:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">同じプロセスでテストを実行します。
-    &gt; vstest.console.exe tests.dll を別のプロセスでテストを実行します。
-    &gt; vstest.console.exe/inIsolation tests.dll
-  データ コレクターなど他の設定でテストを実行します。
-    &gt; vstest.console.exe tests.dll/Settings:Local.RunSettings</target>
+          <target state-qualifier="mt-suggestion">Tests im gleichen Prozess ausgeführt:
+    &gt; vstest.console.exe tests.dll Tests in einem separaten Prozess ausführen:
+    &gt; vstest.console.exe /inIsolation tests.dll
+  Zum Ausführen von Tests mit zusätzlichen wie Datensammlungen
+    &gt; vstest.console.exe tests.dll /Settings:Local.RunSettings</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="35" adjWordcount="29.75" curWordcount="29.75"</note>
       </trans-unit>
@@ -479,8 +479,8 @@
       インストール済みのテスト探索プログラムを一覧表示します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/ListDiscoverers
-      リストには、テストの discoverers がインストールされています。</target>
+          <target state-qualifier="mt-suggestion">/ ListDiscoverers
+      Listet die installierten Test Entdecker.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -491,8 +491,8 @@
       インストール済みのテスト実行プログラムを一覧表示します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/ListExecutors
-      リストには、テストのエグゼキュータがインストールされています。</target>
+          <target state-qualifier="mt-suggestion">/ ListExecutors
+      Listet die installierten Test Executor.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -503,8 +503,8 @@
       インストール済みのテスト ロガーを一覧表示します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/ListLoggers
-      リストには、テストのロガーがインストールされています。</target>
+          <target state-qualifier="mt-suggestion">/ ListLoggers
+      Listet die installierten Test Protokollierungsmodule.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -515,8 +515,8 @@
       インストール済みのテスト設定プロバイダーを一覧表示します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/ListSettingsProviders
-      リストには、テストの設定プロバイダーがインストールされています。</target>
+          <target state-qualifier="mt-suggestion">/ ListSettingsProviders
+      Listet die installierten Test Einstellungsanbieter.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -524,11 +524,11 @@
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
         <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;ファイル名&gt;
-      指定されたテスト コンテナーから探索されたすべてのテストを一覧表示します。</target>
+      指定されたテスト コンテナーから、すべての探索されたテストを一覧表示します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">強い |-ListTests |/lt |/ListTests: &lt; ファイル名 &gt;
-      リストは、指定したテスト コンテナーからのテストを発見しました。</target>
+          <target state-qualifier="mt-suggestion">-Lt |-ListTests | / Lt | / ListTests: &lt; Dateiname &gt;
+      Listen entdeckt Tests im angegebenen Testcontainer.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -537,7 +537,7 @@
         <target state="translated">経過時間:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">経過時間です。</target>
+          <target state-qualifier="mt-suggestion">Verstrichene Zeit:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -548,8 +548,8 @@
        例: /Tests:TestsMethod1、/Tests:TestMethod1,method2 </target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Tests 引数には、1 つまたは複数の特定のテストの名前またはその部分文字列が必要です。
-       例:/Tests:TestsMethod1、/Tests:TestMethod1、method2</target>
+          <target state-qualifier="mt-suggestion">Das Batch.log-Argument erfordert eine oder mehrere bestimmte Testnamen oder die Teilzeichenfolgen.
+       Beispiele: /Tests:TestsMethod1, /Tests:TestMethod1, Methode2</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -558,7 +558,7 @@
         <target state="translated">合計 {0} 個のテストが検出されましたが、指定された選択条件 ({1}) に一致するテストはありません。適切な値を使用して、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} のテストで発見された、テストの合計では、指定された選択範囲の criteria({1}) と一致します。右側の値を使用して、もう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Insgesamt {0} Tests entdeckt wurden, aber kein Test entspricht der angegebenen Auswahl criteria({1}). Richtige Werte verwenden und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -578,18 +578,18 @@
       values, separate them by commas.
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
-        <target state="translated">--Tests|/Tests:&lt;テスト名&gt;
+        <target state="translated">--Tests|/Tests:&lt;Test Names&gt;
       指定された値に一致する名前のテストを実行します。複数の値を
-      指定するには、名前をコンマで区切ってください。
+      指定する場合、コンマで区切ります。
       例: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</target>
         <note>Please verify if the console output looks good after modifiaction. </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--テスト | テスト/: &lt; 名をテストする &gt;
-      指定された値に一致する名前でテストを実行します。複数を提供するには
-      値は、カンマで区切ります。
-      例:/Tests:TestMethod1
-                /Tests:TestMethod1、testMethod2</target>
+          <target state-qualifier="mt-suggestion">– Testet | / Tests: &lt; Test Namen &gt;
+      Führen Sie Tests, deren Namen, die mit die angegebenen Werten übereinstimmen. Bereitstellen mehrerer
+      Werte trennen durch Kommas.
+      Beispiele: /Tests:TestMethod1
+                /Tests:TestMethod1 testMethod2</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="25" adjWordcount="21.25" curWordcount="21.25"</note>
       </trans-unit>
@@ -598,7 +598,7 @@
         <target state="translated">診断データ アダプターが実行設定で有効になっていたので、テストの実行に分離モードを使用しています。この警告が表示されないようにするには、/inIsolation パラメーターを使用します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">診断データ アダプターは、runsettings で有効になっていなかったとは、テストを実行するのにには、分離モードを使用します。この警告を非表示にするのにには、/inIsolation パラメーターを使用します。</target>
+          <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -607,7 +607,7 @@
         <target state="translated">Windows ストア アプリの単体テストを実行するために、分離モードを使用しています。この警告が表示されないようにするには、/InIsolation パラメーターを使用します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">分離モードを使用してユニットを実行する Windows ストア アプリをテストします。この警告を非表示にするのにには、/InIsolation パラメーターを使用します。</target>
+          <target state-qualifier="mt-suggestion">Mit Isolationsmodus führen tests für Windows Store-apps. Verwenden Sie den Parameter /InIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -616,7 +616,7 @@
         <target state="translated">Windows ストア アプリの単体テストの実行時は、診断データ アダプターはサポートされません。設定から診断データ アダプターの設定を削除してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Windows ストア アプリの実行中の単体テストを使用する場合は、診断データ アダプターはサポートされていません。診断データ アダプターの設定は、設定から削除します。</target>
+          <target state-qualifier="mt-suggestion">Adapter für diagnostische Daten werden bei laufenden für Windows Store-apps Komponententests unterstützt. Entfernen Sie Diagnosedaten Adapter Einstellungen aus.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -634,7 +634,7 @@
         <target state="translated">        URI: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Uri: {0}</target>
+          <target state-qualifier="mt-suggestion">URI: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -652,7 +652,7 @@
         <target state="translated">        サポートされているファイルの種類:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">ファイルの種類がサポートされています。</target>
+          <target state-qualifier="mt-suggestion">Unterstützte Dateitypen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -670,7 +670,7 @@
         <target state="translated"> {0},</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} は、</target>
+          <target state-qualifier="mt-suggestion">{0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -679,7 +679,7 @@
         <target state="translated">        既定の実行プログラムの URI: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">既定のエグゼキュータの Uri: {0}</target>
+          <target state-qualifier="mt-suggestion">Standard-Executor Uri: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -688,7 +688,7 @@
         <target state="translated">        URI: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Uri: {0}</target>
+          <target state-qualifier="mt-suggestion">URI: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="0.5" curWordcount="0.5"</note>
       </trans-unit>
@@ -697,7 +697,7 @@
         <target state="translated">プラットフォームの種類が無効です: {0}。有効なプラットフォームの種類は、x86、x64、および Arm です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">無効なプラットフォームの種類: {0}. 有効なプラットフォームの種類は、x86、x64、Arm。</target>
+          <target state-qualifier="mt-suggestion">Ungültige Plattform: {0}. gültige Plattformtypen sind X86, X64 und Arm.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -706,7 +706,7 @@
         <target state="translated">/Platform 引数には、テストの実行対象とするプラットフォームの種類を指定する必要があります。例: /Platform:x86</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Platform 引数には、テストの実行を提供するターゲット ・ プラットフォームの種類が必要です。  例: このため、/platform:x86 86</target>
+          <target state-qualifier="mt-suggestion">/ Platform Argument erfordert den Zieltyp Plattform für den Testlauf bereitgestellt werden.   Beispiel: /Platform:x 86</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -714,14 +714,14 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="translated">--Platform|/Platform:&lt;プラットフォームの種類&gt;
-      テストの実行対象とするプラットフォーム アーキテクチャです。
-      有効な値は x86、x64、ARM です。</target>
+        <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
+      テストの実行に使用するターゲット プラットフォームのアーキテクチャです。
+      有効な値は、x86、x64、ARM です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--プラットフォーム |/プラットフォーム: &lt; プラットフォームの種類 &gt;
-      テストの実行に使用するプラットフォームのアーキテクチャを対象とします。
-      有効な値は、x86、x64、ARM には。</target>
+          <target state-qualifier="mt-suggestion">-Plattform | / Platform: &lt; Plattformtyp &gt;
+      Ziel Plattformarchitektur für Ausführung verwendet werden. 
+      Gültige Werte sind X86, X64 und ARM.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -730,7 +730,7 @@
         <target state="translated">テスト実行のための効果的なプラットフォーム: {0} および .Net Framework: {1} の設定で必要とされるため、テストの実行に分離モードを使用しています。この警告が表示されないようにするには、/inIsolation パラメーターを使用します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">分離モードを使用して、パフォーマンスの高いプラットフォームで必要なテストを実行する: {0} および .Net フレームワーク: {1} テストの設定を実行します。この警告を非表示にするのにには、/inIsolation パラメーターを使用します。</target>
+          <target state-qualifier="mt-suggestion">Isolation Modus zum Ausführen von Tests gemäß wirksame Plattform: {0} und .net Framework: {1} Einstellungen für den Testlauf. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="26" adjWordcount="22.1" curWordcount="22.1"</note>
       </trans-unit>
@@ -739,16 +739,16 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework のバージョン&gt;
-      テスト実行に使用するターゲット .Net Framework のバージョンです。 
+        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
+      テストの実行に使用する、.Net Framework のターゲット バージョン。
       有効な値は ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" などです。
-      その他のサポートされている値は Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
+      サポートされている他の値は、Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--フレームワーク |/フレームワーク: &lt; フレームワーク バージョン &gt;
-      対象の .Net Framework のバージョンをテストの実行に使用します。
-      有効な値は"です。NETFramework、バージョン = v4.6「,」です。NETCoreApp、バージョン = v1.0」などです。
-      その他のサポートされている値は、Framework35、Framework40、Framework45、FrameworkCore10 です。</target>
+          <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; Frameworkversion &gt;
+      Ziel von .net Framework-Version für die Ausführung verwendet werden. 
+      Gültige Werte sind ". NETFramework, Version v4. 6 = ",". NETCoreApp, Version = 1.0 "usw..
+      Andere unterstützte Werte sind Framework35, Framework40, Framework45 und FrameworkCore10.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
@@ -757,7 +757,7 @@
         <target state="translated">/Framework 引数には、テストの実行対象とする .Net Framework バージョンが必要です。例: /Framework:".NETFramework,Version=v4.5.1"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Framework 引数には、ターゲットが必要です .Net フレームワークのバージョンのテストを実行します。  例:/Framework:"です。NETFramework、バージョン = v4.6」</target>
+          <target state-qualifier="mt-suggestion">Das Argument /Framework muss das Ziel .net Framework-Version für den Testlauf.   Beispiel: /Framework: ". NETFramework, Version v4. 6 = "</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -766,7 +766,7 @@
         <target state="translated">.Net Framework バージョンが無効です: {0}。TargetFramework の完全な名前を指定してください (例: .NETCoreApp,Version=v2.0)。その他のサポートされる .Net Framework バージョンは Framework40、Framework45、FrameworkCore10、FrameworkUap10 です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">無効な .Net Framework のバージョン: {0}.、TargetFramework のフルネームを指定してください。サポートされているその他の .Net Framework のバージョンは、Framework35、Framework40 および Framework45。</target>
+          <target state-qualifier="mt-suggestion">Ungültige .net Framework-Version: {0}. Geben Fullname der TargetFramework. Andere unterstützt .net Framework-Versionen sind Framework35, Framework40 und Framework45.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -775,7 +775,7 @@
         <target state="translated">Windows ストア アプリの単体テストのテスト実行を開始できません: {0}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Windows ストア アプリケーションの単体テストの実行テストを開始できませんでした: {0}。</target>
+          <target state-qualifier="mt-suggestion">Testlauf für Komponententests für Windows Store-app konnte nicht gestartet werden: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -789,26 +789,26 @@
       Examples: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</source>
-        <target state="translated">--TestCaseFilter|/TestCaseFilter:&lt;式&gt;
-       指定された式に一致するテストを実行します。
-      &lt;式&gt; の形式は、&lt;プロパティ&gt;演算子&lt;値&gt;[|&amp;&lt;式&gt;] です。
-         演算子は =、!=、~ のいずれかです (演算子 ~ は '含む' を
-         意味し、DisplayName のような文字列プロパティに適用できます)。
-         かっこ () を使用して部分式をグループ化できます。
+        <target state="translated">--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
+      指定された式と一致するテストを実行します。
+      &lt;Expression&gt; の形式は &lt;property&gt;演算子&lt;value&gt;[|&amp;&lt;Expression&gt;]
+         で、演算子は =、!=、~ のいずれかです (演算子 ~ には '含む'
+         セマンティクスがあり、DisplayName などの文字列プロパティに適用されます)。
+         かっこ () は、サブ式のグループ化に使用できます。
       例: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--TestCaseFilter |/TestCaseFilter: &lt; 式 &gt;
-      指定された式に一致するテストを実行します。
-      形式 &lt; プロパティ &gt; 演算子 &lt; 値 &gt; の &lt; 式 &gt; は、[| &amp; &lt; 式 &gt;]
-         演算子は、= のいずれか、! = または ~ (演算子 ~ を含む' には
-         セマンティクスは、文字列プロパティの表示名と同じように適用し)。
-         かっこ () は、部分式のグループを使用できます。
-      例:/TestCaseFilter:"優先度 = 1"
+          <target state-qualifier="mt-suggestion">--TestCaseFilter | / TestCaseFilter: &lt; Ausdruck &gt;
+      Ausführen von Tests, die mit dem angegebenen Ausdruck übereinstimmt.
+      &lt; Ausdruck &gt; Format &lt; Eigenschaft &gt; Operator &lt; Wert &gt; ist [| &amp; &lt; Ausdruck &gt;]
+         Operator ist eine =,! = oder ~ (Operator ~ ' enthält '
+         Semantik und für Eigenschaften wie "DisplayName").
+         Klammern () kann Teilausdrücke Gruppe verwendet werden.
+      Beispiele: /TestCaseFilter: "Priorität 1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
-                                  |Name=MyTestMethod)」</target>
+                                  | Name=MyTestMethod) "</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="57" adjWordcount="48.45" curWordcount="48.45"</note>
       </trans-unit>
@@ -821,9 +821,9 @@
         例: "Priority=1"、"TestCategory=Nightly"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/TestCaseFilter 引数には、フィルターの値が必要です。
-        フィルターの値は、&lt; プロパティ &gt; = &lt; 値 &gt; 型です。
-        例:"優先度 = 1"、"TestCategory 夜間 ="</target>
+          <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter muss den Filterwert.
+        Filter kann &lt; Eigenschaft &gt; = &lt; Wert &gt;.
+        Beispiel: "Priorität 1", "TestCategory = jede Nacht"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -832,7 +832,7 @@
         <target state="translated">/TestCaseFilter 引数を /Tests と共に指定することはできません。テストが指定されている場合、テスト ケースのフィルター処理は適用できません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Tests では、/TestCaseFilter 引数を指定できません。テストを指定する場合、テスト_ケースのフィルターは適用できません。</target>
+          <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter kann mit Batch.log angegeben werden. Filtern von Testfällen ist nicht anwendbar, wenn Tests angegeben werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -841,7 +841,7 @@
         <target state="translated">{0} は {1}/{2} 用にビルドされています。実行で指定されるテスト アセンブリは、対象とする .NET Framework およびプラットフォームを共通にする必要があります。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} が {1} のビルド/{2} です。実行で指定されたテスト アセンブリには、共通のターゲットの .Net フレームワークとプラットフォームが必要です。</target>
+          <target state-qualifier="mt-suggestion">{0} wurde für {1} / {2}. In einer angegebenen Testassemblys müssen eine allgemeine .net Framework-Zielversion und Plattform.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -850,7 +850,7 @@
         <target state="translated">実行する複数のテストには、1 つのアプリ パッケージ (.appx ファイル) だけを指定できます。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストを実行するためだけに 1 つのアプリケーション パッケージ (.appx ファイル) を指定できます。</target>
+          <target state-qualifier="mt-suggestion">Zum Ausführen von Tests kann nur ein Anwendungspaket (.appx Datei) angegeben werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -859,7 +859,7 @@
         <target state="translated">テスト探索を開始しています。お待ちください...</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの探索を開始しています。</target>
+          <target state-qualifier="mt-suggestion">Warten Sie Discovery Test gestartet, bitte...</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -868,7 +868,7 @@
         <target state="translated">テスト実行を開始しています。お待ちください...</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの実行を開始しています。</target>
+          <target state-qualifier="mt-suggestion">Warten Sie Ausführung gestartet, bitte...</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -877,7 +877,7 @@
         <target state="translated">診断データ アダプターの設定の読み取り中に実行中の '{0}' がスローされました。この実行では、すべての診断データ アダプターがスキップされます。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">診断データ アダプターの設定の読み取りをスローしました '{0}' 実行中です。すべての診断データ アダプターは、この実行でスキップされます。</target>
+          <target state-qualifier="mt-suggestion">Lesen von Diagnosedaten adaptereinstellungen hat eine laufende '{0}'. Alle Adapter für diagnostische Daten werden in diesem Durchlauf übersprungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -888,8 +888,8 @@
       テストの実行用にデータ コレクター 'CodeCoverage' を有効にします。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/EnableCodeCoverage
-      診断データ アダプター 'CodeCoverage' のテストの実行を有効にします。既定の設定は、使用指定しない場合は設定ファイルを使用します。</target>
+          <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
+      Adapter für diagnostische Daten "CodeCoverage" im Testlauf ermöglicht. Standardeinstellungen werden nicht angegeben, mit der Datei.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -898,7 +898,7 @@
         <target state="translated">引数 {0} は、'EnableCodeCoverage' コマンドでは必要ではありません。引数なしでコマンドを指定し (例: vstest.console.exe myTests.dll /EnableCodeCoverage)、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">引数 {0} は、'EnableCodeCoverage' コマンドでは想定されていません。引数がない場合、コマンドを指定する (例: vstest.console.exe myTests.dll/EnableCodeCoverage) もう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'EnableCodeCoverage'. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /EnableCodeCoverage) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -907,7 +907,7 @@
         <target state="translated">アプリ パッケージ '{0}' に、テスト実行プログラムのエントリ ポイントがありません。Windows ストア アプリの単体テストを実行する場合は、Windows ストア アプリ単体テスト ライブラリ プロジェクトを使用して、アプリ パッケージを作成してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">アプリケーション パッケージ '{0}' には、テスト実行のエントリ ポイントがありません。Windows ストア アプリケーションの単体テストを実行するためには、Windows ストア アプリケーションの単体テスト ライブラリ プロジェクトを使用してアプリケーション パッケージを作成します。</target>
+          <target state-qualifier="mt-suggestion">App-Paket '{0}' hat keine Test Executor Einstiegspunkt. Erstellen Sie zum Ausführen von Komponententests für Windows Store-apps, app-Paket mit Windows Store-app Einheitenbibliothek-Projekt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -916,7 +916,7 @@
         <target state="translated">Windows ストア アプリではコード カバレッジを使用できません。このテスト実行ではコード カバレッジ分析はスキップされました。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">コード カバレッジは、Windows ストア アプリの利用可能ではありません。コード カバレッジ分析は、このテストの実行をスキップしました。</target>
+          <target state-qualifier="mt-suggestion">Codeabdeckungsdaten ist nicht verfügbar für Windows Store-apps. Codeabdeckungsanalyse übersprungen für diesen Testlauf.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -925,7 +925,7 @@
         <target state="translated">合計 {0} 個のテストが検出されましたが、指定された選択条件 ({1}) に一致しないテストがあります。適切な値を使用して、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} テストの合計が発見されたが、いくつかのテストでは、指定された選択範囲の criteria({1}) が一致しません。右側の値を使用して、もう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">{0} Tests entdeckt wurden jedoch einige Tests entsprechen nicht der angegebenen Auswahl criteria({1}). Richtige Werte verwenden und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -935,15 +935,15 @@
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <target state="translated">--TestAdapterPath|/TestAdapterPath
-      テストの実行で、指定パス (ある場合) にあるカスタム テスト アダプターを
-      vstest.console.exe プロセスが使用します。
-      例 /TestAdapterPath:&lt; カスタム アダプターのパス&gt;</target>
+      テストの実行で、vstest.console.exe プロセスが指定されたパス (ある場合) 
+      からのカスタム テスト アダプターを使用するようにします。
+      例  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--TestAdapterPath |/TestAdapterPath
-      カスタム テスト アダプターを使用して vstest.console.exe プロセスは、この
-      テストの実行に特定のパス (存在する場合)。
-      例/TestAdapterPath: &lt; pathToCustomAdapters &gt;</target>
+          <target state-qualifier="mt-suggestion">--TestAdapterPath | / TestAdapterPath
+      Das macht vstest.console.exe benutzerdefinierten Testadapter verwendet
+      aus einem angegebenen Pfad (falls vorhanden) im Testlauf. 
+      Beispiel /TestAdapterPath: &lt; PathToCustomAdapters &gt;</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -952,7 +952,7 @@
         <target state="translated">/TestAdapterPath パラメーターには、値として、カスタム テスト アダプターがある場所のパスが必要です。例: /TestAdapterPath:c:\MyCustomAdapters</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/TestAdapterPath パラメーターには、カスタム テスト アダプターが含まれる場所のパスには、値が必要です。例:/TestAdapterPath:c:\MyCustomAdapters</target>
+          <target state-qualifier="mt-suggestion">Der /TestAdapterPath-Parameter erfordert einen Wert, der Pfad zu einem Speicherort mit benutzerdefinierten Testadapter. Beispiel: /TestAdapterPath:c:\MyCustomAdapters</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
@@ -961,7 +961,7 @@
         <target state="translated">'TestAdapterPath' に指定されているパス '{0}' は無効です。エラー: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' が 'TestAdapterPath' で指定されたパスが正しくありません。エラー: {1}</target>
+          <target state-qualifier="mt-suggestion">Der Pfad '{0}' in 'TestAdapterPath' angegeben ist ungültig. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -970,7 +970,7 @@
         <target state="translated">カスタム テスト アダプターの指定された検索パスが見つかりませんでした。有効なパスを指定して、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定されたカスタム テスト アダプターの検索パスが見つかりませんでした、有効なパスを指定してからやり直してください。</target>
+          <target state-qualifier="mt-suggestion">Bereitgestellten benutzerdefinierten Test Adapter Suchpfad nicht gefunden, geben Sie einen gültigen Pfad, und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -979,7 +979,7 @@
         <target state="translated">'TestAdapterPath' に指定されているパス '{0}' には、テスト アダプターがありません。有効なパスを指定して、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' が 'TestAdapterPath' で指定されたパスはないテスト アダプターが含まれている、有効なパスを提供するもう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Der Pfad '{0}' in 'TestAdapterPath' angegebene nicht Testadapter enthalten, geben Sie einen gültigen Pfad und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -988,7 +988,7 @@
         <target state="translated">Windows Phone アプリに対するテストのテスト実行を開始できません: {0}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの Windows Phone アプリケーションのテストの実行を開始できませんでした: {0}。</target>
+          <target state-qualifier="mt-suggestion">Testlauf für die Tests für Windows Phone-Anwendung konnte nicht gestartet werden: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -997,7 +997,7 @@
         <target state="translated">Windows Phone アプリの単体テストを実行するために、分離モードを使用しています。この警告が表示されないようにするには、/InIsolation パラメーターを使用します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">分離モードを使用してユニットを実行する Windows Phone アプリケーションをテストします。この警告を非表示にするのにには、/InIsolation パラメーターを使用します。</target>
+          <target state-qualifier="mt-suggestion">Windows Phone apps prüft mit Isolationsmodus führen. Verwenden Sie den Parameter /InIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -1006,7 +1006,7 @@
         <target state="translated">Windows Phone アプリではコード カバレッジを使用できません。このテスト実行ではコード カバレッジ分析はスキップされました。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">コード カバレッジは、Windows Phone アプリケーションの利用可能ではありません。コード カバレッジ分析は、このテストの実行をスキップしました。</target>
+          <target state-qualifier="mt-suggestion">Codeabdeckungsdaten ist nicht verfügbar für Windows Phone apps. Codeabdeckungsanalyse übersprungen für diesen Testlauf.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -1015,7 +1015,7 @@
         <target state="translated">Windows Phone アプリの単体テストの実行時は、診断データ アダプターはサポートされません。設定から診断データ アダプターの設定を削除してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Windows Phone アプリケーションの実行中の単体テストを使用する場合は、診断データ アダプターはサポートされていません。診断データ アダプターの設定は、設定から削除します。</target>
+          <target state-qualifier="mt-suggestion">Adapter für diagnostische Daten werden bei laufenden für Windows Phone apps Komponententests unterstützt. Entfernen Sie Diagnosedaten Adapter Einstellungen aus.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -1024,7 +1024,7 @@
         <target state="translated">アプリ パッケージ '{0}' に、テスト実行プログラムのエントリ ポイントがありません。Windows Phone アプリの単体テストを実行する場合は、Windows Phone 単体テスト アプリ プロジェクトを使用して、アプリ パッケージを作成してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">アプリケーション パッケージ '{0}' には、テスト実行のエントリ ポイントがありません。Windows Phone アプリケーションの単体テストを実行するためには、Windows Phone の単体テストのアプリケーション プロジェクトを使用してアプリケーション パッケージを作成します。</target>
+          <target state-qualifier="mt-suggestion">App-Paket '{0}' hat keine Test Executor Einstiegspunkt. Erstellen Sie zum Ausführen von Komponententests für Windows Phone apps, app Paket mit Windows Phone Unit Test-App-Projekt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
@@ -1033,7 +1033,7 @@
         <target state="translated">フレームワーク {0} を使用してテストを実行します。この警告を表示しないようにするには、/Framework:{1} を指定します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Framework {0} を使用して、テストを実行します。/Framework を指定する: {1} この警告を非表示にします。</target>
+          <target state-qualifier="mt-suggestion">Framework {0} verwenden zum Ausführen der Tests. Geben Sie /Framework: {1}, um diese Warnung zu unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1042,7 +1042,7 @@
         <target state="translated">指定されたテスト コンテナーにテストが見つかりません。さらに、Microsoft Windows ストア単体テスト アダプターで .appxbundle ファイルがサポートされていません。アプリ パッケージの作成時に appx ([アプリ バンドルの生成] オプションを [しない] に設定) し、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定したテスト コンテナーでテストします。さらに、Microsoft Windows ストアの単体テストのアダプターでは、.appxbundle ファイルがサポートされていません。Appx の作成 (生成アプリケーション バンドル ・ オプションは無期限に設定) とアプリケーション パッケージを作成するもう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Keine Tests im angegebenen Testcontainer gefunden. Darüber hinaus unterstützt Microsoft Windows Store Unit Test-Adapter nicht .appxbundle Dateien. Erstellen einer Anlage (Einstellung generieren App Bundle Option nie) als Anwendungspaket erstellen und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="37" adjWordcount="31.45" curWordcount="31.45"</note>
       </trans-unit>
@@ -1057,10 +1057,10 @@
       使用するコアの数は、設定ファイルを使用して構成できます。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-並列 |/パラレル
-      テストを並列で実行されることを指定します。デフォルトで
-      マシン上のすべての使用可能なコアを使用できます。
-      設定ファイルを使用して使用するコアの数を構成する場合があります。</target>
+          <target state-qualifier="mt-suggestion">--Parallel | / Parallel
+      Gibt an, dass die Tests parallel ausgeführt werden. Standardmäßig oben
+      für alle verfügbaren Kerne auf dem Computer verwendet werden.
+      Die Anzahl der Kerne verwendet möglicherweise mithilfe einer Einstellungsdatei konfiguriert werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="36" adjWordcount="30.6" curWordcount="30.6"</note>
       </trans-unit>
@@ -1069,7 +1069,7 @@
         <target state="translated">引数 {0} は 'Parallel' コマンド内で使用できません。引数を使用せずにコマンドを指定して (例: vstest.console.exe myTests.dll /Parallel)、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'並列' コマンドでは、引数 {0} は想定されていません。引数がない場合、コマンドを指定する (例: vstest.console.exe myTests.dll/Parallel) もう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} ist nicht 'Parallel' Befehl erwartet. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /Parallel) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -1078,19 +1078,19 @@
         <target state="translated">null または空にすることはできません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Null または空にすることはできません。</target>
+          <target state-qualifier="mt-suggestion">Darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="PortArgumentHelp">
         <source>--Port|/Port:&lt;Port&gt;
       The Port for socket connection and receiving the event messages.</source>
-        <target state="translated">--Port|/Port:&lt;ポート&gt;
-      ソケット接続およびイベント メッセージ受信用のポートです。</target>
+        <target state="translated">--Port|/Port:&lt;Port&gt;
+      ソケット接続およびイベント メッセージを受信するためのポートです。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--ポート |/ポート: &lt; ポート &gt;
-      ソケット接続とイベント メッセージの受信のポートがあることです。</target>
+          <target state-qualifier="mt-suggestion">-Port | / Port: &lt; Port &gt;
+      Der Port für Socket-Verbindung und das Ereignis empfangen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1099,7 +1099,7 @@
         <target state="translated">--Port|/Port 引数には、整数であるポート番号を指定する必要があります。ソケット接続およびイベント メッセージ受信用のポートを指定してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-ポート | ポート引数は整数のポート番号を必要があります。ソケット接続とイベント メッセージの受信用のポートを指定します。</target>
+          <target state-qualifier="mt-suggestion">-Port | / Port-Argument ist die Port-Nummer ist eine ganze Zahl. Geben Sie den Port für die Socket-Verbindung und das Ereignis empfangen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -1108,7 +1108,7 @@
         <target state="translated">テスト中のアセンブリが見つかりません。プロジェクトがビルドされたことをご確認ください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テスト対象のアセンブリを見つけることができません。プロジェクトがビルドされたことを確認してください。</target>
+          <target state-qualifier="mt-suggestion">Nicht getestete Assembly gefunden. Stellen Sie sicher, dass das Projekt erstellt wird.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
@@ -1117,7 +1117,7 @@
         <target state="translated">パス {0} は存在しません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">パス {0} は存在しません。</target>
+          <target state-qualifier="mt-suggestion">Der Pfad {0} ist nicht vorhanden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -1128,20 +1128,20 @@
       一時的な出力を含むディレクトリです。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--BuildBasePath |/BuildBasePath: &lt; BuildBasePath &gt;
-      一時的な出力を含むディレクトリ。</target>
+          <target state-qualifier="mt-suggestion">--BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
+      Das Verzeichnis für temporären Ausgaben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="ConfigurationArgumentHelp">
         <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
       The configuration the project is built for i.e. Debug/Release</source>
-        <target state="translated">-c|--Configuration|/c|/Configuration:&lt;構成&gt;
-      プロジェクトがビルドされている構成です (例: デバッグ/リリース)</target>
+        <target state="translated">-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
+      プロジェクトをビルドする構成です。つまり、Debug/Release</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-c |-構成 |/c |/構成: &lt; 構成 &gt;
-      などのデバッグとリリース プロジェクト構成が組み込まれています。</target>
+          <target state-qualifier="mt-suggestion">-C |-Konfiguration | / C | / Konfiguration: &lt; Configuration &gt;
+      Die Konfiguration des Projekts wird für z. B. Debug/Release erstellt</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -1150,19 +1150,19 @@
         <target state="translated">指定の構成が無効です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定の構成が正しくありません。</target>
+          <target state-qualifier="mt-suggestion">Die Konfiguration ist ungültig.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="OutputArgumentHelp">
         <source>-o|--Output|/o|/Output:&lt;Output&gt;
       The directory containing the binaries to run.</source>
-        <target state="translated">-o|--Output|/o|/Output:&lt;出力&gt;
+        <target state="translated">-o|--Output|/o|/Output:&lt;Output&gt;
       実行するバイナリを含むディレクトリです。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-o |--出力 | o/|/出力: &lt; 出力 &gt;
-      実行するバイナリを含むディレクトリ。</target>
+          <target state-qualifier="mt-suggestion">-o |-Ausgabe | / o | / Output: &lt; Output &gt;
+      Das Verzeichnis Binärdateien ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -1171,7 +1171,7 @@
         <target state="translated">BuildBasePath が見つかりませんでした。有効なパスを指定してもう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">BuildBasePath が見つかりませんでした、無効なパスを指定してからやり直してください。</target>
+          <target state-qualifier="mt-suggestion">Die BuildBasePath wurde nicht gefunden, geben Sie einen gültigen Pfad und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -1180,7 +1180,7 @@
         <target state="translated">Output パスが見つかりませんでした。有効なパスを指定してもう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">出力パスを発見し、有効なパスを指定していないがもう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Das Verzeichnis wurde nicht gefunden, geben Sie einen gültigen Pfad und wiederholen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1189,7 +1189,7 @@
         <target state="translated">追加情報メッセージ:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">詳細メッセージ:</target>
+          <target state-qualifier="mt-suggestion">Weitere Informationen-Nachrichten:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1198,7 +1198,7 @@
         <target state="translated">日数</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">日</target>
+          <target state-qualifier="mt-suggestion">Tage</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1207,16 +1207,17 @@
         <target state="translated">エラー メッセージ:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー メッセージ:</target>
+          <target state-qualifier="mt-suggestion">Fehlermeldung:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
-        <target state="new">テスト実行時間: {0:0.0000} {1}</target>
-        <note></note>
+        <target state="translated">合計時間: {0:0.0000} {1}</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの実行時間: {0:0.0000} {1}</target>
+          <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -1225,7 +1226,7 @@
         <target state="translated">時間</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">時間</target>
+          <target state-qualifier="mt-suggestion">Stunden</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1234,7 +1235,7 @@
         <target state="translated">URI または FriendlyName が '{0}' のテスト ロガーは見つかりませんでした。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テスト ロガー URI または FriendlyName '{0}' が見つかりませんでした。</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -1243,7 +1244,7 @@
         <target state="translated">分</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">分</target>
+          <target state-qualifier="mt-suggestion">Minuten</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1252,7 +1253,7 @@
         <target state="translated">秒</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">秒</target>
+          <target state-qualifier="mt-suggestion">Sekunden</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1261,7 +1262,7 @@
         <target state="translated">スタック トレース:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">スタック トレース:</target>
+          <target state-qualifier="mt-suggestion">Stack-Trace:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1270,7 +1271,7 @@
         <target state="translated">標準エラー メッセージ:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">標準のエラー メッセージ:</target>
+          <target state-qualifier="mt-suggestion">Standard-Fehlermeldungen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1279,7 +1280,7 @@
         <target state="translated">標準出力メッセージ:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">標準出力メッセージ。</target>
+          <target state-qualifier="mt-suggestion">Standardausgabe Nachrichten:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1288,7 +1289,7 @@
         <target state="translated">添付ファイル:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">添付ファイル:</target>
+          <target state-qualifier="mt-suggestion">Anlagen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1303,10 +1304,10 @@
       </trans-unit>
       <trans-unit id="NoTestsAvailableInSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} で使用できるテストはありません。インストールされているテスト探索プログラム、実行プログラム、プラットフォーム、およびフレームワークのバージョン設定が適切であることを確認し、もう一度お試しください。</target>
+        <target state="translated">{0} で使用できるテストはありません。インストールされているテスト探索プログラム、実行プログラム、プラットフォーム、およびフレームワークのバージョン設定が適切であることを確認し、再試行してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} ではテストは有効ではありません。インストールされているプラットフォームおよびフレームワークのバージョンの設定が適切なテスト discoverers &amp; エグゼキュータでは、もう一度やり直してください。</target>
+          <target state-qualifier="mt-suggestion">Kein Test ist verfügbar in {0}. Sicher installierten test Entdecker &amp; Executors Platform &amp; Framework Version sind geeignete und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -1315,7 +1316,7 @@
         <target state="translated">失敗   {0}</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} が失敗しました</target>
+          <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1324,7 +1325,7 @@
         <target state="translated">成功   {0}</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">渡された {0}</target>
+          <target state-qualifier="mt-suggestion">Übergebene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1333,7 +1334,7 @@
         <target state="translated">スキップ  {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} がスキップされました</target>
+          <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1342,7 +1343,7 @@
         <target state="translated">指定したソースで検出が失敗しました。例外 : {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">ソースが指定されているの検出が失敗しました。例外: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler bei der Ermittlung für angegebenen Quellen. Ausnahme: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -1350,11 +1351,11 @@
         <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
       Process Id of the Parent Process responsible for launching current process.</source>
         <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
-      現在のプロセスを開始させる親プロセスのプロセス ID です。</target>
+      現在のプロセスを起動する親プロセスのプロセス ID です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">ParentProcessId-|/ParentProcessId: &lt; ParentProcessId &gt;
-      現在のプロセスを起動するため、親プロセスのプロセス Id です。</target>
+          <target state-qualifier="mt-suggestion">– Diese Eigenschaft | / diese Eigenschaft: &lt; Prozesskennung &gt;
+      Prozess-Id des übergeordneten Prozesses für aktuellen Prozess verantwortlich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -1363,7 +1364,7 @@
         <target state="translated">--ParentProcessId|/ParentProcessId 引数には整数であるプロセス ID を指定する必要があります。このプロセスを開始した親プロセスのプロセス ID を指定してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--ParentProcessId | ParentProcessId 引数が整数では、プロセス id を必要があります。このプロセスを起動した親プロセスのプロセス id を指定します。</target>
+          <target state-qualifier="mt-suggestion">Diese Eigenschaft – | / Argument für diese Eigenschaft ist die Prozess-Id ist eine ganze Zahl. Geben Sie die Prozess-Id des übergeordneten Prozesses, die diesen Prozess gestartet.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -1372,7 +1373,7 @@
         <target state="translated">引数:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">引数:</target>
+          <target state-qualifier="mt-suggestion">Argumente:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1384,18 +1385,18 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="translated">--Diag|/Diag:&lt;ログ ファイルのパス&gt;
-      テスト プラットフォームのログを有効にします。
+        <target state="translated">--Diag|/Diag:&lt;Path to log file&gt;
+      テスト プラットフォームに対してログを有効にします。
       ログは指定されたファイルに書き込まれます。
 
-      ログのトレース レベルを以下のように変更します
-      例: /Diag:&lt;ログ ファイルのパス&gt;;tracelevel=&lt;既定値は "verbose"&gt;
-      tracelevel に指定できる値は、off、error、warning、info、verbose です。</target>
+      次のようにログのトレース レベルを変更します。
+      例: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      トレース レベルに使用できる値: off、error、warning、info、verbose。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Diag | または Diag: &lt; ログ ファイルへのパス &gt;
-      テスト プラットフォームの詳細なログを有効にします。
-      ログは、指定されたファイルに書き込まれます。</target>
+          <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; Pfad zur Protokolldatei &gt;
+      Aktivieren Sie ausführliche Protokolle Testplattform.
+      Protokolle werden in die angegebene Datei geschrieben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -1404,7 +1405,7 @@
         <target state="translated">指定されたファイル {0} は読み取り専用です。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定されたファイル {0} は読み取り専用</target>
+          <target state-qualifier="mt-suggestion">Die bereitgestellte Datei {0} ist schreibgeschützt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -1434,8 +1435,8 @@
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
         <target state="translated">--ResultsDirectory|/ResultsDirectory
-      テスト結果ディレクトリが存在しない場合は、指定されたパスに作成されます。
-      例  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
+      存在しない場合、テスト結果のディレクトリが指定されたパスに作成されます。
+      例: /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
@@ -1467,7 +1468,7 @@
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="translated">--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      テストの実行用にデータ コレクターを有効にします。詳細情報: https://aka.ms/vstest-collect</target>
+      テストの実行用のデータ コレクターを有効にします。詳細情報はこちら: https://aka.ms/vstest-collect</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
@@ -1526,13 +1527,14 @@
         <source>@&lt;file&gt;
       Read response file for more options.</source>
         <target state="translated">@&lt;file&gt;
-      その他のオプションについて、応答ファイルを読み取ります。</target>
+      その他のオプションについては、応答ファイルを参照してください。</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
-        <target state="new">テストの合計: 不明。合格: {0}。不合格: {1}。スキップ: {2}。</target>
-        <note></note>
+        <target state="translated">テストの合計数: 不明</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1541,7 +1543,7 @@
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
         <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
-        <target state="translated">また、テスト アダプターへのパスは /TestAdapterPath コマンドを使用して指定できます。例: /TestAdapterPath:&lt;pathToCustomAdapters&gt;。</target>
+        <target state="translated">さらに、/TestAdapterPath コマンドを使用してテスト アダプターのパスを指定できます。例: /TestAdapterPath:&lt;pathToCustomAdapters&gt;。</target>
         <note />
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
@@ -1579,18 +1581,18 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;ロガー URI/FriendlyName&gt;
-      テスト結果のロガーを指定します。たとえば、結果を 
-      Visual Studio テスト結果ファイル (TRX) に記録する場合は、/logger:trx[;LogFileName=&lt;既定値は一意のファイル名&gt;]
-      TestResults ディレクトリに指定した LogFileName でファイルを作成します。
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      テスト結果のロガーを指定します。たとえば、結果のログを
+      Visual Studio のテスト結果ファイル (TRX) に記録するには、/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;] を使用します
+      TestResults ディレクトリに、指定された LogFileName でファイルを作成します。
 
-      コンソール ロガーのログ メッセージの詳細レベルを次のように変更します。
-      例: /logger:console;verbosity=&lt;既定値は "minimal"&gt;
-      指定できる詳細レベルの値: quiet、minimal、normal、detailed。
+      コンソール ロガーのログ メッセージの詳細レベルを、次のように変更します
+      例: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      詳細レベルに使用できる値: quiet、minimal、normal、detailed。
 
-      コンソール ロガーの診断レベルのプレフィックスを次のように変更します。
-      例: /logger:console;prefix=&lt;既定値は "false"&gt;
-      コンソール ロガーの詳細については、https://aka.ms/console-logger をご覧ください。</target>
+      コンソール ロガーの診断レベルのプレフィックスを次のように変更します
+      例: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      コンソール ロガーの詳細についてはこちらをご覧ください: https://aka.ms/console-logger</target>
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
@@ -1625,33 +1627,39 @@
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 はサポートされていません。.Net Framework 3.5 を対象とするプロジェクトでは、Framework40 を使用して CLR 4.0 の "互換モード" でテストを実行してください。</target>
-        <note></note>
+        <target state="translated">Framework35 はサポートされていません。.Net Framework 3.5 を対象にしたプロジェクトでは、CLR 4.0 の「互換モード」でテストが実行されます。</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
-        <target state="new">Test run in progress</target>
-        <note></note>
+        <target state="translated">テストの実行が処理中</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
-        <target state="new">Total tests: {0}</target>
-        <note></note>
+        <target state="translated">テストの合計数: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
-        <target state="new">     Failed: {0}</target>
-        <note></note>
+        <target state="translated">     失敗: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
-        <target state="new">     Passed: {0}</target>
-        <note></note>
+        <target state="translated">     成功: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
-        <target state="new">    Skipped: {0}</target>
-        <note></note>
+        <target state="translated">    スキップ: {0}</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

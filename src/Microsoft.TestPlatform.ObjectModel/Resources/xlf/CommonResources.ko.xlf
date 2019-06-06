@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../CommonResources.resx" build-num="-1195242808">
+  <file datatype="xml" source-language="en" target-language="ko" original="../CommonResources.resx" build-num="595041357">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">71</count>
@@ -25,7 +25,7 @@
         <target state="translated">매개 변수는 null이거나 비워 둘 수 없습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">매개 변수는 null 이거나 비워 둘 수 없습니다.</target>
+          <target state-qualifier="mt-suggestion">Der Parameter darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -36,7 +36,7 @@
 </target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">테스트 실행 프레임 워크 {0}에서 {1} 플랫폼에 대 한 빌드 DLL(s)를 사용 합니다. DLL(s) 다음 부분에서는 실행 되지 것입니다: 이러한 설정을 관리에 대 한 자세한 내용은 {3} {2} 이동 합니다.</target>
+          <target state-qualifier="mt-suggestion">Testlauf verwendet DLLs für Framework {0} und {1}-Plattform integriert. Folgende DLLs nicht Teil ausführen: {2} zur {3} Einzelheiten auf diese Einstellungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
@@ -45,7 +45,7 @@
         <target state="translated">제공된 테스트 컨테이너 중에 테스트 실행을 위한 플랫폼 아키텍처 및 .NET Framework 설정과 일치하는 것이 없습니다. 플랫폼: {0}, .NET Framework: {1}. 이러한 설정의 관리에 대한 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=330428을 참조하세요.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">제공 된 테스트 컨테이너가 일치 하는 플랫폼 아키텍처와.Net Framework 설정을 테스트 실행에 대 한. 플랫폼: {0}.Net Framework: {1}입니다. 이러한 설정을 관리에 대 한 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=330428로 이동 합니다.</target>
+          <target state-qualifier="mt-suggestion">Keine der angegebenen Container übereinstimmt Plattformarchitektur und .net Framework-Einstellungen für den Testlauf. Plattform: {0} .net Framework: {1}. Lesen Sie http://go.microsoft.com/fwlink/?LinkID=330428 Weitere Informationen über diese Einstellungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>

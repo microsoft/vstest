@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-1826485515">
+  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-508382432">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">27</count>
@@ -25,7 +25,7 @@
         <target state="translated">Impossible d'exécuter la série de tests, car l'état initial est non valide.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">La série de tests n’a pas pu être exécutée car l’état initial n’est pas valide.</target>
+          <target state-qualifier="mt-suggestion">Testlauf konnte nicht ausgeführt werden, der ursprüngliche Status ungültig ist.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">L'attente de la fin de l'exécution d'une opération n'est pas autorisée quand il n'existe aucune série de tests active. </target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Attente de l’opération de fin n’est pas autorisée lorsqu’il n’existe aucune série de tests active.</target>
+          <target state-qualifier="mt-suggestion">Warten Sie auf Abschluss Vorgang nicht zulässig ist, wird keine aktiven Test ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>

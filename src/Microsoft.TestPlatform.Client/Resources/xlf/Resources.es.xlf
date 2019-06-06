@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="-1576854377">
+  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="-508382432">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">27</count>
@@ -25,7 +25,7 @@
         <target state="translated">No se pudo ejecutar la serie de pruebas porque el estado inicial no era válido.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">No se podrían ejecutar la ejecución de pruebas porque el estado inicial no era válido.</target>
+          <target state-qualifier="mt-suggestion">Testlauf konnte nicht ausgeführt werden, der ursprüngliche Status ungültig ist.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">La operación “Esperar que termine” no se permite cuando no hay ninguna serie de pruebas activa. </target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">De espera de la operación de finalización no se permite cuando no hay ninguna ejecución de prueba activa.</target>
+          <target state-qualifier="mt-suggestion">Warten Sie auf Abschluss Vorgang nicht zulässig ist, wird keine aktiven Test ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>

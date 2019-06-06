@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="-1298029716">
+  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="-1605532954">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">228</count>
@@ -25,7 +25,7 @@
         <target state="translated">探索プログラムのインスタンス化中に例外が発生しました: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Discoverer をインスタンス化中に例外が発生しました: {0}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Instanziieren Entdecker: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">同じ URI '{0}' を持つ複数のテスト アダプターが見つかりました。アダプター '{1}' を無視します。この警告が表示されないようにするには、競合するアダプターをアンインストールしてください。</target>
         <note>{0} is the unique identifier of test adapter. {1} is the name of the test adapter that shares a unique identifier with a previously loaded adapter.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">同じ uri '{0}' を持つ複数のテスト アダプターが検出されました。アダプター '{1}' を無視します。この警告を回避するのには競合しているアダプターをアンインストールしてください。</target>
+          <target state-qualifier="mt-suggestion">Mehrere Testadapter mit demselben Uri '{0}' gefunden. Der Adapter '{1}' ignorieren. Deinstallieren Sie die Konflikt Adaptern um diese Warnung zu vermeiden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">指定された重複データ ソース '{0}' を無視します。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定された重複データ ソース '{0}' を無視します。</target>
+          <target state-qualifier="mt-suggestion">Ignoriert die angegebene doppelte Quelle '{0}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">テスト探索プログラム '{0}' がテストを読み込んでいるときに例外が発生しました。例外: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Discoverer のテスト '{0}' のテストの読み込み中に例外が発生しました。例外: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Test Entdecker '{0}' Tests laden. Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">実行プログラム '{0}' の呼び出し中に例外が発生しました: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' 呼び出しの実行中に例外が発生しました: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Aufrufen Executor '{0}': {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">ファイル {0} は見つかりませんでした。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">ファイル {0} が見つかりませんでした。</target>
+          <target state-qualifier="mt-suggestion">Datei {0} konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">ホスト デバッグが有効です。続行するにはデバッガーをテスト ホスト プロセスにアタッチしてください。</target>
         <note>Host, testhost are key words, it should not be localized</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">デバッグ ホストを有効にします。考えますプロセスを続行するには、デバッガーを添付してください。</target>
+          <target state-qualifier="mt-suggestion">Host-Debuggen aktiviert ist. Testhost Prozess weiterhin zuordnen Sie Debugger.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">テスト探索プログラム {0} には DefaultExecutorUri 属性が含まれていないため、このテスト探索プログラムに対応するテスト実行プログラムを無視しています。テスト アダプター アドインの再インストールが必要になる場合があります。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Discoverer は DefaultExecutorUri 属性を持っていないために、{0} の discoverer をテストするのには対応するテストの実行を無視します。テスト アダプター アドインを再インストールする必要があります。</target>
+          <target state-qualifier="mt-suggestion">Ignorieren den Test Executor Entdecker {0} testen, da der Entdecker nicht das DefaultExecutorUri-Attribut entspricht. Sie müssen den Test Adapter Add-In erneut installieren.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">クライアント プロキシを初期化できませんでした。テスト プロセスに接続できませんでした。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">クライアント プロキシの初期化に失敗しました: プロセスをテストするのには接続できませんでした。</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Clientproxys: zum Testen nicht möglich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">この操作は、非デバッグ実行のコンテキストでは許可されていません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">この操作は、非デバッグ実行のコンテキストでは実行できません。</target>
+          <target state-qualifier="mt-suggestion">Dieser Vorgang kann nicht im Kontext zu einem nicht-Debug ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">URI が '{0}' のテスト実行プログラムが見つかりませんでした。テスト実行プログラムがインストールされ、.net ランタイム バージョン {1} をサポートしていることをご確認ください。</target>
         <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">URI '{0}' のテストの実行プログラムを見つけられませんでした。 テスト実行プログラムがインストールされ、.net ランタイム バージョン '{1}' をサポートしていることを確認してください。</target>
+          <target state-qualifier="mt-suggestion">Test Executor mit URI '{0}' konnte nicht gefunden werden.  Sicherstellen Sie, dass der Test Executor installiert ist und .net Runtime Version {1 unterstützt}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">指定されたソース '{0}' がいずれも有効ではありません。上記のエラーおよび警告を修正してから、もう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定したソース '{0}' の [なし] は、有効です。上記のエラーまたは警告を修正してからやり直してください。</target>
+          <target state-qualifier="mt-suggestion">Keiner der angegebenen Quellen '{0}' ist ungültig. Die obigen Fehler/Warnung beheben, und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -143,7 +143,7 @@
         <target state="translated">フィルターに一致するテストがありません。フィルターに無効なプロパティが 1 つ以上含まれています ({0})。有効なプロパティを含むフィルター式 ({1}) を指定してください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">1 つまたは複数のプロパティは無効です ({0}) が含まれているために、テストによって、フィルターは一致しませんでした。有効なプロパティ ({1}) を含むフィルター式を指定してからやり直してください。</target>
+          <target state-qualifier="mt-suggestion">Keine Tests entsprach dem Filter, da es eine oder mehrere Eigenschaften enthält, die nicht gültig ({0}). Filterausdruck mit gültigen Eigenschaften ({1}) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} で使用できるテストはありません。テスト探索プログラムと実行プログラムが登録されており、プラットフォームとフレームワークのバージョン設定が適切であることを確認して、もう一度お試しください。</target>
+        <target state="translated">{0} で使用できるテストはありません。テスト探索プログラムおよび実行プログラムが登録されており、プラットフォームおよびフレームワークのバージョン設定が適切であることを確認してから、もう一度お試しください。</target>
         <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">

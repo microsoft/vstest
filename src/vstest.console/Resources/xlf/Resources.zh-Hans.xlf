@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-1834472646">
+  <file datatype="xml" source-language="en" target-language="zh-HANS" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -25,7 +25,7 @@
         <target state="translated">指定了重复的源 {0}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">重复指定的源 {0}。</target>
+          <target state-qualifier="mt-suggestion">Doppelte Quelle {0} angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">未找到“{0}”。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">"{0} 未找到。</target>
+          <target state-qualifier="mt-suggestion">'{0}' wurde nicht gefunden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">以下测试发现外接程序可用:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">下面的测试发现外接是可用的︰</target>
+          <target state-qualifier="mt-suggestion">Die folgende Tests Discovery Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -52,13 +52,13 @@
         <target state="translated">以下测试执行外接程序可用:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">下面的测试执行外接是可用的︰</target>
+          <target state-qualifier="mt-suggestion">Die folgende Test Execution Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -79,13 +79,13 @@
         <target state="translated">以下测试记录器加载项可用:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">以下测试记录器插件是可用的︰</target>
+          <target state-qualifier="mt-suggestion">Die folgende Tests Protokollierung Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableTestsFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -97,7 +97,7 @@
         <target state="translated">错误: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">应只提供一次参数“{0}”。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数"{0}"应提供一次。</target>
+          <target state-qualifier="mt-suggestion">Der Parameter '{0}' sollte nur einmal erfolgen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">实例化扩展“{0}”时出现异常: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">实例化扩展"{0} 时出现异常︰ {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Instanziieren Erweiterung '{0}': {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">以下测试可用:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">下面的测试是可用的︰</target>
+          <target state-qualifier="mt-suggestion">Die folgenden Tests sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">无法识别的参数“{0}”。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">无法识别的参数"{0}"。</target>
+          <target state-qualifier="mt-suggestion">Unbekannte Parameter '{0}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">找不到提供的测试源文件“{0}”。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到测试源代码文件"{0}"提供。</target>
+          <target state-qualifier="mt-suggestion">Quelldatei Test "{0}' bereitgestellt wurde nicht gefunden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">测试记录器 URI“{0}”无效。将忽略该测试记录器。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试记录器 URI"{0} 为无效。 测试记录器将被忽略。</target>
+          <target state-qualifier="mt-suggestion">Test Protokollierung URI '{0}' ist ungültig.  Die Test-Protokollierung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">信息: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">信息︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Informationen: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">警告: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">警告︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Warnung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -189,8 +189,8 @@
       显示此用法信息。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-?|-帮助 | /？ |/ 帮助
-      显示此用法信息。</target>
+          <target state-qualifier="mt-suggestion">-?| --Hilfreiche | /? | / Help
+      Diesen Hilfetext anzeigen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -199,7 +199,7 @@
         <target state="translated">版权所有 (C) Microsoft Corporation。保留所有权利。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">版权所有 （c） 微软公司。 保留所有权利。</target>
+          <target state-qualifier="mt-suggestion">Copyright (c) Microsoft Corporation.  Alle Rechte vorbehalten.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -208,7 +208,7 @@
         <target state="translated">Microsoft (R) 测试执行命令行工具版本 {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Microsoft (R) 测试执行命令行工具版本 {0}</target>
+          <target state-qualifier="mt-suggestion">Microsoft (R) Test Execution Command Line Tool Version {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -226,29 +226,28 @@
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
         <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      为测试结果指定记录器。例如，若要将结果记录到
-      Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx[;LogFileName=&lt;默认为唯一文件名&gt;]
-      使用给定的 LogFileName 在 TestResults 目录中创建文件。
+      为测试结果指定一个记录器。例如，若要将结果记录到 Visual Studio 测试结果文件(TRX)中，请使用/logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      使用给定的  LogFileName 在 TestResults 目录中创建文件。
 
-      更改控制台记录器的日志消息的详细级别，如下所示
-      例如: /logger:console;verbosity=&lt;默认为 "正常"&gt;
-      允许的详细程度值: 最简单、最小、正常和详细。
+     更改控制台记录器的日志消息中的详细级别，如下所示
+      示例: /logger:console;verbosity&lt;Defaults to "normal"&gt;
+      允许的详细级别的值: quiet、minimal、normal 和 detailed。
 
       更改控制台记录器的诊断级别前缀，如下所示
-      示例: /logger:console;prefix=&lt;默认为 "false"&gt;
-      在此处查看控制台记录器的详细信息: https://aka.ms/console-logger</target>
+      示例: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      此处为控制台记录器的详细信息: https://aka.ms/console-logger</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
-      指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。
-      若要将测试结果发布到 Team Foundation Server，使用 TfsPublisher 如下所示
-      例如︰ /logger:TfsPublisher;
-                集合 = &lt; 团队项目集合 url &gt;;
-                BuildName = &lt; 生成名称 &gt;;
-                TeamProject = &lt; 团队项目名称 &gt;
-                [;平台 = &lt; 默认为"任何 CPU"&gt;]
-                [;口味 = &lt; 默认为"调试"&gt;]
-                [;RunTitle = &lt; 标题 &gt;]</target>
+          <target state-qualifier="mt-suggestion">-Protokollierung | / Logger: &lt; Logger Uri/FriendlyName &gt;
+      Geben Sie eine Protokollierung für Testergebnisse.  Z. B. protokollieren Ergebnisse in ein Visual Studio--Hardwareabstraktionsschicht (Test Ergebnisse Datei, TK) /logger:trx.
+      Verwenden Sie TfsPublisher zum Veröffentlichen von Testergebnissen in Team Foundation Server wie folgt
+      Beispiel: /logger:TfsPublisher;
+                Auflistung = &lt; Team Project Collection-Url &gt;;
+                BuildName = &lt; Buildnamen &gt;;
+                TeamProject = &lt; Team Projektname &gt;
+                [; Plattform = &lt; standardmäßig "Any CPU" &gt;]
+                [; Typ = &lt; standardmäßig "Debug" &gt;]
+                [; RunTitle = &lt; Title &gt;]</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="63" adjWordcount="53.55" curWordcount="53.55"</note>
       </trans-unit>
@@ -257,7 +256,7 @@
         <target state="translated">说明: 从指定的文件运行测试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">说明︰ 从指定的文件中运行测试。</target>
+          <target state-qualifier="mt-suggestion">Beschreibung: Führt Tests aus den angegebenen Dateien.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -266,16 +265,16 @@
         <target state="translated">选项:</target>
         <note>Section Header for subsequent command help listing</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">选项：</target>
+          <target state-qualifier="mt-suggestion">Optionen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="translated">用法: vstest.console.exe [参数] [选项] [[--] &lt;RunSettings 参数&gt;...]]</target>
+        <target state="translated">用法: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">用法︰ vstest.console.exe [参数] [选项]</target>
+          <target state-qualifier="mt-suggestion">Syntax: vstest.console.exe [Optionen] [Argumente]</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -284,7 +283,7 @@
         <target state="translated">未指定测试源文件。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定没有测试的源代码文件。</target>
+          <target state-qualifier="mt-suggestion">Es wurden keine Quelldateien Test angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -293,7 +292,7 @@
         <target state="translated">未指定参数。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">未不指定任何参数。</target>
+          <target state-qualifier="mt-suggestion">Keine Argumente wurden angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -311,9 +310,9 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
-      从指定的文件中运行测试。多个测试文件名称
-      用空格。
-      示例︰ mytestproject.dll
+      Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
+      durch Leerzeichen.
+      Beispiele: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
@@ -323,7 +322,7 @@
         <target state="translated">以下设置提供程序外接程序可用:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">下面的设置提供程序加载项是可用的︰</target>
+          <target state-qualifier="mt-suggestion">Die folgende Einstellung Anbieter Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -331,11 +330,11 @@
         <source>--Settings|/Settings:&lt;Settings File&gt;
       Settings to use when running tests.</source>
         <target state="translated">--Settings|/Settings:&lt;Settings File&gt;
-      运行测试时要使用的设置。</target>
+   运行测试时要使用的设置。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-设置 | / 设置︰ &lt; 设置文件 &gt;
-      在运行测试时要使用的设置。</target>
+          <target state-qualifier="mt-suggestion">-Einstellungen | / Settings: &lt; Datei &gt;
+      Einstellungen Tests ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -344,7 +343,7 @@
         <target state="translated">/Settings 参数要求提供设置文件。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Settings 参数要求一个设置文件来提供。</target>
+          <target state-qualifier="mt-suggestion">Der Parameter/Settings erfordert eine Einstellungsdatei bereitgestellt werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -353,7 +352,7 @@
         <target state="translated">找不到设置文件“{0}”。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到设置文件"{0}。</target>
+          <target state-qualifier="mt-suggestion">Die Einstellungsdatei '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -362,7 +361,7 @@
         <target state="translated">测试运行失败。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试运行失败。</target>
+          <target state-qualifier="mt-suggestion">Der Testlauf ist fehlgeschlagen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -371,7 +370,7 @@
         <target state="translated">测试运行成功。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试运行成功。</target>
+          <target state-qualifier="mt-suggestion">Testlauf erfolgreich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -380,7 +379,7 @@
         <target state="translated">参数 {0} 不应出现在 "InIsolation" 命令中。指定不带该参数的命令(示例: vstest.console.exe myTests.dll /InIsolation)，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数 {0} 不应在 InIsolation 命令。指定不带参数的命令 (示例︰ vstest.console.exe myTests.dll /InIsolation)，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'InIsolation'. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /InIsolation) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -389,7 +388,7 @@
         <target state="translated">/UseVsixExtensions 参数需要一个值。如果值为 "true"，则安装的 VSIX 扩展(如果有)将用在测试运行中。如果值为 "false"，则将其忽略。示例: /UseVsixExtensions:true</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/UseVsixExtensions 参数需要一个值。如果为 true，则将测试运行中使用已安装的 VSIX 扩展 （如果有的话）。如果为 false，会将其忽略。  例如︰ /UseVsixExtensions:true</target>
+          <target state-qualifier="mt-suggestion">Der /UseVsixExtensions-Parameter erfordert einen Wert. "True" werden der installierten VSIX-Erweiterung (falls vorhanden) im Testlauf verwendet. Wenn false, werden sie ignoriert.   Beispiel: /UseVsixExtensions:true</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -398,7 +397,7 @@
         <target state="translated">参数 {0} 不应出现在 "UseVsixExtensions" 命令中。指定指示是否应使用或跳过 vsix 扩展的命令(示例：vstest.console.exe myTests.dll /UseVsixExtensions:true)，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数 {0} 不应在 UseVsixExtensions 命令。指定命令，指示是否应使用或跳过的 vsix 扩展 (示例︰ vstest.console.exe myTests.dll /UseVsixExtensions:true)，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'UseVsixExtensions'. Geben Sie den Befehl an, ob die VSIX-Erweiterung verwendet oder übersprungen werden (Beispiel: vstest.console.exe myTests.dll /UseVsixExtensions:true) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -414,7 +413,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
-      在独立进程中运行测试。这使得 vstest.console.exe 进程不太可能被停止的错误在测试中，但是测试运行速度将减慢。</target>
+      Führt Tests in einem isolierten Prozess. Vstest.console.exe wird voraussichtlich auf Fehler in den Tests beendet jedoch Tests möglicherweise langsamer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
@@ -430,8 +429,8 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ UseVsixExtensions
-      这使得 vstest.console.exe 进程使用，或者跳过安装 （如果有的话） 中运行的测试的 VSIX 扩展。
-      /UseVsixExtensions:true 示例</target>
+      Das macht vstest.console.exe verwenden oder das VSIX-Extensions installiert (sofern vorhanden) in der überspringen. 
+      Beispiel /UseVsixExtensions:true</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -440,7 +439,7 @@
         <target state="translated">/BatchSize 参数要求批的大小。示例: /BatchSize:10</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/BatchSize 参数要求批处理的大小。 例如︰ /BatchSize:10</target>
+          <target state-qualifier="mt-suggestion">Das Argument /BatchSize muss die Größe des Stapels.  Beispiel: /BatchSize:10</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -449,7 +448,7 @@
         <target state="translated">批大小 {0} 无效。批大小应大于零。示例: /BatchSize:10</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">无效的批处理大小 {0}。批处理大小应大于零。例如︰ /BatchSize:10</target>
+          <target state-qualifier="mt-suggestion">Ungültige Batchgröße {0}. Die Batch-Größe muss größer als NULL sein. Beispiel: /BatchSize:10</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -458,16 +457,16 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="translated">  运行测试:
-    &gt;vstest.console.exe tests.dll 
-  使用其他设置(如数据收集器)运行测试:
-    &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
+        <target state="translated"> 运行测试:
+  &gt;vstest.console.exe tests.dll 
+ 使用其他设置(如数据收集器)运行测试:
+  &gt;vstest.console.exe tests.dll /Settings:Local.RunSettings</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">同一进程中运行测试︰
-    &gt; vstest.console.exe tests.dll 若要在单独的进程中运行测试︰
+          <target state-qualifier="mt-suggestion">Tests im gleichen Prozess ausgeführt:
+    &gt; vstest.console.exe tests.dll Tests in einem separaten Prozess ausführen:
     &gt; vstest.console.exe /inIsolation tests.dll
-  若要用其他设置，如数据收集器运行测试︰
+  Zum Ausführen von Tests mit zusätzlichen wie Datensammlungen
     &gt; vstest.console.exe tests.dll /Settings:Local.RunSettings</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="35" adjWordcount="29.75" curWordcount="29.75"</note>
@@ -480,7 +479,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListDiscoverers
-      列出已安装测试 discoverers。</target>
+      Listet die installierten Test Entdecker.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -492,7 +491,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListExecutors
-      列出已安装的测试执行器。</target>
+      Listet die installierten Test Executor.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -504,7 +503,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListLoggers
-      列出已安装测试记录器。</target>
+      Listet die installierten Test Protokollierungsmodule.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -516,7 +515,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListSettingsProviders
-      列出已安装的测试设置提供程序。</target>
+      Listet die installierten Test Einstellungsanbieter.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -524,11 +523,11 @@
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
         <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      列出给定测试容器中已发现的所有测试。</target>
+      从给定测试容器中列出所有已发现的测试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-长期 |-ListTests | / lt | / ListTests: &lt; 文件名 &gt;
-      列表发现从给定的测试容器测试。</target>
+          <target state-qualifier="mt-suggestion">-Lt |-ListTests | / Lt | / ListTests: &lt; Dateiname &gt;
+      Listen entdeckt Tests im angegebenen Testcontainer.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -537,7 +536,7 @@
         <target state="translated">已用时间:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">已用时间︰</target>
+          <target state-qualifier="mt-suggestion">Verstrichene Zeit:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -548,8 +547,8 @@
        示例: /Tests:TestsMethod1、/Tests:TestMethod1、method2</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Tests 参数要求一个或多个特定的测试名称或它们的子字符串。
-       示例︰ /Tests:TestsMethod1、 /Tests:TestMethod1、 method2</target>
+          <target state-qualifier="mt-suggestion">Das Batch.log-Argument erfordert eine oder mehrere bestimmte Testnamen oder die Teilzeichenfolgen.
+       Beispiele: /Tests:TestsMethod1, /Tests:TestMethod1, Methode2</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -558,7 +557,7 @@
         <target state="translated">共发现 {0} 个测试，但没有与指定选择条件 ({1}) 匹配的测试。使用正确的值，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} 的测试发现，但没有测试共匹配指定的选择 criteria({1})。使用正确的值，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Insgesamt {0} Tests entdeckt wurden, aber kein Test entspricht der angegebenen Auswahl criteria({1}). Richtige Werte verwenden und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -579,16 +578,16 @@
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
         <target state="translated">--Tests|/Tests:&lt;Test Names&gt;
-      使用与提供的值相匹配的名称运行测试。若要提供多个
-      值，使用逗号将它们分隔开。
-      示例: /Tests:TestMethod1
-                /Tests:TestMethod1,testMethod2</target>
+      运行其名称与所提供值相匹配的测试。若要提供多个
+   值，请用逗号将这些值分隔开。
+   示例: /Tests:TestMethod1
+        /Tests:TestMethod1,testMethod2</target>
         <note>Please verify if the console output looks good after modifiaction. </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-测试 | / 测试︰ &lt; 测试名称 &gt;
-      具有与提供的值相匹配的名称中运行测试。若要提供多个
-      值，使用逗号分隔它们。
-      例如︰ /Tests:TestMethod1
+          <target state-qualifier="mt-suggestion">– Testet | / Tests: &lt; Test Namen &gt;
+      Führen Sie Tests, deren Namen, die mit die angegebenen Werten übereinstimmen. Bereitstellen mehrerer
+      Werte trennen durch Kommas.
+      Beispiele: /Tests:TestMethod1
                 /Tests:TestMethod1 testMethod2</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="25" adjWordcount="21.25" curWordcount="21.25"</note>
@@ -598,7 +597,7 @@
         <target state="translated">使用隔离模式运行测试，因为已在 runsettings 中启用了诊断数据适配器。使用 /inIsolation 参数取消此警告。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">使用隔离模式以运行测试，为诊断数据适配器已启用 runsettings 中。/InIsolation 参数用于禁止显示此警告。</target>
+          <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -607,7 +606,7 @@
         <target state="translated">使用隔离模式为 Windows 应用商店应用运行单元测试。使用 /InIsolation 参数取消此警告。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">使用隔离模式下运行单元测试 Windows 应用商店应用程序。/InIsolation 参数用于禁止显示此警告。</target>
+          <target state-qualifier="mt-suggestion">Mit Isolationsmodus führen tests für Windows Store-apps. Verwenden Sie den Parameter /InIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -616,7 +615,7 @@
         <target state="translated">为 Windows 应用商店应用运行单元测试时不支持诊断数据适配器。从设置中删除诊断数据适配器设置。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">在 Windows 应用商店应用程序的运行单元测试时不支持诊断数据适配器。删除设置的诊断数据适配器设置。</target>
+          <target state-qualifier="mt-suggestion">Adapter für diagnostische Daten werden bei laufenden für Windows Store-apps Komponententests unterstützt. Entfernen Sie Diagnosedaten Adapter Einstellungen aus.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -625,7 +624,7 @@
         <target state="translated">        FriendlyName: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">友好名称︰ {0}</target>
+          <target state-qualifier="mt-suggestion">FriendlyName: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -634,7 +633,7 @@
         <target state="translated">        URI: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Uri: {0}</target>
+          <target state-qualifier="mt-suggestion">URI: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -652,7 +651,7 @@
         <target state="translated">        支持的文件类型:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">支持的文件类型︰</target>
+          <target state-qualifier="mt-suggestion">Unterstützte Dateitypen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -670,7 +669,7 @@
         <target state="translated">{0}，</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0}，</target>
+          <target state-qualifier="mt-suggestion">{0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -679,7 +678,7 @@
         <target state="translated">        默认执行器 URI: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">默认执行器 Uri: {0}</target>
+          <target state-qualifier="mt-suggestion">Standard-Executor Uri: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -688,7 +687,7 @@
         <target state="translated">        URI: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Uri: {0}</target>
+          <target state-qualifier="mt-suggestion">URI: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="0.5" curWordcount="0.5"</note>
       </trans-unit>
@@ -697,7 +696,7 @@
         <target state="translated">无效的平台类型: {0}。有效平台类型为 x86、x64 和 ARM。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">无效的平台类型︰ {0}。 有效平台类型是 x86、 x64 和扶手。</target>
+          <target state-qualifier="mt-suggestion">Ungültige Plattform: {0}. gültige Plattformtypen sind X86, X64 und Arm.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -706,7 +705,7 @@
         <target state="translated">/Platform 参数要求提供用于测试运行的目标平台类型。示例: /Platform:x86</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Platform 参数测试运行来提供要求的目标平台类型。  例如︰ /Platform:x 86</target>
+          <target state-qualifier="mt-suggestion">/ Platform Argument erfordert den Zieltyp Plattform für den Testlauf bereitgestellt werden.   Beispiel: /Platform:x 86</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -715,13 +714,13 @@
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
         <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
-      用于测试执行的目标平台体系结构。
-      有效值为 x86、x64 和 ARM。</target>
+      用于执行测试的目标平台体系结构。
+   有效值为 x86、x64 和 ARM。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-平台 | / 平台︰ &lt; 平台类型 &gt;
-      目标平台体系结构，用于测试执行。
-      有效值为 x86、 x64 和 ARM。</target>
+          <target state-qualifier="mt-suggestion">-Plattform | / Platform: &lt; Plattformtyp &gt;
+      Ziel Plattformarchitektur für Ausführung verwendet werden. 
+      Gültige Werte sind X86, X64 und ARM.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -730,7 +729,7 @@
         <target state="translated">按照针对测试运行有效的 Platform:{0} 和 .Net Framework:{1} 设置要求，使用隔离模式运行测试。使用 /inIsolation 参数取消此警告。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">使用隔离模式进行测试，根据需要通过有效的平台︰ {0} 和.Net 框架︰ 对测试运行设置 {1}。/InIsolation 参数用于禁止显示此警告。</target>
+          <target state-qualifier="mt-suggestion">Isolation Modus zum Ausführen von Tests gemäß wirksame Plattform: {0} und .net Framework: {1} Einstellungen für den Testlauf. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="26" adjWordcount="22.1" curWordcount="22.1"</note>
       </trans-unit>
@@ -739,16 +738,16 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
-      用于测试执行的目标 .Net Framework 版本。
-      有效值为 ".NETFramework,Version=v4.5.1"、".NETCoreApp,Version=v1.0" 等。
-      其他受支持的值为 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
+        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
+      用于执行测试的目标 .Net Framework 版本。
+      有效值为 ".NETFramework,Version=v4.5.1".NETCoreApp,Version=v1.0" 等。
+      其他支持的值为 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
-      目标.Net Framework 版本以用于测试执行。
-      有效值为"。NETFramework、 版本 = v4.6"，"。NETCoreApp、 版本 = 1.0 版"等。
-      其他受支持的值是 Framework35、 Framework40、 Framework45 和 FrameworkCore10。</target>
+          <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; Frameworkversion &gt;
+      Ziel von .net Framework-Version für die Ausführung verwendet werden. 
+      Gültige Werte sind ". NETFramework, Version v4. 6 = ",". NETCoreApp, Version = 1.0 "usw..
+      Andere unterstützte Werte sind Framework35, Framework40, Framework45 und FrameworkCore10.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
@@ -757,7 +756,7 @@
         <target state="translated">/Framework 参数要求用于测试运行的目标 .Net Framework 版本。示例: /Framework:".NETFramework,Version=v4.5.1"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Framework 参数要求目标.Net Framework 版本的测试运行。  例如︰ /Framework:"。NETFramework、 版本 = v4.6"</target>
+          <target state-qualifier="mt-suggestion">Das Argument /Framework muss das Ziel .net Framework-Version für den Testlauf.   Beispiel: /Framework: ". NETFramework, Version v4. 6 = "</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -766,7 +765,7 @@
         <target state="translated">无效的 .Net Framework 版本: {0}。请提供 TargetFramework 的全名(示例: .NETCoreApp,Version=v2.0)。其他支持的 .Net Framework 版本为 Framework40、Framework45、FrameworkCore10 和 FrameworkUap10。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">无效的.Net Framework 版本︰ {0}。 请给 TargetFramework 的全名。其他受支持的.Net Framework 版本是 Framework35、 Framework40 和 Framework45。</target>
+          <target state-qualifier="mt-suggestion">Ungültige .net Framework-Version: {0}. Geben Fullname der TargetFramework. Andere unterstützt .net Framework-Versionen sind Framework35, Framework40 und Framework45.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -775,7 +774,7 @@
         <target state="translated">无法启动针对 Windows 应用商店应用的单元测试的测试运行: {0}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">无法启动 Windows 应用商店应用程序的单元测试运行的测试︰ {0}。</target>
+          <target state-qualifier="mt-suggestion">Testlauf für Komponententests für Windows Store-app konnte nicht gestartet werden: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -790,25 +789,25 @@
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</source>
         <target state="translated">--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
-      运行与给定表达式匹配的测试。
-      &lt;表达式&gt; 的格式为 &lt;属性&gt;Operator&lt;值&gt;[|&amp;&lt;表达式&gt;]
-         其中 Operator 是 =、!= 或 ~ 之一(Operator ~ 具有 "contains" 
-         语义且适用于如 DisplayName 之类的字符串属性)
-         括号 () 可用于对子表达式进行分组。
-      示例: /TestCaseFilter:"Priority=1"
-                /TestCaseFilter:"(FullyQualifiedName~Nightly
-                                  |Name=MyTestMethod)"</target>
+   运行与给定表达式匹配的测试。
+   &lt;Expression&gt; 的格式为 &lt;property&gt;Operator&lt;value&gt;[|&amp;&lt;Expression&gt;]
+     其中，Operator 是 =、!= 或 ~ (Operator ~ 具有 "contains"
+     语义且适用于诸如 DisplayName 之类的字符串属性)。
+     括号()可用于对子表达式进行分组。
+   示例: /TestCaseFilter:"Priority=1"
+         /TestCaseFilter:"(FullyQualifiedName~Nightly
+                 |Name=MyTestMethod)"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-TestCaseFilter | / TestCaseFilter: &lt; 表达式 &gt;
-      运行测试符合给定的表达式。
-      &lt; 表达式 &gt; &lt; 属性 &gt; &lt; 值 &gt; 运算符的格式为 [| &amp; &lt; 表达式 &gt;]
-         运算符是一个 =，其中 ！ = 或 ~ (运算符 ~ 有包含
-         语义和适用于字符串属性，如显示名称)。
-         圆括号 （） 可用于组的子表达式。
-      示例︰ /TestCaseFilter:"优先级 = 1"
+          <target state-qualifier="mt-suggestion">--TestCaseFilter | / TestCaseFilter: &lt; Ausdruck &gt;
+      Ausführen von Tests, die mit dem angegebenen Ausdruck übereinstimmt.
+      &lt; Ausdruck &gt; Format &lt; Eigenschaft &gt; Operator &lt; Wert &gt; ist [| &amp; &lt; Ausdruck &gt;]
+         Operator ist eine =,! = oder ~ (Operator ~ ' enthält '
+         Semantik und für Eigenschaften wie "DisplayName").
+         Klammern () kann Teilausdrücke Gruppe verwendet werden.
+      Beispiele: /TestCaseFilter: "Priorität 1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
-                                  |Name=MyTestMethod)"</target>
+                                  | Name=MyTestMethod) "</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="57" adjWordcount="48.45" curWordcount="48.45"</note>
       </trans-unit>
@@ -816,14 +815,14 @@
         <source>The /TestCaseFilter argument requires the filter value.
         Filter value can be &lt;property&gt;=&lt;value&gt; type.
         Examples: "Priority=1", "TestCategory=Nightly"</source>
-        <target state="translated">/TestCaseFilter 参数要求筛选值。
-        筛选值可以为类型 &lt;属性&gt;=&lt;值&gt;。
-        示例: "Priority=1"、"TestCategory=Nightly"</target>
+        <target state="translated">/TestCaseFilter 参数需要筛选器值。
+    筛选器值可以是“&lt;属性&gt;=&lt;值&gt;”类型。
+    示例: "Priority=1", "TestCategory=Nightly"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/TestCaseFilter 参数要求的筛选器值。
-        筛选器值可以是 &lt; 属性 &gt; = &lt; 值 &gt; 类型。
-        示例:"优先级 = 1"，"TestCategory = 每晚"</target>
+          <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter muss den Filterwert.
+        Filter kann &lt; Eigenschaft &gt; = &lt; Wert &gt;.
+        Beispiel: "Priorität 1", "TestCategory = jede Nacht"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -832,7 +831,7 @@
         <target state="translated">不能使用 /Tests 指定 /TestCaseFilter 参数。指定测试时无法筛选测试用例。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">不能使用 /Tests 指定 /TestCaseFilter 参数。指定测试时，测试用例的筛选不适用。</target>
+          <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter kann mit Batch.log angegeben werden. Filtern von Testfällen ist nicht anwendbar, wenn Tests angegeben werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -841,7 +840,7 @@
         <target state="translated">{0} 为 {1}/{2} 而生成。运行中指定的测试程序集应具有共有的目标.Net Framework 和平台。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} 生成为 {1} / {2}。指定某个运行中的测试程序集应具有公共目标.Net 框架和平台。</target>
+          <target state-qualifier="mt-suggestion">{0} wurde für {1} / {2}. In einer angegebenen Testassemblys müssen eine allgemeine .net Framework-Zielversion und Plattform.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -850,7 +849,7 @@
         <target state="translated">只能为运行测试指定一个应用包(.appx 文件)。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">只有一个应用程序的程序包 （.appx 文件） 可以指定用于运行测试。</target>
+          <target state-qualifier="mt-suggestion">Zum Ausführen von Tests kann nur ein Anwendungspaket (.appx Datei) angegeben werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -859,7 +858,7 @@
         <target state="translated">正在启动测试发现，请稍候...</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">开始测试发现，请稍候...</target>
+          <target state-qualifier="mt-suggestion">Warten Sie Discovery Test gestartet, bitte...</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -868,7 +867,7 @@
         <target state="translated">正在启动测试执行，请稍候...</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">开始测试执行，请稍候...</target>
+          <target state-qualifier="mt-suggestion">Warten Sie Ausführung gestartet, bitte...</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -877,7 +876,7 @@
         <target state="translated">读取诊断数据适配器设置引发了“{0}”的运行。将在此运行中跳过所有诊断数据适配器。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">正在读取诊断数据适配器设置引发运行"{0}。此运行中，将跳过所有诊断数据适配器。</target>
+          <target state-qualifier="mt-suggestion">Lesen von Diagnosedaten adaptereinstellungen hat eine laufende '{0}'. Alle Adapter für diagnostische Daten werden in diesem Durchlauf übersprungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -889,7 +888,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
-      启用诊断数据适配器 CodeCoverage 中的测试运行。如果不使用设置文件指定，则默认设置使用。</target>
+      Adapter für diagnostische Daten "CodeCoverage" im Testlauf ermöglicht. Standardeinstellungen werden nicht angegeben, mit der Datei.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -898,7 +897,7 @@
         <target state="translated">参数 {0} 不应出现在 "EnableCodeCoverage" 命令中。指定不带参数的命令(示例: vstest.console.exe myTests.dll /EnableCodeCoverage)，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数 {0} 不应在 EnableCodeCoverage 命令。指定不带参数的命令 (示例︰ vstest.console.exe myTests.dll /EnableCodeCoverage)，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'EnableCodeCoverage'. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /EnableCodeCoverage) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -907,7 +906,7 @@
         <target state="translated">应用包“{0}”没有测试执行器入口点。为对 Windows 应用商店应用运行单元测试，使用 Windows 应用商店应用单元测试库项目创建应用包。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">应用程序软件包"{0} 并不具有测试执行器入口点。对于运行 Windows 应用商店应用程序的单元测试，创建应用程序使用 Windows 应用商店应用程序单元测试库项目的包。</target>
+          <target state-qualifier="mt-suggestion">App-Paket '{0}' hat keine Test Executor Einstiegspunkt. Erstellen Sie zum Ausführen von Komponententests für Windows Store-apps, app-Paket mit Windows Store-app Einheitenbibliothek-Projekt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -916,7 +915,7 @@
         <target state="translated">代码覆盖率不适用于 Windows 应用商店应用。已对此测试运行跳过代码覆盖率分析。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">代码覆盖率不用于 Windows 应用商店应用程序。代码覆盖率分析跳过运行此测试。</target>
+          <target state-qualifier="mt-suggestion">Codeabdeckungsdaten ist nicht verfügbar für Windows Store-apps. Codeabdeckungsanalyse übersprungen für diesen Testlauf.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -925,7 +924,7 @@
         <target state="translated">共发现 {0} 个测试，但一些测试与指定选择条件 ({1}) 不匹配。使用正确的值，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} 的测试共发现但某些测试不匹配指定的选择 criteria({1})。使用正确的值，然后重试。</target>
+          <target state-qualifier="mt-suggestion">{0} Tests entdeckt wurden jedoch einige Tests entsprechen nicht der angegebenen Auswahl criteria({1}). Richtige Werte verwenden und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -935,15 +934,15 @@
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <target state="translated">--TestAdapterPath|/TestAdapterPath
-      这可使 vstest.console.exe 进程在测试运行中使用
-      给定路径(如果有)中的自定义测试适配器
-      示例  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
+      这将使 vstest.console.exe 进程在测试运行中使用
+   给定路径(如果有)中的自定义测试适配器。
+   示例 /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-TestAdapterPath | / TestAdapterPath
-      这使得 vstest.console.exe 进程使用自定义测试适配器
-      从给定的路径 （如果有的话） 中的测试运行。
-      /TestAdapterPath 示例︰ &lt; pathToCustomAdapters &gt;</target>
+          <target state-qualifier="mt-suggestion">--TestAdapterPath | / TestAdapterPath
+      Das macht vstest.console.exe benutzerdefinierten Testadapter verwendet
+      aus einem angegebenen Pfad (falls vorhanden) im Testlauf. 
+      Beispiel /TestAdapterPath: &lt; PathToCustomAdapters &gt;</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -952,7 +951,7 @@
         <target state="translated">/TestAdapterPath 参数需要一个值，该值是自定义测试适配器所在位置的路径。示例: /TestAdapterPath:c:\MyCustomAdapters</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/TestAdapterPath 参数需要一个值，它是包含自定义测试适配器的位置路径。例如︰ /TestAdapterPath:c:\MyCustomAdapters</target>
+          <target state-qualifier="mt-suggestion">Der /TestAdapterPath-Parameter erfordert einen Wert, der Pfad zu einem Speicherort mit benutzerdefinierten Testadapter. Beispiel: /TestAdapterPath:c:\MyCustomAdapters</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
@@ -961,7 +960,7 @@
         <target state="translated">"TestAdapterPath" 中指定的路径“{0}”无效。错误: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">路径"{0} 指定 TestAdapterPath 中无效。错误︰ {1}</target>
+          <target state-qualifier="mt-suggestion">Der Pfad '{0}' in 'TestAdapterPath' angegeben ist ungültig. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -970,7 +969,7 @@
         <target state="translated">找不到提供的自定义测试适配器搜索路径，请提供一个有效路径，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到提供的自定义测试适配器搜索路径、 提供了一个有效的路径，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Bereitgestellten benutzerdefinierten Test Adapter Suchpfad nicht gefunden, geben Sie einen gültigen Pfad, und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -979,7 +978,7 @@
         <target state="translated">"TestAdapterPath" 中指定的路径“{0}”不包含任何测试适配器，请提供有效路径，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">路径"{0} 指定 TestAdapterPath 中不包含任何测试适配器，提供有效的路径然后再试一次。</target>
+          <target state-qualifier="mt-suggestion">Der Pfad '{0}' in 'TestAdapterPath' angegebene nicht Testadapter enthalten, geben Sie einen gültigen Pfad und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -988,7 +987,7 @@
         <target state="translated">无法启动针对 Windows Phone 应用的测试的测试运行: {0}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">无法启动 Windows Phone 应用程序的测试运行的测试︰ {0}。</target>
+          <target state-qualifier="mt-suggestion">Testlauf für die Tests für Windows Phone-Anwendung konnte nicht gestartet werden: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -997,7 +996,7 @@
         <target state="translated">使用隔离模式为 Windows Phone 应用运行单元测试。使用 /InIsolation 参数取消此警告。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">使用隔离模式下运行单元测试 Windows Phone 应用程序。/InIsolation 参数用于禁止显示此警告。</target>
+          <target state-qualifier="mt-suggestion">Windows Phone apps prüft mit Isolationsmodus führen. Verwenden Sie den Parameter /InIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -1006,7 +1005,7 @@
         <target state="translated">代码覆盖率不适用于 Windows Phone 应用。已为此测试运行跳过代码覆盖率分析。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">代码覆盖率不用于 Windows Phone 应用程序。代码覆盖率分析跳过运行此测试。</target>
+          <target state-qualifier="mt-suggestion">Codeabdeckungsdaten ist nicht verfügbar für Windows Phone apps. Codeabdeckungsanalyse übersprungen für diesen Testlauf.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -1015,7 +1014,7 @@
         <target state="translated">为 Windows Phone 应用运行单元测试时不支持诊断数据适配器。从设置中删除诊断数据适配器设置。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">对于 Windows Phone 应用程序正在运行单元测试时，不支持诊断数据适配器。删除设置的诊断数据适配器设置。</target>
+          <target state-qualifier="mt-suggestion">Adapter für diagnostische Daten werden bei laufenden für Windows Phone apps Komponententests unterstützt. Entfernen Sie Diagnosedaten Adapter Einstellungen aus.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -1024,7 +1023,7 @@
         <target state="translated">应用包“{0}”没有测试执行器入口点。为对 Windows Phone 应用运行单元测试，使用 Windows Phone 应用单元测试应用项目创建应用包。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">应用程序软件包"{0} 并不具有测试执行器入口点。对于运行 Windows Phone 应用程序的单元测试，应用程序使用创建包 Windows Phone 单元测试应用程序项目。</target>
+          <target state-qualifier="mt-suggestion">App-Paket '{0}' hat keine Test Executor Einstiegspunkt. Erstellen Sie zum Ausführen von Komponententests für Windows Phone apps, app Paket mit Windows Phone Unit Test-App-Projekt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
@@ -1033,7 +1032,7 @@
         <target state="translated">使用框架 {0} 运行测试。指定 /Framework:{1} 取消此警告。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">使用框架 {0} 来运行测试。指定 /Framework: {1} 要禁止显示此警告。</target>
+          <target state-qualifier="mt-suggestion">Framework {0} verwenden zum Ausführen der Tests. Geben Sie /Framework: {1}, um diese Warnung zu unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1042,7 +1041,7 @@
         <target state="translated">在指定测试容器中找不到任何测试。此外，Microsoft Windows 应用商店单元测试适配器不支持 .appxbundle 文件。在创建应用包时创建一个 appx (将“生成应用程序包”选项设置为“从不”)并重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">在指定的测试容器中找到任何测试。另外，Microsoft Windows 存储单元测试适配器不支持.appxbundle 文件。创建 appx （生成应用程序捆绑包将选项设置为从不） 时创建的应用程序的软件包，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Keine Tests im angegebenen Testcontainer gefunden. Darüber hinaus unterstützt Microsoft Windows Store Unit Test-Adapter nicht .appxbundle Dateien. Erstellen einer Anlage (Einstellung generieren App Bundle Option nie) als Anwendungspaket erstellen und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="37" adjWordcount="31.45" curWordcount="31.45"</note>
       </trans-unit>
@@ -1057,10 +1056,10 @@
       可使用设置文件配置要使用的内核数。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-平行 | / 并行
-      指定并行执行测试。默认情况下安装
-      到计算机上的所有可用内核可以使用。
-      可能使用设置文件配置的内核使用的数量。</target>
+          <target state-qualifier="mt-suggestion">--Parallel | / Parallel
+      Gibt an, dass die Tests parallel ausgeführt werden. Standardmäßig oben
+      für alle verfügbaren Kerne auf dem Computer verwendet werden.
+      Die Anzahl der Kerne verwendet möglicherweise mithilfe einer Einstellungsdatei konfiguriert werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="36" adjWordcount="30.6" curWordcount="30.6"</note>
       </trans-unit>
@@ -1069,7 +1068,7 @@
         <target state="translated">参数 {0} 不应出现在 "Parallel" 命令中。指定不带参数的命令(示例: vstest.console.exe myTests.dll /Parallel)，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数 {0} 不应在平行的命令。指定不带参数的命令 (示例︰ vstest.console.exe myTests.dll /Parallel)，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} ist nicht 'Parallel' Befehl erwartet. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /Parallel) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -1078,7 +1077,7 @@
         <target state="translated">不能为 NULL 或为空</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">不能为 null 或为空</target>
+          <target state-qualifier="mt-suggestion">Darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -1086,11 +1085,11 @@
         <source>--Port|/Port:&lt;Port&gt;
       The Port for socket connection and receiving the event messages.</source>
         <target state="translated">--Port|/Port:&lt;Port&gt;
-      用于套接字连接以及接收事件消息的端口。</target>
+      套接字连接和接收事件消息的端口。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-端口 | / 端口︰ &lt; 端口 &gt;
-      用于套接字连接，接收事件消息的端口。</target>
+          <target state-qualifier="mt-suggestion">-Port | / Port: &lt; Port &gt;
+      Der Port für Socket-Verbindung und das Ereignis empfangen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1099,7 +1098,7 @@
         <target state="translated">--Port|/Port 参数需要为整数的端口号。指定用于套接字连接以及接收事件消息的端口。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--端口 | / 端口参数要求的端口号，它是一个整数。指定套接字连接，接收事件消息的端口。</target>
+          <target state-qualifier="mt-suggestion">-Port | / Port-Argument ist die Port-Nummer ist eine ganze Zahl. Geben Sie den Port für die Socket-Verbindung und das Ereignis empfangen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -1108,7 +1107,7 @@
         <target state="translated">测试下找不到程序集。请确保已生成该项目。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到测试下的程序集。请确保已生成了该项目。</target>
+          <target state-qualifier="mt-suggestion">Nicht getestete Assembly gefunden. Stellen Sie sicher, dass das Projekt erstellt wird.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
@@ -1117,19 +1116,19 @@
         <target state="translated">路径 {0} 不存在。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">路径 {0} 不存在。</target>
+          <target state-qualifier="mt-suggestion">Der Pfad {0} ist nicht vorhanden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="BuildBasePathArgumentHelp">
         <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</source>
-        <target state="translated">--BuildBasePath|/BuildBasePath: &lt;BuildBasePath&gt;
+        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       包含临时输出的目录。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
-      包含临时输出的目录。</target>
+          <target state-qualifier="mt-suggestion">--BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
+      Das Verzeichnis für temporären Ausgaben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -1137,11 +1136,11 @@
         <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
       The configuration the project is built for i.e. Debug/Release</source>
         <target state="translated">-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
-      项目为其生成的配置，即调试/发布</target>
+      项目为调试/发布等生成的配置</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-c |-配置 | /c | / 配置︰ &lt; 配置 &gt;
-      亦即发布版调试生成配置项目</target>
+          <target state-qualifier="mt-suggestion">-C |-Konfiguration | / C | / Konfiguration: &lt; Configuration &gt;
+      Die Konfiguration des Projekts wird für z. B. Debug/Release erstellt</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -1150,7 +1149,7 @@
         <target state="translated">给定的配置无效。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">给定的配置无效。</target>
+          <target state-qualifier="mt-suggestion">Die Konfiguration ist ungültig.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -1161,8 +1160,8 @@
       包含要运行的二进制文件的目录。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-o |-输出 | / o | / 输出︰ &lt; 输出 &gt;
-      包含要运行的二进制文件的目录。</target>
+          <target state-qualifier="mt-suggestion">-o |-Ausgabe | / o | / Output: &lt; Output &gt;
+      Das Verzeichnis Binärdateien ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -1171,7 +1170,7 @@
         <target state="translated">找不到 BuildBasePath，请提供有效的路径，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到 BuildBasePath，提供有效的路径，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Die BuildBasePath wurde nicht gefunden, geben Sie einen gültigen Pfad und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -1180,7 +1179,7 @@
         <target state="translated">找不到 Output 路径，请提供有效的路径，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">输出路径未找到，提供有效的路径，然后重试。</target>
+          <target state-qualifier="mt-suggestion">Das Verzeichnis wurde nicht gefunden, geben Sie einen gültigen Pfad und wiederholen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1189,7 +1188,7 @@
         <target state="translated">其他信息性消息:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">附加信息︰</target>
+          <target state-qualifier="mt-suggestion">Weitere Informationen-Nachrichten:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1198,7 +1197,7 @@
         <target state="translated">天</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">天</target>
+          <target state-qualifier="mt-suggestion">Tage</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1207,16 +1206,17 @@
         <target state="translated">错误消息:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误消息︰</target>
+          <target state-qualifier="mt-suggestion">Fehlermeldung:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
-        <target state="new">测试执行时间: {0:0.0000} {1}</target>
-        <note></note>
+        <target state="translated">总时间: {0:0.0000} {1}</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试执行时间: {0:0.0000} {1}</target>
+          <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -1225,7 +1225,7 @@
         <target state="translated">小时</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">小时</target>
+          <target state-qualifier="mt-suggestion">Stunden</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1234,7 +1234,7 @@
         <target state="translated">找不到 URI 或 FriendlyName 为“{0}”的测试记录器。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到测试记录器与 URI 或友好名称"{0}。</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -1243,7 +1243,7 @@
         <target state="translated">分钟</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">分钟</target>
+          <target state-qualifier="mt-suggestion">Minuten</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1252,7 +1252,7 @@
         <target state="translated">秒</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">秒</target>
+          <target state-qualifier="mt-suggestion">Sekunden</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1261,7 +1261,7 @@
         <target state="translated">堆栈跟踪:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">堆栈跟踪︰</target>
+          <target state-qualifier="mt-suggestion">Stack-Trace:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1270,7 +1270,7 @@
         <target state="translated">标准错误消息:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">标准错误消息︰</target>
+          <target state-qualifier="mt-suggestion">Standard-Fehlermeldungen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1279,7 +1279,7 @@
         <target state="translated">标准输出消息:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">标准输出消息︰</target>
+          <target state-qualifier="mt-suggestion">Standardausgabe Nachrichten:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1288,7 +1288,7 @@
         <target state="translated">附件:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">附件︰</target>
+          <target state-qualifier="mt-suggestion">Anlagen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1303,10 +1303,10 @@
       </trans-unit>
       <trans-unit id="NoTestsAvailableInSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} 中没有可用的测试。确保安装的测试发现器和执行器以及平台和框架版本设置适当，然后重试。</target>
+        <target state="translated">{0} 中没有可用测试。请确保安装了适当的测试发现器和执行器且平台和框架版本设置合适，然后重试。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">没有测试位于 {0}。请确保安装的测试平台与框架版本设置的相应 discoverers &amp; 执行器，并再试一次。</target>
+          <target state-qualifier="mt-suggestion">Kein Test ist verfügbar in {0}. Sicher installierten test Entdecker &amp; Executors Platform &amp; Framework Version sind geeignete und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -1315,7 +1315,7 @@
         <target state="translated">{0} 个失败</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">失败的 {0}</target>
+          <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1324,7 +1324,7 @@
         <target state="translated">已通过 {0} 个</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">通过的 {0}</target>
+          <target state-qualifier="mt-suggestion">Übergebene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1333,7 +1333,7 @@
         <target state="translated">已跳过 {0} 个</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">已跳过的 {0}</target>
+          <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1342,19 +1342,19 @@
         <target state="translated">针对给定源的发现失败。异常: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">发现对于给定的源失败。异常︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler bei der Ermittlung für angegebenen Quellen. Ausnahme: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="ParentProcessIdArgumentHelp">
         <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
       Process Id of the Parent Process responsible for launching current process.</source>
-        <target state="translated">--ParentProcessId|/ParentProcessId: &lt;ParentProcessId&gt;
-      负责启动当前进程的父进程的进程 ID。</target>
+        <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
+      父进程的进程 ID 负责启动当前进程。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-ParentProcessId | / ParentProcessId: &lt; ParentProcessId &gt;
-      负责启动当前进程的父进程的进程 Id。</target>
+          <target state-qualifier="mt-suggestion">– Diese Eigenschaft | / diese Eigenschaft: &lt; Prozesskennung &gt;
+      Prozess-Id des übergeordneten Prozesses für aktuellen Prozess verantwortlich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -1363,7 +1363,7 @@
         <target state="translated">--ParentProcessId|/ParentProcessId 参数要求整数形式的进程 ID。指定启动此进程的父进程的进程 ID。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-ParentProcessId | / ParentProcessId 参数要求的进程 id，它是一个整数。指定启动此进程的父进程的进程 id。</target>
+          <target state-qualifier="mt-suggestion">Diese Eigenschaft – | / Argument für diese Eigenschaft ist die Prozess-Id ist eine ganze Zahl. Geben Sie die Prozess-Id des übergeordneten Prozesses, die diesen Prozess gestartet.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -1372,7 +1372,7 @@
         <target state="translated">参数:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数︰</target>
+          <target state-qualifier="mt-suggestion">Argumente:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1384,18 +1384,18 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="translated">--Diag|/Diag:&lt;日志文件路径&gt;
-      为测试平台启用日志。
-      日志写入到提供的文件中。
+        <target state="translated">--Diag|/Diag:&lt;Path to log file&gt;
+      启用测试平台的日志。
+      日志将写入所提供的文件。
 
-      如下所示更改日志的跟踪级别
-      示例: /Diag:&lt;日志文件路径&gt;;tracelevel=&lt;默认为“详细”&gt;
-      跟踪级别允许的值: 关、错误、警告、信息和详细。</target>
+      更改日志的跟踪级别，如下所示
+      示例: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
+      允许的 tracelevel 的值: off、error、 warning、info 和 verbose。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-诊断 | / 诊断︰ &lt; 日志文件路径 &gt;
-      启用详细日志中的测试平台。
-      日志写入到所提供的文件。</target>
+          <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; Pfad zur Protokolldatei &gt;
+      Aktivieren Sie ausführliche Protokolle Testplattform.
+      Protokolle werden in die angegebene Datei geschrieben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -1404,7 +1404,7 @@
         <target state="translated">提供的文件 {0} 是只读文件</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">提供的文件 {0} 具有只读属性</target>
+          <target state-qualifier="mt-suggestion">Die bereitgestellte Datei {0} ist schreibgeschützt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -1433,9 +1433,9 @@
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="translated">--ResultsDirectory|/ResultsDirectory
-      如果测试结果目录不存在，则会在指定路径下创建。
-      例如 /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
+        <target state="translated">-ResultsDirectory | / ResultsDirectory
+      如果不存在测试结果目录，则将在指定路径中创建。
+      示例 /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
@@ -1467,7 +1467,7 @@
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="translated">--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      为测试运行启用数据收集器。有关详细信息，请访问: https://aka.ms/vstest-collect</target>
+      启用数据收集器以运行测试。可在此处获取详细信息: https://aka.ms/vstest-collect</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
@@ -1526,13 +1526,14 @@
         <source>@&lt;file&gt;
       Read response file for more options.</source>
         <target state="translated">@&lt;file&gt;
-      读取响应文件，获取更多选项。</target>
+      有关更多选项，请阅读响应文件。</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
-        <target state="new">测试总数: 未知。通过数: {0}。失败数: {1}。忽略数: {2}。</target>
-        <note></note>
+        <target state="translated">测试总数: 未知</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1541,7 +1542,7 @@
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
         <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
-        <target state="translated">此外，还可以使用 /TestAdapterPath 命令指定测试适配器路径。例如 /TestAdapterPath:&lt;pathToCustomAdapters&gt;。</target>
+        <target state="translated">此外，还可以使用 /TestAdapterPath 命令指定测试适配器的路径。示例 /TestAdapterPath:&lt;pathToCustomAdapters&gt;。</target>
         <note />
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
@@ -1580,17 +1581,17 @@
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
         <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      为测试结果指定记录器。例如，若要将结果记录到
-      Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx[;LogFileName=&lt;默认为唯一文件名&gt;]
-      使用给定的 LogFileName 在 TestResults 目录中创建文件。
+      为测试结果指定一个记录器。例如，若要将结果记录到
+      Visual Studio 测试结果文件(TRX)中，请使用 /logger:trx[;LogFileName=&lt;Defaults to unique file name&gt;]
+      使用给定的  LogFileName 在 TestResults 目录中创建文件。
 
-      更改控制台记录器的日志消息的详细级别，如下所示
-      例如: /logger:console;verbosity=&lt;默认为 "最小"&gt;
-      允许的详细程度值: 最简单、最小、正常和详细。
+     更改控制台记录器的日志消息中的详细级别，如下所示
+      示例: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
+      允许的详细级别的值: quiet、minimal、normal 和 detailed。
 
       更改控制台记录器的诊断级别前缀，如下所示
-      示例: /logger:console;prefix=&lt;默认为 "false"&gt;
-      在此处查看控制台记录器的详细信息: https://aka.ms/console-logger</target>
+      示例: /logger:console;prefix=&lt;Defaults to "false"&gt;
+      此处为控制台记录器的详细信息: https://aka.ms/console-logger</target>
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
@@ -1625,33 +1626,39 @@
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 不受支持。对于面向 .Net Framework 3.5 的项目，请使用 Framework40 在 CLR 4.0“兼容性模式”下运行测试。</target>
-        <note></note>
+        <target state="translated">不支持 Framework35。对于面向 .Net Framework 3.5 的项目，将在 CLR 4.0“兼容性模式”中运行测试。</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
-        <target state="new">Test run in progress</target>
-        <note></note>
+        <target state="translated">正在运行测试</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
-        <target state="new">Total tests: {0}</target>
-        <note></note>
+        <target state="translated">测试总数: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
-        <target state="new">     Failed: {0}</target>
-        <note></note>
+        <target state="translated">     失败数: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
-        <target state="new">     Passed: {0}</target>
-        <note></note>
+        <target state="translated">     通过数: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
-        <target state="new">    Skipped: {0}</target>
-        <note></note>
+        <target state="translated">    跳过数: {0}</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

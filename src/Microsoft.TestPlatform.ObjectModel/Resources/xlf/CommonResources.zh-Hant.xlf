@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../CommonResources.resx" build-num="-1391729696">
+  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../CommonResources.resx" build-num="595041357">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">71</count>
@@ -25,7 +25,7 @@
         <target state="translated">參數不可為 null 或空白。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">参数不能为 null 或为空。</target>
+          <target state-qualifier="mt-suggestion">Der Parameter darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -36,7 +36,7 @@
 </target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试运行将使用 DLL(s) 框架 {0} 和 {1} 的平台的构建。按照 DLL(s) 将不能运行的过程︰ {2} 转到详细 {3} 上管理这些设置。</target>
+          <target state-qualifier="mt-suggestion">Testlauf verwendet DLLs für Framework {0} und {1}-Plattform integriert. Folgende DLLs nicht Teil ausführen: {2} zur {3} Einzelheiten auf diese Einstellungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
@@ -45,7 +45,7 @@
         <target state="translated">提供的測試容器全都不符合測試回合的平台架構與 .Net Framework 設定。平台: {0}  .Net Framework: {1}。如需如何管理這些設定的詳細資料，請前往 http://go.microsoft.com/fwlink/?LinkID=330428。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">所有提供的测试容器都不匹配的平台体系结构和.Net 框架运行测试的设置。平台︰ {0}.Net 框架︰ {1}。 在管理这些设置，请转到 http://go.microsoft.com/fwlink/?LinkID=330428 了解详情。</target>
+          <target state-qualifier="mt-suggestion">Keine der angegebenen Container übereinstimmt Plattformarchitektur und .net Framework-Einstellungen für den Testlauf. Plattform: {0} .net Framework: {1}. Lesen Sie http://go.microsoft.com/fwlink/?LinkID=330428 Weitere Informationen über diese Einstellungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>

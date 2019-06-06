@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="824728581">
+  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -50,8 +50,8 @@ SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
         <target state="translated">Utilisation valide :
-SettingsMigrator.exe &lt;Chemin complet du fichier testsettings ou fichier runsettings à migrer&gt;
-SettingsMigrator.exe &lt;Chemin complet du fichier testsettings ou fichier runsettings à migrer&gt; &lt;Chemin complet du fichier runsettings à créer&gt;
+SettingsMigrator.exe &lt;chemin complet du fichier testsettings ou runsettings à migrer&gt;
+SettingsMigrator.exe &lt;chemin complet du fichier testsettings ou runsettings à migrer&gt; &lt;chemin complet du fichier runsettings à créer&gt;
 Exemples :
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings

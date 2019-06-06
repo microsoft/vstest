@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="1704810423">
+  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-627307614">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">23</count>
@@ -25,7 +25,7 @@
         <target state="translated">La série de tests active a été abandonnée.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">L’exécution de Tests active a été abandonné.</target>
+          <target state-qualifier="mt-suggestion">Aktive Tests ausgeführt wurde abgebrochen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">La découverte de tests active a été abandonnée.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">La découverte de Tests active a été abandonnée.</target>
+          <target state-qualifier="mt-suggestion">Der aktive Tests wurde abgebrochen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">Échec de réception du message du processus vstest.console</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Échec de réception de message à partir de processus de vstest.console</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Empfangen der Nachricht aus vstest.console</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -52,14 +52,15 @@
         <target state="translated">Sortie anormale du processus vstest.console</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">processus de VSTest.console a été interrompu anormalement</target>
+          <target state-qualifier="mt-suggestion">VSTest.Console Prozess nicht normal beendet</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="InvalidFilePath">
         <source>File {0} does not exists</source>
-        <target state="new">File {0} does not exists</target>
-        <note></note>
+        <target state="translated">Le fichier {0} n'existe pas</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

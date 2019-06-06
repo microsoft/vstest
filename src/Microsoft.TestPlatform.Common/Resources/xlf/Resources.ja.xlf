@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="1262146584">
+  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="-1247456046">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">178</count>
@@ -25,7 +25,7 @@
         <target state="translated">データ コレクション : {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">診断データ アダプターのメッセージ: {0}</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter Meldung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">データ コレクター '{0}' メッセージ: {1}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">診断データ アダプター (' {0} ') のメッセージ: {1}。</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter ('{0}') Meldung: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">テスト拡張 URI '{0}' は重複しています。重複する拡張を無視しています。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの拡張 URI '{0}' が重複してください。 重複している拡張子は無視されます。</target>
+          <target state-qualifier="mt-suggestion">Doppelte Erweiterung URI '{0}'.  Die doppelte Erweiterung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">'{0}' という名前の設定プロバイダーが重複しています。重複するプロバイダーを無視しています。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">設定プロバイダーの名前 '{0}' が重複してください。 重複したプロバイダーを無視します。</target>
+          <target state-qualifier="mt-suggestion">Doppelte Einstellungsanbieter mit dem Namen '{0}'.  Doppelten Provider werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">'{0}' という名前の重複した実行設定セクションが見つかりました。重複する設定を無視しています。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">実行設定セクションの名前 '{0}' が見つかりましたが重複しています。 重複する設定は無視されます。</target>
+          <target state-qualifier="mt-suggestion">Dupliziert die Ausführung Abschnitt '{0}' gefunden.  Doppelten Einstellungen werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">エラー: かっこ ( ) が空です</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: 空のかっこ)</target>
+          <target state-qualifier="mt-suggestion">Fehler: Leere Klammern)</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">エラー: 条件 '{0}' が無効です</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: 無効な状態 ' {0} '</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültige Bedingung '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">テスト拡張に無効な URI '{0}' があります: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テストの拡張機能が無効な URI '{0}' をしました: {1}</target>
+          <target state-qualifier="mt-suggestion">Erweiterung ist einen ungültigen URI "{0}": {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">エラー: 演算子 '{0}' が無効です</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: 無効な演算子 ' {0} '</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültiger Operator '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">{0}: '{1}' でのロガーの初期化中に例外が発生しました。ロガーは使用されません。例外: {2}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">URI '{0}' を持つロガーの初期化中に例外が発生しました。 ロガーは使用されません。 例外: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Initialisieren der Protokollierung mit URI '{0}'.  Die Protokollierung wird nicht verwendet.  Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">AssemblyQualifiedName、URI または FriendlyName が '{0}' のテスト ロガーは見つかりませんでした。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">テスト ロガー URI または FriendlyName '{0}' が見つかりませんでした。</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">エラー: ')' がありません</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: 不足している ')'</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ")"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">エラー: '(' がありません</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: 不足している ' ('</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ' ('</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">エラー: オペランドがありません</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">エラー: オペランドがありません。</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlender operand</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">演算子 '|' または '&amp;' がありません</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">演算子が不足している ' |' または '&amp;'</target>
+          <target state-qualifier="mt-suggestion">Fehlender Operator ' |' oder '&amp;'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">実行設定は既に読み込まれています。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">実行設定が既に読み込まれています。</target>
+          <target state-qualifier="mt-suggestion">Run Settings wurden bereits geladen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">実行設定の読み込み中にエラーが発生しました。エラー: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">実行設定の読み込み中にエラーが発生しました。 エラー: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der run Settings.  Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">無効な設定ノードが指定されました。設定ノードの名前プロパティを空白にしないようにしてください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">無効な設定ノードを指定します。設定] ノードの name プロパティには、空でない必要があります。</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung angegebenen Knoten. Die Name-Eigenschaft eines Knotens Einstellung darf nicht leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -187,7 +187,7 @@
         <target state="translated">'{0}' という名前の設定プロバイダーを初期化中にエラーが発生しました。エラー: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' の設定プロバイダーの初期化中にエラーが発生しました。エラー: {1}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Einstellungsanbieters mit dem Namen '{0}'. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -196,7 +196,7 @@
         <target state="translated">'{0}' という名前の設定プロバイダーが見つかりませんでした。設定を読み込めません。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">設定プロバイダーの名前 '{0}' が見つかりませんでした。 設定が読み込まれていないことができます。</target>
+          <target state-qualifier="mt-suggestion">Einstellungsanbieter mit dem Namen '{0}' wurde nicht gefunden.  Die Einstellung können nicht geladen werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -205,7 +205,7 @@
         <target state="translated">TestCaseFilter {0} の形式が正しくありません。正しい形式を指定してもう一度お試しください。形式が正しくないと、テストが実行されないことがあります。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">TestCaseFilter {0} の形式が正しくありません。正しい形式を指定してからやり直してください。形式が正しくない可能性がないテストの実行を取得することに注意します。</target>
+          <target state-qualifier="mt-suggestion">Ungültiges Format für TestCaseFilter {0}. Geben Sie das richtige Format, und versuchen Sie es erneut. Beachten Sie, dass das falsche Format kein Test immer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>

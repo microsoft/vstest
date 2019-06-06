@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="1053781791">
+  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-1247456046">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">178</count>
@@ -25,7 +25,7 @@
         <target state="translated">資料收集: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">诊断数据适配器消息︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter Meldung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">資料收集器 '{0}' 的訊息: {1}。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">诊断数据适配器 ("{0}) 消息︰ {1}。</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter ('{0}') Meldung: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">重複的測試延伸模組 URI '{0}'。忽略重複的延伸模組。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">重复测试扩展 URI"{0}。 忽略重复的扩展。</target>
+          <target state-qualifier="mt-suggestion">Doppelte Erweiterung URI '{0}'.  Die doppelte Erweiterung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">名為 '{0}' 的重複的設定提供者。忽略重複的提供者。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">名为"{0} 的重复设置提供程序。 忽略重复的提供程序。</target>
+          <target state-qualifier="mt-suggestion">Doppelte Einstellungsanbieter mit dem Namen '{0}'.  Doppelten Provider werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">找到名為 '{0}' 的重複執行設定區段。忽略重複的設定。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">重复的名为"{0} 找到运行的设置部分。 忽略重复设置。</target>
+          <target state-qualifier="mt-suggestion">Dupliziert die Ausführung Abschnitt '{0}' gefunden.  Doppelten Einstellungen werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">錯誤: 空的括弧 ( )</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ 空括号 （)</target>
+          <target state-qualifier="mt-suggestion">Fehler: Leere Klammern)</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">錯誤: 條件 '{0}' 無效</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ 无效的条件"{0}</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültige Bedingung '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">測試延伸模組的 URI '{0}' 無效: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">测试扩展具有无效的 URI"{0}: {1}</target>
+          <target state-qualifier="mt-suggestion">Erweiterung ist einen ungültigen URI "{0}": {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">錯誤: 運算子 '{0}' 無效</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ 无效的运算符"{0}</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültiger Operator '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">初始化具有 '{0}' 的記錄器時，發生例外狀況: '{1}'。將不會使用此記錄器。例外狀況: {2}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">初始化记录器与 URI"{0} 时出现异常。 将不使用的记录器。 异常︰ {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Initialisieren der Protokollierung mit URI '{0}'.  Die Protokollierung wird nicht verwendet.  Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">找不到具有 AssemblyQualifiedName、URI 或 FriendlyName '{0}' 的測試記錄器。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到测试记录器与 URI 或友好名称"{0}。</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">錯誤: 遺漏 ')'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ 缺少 ')</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ")"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">錯誤: 遺漏 '('</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ 缺少 (</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ' ('</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">錯誤: 遺漏運算元</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">错误︰ 缺少操作数</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlender operand</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">遺漏運算子 '|' 或 '&amp;'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">缺少运算符 | 或 &amp;</target>
+          <target state-qualifier="mt-suggestion">Fehlender Operator ' |' oder '&amp;'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">已載入 [回合設定]。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">已加载运行设置。</target>
+          <target state-qualifier="mt-suggestion">Run Settings wurden bereits geladen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">載入回合設定時發生錯誤。錯誤: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">加载运行的设置时出错。 错误︰ {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der run Settings.  Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">指定的設定節點無效。設定節點的名稱屬性必須為非空白。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">指定了无效的设置节点。设置节点的名称属性必须为非空。</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung angegebenen Knoten. Die Name-Eigenschaft eines Knotens Einstellung darf nicht leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -187,7 +187,7 @@
         <target state="translated">將名為 '{0}' 的設定提供者初始化時發生錯誤。錯誤: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">初始化设置提供程序名为"{0} 时出错。错误︰ {1}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Einstellungsanbieters mit dem Namen '{0}'. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -196,7 +196,7 @@
         <target state="translated">找不到名為 '{0}' 的設定提供者。無法載入設定。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">找不到名为"{0} 的设置提供程序。 无法加载设置。</target>
+          <target state-qualifier="mt-suggestion">Einstellungsanbieter mit dem Namen '{0}' wurde nicht gefunden.  Die Einstellung können nicht geladen werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -205,7 +205,7 @@
         <target state="translated">TestCaseFilter {0} 的格式不正確。請指定正確的格式後再試一次。請注意，格式不正確可能會導致無法執行測試。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">对于 TestCaseFilter {0} 的格式不正确。指定正确的格式，然后重试。请注意，格式不正确可能会导致没有得到执行的测试。</target>
+          <target state-qualifier="mt-suggestion">Ungültiges Format für TestCaseFilter {0}. Geben Sie das richtige Format, und versuchen Sie es erneut. Beachten Sie, dass das falsche Format kein Test immer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
