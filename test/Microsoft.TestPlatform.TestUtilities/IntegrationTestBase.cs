@@ -348,6 +348,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             return this.testEnvironment.GetTestAsset(assetName);
         }
 
+        protected string GetAssetFullPath(string assetName, string targetFramework)
+        {
+            return this.testEnvironment.GetTestAsset(assetName, targetFramework);
+        }
+
         protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
         {
             string adapterRelativePath = string.Empty;

@@ -82,6 +82,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.VaildateDataCollectorOutput();
         }
 
+        [TestMethod]
+        [NetCoreTargetFrameworkDataSource]
+        public void DataCollectorAssemblyLoadingShouldNotThrowErrorForNetCore(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll", "netcoreapp2.0"), string.Empty, string.Empty, this.FrameworkArgValue);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(GetAssetFullPath("AppDomainGetAssembliesTestProject.dll"), string.Empty, string.Empty, this.FrameworkArgValue);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
         private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
         {
             var doc = new XmlDocument();
