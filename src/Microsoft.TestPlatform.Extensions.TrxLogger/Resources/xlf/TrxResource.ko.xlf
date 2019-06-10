@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../TrxResource.resx" build-num="357010045">
+  <file datatype="xml" source-language="en" target-language="ko" original="../TrxResource.resx" build-num="247625400">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">134</count>
@@ -25,7 +25,7 @@
         <target state="translated">중단됨</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">중단</target>
+          <target state-qualifier="mt-suggestion">Abgebrochen</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">완료됨</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">완료</target>
+          <target state-qualifier="mt-suggestion">Abgeschlossen</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">연결 끊김</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">연결 끊김</target>
+          <target state-qualifier="mt-suggestion">Verbindung getrennt</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">오류</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">오류</target>
+          <target state-qualifier="mt-suggestion">Fehler</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">실패</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">실패</target>
+          <target state-qualifier="mt-suggestion">Fehler</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">결과 불충분</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">결과 불충분</target>
+          <target state-qualifier="mt-suggestion">Nicht eindeutig</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">진행 중</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">진행 중</target>
+          <target state-qualifier="mt-suggestion">In Bearbeitung</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">실행되지 않음</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">실행 안 함</target>
+          <target state-qualifier="mt-suggestion">Nicht ausgeführt</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">실행할 수 없음</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">실행할 수 없음</target>
+          <target state-qualifier="mt-suggestion">Nicht ausführbar</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">통과</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">전달</target>
+          <target state-qualifier="mt-suggestion">Übergeben</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">통과(실행이 중단됨)</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">성공된 (실행이 중단 되었습니다)</target>
+          <target state-qualifier="mt-suggestion">Erfolgreich (Testlauf abgebrochen)</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">보류 중</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">보류 중</target>
+          <target state-qualifier="mt-suggestion">Ausstehend</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">시간 초과</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">시간 제한</target>
+          <target state-qualifier="mt-suggestion">Zeitlimit</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">경고</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">경고</target>
+          <target state-qualifier="mt-suggestion">Warnung</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">매개 변수는 0보다 작을 수 없습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">매개 변수는 0 보다 작을 수 없습니다.</target>
+          <target state-qualifier="mt-suggestion">Der Parameter darf nicht kleiner als 0 sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">매개 변수는 null이거나 비워 둘 수 없습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">매개 변수는 null 이거나 비워 둘 수 없습니다.</target>
+          <target state-qualifier="mt-suggestion">Der Parameter darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">{1} 디렉터리에 {0}(1),(2),..의 형식으로 새 이름을 지정할 수 없습니다. 이 디렉터리를 정리하세요.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} {1} 디렉터리에 0}(1),(2)에 대 한 무료 이름을 가져올 수 없습니다. 이 디렉터리를 정리 하십시오.</target>
+          <target state-qualifier="mt-suggestion">Freien Name für {0}(1),(2),... in Verzeichnis ' {1} ' kann nicht abgerufen werden. Bereinigen Sie dieses Verzeichnis.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">테스트 설정이 지정되지 않았습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">테스트 설정은 지정 하지 않습니다.</target>
+          <target state-qualifier="mt-suggestion">Einstellungen sind nicht angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -187,7 +187,7 @@
         <target state="translated">활성 테스트 설정에 실행 배포 디렉터리가 정의되어 있지 않습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">활성 테스트 설정에 실행 배포 디렉터리가 정의 하지 않습니다.</target>
+          <target state-qualifier="mt-suggestion">Aktive Testkonfigurationen definieren Bereitstellungsverzeichnis auszuführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -196,7 +196,7 @@
         <target state="translated">결과가 테스트 실행과 연결되어 있지 않습니다. 진행 중이거나 완료된 테스트 실행에서 가져온 결과를 사용하세요.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">결과 테스트 실행에 연결 되지 않습니다. 진행 중이거나 완료 된 테스트 실행에서 얻은 결과 사용 합니다.</target>
+          <target state-qualifier="mt-suggestion">Das Ergebnis ist ein Testlauf nicht zugeordnet. Verwenden Sie ein Ergebnis aus einem laufenden oder abgeschlossenen Testlaufs.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -205,7 +205,7 @@
         <target state="translated">지정한 파일/디렉터리 이름 '{0}'이(가) 잘못되었습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">지정 된 파일/디렉터리 이름 ' {0} '이 (가) 잘못 되었습니다.</target>
+          <target state-qualifier="mt-suggestion">Der angegebene Datei-/Verzeichnisname '{0}' ist ungültig.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -225,8 +225,8 @@ Error Details: {1}:{2}</source>
 오류 정보: {1}:{2}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">파일을 연결 하지 못했습니다: {0}
-오류 정보: {1}: {2}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Anfügen von Dateien: {0}
+Fehlerdetails: {1}: {2}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -235,7 +235,7 @@ Error Details: {1}:{2}</source>
         <target state="translated">테스트 실행에서 ‘{0}’ 테스트를 건너뛰었습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">테스트 ' {0} '이 (가) 테스트 실행에서 생략 되었습니다.</target>
+          <target state-qualifier="mt-suggestion">Test "{0}" wurde im Testlauf übersprungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -244,7 +244,7 @@ Error Details: {1}:{2}</source>
         <target state="translated">결과 파일: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">결과 파일: {0}</target>
+          <target state-qualifier="mt-suggestion">Datei: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -253,7 +253,7 @@ Error Details: {1}:{2}</source>
         <target state="translated">로드된 모든 결과</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">로드 된 모든 결과</target>
+          <target state-qualifier="mt-suggestion">Alle geladenen Ergebnisse</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -262,7 +262,7 @@ Error Details: {1}:{2}</source>
         <target state="translated">목록에 없는 결과</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">목록에 없는 결과</target>
+          <target state-qualifier="mt-suggestion">Ergebnisse nicht in einer Liste</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -271,7 +271,7 @@ Error Details: {1}:{2}</source>
         <target state="translated">배포 항목 '{0}'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">배포 항목 ' {0} '이 (가)</target>
+          <target state-qualifier="mt-suggestion">Bereitstellungselement "{0}"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -280,7 +280,7 @@ Error Details: {1}:{2}</source>
         <target state="translated">배포 항목 '{0}'(출력 디렉터리 '{1}')</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">배포 항목 ' {0} ' (출력 디렉터리 ' {1} ')</target>
+          <target state-qualifier="mt-suggestion">Bereitstellungselement "{0}' (Ausgabeverzeichnis '{1}')</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>

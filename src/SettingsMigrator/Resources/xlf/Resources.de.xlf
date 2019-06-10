@@ -50,8 +50,8 @@ SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
         <target state="translated">Gültige Syntax:
-SettingsMigrator.exe &lt;Vollständiger Pfad zur Datei "testsettings" oder "runsettings" für die Migration&gt;
-SettingsMigrator.exe &lt;Vollständiger Pfad zur Datei "testsettings" oder "runsettings" für die Migration&gt; &lt;Vollständiger Pfad zu der zu erstellenden Datei "runsettings"&gt;
+SettingsMigrator.exe &lt;vollständiger Pfad zur TESTSETTINGS-Datei oder RUNSETTINGS-Datei für die Migration&gt;
+SettingsMigrator.exe &lt;vollständiger Pfad zur TESTSETTINGS-Datei oder RUNSETTINGS-Datei für die Migration&gt; &lt;vollständiger Pfad zur zu erstellenden RUNSETTINGS-Datei&gt;
 Beispiele:
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings

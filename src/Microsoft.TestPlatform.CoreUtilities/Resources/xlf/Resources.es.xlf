@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="1931783711">
+  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="-1121215064">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">119</count>
@@ -25,7 +25,7 @@
         <target state="translated">El parámetro no puede ser nulo ni estar vacío.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El parámetro no puede ser nulo ni estar vacío.</target>
+          <target state-qualifier="mt-suggestion">Der Parameter darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">Error: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Error: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">Información: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Información: {0}</target>
+          <target state-qualifier="mt-suggestion">Informationen: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">Advertencia: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Advertencia: {0}</target>
+          <target state-qualifier="mt-suggestion">Warnung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">El argumento especificado no puede estar vacío.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado no puede estar vacío.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument darf nicht leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">El argumento especificado no puede ser negativo.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado no puede ser negativo.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument darf nicht negativ sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">El argumento especificado debe tener el tipo {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado debe tener el tipo siguiente: {0}.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument muss vom folgenden Typ: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">El argumento especificado tiene la siguiente propiedad, que no puede ser una cadena vacía: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad, que no puede ser una cadena vacía: {0}.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument hat die folgende-Eigenschaft eine leere Zeichenfolge ist: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">El argumento especificado tiene la siguiente propiedad, que no puede ser negativa: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad, que no puede ser negativa: {0}.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument ist die folgende Eigenschaft kann nicht negativ sein: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">El argumento especificado tiene la siguiente propiedad, que no puede ser nula: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad, que no puede ser nula: {0}.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument ist die folgende Eigenschaft darf nicht null sein: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">El argumento especificado tiene la siguiente propiedad: {0}. Esta propiedad debe tener el tipo {1}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad: {0}. esta propiedad debe tener los siguientes tipos: {1}.</target>
+          <target state-qualifier="mt-suggestion">Das angegebene Argument ist die folgende Eigenschaft: {0}. dieser Eigenschaft muss vom folgenden Typ sein: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">Se produjo una excepción no controlada al procesar un trabajo de la cola '{0}': {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Se produjo una excepción no controlada al procesar un trabajo de la cola '{0}': {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahmefehler beim Verarbeiten eines Auftrags in der Warteschlange '{0}': {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">La cola {0} ya se ha eliminado.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">La cola {0} ha sido cancelada.</target>
+          <target state-qualifier="mt-suggestion">Warteschlange {0} wurde bereits freigegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">La cola {0} no se puede eliminar mientras está en pausa.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">La cola {0} no se puede eliminar mientras está en pausa.</target>
+          <target state-qualifier="mt-suggestion">Warteschlange {0} kann nicht verworfen werden, während angehalten.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">Error al obtener el nombre del proceso.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Error al obtener el nombre de proceso.</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Abrufen der Prozessname.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>

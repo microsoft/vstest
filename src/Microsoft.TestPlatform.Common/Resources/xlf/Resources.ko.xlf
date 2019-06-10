@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="438675319">
+  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="-1247456046">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">178</count>
@@ -25,7 +25,7 @@
         <target state="translated">데이터 수집: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">진단 데이터 어댑터의 메시지: {0}</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter Meldung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">데이터 수집기 '{0}' 메시지: {1}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">진단 데이터 어댑터 (' {0} ') 메시지: {1}입니다.</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter ('{0}') Meldung: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">테스트 확장 URI '{0}'이(가) 중복됩니다. 중복 확장을 무시합니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">테스트 확장을 URI ' {0} '이 (가) 중복 되었습니다.  중복 된 확장명을 무시합니다.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Erweiterung URI '{0}'.  Die doppelte Erweiterung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">설정 공급자 '{0}'이(가) 중복됩니다. 중복 공급자를 무시합니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">설정 공급자를 이름이 ' {0} '이 (가) 중복 되었습니다.  중복 된 공급자를 무시합니다.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Einstellungsanbieter mit dem Namen '{0}'.  Doppelten Provider werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">중복 실행 설정 섹션 '{0}'이(가) 있습니다. 중복 설정을 무시합니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">이름이 ' {0} '이 (가) 발견 실행된 설정 섹션을 중복.  복제 설정을 무시합니다.</target>
+          <target state-qualifier="mt-suggestion">Dupliziert die Ausführung Abschnitt '{0}' gefunden.  Doppelten Einstellungen werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">오류: 빈 괄호 ( )</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">빈 괄호 () 오류:</target>
+          <target state-qualifier="mt-suggestion">Fehler: Leere Klammern)</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">오류: 잘못된 조건 '{0}'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">오류: 잘못 된 상태 ' {0} '이 (가)</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültige Bedingung '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">테스트 확장의 URI '{0}'이(가) 잘못되었습니다. {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">확장 테스트에는 ' {0} '이 (가) 잘못 된 URI: {1}</target>
+          <target state-qualifier="mt-suggestion">Erweiterung ist einen ungültigen URI "{0}": {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">오류: 잘못된 연산자 '{0}'</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">오류: 잘못 된 연산자 ' {0} '이 (가)</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültiger Operator '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">{0}: '{1}'인 로거를 초기화하는 동안 예외가 발생했습니다. 로거가 사용되지 않습니다. 예외: {2}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">URI ' {0} '이 (가)를 사용 하 여로 거를 초기화 하는 동안 예외가 발생 했습니다.  로 거의 사용 되지 않습니다.  예외: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Initialisieren der Protokollierung mit URI '{0}'.  Die Protokollierung wird nicht verwendet.  Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">AssemblyQualifiedName, URI 또는 FriendlyName이 '{0}'인 테스트 로거를 찾을 수 없습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">URI ' {0} '이 (가) FriendlyName와 테스트로 거를 찾을 수 없습니다.</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">오류: ')' 누락</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">오류: 누락 된 ')'</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ")"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">오류: '(' 누락</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">오류: 누락 된 ' ('</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ' ('</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">오류: 피연산자 누락</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">피연산자가 없습니다 오류:</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlender operand</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">'|' 또는 '&amp;' 연산자 누락</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">없음 연산자 ' |' 또는 '&amp;'</target>
+          <target state-qualifier="mt-suggestion">Fehlender Operator ' |' oder '&amp;'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">실행 설정이 이미 로드되었습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">실행 설정 이미 로드 되었습니다.</target>
+          <target state-qualifier="mt-suggestion">Run Settings wurden bereits geladen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">실행 설정을 로드하는 동안 오류가 발생했습니다. 오류: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">실행된 설정을 로드 하는 동안 오류가 발생 했습니다.  오류: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der run Settings.  Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">잘못된 설정 노드를 지정했습니다. 설정 노드의 이름 속성이 비어 있어서는 안 됩니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">잘못 된 설정 노드를 지정 합니다. 설정 노드의 name 속성을 비어 있어야 합니다.</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung angegebenen Knoten. Die Name-Eigenschaft eines Knotens Einstellung darf nicht leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -187,7 +187,7 @@
         <target state="translated">설정 공급자 '{0}'을(를) 초기화하는 동안 오류가 발생했습니다. 오류: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">이름이 ' {0} '이 (가) 설정 공급자를 초기화 하는 동안 오류가 발생 했습니다. 오류: {1}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Einstellungsanbieters mit dem Namen '{0}'. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -196,7 +196,7 @@
         <target state="translated">설정 공급자 '{0}'을(를) 찾을 수 없습니다. 설정을 로드할 수 없습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">이름이 ' {0} '이 (가) 설정 공급자를 찾을 수 없습니다.  설정은 로드할 수 있습니다.</target>
+          <target state-qualifier="mt-suggestion">Einstellungsanbieter mit dem Namen '{0}' wurde nicht gefunden.  Die Einstellung können nicht geladen werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -205,7 +205,7 @@
         <target state="translated">TestCaseFilter {0}의 형식이 잘못되었습니다. 올바른 형식을 지정하고 다시 시도하세요. 잘못된 형식을 사용하면 테스트가 실행되지 않을 수 있습니다.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">TestCaseFilter {0}의 형식이 잘못 되었습니다. 정확한 형식을 지정 하 고 다시 시도 하십시오. 참고 잘못 된 형식 없이 테스트를 실행 하기 발생할 수 있습니다.</target>
+          <target state-qualifier="mt-suggestion">Ungültiges Format für TestCaseFilter {0}. Geben Sie das richtige Format, und versuchen Sie es erneut. Beachten Sie, dass das falsche Format kein Test immer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>

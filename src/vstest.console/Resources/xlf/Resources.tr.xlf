@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="2120988183">
+  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -25,7 +25,7 @@
         <target state="translated">Yinelenen {0} kaynağı belirtildi.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Belirtilen kaynak {0} yinelenen.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Quelle {0} angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">'{0}' bulunamadı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0} bulunamadı'.</target>
+          <target state-qualifier="mt-suggestion">'{0}' wurde nicht gefunden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">Şu Test Bulma Eklentileri kullanılabilir:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Aşağıdaki Test bulma eklentileri mevcuttur:</target>
+          <target state-qualifier="mt-suggestion">Die folgende Tests Discovery Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -52,13 +52,13 @@
         <target state="translated">Şu Test Yürütmesi eklentileri kullanılabilir:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Aşağıdaki Test yürütme eklentileri mevcuttur:</target>
+          <target state-qualifier="mt-suggestion">Die folgende Test Execution Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -79,13 +79,13 @@
         <target state="translated">Şu Test Günlükçüsü Eklentileri kullanılabilir:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Aşağıdaki Test Günlükçü eklentileri mevcuttur:</target>
+          <target state-qualifier="mt-suggestion">Die folgende Tests Protokollierung Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableTestsFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -97,7 +97,7 @@
         <target state="translated">Hata: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Hata: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">"{0}" parametresi yalnızca bir kez belirtilmelidir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">"{0}" parametresi yalnızca bir kez verilmelidir.</target>
+          <target state-qualifier="mt-suggestion">Der Parameter '{0}' sollte nur einmal erfolgen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">'{0}' uzantısının örneği oluşturulurken özel durum oluştu: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Uzantısı '{0}' örneği oluşturulurken özel durum oluştu: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Instanziieren Erweiterung '{0}': {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">Şu Testler kullanılabilir:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Aşağıdaki testleri kullanılabilir:</target>
+          <target state-qualifier="mt-suggestion">Die folgenden Tests sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">"{0}" parametresi tanınmıyor.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Tanınmayan parametresi "{0}".</target>
+          <target state-qualifier="mt-suggestion">Unbekannte Parameter '{0}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">Belirtilen "{0}" test kaynak dosyası bulunamadı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">"{0}" sağlanan test kaynak dosyası bulunamadı.</target>
+          <target state-qualifier="mt-suggestion">Quelldatei Test "{0}' bereitgestellt wurde nicht gefunden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">Test Günlükçüsünün '{0}' URI’si geçerli değil. Test Günlükçüsü yoksayılacak.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test Günlükçü URI '{0}' geçerli değil.  Test Günlükçü göz ardı edilir.</target>
+          <target state-qualifier="mt-suggestion">Test Protokollierung URI '{0}' ist ungültig.  Die Test-Protokollierung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">Bilgi: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Bilgi: {0}</target>
+          <target state-qualifier="mt-suggestion">Informationen: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">Uyarı: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Uyarı: {0}</target>
+          <target state-qualifier="mt-suggestion">Warnung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -189,8 +189,8 @@
       Bu kullanım iletisini görüntüler.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-?| --Yardım | /? | / Yardım
-      Bu kullanım iletisini görüntüler.</target>
+          <target state-qualifier="mt-suggestion">-?| --Hilfreiche | /? | / Help
+      Diesen Hilfetext anzeigen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -199,7 +199,7 @@
         <target state="translated">Telif Hakkı (c) Microsoft Corporation. Tüm hakları saklıdır.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Telif Hakkı (c) Microsoft Corporation.  Tüm hakları saklıdır.</target>
+          <target state-qualifier="mt-suggestion">Copyright (c) Microsoft Corporation.  Alle Rechte vorbehalten.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -208,7 +208,7 @@
         <target state="translated">Microsoft (R) Test Yürütmesi Komut Satırı Aracı Sürüm {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Microsoft (R) Test yürütme komut satırı aracı sürüm {0}</target>
+          <target state-qualifier="mt-suggestion">Microsoft (R) Test Execution Command Line Tool Version {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -225,30 +225,30 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI/FriendlyName&gt;
       Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
-      Visual Studio Test Sonuçları Dosyası’na (TRX) kaydetmek için şunu kullanın: /logger:trx [;LogFileName=&lt;Varsayılan değer benzersiz dosya adıdır&gt;]
-      Dosyayı belirtilen LogFileName ile TestResults dizininde oluşturur.
+      Visual Studio Test Sonuçları Dosyası'na (TRX) kaydetmek için şunu kullanın: /logger:trx[;LogFileName=&lt;Varsayılan olarak benzersiz dosya adını alır&gt;]
+      İlgili LogFileName ile TestResults dizininde dosya oluşturur.
 
-      Konsol günlükçüsü için günlük iletilerinin ayrıntı düzeyini aşağıdaki gibi değiştirin
-      Örnek: /logger:console;verbosity=&lt;Varsayılan değer "normal"&gt;
-      İzin verilen verbosity değerleri: quiet, minimal, normal ve detailed.
+      Konsol günlükçüsü için ayrıntı düzeyini günlük iletilerinde aşağıda gösterildiği gibi değiştirin
+      Örnek: /logger:console;verbosity=&lt;Varsayılan olarak "normal" değerini alır&gt;
+      Ayrıntı için izin verilen değerler: quiet, minimal, normal ve detailed.
 
-      Konsol günlükçüsü için tanılama düzeyi önekini aşağıdaki gibi değiştirin
-      Örnek: /logger:console;prefix=&lt;Varsayılan değer "false"&gt;
-      Konsol Günlükçüsü hakkında daha fazla bilgi için bkz. https://aka.ms/console-logger</target>
+      Konsol günlükçüsü için tanılama düzeyi ön ekini aşağıda gösterildiği gibi değiştirin
+      Örnek: /logger:console;prefix=&lt;Varsayılan olarak "false" değerini alır&gt;
+      Konsol Günlükçüsü hakkında daha fazla bilgi: https://aka.ms/console-logger</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Günlükçü | / Günlükçü: &lt; Günlükçü URI/FriendlyName &gt;
-      Test sonuçları için Günlükçü belirtin.  Örneğin, oturum açmak için /logger:trx sonuçları içine bir Visual Studio Test sonuçları dosyası (TRX) kullanın.
-      Team Foundation Server için test sonuçlarını yayımlamak için TfsPublisher aşağıda gösterildiği gibi kullanın
-      Örnek: /logger:TfsPublisher;
-                Koleksiyon &lt; takım projesi koleksiyonu URL'si &gt; =;
-                BuildName = &lt; yapı adı &gt;;
-                TeamProject = &lt; takım projesi adı &gt;
-                [; Platform &lt; "Herhangi bir CPU" varsayılan değeri &gt; =]
-                [; Özellik &lt; "Debug" varsayılan değeri &gt; =]
-                [; RunTitle = &lt; title &gt; =]</target>
+          <target state-qualifier="mt-suggestion">-Protokollierung | / Logger: &lt; Logger Uri/FriendlyName &gt;
+      Geben Sie eine Protokollierung für Testergebnisse.  Z. B. protokollieren Ergebnisse in ein Visual Studio--Hardwareabstraktionsschicht (Test Ergebnisse Datei, TK) /logger:trx.
+      Verwenden Sie TfsPublisher zum Veröffentlichen von Testergebnissen in Team Foundation Server wie folgt
+      Beispiel: /logger:TfsPublisher;
+                Auflistung = &lt; Team Project Collection-Url &gt;;
+                BuildName = &lt; Buildnamen &gt;;
+                TeamProject = &lt; Team Projektname &gt;
+                [; Plattform = &lt; standardmäßig "Any CPU" &gt;]
+                [; Typ = &lt; standardmäßig "Debug" &gt;]
+                [; RunTitle = &lt; Title &gt;]</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="63" adjWordcount="53.55" curWordcount="53.55"</note>
       </trans-unit>
@@ -257,7 +257,7 @@
         <target state="translated">Açıklama: Belirtilen dosyalardan testleri çalıştırır.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Açıklama: Belirtilen dosyaları testleri çalıştırır.</target>
+          <target state-qualifier="mt-suggestion">Beschreibung: Führt Tests aus den angegebenen Dateien.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -266,7 +266,7 @@
         <target state="translated">Seçenekler:</target>
         <note>Section Header for subsequent command help listing</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Seçenekler:</target>
+          <target state-qualifier="mt-suggestion">Optionen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -275,7 +275,7 @@
         <target state="translated">Kullanım: vstest.console.exe [Bağımsız Değişkenler] [Seçenekler] [[--] &lt;RunSettings bağımsız değişkenleri&gt;...]]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Kullanım: vstest.console.exe [bağımsız değişkenler] [Seçenekler]</target>
+          <target state-qualifier="mt-suggestion">Syntax: vstest.console.exe [Optionen] [Argumente]</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -284,7 +284,7 @@
         <target state="translated">Test kaynak dosyası belirtilmedi.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Hiçbir test kaynak dosyası belirtilmedi.</target>
+          <target state-qualifier="mt-suggestion">Es wurden keine Quelldateien Test angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -293,7 +293,7 @@
         <target state="translated">Bağımsız değişken belirtilmedi.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Hiçbir bağımsız değişken belirtildi.</target>
+          <target state-qualifier="mt-suggestion">Keine Argumente wurden angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -311,10 +311,10 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
-      Belirtilen dosyaları testler. Birden çok test dosya adlarını ayırmak
-      boşluklarla.
-      Örnekler: mytestproject.dll
-                MyTestProject.dll myothertestproject.exe</target>
+      Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
+      durch Leerzeichen.
+      Beispiele: mytestproject.dll
+                mytestproject.dll myothertestproject.exe</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
@@ -323,7 +323,7 @@
         <target state="translated">Şu Ayar Sağlayıcısı Eklentileri kullanılabilir:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Aşağıdaki ayarları sağlayıcıları eklentileri mevcuttur:</target>
+          <target state-qualifier="mt-suggestion">Die folgende Einstellung Anbieter Add-Ins sind verfügbar:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -331,11 +331,11 @@
         <source>--Settings|/Settings:&lt;Settings File&gt;
       Settings to use when running tests.</source>
         <target state="translated">--Settings|/Settings:&lt;Ayarlar Dosyası&gt;
-      Testleri çalıştırırken kullanılan ayarlar.</target>
+      Testleri çalıştırırken kullanılacak ayarlar.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Ayarları | / ayarları: &lt; ayarları Dosya &gt;
-      Testleri çalıştırırken kullanılacak ayarları.</target>
+          <target state-qualifier="mt-suggestion">-Einstellungen | / Settings: &lt; Datei &gt;
+      Einstellungen Tests ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -344,7 +344,7 @@
         <target state="translated">/Settings parametresi bir ayarlar dosyasının belirtilmesini gerektirir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/ Settings parametre sağlanacak bir ayarlar dosyası gerektirir.</target>
+          <target state-qualifier="mt-suggestion">Der Parameter/Settings erfordert eine Einstellungsdatei bereitgestellt werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -353,7 +353,7 @@
         <target state="translated">'{0}' Ayarlar dosyası bulunamadı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' ayarları dosyası bulunamadı.</target>
+          <target state-qualifier="mt-suggestion">Die Einstellungsdatei '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -362,7 +362,7 @@
         <target state="translated">Test Çalıştırması Başarısız.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test çalışması başarısız oldu.</target>
+          <target state-qualifier="mt-suggestion">Der Testlauf ist fehlgeschlagen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -371,7 +371,7 @@
         <target state="translated">Test Çalıştırması Başarılı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test çalışması başarılı.</target>
+          <target state-qualifier="mt-suggestion">Testlauf erfolgreich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -380,7 +380,7 @@
         <target state="translated">{0} bağımsız değişkeni 'InIsolation' komutunda beklenmiyor. Komutu bağımsız değişken olmadan belirtin (Örnek: vstest.console.exe myTests.dll /InIsolation) ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} bağımsız değişkeni 'InIsolation' komutunda beklenmiyor. Komut bağımsız değişkeni olmadan belirtin (örnek: vstest.console.exe myTests.dll /InIsolation) ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'InIsolation'. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /InIsolation) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -389,7 +389,7 @@
         <target state="translated">/UseVsixExtensions parametresi bir değer gerektiriyor. Değer 'true' ise test çalıştırmasında yüklü VSIX uzantıları (varsa) kullanılır. Değer false ise uzantılar yoksayılır. Örnek: /UseVsixExtensions:true</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/UseVsixExtensions parametresi için değer gereklidir. 'True 'ise, test çalışması yüklü VSIX Uzantıları (varsa) kullanılır. False ise, bunlar göz ardı edilir.   Örnek: /UseVsixExtensions:true</target>
+          <target state-qualifier="mt-suggestion">Der /UseVsixExtensions-Parameter erfordert einen Wert. "True" werden der installierten VSIX-Erweiterung (falls vorhanden) im Testlauf verwendet. Wenn false, werden sie ignoriert.   Beispiel: /UseVsixExtensions:true</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -398,7 +398,7 @@
         <target state="translated">{0} bağımsız değişkeni 'UseVsixExtensions' komutunda beklenmiyor. Komutta vsix uzantılarının kullanılacağını veya atlanacağını belirtin (Örnek: vstest.console.exe myTests.dll /UseVsixExtensions:true) ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} bağımsız değişkeni 'UseVsixExtensions' komutunda beklenmiyor. VSIX extensions kullanılan veya Atlanan belirten komut belirtin (örnek: vstest.console.exe myTests.dll /UseVsixExtensions:true) ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'UseVsixExtensions'. Geben Sie den Befehl an, ob die VSIX-Erweiterung verwendet oder übersprungen werden (Beispiel: vstest.console.exe myTests.dll /UseVsixExtensions:true) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -414,7 +414,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
-      Testleri yalıtılmış bir işlem içinde çalıştırır. Bu işlem vstest.console.exe testlerinde hata durdurulması olasılığını sağlar, ancak test çalışması yavaşlayabilir.</target>
+      Führt Tests in einem isolierten Prozess. Vstest.console.exe wird voraussichtlich auf Fehler in den Tests beendet jedoch Tests möglicherweise langsamer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
@@ -430,8 +430,8 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ UseVsixExtensions
-      Bu kullanın veya test çalışması (varsa) yüklü VSIX uzantıları Atla vstest.console.exe işlem yapar. 
-      Örnek /UseVsixExtensions:true</target>
+      Das macht vstest.console.exe verwenden oder das VSIX-Extensions installiert (sofern vorhanden) in der überspringen. 
+      Beispiel /UseVsixExtensions:true</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -440,7 +440,7 @@
         <target state="translated">/BatchSize bağımsız değişkeni toplu iş boyutunu gerektirir. Örnek: /BatchSize:10</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Toplu iş boyutunu /BatchSize bağımsız değişken gerektirir.  Örnek: /BatchSize:10</target>
+          <target state-qualifier="mt-suggestion">Das Argument /BatchSize muss die Größe des Stapels.  Beispiel: /BatchSize:10</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -449,7 +449,7 @@
         <target state="translated">{0} toplu iş boyutu geçersiz. Toplu iş boyutu sıfırdan büyük olmalıdır. Örnek: /BatchSize:10</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Geçersiz toplu iş boyutu: {0}. Toplu iş boyutu sıfırdan büyük olmalıdır. Örnek: /BatchSize:10</target>
+          <target state-qualifier="mt-suggestion">Ungültige Batchgröße {0}. Die Batch-Größe muss größer als NULL sein. Beispiel: /BatchSize:10</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -464,10 +464,10 @@
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Aynı işlem içinde testleri çalıştırmak için:
-    &gt; vstest.console.exe tests.dll testleri ayrı bir işlemde çalıştırmak için:
+          <target state-qualifier="mt-suggestion">Tests im gleichen Prozess ausgeführt:
+    &gt; vstest.console.exe tests.dll Tests in einem separaten Prozess ausführen:
     &gt; vstest.console.exe /inIsolation tests.dll
-  Veri toplayıcıları gibi ek ayarlar ile testleri çalıştırmak için:
+  Zum Ausführen von Tests mit zusätzlichen wie Datensammlungen
     &gt; vstest.console.exe tests.dll /Settings:Local.RunSettings</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="35" adjWordcount="29.75" curWordcount="29.75"</note>
@@ -480,7 +480,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListDiscoverers
-      Yüklü test discoverers listeler.</target>
+      Listet die installierten Test Entdecker.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -492,7 +492,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListExecutors
-      Yüklü test executors listeler.</target>
+      Listet die installierten Test Executor.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -504,7 +504,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListLoggers
-      Yüklü test loggers listeler.</target>
+      Listet die installierten Test Protokollierungsmodule.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -516,7 +516,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListSettingsProviders
-      Yüklü test ayarları sağlayıcıları listeler.</target>
+      Listet die installierten Test Einstellungsanbieter.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -524,11 +524,11 @@
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
         <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Dosya Adı&gt;
-      Belirtilen test kapsayıcısında bulunan tüm testleri listeler.</target>
+      Verilen test kapsayıcısında bulunan tüm testleri listeler.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-lt |--ListTests | / lt | / ListTests: &lt; dosya adı &gt;
-      Listeleri belirli test kapsayıcı testlerden keşfetti.</target>
+          <target state-qualifier="mt-suggestion">-Lt |-ListTests | / Lt | / ListTests: &lt; Dateiname &gt;
+      Listen entdeckt Tests im angegebenen Testcontainer.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -537,7 +537,7 @@
         <target state="translated">Geçen süre:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Geçen süre:</target>
+          <target state-qualifier="mt-suggestion">Verstrichene Zeit:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -548,8 +548,8 @@
        Örnekler: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Bir veya daha fazla belirli test adları veya bunların alt dizeleri /Tests bağımsız değişken gerektirir.
-       Örnekler: /Tests:TestsMethod1, /Tests:TestMethod1, method2</target>
+          <target state-qualifier="mt-suggestion">Das Batch.log-Argument erfordert eine oder mehrere bestimmte Testnamen oder die Teilzeichenfolgen.
+       Beispiele: /Tests:TestsMethod1, /Tests:TestMethod1, Methode2</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -558,7 +558,7 @@
         <target state="translated">Toplam {0} test bulundu, ancak belirtilen ölçütlerle eşleşen test yok({1}). Doğru değerleri kullanın ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} testleri keşfedilmiştir, ancak hiçbir test toplam belirtilen seçim criteria({1}) eşleşir. Sağdaki değerler kullanın ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Insgesamt {0} Tests entdeckt wurden, aber kein Test entspricht der angegebenen Auswahl criteria({1}). Richtige Werte verwenden und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -579,17 +579,17 @@
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
         <target state="translated">--Tests|/Tests:&lt;Test Adları&gt;
-      Belirtilen değerlerle eşleşen adlara sahip testleri çalıştırır. Birden fazla
-      değer belirtmek için değerleri virgülle ayırın.
-      Örnekler: /Tests:TestMethod1
-                /Tests:TestMethod1,testMethod2</target>
+      Sağlanan değerlerle eşleşen adlara sahip testleri çalıştırır. Birden çok
+      değer sağlamak için, değerleri virgülle ayırın.
+      Örnekler: /Tests:TestYöntemi1
+                /Tests:TestYöntemi1,testYöntemi2</target>
         <note>Please verify if the console output looks good after modifiaction. </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Test | / testler: &lt; Test adları &gt;
-      Testler sağlanan değerlerle eşleşen adlara sahip. Birden çok sağlamak için
-      değerleri, ayrı bunları virgüllerle.
-      Örnekler: /Tests:TestMethod1
-                /Tests:TestMethod1, testMethod2</target>
+          <target state-qualifier="mt-suggestion">– Testet | / Tests: &lt; Test Namen &gt;
+      Führen Sie Tests, deren Namen, die mit die angegebenen Werten übereinstimmen. Bereitstellen mehrerer
+      Werte trennen durch Kommas.
+      Beispiele: /Tests:TestMethod1
+                /Tests:TestMethod1 testMethod2</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="25" adjWordcount="21.25" curWordcount="21.25"</note>
       </trans-unit>
@@ -598,7 +598,7 @@
         <target state="translated">Çalıştırma ayarlarında tanılama veri bağdaştırıcıları etkinleştirildiğinden testleri çalıştırmak üzere Yalıtım modu kullanılıyor. Bu uyarıyı kapatmak için /inIsolation parametresini kullanın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Tanı veri bağdaştırıcıları runsettings'de etkinleştirilmiş testleri çalıştırmak için yalıtım modunu kullanıyor. Bu uyarıyı bastırmak için /inIsolation parametresini kullanın.</target>
+          <target state-qualifier="mt-suggestion">Unter Verwendung des Isolationsmodus zum Ausführen der Tests als Adapter für diagnostische Daten in die Runsettings aktiviert wurden. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -607,7 +607,7 @@
         <target state="translated">Windows Mağazası uygulamaları için birim testlerini çalıştırmak üzere Yalıtım modu kullanılıyor. Bu uyarıyı kapatmak için /InIsolation parametresini kullanın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Yalıtım modu kullanarak birim çalıştırmak için Windows Store apps sınar. Bu uyarıyı bastırmak için /InIsolation parametresini kullanın.</target>
+          <target state-qualifier="mt-suggestion">Mit Isolationsmodus führen tests für Windows Store-apps. Verwenden Sie den Parameter /InIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -616,7 +616,7 @@
         <target state="translated">Windows Mağazası uygulamaları için birim testleri çalıştırılırken tanılama veri bağdaştırıcıları desteklenmiyor. Ayarlardan tanılama veri bağdaştırıcısı ayarlarını kaldırın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Windows mağazası uygulamaları için çalışan birim testleri çalıştırılırken tanı veri bağdaştırıcıları desteklenmez. Tanılama veri bağdaştırıcısı ayarlarını ayarları kaldırın.</target>
+          <target state-qualifier="mt-suggestion">Adapter für diagnostische Daten werden bei laufenden für Windows Store-apps Komponententests unterstützt. Entfernen Sie Diagnosedaten Adapter Einstellungen aus.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -643,7 +643,7 @@
         <target state="translated">        SettingName: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">AyarAdı: {0}</target>
+          <target state-qualifier="mt-suggestion">SettingName: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -652,7 +652,7 @@
         <target state="translated">        Desteklenen Dosya Türleri:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Desteklenen dosya türleri:</target>
+          <target state-qualifier="mt-suggestion">Unterstützte Dateitypen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -670,7 +670,7 @@
         <target state="translated"> {0},</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0},</target>
+          <target state-qualifier="mt-suggestion">{0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -679,7 +679,7 @@
         <target state="translated">        Varsayılan Yürütücü URI’si: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Varsayılan gerçekleştirme uygulaması URI: {0}</target>
+          <target state-qualifier="mt-suggestion">Standard-Executor Uri: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -697,7 +697,7 @@
         <target state="translated">Geçersiz platform türü: {0}. Geçerli platform türleri x86, x64 ve ARM’dir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Geçersiz platform türü: {0}. geçerli platform türleri şunlardır: x86, x64 ve Kol.</target>
+          <target state-qualifier="mt-suggestion">Ungültige Plattform: {0}. gültige Plattformtypen sind X86, X64 und Arm.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -706,7 +706,7 @@
         <target state="translated">/Platform bağımsız değişkeni, test çalıştırması için hedef platform türünün belirtilmesini gerektirir. Örnek: /Platform:x86</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/ Platform bağımsız test çalışmasının sağlanması için hedef platform türü gerektirir.   Örnek: /Platform:x 86</target>
+          <target state-qualifier="mt-suggestion">/ Platform Argument erfordert den Zieltyp Plattform für den Testlauf bereitgestellt werden.   Beispiel: /Platform:x 86</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -716,12 +716,12 @@
       Valid values are x86, x64 and ARM.</source>
         <target state="translated">--Platform|/Platform:&lt;Platform türü&gt;
       Test yürütmesi için kullanılacak hedef platform mimarisi. 
-      Geçerli değerler x86, x64 ve ARM’dir.</target>
+      Geçerli değerler x86, x64 ve ARM'dir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Platform | / Platform: &lt; Platform türü &gt;
-      Test yürütmesi için kullanılacak hedef platform mimarisi. 
-      Geçerli değerler şunlardır: x86, x64 ve ARM.</target>
+          <target state-qualifier="mt-suggestion">-Plattform | / Platform: &lt; Plattformtyp &gt;
+      Ziel Plattformarchitektur für Ausführung verwendet werden. 
+      Gültige Werte sind X86, X64 und ARM.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -730,7 +730,7 @@
         <target state="translated">Testleri test çalıştırması için etkili Platformun:{0} ve .NET Framework:{1} ayarlarının gerektirdiği şekilde çalıştırmak için Yalıtım modu kullanılıyor. Bu uyarıyı kapatmak için /inIsolation parametresini kullanın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Etkili bir Platform gerektirdiği testleri çalıştırmak için yalıtım modunu kullanma: {0} ve .net Framework: {1} ayarlarını test çalışması. Bu uyarıyı bastırmak için /inIsolation parametresini kullanın.</target>
+          <target state-qualifier="mt-suggestion">Isolation Modus zum Ausführen von Tests gemäß wirksame Plattform: {0} und .net Framework: {1} Einstellungen für den Testlauf. Verwenden Sie den Parameter /inIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="26" adjWordcount="22.1" curWordcount="22.1"</note>
       </trans-unit>
@@ -740,15 +740,15 @@
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
         <target state="translated">--Framework|/Framework:&lt;Framework Sürümü&gt;
-      Test yürütmesi için kullanılacak hedef .NET Framework sürümü. 
-      Geçerli değerler ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" vb.
-      Framework40, Framework45, FrameworkCore10 ve FrameworkUap10 desteklenen diğer değerlerdir.</target>
+      Test yürütme için kullanılacak hedef .Net Framework sürümü. 
+      Geçerli değerler: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" vb.
+      Diğer desteklenen değerler: Framework40, Framework45, FrameworkCore10 ve FrameworkUap10.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework sürüm &gt;
-      Hedef .net Framework sürümünü test yürütmesi için kullanılacak. 
-      Geçerli değerler: ". NETFramework, sürüm v4.6 = ",". NETCoreApp, sürüm v1.0 = "vs.
-      Diğer desteklenen Framework35, Framework40, Framework45 ve FrameworkCore10 değerleridir.</target>
+          <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; Frameworkversion &gt;
+      Ziel von .net Framework-Version für die Ausführung verwendet werden. 
+      Gültige Werte sind ". NETFramework, Version v4. 6 = ",". NETCoreApp, Version = 1.0 "usw..
+      Andere unterstützte Werte sind Framework35, Framework40, Framework45 und FrameworkCore10.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
@@ -757,7 +757,7 @@
         <target state="translated">/Framework bağımsız değişkeni test çalıştırması için hedef .NET Framework sürümünü gerektirir. Örnek: /Framework:".NETFramework,Version=v4.5.1"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/Framework bağımsız değişken gerektirir hedef .net Framework sürümünü test çalıştırması için.   Örnek: /Framework: ". NETFramework, sürüm v4.6 = "</target>
+          <target state-qualifier="mt-suggestion">Das Argument /Framework muss das Ziel .net Framework-Version für den Testlauf.   Beispiel: /Framework: ". NETFramework, Version v4. 6 = "</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -766,7 +766,7 @@
         <target state="translated">Geçersiz .NET Framework sürümü:{0}. Lütfen TargetFramework tam adını (Örnek: .NETCoreApp,Sürüm=v2.0) belirtin. Desteklenen diğer .NET Framework sürümleri Framework40, Framework45, FrameworkCore10 and FrameworkUap10’dur.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Geçersiz .net Framework sürümü: {0}. Lütfen fullname in TargetFramework verin. Diğer desteklenen .net Framework sürümleri şunlardır: Framework35, Framework40 ve Framework45.</target>
+          <target state-qualifier="mt-suggestion">Ungültige .net Framework-Version: {0}. Geben Fullname der TargetFramework. Andere unterstützt .net Framework-Versionen sind Framework35, Framework40 und Framework45.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -775,7 +775,7 @@
         <target state="translated">Windows Mağazası uygulamalarına yönelik birim testleri için test çalıştırması başlatılamadı: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test çalışması için Windows Store app için birim testleri başlatılamadı: {0}.</target>
+          <target state-qualifier="mt-suggestion">Testlauf für Komponententests für Windows Store-app konnte nicht gestartet werden: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -790,23 +790,23 @@
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</source>
         <target state="translated">--TestCaseFilter|/TestCaseFilter:&lt;İfade&gt;
-      Belirtilen ifadeyle eşleşen testleri çalıştırır.
-      &lt;İfade&gt; değeri &lt;özellik&gt;İşleç&lt;değer&gt;[|&amp;&lt;İfade&gt;] biçimindedir
-         Burada İşleç, =, != veya ~ değerlerinden biridir (İşleç ~, 'contains'
-         semantiğine sahiptir ve DisplayName gibi dize özellikleri için geçerlidir).
-         Alt ifadeleri gruplandırmak için parantez () kullanılabilir.
+      Verilen ifadeyle eşleşen testleri çalıştırır.
+      &lt;İfade&gt;, &lt;özellik&gt;İşleç&lt;değer&gt;[|&amp;&lt;İfade&gt;] biçimindedir;
+         burada İşleç =, != veya ~ simgelerinden biridir (~ İşleci 'içerir'
+         anlamına gelir ve DisplayName gibi dize özelliklerine uygulanabilir).
+         Alt ifadeleri gruplandırmak için ayraç () kullanılabilir.
       Örnekler: /TestCaseFilter:"Priority=1"
-                /TestCaseFilter:"(FullyQualifiedName~Nightly
-                                  |Name=MyTestMethod)"</target>
+                /TestCaseFilter:"(TamAd~Gece
+                                  |Name=TestYöntemim)"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--TestCaseFilter | / TestCaseFilter: &lt; ifade &gt;
-      Verilen ifadenin eşleşen testleri çalıştırın.
-      &lt; ifadesidir &gt; &lt; özelliği &gt; &lt; değer &gt; işleci biçimi [| &amp; &lt; ifade &gt;]
-         İşleç =, biri burada! = veya ~ (işleç ~ 'içerir' var
-         semantik ve DisplayName gibi özellikler dize için geçerlidir).
-         Ayraç () alt ifadeleri gruplamak için kullanılabilir.
-      Örnekler: /TestCaseFilter: "Öncelik = 1"
+          <target state-qualifier="mt-suggestion">--TestCaseFilter | / TestCaseFilter: &lt; Ausdruck &gt;
+      Ausführen von Tests, die mit dem angegebenen Ausdruck übereinstimmt.
+      &lt; Ausdruck &gt; Format &lt; Eigenschaft &gt; Operator &lt; Wert &gt; ist [| &amp; &lt; Ausdruck &gt;]
+         Operator ist eine =,! = oder ~ (Operator ~ ' enthält '
+         Semantik und für Eigenschaften wie "DisplayName").
+         Klammern () kann Teilausdrücke Gruppe verwendet werden.
+      Beispiele: /TestCaseFilter: "Priorität 1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   | Name=MyTestMethod) "</target>
         </alt-trans>
@@ -816,14 +816,14 @@
         <source>The /TestCaseFilter argument requires the filter value.
         Filter value can be &lt;property&gt;=&lt;value&gt; type.
         Examples: "Priority=1", "TestCategory=Nightly"</source>
-        <target state="translated">/TestCaseFilter bağımsız değişkeni filtre değerini gerektirir.
+        <target state="translated">/TestCaseFilter bağımsız değişkeni filtre değeri gerektirir.
         Filtre değeri &lt;özellik&gt;=&lt;değer&gt; türünde olabilir.
-        Örnekler: "Priority=1", "TestCategory=Nightly"</target>
+        Örnekler: "Priority=1", "TestCategory=Gece"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Filtre değeri /TestCaseFilter bağımsız değişken gerektirir.
-        Filtre değeri olabilir &lt; özelliği &gt; = &lt; değer &gt; türü.
-        Örnek: "Öncelik = 1", "TestCategory her gece ="</target>
+          <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter muss den Filterwert.
+        Filter kann &lt; Eigenschaft &gt; = &lt; Wert &gt;.
+        Beispiel: "Priorität 1", "TestCategory = jede Nacht"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -832,7 +832,7 @@
         <target state="translated">/TestCaseFilter bağımsız değişkeni /Tests ile belirtilemez. Testler belirtildiğinde test örneklerinin filtrelemesi geçerli değildir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/TestCaseFilter bağımsız değişkeni /Tests belirtilemez. Test çalışmaları filtreleme, testleri belirtilmediğinde geçerli değildir.</target>
+          <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter kann mit Batch.log angegeben werden. Filtern von Testfällen ist nicht anwendbar, wenn Tests angegeben werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -841,7 +841,7 @@
         <target state="translated">{0}, {1}/{2} için derlendi. Bir çalıştırmada belirtilen test bütünleştirilmiş kodu ortak bir hedef .NET framework ve platforma sahip olmalıdır.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} üretilmiştir {1} / {2}. Çalıştırma sırasında belirtilen test derlemeleri, bir ortak hedef .net Framework'ü ve platform olması gerekir.</target>
+          <target state-qualifier="mt-suggestion">{0} wurde für {1} / {2}. In einer angegebenen Testassemblys müssen eine allgemeine .net Framework-Zielversion und Plattform.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -850,7 +850,7 @@
         <target state="translated">Testleri çalıştırmak için yalnızca bir uygulama paketi (.appx dosyası) belirtilebilir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Testleri çalıştırmak için yalnızca bir uygulama paketi (.appx dosyası) belirtilebilir.</target>
+          <target state-qualifier="mt-suggestion">Zum Ausführen von Tests kann nur ein Anwendungspaket (.appx Datei) angegeben werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -859,7 +859,7 @@
         <target state="translated">Test bulma başlatılıyor, lütfen bekleyin...</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Keşif testi başlıyor, lütfen bekleyin...</target>
+          <target state-qualifier="mt-suggestion">Warten Sie Discovery Test gestartet, bitte...</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -868,7 +868,7 @@
         <target state="translated">Test yürütmesi başlatılıyor, lütfen bekleyin...</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test yürütme başlıyor, lütfen bekleyin...</target>
+          <target state-qualifier="mt-suggestion">Warten Sie Ausführung gestartet, bitte...</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -877,7 +877,7 @@
         <target state="translated">Tanılama veri bağdaştırıcısı ayarlarının okunması çalışan bir '{0}' oluşturdu. Tüm tanılama veri bağdaştırıcıları bu çalıştırmada atlanacak.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Bir çalışan '{0}' attı tanılama veri bağdaştırıcısı ayarları okuma. Bu çalışmada tüm tanılama veri bağdaştırıcıları atlanır.</target>
+          <target state-qualifier="mt-suggestion">Lesen von Diagnosedaten adaptereinstellungen hat eine laufende '{0}'. Alle Adapter für diagnostische Daten werden in diesem Durchlauf übersprungen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -889,7 +889,7 @@
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
-      Veri Tanılama Bağdaştırıcısı 'CodeCoverage' içinde test çalışmasını sağlar. Varsayılan ayarları kullanılır belirtilmediğinde ayarları dosyası kullanarak.</target>
+      Adapter für diagnostische Daten "CodeCoverage" im Testlauf ermöglicht. Standardeinstellungen werden nicht angegeben, mit der Datei.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -898,7 +898,7 @@
         <target state="translated">{0} bağımsız değişkeni 'EnableCodeCoverage' komutunda beklenmiyor. Komutu bağımsız değişken olmadan belirtin (Örnek: vstest.console.exe myTests.dll /EnableCodeCoverage) ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} bağımsız değişkeni 'EnableCodeCoverage' komutunda beklenmiyor. Komut bağımsız değişkeni olmadan belirtin (örnek: vstest.console.exe myTests.dll /EnableCodeCoverage) ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} erwartet nicht den Befehl 'EnableCodeCoverage'. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /EnableCodeCoverage) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -907,7 +907,7 @@
         <target state="translated">'{0}' uygulama paketi, test yürütücüsü giriş noktasına sahip değil. Windows Mağazası uygulamalarına yönelik birim testlerini çalıştırmak için Windows Mağazası uygulaması Birim Testi Kitaplığı projesini kullanarak uygulama paketini oluşturun.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' uygulama paketi test gerçekleştirme uygulaması giriş noktası sahip değil. Windows mağazası uygulamaları için birim testleri çalıştırmak için uygulama paketi Windows Store app Birim Test Kitaplığı projesini kullanarak oluşturun.</target>
+          <target state-qualifier="mt-suggestion">App-Paket '{0}' hat keine Test Executor Einstiegspunkt. Erstellen Sie zum Ausführen von Komponententests für Windows Store-apps, app-Paket mit Windows Store-app Einheitenbibliothek-Projekt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
@@ -916,7 +916,7 @@
         <target state="translated">Kod kapsamı Windows Mağazası uygulamaları için kullanılamaz. Bu test çalıştırması için kod kapsamı analizi atlandı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Kod kapsamı Windows mağazası uygulamaları için kullanılabilir değil. Bu test çalışması için kod kapsamı çözümleme atlandı.</target>
+          <target state-qualifier="mt-suggestion">Codeabdeckungsdaten ist nicht verfügbar für Windows Store-apps. Codeabdeckungsanalyse übersprungen für diesen Testlauf.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -925,7 +925,7 @@
         <target state="translated">Toplam {0} test bulundu, ancak bazı testler belirtilen ölçütlerle eşleşmiyor({1}). Doğru değerleri kullanın ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Toplam {0} test tespit ancak bazı testler belirtilen seçim criteria({1}) eşleşmiyor. Sağdaki değerler kullanın ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">{0} Tests entdeckt wurden jedoch einige Tests entsprechen nicht der angegebenen Auswahl criteria({1}). Richtige Werte verwenden und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -935,15 +935,15 @@
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <target state="translated">--TestAdapterPath|/TestAdapterPath
-      vstest.console.exe işleminin test çalıştırmasında belirtilen bir
-      yoldan (varsa) özel test bağdaştırıcılarını kullanmasını sağlar. 
+      Bu, vstest.console.exe işleminin test çalıştırmasında verilen yoldan
+      (varsa) özel test bağdaştırıcılarını kullanmasını sağlar. 
       Örnek  /TestAdapterPath:&lt;özelBağdaştırıcılarınYolu&gt;</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--TestAdapterPath | / TestAdapterPath
-      Bu özel test bağdaştırıcılarını kullanın vstest.console.exe işlem yapar
-      belirli bir yol (varsa) test çalışmasındaki. 
-      Örnek /TestAdapterPath: &lt; pathToCustomAdapters &gt;</target>
+      Das macht vstest.console.exe benutzerdefinierten Testadapter verwendet
+      aus einem angegebenen Pfad (falls vorhanden) im Testlauf. 
+      Beispiel /TestAdapterPath: &lt; PathToCustomAdapters &gt;</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -952,7 +952,7 @@
         <target state="translated">/TestAdapterPath parametresi, özel test bağdaştırıcıları içeren bir konumun yolu olan değeri gerektirir. Örnek:  /TestAdapterPath:c:\MyCustomAdapters</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">/TestAdapterPath parametresi, özel test bağdaştırıcısı içeren bir konumun yoludur bir değer gerektirir. Örnek: /TestAdapterPath:c:\MyCustomAdapters</target>
+          <target state-qualifier="mt-suggestion">Der /TestAdapterPath-Parameter erfordert einen Wert, der Pfad zu einem Speicherort mit benutzerdefinierten Testadapter. Beispiel: /TestAdapterPath:c:\MyCustomAdapters</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
@@ -961,7 +961,7 @@
         <target state="translated">'TestAdapterPath' içinde belirtilen '{0}' yolu geçersiz. Hata: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'TestAdapterPath' içinde belirtilen ' {0}' yolu geçersiz. Hata: {1}</target>
+          <target state-qualifier="mt-suggestion">Der Pfad '{0}' in 'TestAdapterPath' angegeben ist ungültig. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -970,7 +970,7 @@
         <target state="translated">Belirtilen özel test bağdaştırıcısı arama yolu bulunamadı; geçerli bir yol belirtin ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Sağlanan özel test bağdaştırıcısı arama yolu bulunamadı, geçerli bir yol girin ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Bereitgestellten benutzerdefinierten Test Adapter Suchpfad nicht gefunden, geben Sie einen gültigen Pfad, und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -979,7 +979,7 @@
         <target state="translated">'TestAdapterPath' içinde belirtilen '{0}' yolu hiçbir test bağdaştırıcısı içermiyor; geçerli bir yol belirtin ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'TestAdapterPath' içinde belirtilen ' {0}' yolu değil herhangi test bağdaştırıcılarını içerecek, geçerli bir yol girin ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Der Pfad '{0}' in 'TestAdapterPath' angegebene nicht Testadapter enthalten, geben Sie einen gültigen Pfad und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
@@ -988,7 +988,7 @@
         <target state="translated">Windows Phone uygulamasına yönelik testler için test çalıştırması başlatılamadı: {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test çalışması için Windows Phone Uygulama testleri için başlatılamadı: {0}.</target>
+          <target state-qualifier="mt-suggestion">Testlauf für die Tests für Windows Phone-Anwendung konnte nicht gestartet werden: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -997,7 +997,7 @@
         <target state="translated">Windows Phone uygulamaları için birim testlerini çalıştırmak üzere Yalıtım modu kullanılıyor. Bu uyarıyı kapatmak için /InIsolation parametresini kullanın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Yalıtım modu kullanarak birim çalıştırmak için Windows Phone apps sınar. Bu uyarıyı bastırmak için /InIsolation parametresini kullanın.</target>
+          <target state-qualifier="mt-suggestion">Windows Phone apps prüft mit Isolationsmodus führen. Verwenden Sie den Parameter /InIsolation Sie diese Warnung unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -1006,7 +1006,7 @@
         <target state="translated">Kod kapsamı Windows Phone uygulamaları için kullanılamaz. Bu test çalıştırması için kod kapsamı analizi atlandı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Kod kapsamı Windows Phone uygulamalar için kullanılabilir değil. Bu test çalışması için kod kapsamı çözümleme atlandı.</target>
+          <target state-qualifier="mt-suggestion">Codeabdeckungsdaten ist nicht verfügbar für Windows Phone apps. Codeabdeckungsanalyse übersprungen für diesen Testlauf.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
@@ -1015,7 +1015,7 @@
         <target state="translated">Windows Phone uygulamaları için birim testleri çalıştırılırken tanılama veri bağdaştırıcıları desteklenmiyor. Ayarlardan tanılama veri bağdaştırıcısı ayarlarını kaldırın.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Windows Phone uygulamalar için çalışan birim testleri çalıştırılırken tanı veri bağdaştırıcıları desteklenmez. Tanılama veri bağdaştırıcısı ayarlarını ayarları kaldırın.</target>
+          <target state-qualifier="mt-suggestion">Adapter für diagnostische Daten werden bei laufenden für Windows Phone apps Komponententests unterstützt. Entfernen Sie Diagnosedaten Adapter Einstellungen aus.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
@@ -1024,7 +1024,7 @@
         <target state="translated">'{0}' uygulama paketi, test yürütücüsü giriş noktasına sahip değil. Windows Phone uygulamalarına yönelik birim testlerini çalıştırmak için Windows Phone Birim Testi Uygulaması projesini kullanarak uygulama paketini oluşturun.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">'{0}' uygulama paketi test gerçekleştirme uygulaması giriş noktası sahip değil. Windows Phone uygulamalar için birim testleri çalıştırmak için uygulama paketi kullanarak Windows Phone Birim Test uygulama projesi oluşturun.</target>
+          <target state-qualifier="mt-suggestion">App-Paket '{0}' hat keine Test Executor Einstiegspunkt. Erstellen Sie zum Ausführen von Komponententests für Windows Phone apps, app Paket mit Windows Phone Unit Test-App-Projekt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
@@ -1033,7 +1033,7 @@
         <target state="translated">Testleri çalıştırmak için {0} çerçevesi kullanılıyor. Bu uyarıyı kapatmak için /Framework:{1} değerini belirtin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Testleri çalıştırmak için Framework {0} kullanılıyor. /Framework belirtin: Bu uyarıyı bastırmak için {1}.</target>
+          <target state-qualifier="mt-suggestion">Framework {0} verwenden zum Ausführen der Tests. Geben Sie /Framework: {1}, um diese Warnung zu unterdrücken.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1042,7 +1042,7 @@
         <target state="translated">Belirtilen test kapsayıcılarında test bulunamadı. Ayrıca, Microsoft Windows Mağazası Birim testi bağdaştırıcısı .appxbundle dosyalarını desteklemiyor. Uygulama Paketi oluştururken bir appx oluşturun (Uygulama paketi grubu oluştur seçeneğini Hiçbir Zaman olarak ayarlayın) ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Belirtilen test kapsayıcılarında bulunan test yok. Ayrıca, Microsoft Windows depolama birimi test bağdaştırıcısı .appxbundle dosyalarını desteklemez. Bir UygX oluşturun (App üretmek paket seçeneği asla ayarlandığında) App paket oluşturma ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Keine Tests im angegebenen Testcontainer gefunden. Darüber hinaus unterstützt Microsoft Windows Store Unit Test-Adapter nicht .appxbundle Dateien. Erstellen einer Anlage (Einstellung generieren App Bundle Option nie) als Anwendungspaket erstellen und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="37" adjWordcount="31.45" curWordcount="31.45"</note>
       </trans-unit>
@@ -1057,10 +1057,10 @@
       Kullanılacak çekirdek sayısı bir ayarlar dosyası kullanılarak yapılandırılabilir.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Paralel | / paralel
-      Testleri paralel olarak yürütüldüğünü belirtir. Varsayılan
-      makine üzerindeki tüm kullanılabilir çekirdek için kullanılabilir.
-      Kullanmak için çekirdek sayısı bir ayarlar dosyası kullanılarak yapılandırılabilir.</target>
+          <target state-qualifier="mt-suggestion">--Parallel | / Parallel
+      Gibt an, dass die Tests parallel ausgeführt werden. Standardmäßig oben
+      für alle verfügbaren Kerne auf dem Computer verwendet werden.
+      Die Anzahl der Kerne verwendet möglicherweise mithilfe einer Einstellungsdatei konfiguriert werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="36" adjWordcount="30.6" curWordcount="30.6"</note>
       </trans-unit>
@@ -1069,7 +1069,7 @@
         <target state="translated">{0} bağımsız değişkeni 'Parallel' komutunda beklenmiyor. Komutu bağımsız değişken olmadan belirtin (Örnek: vstest.console.exe myTests.dll /Parallel) ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} bağımsız değişkeni 'Paralel' komutu beklenmiyor. Komut bağımsız değişkeni olmadan belirtin (örnek: vstest.console.exe myTests.dll /Parallel) ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Das Argument {0} ist nicht 'Parallel' Befehl erwartet. Geben Sie den Befehl ohne das Argument (Beispiel: vstest.console.exe myTests.dll /Parallel) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
@@ -1078,19 +1078,19 @@
         <target state="translated">Null veya boş olamaz</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Null veya boş olamaz</target>
+          <target state-qualifier="mt-suggestion">Darf nicht null oder leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="PortArgumentHelp">
         <source>--Port|/Port:&lt;Port&gt;
       The Port for socket connection and receiving the event messages.</source>
-        <target state="translated">--Port|/Port:&lt;BağlantıNoktası&gt;
-      Yuva bağlantısına ve olay iletilerini almaya yönelik bağlantı noktası.</target>
+        <target state="translated">--Port|/Port:&lt;Bağlantı Noktası&gt;
+      Yuva bağlantısı ve olay iletilerini almaya yönelik Bağlantı Noktası.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Liman | / Port: &lt; bağlantı noktası &gt;
-      Yuva bağlantısı ve olay iletileri almak için bağlantı noktası.</target>
+          <target state-qualifier="mt-suggestion">-Port | / Port: &lt; Port &gt;
+      Der Port für Socket-Verbindung und das Ereignis empfangen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1099,7 +1099,7 @@
         <target state="translated">--Port|/Port bağımsız değişkeni tamsayı olan bir bağlantı noktası numarası gerektirir. Yuva bağlantısına ve olay iletilerini almaya yönelik bağlantı noktasını belirtin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Bağlantı noktası--| / bir tamsayı olan bağlantı noktası numarasını bağlantı noktası bağımsız değişken gerektirir. Yuva bağlantısı ve olay iletileri almak için bir bağlantı noktası belirtin.</target>
+          <target state-qualifier="mt-suggestion">-Port | / Port-Argument ist die Port-Nummer ist eine ganze Zahl. Geben Sie den Port für die Socket-Verbindung und das Ereignis empfangen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
@@ -1108,7 +1108,7 @@
         <target state="translated">Test kapsamındaki bütünleştirilmiş kod bulunamıyor. Lütfen projenin oluşturulduğundan emin olun.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test altındaki derleme bulmak oluşturulamıyor. Proje oluşturulur emin olun.</target>
+          <target state-qualifier="mt-suggestion">Nicht getestete Assembly gefunden. Stellen Sie sicher, dass das Projekt erstellt wird.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
@@ -1117,31 +1117,31 @@
         <target state="translated">{0} Yolu yok.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} yolu yok.</target>
+          <target state-qualifier="mt-suggestion">Der Pfad {0} ist nicht vorhanden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="BuildBasePathArgumentHelp">
         <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</source>
-        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;DerlemeTabanıYolu&gt;
-      Geçici çıktıları içeren dizin.</target>
+        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
+      Geçici çıkışları içeren dizin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
-      Geçici çıkış içeren dizin.</target>
+      Das Verzeichnis für temporären Ausgaben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="ConfigurationArgumentHelp">
         <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
       The configuration the project is built for i.e. Debug/Release</source>
-        <target state="translated">-c|--Configuration|/c|/Configuration:&lt;Yapılandırma&gt;
-      Projenin hangi yapılandırma (Hata Ayıklama/Yayın) için derlendiği</target>
+        <target state="translated">-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
+      Projenin derleme nedeni olan yapılandırma (Debug/Release)</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-c |--yapılandırma | / c | / yapılandırma: &lt; Configuration &gt;
-      Proje yapılandırma yani Debug/Release için üretilmiştir</target>
+          <target state-qualifier="mt-suggestion">-C |-Konfiguration | / C | / Konfiguration: &lt; Configuration &gt;
+      Die Konfiguration des Projekts wird für z. B. Debug/Release erstellt</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -1150,7 +1150,7 @@
         <target state="translated">Belirtilen yapılandırma geçersiz.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Belirtilen yapılandırma geçersiz.</target>
+          <target state-qualifier="mt-suggestion">Die Konfiguration ist ungültig.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -1161,8 +1161,8 @@
       Çalıştırılacak ikili dosyaları içeren dizin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">-o |--çıkış | / o | / çıkış: &lt; çıktı &gt;
-      Çalıştırmak için ikili dosyalarını içeren dizin.</target>
+          <target state-qualifier="mt-suggestion">-o |-Ausgabe | / o | / Output: &lt; Output &gt;
+      Das Verzeichnis Binärdateien ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -1171,7 +1171,7 @@
         <target state="translated">BuildBasePath bulunamadı, geçerli bir yol belirtin ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">BuildBasePath bulunamadı, geçerli bir yol girin ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Die BuildBasePath wurde nicht gefunden, geben Sie einen gültigen Pfad und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -1180,7 +1180,7 @@
         <target state="translated">Çıkış yolu bulunamadı, geçerli bir yol belirtin ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Çıkış yolu oldu bulunamıyor, geçerli bir yol girin ve yeniden deneyin.</target>
+          <target state-qualifier="mt-suggestion">Das Verzeichnis wurde nicht gefunden, geben Sie einen gültigen Pfad und wiederholen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -1189,7 +1189,7 @@
         <target state="translated">Ek Bilgi İletileri:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ek bilgi iletileri:</target>
+          <target state-qualifier="mt-suggestion">Weitere Informationen-Nachrichten:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1198,7 +1198,7 @@
         <target state="translated">Gün</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Gün</target>
+          <target state-qualifier="mt-suggestion">Tage</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1207,16 +1207,17 @@
         <target state="translated">Hata İletisi:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Hata iletisi:</target>
+          <target state-qualifier="mt-suggestion">Fehlermeldung:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
-        <target state="new">Test yürütmesi süresi: {0:0.0000} {1}</target>
-        <note></note>
+        <target state="translated"> Toplam süre: {0:0.0000} {1}</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Test yürütme süresi: {0:0.0000}, {1}</target>
+          <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -1225,7 +1226,7 @@
         <target state="translated">Saat</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Saat</target>
+          <target state-qualifier="mt-suggestion">Stunden</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1234,7 +1235,7 @@
         <target state="translated">URI veya FriendlyName değeri '{0}' olan bir test günlükçüsü bulunamadı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">URI veya FriendlyName '{0}' olan bir test Günlükçü bulunamadı.</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -1243,7 +1244,7 @@
         <target state="translated">Dakika</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Dakika</target>
+          <target state-qualifier="mt-suggestion">Minuten</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1252,7 +1253,7 @@
         <target state="translated">Saniye</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Saniye</target>
+          <target state-qualifier="mt-suggestion">Sekunden</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1261,7 +1262,7 @@
         <target state="translated">Yığın İzleme:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Yığın izleme:</target>
+          <target state-qualifier="mt-suggestion">Stack-Trace:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1270,7 +1271,7 @@
         <target state="translated">Standart Hata İletileri:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Standart hata iletisi:</target>
+          <target state-qualifier="mt-suggestion">Standard-Fehlermeldungen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1279,7 +1280,7 @@
         <target state="translated">Standart Çıkış İletileri:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Standart çıktı iletileri:</target>
+          <target state-qualifier="mt-suggestion">Standardausgabe Nachrichten:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -1288,7 +1289,7 @@
         <target state="translated">Ekler:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ekler:</target>
+          <target state-qualifier="mt-suggestion">Anlagen:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1303,10 +1304,10 @@
       </trans-unit>
       <trans-unit id="NoTestsAvailableInSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} içinde test yok. Yüklü test bulucu ve yürütücülerinin, platform ve çerçeve sürümü ayarlarının uygun olduğundan emin olun ve yeniden deneyin.</target>
+        <target state="translated">{0} içinde hiç test yok. Yüklü test bulucuları ve yükleyicileri, platform ve çerçeve sürümü ayarlarının uygun olmasına dikkat edin ve yeniden deneyin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Hiçbir test {0}'de kullanılabilir. Yüklü discoverers &amp; executors, uygun platform &amp; framework sürüm ayarları sınamak ve yeniden deneyin emin olun.</target>
+          <target state-qualifier="mt-suggestion">Kein Test ist verfügbar in {0}. Sicher installierten test Entdecker &amp; Executors Platform &amp; Framework Version sind geeignete und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -1315,7 +1316,7 @@
         <target state="translated">Başarısız   {0}</target>
         <note>Message which is written to the console when a test fails.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">{0} başarısız</target>
+          <target state-qualifier="mt-suggestion">Fehlgeschlagene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1324,7 +1325,7 @@
         <target state="translated">Başarılı   {0}</target>
         <note>Message which is written to the console when a test passes.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Geçirilen {0}</target>
+          <target state-qualifier="mt-suggestion">Übergebene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1333,7 +1334,7 @@
         <target state="translated">Atlandı  {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Atlanan {0}</target>
+          <target state-qualifier="mt-suggestion">Übersprungene {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -1342,19 +1343,19 @@
         <target state="translated">Belirtilen kaynaklar için bulma başarısız oldu. Özel durum: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Bulma kaynaklar için başarısız oldu. Özel durum: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler bei der Ermittlung für angegebenen Quellen. Ausnahme: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="ParentProcessIdArgumentHelp">
         <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
       Process Id of the Parent Process responsible for launching current process.</source>
-        <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ÜstİşlemKimliği&gt;
-      Geçerli işlemi başlatmaktan sorumlu Üst İşlemin işlem kimliği.</target>
+        <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
+      Geçerli işlemi başlatmadan sorumlu Üst İşlemin işlem kimliği.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">ParentProcessId--| / ParentProcessID: &lt; ParentProcessId &gt;
-      Geçerli işlem başlatmaktan sorumlu üst işlemin işlem kimliği.</target>
+          <target state-qualifier="mt-suggestion">– Diese Eigenschaft | / diese Eigenschaft: &lt; Prozesskennung &gt;
+      Prozess-Id des übergeordneten Prozesses für aktuellen Prozess verantwortlich.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -1363,7 +1364,7 @@
         <target state="translated">--ParentProcessId|/ParentProcessId bağımsız değişkeni, işlem kimliğinin tamsayı olmasını gerektirir. Bu işlemi başlatan üst işlemin işlem kimliğini belirtin.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--ParentProcessId | / ParentProcessID bağımsız değişken bir tamsayı olan işlem kimliği gerektirir. Bu işlem başlatılan üst işlemin işlem kimliğini belirtin.</target>
+          <target state-qualifier="mt-suggestion">Diese Eigenschaft – | / Argument für diese Eigenschaft ist die Prozess-Id ist eine ganze Zahl. Geben Sie die Prozess-Id des übergeordneten Prozesses, die diesen Prozess gestartet.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
@@ -1372,7 +1373,7 @@
         <target state="translated">Bağımsız değişkenler:</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Bağımsız değişkenler:</target>
+          <target state-qualifier="mt-suggestion">Argumente:</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
@@ -1384,18 +1385,18 @@
       Change the trace level for logs as shown below
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
-        <target state="translated">--Diag|/Diag:&lt;Günlük dosyasının yolu&gt;
-      Test platformu için günlükleri etkinleştirin.
-      Günlükler belirtilen dosyaya yazılır.
+        <target state="translated">--Diag|/Diag:&lt;Günlük dosyası yolu&gt;
+      Test platformu için günlükleri sağlayın.
+      Günlükler sağlanan dosyaya yazılır.
 
-      Günlüklerin izleme düzeyini aşağıda gösterildiği şekilde değiştirin
-      Örnek: /Diag:&lt;Günlük dosyasının yolu&gt;;tracelevel=&lt;Varsayılan "verbose"&gt;
-      tracelevel için izin verilen değerler: off, error, warning, info ve verbose.</target>
+Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
+      Örnek: /Diag:&lt;Günlük dosyası yolu&gt;; tracelevel=&lt;Varsayılan olarak "ayrıntılı" değerini alır&gt;
+      tracelevel için izin verilen değerler: kapalı, hata, uyarı, bilgiler ve ayrıntılı.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">--Diag | / Diag: &lt; günlük dosyası yolu &gt;
-      Test platformu için ayrıntılı günlüklerini etkinleştirir.
-      Günlükleri sağlanan dosyasına yazılır.</target>
+          <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; Pfad zur Protokolldatei &gt;
+      Aktivieren Sie ausführliche Protokolle Testplattform.
+      Protokolle werden in die angegebene Datei geschrieben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
@@ -1404,7 +1405,7 @@
         <target state="translated">Belirtilen {0} dosyası salt okunur</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Sağlanan {0} dosyası salt okunur</target>
+          <target state-qualifier="mt-suggestion">Die bereitgestellte Datei {0} ist schreibgeschützt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -1434,8 +1435,8 @@
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
         <target state="translated">--ResultsDirectory|/ResultsDirectory
-      Test sonuçları dizini belirtilen yolda yoksa oluşturulur.
-      Örnek  /ResultsDirectory:&lt;SonuçDiziniYolu&gt;</target>
+      Mevcut değilse test sonuçları dizini belirtilen yolda oluşturulacak.
+      Örnek /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
@@ -1466,8 +1467,8 @@
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="translated">--Collect|/Collect:&lt;VeriToplayıcı KolayAdı&gt;
-      Test çalıştırması için veri toplayıcıyı etkinleştirir. Daha fazla bilgi için bkz. https://aka.ms/vstest-collect</target>
+        <target state="translated">--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
+      Test çalıştırması için veri toplayıcıyı etkinleştirir. Daha fazla bilgi: https://aka.ms/vstest-collect</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
@@ -1525,14 +1526,15 @@
       <trans-unit id="ResponseFileArgumentHelp">
         <source>@&lt;file&gt;
       Read response file for more options.</source>
-        <target state="translated">@&lt;file&gt;
+        <target state="translated">@&lt;dosya&gt;
       Daha fazla seçenek için yanıt dosyasını okuyun.</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
-        <target state="new">Toplam test: Bilinmiyor. Başarılı: {0}. Başarısız: {1}. Atlandı: {2}.</target>
-        <note></note>
+        <target state="translated">Toplam test sayısı: Bilinmiyor</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1541,7 +1543,7 @@
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
         <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
-        <target state="translated">Test bağdaştırıcılarının yolu /TestAdapterPath komutu kullanılarak da belirtilebilir. Örnek: /TestAdapterPath:&lt;özelBağdaştırıcılarınYolu&gt;.</target>
+        <target state="translated">Buna ek olarak, test bağdaştırıcıları yolu /TestAdapterPath komutu kullanılarak belirtilebilir. Örnek /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</target>
         <note />
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
@@ -1579,18 +1581,18 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI/FriendlyName&gt;
       Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
-      Visual Studio Test Sonuçları Dosyası’na (TRX) kaydetmek için şunu kullanın: /logger:trx [;LogFileName=&lt;Varsayılan değer benzersiz dosya adıdır&gt;]
-      Dosyayı belirtilen LogFileName ile TestResults dizininde oluşturur.
+      Visual Studio Test Sonuçları Dosyası'na (TRX) kaydetmek için şunu kullanın: /logger:trx[;LogFileName=&lt;Varsayılan olarak benzersiz dosya adını alır&gt;]
+      İlgili LogFileName ile TestResults dizininde dosya oluşturur.
 
-      Konsol günlükçüsü için günlük iletilerinin ayrıntı düzeyini aşağıdaki gibi değiştirin
-      Örnek: /logger:console;verbosity=&lt;Varsayılan değer "minimal"&gt;
-      İzin verilen verbosity değerleri: quiet, minimal, normal ve detailed.
+      Konsol günlükçüsü için ayrıntı düzeyini günlük iletilerinde aşağıda gösterildiği gibi değiştirin
+      Örnek: /logger:console;verbosity=&lt;Varsayılan olarak "minimal" değerini alır&gt;
+      Ayrıntı için izin verilen değerler: quiet, minimal, normal ve detailed.
 
-      Konsol günlükçüsü için tanılama düzeyi önekini aşağıdaki gibi değiştirin
-      Örnek: /logger:console;prefix=&lt;Varsayılan değer "false"&gt;
-      Konsol Günlükçüsü hakkında daha fazla bilgi için bkz. https://aka.ms/console-logger</target>
+      Konsol günlükçüsü için tanılama düzeyi ön ekini aşağıda gösterildiği gibi değiştirin
+      Örnek: /logger:console;prefix=&lt;Varsayılan olarak "false" değerini alır&gt;
+      Konsol Günlükçüsü hakkında daha fazla bilgi: https://aka.ms/console-logger</target>
         <note />
       </trans-unit>
       <trans-unit id="BlameCollectDumpNotSupportedForPlatform">
@@ -1625,33 +1627,39 @@
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 desteklenmiyor. .NET Framework 3.5’i hedefleyen projeler için lütfen Framework40 kullanarak testleri CLR 4.0’ın “uyumluluk modunda” çalıştırın.</target>
-        <note></note>
+        <target state="translated">Framework35 desteklenmiyor. İçin hedefleme .net Framework 3.5, test CLR 4.0 "uyumluluk moduna" çalışacak.</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
-        <target state="new">Test run in progress</target>
-        <note></note>
+        <target state="translated">Test çalıştırması devam ediyor</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
-        <target state="new">Total tests: {0}</target>
-        <note></note>
+        <target state="translated">Toplam test sayısı: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
-        <target state="new">     Failed: {0}</target>
-        <note></note>
+        <target state="translated">     Başarısız: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
-        <target state="new">     Passed: {0}</target>
-        <note></note>
+        <target state="translated">     Geçti: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
-        <target state="new">    Skipped: {0}</target>
-        <note></note>
+        <target state="translated">    Atlandı: {0}</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

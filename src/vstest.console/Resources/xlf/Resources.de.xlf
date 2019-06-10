@@ -58,7 +58,7 @@
       </trans-unit>
       <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -85,7 +85,7 @@
       </trans-unit>
       <trans-unit id="AvailableTestsFormat">
         <source>    {0}</source>
-        <target state="translated">    {0}</target>
+        <target state="new">    {0}</target>
         <note>{Locked}</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
@@ -225,17 +225,17 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;Protokollierungs-Uri/FriendlyName&gt;
-      Gibt eine Protokollierung für die Testergebnisse an. Zum Protokollieren der Ergebnisse in eine 
-      Visual Studio-Testergebnisdatei (TRX-Datei) verwenden Sie z.B.: /logger:trx[;LogFileName=&lt;Entspricht standardmäßig einem eindeutigen Dateinamen&gt;]
-       Erstellt eine Datei im TestResults-Verzeichnis mit dem entsprechenden LogFileName.
+        <target state="translated">--logger|/logger:&lt;URI/Anzeigename für Protokollierung&gt;
+      Geben Sie eine Protokollierung für Testergebnisse an. Um Ergebnisse beispielsweise in einer
+      Visual Studio-Testergebnisdatei (TRX) zu protokollieren, verwenden Sie /logger:trx[;LogFileName=&lt;Standardmäßig eindeutiger Dateiname&gt;]
+      Erstellt die Datei im TestResults-Verzeichnis mit dem angegebenen LogFileName.
 
-      Ändern Sie den Ausführlichkeitsgrad in Protokollnachrichten für die Konsolenprotokollierung wie unten gezeigt:
-      Beispiel: /logger:console;verbosity=&lt;Standardwert ist "normal"&gt;
-      Zulässige Werte für die Ausführlichkeit: "quiet", "minimal", "normal" und "detailed".
+      Ändern Sie den Ausführlichkeitsgrad in den Protokollmeldungen für die Konsolenprotokollierung wie folgt:
+      Beispiel: /logger:console;verbosity=&lt;Standardmäßig "normal"&gt;
+      Zulässige Werte für den Ausführlichkeitsgrad: quiet, minimal, normal, detailed.
 
-      Ändern Sie das Präfix der Diagnoseebene für die Konsolenprotokollierung wie unten gezeigt:
-      Beispiel: /logger:console;prefix=&lt;Standardwert ist "false"&gt;
+      Ändern Sie das Präfix für die Diagnoseebene für die Konsolenprotokollierung wie folgt:
+      Beispiel: /logger:console;prefix=&lt;Standardmäßig "false"&gt;
       Weitere Informationen zur Konsolenprotokollierung finden Sie hier: https://aka.ms/console-logger</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -272,7 +272,7 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="translated">Verwendung: vstest.console.exe [Argumente] [Optionen] [[--] &lt;RunSettings-Argumente&gt;...]]</target>
+        <target state="translated">Syntax: vstest.console.exe [Argumente] [Optionen] [[--] &lt;RunSettings-Argumente&gt;...]]</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Syntax: vstest.console.exe [Optionen] [Argumente]</target>
@@ -330,8 +330,8 @@
       <trans-unit id="RunSettingsArgumentHelp">
         <source>--Settings|/Settings:&lt;Settings File&gt;
       Settings to use when running tests.</source>
-        <target state="translated">--Settings|/Settings: &lt;Einstellungsdatei&gt;
-      Beim Ausführen von Tests zu verwendende Einstellungen.</target>
+        <target state="translated">--Settings|/Settings:&lt;Einstellungsdatei&gt;
+      Einstellungen für die Ausführung der Tests.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Einstellungen | / Settings: &lt; Datei &gt;
@@ -460,7 +460,7 @@
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
         <target state="translated">  Zum Ausführen von Tests:
     &gt;vstest.console.exe tests.dll 
-  Zum Ausführen von Tests mit zusätzlichen Einstellungen wie etwa Datensammlern:
+  Zum Ausführen von Tests mit zusätzlichen Einstellungen wie Datensammlern:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -524,7 +524,7 @@
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists all discovered tests from the given test container.</source>
         <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Dateiname&gt;
-      Listet alle ermittelten Tests aus dem angegebenen Testcontainer auf.</target>
+      Listet alle gefundenen Tests aus dem angegebenen Testcontainer auf.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Lt |-ListTests | / Lt | / ListTests: &lt; Dateiname &gt;
@@ -578,9 +578,9 @@
       values, separate them by commas.
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
-        <target state="translated">--Tests|/Tests:&lt;Testnamen&gt;
-      Führt Tests aus, deren Namen mit den angegebenen Werten übereinstimmen. Zum Bereitstellen mehrerer
-      Werte trennen Sie diese durch Kommas.
+        <target state="translated">--Tests|/Tests:&lt;Testnamen &gt;
+      Führt Tests aus, die mit den eingegebenen Werten übereinstimmen. Verwenden Sie zum
+      Angeben mehrerer Werte Kommas als Trennzeichen.
       Beispiele: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</target>
         <note>Please verify if the console output looks good after modifiaction. </note>
@@ -714,8 +714,8 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="translated">--Plattform|/Platform:&lt;Plattformtyp&gt;
-      Die Zielplattformarchitektur, die für Ausführung verwendet werden soll.
+        <target state="translated">--Platform|/Platform:&lt;Plattformtyp&gt;
+      Zielplattformarchitektur für die Testausführung. 
       Gültige Werte sind x86, x64 und ARM.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -739,10 +739,10 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt; Frameworkversion &gt;
-      Die .NET Framework-Zielversion, die für die Testausführung verwendet werden soll.
-      Gültige Werte sind ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0 " usw.
-      Weitere unterstützte Werte sind "Framework40", "Framework45", "FrameworkCore10" und "FrameworkUap10".</target>
+        <target state="translated">--Framework|/Framework:&lt;Frameworkversion&gt;
+      Die .NET-Framework-Zielversion für die Testausführung. 
+      Gültige Werte sind ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" usw.
+      Weitere unterstützte Werte: Framework40, Framework45, FrameworkCore10, FrameworkUap10.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; Frameworkversion &gt;
@@ -791,13 +791,13 @@
                                   |Name=MyTestMethod)"</source>
         <target state="translated">--TestCaseFilter|/TestCaseFilter:&lt;Ausdruck&gt;
       Führt Tests aus, die mit dem angegebenen Ausdruck übereinstimmen.
-      &lt;Ausdruck&gt; weist das Format &lt;Eigenschaft&gt;Operator&lt;Wert&gt;[|&amp;&lt;Ausdruck&gt;] auf.
-         Dabei ist "Operator" eines der Zeichen =, != oder ~ (der Operator ~ weist Semantik vom Typ "contains"
-         auf und gilt für Zeichenfolgeneigenschaften wie DisplayName).
-         Klammern () können zum Gruppieren von Unterausdrücken verwendet werden.
+      &lt;Ausdruck&gt; entspricht dem Format &lt;Eigenschaft&gt;Operator&lt;Wert&gt;[|&amp;&lt;Ausdruck&gt;],
+         wobei Operator entweder "=", "!=" oder "~" ist (Der Operator "~" verfügt über eine contains-
+         Semantik und kann auf Zeichenfolgeneigenschaften, z. B. DisplayName, angewendet werden).
+         Zum Gruppieren von Unterausdrücken können Klammern () verwendet werden.
       Beispiele: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
-                                  |Name=MeineTestMethode)"</target>
+                                  |Name=MyTestMethod)"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--TestCaseFilter | / TestCaseFilter: &lt; Ausdruck &gt;
@@ -816,9 +816,9 @@
         <source>The /TestCaseFilter argument requires the filter value.
         Filter value can be &lt;property&gt;=&lt;value&gt; type.
         Examples: "Priority=1", "TestCategory=Nightly"</source>
-        <target state="translated">Das Argument "/TestCaseFilter" erfordert den Filterwert.
-        Der Filterwert kann vom Typ &lt;Eigenschaft&gt;=&lt;Wert&gt; sein.
-        Beispiel: "Priority=1", "TestCategory=Nightly"</target>
+        <target state="translated">Für das Argument /TestCaseFilter ist der Filterwert erforderlich.
+        Filterwert kann von folgendem Typ sein: &lt;Eigenschaft&gt;=&lt;Wert&gt;.
+        Beispiele: "Priority=1", "TestCategory=Nightly"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Das Argument /TestCaseFilter muss den Filterwert.
@@ -935,9 +935,9 @@
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <target state="translated">--TestAdapterPath|/TestAdapterPath
-      Bewirkt, dass der Prozess "vstest.console.exe" benutzerdefinierte Testadapter
-      aus einem angegebenen Pfad (falls vorhanden) im Testlauf verwendet.
-      Beispiel: /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
+      Hierdurch verwendet der Prozess "vstest.console.exe" im Testlauf
+      benutzerdefinierte Testadapter aus einem angegeben Pfad (soweit vorhanden). 
+      Beispiel: /TestAdapterPath:&lt;Pfad_zu_benutzerdefinierten_Adaptern&gt;</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--TestAdapterPath | / TestAdapterPath
@@ -1086,7 +1086,7 @@
         <source>--Port|/Port:&lt;Port&gt;
       The Port for socket connection and receiving the event messages.</source>
         <target state="translated">--Port|/Port:&lt;Port&gt;
-      Der Port für die Socketverbindung sowie zum Empfangen der Ereignismeldungen.</target>
+      Der Port für die Socketverbindung und das Empfangen von Ereignismeldungen.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Port | / Port: &lt; Port &gt;
@@ -1124,8 +1124,8 @@
       <trans-unit id="BuildBasePathArgumentHelp">
         <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</source>
-        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;BuildBasisPfad&gt;
-      Das Verzeichnis, das die temporären Ausgaben enthält.</target>
+        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;Buildbasispfad&gt;
+      Das Verzeichnis mit den temporären Ausgaben.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
@@ -1137,7 +1137,7 @@
         <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
       The configuration the project is built for i.e. Debug/Release</source>
         <target state="translated">-c|--Configuration|/c|/Configuration:&lt;Konfiguration&gt;
-      Die Konfiguration, für die das Projekt erstellt wird, z. B. Debug/Release.</target>
+      Die Konfiguration, für die das Projekt erstellt wird, d. h. Debug/Release.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-C |-Konfiguration | / C | / Konfiguration: &lt; Configuration &gt;
@@ -1158,7 +1158,7 @@
         <source>-o|--Output|/o|/Output:&lt;Output&gt;
       The directory containing the binaries to run.</source>
         <target state="translated">-o|--Output|/o|/Output:&lt;Ausgabe&gt;
-      Das Verzeichnis, das die auszuführenden Binärdateien enthält.</target>
+      Das Verzeichnis mit den auszuführenden Binärdateien.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-o |-Ausgabe | / o | / Output: &lt; Output &gt;
@@ -1213,8 +1213,9 @@
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
-        <target state="new">Testausführungszeit: {0:0.0000} {1}</target>
-        <note></note>
+        <target state="translated"> Gesamtzeit: {0:0.0000} {1}</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1303,7 +1304,7 @@
       </trans-unit>
       <trans-unit id="NoTestsAvailableInSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">In {0} ist kein Test verfügbar. Stellen Sie sicher, dass die installierten Versionseinstellungen für Testdiscoverer und -executor, Plattform und Framework richtig sind, und versuchen Sie es erneut.</target>
+        <target state="translated">In "{0}" ist kein Test verfügbar. Stellen Sie sicher, dass die installierten Test-Discoverer und -Executor und die Versionseinstellungen für Plattform und Framework richtig sind, und wiederholen Sie den Vorgang.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Kein Test ist verfügbar in {0}. Sicher installierten test Entdecker &amp; Executors Platform &amp; Framework Version sind geeignete und versuchen Sie es erneut.</target>
@@ -1349,8 +1350,8 @@
       <trans-unit id="ParentProcessIdArgumentHelp">
         <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
       Process Id of the Parent Process responsible for launching current process.</source>
-        <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ÜbergeordneteProzessID&gt;
-      Die Prozess-ID des übergeordneten Prozesses, der für den Start des aktuellen Prozesses verantwortlich ist.</target>
+        <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ÜbergeordneteProzess-ID&gt;
+      Die Prozess-ID des übergeordneten Prozesses, der für das Starten des aktuellen Prozesses zuständig ist.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">– Diese Eigenschaft | / diese Eigenschaft: &lt; Prozesskennung &gt;
@@ -1385,12 +1386,12 @@
       Example: /Diag:&lt;Path to log file&gt;;tracelevel=&lt;Defaults to "verbose"&gt;
       Allowed values for tracelevel: off, error, warning, info and verbose.</source>
         <target state="translated">--Diag|/Diag:&lt;Pfad zur Protokolldatei&gt;
-      Aktiviert Protokolle für die Testplattform.
-      Protokolle werden in die angegebene Datei geschrieben.
+      Aktivieren Sie die Protokolle für die Testplattform.
+      Protokolle werden in die bereitgestellte Datei geschrieben.
 
-      Ändern Sie die Ablaufverfolgungsebene für Protokolle wie unten gezeigt:
-      Beispiel: /Diag:&lt;Pfad zur Protokolldatei&gt;;tracelevel=&lt;Standard: "verbose"&gt;
-      Zulässige Werte für "tracelevel": "off", "error", "warning", "info" und "verbose".</target>
+      Ändern Sie die Ablaufverfolgungsebene für Protokolle wie folgt:
+      Beispiel: /Diag:&lt;Pfad zur Protokolldatei&gt;;tracelevel=&lt;standardmäßig "verbose"&gt;
+      Zulässige Werte für tracelevel: off, error, warning, info, verbose.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; Pfad zur Protokolldatei &gt;
@@ -1434,8 +1435,8 @@
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
         <target state="translated">--ResultsDirectory|/ResultsDirectory
-      Sofern noch nicht vorhanden, wird am angegebenen Pfad ein Testergebnisverzeichnis erstellt.
-      Beispiel: /ResultsDirectory:&lt;Pfad zum Ergebnisverzeichnis&gt;</target>
+      Das Testergebnisverzeichnis wird im angegebenen Pfad erstellt, wenn es noch nicht vorhanden ist.
+      Beispiel: /ResultsDirectory:&lt;Pfad_zu_Ergebnisverzeichnis&gt;</target>
         <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
@@ -1466,8 +1467,8 @@
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="translated">--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Aktiviert den Datensammler für den Testlauf. Weitere Informationen finden Sie hier: https://aka.ms/vstest-collect</target>
+        <target state="translated">--Collect|/Collect:&lt;Datensammler-Anzeigename&gt;
+      Aktiviert den Datensammler für den Testlauf. Weitere Informationen finden Sie unter https://aka.ms/vstest-collect.</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
@@ -1525,14 +1526,15 @@
       <trans-unit id="ResponseFileArgumentHelp">
         <source>@&lt;file&gt;
       Read response file for more options.</source>
-        <target state="translated">@&lt;file&gt;
-      Lesen Sie die Antwortdatei für weitere Optionen.</target>
+        <target state="translated">@&lt;Datei&gt;
+      Antwortdatei mit weiteren Optionen lesen</target>
         <note />
       </trans-unit>
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
-        <target state="new">Tests gesamt: Unbekannt. Erfolgreich: {0}. Fehlerhaft: {1}. Übersprungen: {2}.</target>
-        <note></note>
+        <target state="translated">Gesamtzahl Tests: unbekannt</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1541,7 +1543,7 @@
       </trans-unit>
       <trans-unit id="SuggestTestAdapterPathIfNoTestsIsFound">
         <source>Additionally, path to test adapters can be specified using /TestAdapterPath command. Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.</source>
-        <target state="translated">Außerdem kann der Pfad zu den Testadaptern über den Befehl "/TestAdapterPath" angegeben werden. Beispiel: /TestAdapterPath:&lt;PfadZuBenutzerdefiniertenAdaptern&gt;.</target>
+        <target state="translated">Der Pfad zu Testadaptern kann zudem mit dem Befehl /TestAdapterPath angegeben werden. Beispiel: /TestAdapterPath:&lt;Pfad_zu_benutzerdefinierten_Adaptern&gt;.</target>
         <note />
       </trans-unit>
       <trans-unit id="UseVsixExtensionsDeprecation">
@@ -1579,17 +1581,17 @@
       Change the diagnostic level prefix for console logger as shown below
       Example: /logger:console;prefix=&lt;Defaults to "false"&gt;
       More info on Console Logger here : https://aka.ms/console-logger</source>
-        <target state="translated">--logger|/logger:&lt;Protokollierungs-Uri/FriendlyName&gt;
-      Gibt eine Protokollierung für die Testergebnisse an. Zum Protokollieren der Ergebnisse in eine 
-      Visual Studio-Testergebnisdatei (TRX-Datei) verwenden Sie z.B.: /logger:trx[;LogFileName=&lt;Entspricht standardmäßig einem eindeutigen Dateinamen&gt;]
-       Erstellt eine Datei im TestResults-Verzeichnis mit dem entsprechenden LogFileName.
+        <target state="translated">--logger|/logger:&lt;URI/Anzeigename für Protokollierung&gt;
+      Geben Sie eine Protokollierung für Testergebnisse an. Um Ergebnisse beispielsweise in einer
+      Visual Studio-Testergebnisdatei (TRX) zu protokollieren, verwenden Sie /logger:trx[;LogFileName=&lt;Standardmäßig eindeutiger Dateiname&gt;]
+      Erstellt die Datei im TestResults-Verzeichnis mit dem angegebenen LogFileName.
 
-      Ändern Sie den Ausführlichkeitsgrad in Protokollnachrichten für die Konsolenprotokollierung wie unten gezeigt:
-      Beispiel: /logger:console;verbosity=&lt;Standardwert ist "minimal"&gt;
-      Zulässige Werte für die Ausführlichkeit: "quiet", "minimal", "normal" und "detailed".
+      Ändern Sie den Ausführlichkeitsgrad in den Protokollmeldungen für die Konsolenprotokollierung wie folgt:
+      Beispiel: /logger:console;verbosity=&lt;Standardmäßig "minimal"&gt;
+      Zulässige Werte für den Ausführlichkeitsgrad: quiet, minimal, normal, detailed.
 
-      Ändern Sie das Präfix der Diagnoseebene für die Konsolenprotokollierung wie unten gezeigt:
-      Beispiel: /logger:console;prefix=&lt;Standardwert ist "false"&gt;
+      Ändern Sie das Präfix für die Diagnoseebene für die Konsolenprotokollierung wie folgt:
+      Beispiel: /logger:console;prefix=&lt;Standardmäßig "false"&gt;
       Weitere Informationen zur Konsolenprotokollierung finden Sie hier: https://aka.ms/console-logger</target>
         <note />
       </trans-unit>
@@ -1625,33 +1627,39 @@
       </trans-unit>
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
-        <target state="new">Framework35 wird nicht unterstützt. Verwenden Sie für Projekte, die auf .Net Framework 3.5 ausgerichtet sind, Framework40 zum Ausführen von Tests im "Kompatibilitätsmodus" von CLR 4.0.</target>
-        <note></note>
+        <target state="translated">Framework35 wird nicht unterstützt. Bei Projekten für Zielversion .NET Framework 3.5 wird der Test im CLR 4.0-Kompatibilitätsmodus ausgeführt.</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
-        <target state="new">Test run in progress</target>
-        <note></note>
+        <target state="translated">Testlauf wird ausgeführt.</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
-        <target state="new">Total tests: {0}</target>
-        <note></note>
+        <target state="translated">Gesamtzahl Tests: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
-        <target state="new">     Failed: {0}</target>
-        <note></note>
+        <target state="translated">     Nicht bestanden: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
-        <target state="new">     Passed: {0}</target>
-        <note></note>
+        <target state="translated">     Bestanden: {0}</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
-        <target state="new">    Skipped: {0}</target>
-        <note></note>
+        <target state="translated">    Übersprungen: {0}</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-606520038">
+  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="-1816529201">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">49</count>
@@ -25,7 +25,7 @@
         <target state="translated">Le fichier XML des paramètres d'exécution ne contient pas le nœud "RunSettings".</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Paramètres d’exécution XML ne contient pas le nœud de « RunSettings ».</target>
+          <target state-qualifier="mt-suggestion">Einstellungen enthält XML nicht "RunSettings" Knoten.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">Paramètre non valide '{0}'. Valeur non valide '{1}' spécifiée pour '{2}'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Non valide du paramètre '{0}'. Valeur non valide '{1}' spécifiée pour '{2}'.</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung '{0}'. Ungültiger Wert '{1}' für '{2}' angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">Nœud 'RunSettings' introuvable.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Noeud de 'RunSettings' introuvable.</target>
+          <target state-qualifier="mt-suggestion">'RunSettings'-Knoten konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">Nœud 'RunSettings' introuvable.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Noeud de 'RunSettings' introuvable.</target>
+          <target state-qualifier="mt-suggestion">'RunSettings'-Knoten konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="1.25" curWordcount="1.25"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">Une erreur s'est produite durant le chargement des paramètres. Erreur : {0}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Une erreur s’est produite lors du chargement des paramètres des.  Erreur : {0}.</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der Einstellungen.  Fehler: {0}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">Paramètres de plateforme cible '{0}' incompatibles avec l'architecture système '{1}'.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Incompatible cible paramètres de plateforme '{0}' avec une architecture de système '{1}'.</target>
+          <target state-qualifier="mt-suggestion">Inkompatible Target Platform Settings '{0}' mit Systemarchitektur '{1}'.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">Un fichier de paramètres inattendu a été spécifié.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Fichier de paramètres inattendue spécifié.</target>
+          <target state-qualifier="mt-suggestion">Unerwarteter Einstellungsdatei angegeben.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>

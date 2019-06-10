@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-1229644758">
+  <file datatype="xml" source-language="en" target-language="zh-HANS" original="../Resources.resx" build-num="-508382432">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">27</count>
@@ -25,7 +25,7 @@
         <target state="translated">由于初始状态无效，无法执行测试运行。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">由于初始状态无效，无法执行测试运行。</target>
+          <target state-qualifier="mt-suggestion">Testlauf konnte nicht ausgeführt werden, der ursprüngliche Status ungültig ist.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">没有活动的测试运行时不允许等待完成操作。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">没有活动的测试运行时不允许完成操作等待。</target>
+          <target state-qualifier="mt-suggestion">Warten Sie auf Abschluss Vorgang nicht zulässig ist, wird keine aktiven Test ausführen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>

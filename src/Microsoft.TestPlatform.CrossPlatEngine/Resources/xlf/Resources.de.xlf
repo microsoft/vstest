@@ -164,7 +164,7 @@
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">In {0} ist kein Test verfügbar. Stellen Sie sicher, dass Testdiscoverer und -executor registriert und die Versionseinstellungen für Plattform und Framework richtig sind, und versuchen Sie es anschließend noch mal.</target>
+        <target state="translated">In "{0}" ist kein Test verfügbar. Stellen Sie sicher, dass die Testdiscoverer und -executors registriert und die Versionseinstellungen für Plattform und Framework richtig sind, und wiederholen Sie den Vorgang.</target>
         <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">

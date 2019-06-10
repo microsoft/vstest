@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ru" original="../Resources.resx" build-num="1865360148">
+  <file datatype="xml" source-language="en" target-language="ru" original="../Resources.resx" build-num="-1247456046">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">178</count>
@@ -25,7 +25,7 @@
         <target state="translated">Сбор данных: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Сообщение адаптера диагностических данных: {0}</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter Meldung: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -34,7 +34,7 @@
         <target state="translated">Сообщение сборщика данных "{0}": {1}.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Адаптер («{0}») сообщение диагностических данных: {1}.</target>
+          <target state-qualifier="mt-suggestion">Diagnosedaten Adapter ('{0}') Meldung: {1}.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
@@ -43,7 +43,7 @@
         <target state="translated">Повторяющийся URI расширения теста "{0}". Повторяющееся расширение пропускается.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Дублировать расширения теста URI «{0}».  Пропуск повторяющихся расширения.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Erweiterung URI '{0}'.  Die doppelte Erweiterung wird ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -52,7 +52,7 @@
         <target state="translated">Повторяющийся поставщик параметров с именем "{0}". Повторяющийся поставщик пропускается.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Дублировать параметры поставщика с именем «{0}».  Пропуск повторяющихся поставщика.</target>
+          <target state-qualifier="mt-suggestion">Doppelte Einstellungsanbieter mit dem Namen '{0}'.  Doppelten Provider werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
@@ -61,7 +61,7 @@
         <target state="translated">Обнаружен повторяющийся раздел параметров запуска с именем "{0}". Повторяющиеся параметры пропускаются.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Дублирование с именем «{0}» обнаружен раздел параметров запуска.  Игнорировать повторяющиеся параметры.</target>
+          <target state-qualifier="mt-suggestion">Dupliziert die Ausführung Abschnitt '{0}' gefunden.  Doppelten Einstellungen werden ignoriert.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -70,7 +70,7 @@
         <target state="translated">Ошибка: пустые круглые скобки ()</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ошибка: Пустые круглые скобки)</target>
+          <target state-qualifier="mt-suggestion">Fehler: Leere Klammern)</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -79,7 +79,7 @@
         <target state="translated">Ошибка: недопустимое условие "{0}"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ошибка: Недопустимое условие «{0}»</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültige Bedingung '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -88,7 +88,7 @@
         <target state="translated">Расширение теста имеет недопустимый URI "{0}": {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Расширение теста имеет недопустимый URI «{0}»: {1}</target>
+          <target state-qualifier="mt-suggestion">Erweiterung ist einen ungültigen URI "{0}": {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
@@ -97,7 +97,7 @@
         <target state="translated">Ошибка: недопустимый оператор "{0}"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ошибка: Недопустимый оператор «{0}»</target>
+          <target state-qualifier="mt-suggestion">Fehler: Ungültiger Operator '{0}'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
@@ -106,7 +106,7 @@
         <target state="translated">Возникло исключение при инициализации средства ведения журнала с {0}: "{1}". Средство ведения журнала не будет использоваться. Исключение: {2}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Возникло исключение во время инициализации средства ведения журнала с URI «{0}».  Средства ведения журнала не будет использоваться.  Исключение: {1}</target>
+          <target state-qualifier="mt-suggestion">Ausnahme beim Initialisieren der Protokollierung mit URI '{0}'.  Die Protokollierung wird nicht verwendet.  Ausnahme: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
@@ -115,7 +115,7 @@
         <target state="translated">Не удалось найти средство ведения журнала тестирования с AssemblyQualifiedName, URI или FriendlyName "{0}".</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Не удалось найти средство ведения журнала тестирования с URI или FriendlyName «{0}».</target>
+          <target state-qualifier="mt-suggestion">Eine Test-Protokollierung mit URI ' oder ' FriendlyName '{0}' konnte nicht gefunden werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
@@ -124,7 +124,7 @@
         <target state="translated">Ошибка: отсутствует ")"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ошибка: Отсутствует ")"</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ")"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -133,7 +133,7 @@
         <target state="translated">Ошибка: отсутствует "("</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ошибка: Отсутствует "("</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlende ' ('</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
@@ -142,7 +142,7 @@
         <target state="translated">Ошибка: отсутствует операнд</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ошибка: Отсутствует операнд</target>
+          <target state-qualifier="mt-suggestion">Fehler: Fehlender operand</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
@@ -151,7 +151,7 @@
         <target state="translated">Отсутствует оператор "|" или "&amp;"</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Отсутствует оператор ' |' или '&amp;'</target>
+          <target state-qualifier="mt-suggestion">Fehlender Operator ' |' oder '&amp;'</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
@@ -160,7 +160,7 @@
         <target state="translated">Параметры запуска уже загружены.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Параметры запуска уже загружен.</target>
+          <target state-qualifier="mt-suggestion">Run Settings wurden bereits geladen.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
@@ -169,7 +169,7 @@
         <target state="translated">Произошла ошибка при загрузке параметров запуска. Ошибка: {0}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Произошла ошибка при загрузке параметров запуска.  Ошибка: {0}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Laden der run Settings.  Fehler: {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
@@ -178,7 +178,7 @@
         <target state="translated">Указан недопустимый узел параметров. Узел параметров должен иметь допустимое значение для свойства имени.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Указанный узел недопустимые параметры. Имя свойства параметров узла должно быть непустой.</target>
+          <target state-qualifier="mt-suggestion">Ungültige Einstellung angegebenen Knoten. Die Name-Eigenschaft eines Knotens Einstellung darf nicht leer sein.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
@@ -187,7 +187,7 @@
         <target state="translated">При инициализации поставщика параметров с именем "{0}" произошла ошибка. Ошибка: {1}</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Произошла ошибка при инициализации поставщика параметров с именем «{0}». Ошибка: {1}</target>
+          <target state-qualifier="mt-suggestion">Fehler beim Initialisieren des Einstellungsanbieters mit dem Namen '{0}'. Fehler: {1}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
@@ -196,7 +196,7 @@
         <target state="translated">Поставщик параметров с именем "{0}" не найден. Невозможно загрузить параметры.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Поставщик параметров с именем «{0}» не найден.  Параметры не могут быть загружены.</target>
+          <target state-qualifier="mt-suggestion">Einstellungsanbieter mit dem Namen '{0}' wurde nicht gefunden.  Die Einstellung können nicht geladen werden.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
@@ -205,7 +205,7 @@
         <target state="translated">Неверный формат фильтра TestCaseFilter {0}. Задайте правильный формат и повторите попытку. Обратите внимание, что использование неверного формата может привести к тому, что ни один из тестов не будет выполнен.</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Неправильный формат для TestCaseFilter {0}. Укажите правильный формат и повторите попытку. Обратите внимание, что неверный формат может привести к не начало выполнения теста.</target>
+          <target state-qualifier="mt-suggestion">Ungültiges Format für TestCaseFilter {0}. Geben Sie das richtige Format, und versuchen Sie es erneut. Beachten Sie, dass das falsche Format kein Test immer ausgeführt.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>

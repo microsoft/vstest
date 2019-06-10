@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="1869685853">
+  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="1899456624">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">1766</count>
@@ -49,9 +49,9 @@ SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings E:\MyTest\MyNewRunSettings.runsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings E:\MyTest\MyNewRunSettings.runsettings</source>
-        <target state="translated">有效使用方式:
-SettingsMigrator.exe &lt;所要移轉 testsettings 檔案或 runsettings 檔案的完整路徑&gt;
-SettingsMigrator.exe &lt;所要移轉 testsettings 檔案或 runsettings 檔案的完整路徑&gt; &lt;所要建立 runsettings 檔案的完整路徑&gt;
+        <target state="translated">有效的用法:
+SettingsMigrator.exe &lt;testsettings 檔案或要移轉的 runsettings 檔案的完整路徑&gt;
+SettingsMigrator.exe &lt;testsettings 檔案或要移轉的 runsettings 檔案的完整路徑&gt; &lt;要建立的 runsettings 檔案的完整路徑&gt;
 範例:
 SettingsMigrator.exe  E:\MyTest\MyTestSettings.testsettings
 SettingsMigrator.exe  E:\MyTest\MyOldRunSettings.runsettings

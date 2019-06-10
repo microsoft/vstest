@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="-430993235">
+  <file datatype="xml" source-language="en" target-language="zh-HANT" original="../Resources.resx" build-num="-508382432">
     <header>
       <count-group name="BlackBox wordcount">
         <count count-type="x-wordCount">27</count>
@@ -42,7 +42,7 @@
       </trans-unit>
       <trans-unit id="NoIsTestProjectProperty">
         <source>Skipping running test for project {0}. To run tests with dotnet test add "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" property to project file.</source>
-        <target state="translated">即將跳過為專案 {0} 執行測試。若要使用 dotnet 測試來執行測試，請在專案檔中新增 "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" 屬性。</target>
+        <target state="translated">跳過專案 {0} 目前正在執行中的測試。若要執行有 dotnet 測試的測試項目，請對專案檔新增 "&lt;IsTestProject&gt;true&lt;/IsTestProject&gt;" 屬性。</target>
         <note />
       </trans-unit>
     </body>
