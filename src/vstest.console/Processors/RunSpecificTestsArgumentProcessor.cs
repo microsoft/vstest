@@ -137,6 +137,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private ITestDiscoveryEventsRegistrar discoveryEventsRegistrar;
 
+        /// <summary>
+        /// Registers and Unregisters for test run events before and after test run
+        /// </summary>
+        private ITestRunEventsRegistrar testRunEventsRegistrar;
+
         #endregion
 
         #region Constructor
@@ -159,6 +164,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.runSettingsManager = runSettingsProvider;
             this.output = output;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
+            this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
         #endregion
@@ -259,7 +265,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
                 var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive, TestPlatformOptions = new TestPlatformOptions() { TestCaseFilter = this.commandLineOptions.TestCaseFilterValue }};
-                this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
+                this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
             }
             else
             {
@@ -333,6 +339,54 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             public void UnregisterDiscoveryEvents(IDiscoveryRequest discoveryRequest)
             {
                 discoveryRequest.OnDiscoveredTests -= this.discoveredTestsHandler;
+            }
+        }
+
+        private class TestRunRequestEventsRegistrar : ITestRunEventsRegistrar
+        {
+            private IOutput output;
+            private CommandLineOptions commandLineOptions;
+
+            public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions)
+            {
+                this.output = output;
+                this.commandLineOptions = commandLineOptions;
+            }
+
+            public void LogWarning(string message)
+            {
+                ConsoleLogger.RaiseTestRunWarning(message);
+            }
+
+            public void RegisterTestRunEvents(ITestRunRequest testRunRequest)
+            {
+                testRunRequest.OnRunCompletion += TestRunRequest_OnRunCompletion;
+            }
+
+            public void UnregisterTestRunEvents(ITestRunRequest testRunRequest)
+            {
+                testRunRequest.OnRunCompletion -= TestRunRequest_OnRunCompletion;
+            }
+
+            /// <summary>
+            /// Handles the TestRunRequest complete event
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e">RunCompletion args</param>
+            private void TestRunRequest_OnRunCompletion(object sender, TestRunCompleteEventArgs e)
+            {
+                // If run is not aborted/cancelled then check the count of executed tests.
+                // we need to check if there are any tests executed - to try show some help info to user to check for installed vsix extensions
+                if (!e.IsAborted && !e.IsCanceled)
+                {
+                    var testsFoundInAnySource = (e.TestRunStatistics == null) ? false : (e.TestRunStatistics.ExecutedTests > 0);
+
+                    // Indicate the user to use testadapterpath command if there are no tests found
+                    if (!testsFoundInAnySource && string.IsNullOrEmpty(CommandLineOptions.Instance.TestAdapterPath) && this.commandLineOptions.TestCaseFilterValue == null)
+                    {
+                        this.output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
+                    }
+                }
             }
         }
     }

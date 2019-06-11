@@ -50,5 +50,29 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.StdErrorContains("Test Run Aborted.");
             }
         }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " ", "/tests:PassingTest");
+            arguments = string.Concat(arguments, " ", "/Framework:Framework40");
+
+            this.InvokeVsTest(arguments);
+
+            if (runnerInfo.TargetFramework.Contains("netcore"))
+            {
+                this.StdOutputContains("No test is available");
+            }
+            else
+            {
+                this.StdOutputContains("Following DLL(s) do not match framework/platform settings. ");
+                this.ValidateSummaryStatus(1, 0, 0);
+            }
+        }
     }
 }
