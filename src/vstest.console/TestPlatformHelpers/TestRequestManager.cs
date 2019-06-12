@@ -435,7 +435,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             if (!string.IsNullOrEmpty(incompatibleSettingWarning))
             {
                 EqtTrace.Warning(incompatibleSettingWarning);
-                registrar.LogWarning(incompatibleSettingWarning);
+                registrar?.LogWarning(incompatibleSettingWarning);
             }
 
             // Log compatible sources
