@@ -482,6 +482,64 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(ArgumentProcessorResult.Success, argumentProcessorResult);
         }
 
+        [TestMethod]
+        public void ExecutorShouldDisplayWarningIfNoTestsAreExecuted()
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            var mockTestRunStats = new Mock<ITestRunStatistics>();
+
+            List<TestCase> list = new List<TestCase>();
+            list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
+            list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
+
+            mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Returns(1).Raises(tr => tr.OnRunCompletion += null,
+                new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan()));
+
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+
+            this.ResetAndAddSourceToCommandLineOptions();
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var executor = GetExecutor(testRequestManager);
+
+            executor.Initialize("Test1");
+            executor.Execute();
+
+            this.mockOutput.Verify(op => op.WriteLine(It.Is<string>(st => st.Contains("Additionally, path to test adapters can be specified using /TestAdapterPath command.")), OutputLevel.Warning), Times.Once);
+        }
+
+        [TestMethod]
+        public void ExecutorShouldNotDisplayWarningIfTestsAreExecuted()
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            var testRunStats = new TestRunStatistics(1, new Dictionary<TestOutcome, long> { { TestOutcome.Passed, 1 } });
+
+            List<TestCase> list = new List<TestCase>();
+            list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
+            list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
+
+            mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Returns(1).Raises(tr => tr.OnRunCompletion += null,
+                new TestRunCompleteEventArgs(testRunStats, false, false, null, null, new TimeSpan()));
+
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockTestRunRequest.Object);
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>())).Returns(mockDiscoveryRequest.Object);
+
+            this.ResetAndAddSourceToCommandLineOptions();
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
+            var executor = GetExecutor(testRequestManager);
+
+            executor.Initialize("Test1");
+            executor.Execute();
+
+            this.mockOutput.Verify(op => op.WriteLine(It.Is<string>(st => st.Contains("Additionally, path to test adapters can be specified using /TestAdapterPath command.")), OutputLevel.Warning), Times.Never);
+        }
+
         #endregion
 
         private void ResetAndAddSourceToCommandLineOptions()
