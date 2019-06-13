@@ -161,6 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
                     this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+                    this.ThrowOnTestHostExited(this.testHostExited.IsSet);
                     this.ThrowExceptionOnConnectionFailure(connTimeout);
                 }
 
@@ -304,6 +305,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
+        }
+
+        private void ThrowOnTestHostExited(bool testHostExited)
+        {
+            if (testHostExited)
+            {
+                throw new TestPlatformException(Resources.Resources.TestHostExited);
+            }
         }
 
         private void ThrowExceptionOnConnectionFailure(int connTimeout)

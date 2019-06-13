@@ -195,4 +195,7 @@
   <data name="NoTestsAvailableForGivenTestCaseFilter" xml:space="preserve">
     <value>No test matches the given testcase filter `{0}` in {1}</value>
   </data>
+  <data name="TestHostExited" xml:space="preserve">
+    <value>The testhost process exited unexpectedly. Please check the diagnostic logs for more information.</value>
+  </data>
 </root>
