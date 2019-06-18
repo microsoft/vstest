@@ -160,8 +160,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (!this.testHostLaunched ||
                     !this.RequestSender.WaitForRequestHandlerConnection(connTimeout * 1000, this.CancellationTokenSource.Token))
                 {
+                    // Throw a test platform exception with the appropriate message if user requested cancellation
                     this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
+
+                    // Throw a test platform exception along with the error messages from the test if the test host exited unexpectedly
+                    // before communication was established
                     this.ThrowOnTestHostExited(this.testHostExited.IsSet);
+
+                    // Throw a test platform exception stating the connection to test could not be established even after waiting
+                    // for the configure timeout period
                     this.ThrowExceptionOnConnectionFailure(connTimeout);
                 }
 
