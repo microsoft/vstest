@@ -27,6 +27,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
+
     [TestClass]
     public class ProxyExecutionManagerTests : ProxyBaseManagerTests
     {
@@ -336,6 +338,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldThrowExceptionIfTestHostExitedBeforeConnectionIsEstablished()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Callback(() => { this.mockTestHostManager.Raise(t => t.HostExited += null, new HostProviderEventArgs("I crashed!")); });
+
+            try
+            {
+                this.testExecutionManager.SetupChannel(new List<string> { "source.dll" });
+            }
+            catch (TestPlatformException tpe)
+            {
+                Assert.AreEqual(string.Format(CrossPlatEngineResources.Resources.TestHostExitedWithError, "I crashed!"), tpe.Message);
+            }
         }
 
         [TestMethod]

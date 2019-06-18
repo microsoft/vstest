@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Testhost process exited with error: {0}.
+        ///   Looks up a localized string similar to Testhost process exited with error: {0}. Please check the diagnostic logs for more information..
         /// </summary>
         internal static string TestHostExitedWithError {
             get {

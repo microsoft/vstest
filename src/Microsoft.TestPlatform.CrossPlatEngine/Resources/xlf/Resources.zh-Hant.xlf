@@ -153,9 +153,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
-        <source>Testhost process exited with error: {0}</source>
-        <target state="translated">Testhost 處理序已結束。錯誤: {0}</target>
-        <note />
+        <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
+        <target state="new">Testhost 處理序已結束。錯誤: {0}</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
