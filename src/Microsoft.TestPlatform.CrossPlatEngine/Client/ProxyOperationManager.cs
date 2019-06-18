@@ -311,7 +311,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (testHostExited)
             {
-                throw new TestPlatformException(Resources.Resources.TestHostExited);
+                throw new TestPlatformException(string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError));
             }
         }
 
