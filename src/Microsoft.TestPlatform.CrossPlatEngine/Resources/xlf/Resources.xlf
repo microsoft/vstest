@@ -64,7 +64,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
-        <source>Testhost process exited with error: {0}</source>
+        <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
         <target state="new">Testhost process exited with error: {0}</target>
         <note></note>
       </trans-unit>

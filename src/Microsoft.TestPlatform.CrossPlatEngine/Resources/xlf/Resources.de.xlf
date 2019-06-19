@@ -153,9 +153,9 @@
         <note />
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
-        <source>Testhost process exited with error: {0}</source>
-        <target state="translated">Der Testhostprozess wurde mit dem Fehler {0} beendet.</target>
-        <note />
+        <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
+        <target state="new">Der Testhostprozess wurde mit dem Fehler {0} beendet.</target>
+        <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
