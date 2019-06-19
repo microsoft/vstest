@@ -32,10 +32,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework">
-      <Version>15.1.548</Version>
+      <Version>16.0.461</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>15.1.548</Version>
+      <Version>16.0.461</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />

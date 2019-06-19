@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <!-- Static analysis dependencies -->
-  <ItemGroup Condition="$(EnableCodeAnalysis) == 'true'">
+  <ItemGroup Condition="$(EnableCodeAnalysis) == 'true' AND '$(DotNetBuildFromSource)' != 'true'" >
     <PackageReference Include="StyleCop.Analyzers">
       <Version>1.0.1</Version>
       <PrivateAssets>All</PrivateAssets>
