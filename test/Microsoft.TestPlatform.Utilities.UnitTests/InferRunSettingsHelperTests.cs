@@ -736,7 +736,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
         private string GetSourceIncompatibleMessage(string source)
         {
-            return string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, source, sourceFrameworks[source].Version, sourceArchitectures[source]);
+            return string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, source, sourceFrameworks[source].Name, sourceArchitectures[source]);
         }
 
         private XmlDocument GetXmlDocument(string settingsXml)
