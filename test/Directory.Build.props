@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
+  </PropertyGroup>
+</Project>
