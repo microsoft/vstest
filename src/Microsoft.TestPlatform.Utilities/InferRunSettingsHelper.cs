@@ -629,7 +629,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     string incompatiblityMessage;
                     var onlyFileName = Path.GetFileName(source);
                     // Add message for incompatible sources.
-                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, onlyFileName, actualFramework.Version, actualPlatform);
+                    incompatiblityMessage = string.Format(CultureInfo.CurrentCulture, OMResources.SourceIncompatible, onlyFileName, actualFramework.Name, actualPlatform);
 
                     warnings.AppendLine(incompatiblityMessage);
                     incompatiblityFound = true;
