@@ -597,7 +597,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         Output.Information(false, attachmentOutput);
                     }
                 }
-                Output.WriteLine(String.Empty, OutputLevel.Information);
             }
 
             if (e.IsCanceled)
