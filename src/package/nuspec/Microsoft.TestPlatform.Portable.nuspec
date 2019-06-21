@@ -21,7 +21,6 @@
     <!-- net451 -->
     <file src="net451\$Runtime$\datacollector.exe"	target="tools\net451\datacollector.exe" />
     <file src="net451\$Runtime$\datacollector.exe.config"	target="tools\net451\datacollector.exe.config" />
-    <file src="net451\$Runtime$\Microsoft.DotNet.PlatformAbstractions.dll"	target="tools\net451\Microsoft.DotNet.PlatformAbstractions.dll" />
     <file src="net451\$Runtime$\Microsoft.Extensions.DependencyModel.dll"	target="tools\net451\Microsoft.Extensions.DependencyModel.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\net451\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\net451\Microsoft.TestPlatform.CoreUtilities.dll" />
@@ -223,8 +222,9 @@
     <file src="netcoreapp2.0\datacollector.dll"	target="tools\netcoreapp2.0\datacollector.dll" />
     <file src="netcoreapp2.0\datacollector.dll.config"	target="tools\netcoreapp2.0\datacollector.dll.config" />
     <file src="netcoreapp2.0\datacollector.runtimeconfig.json"	target="tools\netcoreapp2.0\datacollector.runtimeconfig.json" />
-    <file src="netcoreapp2.0\Microsoft.DotNet.PlatformAbstractions.dll"	target="tools\netcoreapp2.0\Microsoft.DotNet.PlatformAbstractions.dll" />
     <file src="netcoreapp2.0\Microsoft.Extensions.DependencyModel.dll"	target="tools\netcoreapp2.0\Microsoft.Extensions.DependencyModel.dll" />
+    <file src="netcoreapp2.0\System.Memory.dll"	  target="tools\netcoreapp2.0\System.Memory.dll" />
+    <file src="netcoreapp2.0\System.Runtime.CompilerServices.Unsafe.dll"   target="tools\netcoreapp2.0\System.Runtime.CompilerServices.Unsafe.dll" />
     <file src="netcoreapp2.0\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\netcoreapp2.0\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="netcoreapp2.0\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\netcoreapp2.0\Microsoft.TestPlatform.CoreUtilities.dll" />
     <file src="netcoreapp2.0\Microsoft.TestPlatform.CrossPlatEngine.dll"	target="tools\netcoreapp2.0\Microsoft.TestPlatform.CrossPlatEngine.dll" />
