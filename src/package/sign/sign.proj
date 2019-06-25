@@ -278,8 +278,8 @@
 
     <!-- Sign Microsoft.TestPlatform.Build -->
     <ItemGroup>
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" />
-      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard1.3\%(ResxLang.Identity)\*.*" />
+      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard2.0\Microsoft.TestPlatform.Build.dll" />
+      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard2.0\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign Microsoft.CodeCoverage -->
