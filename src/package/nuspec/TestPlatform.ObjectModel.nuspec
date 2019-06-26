@@ -15,30 +15,17 @@
     <tags>vstest visual-studio unittest testplatform mstest microsoft test testing</tags>
     <dependencies>
       <group targetFramework="net451">
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
         <dependency id="System.Reflection.Metadata" version="[1.3.0, )" />
       </group>
       <group targetFramework="netstandard1.5">
-        <dependency id="NETStandard.Library" version="[1.6.0, )" />
-        <dependency id="System.ComponentModel.EventBasedAsync" version="[4.0.11, )" />
-        <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
-        <dependency id="System.Reflection.TypeExtensions" version="[4.1.0, )" />
-        <dependency id="System.Reflection.Metadata" version="[1.3.0, )" />
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
-        <dependency id="System.Runtime.Loader" version="[4.0.0, )" />
-        <dependency id="System.Runtime.Serialization.Primitives" version="[4.1.1, )" />
-        <dependency id="System.Runtime.Serialization.Json" version="[4.0.2, )" />
-        <dependency id="System.Xml.XPath.XmlDocument" version="[4.0.1, )" />
-
-        <!-- Dependencies for core utilities -->
-        <dependency id="System.Diagnostics.Process" version="[4.1.0, )" />
-        <dependency id="System.Diagnostics.TextWriterTraceListener" version="[4.0.0, )" />
-        <dependency id="System.Diagnostics.TraceSource" version="[4.0.0, )" />
-        <dependency id="System.Threading.Thread" version="[4.0.0, )" />
+        <dependency id="NETStandard.Library" version="[1.6.1, )" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="[4.3.0, )" />
       </group>
       <group targetFramework="netstandard1.4">
-        <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
-        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
+        <dependency id="System.Diagnostics.FileVersionInfo" version="[4.3.0, )" />
+      </group>
+      <group targetFramework="netstandard2.0">
+        <dependency id="System.Xml.XPath.XmlDocument" version="[4.3.0, )" />
       </group>
     </dependencies>
     <frameworkAssemblies>
@@ -60,6 +47,10 @@
     <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.5\" />
+    
+    <file src="$NetCoreTargetFramework20$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
+    <file src="$NetCoreTargetFramework20$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.5\" />
+    <file src="$NetCoreTargetFramework20$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.5\" />    
 
     <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.4\" />
     <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.4\" />
@@ -121,6 +112,35 @@
     <file src="$NetCoreTargetFramework$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.5\tr" />
     <file src="$NetCoreTargetFramework$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.5\zh-Hans" />
     <file src="$NetCoreTargetFramework$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard1.5\zh-Hant" />
+
+    <file src="$NetCoreTargetFramework20$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\cs" />
+    <file src="$NetCoreTargetFramework20$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\de" />
+    <file src="$NetCoreTargetFramework20$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\es" />
+    <file src="$NetCoreTargetFramework20$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\fr" />
+    <file src="$NetCoreTargetFramework20$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\it" />
+    <file src="$NetCoreTargetFramework20$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ja" />
+    <file src="$NetCoreTargetFramework20$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ko" />
+    <file src="$NetCoreTargetFramework20$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\pl" />
+    <file src="$NetCoreTargetFramework20$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\pt-BR" />
+    <file src="$NetCoreTargetFramework20$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\ru" />
+    <file src="$NetCoreTargetFramework20$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\tr" />
+    <file src="$NetCoreTargetFramework20$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hans" />
+    <file src="$NetCoreTargetFramework20$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard2.0\zh-Hant" />
+
+    <file src="$NetCoreTargetFramework20$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\cs" />
+    <file src="$NetCoreTargetFramework20$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\de" />
+    <file src="$NetCoreTargetFramework20$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\es" />
+    <file src="$NetCoreTargetFramework20$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\fr" />
+    <file src="$NetCoreTargetFramework20$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\it" />
+    <file src="$NetCoreTargetFramework20$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ja" />
+    <file src="$NetCoreTargetFramework20$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ko" />
+    <file src="$NetCoreTargetFramework20$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\pl" />
+    <file src="$NetCoreTargetFramework20$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\pt-BR" />
+    <file src="$NetCoreTargetFramework20$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\ru" />
+    <file src="$NetCoreTargetFramework20$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\tr" />
+    <file src="$NetCoreTargetFramework20$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\zh-Hans" />
+    <file src="$NetCoreTargetFramework20$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\netstandard2.0\zh-Hant" />
+
 
   </files>
 </package>
