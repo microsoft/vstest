@@ -102,6 +102,7 @@ $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } el
 $TPB_CIBuild = $CIBuild
 $TPB_PublishTests = $PublishTestArtifacts
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
+$TPB_PackageOutDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages
 
 $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 
@@ -554,7 +555,7 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
-    $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
+	$packageOutputDir = $TPB_PackageOutDir
 
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
@@ -809,6 +810,12 @@ function Update-VsixVersion($vsixProjectDir)
     Write-Log "Update-VsixVersion: Completed."
 }
 
+function Generate-Manifest
+{
+    $sdkTaskPath = Join-Path $env:TP_ROOT_DIR "eng\common\sdk-task.ps1"
+    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest.xml /p:ManifestBuildData="Location=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+}
+
 function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
@@ -874,13 +881,14 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
-Restore-Package
-Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Publish-Tests
-Create-VsixPackage
-Create-NugetPackages
+#Install-DotNetCli
+#Restore-Package
+#Update-LocalizedResources
+#Invoke-Build
+#Publish-Package
+#Publish-Tests
+#Create-VsixPackage
+#Create-NugetPackages
+Generate-Manifest
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
