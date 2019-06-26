@@ -28,7 +28,7 @@
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <!-- .NetStandardLibrary1.6.0 brings in dependencies which are supported in UWP,
          any higher version will bring in dependencies which are not supported by current UWP version -->
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' != 'netstandard2.0' ">1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
