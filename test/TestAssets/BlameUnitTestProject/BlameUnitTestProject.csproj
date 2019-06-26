@@ -11,7 +11,7 @@
 
   <PropertyGroup>
     <AssemblyName>BlameUnitTestProject</AssemblyName>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0;net451</TargetFrameworks>
     <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
   </PropertyGroup>
 
