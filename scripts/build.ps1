@@ -102,6 +102,7 @@ $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } el
 $TPB_CIBuild = $CIBuild
 $TPB_PublishTests = $PublishTestArtifacts
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
+$TPB_PackageOutDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages
 
 $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 
@@ -554,7 +555,7 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
-    $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
+	$packageOutputDir = $TPB_PackageOutDir
 
     if (-not (Test-Path $packageOutputDir)) {
         New-Item $packageOutputDir -type directory -Force
@@ -811,9 +812,8 @@ function Update-VsixVersion($vsixProjectDir)
 
 function Generate-Manifest
 {
-    $pkgDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages
     $sdkTaskPath = Join-Path $env:TP_ROOT_DIR "eng\common\sdk-task.ps1"
-    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$pkgDir\*.nupkg /p:AssetManifestFilePath=$pkgDir\manifest.xml /p:ManifestBuildData="Location=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest.xml /p:ManifestBuildData="Location=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
 }
 
 function Build-SpecificProjects
