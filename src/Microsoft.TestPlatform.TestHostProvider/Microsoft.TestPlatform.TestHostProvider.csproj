@@ -20,7 +20,6 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>$(JsonNetVersion)</Version>
     </PackageReference>
-    
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

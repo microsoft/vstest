@@ -91,8 +91,9 @@ $TPB_Solution = "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
 $TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
-$TPB_TargetFrameworkCore20 = "netcoreapp2.1"
+$TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_TargetFrameworkUap = "uap10.0"
+$TPB_TargetFrameworkNS1_4 = "netstandard1.4"
 $TPB_TargetFrameworkNS2_0 = "netstandard2.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
@@ -234,7 +235,7 @@ function Publish-Package
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
-    $testhostNS2_0PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS2_0")
+    $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS2_0")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $settingsMigratorProject = Join-Path $env:TP_ROOT_DIR "src\SettingsMigrator\SettingsMigrator.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
@@ -262,7 +263,7 @@ function Publish-Package
     Write-Log "Package: Publish testhost\testhost.csproj"
     Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCorePackageDir
-    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkNS2_0 $testhostNS2_0PackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkNS2_0 $testhostNS1_4PackageDir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir  
@@ -290,13 +291,13 @@ function Publish-Package
     $platformAbstractionUap = Join-Path $platformAbstraction $TPB_TargetFrameworkUap
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
-    Copy-Item $platformAbstractionUap\* $testhostNS2_0PackageDir -Force
+    Copy-Item $platformAbstractionUap\* $testhostNS1_4PackageDir -Force
     
     # Publish msdia
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
-    Copy-Item -Recurse $comComponentsDirectory\* $testhostNS2_0PackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostNS1_4PackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
     # Copy over the logger assemblies to the Extensions folder.
