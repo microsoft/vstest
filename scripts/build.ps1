@@ -286,7 +286,7 @@ function Publish-Package
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
     $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
-    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore20
     $platformAbstractionUap = Join-Path $platformAbstraction $TPB_TargetFrameworkUap
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
