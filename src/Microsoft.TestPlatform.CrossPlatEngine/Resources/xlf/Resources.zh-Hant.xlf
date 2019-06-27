@@ -202,6 +202,11 @@
         <target state="translated">沒有任何測試符合 {1} 中的指定 testcase 篩選 `{0}`</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestDiscoveryCancelled">
+        <source>Discovery of tests cancelled.</source>
+        <target state="new">Discovery of tests cancelled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

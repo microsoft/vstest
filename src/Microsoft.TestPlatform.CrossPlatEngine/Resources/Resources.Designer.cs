@@ -251,6 +251,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Discovery of tests cancelled..
+        /// </summary>
+        internal static string TestDiscoveryCancelled {
+            get {
+                return ResourceManager.GetString("TestDiscoveryCancelled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Logging TestHost Diagnostics in file: {0}.
         /// </summary>
         internal static string TesthostDiagLogOutputFile {

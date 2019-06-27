@@ -202,6 +202,11 @@
         <target state="translated">Nenhum teste corresponde ao filtro de testcase `{0}` determinado no {1}</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestDiscoveryCancelled">
+        <source>Discovery of tests cancelled.</source>
+        <target state="new">Discovery of tests cancelled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -105,5 +105,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// On process exit unblocks communication waiting calls
         /// </summary>
         void OnProcessExited();
+
+        /// <summary>
+        /// Cancels the discovery of tests
+        /// </summary>
+        void CancelDiscovery();
     }
 }

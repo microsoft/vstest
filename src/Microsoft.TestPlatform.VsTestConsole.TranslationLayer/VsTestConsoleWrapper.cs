@@ -166,8 +166,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void CancelDiscovery()
         {
-            // TODO: Cancel Discovery
-            // this.requestSender.CancelDiscovery();
+            this.requestSender.CancelDiscovery();
         }
 
         /// <inheritdoc/>

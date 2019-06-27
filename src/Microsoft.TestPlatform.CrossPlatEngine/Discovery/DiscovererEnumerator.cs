@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
@@ -33,43 +33,58 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     /// </summary>
     internal class DiscovererEnumerator
     {
-        private DiscoveryResultCache discoveryResultCache;
-        private ITestPlatformEventSource testPlatformEventSource;
-        private IRequestData requestData;
-        private IAssemblyProperties assemblyProperties;
+        private readonly DiscoveryResultCache discoveryResultCache;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
+        private readonly IRequestData requestData;
+        private readonly IAssemblyProperties assemblyProperties;
+        private readonly CancellationToken cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
         /// <param name="requestData">The request data for providing discovery services and data.</param>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
-        /// <param name="metricsCollector">Metric Collector</param>
-        public DiscovererEnumerator(IRequestData requestData, DiscoveryResultCache discoveryResultCache) : this(requestData, discoveryResultCache, TestPlatformEventSource.Instance)
+        public DiscovererEnumerator(IRequestData requestData, DiscoveryResultCache discoveryResultCache, CancellationToken token)
+            : this(requestData, discoveryResultCache, TestPlatformEventSource.Instance, token)
         {
         }
 
-        internal DiscovererEnumerator(IRequestData requestData,
-            DiscoveryResultCache discoveryResultCache,
-            ITestPlatformEventSource testPlatformEventSource)
-        {
-            this.discoveryResultCache = discoveryResultCache;
-            this.testPlatformEventSource = testPlatformEventSource;
-            this.requestData = requestData;
-            this.assemblyProperties = new AssemblyProperties();
-        }
-
-        // Added this to make class testable, needed a PEHeader mocked Instance
-        internal DiscovererEnumerator(IRequestData requestData,
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
+        /// </summary>
+        /// <param name="requestData">The request data for providing discovery services and data.</param>
+        /// <param name="discoveryResultCache"> The discovery result cache. </param>
+        /// <param name="testPlatformEventSource">Telemetry events receiver</param>
+        /// <param name="token">Cancellation Token to abort discovery</param>
+        public DiscovererEnumerator(IRequestData requestData,
             DiscoveryResultCache discoveryResultCache,
             ITestPlatformEventSource testPlatformEventSource,
-            IAssemblyProperties assemblyProperties)
+            CancellationToken token)
+            : this(requestData, discoveryResultCache, testPlatformEventSource, new AssemblyProperties(), token)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
+        /// </summary>
+        /// <param name="requestData">The request data for providing discovery services and data.</param>
+        /// <param name="discoveryResultCache"> The discovery result cache. </param>
+        /// <param name="testPlatformEventSource">Telemetry events receiver</param>
+        /// <param name="assemblyProperties">Information on the assemblies being discovered</param>
+        /// <param name="token">Cancellation Token to abort discovery</param>
+        public DiscovererEnumerator(IRequestData requestData,
+            DiscoveryResultCache discoveryResultCache,
+            ITestPlatformEventSource testPlatformEventSource,
+            IAssemblyProperties assemblyProperties,
+            CancellationToken token)
+        {
+            // Added this to make class testable, needed a PEHeader mocked Instance
             this.discoveryResultCache = discoveryResultCache;
             this.testPlatformEventSource = testPlatformEventSource;
             this.requestData = requestData;
             this.assemblyProperties = assemblyProperties;
+            this.cancellationToken = token;
         }
-
 
         /// <summary>
         /// Discovers tests from the sources.
@@ -78,14 +93,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="settings"> The settings. </param>
         /// <param name="testCaseFilter"> The test case filter. </param>
         /// <param name="logger"> The logger. </param>
-        internal void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
+        public void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, string testCaseFilter, IMessageLogger logger)
         {
             this.testPlatformEventSource.DiscoveryStart();
-            foreach (var kvp in testExtensionSourceMap)
+            try
             {
-                this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, testCaseFilter, logger);
+                foreach (var kvp in testExtensionSourceMap)
+                {
+                    this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, testCaseFilter, logger);
+                }
             }
-            this.testPlatformEventSource.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
+            finally
+            {
+                this.testPlatformEventSource.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
+            }
         }
 
         /// <summary>
@@ -105,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Stopwatch to collect metrics
             var timeStart = DateTime.UtcNow;
 
-            var discovererToSourcesMap = DiscovererEnumerator.GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
+            var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger, this.assemblyProperties);
             var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
 
             // Collecting Data Point for TimeTaken to Load Adapters
@@ -117,30 +138,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 return;
             }
 
-            // Collecting Total Number of Adapters Discovered in Machine
-            this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count());
-
-            var context = new DiscoveryContext { RunSettings = settings };
-            context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
-
-            // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
-            this.SetAdapterLoggingSettings(logger, settings);
-
-            var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
             double totalTimeTakenByAdapters = 0;
             double totalAdaptersUsed = 0;
-
-            foreach (var discoverer in discovererToSourcesMap.Keys)
+            try
             {
-                this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
-            }
+                // Collecting Total Number of Adapters Discovered in Machine
+                this.requestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfAdapterDiscoveredDuringDiscovery, discovererToSourcesMap.Keys.Count());
 
-            if (this.discoveryResultCache.TotalDiscoveredTests == 0)
+                var context = new DiscoveryContext { RunSettings = settings };
+                context.FilterExpressionWrapper = !string.IsNullOrEmpty(testCaseFilter) ? new FilterExpressionWrapper(testCaseFilter) : null;
+
+                // Set on the logger the TreatAdapterErrorAsWarning setting from runsettings.
+                this.SetAdapterLoggingSettings(logger, settings);
+
+                var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
+                foreach (var discoverer in discovererToSourcesMap.Keys)
+                {
+                    if (this.cancellationToken.IsCancellationRequested)
+                    {
+                        EqtTrace.Info("DiscovererEnumerator.LoadTestsFromAnExtension: Cancellation Requested. Aborting the discovery");
+                        LogTestsDiscoveryCancellation(logger);
+                        return;
+                    }
+
+                    this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
+                }
+
+                if (this.discoveryResultCache.TotalDiscoveredTests == 0)
+                {
+                    LogWarningOnNoTestsDiscovered(sources, testCaseFilter, logger);
+                }
+            }
+            finally
             {
-                DiscovererEnumerator.LogWarningOnNoTestsDiscovered(sources, testCaseFilter, logger);
+                this.CollectTelemetryAtEnd(totalTimeTakenByAdapters, totalAdaptersUsed);
             }
+        }
 
-            this.CollectTelemetryAtEnd(totalTimeTakenByAdapters, totalAdaptersUsed);
+        private void LogTestsDiscoveryCancellation(IMessageLogger logger)
+        {
+            logger.SendMessage(TestMessageLevel.Warning, CrossPlatEngineResources.TestDiscoveryCancelled);
         }
 
         private void CollectTelemetryAtEnd(double totalTimeTakenByAdapters, double totalAdaptersUsed)
@@ -427,8 +464,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 ".exe".Equals(fileExtension, StringComparison.OrdinalIgnoreCase);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [SuppressMessage("Microsoft.Design",
             "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         private static IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> GetDiscoverers(
             string extensionAssembly,
@@ -436,7 +473,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         {
             try
             {
-                if (string.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
+                if (string.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, Constants.UnspecifiedAdapterPath))
                 {
                     // full discovery.
                     return TestDiscoveryExtensionManager.Create().Discoverers;
@@ -448,10 +485,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
             catch (Exception ex)
             {
-                EqtTrace.Error(
-                    "TestDiscoveryManager: LoadExtensions: Exception occured while loading extensions {0}",
-                    ex);
-
+                EqtTrace.Error($"TestDiscoveryManager: LoadExtensions: Exception occured while loading extensions {ex}");
                 if (throwOnError)
                 {
                     throw;

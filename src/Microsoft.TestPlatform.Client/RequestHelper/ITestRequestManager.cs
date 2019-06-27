@@ -53,5 +53,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// Abort the current TestRun
         /// </summary>
         void AbortTestRun();
+
+        /// <summary>
+        /// Cancels the current discovery request
+        /// </summary>
+        void CancelDiscovery();
     }
 }

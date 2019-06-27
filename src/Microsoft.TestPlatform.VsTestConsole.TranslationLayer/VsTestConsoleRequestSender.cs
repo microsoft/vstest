@@ -276,6 +276,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <inheritdoc/>
+        public void CancelDiscovery()
+        {
+            this.communicationManager.SendMessage(MessageType.CancelDiscovery);
+        }
+
+        /// <inheritdoc/>
         public void OnProcessExited()
         {
             this.processExitCancellationTokenSource.Cancel();
