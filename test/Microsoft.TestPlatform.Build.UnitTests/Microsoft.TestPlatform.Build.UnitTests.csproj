@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Build.UnitTests</AssemblyName>
     <WarningsAsErrors>true</WarningsAsErrors>
