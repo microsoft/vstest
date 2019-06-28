@@ -75,7 +75,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 # Test configuration
 #
 $TPT_TargetFrameworkFullCLR = "net451"
-$TPT_TargetFrameworkCore20 = "netcoreapp2.0"
+$TPT_TargetFrameworkCore20 = "netcoreapp2.1"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
@@ -207,7 +207,7 @@ function Invoke-Test
                 $testFilter = "/testCaseFilter:`"$TPT_TestFilter`""
             }
 
-            if($fx -eq $TPT_TargetFrameworkCore -or $fx -eq $TPT_TargetFrameworkCore20)
+            if($fx -eq $TPT_TargetFrameworkCore20)
             {
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
