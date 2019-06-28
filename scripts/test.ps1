@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("net451", "netcoreapp2.1")]
+    [ValidateSet("net451", "netcoreapp2.0")]
     [Alias("f")]
     [System.String] $TargetFramework,
 

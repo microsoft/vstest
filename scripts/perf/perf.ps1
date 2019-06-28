@@ -40,12 +40,11 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 # Test configuration
 #
 $TPT_TargetFrameworkFullCLR = "net451"
-$TPT_TargetFrameworkCore = "netcoreapp1.0"
-$TPT_TargetFramework20Core = "netcoreapp2.1"
+$TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @(Join-Path $env:TP_ROOT_DIR "test\TestAssets")
-$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR, "net452")
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkFullCLR, "net452")
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_Pattern = $Pattern
