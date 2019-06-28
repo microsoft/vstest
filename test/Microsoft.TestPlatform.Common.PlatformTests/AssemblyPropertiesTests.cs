@@ -20,7 +20,6 @@ namespace TestPlatform.Common.UnitTests.Utilities
 
         [TestMethod]
         [DataRow("net451")]
-        [DataRow("netcoreapp1.0")]
         [DataRow("netcoreapp2.0")]
         public void GetAssemblyTypeForManagedDll(string framework)
         {
@@ -49,7 +48,6 @@ namespace TestPlatform.Common.UnitTests.Utilities
         }
 
         [TestMethod]
-        [DataRow("netcoreapp1.0")]
         [DataRow("netcoreapp2.0")]
         public void GetAssemblyTypeForNetCoreManagedExe(string framework)
         {
