@@ -6,7 +6,7 @@
   <PropertyGroup>
     <AssemblyName>ConsoleManagedApp</AssemblyName>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;net451</TargetFrameworks>
   </PropertyGroup>
 
 </Project>

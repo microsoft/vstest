@@ -90,8 +90,7 @@ Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
 $TPB_TargetFramework = "net451"
-$TPB_TargetFrameworkCore = "netcoreapp1.0"
-$TPB_TargetFrameworkCore20 = "netcoreapp2.0"
+$TPB_TargetFrameworkCore20 = "netcoreapp2.1"
 $TPB_TargetFrameworkUap = "uap10.0"
 $TPB_TargetFrameworkNS2_0 = "netstandard2.0"
 $TPB_Configuration = $Configuration
@@ -169,7 +168,7 @@ function Install-DotNetCli
         & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
     }
 
-    # Get netcoreapp2.0 shared components.
+    # Get netcoreapp2.1 shared components.
     if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.0.0")) {
         & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.0.0' -Channel 'release/2.0.0'
     }
@@ -226,7 +225,6 @@ function Publish-Package
     Write-Log "Publish-Package: Started."
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
-    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
     $coreCLR20TestHostPackageDir = Get-CoreCLR20TestHostPackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
@@ -693,11 +691,6 @@ function Get-FullCLRPackageDirectory
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\$TPB_TargetRuntime")
 }
 
-function Get-CoreCLRPackageDirectory
-{
-    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore")
-}
-
 function Get-CoreCLR20PackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20")
@@ -812,7 +805,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
+    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.1"), ("netcoreapp1.0", "netcoreapp2.1"), ("netcoreapp2.1", "netcoreapp2.1"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.

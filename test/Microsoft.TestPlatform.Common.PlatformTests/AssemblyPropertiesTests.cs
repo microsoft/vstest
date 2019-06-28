@@ -21,7 +21,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
         [TestMethod]
         [DataRow("net451")]
         [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetAssemblyTypeForManagedDll(string framework)
         {
             var assemblyPath = this.testEnvironment.GetTestAsset("SimpleTestProject3.dll", framework);
@@ -50,7 +50,7 @@ namespace TestPlatform.Common.UnitTests.Utilities
 
         [TestMethod]
         [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetAssemblyTypeForNetCoreManagedExe(string framework)
         {
             var assemblyPath = this.testEnvironment.GetTestAsset("ConsoleManagedApp.dll", framework);
