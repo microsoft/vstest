@@ -805,7 +805,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.1"), ("netcoreapp1.0", "netcoreapp2.1"), ("netcoreapp2.1", "netcoreapp2.1"))
+    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard2.0", "netcoreapp2.1"), ("netcoreapp2.1", "netcoreapp2.1"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.
@@ -841,7 +841,7 @@ function Build-SpecificProjects
             $fromDir = $([System.IO.Path]::Combine($ProjectDir, "bin", $TPB_Configuration, $FrameworkAndOutDir[0]))
             $toDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, $TPB_Configuration, $FrameworkAndOutDir[1]))
             if ( Test-Path $fromDir){
-                Write-Log "Copying articates from $fromDir to $toDir"
+                Write-Log "Copying artifacts from $fromDir to $toDir"
                 Get-ChildItem $fromDir | ForEach-Object {
                     if(-not ($_.PSIsContainer)) {
                         copy $_.FullName $toDir
