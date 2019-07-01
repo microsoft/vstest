@@ -53,8 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         [TestMethod]
         [DataRow("net451")]
-        [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForx64Assembly(string framework)
         {
             this.TestDotnetAssemblyArch("SimpleTestProject3", framework, Architecture.X64, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -62,8 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         [TestMethod]
         [DataRow("net451")]
-        [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForx86Assembly(string framework)
         {
             this.TestDotnetAssemblyArch("SimpleTestProjectx86", framework, Architecture.X86, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -71,8 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         [TestMethod]
         [DataRow("net451")]
-        [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForAnyCPUAssembly(string framework)
         {
             this.TestDotnetAssemblyArch("SimpleTestProject", framework, Architecture.AnyCPU, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -80,8 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         [TestMethod]
         [DataRow("net451")]
-        [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetArchitectureShouldReturnCorrentArchForARMAssembly(string framework)
         {
             this.TestDotnetAssemblyArch("SimpleTestProjectARM", framework, Architecture.ARM, expectedElapsedTime: ExpectedTimeForFindingArchForDotNetAssembly);
@@ -110,8 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
 
         [TestMethod]
         [DataRow("net451")]
-        [DataRow("netcoreapp1.0")]
-        [DataRow("netcoreapp2.0")]
+        [DataRow("netcoreapp2.1")]
         public void GetFrameWorkForDotNetAssembly(string framework)
         {
             var expectedElapsedTime = 5;
