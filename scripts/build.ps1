@@ -170,7 +170,7 @@ function Install-DotNetCli
 
     # Get netcoreapp2.1 shared components.
     if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.0.0")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.0.0' -Channel 'release/2.0.0'
+        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.1.0' -Channel 'release/2.1.0'
     }
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
