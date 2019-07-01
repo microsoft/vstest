@@ -122,13 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.PlatformTests
                 expectedElapsedTime = 100;
                 Assert.AreEqual(actualFx.FullName, Constants.DotNetFramework451);
             }
-            else if (framework.Equals("netcoreapp1.0"))
-            {
-                Assert.AreEqual(actualFx.FullName, Constants.DotNetFrameworkCore10);
-            }
             else
             {
-                Assert.AreEqual(actualFx.FullName, ".NETCoreApp,Version=v2.0");
+                Assert.AreEqual(actualFx.FullName, ".NETCoreApp,Version=v2.1");
             }
 
             Console.WriteLine("Framework:{0}, {1}", framework, string.Format(PerfAssertMessageFormat, expectedElapsedTime, stopWatch.ElapsedMilliseconds));
