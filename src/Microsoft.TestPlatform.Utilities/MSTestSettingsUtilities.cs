@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <returns> Updated RunSetting Xml document with imported settings. </returns>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public static IXPathNavigable Import(string settingsFile, IXPathNavigable defaultRunSettings, Architecture architecture, FrameworkVersion frameworkVersion)
+        public static XmlDocument Import(string settingsFile, XmlDocument defaultRunSettings, Architecture architecture, FrameworkVersion frameworkVersion)
         {
             ValidateArg.NotNull(settingsFile, "settingsFile");
             ValidateArg.NotNull(defaultRunSettings, "defaultRunSettings");
@@ -49,8 +49,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             var settingsNode = GenerateMSTestXml(settingsFile);
-            settingsNode.MoveToRoot();
-            navigator.PrependChild(settingsNode);
+            
+            defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(settingsNode, true));
 
             // Adding RunConfig 
             if (!navigator.MoveToChild(Constants.RunConfigurationSettingsName, string.Empty))
@@ -66,13 +66,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 targetFrameworkVersionNode.InnerXml = frameworkVersion.ToString();
                 runConfigurationNode.AppendChild(targetFrameworkVersionNode);
 
-                var runConfigNodeNavigator = runConfigurationNode.CreateNavigator();
-                runConfigNodeNavigator.MoveToRoot();
-                navigator.PrependChild(runConfigNodeNavigator);
+                defaultRunSettings.DocumentElement.PrependChild(defaultRunSettings.ImportNode(runConfigurationNode, true));
             }
 
-            navigator.MoveToRoot();
-            return navigator;
+            return defaultRunSettings;
         }
 
         public static bool IsLegacyTestSettingsFile(string settingsFile)
@@ -84,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        private static XPathNavigator GenerateMSTestXml(string settingsFile)
+        private static XmlElement GenerateMSTestXml(string settingsFile)
         {
             // Generate the MSTest xml
             //
@@ -104,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             forcedLegacyModeNode.InnerXml = "true";
             mstestNode.AppendChild(forcedLegacyModeNode);
 
-            return mstestNode.CreateNavigator();
+            return mstestNode;
         }
     }
 }

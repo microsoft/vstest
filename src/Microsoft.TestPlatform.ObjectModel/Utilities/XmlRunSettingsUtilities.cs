@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </returns>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public static IXPathNavigable CreateDefaultRunSettings()
+        public static XmlDocument CreateDefaultRunSettings()
         {
             // Create a new default xml doc that looks like this:
             // <?xml version="1.0" encoding="utf-8"?>
@@ -209,18 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             var dataCollectorsNode = doc.CreateElement(Constants.DataCollectorsSettingName);
             dataCollectionRunSettingsNode.AppendChild(dataCollectorsNode);
 
-#if NET451
             return doc;
-#else
-            // Xmldocument doesn't inherit from XmlDocument for netcoreapp2.0
-            var ret = doc as IXPathNavigable;
-            if (ret == null)
-            {
-                return doc.ToXPathNavigable();
-            }
-
-            return ret;
-#endif
         }
 
         /// <summary>

@@ -126,9 +126,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Load up the run settings and set it as the active run settings.
             try
             {
-                IXPathNavigable document = this.GetRunSettingsDocument(argument);
+                XmlDocument document = this.GetRunSettingsDocument(argument);
 
-                this.runSettingsManager.UpdateRunSettings(document.CreateNavigator().OuterXml);
+                this.runSettingsManager.UpdateRunSettings(document.OuterXml);
 
                 // To determine whether to infer framework and platform.
                 ExtractFrameworkAndPlatform();
@@ -171,9 +171,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        private IXPathNavigable GetRunSettingsDocument(string runSettingsFile)
+        private XmlDocument GetRunSettingsDocument(string runSettingsFile)
         {
-            IXPathNavigable runSettingsDocument;
+            XmlDocument runSettingsDocument;
 
             if (!MSTestSettingsUtilities.IsLegacyTestSettingsFile(runSettingsFile))
             {
