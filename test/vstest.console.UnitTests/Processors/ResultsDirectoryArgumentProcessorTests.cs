@@ -83,30 +83,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.InitializeExceptionTestTemplate(folder, message);
         }
 
-        [TestMethod]
-        public void InitializeShouldThrowIfGivenPathisIllegal()
-        {
-            //var folder = @"c:\som<\illegal\path\";
-            //var message = string.Format(
-            //    @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-            //    folder,
-            //    "Illegal characters in path.");
-            //this.InitializeExceptionTestTemplate(folder, message);
-        }
-
-        [TestMethod]
-        public void InitializeShouldThrowIfPathIsNotSupported()
-        {
-
-            //var folder = @"c:\path\to\in:valid";
-
-            //var message = string.Format(
-            //    @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-            //    folder,
-            //    "The given path's format is not supported.");
-            //this.InitializeExceptionTestTemplate(folder, message);
-        }
-
         private void InitializeExceptionTestTemplate(string folder, string message)
         {
             var isExceptionThrown = false;

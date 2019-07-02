@@ -158,16 +158,6 @@ function Install-DotNetCli
     & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
     # Pull in additional shared frameworks.
-    # Get netcoreapp1.0 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\1.0.5")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.5' -Channel 'preview'
-    }
-    
-    # Get netcoreapp1.1 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\1.1.2")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
-    }
-
     # Get netcoreapp2.1 shared components.
     if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.1.0")) {
         & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.1.0' -Channel 'release/2.1.0'

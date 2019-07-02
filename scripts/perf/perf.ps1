@@ -11,7 +11,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp1.0", "net451", "net452")]
+    [ValidateSet("net451", "net452")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -44,7 +44,7 @@ $TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @(Join-Path $env:TP_ROOT_DIR "test\TestAssets")
-$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkFullCLR, "net452")
+$Script:TPT_TargetFrameworks =@($TPT_TargetFramework20Core, $TPT_TargetFrameworkFullCLR, "net452")
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_Pattern = $Pattern
@@ -151,7 +151,7 @@ function Get-ConsoleRunnerPath($runner, $targetFrameWork)
 {
     if($runner -eq "vstest.console")
     {
-        if($targetFrameWork -eq $TPT_TargetFrameworkCore)
+        if($targetFrameWork -eq $TPT_TargetFramework20Core)
         {
             $vstestConsoleFileName = "vstest.console.dll"
             $targetRunTime = ""

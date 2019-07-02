@@ -32,7 +32,7 @@
     <Compile Include="Properties\**\*.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <Compile Include="netstandard1.0\**\*.cs" />
+    <Compile Include="netstandard\**\*.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
     <Compile Include="netcore\**\*.cs" />
