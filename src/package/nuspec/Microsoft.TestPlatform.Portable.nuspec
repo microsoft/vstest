@@ -368,7 +368,6 @@
     <file src="netcoreapp2.1\TestHost\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\TestHost\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\TestHost\System.Collections.Immutable.dll"	target="tools\netcoreapp2.1\TestHost\System.Collections.Immutable.dll" />
     <file src="netcoreapp2.1\TestHost\System.Reflection.Metadata.dll"	target="tools\netcoreapp2.1\TestHost\System.Reflection.Metadata.dll" />
-    <file src="netcoreapp2.1\TestHost\System.Runtime.InteropServices.RuntimeInformation.dll"	target="tools\netcoreapp2.1\TestHost\System.Runtime.InteropServices.RuntimeInformation.dll" />
     <file src="netcoreapp2.1\TestHost\testhost.exe"	target="tools\netcoreapp2.1\TestHost\testhost.exe" />
     <file src="netcoreapp2.1\TestHost\testhost.exe.config"	target="tools\netcoreapp2.1\TestHost\testhost.exe.config" />
     <file src="netcoreapp2.1\TestHost\testhost.x86.exe"	target="tools\netcoreapp2.1\TestHost\testhost.x86.exe" />
