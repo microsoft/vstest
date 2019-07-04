@@ -237,7 +237,6 @@
     <file src="netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
     <file src="netcoreapp2.1\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\package.deps.json"	target="tools\netcoreapp2.1\package.deps.json" />
-    <file src="netcoreapp2.1\System.Xml.XPath.XmlDocument.dll"	target="tools\netcoreapp2.1\System.Xml.XPath.XmlDocument.dll" />
     <file src="netcoreapp2.1\vstest.console.deps.json"	target="tools\netcoreapp2.1\vstest.console.deps.json" />
     <file src="netcoreapp2.1\vstest.console.dll"	target="tools\netcoreapp2.1\vstest.console.dll" />
     <file src="netcoreapp2.1\vstest.console.dll.config"	target="tools\netcoreapp2.1\vstest.console.dll.config" />
