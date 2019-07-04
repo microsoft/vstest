@@ -812,8 +812,12 @@ function Update-VsixVersion($vsixProjectDir)
 
 function Generate-Manifest
 {
+    Write-Log "Generate-Manifest: Started."
+
     $sdkTaskPath = Join-Path $env:TP_ROOT_DIR "eng\common\sdk-task.ps1"
-    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest.xml /p:ManifestBuildData="Location=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+    & $sdkTaskPath -restore -task GenerateBuildManifest /p:PackagesToPublishPattern=$TPB_PackageOutDir\*.nupkg /p:AssetManifestFilePath=$TPB_PackageOutDir\manifest\manifest.xml /p:ManifestBuildData="Location=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json" /p:BUILD_BUILDNUMBER=$BuildNumber
+
+    Write-Log "Generate-Manifest: Completed."
 }
 
 function Build-SpecificProjects
