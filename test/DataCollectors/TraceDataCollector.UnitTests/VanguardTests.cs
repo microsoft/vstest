@@ -93,6 +93,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
                 File.ReadAllText(this.configFileName).Replace(" ", string.Empty).Replace(Environment.NewLine, string.Empty));
         }
 
+        [Ignore]
         [TestMethod]
         public void StartShouldStartVanguardProcessWithCollectCommand()
         {
@@ -108,8 +109,10 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             this.vanguard.Start(this.outputFileName, this.dataCollectionContext);
             cts.Cancel();
 
+            var numOfProcessCreated = numOfProcessCreatedTask.Result;
+
             // TODO find the reason why additional process launched when collecting code coverage.
-            Assert.IsTrue(numOfProcessCreatedTask.Result == 1 || numOfProcessCreatedTask.Result == 2, "Number of process created:{0} expected is 1 or 2.");
+            Assert.IsTrue(numOfProcessCreated == 1 || numOfProcessCreated == 2, $"Number of process created:{numOfProcessCreated} expected is 1 or 2.");
         }
 
         [TestMethod]
@@ -151,6 +154,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             Assert.AreEqual(expectedErrorMessage, exception.Message);
         }
 
+        [Ignore]
         [TestMethod]
         public void StopShouldLaunchVarguardWithShutdownCommand()
         {
@@ -171,7 +175,7 @@ namespace Microsoft.VisualStudio.TraceDataCollector.UnitTests
             var numOfProcessCreated = numOfProcessCreatedTask.Result;
 
             // TODO find the reason why additional process launched when collecting code coverage.
-            Assert.IsTrue(numOfProcessCreated >= 2, $"Number of process created:{numOfProcessCreated} expected is greater than 2.");
+            Assert.IsTrue(numOfProcessCreated == 2 || numOfProcessCreated == 4, $"Number of process created:{numOfProcessCreated} expected is 2 or 4.");
         }
 
         private static string GetCollectCommand(string sessionName, string outputName, string configurationFileName)
