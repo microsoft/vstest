@@ -9,7 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>datacollector</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net451;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>
