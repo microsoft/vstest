@@ -122,7 +122,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetFullTargetFrameworkDataSource]
         public void RunTestsWithChutzpahAdapter(RunnerInfo runnerInfo)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
             var sources = new List<string>
@@ -146,17 +146,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(1, testCase.FirstOrDefault().TestCase.LineNumber);
-        }
-
-        private IList<string> GetTestAssemblies()
-        {
-            var testAssemblies = new List<string>
-                                     {
-                                         this.GetAssetFullPath("SimpleTestProject.dll"),
-                                         this.GetAssetFullPath("SimpleTestProject2.dll")
-                                     };
-
-            return testAssemblies;
         }
     }
 }
