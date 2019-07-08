@@ -140,7 +140,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             try
             {
                 // to check valid directory path
-                char[] invalidPathChars = Path.GetInvalidPathChars();
                 if (!string.IsNullOrEmpty(argument) && !IsValidPath(argument) )
                 {
                     throw new ArgumentException("Illegal characters in path.");

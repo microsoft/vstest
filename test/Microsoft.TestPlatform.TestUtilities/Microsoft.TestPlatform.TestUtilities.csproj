@@ -21,11 +21,6 @@
       <Version>$(MSTestFrameworkVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-    <PackageReference Include="System.Xml.XPath.XmlDocument">
-      <Version>4.3.0</Version>
-    </PackageReference>
-  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent">
       <Version>1.0.41</Version>

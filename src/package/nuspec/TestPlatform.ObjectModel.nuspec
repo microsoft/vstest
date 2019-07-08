@@ -18,9 +18,6 @@
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
         <dependency id="System.Reflection.Metadata" version="[1.6.0, )" />
       </group>
-      <group targetFramework="netstandard2.0">
-        <dependency id="System.Xml.XPath.XmlDocument" version="[4.3.0, )" />
-      </group>
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Configuration" targetFramework=".NETFramework4.6" />
