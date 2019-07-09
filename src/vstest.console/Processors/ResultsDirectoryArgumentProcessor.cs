@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     throw new ArgumentException("Illegal characters in path.");
                 }
 
-                var di = new FileInfo(argument);
+                var di = new DirectoryInfo(argument);
 
                 if (!Path.IsPathRooted(argument))
                 {

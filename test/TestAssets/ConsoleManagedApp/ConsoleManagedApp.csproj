@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
@@ -6,7 +6,7 @@
   <PropertyGroup>
     <AssemblyName>ConsoleManagedApp</AssemblyName>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net451</TargetFrameworks>
   </PropertyGroup>
 
 </Project>

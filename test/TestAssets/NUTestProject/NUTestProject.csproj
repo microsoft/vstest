@@ -4,7 +4,7 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;net451;netcoreapp1.1;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net451;netcoreapp2.1</TargetFrameworks>
     <AssemblyName>NUTestProject</AssemblyName>
   </PropertyGroup>
 
