@@ -113,6 +113,11 @@
         <target state="new">No test is available for testcase filter `{0}` in {1}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestDiscoveryCancelled">
+        <source>Discovery of tests cancelled.</source>
+        <target state="new">Discovery of tests cancelled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

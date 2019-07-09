@@ -9,7 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -29,14 +29,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     [TestClass]
     public class DiscovererEnumeratorTests
     {
-        private DiscovererEnumerator discovererEnumerator;
-        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
-        private DiscoveryResultCache discoveryResultCache;
-        private Mock<IRequestData> mockRequestData;
-        private Mock<IMetricsCollection> mockMetricsCollection;
-        private Mock<IAssemblyProperties> mockAssemblyProperties;
-        private Mock<IRunSettings> runSettingsMock;
-        private Mock<IMessageLogger> messageLoggerMock;
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private readonly DiscovererEnumerator discovererEnumerator;
+        private readonly Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
+        private readonly DiscoveryResultCache discoveryResultCache;
+        private readonly Mock<IRequestData> mockRequestData;
+        private readonly Mock<IMetricsCollection> mockMetricsCollection;
+        private readonly Mock<IAssemblyProperties> mockAssemblyProperties;
+        private readonly Mock<IRunSettings> runSettingsMock;
+        private readonly Mock<IMessageLogger> messageLoggerMock;
 
         public DiscovererEnumeratorTests()
         {
@@ -46,7 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
             this.mockAssemblyProperties = new Mock<IAssemblyProperties>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
-            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockAssemblyProperties.Object);
+            this.discovererEnumerator = new DiscovererEnumerator(this.mockRequestData.Object, this.discoveryResultCache, this.mockTestPlatformEventSource.Object, this.mockAssemblyProperties.Object, this.cancellationTokenSource.Token);
             this.runSettingsMock = new Mock<IRunSettings>();
             this.messageLoggerMock = new Mock<IMessageLogger>();
             TestPluginCacheTests.SetupMockExtensions( new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
@@ -382,12 +383,49 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         }
 
         [TestMethod]
+        public void LoadTestsShouldNotCallIntoDiscoverersWhenCancelled()
+        {
+            // Setup
+            string[] extensions = new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location };
+            TestPluginCacheTests.SetupMockExtensions(extensions, () => { });
+
+            var dllsources = new List<string>
+                              {
+                                  typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location,
+                                  typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+                              };
+            var jsonsources = new List<string>
+                              {
+                                  "test1.json",
+                                  "test2.json"
+                              };
+            var sources = new List<string>(dllsources);
+            sources.AddRange(jsonsources);
+
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>
+            {
+                { "_none_", sources }
+            };
+
+            // Act
+            this.cancellationTokenSource.Cancel();
+            var runSettings = this.runSettingsMock.Object;
+            string testCaseFilter = "TestFilter";
+            this.discovererEnumerator.LoadTests(extensionSourceMap, runSettings, testCaseFilter, this.messageLoggerMock.Object);
+
+            // Validate
+            Assert.IsFalse(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
+            Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
+            this.messageLoggerMock.Verify(logger => logger.SendMessage(TestMessageLevel.Warning, "Discovery of tests cancelled."), Times.Once);
+        }
+
+        [TestMethod]
         public void LoadTestsShouldCallIntoTheAdapterWithTheRightTestCaseSink()
         {
-             this.InvokeLoadTestWithMockSetup();
+            this.InvokeLoadTestWithMockSetup();
 
-             Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
-             Assert.AreEqual(2, this.discoveryResultCache.Tests.Count);
+            Assert.IsTrue(ManagedDllTestDiscoverer.IsManagedDiscoverTestCalled);
+            Assert.AreEqual(2, this.discoveryResultCache.Tests.Count);
         }
 
         [TestMethod]
@@ -483,7 +521,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var expectedMessage =
                 $"No test is available in {sourcesString}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
 
-            this.messageLoggerMock.Verify( l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
+            this.messageLoggerMock.Verify(l => l.SendMessage(TestMessageLevel.Warning, expectedMessage));
         }
 
         [TestMethod]

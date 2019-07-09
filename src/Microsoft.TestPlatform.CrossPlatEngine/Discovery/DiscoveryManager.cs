@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using System.Globalization;
     using System.IO;
     using System.Linq;
-
+    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
@@ -28,11 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     /// </summary>
     public class DiscoveryManager : IDiscoveryManager
     {
-        private TestSessionMessageLogger sessionMessageLogger;
-        private ITestPlatformEventSource testPlatformEventSource;
-        private IRequestData requestData;
+        private readonly TestSessionMessageLogger sessionMessageLogger;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
+        private readonly IRequestData requestData;
         private ITestDiscoveryEventsHandler2 testDiscoveryEventsHandler;
         private DiscoveryCriteria discoveryCriteria;
+        private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -109,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    new DiscovererEnumerator(this.requestData, discoveryResultCache).LoadTests(
+                    new DiscovererEnumerator(this.requestData, discoveryResultCache, cancellationTokenSource.Token).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
                         discoveryCriteria.TestCaseFilter,
@@ -138,9 +139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                     // Collecting Total Tests Discovered
                     this.requestData.MetricsCollection.Add(TelemetryDataConstants.TotalTestsDiscovered, totalDiscoveredTestCount);
-
-                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false);
-                    discoveryCompleteEventsArgs.Metrics = this.requestData.MetricsCollection.Metrics;
+                    var discoveryCompleteEventsArgs = new DiscoveryCompleteEventArgs(totalDiscoveredTestCount, false)
+                    {
+                        Metrics = this.requestData.MetricsCollection.Metrics
+                    };
 
                     eventHandler.HandleDiscoveryComplete(discoveryCompleteEventsArgs, lastChunk);
                 }
@@ -161,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         public void Abort()
         {
-            // do nothing for now.
+            this.cancellationTokenSource.Cancel();
         }
 
         private void OnReportTestCases(IEnumerable<TestCase> testCases)

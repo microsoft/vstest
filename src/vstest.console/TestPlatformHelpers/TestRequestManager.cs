@@ -36,21 +36,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     /// </summary>
     internal class TestRequestManager : ITestRequestManager
     {
-        private ITestPlatform testPlatform;
-
+        private readonly ITestPlatform testPlatform;
         private CommandLineOptions commandLineOptions;
-
-        private ITestPlatformEventSource testPlatformEventSource;
-
+        private readonly ITestPlatformEventSource testPlatformEventSource;
         private TestRunResultAggregator testRunResultAggregator;
-
         private static ITestRequestManager testRequestManagerInstance;
-
         private InferHelper inferHelper;
-
         private const int runRequestTimeout = 5000;
-
         private bool telemetryOptedIn;
+        private readonly object syncObject = new object();
+        private readonly Task<IMetricsPublisher> metricsPublisher;
+        private bool isDisposed;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -58,11 +54,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private ITestRunRequest currentTestRunRequest;
 
-        private object syncobject = new object();
-
-        private Task<IMetricsPublisher> metricsPublisher;
-
-        private bool isDisposed;
+        /// <summary>
+        /// Maintains the current active discovery request
+        /// Assumption : There can only be one active discovery request.
+        /// </summary>
+        private IDiscoveryRequest currentDiscoveryRequest;
 
         #region Constructor
 
@@ -161,36 +157,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             // create discovery request
-            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
-            criteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
-
-            try
+            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings)
             {
-                using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, discoveryPayload.TestPlatformOptions))
+                TestCaseFilter = this.commandLineOptions.TestCaseFilterValue
+            };
+
+            // Make sure to run the run request inside a lock as the below section is not thread-safe
+            // There can be only one discovery or execution request at a given point in time
+            lock (this.syncObject)
+            {
+                try
                 {
-                    try
-                    {
-                        discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
+                    EqtTrace.Info("TestRequestManager.DiscoverTests: Synchronization context taken");
 
-                        this.testPlatformEventSource.DiscoveryRequestStart();
+                    this.currentDiscoveryRequest = this.testPlatform.CreateDiscoveryRequest(requestData, criteria, discoveryPayload.TestPlatformOptions);
+                    discoveryEventsRegistrar?.RegisterDiscoveryEvents(this.currentDiscoveryRequest);
 
-                        discoveryRequest.DiscoverAsync();
-                        discoveryRequest.WaitForCompletion();
-                    }
+                    // Notify start of discovery start
+                    this.testPlatformEventSource.DiscoveryRequestStart();
 
-                    finally
-                    {
-                        discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
-                    }
+                    // Start the discovery of tests and wait for completion
+                    this.currentDiscoveryRequest.DiscoverAsync();
+                    this.currentDiscoveryRequest.WaitForCompletion();
                 }
-            }
-            finally
-            {
-                EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
-                this.testPlatformEventSource.DiscoveryRequestStop();
+                finally
+                {
+                    if (this.currentDiscoveryRequest != null)
+                    {
+                        // Dispose the discovery request and unregister for events
+                        discoveryEventsRegistrar?.UnregisterDiscoveryEvents(currentDiscoveryRequest);
+                        this.currentDiscoveryRequest.Dispose();
+                        this.currentDiscoveryRequest = null;
+                    }
 
-                // Posts the Discovery Complete event.
-                this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+                    EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed.");
+                    this.testPlatformEventSource.DiscoveryRequestStop();
+
+                    // Posts the Discovery Complete event.
+                    this.metricsPublisher.Result.PublishMetrics(TelemetryDataConstants.TestDiscoveryCompleteEvent, requestData.MetricsCollection.Metrics);
+                }
             }
         }
 
@@ -310,6 +315,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
             this.currentTestRunRequest?.CancelAsync();
+        }
+
+        /// <summary>
+        /// Cancel the test discovery.
+        /// </summary>
+        public void CancelDiscovery()
+        {
+            EqtTrace.Info("TestRequestManager.CancelTestDiscovery: Sending cancel request.");
+            this.currentDiscoveryRequest?.Abort();
         }
 
         /// <summary>
@@ -544,7 +558,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
             // below logic needs to deserialize and do some cleanup
             // While this section is cleaning up, TranslationLayer can trigger run causing multiple threads to run the below section at the same time
-            lock (syncobject)
+            lock (this.syncObject)
             {
                 try
                 {

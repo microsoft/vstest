@@ -202,6 +202,11 @@
         <target state="translated">没有测试匹配 {1} 中的给定用例测试筛选器“{0}”</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestDiscoveryCancelled">
+        <source>Discovery of tests cancelled.</source>
+        <target state="new">Discovery of tests cancelled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

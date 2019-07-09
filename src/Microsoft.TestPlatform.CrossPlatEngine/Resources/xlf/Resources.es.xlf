@@ -202,6 +202,11 @@
         <target state="translated">Ninguna prueba coincide con el filtro de casos de prueba proporcionado "{0}" en {1}</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestDiscoveryCancelled">
+        <source>Discovery of tests cancelled.</source>
+        <target state="new">Discovery of tests cancelled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

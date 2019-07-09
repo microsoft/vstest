@@ -3,15 +3,17 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 {
-    using Microsoft.TestPlatform.TestUtilities;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using VisualStudio.TestPlatform.ObjectModel.Logging;
+    using System.Threading.Tasks;
+    using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
 
     [TestClass]
     public class DiscoverTests : AcceptanceTestBase
@@ -167,6 +169,42 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             {
                 Assert.AreEqual(22, testCase.FirstOrDefault().LineNumber);
             }
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void CancelTestDiscovery(RunnerInfo runnerInfo)
+        {
+            // Setup
+            var testAssemblies = new List<string>
+                                     {
+                                         this.GetAssetFullPath("DiscoveryTestProject.dll"),
+                                         this.GetAssetFullPath("SimpleTestProject.dll"),
+                                         this.GetAssetFullPath("SimpleTestProject2.dll")
+                                     };
+
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
+
+            var discoveredTests = new List<TestCase>();
+            var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
+            discoveryEvents.Setup((events) => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback
+                ((IEnumerable<TestCase> testcases) => { discoveredTests.AddRange(testcases); });
+
+            // Act
+            var discoveryTask = Task.Run(() =>
+            {
+                this.vstestConsoleWrapper.DiscoverTests(testAssemblies, this.GetDefaultRunSettings(), discoveryEvents.Object);
+            });
+
+            Task.Delay(2000).Wait();
+            vstestConsoleWrapper.CancelDiscovery();
+            discoveryTask.Wait();
+
+            // Assert.
+            int discoveredSources = discoveredTests.Select((testcase) => testcase.Source).Distinct().Count();
+            Assert.AreNotEqual(testAssemblies.Count, discoveredSources, "All test assemblies discovered");
         }
 
         private IList<string> GetTestAssemblies()

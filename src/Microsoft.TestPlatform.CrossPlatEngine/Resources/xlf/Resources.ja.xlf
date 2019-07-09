@@ -202,6 +202,11 @@
         <target state="translated">指定のテストケース フィルター `{0}` に一致するテストは {1} にありません</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestDiscoveryCancelled">
+        <source>Discovery of tests cancelled.</source>
+        <target state="new">Discovery of tests cancelled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
