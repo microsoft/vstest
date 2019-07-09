@@ -191,7 +191,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var discoveryEvents = new Mock<ITestDiscoveryEventsHandler>();
             discoveryEvents.Setup((events) => events.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback
                 ((IEnumerable<TestCase> testcases) => { discoveredTests.AddRange(testcases); });
-            discoveryEvents.Setup((events) => events.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), true)).Verifiable();
 
             // Act
             var discoveryTask = Task.Run(() =>
@@ -204,7 +203,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             discoveryTask.Wait();
 
             // Assert.
-            discoveryEvents.Verify((events) => events.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), true), Times.Once);
             int discoveredSources = discoveredTests.Select((testcase) => testcase.Source).Distinct().Count();
             Assert.AreNotEqual(testAssemblies.Count, discoveredSources, "All test assemblies discovered");
         }
