@@ -140,6 +140,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             try
             {
                 // to check valid directory path
+                if (!string.IsNullOrEmpty(argument) && !IsValidPath(argument) )
+                {
+                    throw new ArgumentException("Illegal characters in path.");
+                }
+
                 var di = new DirectoryInfo(argument);
 
                 if (!Path.IsPathRooted(argument))
@@ -164,6 +169,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
+        }
+
+        /// <summary>
+        /// Checks if a given path is valid
+        /// </summary>
+        /// <returns> Is valid path </returns>
+        private bool IsValidPath(string argument)
+        {
+            if (argument.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+            {
+                return false;
+            }
+
+            if (Path.IsPathRooted(argument))
+            {
+                argument = argument.Substring(argument.IndexOf(Path.DirectorySeparatorChar) + 1);
+            }
+            var folders = argument.Split(new char[] { Path.DirectorySeparatorChar });
+
+            foreach (var folder in folders)
+            {
+                if(folder.IndexOfAny(Path.GetInvalidFileNameChars())>=0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #endregion

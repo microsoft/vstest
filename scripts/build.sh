@@ -120,8 +120,7 @@ DOTNET_CLI_VERSION="LATEST"
 TPB_Solution="TestPlatform.sln"
 TPB_Build_From_Source_Solution="TestPlatform_BuildFromSource.sln"
 TPB_TargetFramework="net451"
-TPB_TargetFrameworkCore="netcoreapp2.0"
-TPB_TargetFrameworkCore10="netcoreapp1.0"
+TPB_TargetFrameworkCore="netcoreapp2.1"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
 TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION_SUFFIX)
@@ -329,11 +328,11 @@ function publish_package()
         cp $newtonsoft $packageDir
     done
 
-    # Publish TestHost for netcoreapp1.0 target
+    # Publish TestHost for netcoreapp2.1 target
     log ".. Package: Publish testhost.csproj"
     local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
-    local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore10
-    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore
+    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
@@ -352,10 +351,10 @@ function publishplatformatbstractions()
     log "Publish-PlatfromAbstractions-Internal: Started."
     
     local start=$SECONDS
-    local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore10
+    local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
     
     local platformAbstraction="$TP_ROOT_DIR/src/Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration"
-    local platformAbstractionNetCore=$platformAbstraction/$TPB_TargetFrameworkCore10
+    local platformAbstractionNetCore=$platformAbstraction/$TPB_TargetFrameworkCore
     
     cp -r $platformAbstractionNetCore $coreCLRPackageDir
     

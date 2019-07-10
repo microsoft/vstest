@@ -83,7 +83,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         protected override string SetVSTestConsoleDLLPathInArgs(string args)
         {
-            var vstestConsoleDll = Path.Combine(portablePackageFolder, "tools", "netcoreapp2.0", "vstest.console.dll");
+            var vstestConsoleDll = Path.Combine(portablePackageFolder, "tools", "netcoreapp2.1", "vstest.console.dll");
             vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
             args = string.Concat(
                 vstestConsoleDll,

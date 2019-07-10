@@ -90,10 +90,8 @@ Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
 $TPB_TestAssets_Solution = Join-Path $env:TP_ROOT_DIR "test\TestAssets\TestAssets.sln"
 $TPB_TargetFramework = "net451"
-$TPB_TargetFrameworkCore = "netcoreapp1.0"
-$TPB_TargetFrameworkCore20 = "netcoreapp2.0"
+$TPB_TargetFrameworkCore20 = "netcoreapp2.1"
 $TPB_TargetFrameworkUap = "uap10.0"
-$TPB_TargetFrameworkNS1_4 = "netstandard1.4"
 $TPB_TargetFrameworkNS2_0 = "netstandard2.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
@@ -161,19 +159,9 @@ function Install-DotNetCli
     & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
     # Pull in additional shared frameworks.
-    # Get netcoreapp1.0 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\1.0.5")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.5' -Channel 'preview'
-    }
-    
-    # Get netcoreapp1.1 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\1.1.2")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
-    }
-
-    # Get netcoreapp2.0 shared components.
-    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.0.0")) {
-        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.0.0' -Channel 'release/2.0.0'
+    # Get netcoreapp2.1 shared components.
+    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\2.1.0")) {
+        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '2.1.0' -Channel 'release/2.1.0'
     }
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
@@ -228,15 +216,14 @@ function Publish-Package
     Write-Log "Publish-Package: Started."
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
-    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
     $coreCLR20TestHostPackageDir = Get-CoreCLR20TestHostPackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
-    $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
-    $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS1_4")
+    $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
+    $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $settingsMigratorProject = Join-Path $env:TP_ROOT_DIR "src\SettingsMigrator\SettingsMigrator.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
@@ -263,8 +250,8 @@ function Publish-Package
     
     Write-Log "Package: Publish testhost\testhost.csproj"
     Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
-    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore $testhostCorePackageDir
-    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkNS1_4 $testhostNS1_4PackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCorePackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostUapPackageDir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir  
@@ -288,17 +275,17 @@ function Publish-Package
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
     $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
-    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore20
     $platformAbstractionUap = Join-Path $platformAbstraction $TPB_TargetFrameworkUap
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
-    Copy-Item $platformAbstractionUap\* $testhostNS1_4PackageDir -Force
+    Copy-Item $platformAbstractionUap\* $testhostUapPackageDir -Force
     
     # Publish msdia
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
-    Copy-Item -Recurse $comComponentsDirectory\* $testhostNS1_4PackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostUapPackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
     # Copy over the logger assemblies to the Extensions folder.
@@ -327,7 +314,7 @@ function Publish-Package
     }
 
     # Copy Blame Datacollector to Extensions folder.
-    $TPB_TargetFrameworkStandard = "netstandard1.5"
+    $TPB_TargetFrameworkStandard = "netstandard2.0"
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
     $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
@@ -590,9 +577,9 @@ function Create-NugetPackages
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
 
     #Copy Uap target, & props
-    $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS1_4")
-    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.props -Force
-    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.targets -Force
+    $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
+    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostUapPackageDir\Microsoft.TestPlatform.TestHost.targets -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
@@ -693,11 +680,6 @@ function Get-DotNetPath
 function Get-FullCLRPackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\$TPB_TargetRuntime")
-}
-
-function Get-CoreCLRPackageDirectory
-{
-    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore")
 }
 
 function Get-CoreCLR20PackageDirectory
@@ -824,7 +806,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
+    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard2.0", "netcoreapp2.1"), ("netcoreapp2.1", "netcoreapp2.1"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.
@@ -860,7 +842,7 @@ function Build-SpecificProjects
             $fromDir = $([System.IO.Path]::Combine($ProjectDir, "bin", $TPB_Configuration, $FrameworkAndOutDir[0]))
             $toDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, $TPB_Configuration, $FrameworkAndOutDir[1]))
             if ( Test-Path $fromDir){
-                Write-Log "Copying articates from $fromDir to $toDir"
+                Write-Log "Copying artifacts from $fromDir to $toDir"
                 Get-ChildItem $fromDir | ForEach-Object {
                     if(-not ($_.PSIsContainer)) {
                         copy $_.FullName $toDir

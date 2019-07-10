@@ -5,7 +5,7 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.1</TargetFrameworks>
 	<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
