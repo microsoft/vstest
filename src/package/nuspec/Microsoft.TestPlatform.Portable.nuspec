@@ -32,7 +32,6 @@
     <file src="net461\$Runtime$\Microsoft.VisualStudio.TestPlatform.Client.dll"	target="tools\net461\Microsoft.VisualStudio.TestPlatform.Client.dll" />
     <file src="net461\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\net461\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="net461\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\net461\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="net461\$Runtime$\msdia140typelib_clr0200.dll"	target="tools\net461\msdia140typelib_clr0200.dll" />
     <file src="net461\$Runtime$\Newtonsoft.Json.dll"	target="tools\net461\Newtonsoft.Json.dll" />
     <file src="net461\$Runtime$\System.Collections.Immutable.dll"	target="tools\net461\System.Collections.Immutable.dll" />
     <file src="net461\$Runtime$\System.Reflection.Metadata.dll"	target="tools\net461\System.Reflection.Metadata.dll" />
@@ -363,7 +362,6 @@
     <file src="netcoreapp2.1\TestHost\Microsoft.TestPlatform.Utilities.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.TestPlatform.Utilities.dll" />
     <file src="netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-    <file src="netcoreapp2.1\TestHost\msdia140typelib_clr0200.dll"	target="tools\netcoreapp2.1\TestHost\msdia140typelib_clr0200.dll" />
     <file src="netcoreapp2.1\TestHost\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\TestHost\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\TestHost\System.Collections.Immutable.dll"	target="tools\netcoreapp2.1\TestHost\System.Collections.Immutable.dll" />
     <file src="netcoreapp2.1\TestHost\System.Reflection.Metadata.dll"	target="tools\netcoreapp2.1\TestHost\System.Reflection.Metadata.dll" />
