@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopClient()
         {
-#if NET451
+#if NET461
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();
 #else

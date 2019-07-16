@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Xml;
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-#if NET451
+#if NET461
     using VisualStudio.Coverage.Analysis;
 #endif
 
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
 
             // Microsoft.VisualStudio.Coverage.Analysis assembly not avaialble for .NET Core.
-#if NET451
+#if NET461
             this.ValidateCoverageData(actualCoverageFile);
 #endif
             Directory.Delete(this.resultsDirectory, true);
@@ -109,7 +109,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return arguments;
         }
 
-#if NET451
+#if NET461
         private void ValidateCoverageData(string coverageFile)
         {
             using (var converageInfo = CoverageInfo.CreateFromFile(coverageFile))

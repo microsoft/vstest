@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-#if NET451
+#if NET461
     using System.Reflection;
 #endif
     using System.Xml;
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, string> configurator)
         {
-#if NET451
+#if NET461
             try
             {
                 Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);

@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
 
     internal class DefaultEngineInvoker :
-#if NET451
+#if NET461
         MarshalByRefObject,
 #endif
         IEngineInvoker
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 EqtTrace.Info("DefaultEngineInvoker.Invoke: Testhost process started with args :{0}",
                     string.Join(",", argsDictionary));
-#if NET451
+#if NET461
                 var appConfigText =
  System.IO.File.ReadAllText(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
                 EqtTrace.Info("DefaultEngineInvoker: Using Application Configuration: '{0}'", appConfigText);

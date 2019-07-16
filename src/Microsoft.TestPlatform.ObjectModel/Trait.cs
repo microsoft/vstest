@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Class that holds Trait. 
     /// A traits is Name, Value pair.
     /// </summary>
-#if NET451
+#if NET461
     [Serializable]
 #endif
     [DataContract]

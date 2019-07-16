@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.fileHelper = fileHelper;
         }
 
-#if NET451
+#if NET461
 
         /// <summary>
         /// TODO: Remove the #if when project is targeted to netstandard2.0

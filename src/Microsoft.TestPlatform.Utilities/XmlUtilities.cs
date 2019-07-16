@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             // Todo: There isn't an equivalent API to SecurityElement.Escape in Core yet. 
             // So trusting that the XML is always valid for now.
-#if NET451
+#if NET461
             var secureInnerXml = SecurityElement.Escape(innerXml);
 #else
             // fixing manually as we currently target to netcore 1.1 and we don't have default implementation for Escape functionality

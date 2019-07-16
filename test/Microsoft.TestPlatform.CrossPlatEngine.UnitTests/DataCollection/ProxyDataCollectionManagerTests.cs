@@ -108,7 +108,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void InitializeShouldPassDiagArgumentsIfDiagIsEnabled()
         {
             // Saving the EqtTrace state
-#if NET451
+#if NET461
             var traceLevel = EqtTrace.TraceLevel;
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else
@@ -136,7 +136,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             {
                 // Restoring to initial state for EqtTrace
                 EqtTrace.InitializeTrace(traceFileName, PlatformTraceLevel.Verbose);
-#if NET451
+#if NET461
                 EqtTrace.TraceLevel = traceLevel;
 #else
                 EqtTrace.TraceLevel = (PlatformTraceLevel)traceLevel;

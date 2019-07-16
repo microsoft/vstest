@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Encapsulates the context of the environment a data collector is being hosted in.
     /// </summary>
-#if NET451
+#if NET461
     [Serializable]
 #endif
     public sealed class DataCollectionEnvironmentContext

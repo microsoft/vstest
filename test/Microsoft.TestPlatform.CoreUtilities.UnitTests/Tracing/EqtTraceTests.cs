@@ -45,7 +45,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsVerboseEnabled()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -56,7 +56,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsErrorEnabled()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Error;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Error;
@@ -67,7 +67,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsInfoEnabled()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -78,7 +78,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void CheckIfTraceStateIsWarningEnabled()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Warning;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
@@ -89,7 +89,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteError()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Error;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Error;
@@ -101,7 +101,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteWarning()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Warning;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;
@@ -113,7 +113,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteVerbose()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -125,7 +125,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldWriteInfo()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -137,7 +137,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         [TestMethod]
         public void TraceShouldNotWriteVerboseIfTraceLevelIsInfo()
         {
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;
@@ -154,7 +154,7 @@ namespace TestPlatform.CoreUtilities.UnitTests
         public void TraceShouldNotWriteIfDoNotInitializationIsSetToTrue()
         {
             EqtTrace.DoNotInitailize = true;
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Info;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Info;

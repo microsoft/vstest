@@ -100,7 +100,7 @@ namespace testhost.UnitTests
         public void InvokeShouldInitializeTraceWithCorrectTraceLevel()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Verbose;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Verbose;
@@ -116,7 +116,7 @@ namespace testhost.UnitTests
         public void InvokeShouldInitializeTraceWithVerboseTraceLevelIfInvalidTraceLevelPassed()
         {
             // Setting EqtTrace.TraceLevel to a value other than info.
-#if NET451
+#if NET461
             EqtTrace.TraceLevel = TraceLevel.Warning;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Warning;

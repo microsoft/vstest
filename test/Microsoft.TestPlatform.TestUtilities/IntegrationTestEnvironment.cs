@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             // Need to remove this assumption when we move to a CDP.
             this.PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
             this.ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
-            this.RunnerFramework = "net451";
+            this.RunnerFramework = "net461";
         }
 
         /// <summary>

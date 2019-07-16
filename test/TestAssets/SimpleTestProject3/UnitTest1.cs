@@ -7,7 +7,7 @@ namespace SampleUnitTestProject3
     using System.IO;
     using System.Reflection;
     using System.Threading;
-#if NET451
+#if NET461
     using System.Windows.Forms;
 #endif
 
@@ -35,7 +35,7 @@ namespace SampleUnitTestProject3
             ExitWithStackoverFlow();
         }
 
-#if NET451
+#if NET461
         [TestMethod]
         public void UITestMethod()
         {

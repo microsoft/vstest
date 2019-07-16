@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Gets the help content resource name.
         /// </summary>
-#if NET451
+#if NET461
         public override string HelpContentResourceName => CommandLineResources.EnableLoggersArgumentHelp;
 #else
         public override string HelpContentResourceName => CommandLineResources.EnableLoggerArgumentsInNetCore;

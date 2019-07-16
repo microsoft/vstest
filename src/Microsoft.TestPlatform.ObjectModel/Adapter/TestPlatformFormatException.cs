@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 {
     using System;
     using System.Runtime.Serialization;
-#if NET451
+#if NET461
 using System.Security.Permissions;
 #endif
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -14,7 +14,7 @@ using System.Security.Permissions;
     /// Exception thrown on parsing error in user provided filter expression.
     /// This can happen when filter has invalid format or has unsupported properties.
     /// </summary>
-#if NET451
+#if NET461
     [Serializable]
 #endif
     public class TestPlatformFormatException : Exception
@@ -59,7 +59,7 @@ using System.Security.Permissions;
         {
         }
 
-#if NET451
+#if NET461
         /// <summary>
         /// Seralization constructor.
         /// </summary>
@@ -83,7 +83,7 @@ using System.Security.Permissions;
             private set;
         }
 
-#if NET451
+#if NET461
         /// <summary>
         /// Serialization helper.
         /// </summary>

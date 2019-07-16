@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
-    <TargetFrameworks>netcoreapp2.1;net451;uap10.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net461;uap10.0;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
@@ -56,15 +56,9 @@
       <Version>4.0.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Compile Include="net451\**\*.cs" />
     <Compile Include="common\**\*.cs" />
-    <PackageReference Include="Microsoft.Internal.Dia.Interop">
-      <Version>14.0.0</Version>
-    </PackageReference>
-    <Reference Include="System.Configuration" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
     <Compile Include="uap10.0\**\*.cs" />
