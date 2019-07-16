@@ -130,7 +130,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         /// <summary>
         /// Gets the target framework.
-        /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
+        /// Supported values = <c>net461</c>, <c>netcoreapp1.0</c>.
         /// </summary>
         public string TargetFramework
         {
