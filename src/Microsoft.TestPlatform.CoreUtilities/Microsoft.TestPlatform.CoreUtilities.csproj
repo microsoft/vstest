@@ -17,6 +17,14 @@
       <Version>4.0.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="Microsoft.Internal.Dia.Interop">
+      <Version>14.0.0</Version>
+    </PackageReference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
