@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using System.IO;
+    using vstest.console.Internal;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -283,28 +284,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
             }
-
+            var filePatternParser = new FilePatternParser();
             source = source.Trim();
-
+            
             // Convert the relative path to absolute path
-            if(!Path.IsPathRooted(source))
+            if (!Path.IsPathRooted(source))
             {
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
             }
 
-            if (!FileHelper.Exists(source))
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
-            }
+            var sourceFiles = filePatternParser.GetMatchingFiles(source);
 
-            if (this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
+            foreach (var sourceFile in sourceFiles)
             {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateSource, source));
-            }
+                if (!FileHelper.Exists(sourceFile))
+                {
+                    throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
+                }
 
-            this.sources.Add(source);
+                if (this.sources.Contains(sourceFile, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateSource, source));
+                }
+
+                this.sources.Add(sourceFile);
+            }
         }
 
         #endregion
