@@ -20,15 +20,6 @@
       </count-group>
     </header>
     <body>
-      <trans-unit id="DuplicateSource">
-        <source>Duplicate source {0} specified.</source>
-        <target state="translated">Yinelenen {0} kaynağı belirtildi.</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Doppelte Quelle {0} angegeben.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
-      </trans-unit>
       <trans-unit id="FileNotFound">
         <source>'{0}' not found.</source>
         <target state="translated">'{0}' bulunamadı.</target>
@@ -1651,6 +1642,11 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="translated">    Atlandı: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestSourcesDiscovered">
+        <source>A total of {0} test source files are discovered.</source>
+        <target state="new">A total of {0} test source files are discovered.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -81,17 +81,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         }
 
         [TestMethod]
-        public void CommandLineOptionsAddSourceShouldAddSourceThrowExceptionIfDuplicateSource()
-        {
-            var testFilePath = "C:\\DummyTestFile.txt";
-            this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
-
-            CommandLineOptions.Instance.AddSource(testFilePath);
-            Assert.That.Throws<CommandLineException>(() => CommandLineOptions.Instance.AddSource(testFilePath))
-                .WithExactMessage("Duplicate source " + testFilePath + " specified.");
-        }
-
-        [TestMethod]
         public void CommandLineOptionsAddSourceShouldAddSourceForValidSource()
         {
             string testFilePath = "C:\\DummyTestFile.txt";

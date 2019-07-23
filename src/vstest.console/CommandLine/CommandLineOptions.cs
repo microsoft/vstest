@@ -305,8 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                 if (this.sources.Contains(sourceFile, StringComparer.OrdinalIgnoreCase))
                 {
-                    throw new CommandLineException(
-                        string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateSource, source));
+                    continue;
                 }
 
                 this.sources.Add(sourceFile);

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
@@ -16,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
@@ -813,6 +815,90 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void TestRunStartHandlerShouldWriteNumberOfTestSourcesDiscoveredOnConsole()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+
+            var fileHelper = new Mock<IFileHelper>();
+            CommandLineOptions.Instance.Reset();
+            CommandLineOptions.Instance.FileHelper = fileHelper.Object;
+            string testFilePath = "C:\\DummyTestFile.dll";
+            fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            string testFilePath2 = "C:\\DummyTestFile2.dll";
+            fileHelper.Setup(fh => fh.Exists(testFilePath2)).Returns(true);
+
+            CommandLineOptions.Instance.AddSource(testFilePath);
+
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
+            loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunStartHandlerShouldWriteTestSourcesDiscoveredOnConsoleIfVerbosityDetailed()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+
+            var fileHelper = new Mock<IFileHelper>();
+            CommandLineOptions.Instance.Reset();
+            CommandLineOptions.Instance.FileHelper = fileHelper.Object;
+            string testFilePath = "C:\\DummyTestFile.dll";
+            fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            string testFilePath2 = "C:\\DummyTestFile2.dll";
+            fileHelper.Setup(fh => fh.Exists(testFilePath2)).Returns(true);
+
+            CommandLineOptions.Instance.AddSource(testFilePath);
+            CommandLineOptions.Instance.AddSource(testFilePath2);
+
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "detailed");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
+            loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile.dll", OutputLevel.Information), Times.Once);
+            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile2.dll", OutputLevel.Information), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestRunStartHandlerShouldNotWriteTestSourcesDiscoveredOnConsoleIfVerbosityNotDetailed()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+
+            var fileHelper = new Mock<IFileHelper>();
+            CommandLineOptions.Instance.Reset();
+            CommandLineOptions.Instance.FileHelper = fileHelper.Object;
+            string testFilePath = "C:\\DummyTestFile.dll";
+            fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            string testFilePath2 = "C:\\DummyTestFile2.dll";
+            fileHelper.Setup(fh => fh.Exists(testFilePath2)).Returns(true);
+
+            CommandLineOptions.Instance.AddSource(testFilePath);
+            CommandLineOptions.Instance.AddSource(testFilePath2);
+
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
+            loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile.dll", OutputLevel.Information), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile2.dll", OutputLevel.Information), Times.Never);
+        }
+
+        [TestMethod]
         public void PrintTimeHandlerShouldPrintElapsedTimeOnConsole()
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
@@ -882,7 +968,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.Write(PassedTestIndicator, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(" Hello", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(String.Empty, OutputLevel.Information), Times.AtLeastOnce);
         }
 
         [TestMethod]

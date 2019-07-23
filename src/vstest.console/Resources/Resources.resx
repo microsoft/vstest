@@ -221,9 +221,6 @@
   <data name="DuplicateArgumentError" xml:space="preserve">
     <value>The parameter "{0}" should be provided only once.</value>
   </data>
-  <data name="DuplicateSource" xml:space="preserve">
-    <value>Duplicate source {0} specified.</value>
-  </data>
   <data name="EnableCodeCoverageArgumentProcessorHelp" xml:space="preserve">
     <value>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</value>
@@ -729,5 +726,8 @@
   </data>
   <data name="ProgressIndicatorString" xml:space="preserve">
     <value>Test run in progress</value>
+  </data>
+  <data name="TestSourcesDiscovered" xml:space="preserve">
+    <value>A total of {0} test source files are discovered.</value>
   </data>
 </root>

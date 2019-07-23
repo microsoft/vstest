@@ -35,18 +35,22 @@ namespace vstest.console.Internal
         public IEnumerable<string> GetMatchingFiles(string filePattern)
         {
             var matchingFiles = new List<string>();
+
+            // If there is no wildcard, return the filename as it is.
             if(filePattern.IndexOfAny(wildCardCharacters) == -1)
             {
                 matchingFiles.Add(filePattern);
                 return matchingFiles;
             }
 
+            // Split the given wildcard into search directory and pattern to be searched.
             var splitPattern = SplitFilePatternOnWildCard(filePattern);
             this.matcherHelper.AddInclude(splitPattern.Item2);
-            var dirinfo = new DirectoryInfoWrapper(new DirectoryInfo(splitPattern.Item1));
-            var name = dirinfo.FullName;
+
+            // Execute the given pattern in the search directory.
             var matches = this.matcherHelper.Execute(new DirectoryInfoWrapper(new DirectoryInfo(splitPattern.Item1)));
 
+            // Add all the files to the list of matching files.
             foreach(var match in matches.Files)
             {
                 matchingFiles.Add(Path.Combine(splitPattern.Item1, match.Path));
@@ -60,8 +64,8 @@ namespace vstest.console.Internal
         /// </summary>
         private Tuple<string, string> SplitFilePatternOnWildCard(string filePattern)
         {
+            // Split the pattern based on first wildcard character found.
             var splitOnWildCardIndex = filePattern.IndexOfAny(wildCardCharacters);
-
             var directorySeparatorIndex = filePattern.Substring(0, splitOnWildCardIndex).LastIndexOf(Path.DirectorySeparatorChar);
 
             string searchDir = filePattern.Substring(0, directorySeparatorIndex);
