@@ -825,8 +825,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
             string testFilePath = "C:\\DummyTestFile.dll";
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
-            string testFilePath2 = "C:\\DummyTestFile2.dll";
-            fileHelper.Setup(fh => fh.Exists(testFilePath2)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
 
@@ -836,6 +834,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
         }
@@ -863,6 +862,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile.dll", OutputLevel.Information), Times.Once);
@@ -892,6 +892,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { "C:\\DummyTestFile.dll" }, 1));
             loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+            loggerEvents.WaitForEventCompletion();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine("C:\\DummyTestFile.dll", OutputLevel.Information), Times.Never);
