@@ -290,16 +290,17 @@
       </trans-unit>
       <trans-unit id="RunTestsArgumentHelp">
         <source>[TestFileNames]
-      Run tests from the specified files. Separate multiple test file names
+      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
       by spaces.
       Examples: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</source>
-        <target state="translated">[NomiFileTest]
+                mytestproject.dll myothertestproject.exe
+                e:\code\**\*testproject.dll mytestproject.dll</source>
+        <target state="new">[NomiFileTest]
       Esegue test dai file specificati. Separare più nomi di file di test
       con spazi.
       Esempi: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1645,7 +1646,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
-        <source>A total of {0} test source files are discovered.</source>
+        <source>A total of {0} test source files are matched with the specified files/pattern.</source>
         <target state="new">A total of {0} test source files are discovered.</target>
         <note></note>
       </trans-unit>

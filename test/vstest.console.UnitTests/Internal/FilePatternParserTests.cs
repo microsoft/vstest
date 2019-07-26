@@ -9,18 +9,17 @@ namespace vstest.console.UnitTests.Internal
     using Moq;
     using System.Collections.Generic;
     using vstest.console.Internal;
-    using vstest.console.Internal.Interfaces;
 
     [TestClass]
     public class FilePatternParserTests
     {
         private FilePatternParser filePatternParser;
-        private Mock<IMatcherHelper> mockMatcherHelper;
+        private Mock<Matcher> mockMatcherHelper;
 
         [TestInitialize]
         public void TestInit()
         {
-            this.mockMatcherHelper = new Mock<IMatcherHelper>();
+            this.mockMatcherHelper = new Mock<Matcher>();
             this.filePatternParser = new FilePatternParser(this.mockMatcherHelper.Object);
         }
 
@@ -28,10 +27,12 @@ namespace vstest.console.UnitTests.Internal
         public void FilePatternParserShouldCorrectlySplitPatternAndDirectory()
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+            var sourceFiles = new List<string>();
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"C:\Users\vanidhi\Desktop\a\c\*bc.dll");
+            var isValidPattern = this.filePatternParser.IsValidPattern(@"C:\Users\vanidhi\Desktop\a\c\*bc.dll", out sourceFiles);
 
             //Assert
+            Assert.IsTrue(isValidPattern);
             this.mockMatcherHelper.Verify(x => x.AddInclude(@"*bc.dll"));
             this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"C:\Users\vanidhi\Desktop\a\c"))));
         }
@@ -40,10 +41,12 @@ namespace vstest.console.UnitTests.Internal
         public void FilePatternParserShouldCorrectlySplitWithArbitraryDirectoryDepth()
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+            var sourceFiles = new List<string>();
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"C:\Users\vanidhi\**\c\*bc.txt");
+            var isValidPattern = this.filePatternParser.IsValidPattern(@"C:\Users\vanidhi\**\c\*bc.txt", out sourceFiles);
 
             //Assert
+            Assert.IsTrue(isValidPattern);
             this.mockMatcherHelper.Verify(x => x.AddInclude(@"**\c\*bc.txt"));
             this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"C:\Users\vanidhi"))));
         }
@@ -52,12 +55,54 @@ namespace vstest.console.UnitTests.Internal
         public void FilePatternParserShouldCorrectlySplitWithWildCardInMultipleDirectory()
         {
             var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+            var sourceFiles = new List<string>();
             this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
-            this.filePatternParser.GetMatchingFiles(@"E:\path\to\project\tests\**.Tests\**\*.Tests.dll");
+            var isValidPattern = this.filePatternParser.IsValidPattern(@"E:\path\to\project\tests\**.Tests\**\*.Tests.dll", out sourceFiles);
 
             //Assert
+            Assert.IsTrue(isValidPattern);
             this.mockMatcherHelper.Verify(x => x.AddInclude(@"**.Tests\**\*.Tests.dll"));
             this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"E:\path\to\project\tests"))));
+        }
+
+        [TestMethod]
+        public void FilePatternParserShouldCorrectlySplitWithMultpleWildCardInPattern()
+        {
+            var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+            var sourceFiles = new List<string>();
+            this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+            var isValidPattern = this.filePatternParser.IsValidPattern(@"E:\path\to\project\tests\Tests*.Blame*.dll", out sourceFiles);
+
+            //Assert
+            Assert.IsTrue(isValidPattern);
+            this.mockMatcherHelper.Verify(x => x.AddInclude(@"Tests*.Blame*.dll"));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"E:\path\to\project\tests"))));
+        }
+
+        [TestMethod]
+        public void FilePatternParserShouldCorrectlySplitWithMultpleWildCardInMultipleDirectory()
+        {
+            var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+            var sourceFiles = new List<string>();
+            this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+            var isValidPattern = this.filePatternParser.IsValidPattern(@"E:\path\to\project\*tests\Tests*.Blame*.dll", out sourceFiles);
+
+            //Assert
+            Assert.IsTrue(isValidPattern);
+            this.mockMatcherHelper.Verify(x => x.AddInclude(@"*tests\Tests*.Blame*.dll"));
+            this.mockMatcherHelper.Verify(x => x.Execute(It.Is<DirectoryInfoWrapper>(y => y.FullName.Equals(@"E:\path\to\project"))));
+        }
+
+        [TestMethod]
+        public void IsValidPatternShouldReturnFalseForAbsoluteSourcePath()
+        {
+            var patternMatchingResult = new PatternMatchingResult(new List<FilePatternMatch>());
+            var sourceFiles = new List<string>();
+            this.mockMatcherHelper.Setup(x => x.Execute(It.IsAny<DirectoryInfoWrapper>())).Returns(patternMatchingResult);
+            var isValidPattern = this.filePatternParser.IsValidPattern(@"E:\path\to\project\tests\Blame.Tests\\abc.Tests.dll", out sourceFiles);
+
+            //Assert
+            Assert.IsFalse(isValidPattern);
         }
     }
 }

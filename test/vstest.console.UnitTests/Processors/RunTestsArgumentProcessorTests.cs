@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunTestsArgumentProcessorCapabilities capabilities = new RunTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/RunTests", capabilities.CommandName);
-            Assert.AreEqual("[TestFileNames]" + Environment.NewLine + "      Run tests from the specified files. Separate multiple test file names" + Environment.NewLine + "      by spaces." + Environment.NewLine + "      Examples: mytestproject.dll" + Environment.NewLine + "                mytestproject.dll myothertestproject.exe", capabilities.HelpContentResourceName);
+            Assert.AreEqual("[TestFileNames]" + Environment.NewLine + "      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern" + Environment.NewLine + "      by spaces." + Environment.NewLine + "      Examples: mytestproject.dll" + Environment.NewLine + "                mytestproject.dll myothertestproject.exe" + Environment.NewLine + @"                e:\code\**\*testproject.dll mytestproject.dll", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.RunTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(true, capabilities.IsAction);

@@ -3,12 +3,12 @@
 
 namespace vstest.console.Internal
 {
+    using Microsoft.Extensions.FileSystemGlobbing;
     using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using vstest.console.Internal.Interfaces;
 
     /// <summary>
     /// Class for getting matching files from wild card pattern file name
@@ -16,47 +16,50 @@ namespace vstest.console.Internal
     /// </summary>
     public class FilePatternParser
     {
-        private IMatcherHelper matcherHelper;
+        private Matcher matcher;
         private char[] wildCardCharacters = { '*' };
 
         public FilePatternParser()
-            : this(new MatcherHelper())
+            : this(new Matcher())
         {
         }
 
-        internal FilePatternParser(IMatcherHelper matcherHelper)
+        internal FilePatternParser(Matcher matcher)
         {
-            this.matcherHelper = matcherHelper;
+            this.matcher = matcher;
         }
 
         /// <summary>
         /// Used to get matching files with pattern
         /// </summary>
-        public IEnumerable<string> GetMatchingFiles(string filePattern)
+        /// <returns>If the file is a valid pattern or full path. Returns true if it is valid pattern</returns>
+        public bool IsValidPattern(string filePattern, out List<string> matchingFiles)
         {
-            var matchingFiles = new List<string>();
+            matchingFiles = new List<string>();
 
-            // If there is no wildcard, return the filename as it is.
+            // If there is no wildcard, return false.
             if(filePattern.IndexOfAny(wildCardCharacters) == -1)
             {
-                matchingFiles.Add(filePattern);
-                return matchingFiles;
+                EqtTrace.Info($"FilePatternParser: The given file {filePattern} is a full path.");
+                return false;
             }
 
             // Split the given wildcard into search directory and pattern to be searched.
             var splitPattern = SplitFilePatternOnWildCard(filePattern);
-            this.matcherHelper.AddInclude(splitPattern.Item2);
+            EqtTrace.Info($"FilePatternParser: Matching file pattern '{splitPattern.Item2}' within directory '{splitPattern.Item1}'");
+
+            this.matcher.AddInclude(splitPattern.Item2);
 
             // Execute the given pattern in the search directory.
-            var matches = this.matcherHelper.Execute(new DirectoryInfoWrapper(new DirectoryInfo(splitPattern.Item1)));
+            var matches = this.matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(splitPattern.Item1)));
 
             // Add all the files to the list of matching files.
-            foreach(var match in matches.Files)
+            foreach (var match in matches.Files)
             {
                 matchingFiles.Add(Path.Combine(splitPattern.Item1, match.Path));
             }
 
-            return matchingFiles;
+            return true;
         }
 
         /// <summary>

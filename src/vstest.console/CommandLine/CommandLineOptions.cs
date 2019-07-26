@@ -284,7 +284,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
             }
-            var filePatternParser = new FilePatternParser();
+            
             source = source.Trim();
             
             // Convert the relative path to absolute path
@@ -293,22 +293,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
             }
 
-            var sourceFiles = filePatternParser.GetMatchingFiles(source);
+            var filePatternParser = new FilePatternParser();
+            var sourceFiles = new List<string>();
+            var isValidPattern = filePatternParser.IsValidPattern(source, out sourceFiles);
 
-            foreach (var sourceFile in sourceFiles)
+            // If the given file is a full path and not a pattern
+            if (!isValidPattern)
             {
-                if (!FileHelper.Exists(sourceFile))
+                if (!FileHelper.Exists(source))
                 {
                     throw new CommandLineException(
                         string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
                 }
 
-                if (this.sources.Contains(sourceFile, StringComparer.OrdinalIgnoreCase))
+                if (!this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
                 {
-                    continue;
+                    this.sources.Add(source);
                 }
+            }
+            else
+            {
+                foreach (var sourceFile in sourceFiles)
+                {
+                    if (this.sources.Contains(sourceFile, StringComparer.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
 
-                this.sources.Add(sourceFile);
+                    this.sources.Add(sourceFile);
+                }
             }
         }
 
