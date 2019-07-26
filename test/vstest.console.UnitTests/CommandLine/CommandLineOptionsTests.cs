@@ -90,5 +90,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             
             Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(testFilePath));
         }
+
+        [TestMethod]
+        public void CommandLineOptionsShouldCheckIfFileExistesIfFilePathDoesNotContainPattern()
+        {
+            string testFilePath = "C:\\DummyTestFile.txt";
+            this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+
+            CommandLineOptions.Instance.AddSource(testFilePath);
+
+            this.fileHelper.Verify(x => x.Exists("C:\\DummyTestFile.txt"), Times.Once);
+            Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(testFilePath));
+        }
+
+        [TestMethod]
+        public void CommandLineOptionsShouldCheckIfFileExistesIfFilePathContainsPattern()
+        {
+            string testFilePath = "C:\\Folder1\\Folder*\\DummyTestFile.txt";
+            this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+
+            CommandLineOptions.Instance.AddSource(testFilePath);
+
+            this.fileHelper.Verify(x => x.Exists(It.IsAny<string>()), Times.Never);
+        }
     }
 }
