@@ -59,9 +59,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var testAssembly = this.GetSampleTestAssembly();
-            var oldAssemblyPath = Path.Combine("Debug", this.testEnvironment.TargetFramework, "SimpleTestProject.dll");
-            var newAssemblyPath = Path.Combine("**", this.testEnvironment.TargetFramework, "*TestProj*.dll");
-            testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
+            testAssembly = testAssembly.Replace("SimpleTestProject.dll", "*TestProj*.dll");
 
             var wildCardIndex = testAssembly.IndexOfAny(new char[] { '*' });
             var testAssemblyDirectory = testAssembly.Substring(0, wildCardIndex);
