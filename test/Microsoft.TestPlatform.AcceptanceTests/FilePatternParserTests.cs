@@ -54,6 +54,34 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
+        public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssembly = this.GetSampleTestAssembly();
+            var oldAssemblyPath = Path.Combine("Debug", this.testEnvironment.TargetFramework, "SimpleTestProject.dll");
+            var newAssemblyPath = Path.Combine("**", this.testEnvironment.TargetFramework, "*TestProj*.dll");
+            testAssembly = testAssembly.Replace(oldAssemblyPath, newAssemblyPath);
+
+            var wildCardIndex = testAssembly.IndexOfAny(new char[] { '*' });
+            var testAssemblyDirectory = testAssembly.Substring(0, wildCardIndex);
+            testAssembly = testAssembly.Substring(wildCardIndex);
+
+            Directory.SetCurrentDirectory(testAssemblyDirectory);
+
+            var arguments = PrepareArguments(
+               testAssembly,
+               this.GetTestAdapterPath(),
+               string.Empty, string.Empty,
+               runnerInfo.InIsolationValue);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 1, 1);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void WildCardPatternShouldCorrectlyWorkOnMultipleFiles(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);

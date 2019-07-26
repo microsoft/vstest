@@ -297,21 +297,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             var sourceFiles = new List<string>();
             var isValidPattern = filePatternParser.IsValidPattern(source, out sourceFiles);
 
-            // If the given file is a full path and not a pattern
-            if (!isValidPattern)
-            {
-                if (!FileHelper.Exists(source))
-                {
-                    throw new CommandLineException(
-                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
-                }
-
-                if (!this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
-                {
-                    this.sources.Add(source);
-                }
-            }
-            else
+            // If the given file is a valid pattern
+            if (isValidPattern)
             {
                 foreach (var sourceFile in sourceFiles)
                 {
@@ -322,6 +309,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                     this.sources.Add(sourceFile);
                 }
+
+                return;
+            }
+
+            // If the given file is not a pattern, check if it exists.
+            if (!FileHelper.Exists(source))
+            {
+                throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
+            }
+
+            // Add the file to the source list if not already present.
+            if (!this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
+            {
+                this.sources.Add(source);
             }
         }
 
