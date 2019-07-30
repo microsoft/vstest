@@ -3,13 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public interface IHtmlTransformer
     {
         /// <summary>
-        /// 
+        /// It transforms the xmlfile to htmlfile 
         /// </summary>
         /// <param name="xmlfile"></param>
         /// <param name="htmlfile"></param>

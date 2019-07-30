@@ -11,16 +11,14 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
     using ObjectModel = VisualStudio.TestPlatform.ObjectModel;
     using VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
-    using HtmlLoggerConstants = Microsoft.TestPlatform.Extensions.HtmlLogger.Utility.Constants;
+    using HtmlLoggerConstants = Utility.Constants;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using HtmlLogger = VisualStudio.TestPlatform.Extensions.HtmlLogger;
-    using System.Text;
     using System.Collections.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Linq;
-    using System.Xml;
-    using System.Xml.Linq;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using System.Runtime.Serialization;
 
     [TestClass]
     public class HtmlLoggerTests
@@ -30,20 +28,28 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         private Dictionary<string, string> parameters;
         private static string DefaultTestRunDirectory = Path.GetTempPath();
         private static string DefaultLogFileNameParameterValue = "logfilevalue.trx";
+
         private Mock<IFileHelper> mockFileHelper;
+        private Mock<XmlObjectSerializer> mockXmlSerializer ;
+        private Mock<IHtmlTransformer> mockHtmlTransformer;
 
         [TestInitialize]
         public void Initialize()
         {
             this.events = new Mock<TestLoggerEvents>();
-            this.htmlLogger = new Htmllogger();
+            this.mockFileHelper = new Mock<IFileHelper>();
+            this.mockHtmlTransformer = new Mock<IHtmlTransformer>();
+            this.mockXmlSerializer = new Mock<XmlObjectSerializer>();
+            this.htmlLogger = new Htmllogger(this.mockFileHelper.Object, this.mockHtmlTransformer.Object, this.mockXmlSerializer.Object);
             this.parameters = new Dictionary<string, string>(2);
-            this.parameters[ObjectModel.DefaultLoggerParameterNames.TestRunDirectory] = HtmlLoggerTests.DefaultTestRunDirectory;
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = HtmlLoggerTests.DefaultTestRunDirectory;
             this.parameters[HtmlLoggerConstants.LogFileNameKey] = HtmlLoggerTests.DefaultLogFileNameParameterValue;
             this.htmlLogger.Initialize(this.events.Object, this.parameters);
-
-
         }
+
+        /// <summary>
+        /// if events is null initialize should throw exception
+        /// </summary>
         [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
@@ -54,6 +60,9 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 });
         }
 
+        /// <summary>
+        /// initilaize should initialize all Properties
+        /// </summary>
         [TestMethod]
         public void InitializeShouldInitializeAllProperties()
         {
@@ -63,13 +72,13 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.Initialize(events.Object, testResultDir);
 
             Assert.AreEqual(this.htmlLogger.TestResultsDirPath, testResultDir);
-            Assert.IsNotNull(this.htmlLogger.GetTestResults());
-           
-            Assert.IsNotNull(this.htmlLogger.GetResults());
+            Assert.IsNotNull(this.htmlLogger.TestResults);
+            Assert.IsNotNull(this.htmlLogger.Results);
         }
 
-        
-
+        /// <summary>
+        /// if test run directory is null the initialize should throw exception
+        /// </summary>
         [TestMethod]
         public void InitializeShouldThrowExceptionIfTestRunDirectoryIsEmptyOrNull()
         {
@@ -82,7 +91,9 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 });
         }
 
-      
+        /// <summary>
+        /// initialize should throw exception if parameters are empty
+        /// </summary>
         [TestMethod]
         public void InitializeShouldThrowExceptionIfParametersAreEmpty()
         {
@@ -90,6 +101,9 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.ThrowsException<ArgumentException>(() => this.htmlLogger.Initialize(events.Object, new Dictionary<string, string>()));
         }
 
+        /// <summary>
+        /// if event args is null test message handler should throw exception
+        /// </summary>
         [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
@@ -99,62 +113,61 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             });
         }
 
+        /// <summary>
+        /// Test message handler should add informational messages to list of informational strings in test results
+        /// </summary>
         [TestMethod]
         public void TestMessageHandlerShouldAddMessageWhenItIsInformation()
         {
             string message = "First message";
-            
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
-            HtmlLogger.TestResults testResults = this.CreateTestResults();
-            this.htmlLogger.SetTestResults(testResults);
+            
             this.htmlLogger.TestMessageHandler(new object(), trme);
  
-            string actualMessage = this.htmlLogger.GetTestResults().RunLevelMessageInformational.First();
-            Assert.AreEqual(message, actualMessage.ToString());
-           
+            string actualMessage = this.htmlLogger.TestResults.RunLevelMessageInformational.First();
+            Assert.AreEqual(message, actualMessage.ToString());   
         }
 
+        /// <summary>
+        /// Test message handler should add ierror and warning messages to list of error and warning strings in test results
+        /// </summary>
         [TestMethod]
         public void TestMessageHandlerShouldAddMessageInListIfItIsWarningAndError()
         {
             string message = "error message";
             string message2 = "warning message";
-  
-            HtmlLogger.TestResults testResults = this.CreateTestResults();
-            this.htmlLogger.SetTestResults(testResults); 
 
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
             this.htmlLogger.TestMessageHandler(new object(), trme);
             TestRunMessageEventArgs trme2 = new TestRunMessageEventArgs(TestMessageLevel.Warning, message2);
             this.htmlLogger.TestMessageHandler(new object(), trme2);
             
-           
-
-            Assert.AreEqual(message, this.htmlLogger.GetTestResults().RunLevelMessageErrorAndWarning.First());
-            Assert.AreEqual(2, this.htmlLogger.GetTestResults().RunLevelMessageErrorAndWarning.Count());
+            Assert.AreEqual(message, this.htmlLogger.TestResults.RunLevelMessageErrorAndWarning.First());
+            Assert.AreEqual(2, this.htmlLogger.TestResults.RunLevelMessageErrorAndWarning.Count());
         }
 
-        
-        
+        /// <summary>
+        /// Test result handler should keep track of passed failed total skipped tests summary
+        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldKeepTrackofSummary()
         {
-            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
-            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
-            ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
-            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
+            TestCase passTestCase1 = CreateTestCase("Pass1");
+            TestCase passTestCase2 = CreateTestCase("Pass2");
+            TestCase failTestCase1 = CreateTestCase("Fail1");
+            TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
-            passResult1.Outcome = ObjectModel.TestOutcome.Passed;
+            passResult1.Outcome = TestOutcome.Passed;
 
             ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2);
-            passResult2.Outcome = ObjectModel.TestOutcome.Passed;
+            passResult2.Outcome = TestOutcome.Passed;
 
             ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1);
-            failResult1.Outcome = ObjectModel.TestOutcome.Failed;
+            failResult1.Outcome = TestOutcome.Failed;
 
             ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            skipResult1.Outcome = TestOutcome.Skipped;
 
             Mock<TestResultEventArgs> pass1 = new Mock<TestResultEventArgs>(passResult1);
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);
@@ -167,17 +180,19 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), fail1.Object);
             this.htmlLogger.TestResultHandler(new object(), skip1.Object);
 
-            Assert.AreEqual(this.htmlLogger.passTests, 2, "Passed Tests");
-            Assert.AreEqual(this.htmlLogger.failTests, 1, "Failed Tests");
-            Assert.AreEqual(this.htmlLogger.totalTests, 4, "Total Tests");
-
+            Assert.AreEqual(this.htmlLogger.PassedTests, 2, "Passed Tests");
+            Assert.AreEqual(this.htmlLogger.FailedTests, 1, "Failed Tests");
+            Assert.AreEqual(this.htmlLogger.TotalTests, 4, "Total Tests");
         }
 
+        /// <summary>
+        /// Test Result handler should set dispaly name in test result Properly
+        /// </summary>
         [TestMethod]
-        public void TestResultHandlerShouldCreateDisplayNameIfNullProperly()
+        public void TestResultHandlerShouldSetDisplayNameIfNullProperly()
         {
             //this assert is for checking result dispalyname equals to null
-            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
+            TestCase passTestCase1 = CreateTestCase("Pass1");
             ObjectModel.TestResult PassTestResultExpected = new ObjectModel.TestResult(passTestCase1);
             PassTestResultExpected.DisplayName = null;
             PassTestResultExpected.TestCase.DisplayName = "abc";
@@ -191,12 +206,9 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             passTestResultActual.resultOutcome = TestOutcome.Passed;
             passTestResultActual.DisplayName = "abc";
 
-            Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.GetTestResults().Results.First().DisplayName);
-          //  Assert.AreEqual( passTestResultActual,this.htmlLogger.GetTestResults().Results.First());
-
-            //this assert is for checking result dispalyname equals to notnull
-
-            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass1");
+            Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.TestResults.Results.First().DisplayName);
+       
+            TestCase passTestCase2 = CreateTestCase("Pass1");
             ObjectModel.TestResult PassTestResultExpected1 = new ObjectModel.TestResult(passTestCase1);
             PassTestResultExpected.DisplayName = "def";
             PassTestResultExpected.TestCase.DisplayName = "abc";
@@ -208,42 +220,16 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             passTestResultActual.resultOutcome = TestOutcome.Passed;
             passTestResultActual.DisplayName = "def";
 
-            Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.GetTestResults().Results.Last().DisplayName);
-           // Assert.AreEqual(passTestResultActual1, this.htmlLogger.GetTestResults().Results.First());
-
-
+            Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.TestResults.Results.Last().DisplayName);           
         }
 
-        [TestMethod]
-        public void TestResultHandlerShouldCreateDisplayNameIfNotNullProperly()
-        {
-           
-            //this assert is for checking result dispalyname equals to notnull
-
-            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass1");
-            ObjectModel.TestResult PassTestResultExpected1 = new ObjectModel.TestResult(passTestCase2);
-            PassTestResultExpected1.DisplayName = "def";
-            PassTestResultExpected1.TestCase.DisplayName = "abc";
-
-            Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(PassTestResultExpected1);
-            this.htmlLogger.TestResultHandler(new object(), pass2.Object);
-
-            HtmlLogger.TestResult passTestResultActual1 = new HtmlLogger.TestResult();
-            passTestResultActual1.resultOutcome = TestOutcome.Passed;
-            passTestResultActual1.DisplayName = "def";
-
-
-            Assert.AreEqual(passTestResultActual1, this.htmlLogger.GetTestResults().Results.First());
-
-        }
-
+        /// <summary>
+        /// Test Result Handler should create test result  properly
+        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldCreateTestResultProperly()
         {
-
-            //this assert is for checking result dispalyname equals to notnull
-
-            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass1");
+                TestCase passTestCase2 = CreateTestCase("Pass1");
                 passTestCase2.DisplayName = "abc";
                 passTestCase2.FullyQualifiedName = "fully";
 
@@ -251,49 +237,37 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             {
                 DisplayName = "def",
                 ErrorMessage = "error message",
-                ErrorStackTrace = "Error strack trace"
+                ErrorStackTrace = "Error strack trace",
+                Duration = TimeSpan.Zero
             };
-
 
             Mock<TestResultEventArgs> eventArg = new Mock<TestResultEventArgs>(PassTestResultExpected1);
 
             this.htmlLogger.TestResultHandler(new object(), eventArg.Object);
 
-            var result = this.htmlLogger.GetTestResults().Results.First();
-
-            Assert.AreEqual(result.Duration, "");
-            Assert.AreEqual(result.Duration, "");
-            Assert.AreEqual(result.Duration, "");
-            Assert.AreEqual(result.Duration, "");
-            Assert.AreEqual(result.Duration, "");
-
+            var result = this.htmlLogger.TestResults.Results.First();
+           
+            Assert.AreEqual(result.DisplayName, "def");
+            Assert.AreEqual(result.ErrorMessage, "error message");
+            Assert.AreEqual(result.ErrorStackTrace, "Error strack trace");
+            Assert.AreEqual(result.FullyQualifiedName, "fully");
+            Assert.AreEqual(result.Duration, null);
         }
 
-
-
-        private HtmlLogger.TestResult CreateTestResult(ObjectModel.TestOutcome testoutcome,string displayName)
-        {
-
-            HtmlLogger.TestResult testResult = new HtmlLogger.TestResult();
-            testResult.resultOutcome = testoutcome;
-            testResult.DisplayName = displayName;
-            return testResult;
-        }
-
+        /// <summary>
+        /// test result should create one test result for one resutlt event args 
+        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldCreateOneTestEntryForEachTestCase()
         {
-            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
-            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
-
-            HtmlLogger.TestResults testResults = this.CreateTestResults();
-            this.htmlLogger.SetTestResults(testResults);
-
+            TestCase testCase1 = CreateTestCase("TestCase1");
+            TestCase testCase2 = CreateTestCase("TestCase2");
+            
             ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
-            result1.Outcome = ObjectModel.TestOutcome.Failed;
+            result1.Outcome = TestOutcome.Failed;
 
             ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
-            result2.Outcome = ObjectModel.TestOutcome.Passed;
+            result2.Outcome = TestOutcome.Passed;
 
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
@@ -301,15 +275,15 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.htmlLogger.GetTestResults().GetTestResultscount(), 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(this.htmlLogger.TestResults.GetTestResultscount(), 2, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
         public void TestResultHandlerShouldAddHierarchicalResultsForOrderedTest()
         {
-            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
-            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
-            ObjectModel.TestCase testCase3 = CreateTestCase("TestCase3");
+           TestCase testCase1 = CreateTestCase("TestCase1");
+           TestCase testCase2 = CreateTestCase("TestCase2");
+           TestCase testCase3 = CreateTestCase("TestCase3");
 
             Guid parentExecutionId = Guid.NewGuid();
 
@@ -317,51 +291,54 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             result1.SetPropertyValue<Guid>(HtmlLoggerConstants.ExecutionIdProperty, parentExecutionId);
             result1.SetPropertyValue<Guid>(HtmlLoggerConstants.TestTypeProperty, HtmlLoggerConstants.OrderedTestTypeGuid);
 
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            Assert.AreEqual(this.htmlLogger.TestResults.GetTestResultscount(), 1, "testhandler is adding parent result correctly");
+            Assert.IsNull(this.htmlLogger.TestResults.Results[0].innerTestResults,  "testhandler is adding child result correctly");
+
             ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
             result2.SetPropertyValue<Guid>(HtmlLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result2.SetPropertyValue<Guid>(HtmlLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
             ObjectModel.TestResult result3 = new ObjectModel.TestResult(testCase3);
-            result3.Outcome = ObjectModel.TestOutcome.Failed;
+            result3.Outcome = TestOutcome.Failed;
             result3.SetPropertyValue<Guid>(HtmlLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
             result3.SetPropertyValue<Guid>(HtmlLoggerConstants.ParentExecIdProperty, parentExecutionId);
 
-            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
             Mock<TestResultEventArgs> resultEventArg3 = new Mock<TestResultEventArgs>(result3);
 
-            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.htmlLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.htmlLogger.GetTestResults().GetTestResultscount(), 1, "testhandler is adding parent result correctly");
-            Assert.AreEqual(this.htmlLogger.GetTestResults().Results[0].GetInnerTestResultscount(), 2, "testhandler is adding child result correctly");
-
-           
+            Assert.AreEqual(this.htmlLogger.TestResults.GetTestResultscount(), 1, "testhandler is adding parent result correctly");
+            Assert.AreEqual(this.htmlLogger.TestResults.Results[0].GetInnerTestResultscount(), 2, "testhandler is adding child result correctly");
         }
 
+        /// <summary>
+        /// Test comple handler should set summary property in test results properly
+        /// </summary>
         [TestMethod]
         public void TestCompleteHandlerShouldKeepTackOfSummary()
         {
-            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
-            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
-            ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
-            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
-
-            HtmlLogger.TestResults testResults = this.CreateTestResults();
-            this.htmlLogger.SetTestResults(testResults);
+            TestCase passTestCase1 = CreateTestCase("Pass1");
+            TestCase passTestCase2 = CreateTestCase("Pass2");
+            TestCase failTestCase1 = CreateTestCase("Fail1");
+            TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
-            passResult1.Outcome = ObjectModel.TestOutcome.Passed;
+            passResult1.Outcome = TestOutcome.Passed;
 
             ObjectModel.TestResult passResult2 = new ObjectModel.TestResult(passTestCase2);
-            passResult2.Outcome = ObjectModel.TestOutcome.Passed;
+            passResult2.Outcome = TestOutcome.Passed;
 
             ObjectModel.TestResult failResult1 = new ObjectModel.TestResult(failTestCase1);
-            failResult1.Outcome = ObjectModel.TestOutcome.Failed;
+            failResult1.Outcome = TestOutcome.Failed;
 
             ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
-            skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
+            skipResult1.Outcome = TestOutcome.Skipped;
 
             Mock<TestResultEventArgs> pass1 = new Mock<TestResultEventArgs>(passResult1);
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);
@@ -374,60 +351,70 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), fail1.Object);
             this.htmlLogger.TestResultHandler(new object(), skip1.Object);
 
+            string fileName;
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);
+
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
 
-            Assert.AreEqual(this.htmlLogger.GetTestResults().Summary.TotalTests, 4, "summary should keep track of totaltests");
-            Assert.AreEqual(this.htmlLogger.GetTestResults().Summary.FailedTests, 1, "summary should keep track of failedtests");
-            Assert.AreEqual(this.htmlLogger.GetTestResults().Summary.PassedTests, 2, "summary should keep track of passedtests");
+            Assert.AreEqual(this.htmlLogger.TestResults.Summary.TotalTests, 4, "summary should keep track of totaltests");
+            Assert.AreEqual(this.htmlLogger.TestResults.Summary.FailedTests, 1, "summary should keep track of failedtests");
+            Assert.AreEqual(this.htmlLogger.TestResults.Summary.PassedTests, 2, "summary should keep track of passedtests");
+        }
+
+        /// <summary>
+        /// Test complete handle should create file correctly
+        /// </summary>
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateFileCorrectly()
+        {
+            string fileName;
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);
+
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
         }
 
         [TestMethod]
-        public void TestRunInformationShouldContainUtcDateTime()
+        public void TestCompleteHandlerShouldCallHtmlTransformerCorrectly()
         {
-            HtmlLogger.TestResults testResults = this.CreateTestResults();
-            this.htmlLogger.SetTestResults(testResults);
-            this.MakeTestRunComplete();
-
-
-            this.ValidateDateTimeInTrx(this.htmlLogger.htmlFileName,"should handle htmlfilename time to meet bounds of utc");
-            this.ValidateDateTimeInTrx(this.htmlLogger.xmlFileName, "should handle xmlfilename time to meet bounds of utc");
+            string fileName;
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            this.mockHtmlTransformer.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
-        private void ValidateDateTimeInTrx(string htmlFileName,string error)
+        [TestMethod]
+        public void TestCompleteHandlerShouldWriteToXmlSerializerCorrectly()
         {
-            this.mockFileHelper = new Mock<IFileHelper>();
-            this.mockFileHelper.Verify(x => x.WriteAllTextToFile(htmlFileName, It.IsAny<string>()), Times.Once);
+            string fileName;
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);          
 
-            //using (FileStream file = File.OpenRead(htmlFileName))
-            //{
-            //    using (XmlReader reader = XmlReader.Create(htmlFileName))
-            //    {
-            //        XDocument document = XDocument.Load(htmlFileName);
-            //        var timesNode = document.Descendants(document.Root.GetDefaultNamespace() + "Times").FirstOrDefault();
-            //        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("creation").FirstOrDefault().Value),error);
-            //        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(timesNode.Attributes("start").FirstOrDefault().Value),error);
-            //        var resultNode = document.Descendants(document.Root.GetDefaultNamespace() + "UnitTestResult").FirstOrDefault();
-            //        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("endTime").FirstOrDefault().Value),error);
-            //        ValidateTimeWithinUtcLimits(DateTimeOffset.Parse(resultNode.Attributes("startTime").FirstOrDefault().Value),error);
-            //    }
-            //}
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            this.mockXmlSerializer.Verify(x => x.WriteObject(It.IsAny<Stream>(), It.IsAny<TestResults>()), Times.Once);
+            Assert.IsTrue(htmlLogger.xmlFilePath.Contains(".xml"));
+            Assert.IsTrue(htmlLogger.htmlFilePath.Contains(".html"));
         }
 
-        private void ValidateTimeWithinUtcLimits(DateTimeOffset dateTime,string error)
+        private HtmlLogger.TestResult CreateTestResult(TestOutcome testoutcome, string displayName)
         {
-            Assert.IsTrue(dateTime.UtcDateTime.Subtract(DateTime.UtcNow) < new TimeSpan(0, 0, 0, 60),error);
+
+            HtmlLogger.TestResult testResult = new HtmlLogger.TestResult();
+            testResult.resultOutcome = testoutcome;
+            testResult.DisplayName = displayName;
+            return testResult;
         }
 
-        private HtmlLogger.TestResults CreateTestResults()
+        private TestResults CreateTestResults()
         {
-            HtmlLogger.TestResults testresults = new HtmlLogger.TestResults();
-            //testresults.Summary.PassedTests = 1;
+            TestResults testresults = new TestResults();
             return testresults;
         }
 
         private static TestCase CreateTestCase(string testCaseName)
         {
-            return new ObjectModel.TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
+            return new TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
         }
 
         private static TestRunCompleteEventArgs CreateTestRunCompleteEventArgs()
@@ -449,7 +436,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                     passResult.Messages.Add(message);
                 }
             }
-
             return new Mock<TestResultEventArgs>(passResult);
         }
 
@@ -461,9 +447,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
         }
 
-
     }
-
 }
 
 

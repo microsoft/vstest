@@ -10,18 +10,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using HtmlLoggerConstants = Microsoft.TestPlatform.Extensions.HtmlLogger.Utility.Constants;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Xml.Serialization;
-    using System.Xml;
     using System.Runtime.Serialization;
     using System.IO;
-    using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
     using System.Collections.Concurrent;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Globalization;
-    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
+    using System.Linq;
+    using System.Globalization;
 
     /// <summary>
     /// Logger for generating Html log
@@ -30,60 +25,72 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     [ExtensionUri(HtmlLoggerConstants.ExtensionUri)]
     public class Htmllogger : ITestLoggerWithParameters
     {
-        // private string htmlFilePath;
-        private Dictionary<string, string> parametersDictionary;
-        private ConcurrentDictionary<Guid, TestResult> Results;
-        //private TestOutcome testRunOutcome;
-        internal int totalTests;
-        internal int failTests;
-        internal int passTests { get; set; }
-        // private string htmlFilePath;
-        private TestResults testResults;
-        internal string htmlFileName;
-        internal string xmlFileName;
-        internal IFileHelper filehelper;
-
-        DataContractSerializer xmlSerializer;
-        IHtmlTransformer htmlTransformer;
+        private IFileHelper filehelper;
+        private XmlObjectSerializer xmlSerializer;
+        private IHtmlTransformer htmlTransformer;
 
         public Htmllogger()
-            : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestResults)))
-            {
-            }
+        : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestResults)))
+        {
+        }
 
-        public Htmllogger(IFileHelper filehelper, IHtmlTransformer htmlTransformer, DataContractSerializer dataContractSerializer)
+        public Htmllogger(IFileHelper filehelper, IHtmlTransformer htmlTransformer, XmlObjectSerializer dataContractSerializer)
         {
             this.filehelper = filehelper;
             this.htmlTransformer = htmlTransformer;
             this.xmlSerializer = dataContractSerializer;
         }
-    
+
+        public string FilePath { get; private set; }
         /// <summary>
-        /// Gets the directory under which default trx file and test results attachements should be saved.
+        /// Gets the directory under which default html file and test results attachements should be saved.
         /// </summary>
         public string TestResultsDirPath { get; private set; }
-        public ConcurrentDictionary<Guid, TestResult> GetResults() { return this.Results; }
 
-        internal TestResults GetTestResults()
-        {
-            return this.testResults;
-        }
+        /// <summary>
+        /// Total Results are stored in sequential order
+        /// </summary>
+        /// <returns></returns>
+        public ConcurrentDictionary<Guid, TestResult> Results { get; private set; }
 
-        internal void SetTestResults(TestResults testresults)
-        {
-            this.testResults = testresults;
-        }
-              
-        public void Initialize(TestLoggerEvents events, string testResultsDirPath)
+        /// <summary>
+        /// TestResults Stores all the Summary and the details of evrey Results in Hiearachial order.
+        /// </summary>
+        public TestResults TestResults { get; private set; }
+
+        /// <summary>
+        /// Total Passed Tests in the TestResults
+        /// </summary>
+        public int PassedTests { get; private set; }
+
+        /// <summary>
+        /// Total FailedTests in the Results
+        /// </summary>
+        public int FailedTests { get; private set; }
+
+        /// <summary>
+        /// Total Tests in the Results
+        /// </summary>
+        public int TotalTests { get; private set; }
+
+        /// <summary>
+        /// Total SkippedTests in the Results
+        /// </summary>
+        public int SkippedTests { get; private set; }
+        private string fileName;
+        public string xmlFilePath { get; private set; }
+        public string htmlFilePath { get; private set; }
+
+        public void Initialize(TestLoggerEvents events, string TestResultsDirPath)
         {
             if (events == null)
             {
                 throw new ArgumentNullException(nameof(events));
             }
 
-            if (string.IsNullOrEmpty(testResultsDirPath))
+            if (string.IsNullOrEmpty(TestResultsDirPath))
             {
-                throw new ArgumentNullException(nameof(testResultsDirPath));
+                throw new ArgumentNullException(nameof(TestResultsDirPath));
             }
 
             // Register for the events.
@@ -91,8 +98,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             events.TestResult += this.TestResultHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
 
-            this.TestResultsDirPath = testResultsDirPath;
-            this.testResults = new TestResults();
+            this.TestResultsDirPath = TestResultsDirPath;
+            this.TestResults = new TestResults();
             this.Results = new ConcurrentDictionary<Guid, TestResult>();
         }
 
@@ -103,32 +110,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             {
                 throw new ArgumentNullException(nameof(parameters));
             }
-            
+
             if (parameters.Count == 0)
             {
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
-
-            this.parametersDictionary = parameters;
-            this.Initialize(events, this.parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
+    
+            this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
         }
 
+        /// <summary>
+        /// Handles the Message level information like warnings errors etc..
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         internal void TestMessageHandler(object sender, TestRunMessageEventArgs e)
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
-            
-            // TrxLoggerObjectModel.RunInfo runMessage;
+
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
-                    testResults.RunLevelMessageInformational.Add(e.Message);
+                    TestResults.RunLevelMessageInformational.Add(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    testResults.RunLevelMessageErrorAndWarning.Add(e.Message);
+                    TestResults.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 case TestMessageLevel.Error:
-                    testResults.RunLevelMessageErrorAndWarning.Add(e.Message);
+                    TestResults.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 default:
                     Debug.Fail("htmlLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
@@ -136,104 +146,170 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
         }
 
+        /// <summary>
+        /// Handles the Result coming from vstest and store it in testresults 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         internal void TestResultHandler(object sender, TestResultEventArgs e)
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
 
-            Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.TestResult testResult = new Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.TestResult() ;
-            if(e.Result.DisplayName!=null)
+            TestResult testResult = new TestResult();
+            if (e.Result.DisplayName != null)
                 testResult.DisplayName = e.Result.DisplayName;
             else
                 testResult.DisplayName = e.Result.TestCase.DisplayName;
 
             testResult.FullyQualifiedName = e.Result.TestCase.FullyQualifiedName;
-            //yet to test...
-            testResult.Duration = e.Result.Duration;
+            testResult.Duration = GetFormattedDurationString(e.Result.Duration);
             testResult.ErrorStackTrace = e.Result.ErrorStackTrace;
             testResult.ErrorMessage = e.Result.ErrorMessage;
 
-            //yet to test..
-            var executionId = Converter.GetExecutionId(e.Result);
-            var parentExecutionId = Converter.GetParentExecutionId(e.Result);
-            
-            this.totalTests++;
+            var executionId = this.GetExecutionId(e.Result);
+            var parentExecutionId = this.GetParentExecutionId(e.Result);
 
-
+            /// TODO: handle skipped tests 
+            this.TotalTests++;
             testResult.resultOutcome = e.Result.Outcome;
             if (e.Result.Outcome == TestOutcome.Failed)
             {
-                this.failTests++;
+                this.FailedTests++;
             }
             else if (e.Result.Outcome == TestOutcome.Passed)
             {
-                this.passTests++;
+                this.PassedTests++;
+            }
+            else if (e.Result.Outcome == TestOutcome.Skipped)
+            {
+                this.SkippedTests++;
             }
 
-            if(parentExecutionId==Guid.Empty)
-                testResults.Results.Add(testResult);
+            if (parentExecutionId == Guid.Empty)
+                TestResults.Results.Add(testResult);
 
             Results.TryAdd(executionId, testResult);
-            if(parentExecutionId!= Guid.Empty)
+            if (parentExecutionId != Guid.Empty)
             {
-                this.AddToParentResult(executionId,parentExecutionId,testResult);
+                this.AddToParentResult(parentExecutionId, testResult);
             }
         }
 
-        internal void AddToParentResult(Guid executionId,Guid parentExecutionId ,TestResult testResult)
+        private void AddToParentResult( Guid parentExecutionId, TestResult testResult)
         {
             TestResult ParentTestResult;
             this.Results.TryGetValue(parentExecutionId, out ParentTestResult);
             if (ParentTestResult.innerTestResults == null)
                 ParentTestResult.innerTestResults = new List<TestResult>();
             ParentTestResult.innerTestResults.Add(testResult);
-
         }
 
-
+        /// <summary>
+        /// Creates a Summary of tests and Popultes the html file by transforming the xml file with help of xslt file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         internal void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            testResults.Summary = new TestRunSummary
+            TestResults.Summary = new TestRunSummary
             {
-                FailedTests = this.failTests,
-                PassedTests = this.passTests,
-                TotalTests = this.totalTests
+                FailedTests = this.FailedTests,
+                PassedTests = this.PassedTests,
+                TotalTests = this.TotalTests
             };
-            //var list = new List<TestResult>();
-            //list.Add(new TestResult(new TestCase("abc", new Uri("executor://dummy"), "abc.dll")));
             this.PopulateHtmlFile();
         }
 
         private void PopulateHtmlFile()
         {
-            var xmlFilePath = GetXmlFilePath();
-            Stream xmlStream = this.filehelper.GetStream(xmlFilePath, FileMode.Create);
+            // TODO: Add exception handling and logging
+            fileName = String.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}", Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+            xmlFilePath = this.GetFilePath("xml",fileName);
 
-            var htmlFilePath = GetHtmlFilePath();
-            xmlSerializer.WriteObject(xmlStream, testResults);
+            Stream xmlStream = this.filehelper.GetStream(xmlFilePath, FileMode.Create);
+            xmlSerializer.WriteObject(xmlStream, TestResults);
             xmlStream.Close();
 
+            htmlFilePath = this.GetFilePath("html", fileName);
             htmlTransformer.Transform(xmlFilePath, htmlFilePath);
         }
 
-        private string GetHtmlFilePath()
-        {
-            this.htmlFileName = GetFileName("html");
-            var htmlFilePath = Path.Combine(this.TestResultsDirPath, htmlFileName);
-            return htmlFilePath;
+        private string GetFilePath(string fileFormat,string FileName)
+        {  
+            var fullfileformat = string.Concat("." + fileFormat);
+            return Path.Combine(this.TestResultsDirPath, string.Concat("TestResult_", FileName, fullfileformat));
         }
 
-        private string GetXmlFilePath()
+
+        private static string FormatDateTimeForRunName(DateTime timeStamp)
         {
-            this.xmlFileName = GetFileName("xml");
-            var xmlFilePath = Path.Combine(this.TestResultsDirPath, xmlFileName);
-            return xmlFilePath;
+            return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
         }
 
-        private string GetFileName(string fileFormat)
+        /// <summary>
+        /// Gives the parent execution id of a TestResult
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns></returns>
+        private Guid GetParentExecutionId(ObjectModel.TestResult testResult)
         {
-            var fullfileformat = string.Concat("." +fileFormat);
-            return string.Concat("TestResult_", DateTime.Now.ToLongDateString(), fullfileformat);
+            TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(HtmlLoggerConstants.ParentExecutionIdPropertyIdentifier));
+            return parentExecutionIdProperty == null ? Guid.Empty : testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Gives the execution id of a TestResult
+        /// </summary>
+        /// <param name="testResult"></param>
+        /// <returns></returns>
+        private Guid GetExecutionId(ObjectModel.TestResult testResult)
+        {
+            TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
+            var executionId = Guid.Empty;
+            if (executionIdProperty != null)
+                executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
+
+            return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
+        }
+
+        /// <summary>
+        /// converts the timespan format to readable string 
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        private string GetFormattedDurationString(TimeSpan duration)
+        {
+            if (duration == default(TimeSpan))
+            {
+                return null;
+            }
+
+            var time = new List<string>();
+            if (duration.Hours > 0)
+            {
+                time.Add(duration.Hours + "h");
+            }
+
+            if (duration.Minutes > 0)
+            {
+                time.Add(duration.Minutes + "m");
+            }
+
+            if (duration.Hours == 0)
+            {
+                if (duration.Seconds > 0)
+                {
+                    time.Add(duration.Seconds + "s");
+                }
+
+                if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                {
+                    time.Add(duration.Milliseconds + "ms");
+                }
+            }
+
+            return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
         }
     }
 }
