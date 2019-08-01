@@ -63,10 +63,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         public const string Procdump64Process = "procdump64.exe";
 
-        ///<summary>
+        /// <summary>
         /// Configuration key name for collect dump always
         /// </summary>
         public const string CollectDumpAlwaysKey = "CollectAlways";
+
+        /// <summary>
+        /// Configuration key name for collecting dump in case of testhost hang
+        /// </summary>
+        public const string CollectDumpOnTestSessionHang = "CollectDumpOnTestSessionHang";
+
+        /// <summary>
+        /// Configuration key name for specifying what the expected execution time for the longest running test is.
+        /// If no events come from the test host for this period a dump will be collected and the test host process will
+        /// be killed.
+        /// </summary>
+        public const string ExpectedExecutionTimeOfLongestRunningTestInMinutes = "ExpectedExecutionTimeOfLongestRunningTestInMinutes";
 
         /// <summary>
         /// Configuration key name for dump type

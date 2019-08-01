@@ -28,7 +28,24 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="isFullDump">
         /// Is full dump enabled
         /// </param>
-        void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
+        void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
+
+        /// <summary>
+        /// Launch procdump process to capture dump in case of a testhost hang and wait for it to exit
+        /// </summary>
+        /// <param name="processId">
+        /// Process ID of test host
+        /// </param>
+        /// <param name="dumpFileGuid">
+        /// Guid as postfix for dump file, testhost.exe_&lt;guid&gt;.dmp
+        /// </param>
+        /// <param name="testResultsDirectory">
+        /// Path to TestResults directory
+        /// </param>
+        /// <param name="isFullDump">
+        /// Is full dump enabled
+        /// </param>
+        void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false);
 
         /// <summary>
         /// Terminate the proc dump process
