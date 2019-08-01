@@ -392,14 +392,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
-            EqtTrace.Info("Reset the timer");
+            EqtTrace.Verbose("Reset the inactivity timer since an event was received.");
             try
             {
-                this.inactivityTimer.Change(TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(-1));
+                this.inactivityTimer.Change(this.inactivityTimespan, TimeSpan.FromMilliseconds(-1));
             }
-            catch
+            catch (Exception e)
             {
-                EqtTrace.Info("trying to reset a disposed timer");
+                EqtTrace.Warning($"Failed to reset the inactivity timer with error {e}");
             }
         }
 
