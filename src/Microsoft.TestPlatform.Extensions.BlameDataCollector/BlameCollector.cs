@@ -127,7 +127,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.collectProcessDumpOnTestHostHang)
             {
-                this.inactivityTimer = new Timer((object state) => { this.CollectDumpAndAbortTesthost(); }, null, TimeSpan.FromSeconds(30), TimeSpan.FromMilliseconds(-1));
+                this.inactivityTimer = new Timer((object state) => { this.CollectDumpAndAbortTesthost(); }, null, this.inactivityTimespan, TimeSpan.FromMilliseconds(-1));
             }
         }
 
