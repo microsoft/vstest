@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.Threading;
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector.Interfaces;
 
     public class InactivityTimer : IInactivityTimer
     {
@@ -16,9 +15,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Creates a new timer with infinite timeout
         /// </summary>
         /// <param name="timerCallback">Function to callback once the timer times out.</param>
-        public InactivityTimer(TimerCallback timerCallback)
+        public InactivityTimer(Action timerCallback)
         {
-            new Timer(timerCallback);
+            this.timer = new Timer((object state) => timerCallback());
         }
 
         /// <inheritdoc />

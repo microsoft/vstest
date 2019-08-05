@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     public interface IBlameReaderWriter
     {

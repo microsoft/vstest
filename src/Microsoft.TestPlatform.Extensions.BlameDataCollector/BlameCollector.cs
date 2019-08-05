@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private bool processFullDumpEnabled;
         private bool inactivityTimerAlreadyFired;
         private string attachmentGuid;
-        private Timer inactivityTimer;
+        private IInactivityTimer inactivityTimer;
         private TimeSpan inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
         private int testHostProcessId;
 
@@ -127,7 +127,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.collectProcessDumpOnTestHostHang)
             {
-                this.inactivityTimer = new Timer((object state) => { this.CollectDumpAndAbortTesthost(); }, null, this.inactivityTimespan, TimeSpan.FromMilliseconds(-1));
+                this.inactivityTimer = new InactivityTimer(this.CollectDumpAndAbortTesthost);
+                this.ResetInactivityTimer();
             }
         }
 
@@ -419,7 +420,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             EqtTrace.Verbose("Reset the inactivity timer since an event was received.");
             try
             {
-                this.inactivityTimer.Change(this.inactivityTimespan, TimeSpan.FromMilliseconds(-1));
+                this.inactivityTimer.ResetTimer(this.inactivityTimespan);
             }
             catch (Exception e)
             {

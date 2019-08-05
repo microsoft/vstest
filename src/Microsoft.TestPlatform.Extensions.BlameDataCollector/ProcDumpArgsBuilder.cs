@@ -6,8 +6,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Collections.Generic;
     using System.Text;
 
-    using Microsoft.TestPlatform.Extensions.BlameDataCollectors.Interfaces;
-
     public class ProcDumpArgsBuilder : IProcDumpArgsBuilder
     {
         /// <inheritdoc />
