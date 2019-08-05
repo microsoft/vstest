@@ -156,16 +156,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 // Detach procdump from the testhost process to prevent testhost process from crashing
                 // if/when we try to kill the existing proc dump process.
-                new Win32NamedEvent($"Procdump-{this.testHostProcessId}");
+                this.processDumpUtility.DetachFromTargetProcess();
             }
 
             try
             {
                 this.processDumpUtility.StartHangBasedProcessDump(this.testHostProcessId, this.attachmentGuid, this.GetResultsDirectory(), this.processFullDumpEnabled);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                EqtTrace.Error($"BlameCollector.CollectDumpAndAbortTesthost: Failed with error {e}");
+                EqtTrace.Error($"BlameCollector.CollectDumpAndAbortTesthost: Failed with error {ex}");
             }
 
             try
@@ -183,10 +183,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
             catch (FileNotFoundException ex)
             {
-                EqtTrace.Error(ex.Message);
+                EqtTrace.Error(ex);
             }
 
-            Process.GetProcessById(this.testHostProcessId).Kill();
+            try
+            {
+                Process.GetProcessById(this.testHostProcessId).Kill();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
+            }
         }
 
         private void ValidateAndAddProcessDumpParameters(XmlElement collectDumpNode)
@@ -341,8 +348,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         }
                         catch (FileNotFoundException ex)
                         {
-                            EqtTrace.Warning(ex.Message);
-                            this.logger.LogWarning(args.Context, ex.Message);
+                            EqtTrace.Warning(ex.ToString());
+                            this.logger.LogWarning(args.Context, ex.ToString());
                         }
                     }
                 }
@@ -352,6 +359,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // Attempt to terminate the proc dump process if proc dump was enabled
                 if (this.collectProcessDumpCollectionBasedOnTrigger)
                 {
+                    this.processDumpUtility.DetachFromTargetProcess();
                     this.processDumpUtility.TerminateProcess();
                 }
 

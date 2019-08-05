@@ -128,8 +128,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             null,
                                             null,
                                             null) as Process;
+        }
 
-            this.procDumpProcess.WaitForExit();
+        /// <inheritdoc/>
+        public void DetachFromTargetProcess()
+        {
+            new Win32NamedEvent($"Procdump-{this.procDumpProcess.Id}").Set();
         }
 
         /// <inheritdoc/>
