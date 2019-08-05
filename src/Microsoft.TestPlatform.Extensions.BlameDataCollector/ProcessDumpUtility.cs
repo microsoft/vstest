@@ -7,7 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Text;
     using Microsoft.TestPlatform.Extensions.BlameDataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;

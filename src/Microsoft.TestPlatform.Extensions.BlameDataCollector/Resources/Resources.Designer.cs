@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The specified inactivity time {0} has elapsed. Collecting a dump and killing the test host process..
+        ///   Looks up a localized string similar to The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process..
         /// </summary>
         internal static string InactivityTimeout {
             get {

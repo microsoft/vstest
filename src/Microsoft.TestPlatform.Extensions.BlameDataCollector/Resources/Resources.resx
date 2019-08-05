@@ -130,7 +130,7 @@
     <value>Collect dump was enabled but no dump file was generated.</value>
   </data>
   <data name="InactivityTimeout" xml:space="preserve">
-    <value>The specified inactivity time {0} has elapsed. Collecting a dump and killing the test host process.</value>
+    <value>The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process.</value>
   </data>
   <data name="ProcDumpCouldNotStart" xml:space="preserve">
     <value>Could not start process dump: {0}</value>
