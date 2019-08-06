@@ -54,11 +54,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
-                               .Returns(new string[] { });
+                .Returns(new string[] { });
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
-                                    .Returns(process);
+                .Returns(process);
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
-                                  .Returns(this.mockProcDumpProcess.Object);
+                .Returns(this.mockProcDumpProcess.Object);
 
             var processDumpUtility = new ProcessDumpUtility(
                 this.mockProcessHelper.Object,
@@ -84,9 +84,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
-                                  .Throws(new Exception());
+                .Throws(new Exception());
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
-                                    .Returns(process);
+                .Returns(process);
 
             var processDumpUtility = new ProcessDumpUtility(
                  this.mockProcessHelper.Object,
@@ -110,11 +110,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
-                               .Returns(new string[] { "dump.dmp" });
+                .Returns(new string[] { "dump.dmp" });
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
-                                    .Returns(process);
+                .Returns(process);
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
-                                  .Returns(this.mockProcDumpProcess.Object);
+                .Returns(this.mockProcDumpProcess.Object);
 
             var processDumpUtility = new ProcessDumpUtility(
                 this.mockProcessHelper.Object,
@@ -142,12 +142,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
-                                  .Returns(this.mockProcDumpProcess.Object);
+                .Returns(this.mockProcDumpProcess.Object);
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
-                                  .Returns(process);
+                .Returns(process);
 
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
-                               .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
+                .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
 
             var processDumpUtility = new ProcessDumpUtility(
                 this.mockProcessHelper.Object,
@@ -175,12 +175,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var testResultsDirectory = "D:\\TestResults";
 
             this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
-                                  .Returns(this.mockProcDumpProcess.Object);
+                .Returns(this.mockProcDumpProcess.Object);
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
-                                  .Returns(process);
-
+                .Returns(process);
             this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
-                               .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
+                .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
 
             var processDumpUtility = new ProcessDumpUtility(
                 this.mockProcessHelper.Object,
@@ -189,6 +188,38 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockNativeMethodsHelper.Object);
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
+
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
+        }
+
+        /// <summary>
+        /// StartProcessDump should start procdump binary with correct arguments for hang based dump, while GetDumpFile returns full path
+        /// </summary>
+        [TestMethod]
+        public void StartProcessDumpForHangWillStartProcDumpExeWithCorrectParams()
+        {
+            var guid = "guid";
+            var process = "process";
+            var processId = 12345;
+            var filename = $"{process}_{processId}_{guid}_hangdump.dmp";
+            var args = $"-accepteula -n 1 -ma {processId} {filename}";
+            var testResultsDirectory = "D:\\TestResults";
+
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+                .Returns(this.mockProcDumpProcess.Object);
+            this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
+                .Returns(process);
+            this.mockFileHelper.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>()))
+                .Returns(new string[] { Path.Combine(testResultsDirectory, filename) });
+
+            var processDumpUtility = new ProcessDumpUtility(
+                this.mockProcessHelper.Object,
+                this.mockFileHelper.Object,
+                this.mockPlatformEnvironment.Object,
+                this.mockNativeMethodsHelper.Object);
+
+            processDumpUtility.StartHangBasedProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
 
             this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());

@@ -52,7 +52,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Ensure this is called before terminating the proc dump process
         /// as it might lead to the testhost process crashing otherwise.
         /// </summary>
-        void DetachFromTargetProcess();
+        /// <param name="targetProcessId">
+        /// Process Id of the process to detach from
+        /// </param>
+        void DetachFromTargetProcess(int targetProcessId);
 
         /// <summary>
         /// Terminate the proc dump process

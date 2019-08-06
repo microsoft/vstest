@@ -130,9 +130,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void DetachFromTargetProcess()
+        public void DetachFromTargetProcess(int targetProcessId)
         {
-            new Win32NamedEvent($"Procdump-{this.procDumpProcess.Id}").Set();
+            new Win32NamedEvent($"Procdump-{targetProcessId}").Set();
         }
 
         /// <inheritdoc/>

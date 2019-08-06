@@ -9,10 +9,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// The blame collector.
@@ -31,6 +32,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private List<Guid> testSequence;
         private Dictionary<Guid, BlameTestObject> testObjectDictionary;
         private IBlameReaderWriter blameReaderWriter;
+        private IFileHelper fileHelper;
         private XmlElement configurationElement;
         private int testStartCount;
         private int testEndCount;
@@ -49,7 +51,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Using XmlReaderWriter by default
         /// </summary>
         public BlameCollector()
-            : this(new XmlReaderWriter(), new ProcessDumpUtility())
+            : this(new XmlReaderWriter(), new ProcessDumpUtility(), null, new FileHelper())
         {
         }
 
@@ -62,10 +64,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="processDumpUtility">
         /// ProcessDumpUtility instance.
         /// </param>
-        internal BlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
+        /// <param name="inactivityTimer">
+        /// InactivityTimer instance.
+        /// </param>
+        /// <param name="fileHelper">
+        /// Filehelper instance.
+        /// </param>
+        internal BlameCollector(
+            IBlameReaderWriter blameReaderWriter,
+            IProcessDumpUtility processDumpUtility,
+            IInactivityTimer inactivityTimer,
+            IFileHelper fileHelper)
         {
             this.blameReaderWriter = blameReaderWriter;
             this.processDumpUtility = processDumpUtility;
+            this.inactivityTimer = inactivityTimer;
+            this.fileHelper = fileHelper;
         }
 
         /// <summary>
@@ -127,7 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             if (this.collectProcessDumpOnTestHostHang)
             {
-                this.inactivityTimer = new InactivityTimer(this.CollectDumpAndAbortTesthost);
+                this.inactivityTimer = this.inactivityTimer ?? new InactivityTimer(this.CollectDumpAndAbortTesthost);
                 this.ResetInactivityTimer();
             }
         }
@@ -157,7 +171,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 // Detach procdump from the testhost process to prevent testhost process from crashing
                 // if/when we try to kill the existing proc dump process.
-                this.processDumpUtility.DetachFromTargetProcess();
+                this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
             }
 
             try
@@ -174,7 +188,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 var dumpFile = this.processDumpUtility.GetDumpFile();
                 if (!string.IsNullOrEmpty(dumpFile))
                 {
-                    var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true);
+                    var fileTransferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, dumpFile, true, this.fileHelper);
                     this.dataCollectionSink.SendFileAsync(fileTransferInformation);
                 }
                 else
@@ -199,55 +213,66 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
         private void ValidateAndAddProcessDumpParameters(XmlElement collectDumpNode)
         {
-            foreach (XmlAttribute attribute in collectDumpNode.Attributes)
+            foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
             {
-                if (string.Equals(attribute.Name, Constants.CollectDumpAlwaysKey, StringComparison.OrdinalIgnoreCase))
+                switch (blameAttribute)
                 {
-                    if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
-                    {
-                        bool.TryParse(attribute.Value, out this.collectDumpAlways);
-                    }
-                    else
-                    {
-                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
-                    }
-                }
-                else if (string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
-                    }
-                    else
-                    {
-                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
-                    }
-                }
-                else if (string.Equals(attribute.Name, Constants.CollectDumpOnTestSessionHang, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
-                    {
-                        bool.TryParse(attribute.Value, out this.collectProcessDumpOnTestHostHang);
-                    }
-                    else
-                    {
-                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
-                    }
-                }
-                else if (string.Equals(attribute.Name, Constants.ExpectedExecutionTimeOfLongestRunningTestInMinutes, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!string.IsNullOrWhiteSpace(attribute.Value) && int.TryParse(attribute.Value, out int inactivityTimespanInMinutes))
-                    {
-                        this.inactivityTimespan = TimeSpan.FromMinutes(inactivityTimespanInMinutes);
-                    }
-                    else
-                    {
-                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnexpectedValueForInactivityTimespanValue, attribute.Value));
-                    }
-                }
-                else
-                {
-                    this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, attribute.Name));
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.CollectDumpAlwaysKey, StringComparison.OrdinalIgnoreCase):
+
+                        if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            bool.TryParse(attribute.Value, out this.collectDumpAlways);
+                        }
+                        else
+                        {
+                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
+                        }
+
+                        break;
+
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
+
+                        if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                        }
+                        else
+                        {
+                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                        }
+
+                        break;
+
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.CollectDumpOnTestSessionHang, StringComparison.OrdinalIgnoreCase):
+
+                        if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            bool.TryParse(attribute.Value, out this.collectProcessDumpOnTestHostHang);
+                        }
+                        else
+                        {
+                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
+                        }
+
+                        break;
+
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.ExpectedExecutionTimeOfLongestRunningTestInMinutes, StringComparison.OrdinalIgnoreCase):
+
+                        if (!string.IsNullOrWhiteSpace(attribute.Value) && int.TryParse(attribute.Value, out int inactivityTimespanInMinutes))
+                        {
+                            this.inactivityTimespan = TimeSpan.FromMinutes(inactivityTimespanInMinutes);
+                        }
+                        else
+                        {
+                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnexpectedValueForInactivityTimespanValue, attribute.Value));
+                        }
+
+                        break;
+
+                    default:
+
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, attribute.Name));
+                        break;
                 }
             }
         }
@@ -360,7 +385,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 // Attempt to terminate the proc dump process if proc dump was enabled
                 if (this.collectProcessDumpCollectionBasedOnTrigger)
                 {
-                    this.processDumpUtility.DetachFromTargetProcess();
+                    this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
                     this.processDumpUtility.TerminateProcess();
                 }
 
