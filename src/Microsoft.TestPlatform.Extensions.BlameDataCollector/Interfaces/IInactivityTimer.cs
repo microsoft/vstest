@@ -5,13 +5,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
 
-    public interface INativeMethodsHelper
+    public interface IInactivityTimer : IDisposable
     {
         /// <summary>
-        /// Returns if a process is 64 bit process
+        /// Resets the timer and configures it to fire after inactivityTimespan elapses
         /// </summary>
-        /// <param name="processHandle">Process Handle</param>
-        /// <returns>Bool for Is64Bit</returns>
-        bool Is64Bit(IntPtr processHandle);
+        /// <param name="inactivityTimespan">Duration after which the timer should fire</param>
+        void ResetTimer(TimeSpan inactivityTimespan);
     }
 }

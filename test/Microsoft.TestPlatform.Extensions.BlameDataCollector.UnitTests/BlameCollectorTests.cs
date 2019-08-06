@@ -8,11 +8,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Xml;
 
     using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -31,6 +33,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private Mock<DataCollectionSink> mockDataCollectionSink;
         private Mock<IBlameReaderWriter> mockBlameReaderWriter;
         private Mock<IProcessDumpUtility> mockProcessDumpUtility;
+        private Mock<IInactivityTimer> mockInactivityTimer;
+        private Mock<IFileHelper> mockFileHelper;
         private XmlElement configurationElement;
         private string filepath;
 
@@ -45,7 +49,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataCollectionSink = new Mock<DataCollectionSink>();
             this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
             this.mockProcessDumpUtility = new Mock<IProcessDumpUtility>();
-            this.blameDataCollector = new TestableBlameCollector(this.mockBlameReaderWriter.Object, this.mockProcessDumpUtility.Object);
+            this.mockInactivityTimer = new Mock<IInactivityTimer>();
+            this.mockFileHelper = new Mock<IFileHelper>();
+            this.blameDataCollector = new TestableBlameCollector(
+                this.mockBlameReaderWriter.Object,
+                this.mockProcessDumpUtility.Object,
+                this.mockInactivityTimer.Object,
+                this.mockFileHelper.Object);
 
             // Initializing members
             TestCase testcase = new TestCase { Id = Guid.NewGuid() };
@@ -73,6 +83,110 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                     null,
                     null);
             });
+        }
+
+        /// <summary>
+        /// Initializing with collect dump for hang disabled should ensure InativityTimer is never initialized or reset
+        /// </summary>
+        [TestMethod]
+        public void InitializeWithDumpForHangDisabledShouldNotInitializeInactivityTimerOrCallReset()
+        {
+            int resetCalledCount = 0;
+
+            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMinutes == 1.0))).Callback(() => { resetCalledCount++; });
+
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(false, false, false),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            Assert.AreEqual(0, resetCalledCount, "Should not have called InactivityTimer.Reset since no collect dump on hang is disabled.");
+        }
+
+        /// <summary>
+        /// Initializing with collect dump for hang should configure the timer with the right values and should
+        /// not call the reset method if no events are received.
+        /// </summary>
+        [TestMethod]
+        public void InitializeWithDumpForHangShouldInitializeInactivityTimerAndCallResetOnce()
+        {
+            int resetCalledCount = 0;
+
+            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMilliseconds == 1.0))).Callback(() => { resetCalledCount++; });
+
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(false, false, true, 1),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            Assert.AreEqual(1, resetCalledCount, "Should have called InactivityTimer.Reset exactly once since no events were received");
+        }
+
+        /// <summary>
+        /// Initializing with collect dump for hang should configure the timer with the right values and should
+        /// reset for each event received
+        /// </summary>
+        [TestMethod]
+        public void InitializeWithDumpForHangShouldInitializeInactivityTimerAndResetForEachEventReceived()
+        {
+            int resetCalledCount = 0;
+
+            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMilliseconds == 1.0))).Callback(() => { resetCalledCount++; });
+
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
+                .Returns(this.filepath);
+
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(false, false, true, 1),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
+
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            Assert.AreEqual(3, resetCalledCount, "Should have called InactivityTimer.Reset exactly 3 times");
+        }
+
+        /// <summary>
+        /// Initializing with collect dump for hang should capture a dump on timeout
+        /// </summary>
+        [TestMethod]
+        public void InitializeWithDumpForHangShouldCaptureADumpOnTimeout()
+        {
+            this.blameDataCollector = new TestableBlameCollector(
+                this.mockBlameReaderWriter.Object,
+                this.mockProcessDumpUtility.Object,
+                null,
+                this.mockFileHelper.Object);
+
+            var dumpFile = "abc_hang.dmp";
+            var hangBasedDumpcollected = new ManualResetEventSlim();
+
+            this.mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
+            this.mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
+            this.mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()));
+            this.mockProcessDumpUtility.Setup(x => x.GetDumpFile()).Returns(dumpFile);
+            this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set());
+
+            this.blameDataCollector.Initialize(
+                this.GetDumpConfigurationElement(false, false, true, 0),
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            hangBasedDumpcollected.Wait(1000);
+            this.mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
+            this.mockProcessDumpUtility.Verify(x => x.GetDumpFile(), Times.Once);
+            this.mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
         }
 
         /// <summary>
@@ -321,7 +435,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false));
+            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false));
         }
 
         /// <summary>
@@ -342,7 +456,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
+            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
         }
 
         /// <summary>
@@ -371,7 +485,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(this.dataCollectionContext, 1234));
 
             // Verify StartProcessDumpCall
-            this.mockProcessDumpUtility.Verify(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
+            this.mockProcessDumpUtility.Verify(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), true));
         }
 
         /// <summary>
@@ -468,7 +582,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var tpex = new TestPlatformException("env var exception");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false))
+            this.mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false))
                                        .Throws(tpex);
 
             // Raise TestHostLaunched
@@ -494,7 +608,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Make StartProcessDump throw exception
             var ex = new Exception("start process failed");
-            this.mockProcessDumpUtility.Setup(x => x.StartProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false))
+            this.mockProcessDumpUtility.Setup(x => x.StartTriggerBasedProcessDump(1234, It.IsAny<string>(), It.IsAny<string>(), false))
                                        .Throws(ex);
 
             // Raise TestHostLaunched
@@ -510,13 +624,18 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             File.Delete(this.filepath);
         }
 
-        private XmlElement GetDumpConfigurationElement(bool isFullDump = false, bool collectDumpOnExit = false)
+        private XmlElement GetDumpConfigurationElement(
+            bool isFullDump = false,
+            bool collectDumpOnExit = false,
+            bool colectDumpOnHang = false,
+            int inactivityTimeInMilliseconds = 0)
         {
             var xmldoc = new XmlDocument();
             var outernode = xmldoc.CreateElement("Configuration");
             var node = xmldoc.CreateElement(BlameDataCollector.Constants.DumpModeKey);
             outernode.AppendChild(node);
             node.InnerText = "Text";
+
             if (isFullDump)
             {
                 var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
@@ -529,6 +648,23 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpAlwaysKey);
                 fulldumpAttribute.Value = "true";
                 node.Attributes.Append(fulldumpAttribute);
+            }
+
+            if (colectDumpOnHang)
+            {
+                var hangDumpNode = xmldoc.CreateElement(BlameDataCollector.Constants.CollectDumpOnTestSessionHang);
+                outernode.AppendChild(hangDumpNode);
+
+                var inactivityTimeAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.TestTimeout);
+                inactivityTimeAttribute.Value = $"{inactivityTimeInMilliseconds}";
+                hangDumpNode.Attributes.Append(inactivityTimeAttribute);
+
+                if (isFullDump)
+                {
+                    var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
+                    fulldumpAttribute.Value = "full";
+                    hangDumpNode.Attributes.Append(fulldumpAttribute);
+                }
             }
 
             return outernode;
@@ -548,8 +684,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             /// <param name="processDumpUtility">
             /// ProcessDumpUtility instance.
             /// </param>
-            internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility)
-                : base(blameReaderWriter, processDumpUtility)
+            /// <param name="inactivityTimer">
+            /// InactivityTimer instance.
+            /// </param>
+            /// <param name="mockFileHelper">
+            /// MockFileHelper instance.
+            /// </param>
+            internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility, IInactivityTimer inactivityTimer, IFileHelper mockFileHelper)
+                : base(blameReaderWriter, processDumpUtility, inactivityTimer, mockFileHelper)
             {
             }
         }
