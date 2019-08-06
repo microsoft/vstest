@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private XmlElement configurationElement;
         private int testStartCount;
         private int testEndCount;
-        private bool collectProcessDumpCollectionBasedOnTrigger;
+        private bool collectProcessDumpOnTrigger;
         private bool collectProcessDumpOnTestHostHang;
         private bool collectDumpAlways;
         private bool processFullDumpEnabled;
@@ -130,8 +130,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             if (this.configurationElement != null)
             {
                 var collectDumpNode = this.configurationElement[Constants.DumpModeKey];
-                this.collectProcessDumpCollectionBasedOnTrigger = collectDumpNode != null;
-                if (this.collectProcessDumpCollectionBasedOnTrigger)
+                this.collectProcessDumpOnTrigger = collectDumpNode != null;
+                if (this.collectProcessDumpOnTrigger)
                 {
                     this.ValidateAndAddTriggerBasedProcessDumpParameters(collectDumpNode);
                 }
@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Verbose("Inactivity timer is already disposed.");
             }
 
-            if (this.collectProcessDumpCollectionBasedOnTrigger)
+            if (this.collectProcessDumpOnTrigger)
             {
                 // Detach procdump from the testhost process to prevent testhost process from crashing
                 // if/when we try to kill the existing proc dump process.
@@ -374,7 +374,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                     this.dataCollectionSink.SendFileAsync(fileTranferInformation);
                 }
 
-                if (this.collectProcessDumpCollectionBasedOnTrigger)
+                if (this.collectProcessDumpOnTrigger)
                 {
                     // If there was a test case crash or if we need to collect dump on process exit.
                     if (this.testStartCount > this.testEndCount || this.collectDumpAlways)
@@ -404,7 +404,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             finally
             {
                 // Attempt to terminate the proc dump process if proc dump was enabled
-                if (this.collectProcessDumpCollectionBasedOnTrigger)
+                if (this.collectProcessDumpOnTrigger)
                 {
                     this.processDumpUtility.DetachFromTargetProcess(this.testHostProcessId);
                     this.processDumpUtility.TerminateProcess();
@@ -424,7 +424,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.ResetInactivityTimer();
             this.testHostProcessId = args.TestHostProcessId;
 
-            if (!this.collectProcessDumpCollectionBasedOnTrigger)
+            if (!this.collectProcessDumpOnTrigger)
             {
                 return;
             }

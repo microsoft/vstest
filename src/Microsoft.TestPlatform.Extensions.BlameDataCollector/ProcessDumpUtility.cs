@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     public class ProcessDumpUtility : IProcessDumpUtility
     {
-        private static readonly List<string> ProcDumpExceptionsList = new List<string>()
+        private static readonly IEnumerable<string> ProcDumpExceptionsList = new List<string>()
         {
             "STACK_OVERFLOW",
             "ACCESS_VIOLATION"
