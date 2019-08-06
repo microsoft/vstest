@@ -133,7 +133,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.collectProcessDumpCollectionBasedOnTrigger = collectDumpNode != null;
                 if (this.collectProcessDumpCollectionBasedOnTrigger)
                 {
-                    this.ValidateAndAddProcessDumpParameters(collectDumpNode);
+                    this.ValidateAndAddTriggerBasedProcessDumpParameters(collectDumpNode);
+                }
+
+                var collectHangBasedDumpNode = this.configurationElement[Constants.CollectDumpOnTestSessionHang];
+                this.collectProcessDumpOnTestHostHang = collectHangBasedDumpNode != null;
+                if (this.collectProcessDumpOnTestHostHang)
+                {
+                    this.ValidateAndAddHangBasedProcessDumpParameters(collectDumpNode);
                 }
             }
 
@@ -211,7 +218,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
         }
 
-        private void ValidateAndAddProcessDumpParameters(XmlElement collectDumpNode)
+        private void ValidateAndAddTriggerBasedProcessDumpParameters(XmlElement collectDumpNode)
         {
             foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
             {
@@ -243,19 +250,20 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                         break;
 
-                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.CollectDumpOnTestSessionHang, StringComparison.OrdinalIgnoreCase):
+                    default:
 
-                        if (string.Equals(attribute.Value, Constants.TrueConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.FalseConfigurationValue, StringComparison.OrdinalIgnoreCase))
-                        {
-                            bool.TryParse(attribute.Value, out this.collectProcessDumpOnTestHostHang);
-                        }
-                        else
-                        {
-                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.TrueConfigurationValue, Constants.FalseConfigurationValue));
-                        }
-
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
                         break;
+                }
+            }
+        }
 
+        private void ValidateAndAddHangBasedProcessDumpParameters(XmlElement collectDumpNode)
+        {
+            foreach (XmlAttribute blameAttribute in collectDumpNode.Attributes)
+            {
+                switch (blameAttribute)
+                {
                     case XmlAttribute attribute when string.Equals(attribute.Name, Constants.ExpectedExecutionTimeOfLongestRunningTestInMinutes, StringComparison.OrdinalIgnoreCase):
 
                         if (!string.IsNullOrWhiteSpace(attribute.Value) && int.TryParse(attribute.Value, out int inactivityTimespanInMinutes))
@@ -269,9 +277,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                         break;
 
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.DumpTypeKey, StringComparison.OrdinalIgnoreCase):
+
+                        if (string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase) || string.Equals(attribute.Value, Constants.MiniConfigurationValue, StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.processFullDumpEnabled = string.Equals(attribute.Value, Constants.FullConfigurationValue, StringComparison.OrdinalIgnoreCase);
+                        }
+                        else
+                        {
+                            this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterValueIncorrect, attribute.Name, Constants.FullConfigurationValue, Constants.MiniConfigurationValue));
+                        }
+
+                        break;
+
                     default:
 
-                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, attribute.Name));
+                        this.logger.LogWarning(this.context.SessionDataCollectionContext, string.Format(CultureInfo.CurrentUICulture, Resources.Resources.BlameParameterKeyIncorrect, blameAttribute.Name));
                         break;
                 }
             }
