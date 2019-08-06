@@ -655,7 +655,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 collectDumpOnHangAttribute.Value = "true";
                 node.Attributes.Append(collectDumpOnHangAttribute);
 
-                var inactivityTimeAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.ExpectedExecutionTimeOfLongestRunningTestInMinutes);
+                var inactivityTimeAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.TestTimeout);
                 inactivityTimeAttribute.Value = $"{inactivityTimeInMinutes}";
                 node.Attributes.Append(inactivityTimeAttribute);
             }

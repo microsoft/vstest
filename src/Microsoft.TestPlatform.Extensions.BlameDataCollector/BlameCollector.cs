@@ -264,7 +264,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 switch (blameAttribute)
                 {
-                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.ExpectedExecutionTimeOfLongestRunningTestInMinutes, StringComparison.OrdinalIgnoreCase):
+                    case XmlAttribute attribute when string.Equals(attribute.Name, Constants.TestTimeout, StringComparison.OrdinalIgnoreCase):
 
                         if (!string.IsNullOrWhiteSpace(attribute.Value) && int.TryParse(attribute.Value, out int inactivityTimespanInMinutes))
                         {

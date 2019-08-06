@@ -78,7 +78,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// If no events come from the test host for this period a dump will be collected and the test host process will
         /// be killed.
         /// </summary>
-        public const string ExpectedExecutionTimeOfLongestRunningTestInMinutes = "ExpectedExecutionTimeOfLongestRunningTestInMinutes";
+        public const string TestTimeout = "TestTimeout";
 
         /// <summary>
         /// Configuration key name for dump type
