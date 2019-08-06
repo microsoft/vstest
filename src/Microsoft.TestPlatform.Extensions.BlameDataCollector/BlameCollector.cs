@@ -106,11 +106,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             DataCollectionLogger logger,
             DataCollectionEnvironmentContext environmentContext)
         {
-            if (string.Equals(Environment.GetEnvironmentVariable("DEBUG_BLAMEDATACOLLECTOR"), "true", StringComparison.OrdinalIgnoreCase))
-            {
-                Debugger.Launch();
-            }
-
             ValidateArg.NotNull(logger, nameof(logger));
 
             this.events = events;
