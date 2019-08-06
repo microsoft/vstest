@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 this.collectProcessDumpOnTestHostHang = collectHangBasedDumpNode != null;
                 if (this.collectProcessDumpOnTestHostHang)
                 {
-                    this.ValidateAndAddHangBasedProcessDumpParameters(collectDumpNode);
+                    this.ValidateAndAddHangBasedProcessDumpParameters(collectHangBasedDumpNode);
                 }
             }
 

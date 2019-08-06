@@ -114,7 +114,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             int resetCalledCount = 0;
 
-            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMinutes == 1.0))).Callback(() => { resetCalledCount++; });
+            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMilliseconds == 1.0))).Callback(() => { resetCalledCount++; });
 
             this.blameDataCollector.Initialize(
                 this.GetDumpConfigurationElement(false, false, true, 1),
@@ -123,7 +123,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockLogger.Object,
                 this.context);
 
-            Assert.AreEqual(1, resetCalledCount, "Should not have called InactivityTimer.Reset more than once since no events were received");
+            Assert.AreEqual(1, resetCalledCount, "Should have called InactivityTimer.Reset exactly once since no events were received");
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         {
             int resetCalledCount = 0;
 
-            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMinutes == 1.0))).Callback(() => { resetCalledCount++; });
+            this.mockInactivityTimer.Setup(x => x.ResetTimer(It.Is<TimeSpan>(y => y.TotalMilliseconds == 1.0))).Callback(() => { resetCalledCount++; });
 
             this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()))
                 .Returns(this.filepath);
@@ -628,13 +628,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             bool isFullDump = false,
             bool collectDumpOnExit = false,
             bool colectDumpOnHang = false,
-            int inactivityTimeInMinutes = 1)
+            int inactivityTimeInMilliseconds = 0)
         {
             var xmldoc = new XmlDocument();
             var outernode = xmldoc.CreateElement("Configuration");
             var node = xmldoc.CreateElement(BlameDataCollector.Constants.DumpModeKey);
             outernode.AppendChild(node);
             node.InnerText = "Text";
+
             if (isFullDump)
             {
                 var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
@@ -651,13 +652,19 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             if (colectDumpOnHang)
             {
-                var collectDumpOnHangAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.CollectDumpOnTestSessionHang);
-                collectDumpOnHangAttribute.Value = "true";
-                node.Attributes.Append(collectDumpOnHangAttribute);
+                var hangDumpNode = xmldoc.CreateElement(BlameDataCollector.Constants.CollectDumpOnTestSessionHang);
+                outernode.AppendChild(hangDumpNode);
 
                 var inactivityTimeAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.TestTimeout);
-                inactivityTimeAttribute.Value = $"{inactivityTimeInMinutes}";
-                node.Attributes.Append(inactivityTimeAttribute);
+                inactivityTimeAttribute.Value = $"{inactivityTimeInMilliseconds}";
+                hangDumpNode.Attributes.Append(inactivityTimeAttribute);
+
+                if (isFullDump)
+                {
+                    var fulldumpAttribute = xmldoc.CreateAttribute(BlameDataCollector.Constants.DumpTypeKey);
+                    fulldumpAttribute.Value = "full";
+                    hangDumpNode.Attributes.Append(fulldumpAttribute);
+                }
             }
 
             return outernode;
@@ -679,6 +686,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             /// </param>
             /// <param name="inactivityTimer">
             /// InactivityTimer instance.
+            /// </param>
+            /// <param name="mockFileHelper">
+            /// MockFileHelper instance.
             /// </param>
             internal TestableBlameCollector(IBlameReaderWriter blameReaderWriter, IProcessDumpUtility processDumpUtility, IInactivityTimer inactivityTimer, IFileHelper mockFileHelper)
                 : base(blameReaderWriter, processDumpUtility, inactivityTimer, mockFileHelper)
