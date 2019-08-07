@@ -126,6 +126,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void InitializeWithParametersShouldSetNoProgress()
+        {
+            var parameters = new Dictionary<string, string>();
+
+            Assert.IsFalse(ConsoleLogger.DisableProgress);
+
+            parameters.Add("noprogress", "true");
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.IsTrue(ConsoleLogger.DisableProgress);
+
+            ConsoleLogger.DisableProgress = false;
+        }
+
+        [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
