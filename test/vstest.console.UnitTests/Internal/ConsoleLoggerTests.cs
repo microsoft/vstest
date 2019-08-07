@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     using System.Globalization;
     using System.Linq;
     using System.Threading;
-
+    using Microsoft.Extensions.FileSystemGlobbing;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using vstest.console.Internal;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
@@ -823,6 +824,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var fileHelper = new Mock<IFileHelper>();
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
             string testFilePath = "C:\\DummyTestFile.dll";
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
 
@@ -848,6 +850,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var fileHelper = new Mock<IFileHelper>();
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
             string testFilePath = "C:\\DummyTestFile.dll";
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
             string testFilePath2 = "C:\\DummyTestFile2.dll";
@@ -878,6 +881,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             var fileHelper = new Mock<IFileHelper>();
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = fileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object);
             string testFilePath = "C:\\DummyTestFile.dll";
             fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
             string testFilePath2 = "C:\\DummyTestFile2.dll";

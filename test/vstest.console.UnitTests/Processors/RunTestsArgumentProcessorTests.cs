@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Reflection;
     using System.Runtime.Versioning;
     using System.Threading.Tasks;
-
+    using Microsoft.Extensions.FileSystemGlobbing;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using vstest.console.Internal;
     using vstest.console.UnitTests.Processors;
 
     /// <summary>
@@ -83,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunTestsArgumentProcessorCapabilities capabilities = new RunTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/RunTests", capabilities.CommandName);
-            Assert.AreEqual("[TestFileNames]" + Environment.NewLine + "      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern" + Environment.NewLine + "      by spaces. Use detailed verbosity to view matched test files." + Environment.NewLine + "      Examples: mytestproject.dll" + Environment.NewLine + "                mytestproject.dll myothertestproject.exe" + Environment.NewLine + @"                testproject*.dll my*project.dll", capabilities.HelpContentResourceName);
+            Assert.AreEqual("[TestFileNames]" + Environment.NewLine + "      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern" + Environment.NewLine + "      by spaces. Set console logger verbosity to detailed to view matched test files." + Environment.NewLine + "      Examples: mytestproject.dll" + Environment.NewLine + "                mytestproject.dll myothertestproject.exe" + Environment.NewLine + @"                testproject*.dll my*project.dll", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.RunTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(true, capabilities.IsAction);
@@ -258,6 +259,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             CommandLineOptions.Instance.Reset();
 
             CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, this.mockFileHelper.Object);
             CommandLineOptions.Instance.AddSource(this.dummyTestFilePath);
         }
 

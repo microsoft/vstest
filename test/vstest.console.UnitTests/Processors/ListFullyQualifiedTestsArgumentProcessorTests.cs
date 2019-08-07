@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Threading.Tasks;
 
     using CoreUtilities.Tracing.Interfaces;
-
+    using Microsoft.Extensions.FileSystemGlobbing;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -25,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using ObjectModel.Client;
     using TestPlatform.Utilities;
     using TestPlatformHelpers;
+    using vstest.console.Internal;
     using vstest.console.UnitTests.Processors;
 
     // <summary>
@@ -119,6 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorInitializeWithValidSourceShouldAddItToTestSources()
         {
             CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, this.mockFileHelper.Object);
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object, this.inferHelper, this.mockMetricsPublisherTask);
             var executor = GetExecutor(testRequestManager, null);
 
@@ -320,6 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             CommandLineOptions.Instance.Reset();
 
             CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
+            CommandLineOptions.Instance.FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, this.mockFileHelper.Object);
             CommandLineOptions.Instance.AddSource(this.dummyTestFilePath);
             if (legitPath)
             {
