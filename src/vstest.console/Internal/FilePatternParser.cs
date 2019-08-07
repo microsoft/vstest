@@ -5,10 +5,16 @@ namespace vstest.console.Internal
 {
     using Microsoft.Extensions.FileSystemGlobbing;
     using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Class for getting matching files from wild card pattern file name
@@ -17,31 +23,43 @@ namespace vstest.console.Internal
     public class FilePatternParser
     {
         private Matcher matcher;
+        private IFileHelper fileHelper;
         private char[] wildCardCharacters = { '*' };
 
         public FilePatternParser()
-            : this(new Matcher())
+            : this(new Matcher(), new FileHelper())
         {
         }
 
-        internal FilePatternParser(Matcher matcher)
+        internal FilePatternParser(Matcher matcher, IFileHelper fileHelper)
         {
             this.matcher = matcher;
+            this.fileHelper = fileHelper;
         }
 
         /// <summary>
         /// Used to get matching files with pattern
         /// </summary>
-        /// <returns>If the file is a valid pattern or full path. Returns true if it is valid pattern</returns>
-        public bool IsValidPattern(string filePattern, out List<string> matchingFiles)
+        /// <returns>Returns the list of matching files</returns>
+        public List<string> GetMatchingFiles(string filePattern)
         {
-            matchingFiles = new List<string>();
+            var matchingFiles = new List<string>();
 
-            // If there is no wildcard, return false.
+            // If there is no wildcard simply add the file to the list of matching files.
             if(filePattern.IndexOfAny(wildCardCharacters) == -1)
             {
                 EqtTrace.Info($"FilePatternParser: The given file {filePattern} is a full path.");
-                return false;
+
+                // Check if the file exists.
+                if (!this.fileHelper.Exists(filePattern))
+                {
+                    throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, filePattern));
+                }
+
+                matchingFiles.Add(filePattern);
+
+                return matchingFiles;
             }
 
             // Split the given wildcard into search directory and pattern to be searched.
@@ -59,7 +77,7 @@ namespace vstest.console.Internal
                 matchingFiles.Add(Path.Combine(splitPattern.Item1, match.Path));
             }
 
-            return true;
+            return matchingFiles;
         }
 
         /// <summary>

@@ -290,7 +290,7 @@
       <trans-unit id="RunTestsArgumentHelp">
         <source>[TestFileNames]
       Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
-      by spaces. Use detailed verbosity to view matched test files.
+      by spaces. Set console logger verbosity to detailed to view matched test files.
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>

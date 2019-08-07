@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -84,6 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             this.BatchSize = DefaultBatchSize;
             this.TestStatsEventTimeout = this.DefaultRetrievalTimeout;
             this.FileHelper = new FileHelper();
+            this.FilePatternParser = new FilePatternParser();
 #if TODO
             UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
@@ -239,6 +239,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         internal IFileHelper FileHelper { get; set; }
 
+        internal FilePatternParser FilePatternParser { get; set; }
+
         /// <summary>
         /// Gets or sets the target Framework version for test run.
         /// </summary>
@@ -293,38 +295,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
             }
 
-            var filePatternParser = new FilePatternParser();
-            var sourceFiles = new List<string>();
-            var isValidPattern = filePatternParser.IsValidPattern(source, out sourceFiles);
+            // Get matching files from file pattern parser
+            var matchingFiles = FilePatternParser.GetMatchingFiles(source);
 
-            // If the given file is a valid pattern
-            if (isValidPattern)
-            {
-                foreach (var sourceFile in sourceFiles)
-                {
-                    if (this.sources.Contains(sourceFile, StringComparer.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    this.sources.Add(sourceFile);
-                }
-
-                return;
-            }
-
-            // If the given file is not a pattern, check if it exists.
-            if (!FileHelper.Exists(source))
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
-            }
-
-            // Add the file to the source list if not already present.
-            if (!this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
-            {
-                this.sources.Add(source);
-            }
+            // Add the matching files to source list
+            this.sources = this.sources.Union(matchingFiles).ToList();
         }
 
         #endregion
