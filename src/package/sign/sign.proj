@@ -334,32 +334,32 @@
 
     <ItemGroup>
       <AssembliesToSign>
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </AssembliesToSign>
 
       <CoreAssembliesToSign>
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CoreAssembliesToSign>
 
       <BuildAssembliesToSign>
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </BuildAssembliesToSign>
 
       <TestHostCoreAssembliesToSign>
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </TestHostCoreAssembliesToSign>
 
       <IntellitraceAssembliesToSign>
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </IntellitraceAssembliesToSign>
 
       <CodeCoverageAssembliesToSign>
-        <Authenticode>Microsoft</Authenticode>
+        <Authenticode>Microsoft402400</Authenticode>
         <StrongName>StrongName</StrongName>
       </CodeCoverageAssembliesToSign>
     </ItemGroup>
