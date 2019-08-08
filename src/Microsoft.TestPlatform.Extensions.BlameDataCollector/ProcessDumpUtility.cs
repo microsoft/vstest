@@ -7,8 +7,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Text;
-    using Microsoft.TestPlatform.Extensions.BlameDataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -17,7 +15,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
     public class ProcessDumpUtility : IProcessDumpUtility
     {
-        private static List<string> procDumpExceptionsList;
+        private static readonly IEnumerable<string> ProcDumpExceptionsList = new List<string>()
+        {
+            "STACK_OVERFLOW",
+            "ACCESS_VIOLATION"
+        };
+
         private IProcessHelper processHelper;
         private IFileHelper fileHelper;
         private IEnvironment environment;
@@ -37,11 +40,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.fileHelper = fileHelper;
             this.environment = environment;
             this.nativeMethodsHelper = nativeMethodsHelper;
-            ProcessDumpUtility.procDumpExceptionsList = new List<string>()
-            {
-                "STACK_OVERFLOW",
-                "ACCESS_VIOLATION"
-            };
         }
 
         /// <inheritdoc/>
@@ -81,18 +79,60 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <inheritdoc/>
-        public void StartProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false)
+        public void StartTriggerBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false)
         {
             this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}";
             this.testResultsDirectory = testResultsDirectory;
 
+            string procDumpArgs = new ProcDumpArgsBuilder().BuildTriggerBasedProcDumpArgs(
+                processId,
+                this.dumpFileName,
+                ProcDumpExceptionsList,
+                isFullDump);
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"ProcessDumpUtility : The procdump argument is {procDumpArgs}");
+            }
+
             this.procDumpProcess = this.processHelper.LaunchProcess(
                                             this.GetProcDumpExecutable(processId),
-                                            ProcessDumpUtility.BuildProcDumpArgs(processId, this.dumpFileName, isFullDump),
+                                            procDumpArgs,
                                             testResultsDirectory,
                                             null,
                                             null,
                                             null) as Process;
+        }
+
+        /// <inheritdoc/>
+        public void StartHangBasedProcessDump(int processId, string dumpFileGuid, string testResultsDirectory, bool isFullDump = false)
+        {
+            this.dumpFileName = $"{this.processHelper.GetProcessName(processId)}_{processId}_{dumpFileGuid}_hangdump";
+            this.testResultsDirectory = testResultsDirectory;
+
+            string procDumpArgs = new ProcDumpArgsBuilder().BuildHangBasedProcDumpArgs(
+                processId,
+                this.dumpFileName,
+                isFullDump);
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"ProcessDumpUtility : The hang based procdump invocation argument is {procDumpArgs}");
+            }
+
+            this.procDumpProcess = this.processHelper.LaunchProcess(
+                                            this.GetProcDumpExecutable(processId),
+                                            procDumpArgs,
+                                            testResultsDirectory,
+                                            null,
+                                            null,
+                                            null) as Process;
+        }
+
+        /// <inheritdoc/>
+        public void DetachFromTargetProcess(int targetProcessId)
+        {
+            new Win32NamedEvent($"Procdump-{targetProcessId}").Set();
         }
 
         /// <inheritdoc/>
@@ -107,49 +147,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 EqtTrace.Warning($"ProcessDumpUtility : Failed to kill proc dump process with exception {e}");
             }
-        }
-
-        /// <summary>
-        /// Arguments for procdump.exe
-        /// </summary>
-        /// <param name="processId">
-        /// Process Id
-        /// </param>
-        /// <param name="filename">
-        /// Filename for dump file
-        /// </param>
-        /// <param name="isFullDump">
-        /// Is full dump enabled
-        /// </param>
-        /// <returns>Arguments</returns>
-        private static string BuildProcDumpArgs(int processId, string filename, bool isFullDump = false)
-        {
-            // -accepteula: Auto accept end-user license agreement
-            // -e: Write a dump when the process encounters an unhandled exception. Include the 1 to create dump on first chance exceptions.
-            // -g: Run as a native debugger in a managed process (no interop).
-            // -t: Write a dump when the process terminates.
-            // -ma: Full dump argument.
-            // -f: Filter the exceptions.
-            StringBuilder procDumpArgument = new StringBuilder("-accepteula -e 1 -g -t ");
-            if (isFullDump)
-            {
-                procDumpArgument.Append("-ma ");
-            }
-
-            foreach (var exceptionFilter in ProcessDumpUtility.procDumpExceptionsList)
-            {
-                procDumpArgument.Append($"-f {exceptionFilter} ");
-            }
-
-            procDumpArgument.Append($"{processId} {filename}.dmp");
-            var argument = procDumpArgument.ToString();
-
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info($"ProcessDumpUtility : The procdump argument is {argument}");
-            }
-
-            return argument;
         }
 
         /// <summary>

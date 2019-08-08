@@ -176,6 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
+            events.TestRunStart += this.TestRunStartHandler;
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
@@ -357,6 +358,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         #endregion
 
         #region Event Handlers
+
+        /// <summary>
+        /// Called when a test run start is received
+        /// </summary>
+        private void TestRunStartHandler(object sender, TestRunStartEventArgs e)
+        {
+            ValidateArg.NotNull<object>(sender, "sender");
+            ValidateArg.NotNull<TestRunStartEventArgs>(e, "e");
+
+            // Print all test containers.
+            Output.WriteLine(string.Empty, OutputLevel.Information);
+            Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
+            if (verbosityLevel == Verbosity.Detailed)
+            {
+                foreach (var source in CommandLineOptions.Instance.Sources)
+                {
+                    Output.WriteLine(source, OutputLevel.Information);
+                }
+            }
+        }
 
         /// <summary>
         /// Called when a test message is received.
