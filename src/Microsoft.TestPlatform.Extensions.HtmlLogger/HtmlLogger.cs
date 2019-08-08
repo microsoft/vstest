@@ -3,20 +3,23 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using HtmlLoggerConstants = Microsoft.TestPlatform.Extensions.HtmlLogger.Utility.Constants;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Runtime.Serialization;
-    using System.IO;
-    using System.Collections.Concurrent;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.Serialization;
+    using System.Xml.Xsl;
+    using HtmlResource = Resources.Resources;
+    using HtmlLoggerConstants = Microsoft.TestPlatform.Extensions.HtmlLogger.Utility.Constants;
 
     /// <summary>
     /// Logger for generating Html log
@@ -28,6 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         private IFileHelper filehelper;
         private XmlObjectSerializer xmlSerializer;
         private IHtmlTransformer htmlTransformer;
+        private string fileName;
+        private Dictionary<string, string> parametersDictionary;
 
         public Htmllogger()
         : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestResults)))
@@ -77,7 +82,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// Total SkippedTests in the Results
         /// </summary>
         public int SkippedTests { get; private set; }
-        private string fileName;
         public string xmlFilePath { get; private set; }
         public string htmlFilePath { get; private set; }
 
@@ -115,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             {
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
-    
+            this.parametersDictionary = parameters;
             this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
         }
 
@@ -157,10 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
 
             TestResult testResult = new TestResult();
-            if (e.Result.DisplayName != null)
-                testResult.DisplayName = e.Result.DisplayName;
-            else
-                testResult.DisplayName = e.Result.TestCase.DisplayName;
+            testResult.DisplayName = e.Result.DisplayName ?? e.Result.TestCase.DisplayName;
 
             testResult.FullyQualifiedName = e.Result.TestCase.FullyQualifiedName;
             testResult.Duration = GetFormattedDurationString(e.Result.Duration);
@@ -170,7 +171,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             var executionId = this.GetExecutionId(e.Result);
             var parentExecutionId = this.GetParentExecutionId(e.Result);
 
-            /// TODO: handle skipped tests 
             this.TotalTests++;
             testResult.resultOutcome = e.Result.Outcome;
             if (e.Result.Outcome == TestOutcome.Failed)
@@ -187,7 +187,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             if (parentExecutionId == Guid.Empty)
+            {
                 TestResults.Results.Add(testResult);
+            }
 
             Results.TryAdd(executionId, testResult);
             if (parentExecutionId != Guid.Empty)
@@ -198,10 +200,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
         private void AddToParentResult( Guid parentExecutionId, TestResult testResult)
         {
+            // Needs to be tested!
             TestResult ParentTestResult;
             this.Results.TryGetValue(parentExecutionId, out ParentTestResult);
+
             if (ParentTestResult.innerTestResults == null)
                 ParentTestResult.innerTestResults = new List<TestResult>();
+
             ParentTestResult.innerTestResults.Add(testResult);
         }
 
@@ -218,21 +223,51 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassedTests = this.PassedTests,
                 TotalTests = this.TotalTests
             };
+
+            if (this.parametersDictionary != null)
+            {
+                var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue);
+                if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
+                {
+                    this.htmlFilePath = Path.Combine(this.TestResultsDirPath, logFileNameValue);
+                }
+            }
+
             this.PopulateHtmlFile();
         }
 
         private void PopulateHtmlFile()
         {
-            // TODO: Add exception handling and logging
             fileName = String.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}", Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
-            xmlFilePath = this.GetFilePath("xml",fileName);
+            xmlFilePath = this.GetFilePath("xml",this.fileName);
+            Stream xmlStream = null;
 
-            Stream xmlStream = this.filehelper.GetStream(xmlFilePath, FileMode.Create);
-            xmlSerializer.WriteObject(xmlStream, TestResults);
-            xmlStream.Close();
+            try
+            {
+                xmlStream = this.filehelper.GetStream(xmlFilePath, FileMode.Create);
+                xmlSerializer.WriteObject(xmlStream, TestResults);
+                xmlStream.Close();
 
-            htmlFilePath = this.GetFilePath("html", fileName);
-            htmlTransformer.Transform(xmlFilePath, htmlFilePath);
+                if (htmlFilePath == null)
+                {
+                    htmlFilePath = this.GetFilePath("html", this.fileName);
+                }
+                htmlTransformer.Transform(xmlFilePath, htmlFilePath);
+            }
+            catch (IOException ioEx)
+            {
+                string ioexMessage = string.Format("HtmlLogger : Failed to create a xml file. Exception : {0}", ioEx.ToString());
+                EqtTrace.Error(ioexMessage);
+            }
+            catch (XsltCompileException xslte)
+            {
+                string xslteMessage = string.Format("HtmlLogger : Failed to convert xml file to html file. Exception : {0}", xslte.ToString());
+                EqtTrace.Error(xslteMessage);
+            }
+
+            string htmlfilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, this.htmlFilePath);
+            EqtTrace.Info(htmlfilePathMessage);
+            ConsoleOutput.Instance.Information(false, this.htmlFilePath);
         }
 
         private string GetFilePath(string fileFormat,string FileName)
@@ -240,7 +275,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             var fullfileformat = string.Concat("." + fileFormat);
             return Path.Combine(this.TestResultsDirPath, string.Concat("TestResult_", FileName, fullfileformat));
         }
-
 
         private static string FormatDateTimeForRunName(DateTime timeStamp)
         {
@@ -267,14 +301,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         {
             TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
             var executionId = Guid.Empty;
+
             if (executionIdProperty != null)
+            {
                 executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
+            }
 
             return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
         }
 
         /// <summary>
-        /// converts the timespan format to readable string 
+        /// Converts the timespan format to readable string 
         /// </summary>
         /// <param name="duration"></param>
         /// <returns></returns>

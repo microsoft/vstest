@@ -11,14 +11,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     public sealed class TestResults
     {
         /// <summary>
-        /// constructor Class for testResults
+        /// Constructor Class for testResults
         /// </summary>
         public TestResults()
         {
         }
 
         /// <summary>
-        /// it has the test run summary of all test results
+        /// It has the test run summary of all test results
         /// </summary>
         [DataMember]
         internal TestRunSummary Summary { get; set; }
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// List of Run Level Message that is Informational 
         /// </summary>
         [DataMember]
-        internal List<string> RunLevelMessageInformational =  new List<string>();
+        internal List<string> RunLevelMessageInformational = new List<string>();
 
         /// <summary>
         /// List of Run Level MessageError and warnings
@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         internal List<string> RunLevelMessageErrorAndWarning = new List<string>();
 
         /// <summary>
-        /// List of all results in Hieracheal model
+        /// List of all results in Hierachal model
         /// </summary>
         [DataMember]
         internal List<TestResult> Results = new List<TestResult>();
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <returns></returns>
         internal int GetTestResultscount()
         {
-            return this.Results.Count;
+            return Results.Count;
         }
     }
 }

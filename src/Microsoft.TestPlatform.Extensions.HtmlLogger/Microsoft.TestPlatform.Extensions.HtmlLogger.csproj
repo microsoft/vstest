@@ -10,9 +10,6 @@
     <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
     <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0</TargetFrameworks>
   </PropertyGroup>
-  <!--<ItemGroup>
-    <EmbeddedResource Include="Resources\TrxResource.resx" />
-  </ItemGroup>-->
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System" />
     <Reference Include="System.Runtime" />
@@ -20,7 +17,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
+    <EmbeddedResource Include="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
@@ -30,25 +27,18 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Resources.Designer.cs">
+    <Compile Update="Resources\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  <!--<ItemGroup>
-    <Compile Update="Resources\TrxResource.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>TrxResource.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources\TrxResource.resx">
+    <None Update="Resources\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>TrxResource.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>-->
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger</RootNamespace>
   </PropertyGroup>

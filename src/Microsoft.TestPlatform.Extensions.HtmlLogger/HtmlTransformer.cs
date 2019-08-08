@@ -1,18 +1,20 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.IO;
-using System.Xml;
-using System.Xml.Xsl;
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 {
+    using System.IO;
+    using System.Xml;
+    using System.Xml.Xsl;
+    using HtmlResources = Resources.Resources;
+
     class HtmlTransformer : IHtmlTransformer
     {
-        StringReader xsltStringReader = new StringReader(Resources.Html);
+        StringReader xsltStringReader = new StringReader(@"D:\Code\vstest\src\Microsoft.TestPlatform.Extensions.HtmlLogger\Html.xslt");//HtmlResources.Html);
         XslCompiledTransform myXslTransform;
 
         /// <summary>
-        /// the following  function invoesthe compiled tranform and Loads the xslt file 
+        /// The following function invokes the compiled tranform and Loads the xslt file.
         /// </summary>
         public HtmlTransformer()
         {
@@ -21,9 +23,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        ///It transforms the xmlfile to htmlfile 
+        /// It transforms the xmlfile to htmlfile.
         /// </summary>
-        public void Transform(string xmlfile,string htmlfile)
+        public void Transform(string xmlfile, string htmlfile)
         {
             myXslTransform.Transform(xmlfile, htmlfile);
         }

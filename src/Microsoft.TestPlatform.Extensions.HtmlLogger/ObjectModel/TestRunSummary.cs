@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     public class TestRunSummary
     {
         /// <summary>
-        /// total tests of a testrun
+        /// Total tests of a test run
         /// </summary>
         public int TotalTests { get; set; }
 

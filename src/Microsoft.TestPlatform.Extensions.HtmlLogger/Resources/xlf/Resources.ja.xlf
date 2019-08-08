@@ -1,0 +1,459 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ja" original="../Resources.resx" build-num="-508382432">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">27</count>
+        <count count-type="x-adjWordCount">22.95</count>
+        <count count-type="x-curAdjWordCount">22.95</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">27</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
+    <body>
+      <trans-unit id="HtmlFilePath">
+        <source>Path to generated html test results file : {0}</source>
+        <target state="new">Obtained Html File's Path is {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Html">
+        <source>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;xsl:stylesheet version="2.0"    
+    xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp"&gt;
+  &lt;xsl:output method="html" indent="yes"/&gt;
+  &lt;xsl:template match="/"&gt;
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;h1&gt;TestResults&lt;/h1&gt;
+        &lt;xsl:apply-templates select ="/tp:TestResults"/&gt;
+      &lt;/body&gt;
+      &lt;script language="javascript"&gt;
+        function ToggleClass(id) {
+        var elem = document.getElementById(id);
+        if (elem.style.display == "none") {
+        elem.style.display = "block";
+        }
+        else {
+        elem.style.display = "none";
+        }
+        }
+      &lt;/script&gt;
+      &lt;style&gt;
+        #testtable {
+        border-collapse: collapse;
+        }
+        #testtable, th, td {
+        border: 1px solid black;
+        }
+        body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
+        h2 {
+        margin-top: 0;
+        }
+        .summary {background-color: #f4f4e1;font-family:monospace; }
+        .row {
+        background-color: #f0f5fa;
+        cursor:pointer;
+        width:100%; 
+        }
+        .innerRow{
+        background-color :#e9e1f4;
+        cursor:pointer;
+        width:100%;
+        }
+        .pass { color: #0c0; }
+        .fail { color: #c00; }
+        .errorMessage{ color : brown; }
+        .errorStackTrace{ color: brown; }
+        .duration{float:right;}
+
+      &lt;/style&gt;
+    &lt;/html&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="/tp:TestResults"&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary"/&gt;
+    &lt;h2&gt;Results&lt;/h2&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Results"/&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="/tp:TestResults/tp:Results"&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Results/tp:TestResult"/&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="tp:TestResults/tp:Summary"&gt;
+    &lt;div class ="summary"&gt;
+    &lt;h2&gt;Summary&lt;/h2&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/&gt;
+    &lt;br/&gt;
+    &lt;/div&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match="tp:TestResult"&gt;
+    &lt;div class ="row" onclick="ToggleClass('{generate-id()}')"&gt;
+      &lt;div &gt;
+        &lt;xsl:apply-templates select = "tp:resultOutcome" /&gt;
+        &lt;xsl:apply-templates select = "tp:FullyQualifiedName" /&gt;
+        &lt;div class="duration"&gt;
+          &lt;xsl:apply-templates select = "tp:Duration" /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;xsl:if test ="tp:ErrorMessage!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorMessage" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:ErrorStackTrace!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorStackTrace" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:innerTestResults!=''"&gt;
+        &lt;a Id="{generate-id()}" style="display:none;"&gt;
+          &lt;h3&gt;Child Test Results:&lt;/h3&gt;
+          &lt;xsl:apply-templates select = "tp:innerTestResults" /&gt;
+        &lt;/a&gt;
+      &lt;/xsl:if&gt;
+      &lt;br /&gt;
+    &lt;/div&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match="tp:innerTestResults/tp:TestResult"&gt;
+    &lt;div class="innerRow" onclick="ToggleClass('{generate-id()}')" &gt;
+      &lt;div&gt;
+        &lt;xsl:apply-templates select = "tp:resultOutcome" /&gt;
+        &lt;xsl:apply-templates select = "tp:FullyQualifiedName" /&gt;
+        &lt;div  style="float:right;"&gt;
+          &lt;xsl:apply-templates select = "tp:Duration" /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;xsl:if test ="tp:ErrorMessage!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorMessage" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:ErrorStackTrace!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorStackTrace" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:innerTestResults!=''"&gt;
+        &lt;a Id="{generate-id()}" style="display:none;"&gt;
+          &lt;h3&gt;Child Test Results:&lt;/h3&gt;
+          &lt;xsl:apply-templates select = "tp:innerTestResults" /&gt;
+        &lt;/a&gt;
+      &lt;/xsl:if&gt;
+      &lt;br /&gt;
+    &lt;/div&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:ErrorMessage"&gt;
+    ErrorMessage: &lt;span class="errorMessage"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:ErrorStackTrace"&gt;
+    ErrorStackTrace: &lt;span class="errorStackTrace"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:FailedTests"&gt;
+    &lt;span&gt;
+      FailedTests:&amp;#160;
+    &lt;/span&gt;
+    &lt;span class="failedTests"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:PassedTests"&gt;
+    &lt;span &gt;
+      PassedTests:&amp;#160;
+    &lt;/span&gt;
+    &lt;span class="passedTests" &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:SkippedTests"&gt;
+    &lt;span &gt;
+      SkippedTests:
+    &lt;/span&gt;
+    &lt;span class="skippedTests" &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:TotalTests"&gt;
+    &lt;span &gt;
+      TotalTests:&amp;#160;&amp;#160;
+  &lt;/span&gt;
+    &lt;span class="totalTests"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:DisplayName"&gt;
+    DisplayName:&lt;span &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:resultOutcome"&gt;
+    &lt;xsl:if test =" . = 'Passed' "&gt;
+      &lt;span class="pass"&gt;
+        &amp;#x2714;
+      &lt;/span&gt;
+    &lt;/xsl:if&gt;
+    &lt;xsl:if test =" . = 'Failed'"&gt;
+      &lt;span class="fail"&gt;
+        &amp;#x2718;
+      &lt;/span&gt;
+    &lt;/xsl:if&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:Duration"&gt;
+    &lt;span &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  &lt;xsl:template match = "tp:FullyQualifiedName"&gt;
+    &lt;span &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</source>
+        <target state="new">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;xsl:stylesheet version="2.0"    
+    xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp"&gt;
+  &lt;xsl:output method="html" indent="yes"/&gt;
+  &lt;xsl:template match="/"&gt;
+    &lt;html&gt;
+      &lt;body&gt;
+        &lt;h1&gt;TestResults&lt;/h1&gt;
+        &lt;xsl:apply-templates select ="/tp:TestResults"/&gt;
+      &lt;/body&gt;
+      &lt;script language="javascript"&gt;
+        function ToggleClass(id) {
+        var elem = document.getElementById(id);
+        if (elem.style.display == "none") {
+        elem.style.display = "block";
+        }
+        else {
+        elem.style.display = "none";
+        }
+        }
+      &lt;/script&gt;
+      &lt;style&gt;
+        #testtable {
+        border-collapse: collapse;
+        }
+        #testtable, th, td {
+        border: 1px solid black;
+        }
+        body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
+        h2 {
+        margin-top: 0;
+        }
+        .summary {background-color: #f4f4e1;font-family:monospace; }
+        .row {
+        background-color: #f0f5fa;
+        cursor:pointer;
+        width:100%; 
+        }
+        .innerRow{
+        background-color :#e9e1f4;
+        cursor:pointer;
+        width:100%;
+        }
+        .pass { color: #0c0; }
+        .fail { color: #c00; }
+        .errorMessage{ color : brown; }
+        .errorStackTrace{ color: brown; }
+        .duration{float:right;}
+
+      &lt;/style&gt;
+    &lt;/html&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="/tp:TestResults"&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary"/&gt;
+    &lt;h2&gt;Results&lt;/h2&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Results"/&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="/tp:TestResults/tp:Results"&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Results/tp:TestResult"/&gt;
+  &lt;/xsl:template&gt;
+
+  &lt;xsl:template match="tp:TestResults/tp:Summary"&gt;
+    &lt;div class ="summary"&gt;
+    &lt;h2&gt;Summary&lt;/h2&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/&gt;
+    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/&gt;
+    &lt;br/&gt;
+    &lt;/div&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match="tp:TestResult"&gt;
+    &lt;div class ="row" onclick="ToggleClass('{generate-id()}')"&gt;
+      &lt;div &gt;
+        &lt;xsl:apply-templates select = "tp:resultOutcome" /&gt;
+        &lt;xsl:apply-templates select = "tp:FullyQualifiedName" /&gt;
+        &lt;div class="duration"&gt;
+          &lt;xsl:apply-templates select = "tp:Duration" /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;xsl:if test ="tp:ErrorMessage!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorMessage" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:ErrorStackTrace!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorStackTrace" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:innerTestResults!=''"&gt;
+        &lt;a Id="{generate-id()}" style="display:none;"&gt;
+          &lt;h3&gt;Child Test Results:&lt;/h3&gt;
+          &lt;xsl:apply-templates select = "tp:innerTestResults" /&gt;
+        &lt;/a&gt;
+      &lt;/xsl:if&gt;
+      &lt;br /&gt;
+    &lt;/div&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match="tp:innerTestResults/tp:TestResult"&gt;
+    &lt;div class="innerRow" onclick="ToggleClass('{generate-id()}')" &gt;
+      &lt;div&gt;
+        &lt;xsl:apply-templates select = "tp:resultOutcome" /&gt;
+        &lt;xsl:apply-templates select = "tp:FullyQualifiedName" /&gt;
+        &lt;div  style="float:right;"&gt;
+          &lt;xsl:apply-templates select = "tp:Duration" /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;xsl:if test ="tp:ErrorMessage!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorMessage" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:ErrorStackTrace!=''"&gt;
+        &lt;xsl:apply-templates select = "tp:ErrorStackTrace" /&gt;
+      &lt;/xsl:if&gt;
+      &lt;xsl:if test ="tp:innerTestResults!=''"&gt;
+        &lt;a Id="{generate-id()}" style="display:none;"&gt;
+          &lt;h3&gt;Child Test Results:&lt;/h3&gt;
+          &lt;xsl:apply-templates select = "tp:innerTestResults" /&gt;
+        &lt;/a&gt;
+      &lt;/xsl:if&gt;
+      &lt;br /&gt;
+    &lt;/div&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:ErrorMessage"&gt;
+    ErrorMessage: &lt;span class="errorMessage"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:ErrorStackTrace"&gt;
+    ErrorStackTrace: &lt;span class="errorStackTrace"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:FailedTests"&gt;
+    &lt;span&gt;
+      FailedTests:&amp;#160;
+    &lt;/span&gt;
+    &lt;span class="failedTests"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:PassedTests"&gt;
+    &lt;span &gt;
+      PassedTests:&amp;#160;
+    &lt;/span&gt;
+    &lt;span class="passedTests" &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:SkippedTests"&gt;
+    &lt;span &gt;
+      SkippedTests:
+    &lt;/span&gt;
+    &lt;span class="skippedTests" &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:TotalTests"&gt;
+    &lt;span &gt;
+      TotalTests:&amp;#160;&amp;#160;
+  &lt;/span&gt;
+    &lt;span class="totalTests"&gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:DisplayName"&gt;
+    DisplayName:&lt;span &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:resultOutcome"&gt;
+    &lt;xsl:if test =" . = 'Passed' "&gt;
+      &lt;span class="pass"&gt;
+        &amp;#x2714;
+      &lt;/span&gt;
+    &lt;/xsl:if&gt;
+    &lt;xsl:if test =" . = 'Failed'"&gt;
+      &lt;span class="fail"&gt;
+        &amp;#x2718;
+      &lt;/span&gt;
+    &lt;/xsl:if&gt;
+  &lt;/xsl:template&gt;
+  
+  &lt;xsl:template match = "tp:Duration"&gt;
+    &lt;span &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+    &lt;br /&gt;
+  &lt;/xsl:template&gt;
+  &lt;xsl:template match = "tp:FullyQualifiedName"&gt;
+    &lt;span &gt;
+      &lt;xsl:value-of select = "." /&gt;
+    &lt;/span&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

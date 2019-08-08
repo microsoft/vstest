@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger {
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -62,22 +62,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;xsl:stylesheet version=&quot;2.0&quot;
-        ///    
-        ///                xmlns:tp=&quot;http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger&quot;
-        ///                xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
-        ///    xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; exclude-result-prefixes=&quot;msxs tp&quot;
-        ///&gt;
+        ///&lt;xsl:stylesheet version=&quot;2.0&quot;    
+        ///    xmlns:tp=&quot;http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger&quot;
+        ///    xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+        ///    xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; exclude-result-prefixes=&quot;msxs tp&quot;&gt;
         ///  &lt;xsl:output method=&quot;html&quot; indent=&quot;yes&quot;/&gt;
         ///  &lt;xsl:template match=&quot;/&quot;&gt;
         ///    &lt;html&gt;
         ///      &lt;body&gt;
         ///        &lt;h1&gt;TestResults&lt;/h1&gt;
-        ///        &lt;xsl:apply-templates [rest of string was truncated]&quot;;.
+        ///        &lt;xsl:apply-templates select =&quot;/tp:TestResults&quot;/&gt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Html {
             get {
                 return ResourceManager.GetString("Html", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Path to generated html test results file : {0}.
+        /// </summary>
+        internal static string HtmlFilePath {
+            get {
+                return ResourceManager.GetString("HtmlFilePath", resourceCulture);
             }
         }
     }
