@@ -22,6 +22,7 @@
     <file src="net451\$Runtime$\datacollector.exe"	target="tools\net451\datacollector.exe" />
     <file src="net451\$Runtime$\datacollector.exe.config"	target="tools\net451\datacollector.exe.config" />
     <file src="net451\$Runtime$\Microsoft.Extensions.DependencyModel.dll"	target="tools\net451\Microsoft.Extensions.DependencyModel.dll" />
+    <file src="net451\$Runtime$\Microsoft.Extensions.FileSystemGlobbing.dll"	target="tools\net451\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\net451\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\net451\Microsoft.TestPlatform.CoreUtilities.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CrossPlatEngine.dll"	target="tools\net451\Microsoft.TestPlatform.CrossPlatEngine.dll" />
@@ -227,6 +228,7 @@
     <file src="netcoreapp2.1\datacollector.runtimeconfig.json"	target="tools\netcoreapp2.1\datacollector.runtimeconfig.json" />
     <file src="netcoreapp2.1\Microsoft.Extensions.DependencyModel.dll"	target="tools\netcoreapp2.1\Microsoft.Extensions.DependencyModel.dll" />
     <file src="netcoreapp2.1\System.Runtime.CompilerServices.Unsafe.dll"   target="tools\netcoreapp2.1\System.Runtime.CompilerServices.Unsafe.dll" />
+    <file src="netcoreapp2.1\Microsoft.Extensions.FileSystemGlobbing.dll"	target="tools\netcoreapp2.1\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="netcoreapp2.1\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\netcoreapp2.1\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="netcoreapp2.1\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\netcoreapp2.1\Microsoft.TestPlatform.CoreUtilities.dll" />
     <file src="netcoreapp2.1\Microsoft.TestPlatform.CrossPlatEngine.dll"	target="tools\netcoreapp2.1\Microsoft.TestPlatform.CrossPlatEngine.dll" />

@@ -19,6 +19,7 @@
     <NUnitConsoleRunnerVersion>3.8.0</NUnitConsoleRunnerVersion>
 
     <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
+    <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
     <NuGetFrameworkVersion>5.2.0</NuGetFrameworkVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>

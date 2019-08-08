@@ -10,8 +10,8 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
     using System;
-    using System.Reflection;
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -39,7 +39,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly while executing following test(s):.
         /// </summary>
@@ -68,70 +68,76 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
                 return ResourceManager.GetString("AbortedTestRun", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   The blame parameter key specified {0} is not valid. Ignoring this key..
+        ///   Looks up a localized string similar to The blame parameter key specified {0} is not valid. Ignoring this key..
         /// </summary>
-        internal static string BlameParameterKeyIncorrect
-        {
-            get
-            {
+        internal static string BlameParameterKeyIncorrect {
+            get {
                 return ResourceManager.GetString("BlameParameterKeyIncorrect", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key..
+        ///   Looks up a localized string similar to The blame parameter key  {0} can only support values {1}/{2}. Ignoring this key..
         /// </summary>
-        internal static string BlameParameterValueIncorrect
-        {
-            get
-            {
+        internal static string BlameParameterValueIncorrect {
+            get {
                 return ResourceManager.GetString("BlameParameterValueIncorrect", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Could not start process dump: {0}.
+        ///   Looks up a localized string similar to Collect dump was enabled but no dump file was generated..
         /// </summary>
-        internal static string ProcDumpCouldNotStart
-        {
-            get
-            {
+        internal static string DumpFileNotGeneratedErrorMessage {
+            get {
+                return ResourceManager.GetString("DumpFileNotGeneratedErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process..
+        /// </summary>
+        internal static string InactivityTimeout {
+            get {
+                return ResourceManager.GetString("InactivityTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not start process dump: {0}.
+        /// </summary>
+        internal static string ProcDumpCouldNotStart {
+            get {
                 return ResourceManager.GetString("ProcDumpCouldNotStart", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable.
+        ///   Looks up a localized string similar to Required environment variable PROCDUMP_PATH was null or empty. Set PROCDUMP_PATH to path of folder containing appropriate procdump executable..
         /// </summary>
-        internal static string ProcDumpEnvVarEmpty
-        {
-            get
-            {
+        internal static string ProcDumpEnvVarEmpty {
+            get {
                 return ResourceManager.GetString("ProcDumpEnvVarEmpty", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   CollectDump was enabled but dump file was not generated..
+        ///   Looks up a localized string similar to CollectDump was enabled but dump file was not generated..
         /// </summary>
-        internal static string ProcDumpNotGenerated
-        {
-            get
-            {
+        internal static string ProcDumpNotGenerated {
+            get {
                 return ResourceManager.GetString("ProcDumpNotGenerated", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to Collect dump was enabled but no dump file was generated.
+        ///   Looks up a localized string similar to Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input..
         /// </summary>
-        internal static string DumpFileNotGeneratedErrorMessage
-        {
-            get
-            {
-                return ResourceManager.GetString("DumpFileNotGeneratedErrorMessage", resourceCulture);
+        internal static string UnexpectedValueForInactivityTimespanValue {
+            get {
+                return ResourceManager.GetString("UnexpectedValueForInactivityTimespanValue", resourceCulture);
             }
         }
     }

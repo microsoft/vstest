@@ -221,9 +221,6 @@
   <data name="DuplicateArgumentError" xml:space="preserve">
     <value>The parameter "{0}" should be provided only once.</value>
   </data>
-  <data name="DuplicateSource" xml:space="preserve">
-    <value>Duplicate source {0} specified.</value>
-  </data>
   <data name="EnableCodeCoverageArgumentProcessorHelp" xml:space="preserve">
     <value>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</value>
@@ -486,10 +483,11 @@
   </data>
   <data name="RunTestsArgumentHelp" xml:space="preserve">
     <value>[TestFileNames]
-      Run tests from the specified files. Separate multiple test file names
-      by spaces.
+      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
+      by spaces. Set console logger verbosity to detailed to view matched test files.
       Examples: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</value>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</value>
   </data>
   <data name="SearchStringDelimiter" xml:space="preserve">
     <value>,</value>
@@ -729,5 +727,8 @@
   </data>
   <data name="ProgressIndicatorString" xml:space="preserve">
     <value>Test run in progress</value>
+  </data>
+  <data name="TestSourcesDiscovered" xml:space="preserve">
+    <value>A total of {0} test files matched the specified pattern.</value>
   </data>
 </root>

@@ -433,15 +433,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate source {0} specified..
-        /// </summary>
-        internal static string DuplicateSource {
-            get {
-                return ResourceManager.GetString("DuplicateSource", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to --Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
         ///      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
         ///      It creates an output file in the current directory as &quot;Sequence.xml&quot;,
@@ -1616,7 +1607,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("TestSourceFileNotFound", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to A total of {0} test source files are discovered..
+        /// </summary>
+        internal static string TestSourcesDiscovered
+        {
+            get
+            {
+                return ResourceManager.GetString("TestSourcesDiscovered", resourceCulture);
+            }
+        }
+
+
         /// <summary>
         ///   Looks up a localized string similar to Time elapsed :.
         /// </summary>

@@ -2,10 +2,6 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
-      <trans-unit id="DuplicateSource">
-        <source>Duplicate source {0} specified.</source>
-        <note></note>
-      </trans-unit>
       <trans-unit id="FileNotFound">
         <source>'{0}' not found.</source>
         <note></note>
@@ -124,10 +120,11 @@
       </trans-unit>
       <trans-unit id="RunTestsArgumentHelp">
         <source>[TestFileNames]
-      Run tests from the specified files. Separate multiple test file names
-      by spaces.
+      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
+      by spaces. Set console logger verbosity to detailed to view matched test files.
       Examples: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</source>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</source>
         <note></note>
       </trans-unit>
       <trans-unit id="AvailableSettingsProvidersHeaderMessage">
@@ -838,6 +835,11 @@
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="new">    Skipped: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestSourcesDiscovered">
+        <source>A total of {0} test files matched the specified pattern.</source>
+        <target state="new">A total of {0} test source files are discovered.</target>
         <note></note>
       </trans-unit>
     </body>
