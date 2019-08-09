@@ -144,6 +144,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void InitializeWithParametersShouldSetDisableProgressWhenCI()
+        {
+            Environment.SetEnvironmentVariable("CI", "true");
+
+            var parameters = new Dictionary<string, string>();
+
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.IsTrue(ConsoleLogger.DisableProgress);
+
+            ConsoleLogger.DisableProgress = false;
+        }
+
+        [TestMethod]
+        public void InitializeWithParametersShouldSetDisableProgressFalseOverrideCI()
+        {
+            Environment.SetEnvironmentVariable("CI", "true");
+
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("noprogress", "false");
+
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.IsFalse(ConsoleLogger.DisableProgress);
+
+            ConsoleLogger.DisableProgress = false;
+        }
+
+
+        [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
             var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
@@ -977,7 +1007,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testresults = this.GetTestResultObject(TestOutcome.Passed);
-            testresults[0].Messages.Add(new TestResultMessage (TestResultMessage.StandardOutCategory, "Hello"));
+            testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "Hello"));
 
             foreach (var testResult in testresults)
             {
@@ -1096,7 +1126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             return testresultList;
         }
 
-        
+
 
 
         private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)

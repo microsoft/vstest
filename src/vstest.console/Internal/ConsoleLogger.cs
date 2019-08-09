@@ -85,6 +85,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string NoProgressParam = "noprogress";
 
+        internal const string ContinuousIntegrationIndicator = "CI";
+
         #endregion
 
         internal enum Verbosity
@@ -136,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Properties        
+        #region Properties
 
         /// <summary>
         /// Gets instance of IOutput used for sending output.
@@ -181,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // Progress indicator needs to be displayed only for cli experience.
                 this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
             }
-            
+
             // Register for the events.
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
@@ -219,10 +221,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 bool.TryParse(prefix, out AppendPrefix);
             }
 
+            var ciEnvironment = Environment.GetEnvironmentVariable(ConsoleLogger.ContinuousIntegrationIndicator);
+            if (bool.TryParse(ciEnvironment, out var ci) && ci)
+            {
+                DisableProgress = true;
+            }
+
             var noprogressExists = parameters.TryGetValue(ConsoleLogger.NoProgressParam, out string noprogress);
             if (noprogressExists)
             {
-                bool.TryParse(noprogress, out DisableProgress);
+                if (bool.TryParse(noprogress, out var disableProgress))
+                {
+                    DisableProgress = disableProgress;
+                }
             }
 
             Initialize(events, String.Empty);
@@ -232,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         #region Private Methods
 
         /// <summary>
-        /// Prints the timespan onto console. 
+        /// Prints the timespan onto console.
         /// </summary>
         private static void PrintTimeSpan(TimeSpan timeSpan)
         {
@@ -468,7 +479,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
 
-            // Update the test count statistics based on the result of the test. 
+            // Update the test count statistics based on the result of the test.
             this.testsTotal++;
 
             var testDisplayName = e.Result.DisplayName;
@@ -517,7 +528,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         {
                             break;
                         }
-                        
+
                         // Pause the progress indicator before displaying test result information
                         this.progressIndicator?.Pause();
 
