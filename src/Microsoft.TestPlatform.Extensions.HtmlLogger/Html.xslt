@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0"    
+<xsl:stylesheet version="2.0"
     xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp">
@@ -36,7 +36,7 @@
         .row {
         background-color: #f0f5fa;
         cursor:pointer;
-        width:100%; 
+        width:100%;
         }
         .innerRow{
         background-color :#e9e1f4;
@@ -65,15 +65,15 @@
 
   <xsl:template match="tp:TestResults/tp:Summary">
     <div class ="summary">
-    <h2>Summary</h2>
-    <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/>
-    <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/>
-    <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/>
-    <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/>
-    <br/>
+      <h2>Summary</h2>
+      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/>
+      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/>
+      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/>
+      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/>
+      <br/>
     </div>
   </xsl:template>
-  
+
   <xsl:template match="tp:TestResult">
     <div class ="row" onclick="ToggleClass('{generate-id()}')">
       <div >
@@ -98,7 +98,7 @@
       <br />
     </div>
   </xsl:template>
-  
+
   <xsl:template match="tp:innerTestResults/tp:TestResult">
     <div class="innerRow" onclick="ToggleClass('{generate-id()}')" >
       <div>
@@ -123,21 +123,21 @@
       <br />
     </div>
   </xsl:template>
-  
+
   <xsl:template match = "tp:ErrorMessage">
     ErrorMessage: <span class="errorMessage">
       <xsl:value-of select = "." />
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:ErrorStackTrace">
     ErrorStackTrace: <span class="errorStackTrace">
       <xsl:value-of select = "." />
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:FailedTests">
     <span>
       FailedTests:&#160;
@@ -147,7 +147,7 @@
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:PassedTests">
     <span >
       PassedTests:&#160;
@@ -157,7 +157,7 @@
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:SkippedTests">
     <span >
       SkippedTests:
@@ -167,24 +167,24 @@
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:TotalTests">
     <span >
       TotalTests:&#160;&#160;
-  </span>
+    </span>
     <span class="totalTests">
       <xsl:value-of select = "." />
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:DisplayName">
     DisplayName:<span >
       <xsl:value-of select = "." />
     </span>
     <br />
   </xsl:template>
-  
+
   <xsl:template match = "tp:resultOutcome">
     <xsl:if test =" . = 'Passed' ">
       <span class="pass">
@@ -197,7 +197,7 @@
       </span>
     </xsl:if>
   </xsl:template>
-  
+
   <xsl:template match = "tp:Duration">
     <span >
       <xsl:value-of select = "." />

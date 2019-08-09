@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="Html">
         <source>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;xsl:stylesheet version="2.0"    
+&lt;xsl:stylesheet version="2.0"
     xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp"&gt;
@@ -46,7 +46,7 @@
         .row {
         background-color: #f0f5fa;
         cursor:pointer;
-        width:100%; 
+        width:100%;
         }
         .innerRow{
         background-color :#e9e1f4;
@@ -75,15 +75,15 @@
 
   &lt;xsl:template match="tp:TestResults/tp:Summary"&gt;
     &lt;div class ="summary"&gt;
-    &lt;h2&gt;Summary&lt;/h2&gt;
-    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/&gt;
-    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/&gt;
-    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/&gt;
-    &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/&gt;
-    &lt;br/&gt;
+      &lt;h2&gt;Summary&lt;/h2&gt;
+      &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/&gt;
+      &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/&gt;
+      &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/&gt;
+      &lt;xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/&gt;
+      &lt;br/&gt;
     &lt;/div&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match="tp:TestResult"&gt;
     &lt;div class ="row" onclick="ToggleClass('{generate-id()}')"&gt;
       &lt;div &gt;
@@ -108,7 +108,7 @@
       &lt;br /&gt;
     &lt;/div&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match="tp:innerTestResults/tp:TestResult"&gt;
     &lt;div class="innerRow" onclick="ToggleClass('{generate-id()}')" &gt;
       &lt;div&gt;
@@ -133,21 +133,21 @@
       &lt;br /&gt;
     &lt;/div&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:ErrorMessage"&gt;
     ErrorMessage: &lt;span class="errorMessage"&gt;
       &lt;xsl:value-of select = "." /&gt;
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:ErrorStackTrace"&gt;
     ErrorStackTrace: &lt;span class="errorStackTrace"&gt;
       &lt;xsl:value-of select = "." /&gt;
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:FailedTests"&gt;
     &lt;span&gt;
       FailedTests:&amp;#160;
@@ -157,7 +157,7 @@
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:PassedTests"&gt;
     &lt;span &gt;
       PassedTests:&amp;#160;
@@ -167,7 +167,7 @@
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:SkippedTests"&gt;
     &lt;span &gt;
       SkippedTests:
@@ -177,24 +177,24 @@
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:TotalTests"&gt;
     &lt;span &gt;
       TotalTests:&amp;#160;&amp;#160;
-  &lt;/span&gt;
+    &lt;/span&gt;
     &lt;span class="totalTests"&gt;
       &lt;xsl:value-of select = "." /&gt;
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:DisplayName"&gt;
     DisplayName:&lt;span &gt;
       &lt;xsl:value-of select = "." /&gt;
     &lt;/span&gt;
     &lt;br /&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:resultOutcome"&gt;
     &lt;xsl:if test =" . = 'Passed' "&gt;
       &lt;span class="pass"&gt;
@@ -207,7 +207,7 @@
       &lt;/span&gt;
     &lt;/xsl:if&gt;
   &lt;/xsl:template&gt;
-  
+
   &lt;xsl:template match = "tp:Duration"&gt;
     &lt;span &gt;
       &lt;xsl:value-of select = "." /&gt;
