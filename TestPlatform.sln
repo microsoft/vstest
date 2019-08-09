@@ -42,6 +42,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{46250E12-4CF1-4051-B4A7-80C8C06E0068}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logger", "Logger", "{020E15EA-731F-4667-95AF-226671E0C3AE}"
+	ProjectSection(SolutionItems) = preProject
+		test\Microsoft.TestPlatform.AcceptanceTests\TestResults.html = test\Microsoft.TestPlatform.AcceptanceTests\TestResults.html
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance", "{595BE9C1-E10F-4E50-938A-E6C248D3F950}"
 EndProject

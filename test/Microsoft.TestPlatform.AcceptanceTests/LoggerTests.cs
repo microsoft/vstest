@@ -50,7 +50,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             var htmlLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", htmlFileName);
-            var expectedHtmlFilePath = @"D:\Code\vstest\test\Microsoft.TestPlatform.AcceptanceTests\TestResults.html";
+            var expectedHtmlFilePath = @".\TestResults.html";
             Assert.IsTrue(IsFileAndContentEqual(htmlLogFilePath, expectedHtmlFilePath), "Invalid content in Html log file");
         }
 
