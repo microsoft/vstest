@@ -869,7 +869,7 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-#Install-DotNetCli
+Install-DotNetCli
 Restore-Package
 Update-LocalizedResources
 Invoke-Build
