@@ -149,6 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             Environment.SetEnvironmentVariable("CI", "true");
 
             var parameters = new Dictionary<string, string>();
+            parameters.Add("fakeparam", "false");
 
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
