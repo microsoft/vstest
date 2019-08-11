@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
+        public Collection<AttachmentSet> SendAfterTestRunEndAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
         {
             var isDataCollectionComplete = false;
             Collection<AttachmentSet> attachmentSets = null;
