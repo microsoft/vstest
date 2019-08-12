@@ -447,6 +447,37 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         #endregion
 
+        #region RunSettings With EnvironmentVariables Settings Tests
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void EnvironmentVariablesSettingsShouldSetEnvironmentVariables(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var testAssemblyPath = this.GetAssetFullPath("EnvironmentVariablesTestProject.dll");
+
+            var runsettingsXml = @"<RunSettings>
+                                    <RunConfiguration>
+                                      <EnvironmentVariables>
+                                        <DOTNET_ROOT>C:\ProgramFiles\dotnet</DOTNET_ROOT>
+                                      </EnvironmentVariables>
+                                    </RunConfiguration>
+                                   </RunSettings>";
+
+            File.WriteAllText(this.runsettingsPath, runsettingsXml);
+
+            var arguments = PrepareArguments(
+               testAssemblyPath,
+               string.Empty,
+               this.runsettingsPath, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        #endregion
+
         private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
             var runsettingsPath = Path.Combine(

@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.IO;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,15 +14,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using vstest.console.UnitTests.Processors;
 
     using Moq;
     using System.Text;
 
+    using ExceptionUtilities = Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.ExceptionUtilities;
+
     [TestClass]
     public class RunSettingsArgumentProcessorTests
     {
-        private IRunSettingsProvider settingsProvider;
+        private TestableRunSettingsProvider settingsProvider;
 
         [TestInitialize]
         public void Init()
@@ -306,6 +308,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize(runsettingsFile);
             Assert.IsTrue(this.settingsProvider.ActiveRunSettings.SettingsXml.Contains(@"C:\新しいフォルダー"));
+            File.Delete(runsettingsFile);
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetInIsolataionToTrueIfEnvironmentVariablesSpecified()
+        {            
+            var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldPreserveActualJapaneseString.runsettings");
+            var settingsXml = @"<RunSettings><RunConfiguration><EnvironmentVariables><DOTNET_ROOT>C:\ProgramFIles\dotnet</DOTNET_ROOT></EnvironmentVariables></RunConfiguration></RunSettings>";
+            File.WriteAllText(runsettingsFile, settingsXml, Encoding.UTF8);
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                this.settingsProvider,
+                null);
+
+            executor.Initialize(runsettingsFile);
+            Assert.IsTrue(CommandLineOptions.Instance.InIsolation);
+            Assert.AreEqual("true", this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
+            File.Delete(runsettingsFile);
+        }
+
+        [TestMethod]
+        public void InitializeShouldNotSetInIsolataionToTrueIfEnvironmentVariablesNotSpecified()
+        {
+            var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldPreserveActualJapaneseString.runsettings");
+            var settingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            File.WriteAllText(runsettingsFile, settingsXml, Encoding.UTF8);
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                this.settingsProvider,
+                null);
+
+            executor.Initialize(runsettingsFile);
+            Assert.IsFalse(CommandLineOptions.Instance.InIsolation);
+            Assert.IsNull(this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
             File.Delete(runsettingsFile);
         }
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27106.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitAdapterPerfTestProject", "..\PerfAssets\NUnitAdapterPerfTestProject\NUnitAdapterPerfTestProject.csproj", "{F22A8D65-0581-4CC7-9C1C-9BC9F9E80DA4}"
 EndProject
@@ -46,6 +46,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewtonSoftDependency", "..\NewtonSoftDependency\NewtonSoftDependency.csproj", "{79EDA259-5EA0-45F0-990A-F078427E198A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDomainGetAssembliesTestProject", "..\AppDomainGetAssembliesTestProject\AppDomainGetAssembliesTestProject.csproj", "{BF090BCE-CC7D-4359-93E2-30F2B454F751}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmentVariablesTestProject", "..\EnvironmentVariablesTestProject\EnvironmentVariablesTestProject.csproj", "{BA53C202-55D6-4BBC-A24A-444B2D5F6309}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,6 +143,10 @@ Global
 		{BF090BCE-CC7D-4359-93E2-30F2B454F751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF090BCE-CC7D-4359-93E2-30F2B454F751}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF090BCE-CC7D-4359-93E2-30F2B454F751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA53C202-55D6-4BBC-A24A-444B2D5F6309}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

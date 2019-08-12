@@ -25,7 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
     using CoreUtilitiesConstants = Microsoft.VisualStudio.TestPlatform.CoreUtilities.Constants;
-   
+    using System.Collections;
+
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
@@ -96,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns>
         /// Returns true if Communation is established b/w runner and host
         /// </returns>
-        public virtual bool SetupChannel(IEnumerable<string> sources)
+        public virtual bool SetupChannel(IEnumerable<string> sources, string runSettings)
         {
             this.CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
             var connTimeout = EnvironmentHelper.GetConnectionTimeout();
@@ -120,8 +121,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
                 this.testHostManager.HostExited += this.TestHostManagerHostExited;
 
+                // Get envVars from run settings
+                var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
+
                 // Get the test process start info
-                var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo));
+                var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, envVars, connectionInfo));
                 try
                 {
                     // Launch the test host.
