@@ -131,46 +131,61 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeWithParametersShouldSetNoProgress()
         {
-            var parameters = new Dictionary<string, string>();
+            try
+            {
+                var parameters = new Dictionary<string, string>();
 
-            Assert.IsFalse(ConsoleLogger.DisableProgress);
+                Assert.IsFalse(ConsoleLogger.DisableProgress);
 
-            parameters.Add("noprogress", "true");
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+                parameters.Add("noprogress", "true");
+                this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.IsTrue(ConsoleLogger.DisableProgress);
-
-            ConsoleLogger.DisableProgress = false;
+                Assert.IsTrue(ConsoleLogger.DisableProgress);
+            }
+            finally
+            {
+                ConsoleLogger.DisableProgress = false;
+            }
         }
 
         [TestMethod]
         public void InitializeWithParametersShouldSetDisableProgressWhenCI()
         {
-            Environment.SetEnvironmentVariable("CI", "true");
+            try
+            {
+                Environment.SetEnvironmentVariable("CI", "true");
 
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("fakeparam", "false");
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("fakeparam", "false");
 
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+                this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.IsTrue(ConsoleLogger.DisableProgress);
-
-            ConsoleLogger.DisableProgress = false;
+                Assert.IsTrue(ConsoleLogger.DisableProgress);
+            }
+            finally
+            {
+                ConsoleLogger.DisableProgress = false;
+            }
         }
 
         [TestMethod]
         public void InitializeWithParametersShouldSetDisableProgressFalseOverrideCI()
         {
-            Environment.SetEnvironmentVariable("CI", "true");
+            try
+            {
+                Environment.SetEnvironmentVariable("CI", "true");
 
-            var parameters = new Dictionary<string, string>();
-            parameters.Add("noprogress", "false");
+                var parameters = new Dictionary<string, string>();
+                parameters.Add("noprogress", "false");
 
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+                this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.IsFalse(ConsoleLogger.DisableProgress);
-
-            ConsoleLogger.DisableProgress = false;
+                Assert.IsFalse(ConsoleLogger.DisableProgress);
+            }
+            finally
+            {
+                ConsoleLogger.DisableProgress = false;
+            }
         }
 
 
