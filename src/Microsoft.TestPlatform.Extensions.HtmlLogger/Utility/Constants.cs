@@ -18,6 +18,10 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.Utility
         /// </summary>
         public const string FriendlyName = "Html";
 
+        public const string Xml = "xml";
+
+        public const string Html = "html";
+
         ///  /// <summary>
         /// Property Id storing the TestType.
         /// </summary>

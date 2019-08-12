@@ -61,26 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;xsl:stylesheet version=&quot;2.0&quot;    
-        ///    xmlns:tp=&quot;http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger&quot;
-        ///    xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
-        ///    xmlns:msxsl=&quot;urn:schemas-microsoft-com:xslt&quot; exclude-result-prefixes=&quot;msxs tp&quot;&gt;
-        ///  &lt;xsl:output method=&quot;html&quot; indent=&quot;yes&quot;/&gt;
-        ///  &lt;xsl:template match=&quot;/&quot;&gt;
-        ///    &lt;html&gt;
-        ///      &lt;body&gt;
-        ///        &lt;h1&gt;TestResults&lt;/h1&gt;
-        ///        &lt;xsl:apply-templates select =&quot;/tp:TestResults&quot;/&gt; [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string Html {
-            get {
-                return ResourceManager.GetString("Html", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Path to generated html test results file : {0}.
+        ///   Looks up a localized string similar to Html test results file : {0}.
         /// </summary>
         internal static string HtmlFilePath {
             get {

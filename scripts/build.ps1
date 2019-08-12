@@ -307,7 +307,7 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 
-    # Move trx logger resource dlls
+    # Move logger resource dlls
     if($TPB_LocalizedBuild) {
         Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
@@ -356,7 +356,7 @@ function Publish-Package
     }
 
     # Move TestHostRuntimeProvider resource dlls
-    if($TPB_LocalizedBuild) {
+    if ($TPB_LocalizedBuild) {
         Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }

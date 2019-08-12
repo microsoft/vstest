@@ -82,8 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// Total SkippedTests in the Results
         /// </summary>
         public int SkippedTests { get; private set; }
-        public string xmlFilePath { get; private set; }
-        public string htmlFilePath { get; private set; }
+        public string XmlFilePath { get; private set; }
+        public string HtmlFilePath { get; private set; }
 
         public void Initialize(TestLoggerEvents events, string TestResultsDirPath)
         {
@@ -229,7 +229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue);
                 if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
                 {
-                    this.htmlFilePath = Path.Combine(this.TestResultsDirPath, logFileNameValue);
+                    HtmlFilePath = Path.Combine(this.TestResultsDirPath, logFileNameValue);
                 }
             }
 
@@ -239,20 +239,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         private void PopulateHtmlFile()
         {
             fileName = String.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}", Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
-            xmlFilePath = this.GetFilePath("xml",this.fileName);
+            XmlFilePath = this.GetFilePath("xml",this.fileName);
             Stream xmlStream = null;
 
             try
             {
-                xmlStream = this.filehelper.GetStream(xmlFilePath, FileMode.Create);
+                xmlStream = this.filehelper.GetStream(XmlFilePath, FileMode.Create);
                 xmlSerializer.WriteObject(xmlStream, TestResults);
                 xmlStream.Close();
 
-                if (htmlFilePath == null)
+                if (HtmlFilePath == null)
                 {
-                    htmlFilePath = this.GetFilePath("html", this.fileName);
+                    HtmlFilePath = this.GetFilePath("html", this.fileName);
                 }
-                htmlTransformer.Transform(xmlFilePath, htmlFilePath);
+                htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
             }
             catch (IOException ioEx)
             {
@@ -265,9 +265,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 EqtTrace.Error(xslteMessage);
             }
 
-            string htmlfilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, this.htmlFilePath);
+            string htmlfilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, HtmlFilePath);
             EqtTrace.Info(htmlfilePathMessage);
-            ConsoleOutput.Instance.Information(false, this.htmlFilePath);
+            ConsoleOutput.Instance.Information(false, HtmlFilePath);
         }
 
         private string GetFilePath(string fileFormat,string FileName)

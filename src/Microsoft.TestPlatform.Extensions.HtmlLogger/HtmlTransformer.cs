@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
     class HtmlTransformer : IHtmlTransformer
     {
-        StringReader xsltStringReader = new StringReader(HtmlResources.Html);
+        StringReader xsltStringReader = new StringReader("html.xslt");
         XslCompiledTransform myXslTransform;
 
         /// <summary>
