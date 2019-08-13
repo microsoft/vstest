@@ -22,33 +22,29 @@
         }
       </script>
       <style>
-        #testtable {
-        border-collapse: collapse;
-        }
-        #testtable, th, td {
-        border: 1px solid black;
-        }
         body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
         h2 {
         margin-top: 0;
         }
         .summary {background-color: #f4f4e1;font-family:monospace; }
         .row {
+        border: 3px solid #ffffff;
         background-color: #f0f5fa;
         cursor:pointer;
         width:100%;
         }
         .innerRow{
+        border: 2px solid #ffffff;
+        padding-left:1%;
+        margin-left:1%;
         background-color :#e9e1f4;
         cursor:pointer;
-        width:100%;
         }
         .pass { color: #0c0; }
         .fail { color: #c00; }
         .errorMessage{ color : brown; }
         .errorStackTrace{ color: brown; }
-        .duration{float:right;}
-
+        .duration{float:right;padding-right:1%;}
       </style>
     </html>
   </xsl:template>
@@ -91,7 +87,6 @@
       </xsl:if>
       <xsl:if test ="tp:innerTestResults!=''">
         <a Id="{generate-id()}" style="display:none;">
-          <h3>Child Test Results:</h3>
           <xsl:apply-templates select = "tp:innerTestResults" />
         </a>
       </xsl:if>
@@ -104,7 +99,7 @@
       <div>
         <xsl:apply-templates select = "tp:resultOutcome" />
         <xsl:apply-templates select = "tp:FullyQualifiedName" />
-        <div  style="float:right;">
+        <div class="duration">
           <xsl:apply-templates select = "tp:Duration" />
         </div>
       </div>
@@ -116,7 +111,6 @@
       </xsl:if>
       <xsl:if test ="tp:innerTestResults!=''">
         <a Id="{generate-id()}" style="display:none;">
-          <h3>Child Test Results:</h3>
           <xsl:apply-templates select = "tp:innerTestResults" />
         </a>
       </xsl:if>
@@ -125,6 +119,7 @@
   </xsl:template>
 
   <xsl:template match = "tp:ErrorMessage">
+    &#160;&#160;
     ErrorMessage: <span class="errorMessage">
       <xsl:value-of select = "." />
     </span>
@@ -132,6 +127,7 @@
   </xsl:template>
 
   <xsl:template match = "tp:ErrorStackTrace">
+    &#160;&#160;
     ErrorStackTrace: <span class="errorStackTrace">
       <xsl:value-of select = "." />
     </span>

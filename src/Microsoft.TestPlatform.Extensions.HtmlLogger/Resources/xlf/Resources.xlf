@@ -3,7 +3,7 @@
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
       <trans-unit id="HtmlFilePath">
-        <source>Path to generated html test results file : {0}</source>
+        <source>Html test results file : {0}</source>
         <target state="new">Obtained Html File's Path is {0}</target>
         <note></note>
       </trans-unit>

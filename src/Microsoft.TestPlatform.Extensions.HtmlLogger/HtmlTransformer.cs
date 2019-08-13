@@ -3,23 +3,21 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 {
-    using System.IO;
     using System.Xml;
     using System.Xml.Xsl;
     using HtmlResources = Resources.Resources;
 
     class HtmlTransformer : IHtmlTransformer
     {
-        StringReader xsltStringReader = new StringReader("html.xslt");
-        XslCompiledTransform myXslTransform;
+        XslCompiledTransform xslTransform;
 
         /// <summary>
         /// The following function invokes the compiled tranform and Loads the xslt file.
         /// </summary>
         public HtmlTransformer()
         {
-            myXslTransform = new XslCompiledTransform();
-            myXslTransform.Load(XmlReader.Create(xsltStringReader));
+            xslTransform = new XslCompiledTransform();
+            xslTransform.Load(XmlReader.Create(this.GetType().Assembly.GetManifestResourceStream("Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Html.xslt")));
         }
 
         /// <summary>
@@ -27,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         public void Transform(string xmlfile, string htmlfile)
         {
-            myXslTransform.Transform(xmlfile, htmlfile);
+            xslTransform.Transform(xmlfile, htmlfile);
         }
     }
 }

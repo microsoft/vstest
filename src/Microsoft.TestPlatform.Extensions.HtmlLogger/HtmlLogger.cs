@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         private Dictionary<string, string> parametersDictionary;
 
         public Htmllogger()
-        : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestResults)))
+        : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestRunDetails)))
         {
         }
 
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <summary>
         /// TestResults Stores all the Summary and the details of evrey Results in Hiearachial order.
         /// </summary>
-        public TestResults TestResults { get; private set; }
+        public TestRunDetails TestResults { get; private set; }
 
         /// <summary>
         /// Total Passed Tests in the TestResults
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             events.TestRunComplete += this.TestRunCompleteHandler;
 
             this.TestResultsDirPath = TestResultsDirPath;
-            this.TestResults = new TestResults();
+            this.TestResults = new TestRunDetails();
             this.Results = new ConcurrentDictionary<Guid, TestResult>();
         }
 
@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                     TestResults.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 default:
-                    Debug.Fail("htmlLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
+                    EqtTrace.Info("htmlLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
         }
@@ -201,13 +201,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         private void AddToParentResult( Guid parentExecutionId, TestResult testResult)
         {
             // Needs to be tested!
-            TestResult ParentTestResult;
-            this.Results.TryGetValue(parentExecutionId, out ParentTestResult);
+            TestResult parentTestResult;
+            this.Results.TryGetValue(parentExecutionId, out parentTestResult);
 
-            if (ParentTestResult.innerTestResults == null)
-                ParentTestResult.innerTestResults = new List<TestResult>();
+            if (parentTestResult.innerTestResults == null)
+                parentTestResult.innerTestResults = new List<TestResult>();
 
-            ParentTestResult.innerTestResults.Add(testResult);
+            parentTestResult.innerTestResults.Add(testResult);
         }
 
         /// <summary>
@@ -238,8 +238,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
         private void PopulateHtmlFile()
         {
-            fileName = String.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}", Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
-            XmlFilePath = this.GetFilePath("xml",this.fileName);
+            this.fileName = String.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}", Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+            XmlFilePath = this.GetFilePath(HtmlLoggerConstants.Xml,this.fileName);
             Stream xmlStream = null;
 
             try
@@ -248,26 +248,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 xmlSerializer.WriteObject(xmlStream, TestResults);
                 xmlStream.Close();
 
-                if (HtmlFilePath == null)
+                if (string.IsNullOrEmpty(HtmlFilePath))
                 {
-                    HtmlFilePath = this.GetFilePath("html", this.fileName);
+                    HtmlFilePath = this.GetFilePath(HtmlLoggerConstants.Html, this.fileName);
                 }
                 htmlTransformer.Transform(XmlFilePath, HtmlFilePath);
             }
             catch (IOException ioEx)
             {
-                string ioexMessage = string.Format("HtmlLogger : Failed to create a xml file. Exception : {0}", ioEx.ToString());
-                EqtTrace.Error(ioexMessage);
+                EqtTrace.Error(string.Format("HtmlLogger : Failed to create a xml file. Exception : {0}", ioEx.ToString()));
             }
             catch (XsltCompileException xslte)
             {
-                string xslteMessage = string.Format("HtmlLogger : Failed to convert xml file to html file. Exception : {0}", xslte.ToString());
-                EqtTrace.Error(xslteMessage);
+                EqtTrace.Error(string.Format("HtmlLogger : Failed to convert xml file to html file. Exception : {0}", xslte.ToString()));
             }
 
             string htmlfilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, HtmlFilePath);
             EqtTrace.Info(htmlfilePathMessage);
-            ConsoleOutput.Instance.Information(false, HtmlFilePath);
+            ConsoleOutput.Instance.Information(false, htmlfilePathMessage);
         }
 
         private string GetFilePath(string fileFormat,string FileName)

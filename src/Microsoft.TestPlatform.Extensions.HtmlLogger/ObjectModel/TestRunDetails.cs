@@ -8,12 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 {
     [DataContract]
     [KnownType(typeof(TestResult))]
-    public sealed class TestResults
+    public sealed class TestRunDetails
     {
         /// <summary>
         /// Constructor Class for testResults
         /// </summary>
-        public TestResults()
+        public TestRunDetails()
         {
         }
 

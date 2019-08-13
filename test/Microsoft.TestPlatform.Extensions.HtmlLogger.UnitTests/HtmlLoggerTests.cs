@@ -392,7 +392,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
 
-            this.mockXmlSerializer.Verify(x => x.WriteObject(It.IsAny<Stream>(), It.IsAny<TestResults>()), Times.Once);
+            this.mockXmlSerializer.Verify(x => x.WriteObject(It.IsAny<Stream>(), It.IsAny<TestRunDetails>()), Times.Once);
             Assert.IsTrue(htmlLogger.XmlFilePath.Contains(".xml"));
             Assert.IsTrue(htmlLogger.HtmlFilePath.Contains(".html"));
         }
@@ -406,9 +406,9 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             return testResult;
         }
 
-        private TestResults CreateTestResults()
+        private TestRunDetails CreateTestResults()
         {
-            TestResults testresults = new TestResults();
+            TestRunDetails testresults = new TestRunDetails();
             return testresults;
         }
 
