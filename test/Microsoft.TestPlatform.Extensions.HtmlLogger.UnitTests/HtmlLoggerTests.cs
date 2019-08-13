@@ -47,9 +47,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.Initialize(this.events.Object, this.parameters);
         }
 
-        /// <summary>
-        /// if events is null initialize should throw exception
-        /// </summary>
         [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
@@ -60,9 +57,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 });
         }
 
-        /// <summary>
-        /// initilaize should initialize all Properties
-        /// </summary>
         [TestMethod]
         public void InitializeShouldInitializeAllProperties()
         {
@@ -76,9 +70,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.IsNotNull(this.htmlLogger.Results);
         }
 
-        /// <summary>
-        /// if test run directory is null the initialize should throw exception
-        /// </summary>
         [TestMethod]
         public void InitializeShouldThrowExceptionIfTestRunDirectoryIsEmptyOrNull()
         {
@@ -91,9 +82,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
                 });
         }
 
-        /// <summary>
-        /// initialize should throw exception if parameters are empty
-        /// </summary>
         [TestMethod]
         public void InitializeShouldThrowExceptionIfParametersAreEmpty()
         {
@@ -101,9 +89,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.ThrowsException<ArgumentException>(() => this.htmlLogger.Initialize(events.Object, new Dictionary<string, string>()));
         }
 
-        /// <summary>
-        /// if event args is null test message handler should throw exception
-        /// </summary>
         [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
@@ -113,9 +98,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             });
         }
 
-        /// <summary>
-        /// Test message handler should add informational messages to list of informational strings in test results
-        /// </summary>
         [TestMethod]
         public void TestMessageHandlerShouldAddMessageWhenItIsInformation()
         {
@@ -128,9 +110,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(message, actualMessage.ToString());   
         }
 
-        /// <summary>
-        /// Test message handler should add ierror and warning messages to list of error and warning strings in test results
-        /// </summary>
         [TestMethod]
         public void TestMessageHandlerShouldAddMessageInListIfItIsWarningAndError()
         {
@@ -146,9 +125,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(2, this.htmlLogger.TestResults.RunLevelMessageErrorAndWarning.Count());
         }
 
-        /// <summary>
-        /// Test result handler should keep track of passed failed total skipped tests summary
-        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldKeepTrackofSummary()
         {
@@ -185,9 +161,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(this.htmlLogger.TotalTests, 4, "Total Tests");
         }
 
-        /// <summary>
-        /// Test Result handler should set dispaly name in test result Properly
-        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldSetDisplayNameIfNullProperly()
         {
@@ -223,9 +196,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.TestResults.Results.Last().DisplayName);           
         }
 
-        /// <summary>
-        /// Test Result Handler should create test result  properly
-        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldCreateTestResultProperly()
         {
@@ -254,9 +224,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(result.Duration, null);
         }
 
-        /// <summary>
-        /// test result should create one test result for one resutlt event args 
-        /// </summary>
         [TestMethod]
         public void TestResultHandlerShouldCreateOneTestEntryForEachTestCase()
         {
@@ -317,9 +284,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(this.htmlLogger.TestResults.Results[0].GetInnerTestResultscount(), 2, "testhandler is adding child result correctly");
         }
 
-        /// <summary>
-        /// Test comple handler should set summary property in test results properly
-        /// </summary>
         [TestMethod]
         public void TestCompleteHandlerShouldKeepTackOfSummary()
         {
@@ -361,9 +325,6 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(this.htmlLogger.TestResults.Summary.PassedTests, 2, "summary should keep track of passedtests");
         }
 
-        /// <summary>
-        /// Test complete handle should create file correctly
-        /// </summary>
         [TestMethod]
         public void TestCompleteHandlerShouldCreateFileCorrectly()
         {
@@ -374,6 +335,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
         }
+
 
         [TestMethod]
         public void TestCompleteHandlerShouldCallHtmlTransformerCorrectly()

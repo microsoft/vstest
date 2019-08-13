@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     using HtmlLoggerConstants = Microsoft.TestPlatform.Extensions.HtmlLogger.Utility.Constants;
 
     /// <summary>
-    /// Logger for generating Html log
+    /// Logger for generating Html.
     /// </summary>
     [FriendlyName(HtmlLoggerConstants.FriendlyName)]
     [ExtensionUri(HtmlLoggerConstants.ExtensionUri)]
@@ -46,40 +46,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             this.xmlSerializer = dataContractSerializer;
         }
 
-        public string FilePath { get; private set; }
         /// <summary>
         /// Gets the directory under which default html file and test results attachements should be saved.
         /// </summary>
         public string TestResultsDirPath { get; private set; }
 
         /// <summary>
-        /// Total Results are stored in sequential order
+        /// Total results are stored in sequential order
         /// </summary>
         /// <returns></returns>
         public ConcurrentDictionary<Guid, TestResult> Results { get; private set; }
 
         /// <summary>
-        /// TestResults Stores all the Summary and the details of evrey Results in Hiearachial order.
+        /// Test results stores all the summary and the details of evrey results in hiearachial order.
         /// </summary>
         public TestRunDetails TestResults { get; private set; }
 
         /// <summary>
-        /// Total Passed Tests in the TestResults
+        /// Total passed tests in the test results.
         /// </summary>
         public int PassedTests { get; private set; }
 
         /// <summary>
-        /// Total FailedTests in the Results
+        /// Total failed tests in the test results.
         /// </summary>
         public int FailedTests { get; private set; }
 
         /// <summary>
-        /// Total Tests in the Results
+        /// Total tests in the results.
         /// </summary>
         public int TotalTests { get; private set; }
 
         /// <summary>
-        /// Total SkippedTests in the Results
+        /// Total skipped tests in the results.
         /// </summary>
         public int SkippedTests { get; private set; }
         public string XmlFilePath { get; private set; }
@@ -124,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// Handles the Message level information like warnings errors etc..
+        /// Handles the message level information like warnings, errors etc..
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -151,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// Handles the Result coming from vstest and store it in testresults 
+        /// Handles the result coming from vstest and store it in test results.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -200,7 +199,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
         private void AddToParentResult( Guid parentExecutionId, TestResult testResult)
         {
-            // Needs to be tested!
             TestResult parentTestResult;
             this.Results.TryGetValue(parentExecutionId, out parentTestResult);
 
@@ -211,7 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// Creates a Summary of tests and Popultes the html file by transforming the xml file with help of xslt file
+        /// Creates a summary of tests and popultes the html file by transforming the xml file with help of xslt file.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -240,13 +238,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         {
             this.fileName = String.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}", Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
             XmlFilePath = this.GetFilePath(HtmlLoggerConstants.Xml,this.fileName);
-            Stream xmlStream = null;
 
             try
             {
-                xmlStream = this.filehelper.GetStream(XmlFilePath, FileMode.Create);
-                xmlSerializer.WriteObject(xmlStream, TestResults);
-                xmlStream.Close();
+                using (Stream xmlStream = this.filehelper.GetStream(XmlFilePath, FileMode.Create))
+                {
+                    xmlSerializer.WriteObject(xmlStream, TestResults);
+                }
 
                 if (string.IsNullOrEmpty(HtmlFilePath))
                 {
@@ -257,10 +255,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             catch (IOException ioEx)
             {
                 EqtTrace.Error(string.Format("HtmlLogger : Failed to create a xml file. Exception : {0}", ioEx.ToString()));
+                return;
             }
             catch (XsltCompileException xslte)
             {
                 EqtTrace.Error(string.Format("HtmlLogger : Failed to convert xml file to html file. Exception : {0}", xslte.ToString()));
+                return;
             }
 
             string htmlfilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, HtmlFilePath);
@@ -280,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// Gives the parent execution id of a TestResult
+        /// Gives the parent execution id of a TestResult.
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>
@@ -291,7 +291,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// Gives the execution id of a TestResult
+        /// Gives the execution id of a TestResult.
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>
@@ -309,7 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// Converts the timespan format to readable string 
+        /// Converts the time span format to readable string.
         /// </summary>
         /// <param name="duration"></param>
         /// <returns></returns>

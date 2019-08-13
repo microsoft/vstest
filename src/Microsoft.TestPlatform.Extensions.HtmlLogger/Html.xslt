@@ -7,8 +7,8 @@
   <xsl:template match="/">
     <html>
       <body>
-        <h1>TestResults</h1>
-        <xsl:apply-templates select ="/tp:TestResults"/>
+        <h1>TestRunDetails</h1>
+        <xsl:apply-templates select ="/tp:TestRunDetails"/>
       </body>
       <script language="javascript">
         function ToggleClass(id) {
@@ -49,23 +49,23 @@
     </html>
   </xsl:template>
 
-  <xsl:template match="/tp:TestResults">
-    <xsl:apply-templates select ="/tp:TestResults/tp:Summary"/>
+  <xsl:template match="/tp:TestRunDetails">
+    <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary"/>
     <h2>Results</h2>
-    <xsl:apply-templates select ="/tp:TestResults/tp:Results"/>
+    <xsl:apply-templates select ="/tp:TestRunDetails/tp:Results"/>
   </xsl:template>
 
-  <xsl:template match="/tp:TestResults/tp:Results">
-    <xsl:apply-templates select ="/tp:TestResults/tp:Results/tp:TestResult"/>
+  <xsl:template match="/tp:TestRunDetails/tp:Results">
+    <xsl:apply-templates select ="/tp:TestRunDetails/tp:Results/tp:TestResult"/>
   </xsl:template>
 
-  <xsl:template match="tp:TestResults/tp:Summary">
+  <xsl:template match="tp:TestRunDetails/tp:Summary">
     <div class ="summary">
       <h2>Summary</h2>
-      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:TotalTests"/>
-      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:FailedTests"/>
-      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:PassedTests"/>
-      <xsl:apply-templates select ="/tp:TestResults/tp:Summary/tp:SkippedTests"/>
+      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalTests"/>
+      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:FailedTests"/>
+      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassedTests"/>
+      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:SkippedTests"/>
       <br/>
     </div>
   </xsl:template>
@@ -85,16 +85,16 @@
       <xsl:if test ="tp:ErrorStackTrace!=''">
         <xsl:apply-templates select = "tp:ErrorStackTrace" />
       </xsl:if>
-      <xsl:if test ="tp:innerTestResults!=''">
+      <xsl:if test ="tp:innerTestRunDetails!=''">
         <a Id="{generate-id()}" style="display:none;">
-          <xsl:apply-templates select = "tp:innerTestResults" />
+          <xsl:apply-templates select = "tp:innerTestRunDetails" />
         </a>
       </xsl:if>
       <br />
     </div>
   </xsl:template>
 
-  <xsl:template match="tp:innerTestResults/tp:TestResult">
+  <xsl:template match="tp:innerTestRunDetails/tp:TestResult">
     <div class="innerRow" onclick="ToggleClass('{generate-id()}')" >
       <div>
         <xsl:apply-templates select = "tp:resultOutcome" />
@@ -109,9 +109,9 @@
       <xsl:if test ="tp:ErrorStackTrace!=''">
         <xsl:apply-templates select = "tp:ErrorStackTrace" />
       </xsl:if>
-      <xsl:if test ="tp:innerTestResults!=''">
+      <xsl:if test ="tp:innerTestRunDetails!=''">
         <a Id="{generate-id()}" style="display:none;">
-          <xsl:apply-templates select = "tp:innerTestResults" />
+          <xsl:apply-templates select = "tp:innerTestRunDetails" />
         </a>
       </xsl:if>
       <br />

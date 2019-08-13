@@ -6,22 +6,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     public class TestRunSummary
     {
         /// <summary>
-        /// Total tests of a test run
+        /// Total tests of a test run.
         /// </summary>
         public int TotalTests { get; set; }
 
         /// <summary>
-        /// Passed tests of test run
+        /// Passed tests of test run.
         /// </summary>
         public int PassedTests { get; set; }
 
         /// <summary>
-        /// Failed Tests of test run
+        /// Failed Tests of test run.
         /// </summary>
         public int FailedTests { get; set; }
 
         /// <summary>
-        /// Skipped Tests of test run
+        /// Skipped Tests of test run.
         /// </summary>
         public int SkippedTests { get; set; }
     }
