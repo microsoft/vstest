@@ -145,6 +145,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
+        public void InitilizeShouldLaunchDataCollectorWithEnvironmentVariables()
+        {
+            string runSettings = @"<RunSettings>
+                                       <RunConfiguration>
+                                          <EnvironmentVariables>
+                                             <DOTNET_ROOT>C:\ProgramFiles\dotnet</DOTNET_ROOT>
+                                             <VS_PATH>C:\ProgramFiles\VS</VS_PATH>
+                                          </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            this.proxyDataCollectionManager = this.proxyDataCollectionManager = new ProxyDataCollectionManager(this.mockRequestData.Object, runSettings, new List<string>() { "testsource1.dll" }, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+            this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000)).Returns(true);
+            this.proxyDataCollectionManager.Initialize();
+
+            this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.Is<IDictionary<string, string>>(y => y.ContainsKey("DOTNET_ROOT") && y["DOTNET_ROOT"].Equals(@"C:\ProgramFiles\dotnet")), 
+                                                                              It.IsAny<IList<string>>()), Times.Once);
+        }
+
+        [TestMethod]
         public void SendTestHostInitiazliedShouldPassProcessIdToRequestSender()
         {
             this.proxyDataCollectionManager.TestHostLaunched(1234);
