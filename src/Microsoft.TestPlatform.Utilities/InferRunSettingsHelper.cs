@@ -379,9 +379,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             return null;
         }
 
+        /// <summary>
+        /// Returns a dictionary of environment variables given in run settings
+        /// </summary>
+        /// <param name="runsettingsXml">The run settings xml string</param>
+        /// <returns>Environment Variables Dictionary</returns>
         public static Dictionary<string, string> GetEnvironmentVariables(string runSettings)
         {
-            var environmentVariables = new Dictionary<string, string>();
+            Dictionary<string, string> environmentVariables = null;
             try
             {
                 using (var stream = new StringReader(runSettings))
@@ -394,20 +399,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     var node = runSettingsNavigator.SelectSingleNode(EnvironmentVariablesNodePath);
                     if (node == null)
                     {
-                        return environmentVariables;
+                        return null;
                     }
 
+                    environmentVariables = new Dictionary<string, string>();
                     var childNodes = node.SelectChildren(XPathNodeType.Element);
 
                     while (childNodes.MoveNext())
                     {
-                        environmentVariables.Add(childNodes.Current.Name, childNodes.Current.Value);
+                        environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Error while trying to read legacy settings. Message: {0}", ex.ToString());
+                EqtTrace.Error("Error while trying to read environment variables settings. Message: {0}", ex.ToString());
+                return null;
             }
 
             return environmentVariables;

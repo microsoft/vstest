@@ -314,37 +314,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetInIsolataionToTrueIfEnvironmentVariablesSpecified()
         {            
-            var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldPreserveActualJapaneseString.runsettings");
-            var settingsXml = @"<RunSettings><RunConfiguration><EnvironmentVariables><DOTNET_ROOT>C:\ProgramFIles\dotnet</DOTNET_ROOT></EnvironmentVariables></RunConfiguration></RunSettings>";
-            File.WriteAllText(runsettingsFile, settingsXml, Encoding.UTF8);
+            var settingsXml = @"<RunSettings><RunConfiguration><EnvironmentVariables><RANDOM_PATH>C:\temp</RANDOM_PATH></EnvironmentVariables></RunConfiguration></RunSettings>";
+
+            // Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
                 this.settingsProvider,
-                null);
+                settingsXml);
 
-            executor.Initialize(runsettingsFile);
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
             Assert.IsTrue(CommandLineOptions.Instance.InIsolation);
             Assert.AreEqual("true", this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
-            File.Delete(runsettingsFile);
         }
 
         [TestMethod]
         public void InitializeShouldNotSetInIsolataionToTrueIfEnvironmentVariablesNotSpecified()
         {
-            var runsettingsFile = Path.Combine(Path.GetTempPath(), "InitializeShouldPreserveActualJapaneseString.runsettings");
             var settingsXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            File.WriteAllText(runsettingsFile, settingsXml, Encoding.UTF8);
+            
+            /// Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
 
             var executor = new TestableRunSettingsArgumentExecutor(
                 CommandLineOptions.Instance,
                 this.settingsProvider,
-                null);
+                settingsXml);
 
-            executor.Initialize(runsettingsFile);
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
             Assert.IsFalse(CommandLineOptions.Instance.InIsolation);
             Assert.IsNull(this.settingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
-            File.Delete(runsettingsFile);
         }
 
         #endregion

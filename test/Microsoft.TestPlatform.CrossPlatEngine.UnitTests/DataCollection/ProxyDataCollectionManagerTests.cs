@@ -145,13 +145,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
-        public void InitilizeShouldLaunchDataCollectorWithEnvironmentVariables()
+        public void InitializeShouldLaunchDataCollectorWithEnvironmentVariables()
         {
             string runSettings = @"<RunSettings>
                                        <RunConfiguration>
                                           <EnvironmentVariables>
-                                             <DOTNET_ROOT>C:\ProgramFiles\dotnet</DOTNET_ROOT>
-                                             <VS_PATH>C:\ProgramFiles\VS</VS_PATH>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
                                           </EnvironmentVariables>
                                        </RunConfiguration>
                                       </RunSettings>";
@@ -160,7 +159,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.mockDataCollectionRequestSender.Setup(x => x.WaitForRequestHandlerConnection(EnvironmentHelper.DefaultConnectionTimeout * 1000)).Returns(true);
             this.proxyDataCollectionManager.Initialize();
 
-            this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.Is<IDictionary<string, string>>(y => y.ContainsKey("DOTNET_ROOT") && y["DOTNET_ROOT"].Equals(@"C:\ProgramFiles\dotnet")), 
+            this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.Is<IDictionary<string, string>>(y => y["RANDOM_PATH"].Equals(@"C:\temp")), 
                                                                               It.IsAny<IList<string>>()), Times.Once);
         }
 

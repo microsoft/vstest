@@ -461,7 +461,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var runsettingsXml = @"<RunSettings>
                                     <RunConfiguration>
                                       <EnvironmentVariables>
-                                        <DOTNET_ROOT>C:\ProgramFiles\dotnet</DOTNET_ROOT>
+                                        <RANDOM_PATH>C:\temp</RANDOM_PATH>
                                       </EnvironmentVariables>
                                     </RunConfiguration>
                                    </RunSettings>";

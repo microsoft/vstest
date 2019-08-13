@@ -9,8 +9,8 @@ namespace EnvironmentVariablesTestProject
         [TestMethod]
         public void TestMethod1()
         {
-            var variable = Environment.GetEnvironmentVariable("DOTNET_ROOT");
-            Assert.AreEqual(variable, @"C:\ProgramFiles\dotnet");
+            var envVar = Environment.GetEnvironmentVariable("RANDOM_PATH");
+            Assert.AreEqual(envVar, @"C:\temp");
         }
     }
 }

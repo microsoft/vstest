@@ -564,25 +564,26 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             string runSettingsXml = @"<RunSettings>
                                        <RunConfiguration>
                                           <EnvironmentVariables>
-                                             <DOTNET_ROOT>C:\ProgramFiles\dotnet</DOTNET_ROOT>
-                                             <VS_PATH>C:\ProgramFiles\VS</VS_PATH>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
+                                             <RANDOM_PATH2>C:\temp2</RANDOM_PATH2>
                                           </EnvironmentVariables>
                                        </RunConfiguration>
                                       </RunSettings>";
 
             var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+
             Assert.AreEqual(2, envVars.Count);
-            Assert.IsTrue(envVars.ContainsKey("DOTNET_ROOT"));
-            Assert.AreEqual(envVars["DOTNET_ROOT"], @"C:\ProgramFiles\dotnet");
-            Assert.IsTrue(envVars.ContainsKey("VS_PATH"));
-            Assert.AreEqual(envVars["VS_PATH"], @"C:\ProgramFiles\VS");
+            Assert.AreEqual(envVars["RANDOM_PATH"], @"C:\temp");
+            Assert.AreEqual(envVars["RANDOM_PATH2"], @"C:\temp2");
         }
 
         [TestMethod]
-        public void GetEnvironmentVariablesWithNoValuesInRunSettingsShouldReturnEmptyDictionary()
+        public void GetEnvironmentVariablesWithEmptyVariablesInRunSettingsShouldReturnEmptyDictionary()
         {
             string runSettingsXml = @"<RunSettings>
                                        <RunConfiguration>
+                                         <EnvironmentVariables>
+                                         </EnvironmentVariables>
                                        </RunConfiguration>
                                       </RunSettings>";
 
@@ -591,16 +592,30 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
-        public void GetEnvironmentVariablesWithInvalidValuesInRunSettingsShouldReturnEmptyDictionary()
+        public void GetEnvironmentVariablesWithInvalidValuesInRunSettingsShouldReturnNull()
         {
             string runSettingsXml = @"<RunSettings>
                                        <RunConfiguration>
-                                         <Foo>
+                                         <EnvironmentVariables>
+                                            <Foo>
+                                         </EnvironmentVariables>
                                        </RunConfiguration>
                                       </RunSettings>";
 
             var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
-            Assert.AreEqual(0, envVars.Count);
+            Assert.IsNull(envVars);
+        }
+
+        [TestMethod]
+        public void GetEnvironmentVariablesWithoutEnvVarNodeInRunSettingsShouldReturnNull()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+            Assert.IsNull(envVars);
         }
 
         #region RunSettingsIncompatibeWithTestSettings Tests
