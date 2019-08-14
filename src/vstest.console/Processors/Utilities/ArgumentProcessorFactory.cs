@@ -158,6 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             return argumentProcessor;
+           
         }
 
         /// <summary>

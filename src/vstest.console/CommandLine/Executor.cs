@@ -30,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -40,8 +41,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -172,6 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "processorInstance", Justification = "Done on purpose to force the instances to be created")]
         private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
         {
+             
             processors = new List<IArgumentProcessor>();
 
             int result = 0;
@@ -188,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     processors.Add(cliRunSettingsProcessor);
                     break;
                 }
-
+          
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
@@ -225,6 +227,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
             foreach (var processor in processors)
             {
+                
                 IArgumentExecutor executorInstance;
                 try
                 {
@@ -236,8 +239,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 {
                     if (ex is CommandLineException || ex is TestPlatformException)
                     {
-                        this.Output.Error(false, ex.Message);
+                        //gets the provided CommandName/Type
+                        string invalidCommandName = processor.Metadata.Value.CommandName;
+                        
+                            
+                        this.Output.Error(false, CommandLineResources.InvalidArgument, invalidCommandName);
+
+                        // the /help options - display : off
+                        this.showHelp = false;
                         result = 1;
+                        break;
                     }
                     else if (ex is SettingsException)
                     {

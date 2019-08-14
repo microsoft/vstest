@@ -1653,6 +1653,13 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         <target state="translated">    Atlandı: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The given argument {0} is incorrect or invalid. Kindly use /help option to check the valid args
+Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</source>
+        <target state="new">The given argument {0} . Kindly use /help option to know more about the valid args
+Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
