@@ -369,6 +369,7 @@
     <file src="netcoreapp2.1\TestHost\Microsoft.TestPlatform.Utilities.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.TestPlatform.Utilities.dll" />
     <file src="netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     <file src="netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll"	target="tools\netcoreapp2.1\TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+    <file src="netcoreapp2.1\TestHost\NuGet.Frameworks.dll"	target="tools\netcoreapp2.1\TestHost\NuGet.Frameworks.dll" />
     <file src="netcoreapp2.1\TestHost\msdia140typelib_clr0200.dll"	target="tools\netcoreapp2.1\TestHost\msdia140typelib_clr0200.dll" />
     <file src="netcoreapp2.1\TestHost\Newtonsoft.Json.dll"	target="tools\netcoreapp2.1\TestHost\Newtonsoft.Json.dll" />
     <file src="netcoreapp2.1\TestHost\System.Collections.Immutable.dll"	target="tools\netcoreapp2.1\TestHost\System.Collections.Immutable.dll" />
@@ -492,6 +493,5 @@
     <file src="netcoreapp2.1\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\zh-Hant\vstest.console.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\vstest.console.resources.dll" />
-
   </files>
 </package>

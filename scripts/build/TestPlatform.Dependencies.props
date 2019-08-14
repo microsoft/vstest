@@ -21,7 +21,7 @@
     <ChutzpahAdapterVersion>4.3.7</ChutzpahAdapterVersion>
     <FileSystemGlobbingVersion>1.1.1</FileSystemGlobbingVersion>
 
-    <NuGetFrameworkVersion>5.2.0</NuGetFrameworkVersion>
+    <NuGetFrameworksVersion>5.0.0</NuGetFrameworksVersion>
     <JsonNetVersion>9.0.1</JsonNetVersion>
     <MoqVersion>4.7.63</MoqVersion>
     <TestPlatformExternalsVersion>16.0.0-preview-2148743</TestPlatformExternalsVersion>
