@@ -2,12 +2,13 @@
 <xsl:stylesheet version="2.0"
     xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"            
     xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp">
   <xsl:output method="html" indent="yes"/>
   <xsl:template match="/">
     <html>
       <body>
-        <h1>TestRunDetails</h1>
+        <h1>Test run details</h1>
         <xsl:apply-templates select ="/tp:TestRunDetails"/>
       </body>
       <script language="javascript">
@@ -26,25 +27,39 @@
         h2 {
         margin-top: 0;
         }
-        .summary {background-color: #f4f4e1;font-family:monospace; }
+        .summary {font-family:monospace;
+        display: -webkit-flex; /* Safari */
+        -webkit-flex-wrap: wrap; /* Safari 6.1+ */
+        display: flex;
+        flex-wrap: wrap;
+        }
         .row {
         border: 3px solid #ffffff;
-        background-color: #f0f5fa;
-        cursor:pointer;
         width:100%;
         }
         .innerRow{
         border: 2px solid #ffffff;
         padding-left:1%;
         margin-left:1%;
-        background-color :#e9e1f4;
+        }
+        .block{
+        width : 150px;
+        }
+        .division{
         cursor:pointer;
+        background-color:#bcdaf7;
+        }
+        .innerDivision{
+        background-color:#f0f5fa;
         }
         .pass { color: #0c0; }
         .fail { color: #c00; }
-        .errorMessage{ color : brown; }
-        .errorStackTrace{ color: brown; }
-        .duration{float:right;padding-right:1%;}
+        .errorMessage { color : brown; }
+        .errorStackTrace { color: brown; }
+        .duration {float:right;padding-right:1%;}
+        .totalTests { font-size : 30px}
+        .testRunTime { font-size : 30px}
+        .passPercentage { font-size : 30px}
       </style>
     </html>
   </xsl:template>
@@ -58,69 +73,120 @@
   <xsl:template match="/tp:TestRunDetails/tp:Results">
     <xsl:apply-templates select ="/tp:TestRunDetails/tp:Results/tp:TestResult"/>
   </xsl:template>
-
+  
   <xsl:template match="tp:TestRunDetails/tp:Summary">
     <div class ="summary">
-      <h2>Summary</h2>
-      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalTests"/>
-      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:FailedTests"/>
-      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassedTests"/>
-      <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:SkippedTests"/>
+      <div class ="block">
+        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalTests"/>
+      </div>
+      <div class ="block">
+        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassedTests"/>
+        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:FailedTests"/>
+        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:SkippedTests"/>
+      </div>
+      <div class ="block">
+        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassPercentage"/>
+      </div>
+      <div class ="block">
+        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalRunTime"/>
+      </div>
       <br/>
     </div>
   </xsl:template>
 
   <xsl:template match="tp:TestResult">
-    <div class ="row" onclick="ToggleClass('{generate-id()}')">
-      <div >
-        <xsl:apply-templates select = "tp:resultOutcome" />
-        <xsl:apply-templates select = "tp:FullyQualifiedName" />
-        <div class="duration">
-          <xsl:apply-templates select = "tp:Duration" />
+    <div class ="row" onclick="ToggleClass('{generate-id()}')">  
+      <xsl:if test ="tp:innerTestResults!=''">
+        <div class="division">
+          <div >
+            <xsl:apply-templates select = "tp:resultOutcome" />
+            <xsl:apply-templates select = "tp:FullyQualifiedName" />
+            <div class="duration">
+              <xsl:apply-templates select = "tp:Duration" />
+            </div>
+          </div>
+          <xsl:if test ="tp:ErrorMessage!=''">
+            <xsl:apply-templates select = "tp:ErrorMessage" />
+          </xsl:if>
+          <xsl:if test ="tp:ErrorStackTrace!=''">
+            <xsl:apply-templates select = "tp:ErrorStackTrace" />
+          </xsl:if>      
+        </div>  
+      </xsl:if>
+
+      <xsl:if test ="tp:innerTestResults =''">
+        <div class="innerDivision">
+          <div >
+            <xsl:apply-templates select = "tp:resultOutcome" />
+            <xsl:apply-templates select = "tp:FullyQualifiedName" />
+            <div class="duration">
+              <xsl:apply-templates select = "tp:Duration" />
+            </div>
+          </div>
+          <xsl:if test ="tp:ErrorMessage!=''">
+            <xsl:apply-templates select = "tp:ErrorMessage" />
+          </xsl:if>
+          <xsl:if test ="tp:ErrorStackTrace!=''">
+            <xsl:apply-templates select = "tp:ErrorStackTrace" />
+          </xsl:if>
         </div>
-      </div>
-      <xsl:if test ="tp:ErrorMessage!=''">
-        <xsl:apply-templates select = "tp:ErrorMessage" />
       </xsl:if>
-      <xsl:if test ="tp:ErrorStackTrace!=''">
-        <xsl:apply-templates select = "tp:ErrorStackTrace" />
-      </xsl:if>
-      <xsl:if test ="tp:innerTestRunDetails!=''">
+    </div>  
+      <xsl:if test ="tp:innerTestResults!=''">
         <a Id="{generate-id()}" style="display:none;">
-          <xsl:apply-templates select = "tp:innerTestRunDetails" />
+          <xsl:apply-templates select = "tp:innerTestResults" />
         </a>
       </xsl:if>
-      <br />
-    </div>
   </xsl:template>
 
-  <xsl:template match="tp:innerTestRunDetails/tp:TestResult">
-    <div class="innerRow" onclick="ToggleClass('{generate-id()}')" >
-      <div>
-        <xsl:apply-templates select = "tp:resultOutcome" />
-        <xsl:apply-templates select = "tp:FullyQualifiedName" />
-        <div class="duration">
-          <xsl:apply-templates select = "tp:Duration" />
+  <xsl:template match="tp:innerTestResults/tp:TestResult">
+    <div class ="innerRow" onclick="ToggleClass('{generate-id()}')">
+      <xsl:if test ="tp:innerTestResults!=''">
+        <div class="division">
+          <div >
+            <xsl:apply-templates select = "tp:resultOutcome" />
+            <xsl:apply-templates select = "tp:FullyQualifiedName" />
+            <div class="duration">
+              <xsl:apply-templates select = "tp:Duration" />
+            </div>
+          </div>
+          <xsl:if test ="tp:ErrorMessage!=''">
+            <xsl:apply-templates select = "tp:ErrorMessage" />
+          </xsl:if>
+          <xsl:if test ="tp:ErrorStackTrace!=''">
+            <xsl:apply-templates select = "tp:ErrorStackTrace" />
+          </xsl:if>
         </div>
-      </div>
-      <xsl:if test ="tp:ErrorMessage!=''">
-        <xsl:apply-templates select = "tp:ErrorMessage" />
       </xsl:if>
-      <xsl:if test ="tp:ErrorStackTrace!=''">
-        <xsl:apply-templates select = "tp:ErrorStackTrace" />
+
+      <xsl:if test ="tp:innerTestResults =''">
+        <div class="innerDivision">
+          <div >
+            <xsl:apply-templates select = "tp:resultOutcome" />
+            <xsl:apply-templates select = "tp:FullyQualifiedName" />
+            <div class="duration">
+              <xsl:apply-templates select = "tp:Duration" />
+            </div>
+          </div>
+          <xsl:if test ="tp:ErrorMessage!=''">
+            <xsl:apply-templates select = "tp:ErrorMessage" />
+          </xsl:if>
+          <xsl:if test ="tp:ErrorStackTrace!=''">
+            <xsl:apply-templates select = "tp:ErrorStackTrace" />
+          </xsl:if>
+        </div>
       </xsl:if>
-      <xsl:if test ="tp:innerTestRunDetails!=''">
+    </div>
+      <xsl:if test ="tp:innerTestResults!=''">
         <a Id="{generate-id()}" style="display:none;">
-          <xsl:apply-templates select = "tp:innerTestRunDetails" />
+          <xsl:apply-templates select = "tp:innerTestResults" />
         </a>
       </xsl:if>
-      <br />
-    </div>
   </xsl:template>
 
   <xsl:template match = "tp:ErrorMessage">
     &#160;&#160;
-    ErrorMessage: <span class="errorMessage">
+    Error: <span class="errorMessage">
       <xsl:value-of select = "." />
     </span>
     <br />
@@ -128,7 +194,7 @@
 
   <xsl:template match = "tp:ErrorStackTrace">
     &#160;&#160;
-    ErrorStackTrace: <span class="errorStackTrace">
+   Stack trace: <span class="errorStackTrace">
       <xsl:value-of select = "." />
     </span>
     <br />
@@ -136,7 +202,7 @@
 
   <xsl:template match = "tp:FailedTests">
     <span>
-      FailedTests:&#160;
+      Failed &#160;:&#160;
     </span>
     <span class="failedTests">
       <xsl:value-of select = "." />
@@ -146,7 +212,7 @@
 
   <xsl:template match = "tp:PassedTests">
     <span >
-      PassedTests:&#160;
+      Passed &#160;:&#160;
     </span>
     <span class="passedTests" >
       <xsl:value-of select = "." />
@@ -156,7 +222,7 @@
 
   <xsl:template match = "tp:SkippedTests">
     <span >
-      SkippedTests:
+      Skipped :&#160;
     </span>
     <span class="skippedTests" >
       <xsl:value-of select = "." />
@@ -166,18 +232,31 @@
 
   <xsl:template match = "tp:TotalTests">
     <span >
-      TotalTests:&#160;&#160;
+      Total tests
     </span>
-    <span class="totalTests">
+    <div  class="totalTests">
       <xsl:value-of select = "." />
-    </span>
+    </div>
     <br />
   </xsl:template>
 
-  <xsl:template match = "tp:DisplayName">
-    DisplayName:<span >
-      <xsl:value-of select = "." />
+  <xsl:template match = "tp:TotalRunTime">
+    <span >
+      Run duration 
     </span>
+    <div  class="testRunTime" >
+      <xsl:value-of select = "." />
+    </div>
+    <br />
+  </xsl:template>
+
+  <xsl:template match = "tp:PassPercentage">
+    <span >
+      Pass percentage
+    </span>
+    <div  class="passPercentage" >
+      <xsl:value-of select = "." /> &#37;
+    </div>
     <br />
   </xsl:template>
 
@@ -190,6 +269,11 @@
     <xsl:if test =" . = 'Failed'">
       <span class="fail">
         &#x2718;
+      </span>
+    </xsl:if>
+    <xsl:if test =" . = 'Skipped'">
+      <span class="skip">
+        &#33;
       </span>
     </xsl:if>
   </xsl:template>

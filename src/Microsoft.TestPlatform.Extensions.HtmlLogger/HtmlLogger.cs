@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <summary>
         /// Test results stores all the summary and the details of evrey results in hiearachial order.
         /// </summary>
-        public TestRunDetails TestResults { get; private set; }
+        public TestRunDetails TestRunDetails { get; private set; }
 
         /// <summary>
         /// Total passed tests in the test results.
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             events.TestRunComplete += this.TestRunCompleteHandler;
 
             this.TestResultsDirPath = TestResultsDirPath;
-            this.TestResults = new TestRunDetails();
+            this.TestRunDetails = new TestRunDetails();
             this.Results = new ConcurrentDictionary<Guid, TestResult>();
         }
 
@@ -135,13 +135,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
-                    TestResults.RunLevelMessageInformational.Add(e.Message);
+                    if (TestRunDetails.RunLevelMessageInformational == null)
+                    {
+                        TestRunDetails.RunLevelMessageInformational = new List<string>();
+                    }
+                    TestRunDetails.RunLevelMessageInformational.Add(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    TestResults.RunLevelMessageErrorAndWarning.Add(e.Message);
+                    TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 case TestMessageLevel.Error:
-                    TestResults.RunLevelMessageErrorAndWarning.Add(e.Message);
+                    TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 default:
                     EqtTrace.Info("htmlLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
@@ -187,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             if (parentExecutionId == Guid.Empty)
             {
-                TestResults.Results.Add(testResult);
+                TestRunDetails.Results.Add(testResult);
             }
 
             Results.TryAdd(executionId, testResult);
@@ -215,12 +219,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <param name="e"></param>
         internal void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            TestResults.Summary = new TestRunSummary
+            TestRunDetails.Summary = new TestRunSummary
             {
                 FailedTests = this.FailedTests,
                 PassedTests = this.PassedTests,
-                TotalTests = this.TotalTests
+                TotalTests = this.TotalTests,
+                SkippedTests = this.SkippedTests,
+                PassPercentage = (PassedTests * 100)/ TotalTests ,
             };
+            TestRunDetails.Summary.TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests); 
 
             if (this.parametersDictionary != null)
             {
@@ -243,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             {
                 using (Stream xmlStream = this.filehelper.GetStream(XmlFilePath, FileMode.Create))
                 {
-                    xmlSerializer.WriteObject(xmlStream, TestResults);
+                    xmlSerializer.WriteObject(xmlStream, TestRunDetails);
                 }
 
                 if (string.IsNullOrEmpty(HtmlFilePath))
