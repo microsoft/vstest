@@ -407,7 +407,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                     while (childNodes.MoveNext())
                     {
-                        environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
+                        if (!environmentVariables.ContainsKey(childNodes.Current.Name))
+                        {
+                            environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
+                        }
                     }
                 }
             }

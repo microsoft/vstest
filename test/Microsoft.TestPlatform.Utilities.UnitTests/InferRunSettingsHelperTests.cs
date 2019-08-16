@@ -578,6 +578,24 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
         }
 
         [TestMethod]
+        public void GetEnvironmentVariablesWithDuplicateEnvValuesInRunSettingsShouldReturnValidDictionary()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                          <EnvironmentVariables>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
+                                             <RANDOM_PATH>C:\temp2</RANDOM_PATH>
+                                          </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+
+            Assert.AreEqual(1, envVars.Count);
+            Assert.AreEqual(envVars["RANDOM_PATH"], @"C:\temp");
+        }
+
+        [TestMethod]
         public void GetEnvironmentVariablesWithEmptyVariablesInRunSettingsShouldReturnEmptyDictionary()
         {
             string runSettingsXml = @"<RunSettings>
