@@ -50,8 +50,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             var htmlLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", htmlFileName);
-            var expectedHtmlFilePath = @".\TestResults.html";
-            Assert.IsTrue(IsFileAndContentEqual(htmlLogFilePath, expectedHtmlFilePath), "Invalid content in Html log file");
+            IsFileAndContentEqual(htmlLogFilePath);
         }
 
         [TestMethod]
@@ -91,8 +90,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             var htmlLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", htmlFileName);
-            var expectedHtmlFilePath = @"D:\Code\vstest\test\Microsoft.TestPlatform.AcceptanceTests\TestResults.html";
-            Assert.IsTrue(IsFileAndContentEqual(htmlLogFilePath, expectedHtmlFilePath), "Invalid content in Html log file");
+            // var expectedHtmlFilePath = @".\TestResults.html";
+            IsFileAndContentEqual(htmlLogFilePath);
         }
 
         private bool IsValidXml(string xmlFilePath)
@@ -111,7 +110,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        private bool IsFileAndContentEqual(string filePath,string expectedFilePath)
+        private void IsFileAndContentEqual(string filePath)
         {
             StringBuilder sb = new StringBuilder();
             using (var sr = new StreamReader(filePath))
@@ -120,18 +119,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             string filePathContent = sb.ToString();
 
-            StringBuilder sbExpected = new StringBuilder();
-            using (var sr = new StreamReader(filePath))
+            string[] divs = { "Total tests", "Passed", "Failed", "Skipped", "Run duration", "Pass percentage", "SampleUnitTestProject.UnitTest1.PassingTest" };
+            
+
+            foreach (string str in divs)
             {
-                sbExpected.Append(sr.ReadToEnd());
+                StringAssert.Contains(filePathContent, str);
             }
-
-            string expectedFilePathContent = sb.ToString();
-
-            if (expectedFilePathContent == filePathContent)
-                return true;
-            else
-                return false;
         }
     }
 }

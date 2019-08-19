@@ -18,36 +18,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         }
 
         /// <summary>
-        /// It has the test run summary of all TestResults.
+        /// Test run summary of all test results.
         /// </summary>
         [DataMember]
         internal TestRunSummary Summary { get; set; }
 
         /// <summary>
-        /// List of Run level message that is Informational.
+        /// List of informational run level messages.
         /// </summary>
         [DataMember]
         internal List<string> RunLevelMessageInformational = new List<string>();
 
         /// <summary>
-        /// List of Run level message error and warnings
+        /// List of error and warning messages 
         /// </summary>
         [DataMember]
         internal List<string> RunLevelMessageErrorAndWarning = new List<string>();
 
         /// <summary>
-        /// List of all results in hierarchical model.
+        /// List of all the results
         /// </summary>
         [DataMember]
         internal List<TestResult> Results = new List<TestResult>();
-
-        /// <summary>
-        /// Gives the count of elements that Present in the results list.
-        /// </summary>
-        /// <returns></returns>
-        internal int GetTestResultscount()
-        {
-            return Results.Count;
-        }
     }
 }

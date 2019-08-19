@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// Total test run time.
         /// </summary>
         public string TotalRunTime { get; set; }
+
         /// <summary>
         /// Total tests of a test run.
         /// </summary>

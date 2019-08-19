@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             var parentExecutionId = this.GetParentExecutionId(e.Result);
 
             this.TotalTests++;
-            testResult.resultOutcome = e.Result.Outcome;
+            testResult.ResultOutcome = e.Result.Outcome;
             if (e.Result.Outcome == TestOutcome.Failed)
             {
                 this.FailedTests++;
@@ -206,10 +206,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             TestResult parentTestResult;
             this.Results.TryGetValue(parentExecutionId, out parentTestResult);
 
-            if (parentTestResult.innerTestResults == null)
-                parentTestResult.innerTestResults = new List<TestResult>();
+            if (parentTestResult.InnerTestResults == null)
+                parentTestResult.InnerTestResults = new List<TestResult>();
 
-            parentTestResult.innerTestResults.Add(testResult);
+            parentTestResult.InnerTestResults.Add(testResult);
         }
 
         /// <summary>

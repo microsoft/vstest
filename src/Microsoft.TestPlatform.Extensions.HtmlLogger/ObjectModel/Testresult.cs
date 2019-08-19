@@ -10,29 +10,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     public class TestResult
     {
         /// <summary>
-        /// Fully Qualified name of TestResult.
+        /// Fully qualified name of the Test Result.
         /// </summary>
-        public string FullyQualifiedName;
+        public string FullyQualifiedName { get; set; }
 
         /// <summary>
-        /// DisplayName for the Particular TestResult.It is unique for each TestResult.
+        /// Display Name for the particular Test Result
         /// </summary>
-        public string DisplayName;
+        public string DisplayName { get; set; }
 
         /// <summary>
-        /// The error stack trace of the TestResult.
+        /// The error stack trace of the Test Result.
         /// </summary>
-        public string ErrorStackTrace;
+        public string ErrorStackTrace { get; set; }
 
         /// <summary>
-        /// Error message of the TestResult.
+        /// Error message of the Test Result.
         /// </summary>
-        public string ErrorMessage;
+        public string ErrorMessage { get; set; }
 
         /// <summary>
-        /// It is enum whether the TestResult is passed failed or skipped.
+        /// Enum that deteremines the outcome of the test case
         /// </summary>
-        public TestOutcome resultOutcome;
+        public TestOutcome ResultOutcome { get; set; }
 
         /// <summary>
         /// Total timespan of the TestResult
@@ -40,26 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         public string Duration { get; set; }
 
         /// <summary>
-        /// The list of TestResults that are children to the current TestResult.
+        /// The list of TestResults that are children to the current Test Result.
         /// </summary>
-        public List<TestResult> innerTestResults;
-
-        /// <summary>
-        /// Get the count of inner TestResults count.
-        /// </summary>
-        /// <returns></returns>
-        internal int GetInnerTestResultscount()
-        {
-            return this.innerTestResults.Count;
-        }
-
-        /// <summary>
-        /// Gives the current TestResult.
-        /// </summary>
-        /// <returns></returns>
-        internal TestResult GetTestResult()
-        {
-            return this;
-        }
+        public List<TestResult> InnerTestResults { get; set; }
     }
 }

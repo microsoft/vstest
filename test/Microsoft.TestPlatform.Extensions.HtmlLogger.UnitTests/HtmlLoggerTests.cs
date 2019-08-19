@@ -176,7 +176,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             HtmlLogger.TestResult passTestResultActual = new HtmlLogger.TestResult();
             
-            passTestResultActual.resultOutcome = TestOutcome.Passed;
+            passTestResultActual.ResultOutcome = TestOutcome.Passed;
             passTestResultActual.DisplayName = "abc";
 
             Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.TestRunDetails.Results.First().DisplayName);
@@ -190,7 +190,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), pass1.Object);
 
             HtmlLogger.TestResult passTestResultActual1 = new HtmlLogger.TestResult();
-            passTestResultActual.resultOutcome = TestOutcome.Passed;
+            passTestResultActual.ResultOutcome = TestOutcome.Passed;
             passTestResultActual.DisplayName = "def";
 
             Assert.AreEqual(passTestResultActual.DisplayName, this.htmlLogger.TestRunDetails.Results.Last().DisplayName);           
@@ -242,7 +242,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.GetTestResultscount(), 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.Results.Count(), 2, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -262,8 +262,8 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
 
             this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.GetTestResultscount(), 1, "testhandler is adding parent result correctly");
-            Assert.IsNull(this.htmlLogger.TestRunDetails.Results[0].innerTestResults,  "testhandler is adding child result correctly");
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.Results.Count(), 1, "testhandler is adding parent result correctly");
+            Assert.IsNull(this.htmlLogger.TestRunDetails.Results[0].InnerTestResults,  "testhandler is adding child result correctly");
 
             ObjectModel.TestResult result2 = new ObjectModel.TestResult(testCase2);
             result2.SetPropertyValue<Guid>(HtmlLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
@@ -280,8 +280,8 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.TestResultHandler(new object(), resultEventArg2.Object);
             this.htmlLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.GetTestResultscount(), 1, "testhandler is adding parent result correctly");
-            Assert.AreEqual(this.htmlLogger.TestRunDetails.Results[0].GetInnerTestResultscount(), 2, "testhandler is adding child result correctly");
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.Results.Count(), 1, "testhandler is adding parent result correctly");
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.Results[0].InnerTestResults.Count, 2, "testhandler is adding child result correctly");
         }
 
         [TestMethod]
@@ -332,8 +332,15 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         public void TestCompleteHandlerShouldCreateFileCorrectly()
         {
             string fileName;
+            TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.Outcome = TestOutcome.Failed;
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+           
+
             this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);
 
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
 
             this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
@@ -344,8 +351,16 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         public void TestCompleteHandlerShouldCallHtmlTransformerCorrectly()
         {
             string fileName;
+            TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.Outcome = TestOutcome.Failed;
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+
             this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);
+
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
             this.mockHtmlTransformer.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
@@ -353,8 +368,13 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         public void TestCompleteHandlerShouldWriteToXmlSerializerCorrectly()
         {
             string fileName;
-            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);          
+            TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
+            result1.Outcome = TestOutcome.Failed;
+            Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) => fileName = x).Returns(new Mock<Stream>().Object);
 
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
 
             this.mockXmlSerializer.Verify(x => x.WriteObject(It.IsAny<Stream>(), It.IsAny<TestRunDetails>()), Times.Once);
@@ -366,7 +386,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         {
 
             HtmlLogger.TestResult testResult = new HtmlLogger.TestResult();
-            testResult.resultOutcome = testoutcome;
+            testResult.ResultOutcome = testoutcome;
             testResult.DisplayName = displayName;
             return testResult;
         }
