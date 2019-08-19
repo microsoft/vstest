@@ -20,15 +20,6 @@
       </count-group>
     </header>
     <body>
-      <trans-unit id="DuplicateSource">
-        <source>Duplicate source {0} specified.</source>
-        <target state="translated">Source dupliquée {0} spécifiée.</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Doppelte Quelle {0} angegeben.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
-      </trans-unit>
       <trans-unit id="FileNotFound">
         <source>'{0}' not found.</source>
         <target state="translated">'{0}' introuvable.</target>
@@ -299,16 +290,17 @@
       </trans-unit>
       <trans-unit id="RunTestsArgumentHelp">
         <source>[TestFileNames]
-      Run tests from the specified files. Separate multiple test file names
-      by spaces.
+      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
+      by spaces. Set console logger verbosity to detailed to view matched test files.
       Examples: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</source>
-        <target state="translated">[TestFileNames]
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</source>
+        <target state="new">[TestFileNames]
       Exécutez les tests à partir des fichiers spécifiés. Séparez plusieurs noms de fichiers de test
       par des espaces.
       Exemples : mytestproject.dll
                 mytestproject.dll myothertestproject.exe</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1658,6 +1650,11 @@
 Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</source>
         <target state="new">The given argument {0} . Kindly use /help option to know more about the valid args
 Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestSourcesDiscovered">
+        <source>A total of {0} test files matched the specified pattern.</source>
+        <target state="new">A total of {0} test source files are discovered.</target>
         <note></note>
       </trans-unit>
     </body>

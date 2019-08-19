@@ -97,6 +97,7 @@
     <file src="net451\$Runtime$\ManualTests.testtype"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\ManualTests.testtype" />
     <file src="net451\$Runtime$\Microsoft.DiaSymReader.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.DiaSymReader.dll" />
     <file src="net451\$Runtime$\Microsoft.Extensions.DependencyModel.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.DependencyModel.dll" />
+    <file src="net451\$Runtime$\Microsoft.Extensions.FileSystemGlobbing.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="net451\$Runtime$\Microsoft.IntelliTrace.Core.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.IntelliTrace.Core.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll"	target="tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CoreUtilities.dll" />
