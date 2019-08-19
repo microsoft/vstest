@@ -255,10 +255,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         /// <inheritdoc/>
         public void EndSession()
-        {
+        {            
             this.requestSender.EndSession();
             this.requestSender.Close();
             this.sessionStarted = false;
+
+            EqtTrace.Info("VsTestConsoleWrapper.EndSession: Terminating vstest.cosole process");
             this.vstestConsoleProcessManager.ShutdownProcess();
         }
 
