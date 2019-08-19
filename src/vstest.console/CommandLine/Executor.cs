@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
              
             processors = new List<IArgumentProcessor>();
-
+          
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
 
@@ -237,12 +237,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
+                    
+
                     if (ex is CommandLineException || ex is TestPlatformException)
                     {
-                        //gets the provided CommandName/Type
-                        string invalidCommandName = processor.Metadata.Value.CommandName;
                         
-                            
+                        //gets the CommandName/Type
+                        string invalidCommandName = processor.Metadata.Value.CommandName;
+                                                 
                         this.Output.Error(false, CommandLineResources.InvalidArgument, invalidCommandName);
 
                         // the /help options - display : off
