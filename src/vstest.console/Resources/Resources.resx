@@ -729,7 +729,7 @@
     <value>Test run in progress</value>
   </data>
   <data name="InvalidArgument" xml:space="preserve">
-    <value>The given argument {0} is incorrect or invalid. Kindly use /help option to check the valid args
+    <value>The argument {0} provided is incorrect or invalid. Kindly use /help option to check the valid args
 Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</value>
   </data>
   <data name="TestSourcesDiscovered" xml:space="preserve">

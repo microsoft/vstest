@@ -241,13 +241,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                     if (ex is CommandLineException || ex is TestPlatformException)
                     {
+
+                        //string invalidParam = ex.Message.Split('\\').Last().ToString();
                         
-                        //gets the CommandName/Type
-                        string invalidCommandName = processor.Metadata.Value.CommandName;
+                        ////gets the CommandName/Type
+                        //string invalidCommandName = processor.Metadata.Value.CommandName;
                                                  
-                        this.Output.Error(false, CommandLineResources.InvalidArgument, invalidCommandName);
+                        //this.Output.Error(false, CommandLineResources.InvalidArgument, invalidParam, invalidCommandName);
 
                         // the /help options - display : off
+                        this.Output.Error(false, ex.Message);
                         this.showHelp = false;
                         result = 1;
                         break;

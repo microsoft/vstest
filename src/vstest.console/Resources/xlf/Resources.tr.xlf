@@ -1646,7 +1646,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidArgument">
-        <source>The given argument {0} is incorrect or invalid. Kindly use /help option to check the valid args
+        <source>The argument {0} provided is incorrect or invalid. Kindly use /help option to check the valid args
 Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</source>
         <target state="new">The given argument {0} . Kindly use /help option to know more about the valid args
 Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</target>

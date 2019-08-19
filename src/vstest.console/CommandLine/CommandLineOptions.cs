@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using System.IO;
     using vstest.console.Internal;
+    using System.Globalization;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -282,17 +283,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="source">Path to source file to look for tests in.</param>
         public void AddSource(string source)
         {
+            var extnList = new List<string>() { ".dll", ".exe" };
             if (String.IsNullOrWhiteSpace(source))
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
             }
             
             source = source.Trim();
-            
+
             // Convert the relative path to absolute path
             if (!Path.IsPathRooted(source))
             {
+                if (!extnList.Contains(source))
+                {
+                    throw new CommandLineException(
+                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
+                }
+                else
+                { 
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
+                }
             }
 
             // Get matching files from file pattern parser

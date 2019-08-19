@@ -674,7 +674,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The given argument {0} is incorrect or invalid. Kindly use /help option to check the valid args
+        ///   Looks up a localized string similar to The argument {0} provided is incorrect or invalid. Kindly use /help option to check the valid args
         ///Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options.
         /// </summary>
         internal static string InvalidArgument {
@@ -1264,10 +1264,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         
         /// <summary>
         ///   Looks up a localized string similar to [TestFileNames]
-        ///      Run tests from the specified files. Separate multiple test file names
-        ///      by spaces.
+        ///      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
+        ///      by spaces. Set console logger verbosity to detailed to view matched test files.
         ///      Examples: mytestproject.dll
-        ///                mytestproject.dll myothertestproject.exe.
+        ///                mytestproject.dll myothertestproject.exe
+        ///                testproject*.dll my*project.dll.
         /// </summary>
         internal static string RunTestsArgumentHelp {
             get {
@@ -1612,19 +1613,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("TestSourceFileNotFound", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to A total of {0} test source files are discovered..
+        ///   Looks up a localized string similar to A total of {0} test files matched the specified pattern..
         /// </summary>
-        internal static string TestSourcesDiscovered
-        {
-            get
-            {
+        internal static string TestSourcesDiscovered {
+            get {
                 return ResourceManager.GetString("TestSourcesDiscovered", resourceCulture);
             }
         }
-
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Time elapsed :.
         /// </summary>
