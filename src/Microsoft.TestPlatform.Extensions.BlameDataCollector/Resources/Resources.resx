@@ -129,6 +129,9 @@
   <data name="DumpFileNotGeneratedErrorMessage" xml:space="preserve">
     <value>Collect dump was enabled but no dump file was generated.</value>
   </data>
+  <data name="InactivityTimeout" xml:space="preserve">
+    <value>The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process.</value>
+  </data>
   <data name="ProcDumpCouldNotStart" xml:space="preserve">
     <value>Could not start process dump: {0}</value>
   </data>
@@ -137,5 +140,8 @@
   </data>
   <data name="ProcDumpNotGenerated" xml:space="preserve">
     <value>CollectDump was enabled but dump file was not generated.</value>
+  </data>
+  <data name="UnexpectedValueForInactivityTimespanValue" xml:space="preserve">
+    <value>Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input.</value>
   </data>
 </root>

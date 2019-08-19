@@ -6,8 +6,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.PlatformAbstractions</AssemblyName>
-    <TargetFrameworks>netstandard1.0;netcoreapp1.0;net451;uap10.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard1.0;netcoreapp1.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;net451;uap10.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(DotNetBuildFromSource)' == 'true' ">netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
@@ -31,10 +31,10 @@
     <Compile Include="Interfaces\**\*.cs" />
     <Compile Include="Properties\**\*.cs" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <Compile Include="netstandard1.0\**\*.cs" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <Compile Include="netstandard\**\*.cs" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
     <Compile Include="netcore\**\*.cs" />
     <Compile Include="common\**\*.cs" />
     <PackageReference Include="System.Threading.Thread">

@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -15,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using System.IO;
+    using vstest.console.Internal;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -83,6 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             this.BatchSize = DefaultBatchSize;
             this.TestStatsEventTimeout = this.DefaultRetrievalTimeout;
             this.FileHelper = new FileHelper();
+            this.FilePatternParser = new FilePatternParser();
 #if TODO
             UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
 #endif
@@ -238,6 +239,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         internal IFileHelper FileHelper { get; set; }
 
+        internal FilePatternParser FilePatternParser { get; set; }
+
         /// <summary>
         /// Gets or sets the target Framework version for test run.
         /// </summary>
@@ -283,28 +286,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
             }
-
+            
             source = source.Trim();
-
+            
             // Convert the relative path to absolute path
-            if(!Path.IsPathRooted(source))
+            if (!Path.IsPathRooted(source))
             {
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
             }
 
-            if (!FileHelper.Exists(source))
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
-            }
+            // Get matching files from file pattern parser
+            var matchingFiles = FilePatternParser.GetMatchingFiles(source);
 
-            if (this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateSource, source));
-            }
-
-            this.sources.Add(source);
+            // Add the matching files to source list
+            this.sources = this.sources.Union(matchingFiles).ToList();
         }
 
         #endregion

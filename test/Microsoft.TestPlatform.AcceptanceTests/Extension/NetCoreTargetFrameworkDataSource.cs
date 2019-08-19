@@ -31,26 +31,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             {
                 this.dataRows.Add(new object[]
                 {
-                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework)
-                });
-                this.dataRows.Add(new object[]
-                {
-                    new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework)
-                });
-                this.dataRows.Add(new object[]
-                {
                     new RunnerInfo(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework)
                 });
             }
 
             if (useCoreRunner)
             {
-                this.dataRows.Add(new object[]
-                    {new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework)});
-                this.dataRows.Add(new object[]
-                {
-                    new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework)
-                });
                 this.dataRows.Add(new object[]
                 {
                     new RunnerInfo(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework)

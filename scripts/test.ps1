@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp1.0", "net451", "netcoreapp2.0")]
+    [ValidateSet("net451", "netcoreapp2.1")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -75,12 +75,11 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 # Test configuration
 #
 $TPT_TargetFrameworkFullCLR = "net451"
-$TPT_TargetFrameworkCore = "netcoreapp1.0"
-$TPT_TargetFrameworkCore20 = "netcoreapp2.0"
+$TPT_TargetFrameworkCore20 = "netcoreapp2.1"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR, $TPT_TargetFrameworkCore20)
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkFullCLR, $TPT_TargetFrameworkCore20)
 $Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("_none_");
@@ -208,7 +207,7 @@ function Invoke-Test
                 $testFilter = "/testCaseFilter:`"$TPT_TestFilter`""
             }
 
-            if($fx -eq $TPT_TargetFrameworkCore -or $fx -eq $TPT_TargetFrameworkCore20)
+            if($fx -eq $TPT_TargetFrameworkCore20)
             {
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
