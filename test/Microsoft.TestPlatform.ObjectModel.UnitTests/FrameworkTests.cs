@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(".NETCoreApp,Version=v1.0", fx.Name);
 
             fx = Framework.FromString("frameworkUAP10");
-            Assert.AreEqual("Uap,Version=v10.0", fx.Name);
+            Assert.AreEqual("UAP,Version=v10.0", fx.Name);
         }
 
         [TestMethod]
@@ -54,7 +54,19 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var fx = Framework.FromString("  Framework35");
 
             Assert.AreEqual(".NETFramework,Version=v3.5", fx.Name);
-            Assert.AreEqual("3.5", fx.Version);
+            Assert.AreEqual("3.5.0.0", fx.Version);
+        }
+
+        [TestMethod]
+        public void FrameworkFromStringShouldWorkForShortNames()
+        {
+            var fx = Framework.FromString("net451");
+            Assert.AreEqual(".NETFramework,Version=v4.5.1", fx.Name);
+            Assert.AreEqual("4.5.1.0", fx.Version);
+
+            var corefx = Framework.FromString("netcoreapp2.0");
+            Assert.AreEqual(".NETCoreApp,Version=v2.0", corefx.Name);
+            Assert.AreEqual("2.0.0.0", corefx.Version);
         }
 
         [TestMethod]
