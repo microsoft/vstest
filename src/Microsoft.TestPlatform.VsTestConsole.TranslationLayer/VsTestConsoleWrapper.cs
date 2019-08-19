@@ -259,6 +259,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.requestSender.EndSession();
             this.requestSender.Close();
             this.sessionStarted = false;
+            this.vstestConsoleProcessManager.ShutdownProcess();
         }
 
         #endregion

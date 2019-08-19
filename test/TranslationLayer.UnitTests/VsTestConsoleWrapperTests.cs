@@ -310,6 +310,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
             this.mockRequestSender.Verify(rs => rs.Close(), Times.Once);
+            this.mockProcessManager.Verify(x => x.ShutdownProcess(), Times.Once);
         }
     }
 }
