@@ -513,12 +513,22 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             List<string> resultFiles = new List<string>();
             foreach (ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
             {
-                if (ObjectModel.EqtTrace.IsVerboseEnabled)
+                string sourceFile;
+
+                if (!uriDataAttachment.Uri.IsAbsoluteUri)
                 {
-                    ObjectModel.EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + uriDataAttachment.Uri.LocalPath);
+                    sourceFile = new UriBuilder() { Scheme = "file", Path = uriDataAttachment.Uri.ToString(), Host = "" }.Uri.LocalPath;
+                }
+                else
+                {
+                    sourceFile = uriDataAttachment.Uri.LocalPath;
                 }
 
-                string sourceFile = uriDataAttachment.Uri.LocalPath;
+                if (ObjectModel.EqtTrace.IsVerboseEnabled)
+                {
+                    ObjectModel.EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + sourceFile);
+                }
+
                 Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
                 // copy the source file to the target location
                 string targetFileName = FileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
