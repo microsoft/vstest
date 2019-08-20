@@ -226,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionPort = this.dataCollectionRequestSender.InitializeCommunication();
 
             // Warn the user that execution will wait for debugger attach.
-            this.dataCollectionProcessId = this.dataCollectionLauncher.LaunchDataCollector(InferRunSettingsHelper.GetEnvironmentVariables(SettingsXml), this.GetCommandLineArguments(this.dataCollectionPort));
+            this.dataCollectionProcessId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(this.dataCollectionPort));
             EqtTrace.Info("ProxyDataCollectionManager.Initialize: Launched datacollector processId: {0} port: {1}", this.dataCollectionProcessId, this.dataCollectionPort);
 
             var connectionTimeout = this.GetConnectionTimeout(dataCollectionProcessId);
