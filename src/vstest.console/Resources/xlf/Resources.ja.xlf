@@ -295,12 +295,14 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[テストファイル名]
-      指定されたファイルからテストを実行します。複数のテスト ファイルがある場合は、
-      名前をスペースで区切ってください。
+        <target state="translated">[TestFileNames]
+      指定されたファイルまたはワイルド カード パターンからテストを実行します。複数のテスト ファイル名または
+      パターンをスペースで区切ります。一致したテスト ファイルを表示するには、コンソール ロガーの詳細度を detailed に設定します。
       例: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
-        <note></note>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1206,7 +1208,8 @@
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
         <target state="translated">合計時間: {0:0.0000} {1}</target>
-        <note></note>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1524,7 +1527,8 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
         <target state="translated">テストの合計数: 不明</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1618,37 +1622,44 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="translated">Framework35 はサポートされていません。.Net Framework 3.5 を対象にしたプロジェクトでは、CLR 4.0 の「互換モード」でテストが実行されます。</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="translated">テストの実行が処理中</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
         <target state="translated">テストの合計数: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
         <target state="translated">     失敗: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
         <target state="translated">     成功: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="translated">    スキップ: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
-        <note></note>
+        <target state="translated">合計 {0} 個のテスト ファイルが指定されたパターンと一致しました。</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

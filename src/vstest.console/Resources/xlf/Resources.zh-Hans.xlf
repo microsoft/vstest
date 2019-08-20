@@ -294,12 +294,14 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      从指定文件运行测试。使用空格分隔多个测试文件
-      名称。
-      实例: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
-        <note></note>
+        <target state="translated">[TestFileNames]
+      从指定的文件或通配符模式运行测试。通过空格将多个测试文件或模式分隔开来。
+      将控制台记录器详细级别设置为“详细”以查看匹配的测试文件。
+      示例: mytestproject.dll
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1205,7 +1207,8 @@
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
         <target state="translated">总时间: {0:0.0000} {1}</target>
-        <note></note>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1523,7 +1526,8 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
         <target state="translated">测试总数: 未知</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1617,37 +1621,44 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="translated">不支持 Framework35。对于面向 .Net Framework 3.5 的项目，将在 CLR 4.0“兼容性模式”中运行测试。</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="translated">正在运行测试</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
         <target state="translated">测试总数: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
         <target state="translated">     失败数: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
         <target state="translated">     通过数: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="translated">    跳过数: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
-        <note></note>
+        <target state="translated">总共 {0} 个测试文件与指定模式相匹配。</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>
