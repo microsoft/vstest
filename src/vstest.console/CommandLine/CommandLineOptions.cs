@@ -283,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="source">Path to source file to look for tests in.</param>
         public void AddSource(string source)
         {
-            var extnList = new List<string>() { ".dll", ".exe" };
+            var extnList = new List<string>() { ".xap",".appx",".dll", ".exe" };
             if (String.IsNullOrWhiteSpace(source))
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
@@ -299,10 +299,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     throw new CommandLineException(
                         string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
                 }
-                else
-                { 
+               
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
-                }
+                
             }
 
             // Get matching files from file pattern parser
