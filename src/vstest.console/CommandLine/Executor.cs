@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "processorInstance", Justification = "Done on purpose to force the instances to be created")]
         private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
         {          
-            processors = new List<IArgumentProcessor>();         
+            processors = new List<IArgumentProcessor>();
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
             for (var index = 0; index < args.Length; index++)
@@ -228,11 +228,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     executorInstance = processor.Executor.Value;
                 }
                 catch (Exception ex)
-                {                
+                {
                     if (ex is CommandLineException || ex is TestPlatformException)
-                    {                        
+                    {
                         this.Output.Error(false, ex.Message);
-
                         // the /help options - display : off
                         this.showHelp = false;
                         result = 1;

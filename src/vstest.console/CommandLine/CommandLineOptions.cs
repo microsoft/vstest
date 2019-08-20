@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.IO;
     using vstest.console.Internal;
     using System.Globalization;
+    using System.Collections;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -43,6 +44,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// The default retrieval timeout for fetching of test results or test cases
         /// </summary>
         private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500);
+
+        /// <summary>
+        /// The supported extension types for test source
+        /// </summary>
+        public static readonly IEnumerable<string> extnList = new List<string>()
+        {
+         ".xap" ,
+         ".appx" ,
+         ".dll",
+         ".exe",
+         "*.appxrecipe"
+        };
+
 
         #endregion
 
@@ -283,7 +297,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="source">Path to source file to look for tests in.</param>
         public void AddSource(string source)
         {
-            var extnList = new List<string>() { ".xap", ".appx", ".dll", ".exe" };
             if (String.IsNullOrWhiteSpace(source))
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
@@ -291,16 +304,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             source = source.Trim();
 
-            //verify whether the given argument is source type if not process further
-            int count = 0;
-            foreach (string extension in extnList)
-            {             
-                if (source.Contains(extension))
-                {
-                    count += 1;
-                }             
-            }
-            if (count == 0)
+            //verify whether the given argument is source type
+            bool isEntensionMatched = extnList.Any(a => a == Path.GetExtension(source));
+            if (!isEntensionMatched)
             {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
