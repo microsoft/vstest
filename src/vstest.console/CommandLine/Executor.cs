@@ -31,7 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.IO;
     using System.Linq;
     using System.Threading;
-
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
@@ -41,8 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;  
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -172,25 +170,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <returns>0 if all of the processors were created successfully and 1 otherwise.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "processorInstance", Justification = "Done on purpose to force the instances to be created")]
         private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
-        {
-             
-            processors = new List<IArgumentProcessor>();
-          
+        {          
+            processors = new List<IArgumentProcessor>();         
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
-
             for (var index = 0; index < args.Length; index++)
             {
                 var arg = args[index];
-
                 // If argument is '--', following arguments are key=value pairs for run settings.
                 if (arg.Equals("--"))
                 {
                     var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
                     processors.Add(cliRunSettingsProcessor);
                     break;
-                }
-          
+                }        
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
@@ -226,8 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Instantiate and initialize the processors in priority order.
             processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
             foreach (var processor in processors)
-            {
-                
+            {               
                 IArgumentExecutor executorInstance;
                 try
                 {
@@ -236,21 +228,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     executorInstance = processor.Executor.Value;
                 }
                 catch (Exception ex)
-                {
-                    
-
+                {                
                     if (ex is CommandLineException || ex is TestPlatformException)
-                    {
-
-                        //string invalidParam = ex.Message.Split('\\').Last().ToString();
-                        
-                        ////gets the CommandName/Type
-                        //string invalidCommandName = processor.Metadata.Value.CommandName;
-                                                 
-                        //this.Output.Error(false, CommandLineResources.InvalidArgument, invalidParam, invalidCommandName);
+                    {                        
+                        this.Output.Error(false, ex.Message);
 
                         // the /help options - display : off
-                        this.Output.Error(false, ex.Message);
                         this.showHelp = false;
                         result = 1;
                         break;
@@ -314,7 +297,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     }
                 }
             }
-
             return result;
         }
 
@@ -389,7 +371,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 continueExecution = false;
             }
-
             return continueExecution;
         }
 

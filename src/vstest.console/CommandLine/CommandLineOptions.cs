@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     internal class CommandLineOptions
     {
         #region Constants/Readonly 
-        
+
         /// <summary>
         /// The default batch size.
         /// </summary>
@@ -38,14 +38,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// The default use vsix extensions value.
         /// </summary>
         public const bool DefaultUseVsixExtensionsValue = false;
-        
+
         /// <summary>
         /// The default retrieval timeout for fetching of test results or test cases
         /// </summary>
-        private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500); 
-        
+        private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500);
+
         #endregion
-        
+
         #region PrivateMembers
 
         private static CommandLineOptions instance;
@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         private List<string> sources = new List<string>();
 
         private Architecture architecture;
-        
+
         private Framework frameworkVersion;
 
         #endregion
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 #endif
         }
 
-#endregion
+        #endregion
 
         #region Properties
 
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Directory containing the binaries to run
         /// </summary>
         public string Output { get; set; }
-        
+
         /// <summary>
         /// Specifies the frequency of the runStats/discoveredTests event
         /// </summary>
@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 return !string.IsNullOrEmpty(TargetDevice);
             }
         }
-        
+
         /// <summary>
         /// Specifies the target platform type for test run.
         /// </summary>
@@ -231,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 return IsDesignMode;
             }
-        }        
+        }
 
         /// <summary>
         /// Specifies if /Platform has been specified on command line or not.
@@ -283,25 +283,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="source">Path to source file to look for tests in.</param>
         public void AddSource(string source)
         {
-            var extnList = new List<string>() { ".xap",".appx",".dll", ".exe" };
+            var extnList = new List<string>() { ".xap", ".appx", ".dll", ".exe" };
             if (String.IsNullOrWhiteSpace(source))
             {
                 throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
             }
-            
+
             source = source.Trim();
+
+            //verify whether the given argument is source type if not process further
+            int count = 0;
+            foreach (string extension in extnList)
+            {             
+                if (source.Contains(extension))
+                {
+                    count += 1;
+                }             
+            }
+            if (count == 0)
+            {
+                throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
+            }
 
             // Convert the relative path to absolute path
             if (!Path.IsPathRooted(source))
             {
-                if (!extnList.Contains(source))
-                {
-                    throw new CommandLineException(
-                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
-                }
-               
                 source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
-                
             }
 
             // Get matching files from file pattern parser

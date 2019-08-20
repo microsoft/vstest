@@ -674,8 +674,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The argument {0} provided is incorrect or invalid. Kindly use /help option to check the valid args
-        ///Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options.
+        ///   Looks up a localized string similar to The argument {0} provided is incorrect or invalid. Kindly use /help option to check the valid args. Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options.
         /// </summary>
         internal static string InvalidArgument {
             get {
