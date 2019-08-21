@@ -45,19 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500);
 
-        /// <summary>
-        /// The supported extension types for test source
-        /// </summary>
-        public static readonly IEnumerable<string> extnList = new List<string>()
-        {
-         ".xap" ,
-         ".appx" ,
-         ".dll",
-         ".exe",
-         ".appxrecipe"
-        };
-
-
         #endregion
 
         #region PrivateMembers

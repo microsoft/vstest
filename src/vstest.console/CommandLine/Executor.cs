@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
@@ -170,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <returns>0 if all of the processors were created successfully and 1 otherwise.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "processorInstance", Justification = "Done on purpose to force the instances to be created")]
         private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
-        {          
+        {
             processors = new List<IArgumentProcessor>();
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
@@ -183,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
                     processors.Add(cliRunSettingsProcessor);
                     break;
-                }        
+                }
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
@@ -219,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Instantiate and initialize the processors in priority order.
             processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
             foreach (var processor in processors)
-            {               
+            {
                 IArgumentExecutor executorInstance;
                 try
                 {
@@ -380,10 +379,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             string assemblyVersion = string.Empty;
             assemblyVersion = Product.Version;
-
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
-
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
             this.Output.WriteLine(string.Empty, OutputLevel.Information);
         }
