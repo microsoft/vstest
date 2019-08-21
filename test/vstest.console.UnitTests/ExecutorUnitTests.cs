@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 
             Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
 
-            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.TestSourceFileNotFound, badArg))));
+            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
         }
 
         /// <summary>

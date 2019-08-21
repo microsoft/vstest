@@ -79,7 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             }
             catch (Exception ex)
             {
-                Assert.IsTrue(ex is CommandLineException);
+                //Assert.IsTrue(ex is CommandLineException);
+                Assert.IsTrue(ex is TestSourceException);
                 Assert.AreEqual("The test source file \"" + testFilePath + "\" provided was not found.", ex.Message);
             }
         }
