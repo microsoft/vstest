@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private int runCompletedClients = 0;
         private int runStartedClients = 0;
-        private int availableTestSources = -1;
+        private int availableTestBuckets = -1;
 
         private TestRunCriteria actualTestRunCriteria;
 
@@ -99,36 +99,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (this.hasSpecificTestsRun)
             {
-                var testCasesBySource = new Dictionary<string, List<TestCase>>();
+                var testCasesByBucket = new Dictionary<string, List<TestCase>>();
                 foreach (var test in testRunCriteria.Tests)
                 {
-                    if (!testCasesBySource.ContainsKey(test.Source))
+                    int bucket = test.GetPropertyValue(TestCaseProperties.Bucket, 0);
+                    string key = $"{test.Source}:{bucket}";
+                    if (!testCasesByBucket.ContainsKey(key))
                     {
-                        testCasesBySource.Add(test.Source, new List<TestCase>());
+                        testCasesByBucket.Add(key, new List<TestCase>());
                     }
 
-                    testCasesBySource[test.Source].Add(test);
+                    testCasesByBucket[key].Add(test);
                 }
 
                 // Do not use "Dictionary.ValueCollection.Enumerator" - it becomes undetermenstic once we go out of scope of this method
                 // Use "ToArray" to copy ValueColleciton to a simple array and use it's enumerator
                 // Set the enumerator for parallel yielding of testCases
                 // Whenever a concurrent executor becomes free, it picks up the next set of testCases using this enumerator
-                var testCaseLists = testCasesBySource.Values.ToArray();
+                var testCaseLists = testCasesByBucket.Values.ToArray();
                 this.testCaseListEnumerator = testCaseLists.GetEnumerator();
-                this.availableTestSources = testCaseLists.Length;
+                this.availableTestBuckets = testCaseLists.Length;
             }
             else
             {
                 // Set the enumerator for parallel yielding of sources
                 // Whenever a concurrent executor becomes free, it picks up the next source using this enumerator
                 this.sourceEnumerator = testRunCriteria.Sources.GetEnumerator();
-                this.availableTestSources = testRunCriteria.Sources.Count();
+                this.availableTestBuckets = testRunCriteria.Sources.Count();
             }
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total sources: " + this.availableTestSources);
+                EqtTrace.Verbose("ParallelProxyExecutionManager: Start execution. Total buckets: " + this.availableTestBuckets);
             }
             return this.StartTestRunPrivate(eventHandler);
         }
@@ -184,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
                 else
                 {
-                    allRunsCompleted = this.runCompletedClients == this.availableTestSources;
+                    allRunsCompleted = this.runCompletedClients == this.availableTestBuckets;
                 }
 
                 if (EqtTrace.IsVerboseEnabled)

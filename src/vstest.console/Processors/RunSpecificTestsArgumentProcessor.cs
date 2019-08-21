@@ -88,6 +88,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #region Fields
 
         /// <summary>
+        /// Indicates if bucketization is enabled.
+        /// </summary>
+        private bool enableBucketization;
+
+        /// <summary>
         /// Used for getting sources.
         /// </summary>
         private CommandLineOptions commandLineOptions;
@@ -154,7 +159,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             IRunSettingsProvider runSettingsProvider,
             ITestRequestManager testRequestManager,
             IOutput output)
+            : this(options, runSettingsProvider, testRequestManager, output, false)
         {
+        }
+
+        public RunSpecificTestsArgumentExecutor(
+            CommandLineOptions options,
+            IRunSettingsProvider runSettingsProvider,
+            ITestRequestManager testRequestManager,
+            IOutput output,
+            bool enableBucketization)
+        {
+            this.enableBucketization = enableBucketization;
+
             Contract.Requires(options != null);
             Contract.Requires(testRequestManager != null);
 
@@ -163,7 +180,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.runSettingsManager = runSettingsProvider;
             this.output = output;
-            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
+            this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(
+                enableBucketization
+                ? (EventHandler<DiscoveredTestsEventArgs>)this.discoveryRequest_OnDiscoveredBucketizedTests
+                : this.discoveryRequest_OnDiscoveredTests);
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar(this.output, this.commandLineOptions);
         }
 
@@ -177,6 +197,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument"></param>
         public void Initialize(string argument)
         {
+            if (this.enableBucketization)
+            {
+                return;
+            }
+
             if (!string.IsNullOrWhiteSpace(argument))
             {
                 this.selectedTestNames = new Collection<string>(
@@ -312,6 +337,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                         break;
                     }
                 }
+            }
+        }
+
+        private void discoveryRequest_OnDiscoveredBucketizedTests(object sender, DiscoveredTestsEventArgs args)
+        {
+            this.discoveredTestCount += args.DiscoveredTestCases.Count();
+            foreach (var testCase in args.DiscoveredTestCases)
+            {
+                this.selectedTestCases.Add(testCase);
             }
         }
 

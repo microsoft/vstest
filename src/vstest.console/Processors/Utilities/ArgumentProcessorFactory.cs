@@ -219,6 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new ListTestsArgumentProcessor(),
                 new RunTestsArgumentProcessor(),
                 new RunSpecificTestsArgumentProcessor(),
+                new RunBucketizedTestsArgumentProcessor(),
                 new TestAdapterPathArgumentProcessor(),
                 new TestCaseFilterArgumentProcessor(),
                 new ParentProcessIdArgumentProcessor(),

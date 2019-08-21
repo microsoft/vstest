@@ -325,6 +325,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private const string SourceLabel = "Source";
         private const string FilePathLabel = "File Path";
         private const string LineNumberLabel = "Line Number";
+        private const string BucketLabel = "Bucket";
 
         #endregion
 
@@ -348,6 +349,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty LineNumber = TestProperty.Register("TestCase.LineNumber", LineNumberLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        public static readonly TestProperty Bucket = TestProperty.Register("TestCase.Bucket", BucketLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
 
         internal static TestProperty[] Properties { get; } =
         {

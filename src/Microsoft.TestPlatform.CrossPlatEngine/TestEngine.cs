@@ -102,8 +102,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </returns>
         public IProxyExecutionManager GetExecutionManager(IRequestData requestData, ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria)
         {
-            var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
-            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
+            var bucketCount = GetDistinctNumberOfBuckets(testRunCriteria);
+            var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(bucketCount, testRunCriteria.TestRunSettings);
 
             // Collecting IsParallel Enabled
             requestData.MetricsCollection.Add(TelemetryDataConstants.ParallelEnabledDuringExecution, parallelLevel > 1 ? "True" : "False");
@@ -172,14 +172,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         #endregion
 
-        private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)
+        private static int GetDistinctNumberOfBuckets(TestRunCriteria testRunCriteria)
         {
             // No point in creating more processes if number of sources is less than what user configured for
             int numSources = 1;
             if (testRunCriteria.HasSpecificTests)
             {
                 numSources = new System.Collections.Generic.HashSet<string>(
-                    testRunCriteria.Tests.Select((testCase) => testCase.Source)).Count;
+                    testRunCriteria.Tests.Select((testCase) => $"{testCase.Source}:{testCase.GetPropertyValue(TestCaseProperties.Bucket, 0)}")).Count;
             }
             else
             {
