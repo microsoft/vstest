@@ -229,19 +229,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    if (ex is CommandLineException || ex is TestPlatformException)
+                    if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                     {
                         this.Output.Error(false, ex.Message);
-                        // the /help options - display : off
-                        this.showHelp = false;
                         result = 1;
-                        break;
+                        this.showHelp = false;
                     }
-                    else if (ex is SettingsException)
+                    else if(ex is TestSourceException)
                     {
                         this.Output.Error(false, ex.Message);
                         result = 1;
                         this.showHelp = false;
+                        break;
+
                     }
                     else
                     {

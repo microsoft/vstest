@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
          ".appx" ,
          ".dll",
          ".exe",
-         "*.appxrecipe"
+         ".appxrecipe"
         };
 
 
@@ -299,28 +299,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(source))
             {
-                throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
+                throw new TestSourceException(CommandLineResources.CannotBeNullOrEmpty);
             }
 
             source = source.Trim();
 
-            //verify whether the given argument is source type
-            bool isEntensionMatched = extnList.Any(a => a == Path.GetExtension(source));
-            if (!isEntensionMatched)
+            List<string> matchingFiles;
+            try
             {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
+                // Get matching files from file pattern parser
+                matchingFiles = FilePatternParser.GetMatchingFiles(source);
             }
-
-            // Convert the relative path to absolute path
-            if (!Path.IsPathRooted(source))
+            catch(TestSourceException ex)
             {
-                source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
+                if(source.StartsWith("-") || source.StartsWith("/"))
+                {
+                    throw new TestSourceException(
+                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
+                }
+                throw ex;
             }
-
-            // Get matching files from file pattern parser
-            var matchingFiles = FilePatternParser.GetMatchingFiles(source);
-
             // Add the matching files to source list
             this.sources = this.sources.Union(matchingFiles).ToList();
         }
