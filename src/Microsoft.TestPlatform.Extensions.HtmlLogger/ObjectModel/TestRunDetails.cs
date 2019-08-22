@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
 {
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     [DataContract]
-    [KnownType(typeof(TestResult))]
     public sealed class TestRunDetails
     {
         /// <summary>
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         internal List<string> RunLevelMessageInformational = new List<string>();
 
         /// <summary>
-        /// List of error and warning messages 
+        /// List of error and warning messages.
         /// </summary>
         [DataMember]
         internal List<string> RunLevelMessageErrorAndWarning = new List<string>();
@@ -39,6 +39,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// List of all the results
         /// </summary>
         [DataMember]
-        internal List<TestResult> Results = new List<TestResult>();
+        internal List<TestResultCollection> ResultCollectionList = new List<TestResultCollection>();
     }
 }

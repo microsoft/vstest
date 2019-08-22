@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="2.0"
-    xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger"
+    xmlns:tp="http://schemas.datacontract.org/2004/07/Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"            
     xmlns:msxsl="urn:schemas-microsoft-com:xslt" exclude-result-prefixes="msxs tp">
@@ -25,7 +25,8 @@
       <style>
         body { font-family: Calibri, Verdana, Arial, sans-serif; background-color: White; color: Black; }
         h2 {
-        margin-top: 0;
+        margin-top: 15px;
+        margin-bottom:10px;
         }
         .summary {font-family:monospace;
         display: -webkit-flex; /* Safari */
@@ -39,6 +40,12 @@
         cursor:pointer;
         background-color:#bcdaf7;
         }
+        .listRow {
+        border: 2px solid #ffffff;
+        width:100%;
+        cursor:pointer;
+        background-color:#ffffff;
+        }
         .innerRow{
         border: 2px solid #ffffff;
         padding-left:1%;
@@ -48,13 +55,15 @@
         .block{
         width : 150px;
         }
-        .division{
-        cursor:pointer;
-        background-color:#bcdaf7;
-        }
-        .innerDivision{
+        .leafDivision{
         border: 2px solid #ffffff;
         background-color:#e0f0ff;
+        }
+        .resultDivision{
+        border: 2px solid #ffffff;
+        padding-left:1%;
+        margin-left:1%;
+        background-color:#ffffff;
         }
         .pass { color: #0c0; }
         .fail { color: #c00; }
@@ -64,48 +73,71 @@
         .totalTests { font-size : 30px}
         .testRunTime { font-size : 30px}
         .passPercentage { font-size : 30px}
+        .errorInfo{
+        margin-left:16px;
+        }
       </style>
     </html>
   </xsl:template>
 
   <xsl:template match="/tp:TestRunDetails">
     <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary"/>
-    <h2>Results</h2>
-    <xsl:apply-templates select ="/tp:TestRunDetails/tp:Results"/>
+    <xsl:apply-templates select ="/tp:TestRunDetails/tp:ResultCollectionList"/>
   </xsl:template>
 
   <xsl:template match="tp:TestRunDetails/tp:Summary">
     <div class ="summary">
-      <div class ="block">
-        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalTests"/>
-      </div>
+      <div class ="block"><xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalTests"/></div>
       <div class ="block">
         <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassedTests"/>
         <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:FailedTests"/>
         <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:SkippedTests"/>
       </div>
-      <div class ="block">
-        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassPercentage"/>
-      </div>
-      <div class ="block">
-        <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalRunTime"/>
-      </div>
+      <div class ="block"><xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:PassPercentage"/></div>
+      <div class ="block"><xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary/tp:TotalRunTime"/></div>
       <br/>
     </div>
   </xsl:template>
 
-  <xsl:template match="/tp:TestRunDetails/tp:Results">
-    <xsl:apply-templates select ="/tp:TestRunDetails/tp:Results/tp:TestResult"/>
+  <xsl:template match="/tp:TestRunDetails/tp:ResultCollectionList">
+    <h2>Failed Results</h2><xsl:call-template name ="FailedResults"/>
+    <h2>All Results</h2><xsl:call-template name ="Results"/>
   </xsl:template>
 
-  <xsl:template match="tp:TestResult">  
+  <xsl:template name ="Results">
+    <xsl:for-each select ="tp:TestResultCollection">
+      <xsl:variable name="Source" select="tp:Id" />
+      <xsl:if test="tp:ResultList!=''">
+        <div class ="listRow" onclick="ToggleClass('{$Source}')"><xsl:value-of select = "tp:Source" /></div>
+        <div class ="resultDivision" Id="{$Source}" style="display:none;">
+          <xsl:for-each select ="tp:ResultList/tp:TestResult"><xsl:call-template name ="TestResult"/></xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name = "FailedResults">
+    <xsl:for-each select ="tp:TestResultCollection">
+      <xsl:variable name="Source" select="tp:Id" />
+      <xsl:if test="tp:FailedResultList!=''">
+        <div class ="listRow" onclick="ToggleClass('{concat($Source,'-failedResult')}')"><xsl:value-of select = "tp:Source" /> </div>
+        <div class ="resultDivision" Id="{concat($Source,'-failedResult')}" style="display:none;">
+          <xsl:for-each select ="tp:FailedResultList/tp:TestResult"><xsl:call-template name ="TestResult"/></xsl:for-each>
+        </div>
+      </xsl:if>
+    </xsl:for-each>    
+  </xsl:template>  
+  
+  <xsl:template name="TestResult" match="tp:TestResult">
+    <xsl:variable name="TestResultId" select="tp:TestResultId" />
+    
     <xsl:if test ="tp:InnerTestResults!=''">
-      <div class ="row" onclick="ToggleClass('{generate-id()}')"><xsl:call-template name = "Result" /></div>
-      <a Id="{generate-id()}" style="display:none;"><xsl:apply-templates select = "tp:InnerTestResults" /></a>
+      <div class ="row" onclick="ToggleClass('{concat($TestResultId,'-',name(..))}')"><xsl:call-template name = "Result" /></div>
+      <a Id="{concat($TestResultId,'-',name(..))}" style="display:none;"><xsl:apply-templates select = "tp:InnerTestResults" /></a>
     </xsl:if> 
     
     <xsl:if test ="tp:InnerTestResults=''">
-      <div class ="innerDivision"><xsl:call-template name = "Result" /></div>
+      <div class ="leafDivision"><xsl:call-template name = "Result" /></div>
     </xsl:if>   
     
   </xsl:template>
@@ -115,21 +147,23 @@
   </xsl:template>
 
 <xsl:template name="Result" >
-    <div >
+    <div>
       <xsl:apply-templates select = "tp:ResultOutcome"/>
-      <xsl:apply-templates select = "tp:FullyQualifiedName" />
+      <xsl:apply-templates select = "tp:DisplayName" />
       <div class="duration"><xsl:apply-templates select = "tp:Duration" /></div>
     </div>
-    <xsl:if test ="tp:ErrorMessage!=''"><xsl:apply-templates select = "tp:ErrorMessage" /></xsl:if>
-    <xsl:if test ="tp:ErrorStackTrace!=''"><xsl:apply-templates select = "tp:ErrorStackTrace" /></xsl:if>
+   <div class="errorInfo"> 
+     <xsl:if test ="tp:ErrorMessage!=''"><xsl:apply-templates select = "tp:ErrorMessage" /></xsl:if>
+     <xsl:if test ="tp:ErrorStackTrace!=''"><xsl:apply-templates select = "tp:ErrorStackTrace" /></xsl:if>
+   </div>
   </xsl:template>
   
   <xsl:template match = "tp:ErrorMessage">
-    &#160;&#160;&#160;&#160;Error: <span class="errorMessage"><xsl:value-of select = "." /></span><br />
+    Error: <span class="errorMessage"><xsl:value-of select = "." /></span><br />
   </xsl:template>
 
   <xsl:template match = "tp:ErrorStackTrace">
-    &#160;&#160;&#160;&#160;Stack trace: <span class="errorStackTrace"><xsl:value-of select = "." /></span><br />
+    Stack trace: <span class="errorStackTrace"><xsl:value-of select = "." /></span><br />
   </xsl:template>
 
   <xsl:template match = "tp:FailedTests">
@@ -159,14 +193,14 @@
   <xsl:template match = "tp:ResultOutcome">
     <xsl:if test =" . = 'Passed' "><span class="pass">&#x2714;</span></xsl:if>
     <xsl:if test =" . = 'Failed'"><span class="fail">&#x2718;</span></xsl:if>
-    <xsl:if test =" . = 'Skipped'"><span class="skip">&#33;</span></xsl:if>
+    <xsl:if test =" . = 'Skipped'"><span class="skip">&#x2762;</span></xsl:if>
   </xsl:template>
 
   <xsl:template match = "tp:Duration">
     <span><xsl:value-of select = "." /></span><br />
   </xsl:template>
   
-  <xsl:template match = "tp:FullyQualifiedName">
+  <xsl:template match = "tp:DisplayName">
     <span>&#160;<xsl:value-of select = "." /></span>
   </xsl:template>
 </xsl:stylesheet>

@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 {
     using System.Xml;
     using System.Xml.Xsl;
-    using HtmlResources = Resources.Resources;
 
     class HtmlTransformer : IHtmlTransformer
     {

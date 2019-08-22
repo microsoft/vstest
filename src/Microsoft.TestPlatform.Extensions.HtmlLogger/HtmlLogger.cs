@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -20,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     using System.Xml.Xsl;
     using HtmlResource = Resources.Resources;
     using HtmlLoggerConstants = Microsoft.TestPlatform.Extensions.HtmlLogger.Utility.Constants;
+    using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 
     /// <summary>
     /// Logger for generating Html.
@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     [ExtensionUri(HtmlLoggerConstants.ExtensionUri)]
     public class Htmllogger : ITestLoggerWithParameters
     {
-        private IFileHelper filehelper;
+        private IFileHelper fileHelper;
         private XmlObjectSerializer xmlSerializer;
         private IHtmlTransformer htmlTransformer;
         private string fileName;
@@ -39,9 +39,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         {
         }
 
-        public Htmllogger(IFileHelper filehelper, IHtmlTransformer htmlTransformer, XmlObjectSerializer dataContractSerializer)
+        public Htmllogger(IFileHelper fileHelper, IHtmlTransformer htmlTransformer, XmlObjectSerializer dataContractSerializer)
         {
-            this.filehelper = filehelper;
+            this.fileHelper = fileHelper;
             this.htmlTransformer = htmlTransformer;
             this.xmlSerializer = dataContractSerializer;
         }
@@ -55,7 +55,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// Total results are stored in sequential order
         /// </summary>
         /// <returns></returns>
-        public ConcurrentDictionary<Guid, TestResult> Results { get; private set; }
+        public ConcurrentDictionary<Guid, ObjectModel.TestResult> Results { get; private set; }
+
+        public ConcurrentDictionary<string,TestResultCollection> ResultCollectionDictionary { get; private set; }
 
         /// <summary>
         /// Test results stores all the summary and the details of evrey results in hiearachial order.
@@ -103,7 +105,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             this.TestResultsDirPath = TestResultsDirPath;
             this.TestRunDetails = new TestRunDetails();
-            this.Results = new ConcurrentDictionary<Guid, TestResult>();
+            this.Results = new ConcurrentDictionary<Guid, ObjectModel.TestResult>();
+            this.ResultCollectionDictionary = new ConcurrentDictionary<string, TestResultCollection>();
         }
 
         /// <inheritdoc/>
@@ -163,22 +166,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
 
-            TestResult testResult = new TestResult();
-            testResult.DisplayName = e.Result.DisplayName ?? e.Result.TestCase.DisplayName;
+            ObjectModel.TestResult testResult = new ObjectModel.TestResult();
+            testResult.DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName;
 
             testResult.FullyQualifiedName = e.Result.TestCase.FullyQualifiedName;
             testResult.Duration = GetFormattedDurationString(e.Result.Duration);
             testResult.ErrorStackTrace = e.Result.ErrorStackTrace;
             testResult.ErrorMessage = e.Result.ErrorMessage;
+            testResult.TestResultId = e.Result.TestCase.Id;
+            testResult.ResultOutcome = e.Result.Outcome;
 
             var executionId = this.GetExecutionId(e.Result);
             var parentExecutionId = this.GetParentExecutionId(e.Result);
 
+            ResultCollectionDictionary.TryGetValue(e.Result.TestCase.Source, out TestResultCollection testResultCollection);
+            if (testResultCollection == null)
+            {
+                testResultCollection = new TestResultCollection
+                {
+                    Source = e.Result.TestCase.Source,
+                    ResultList = new List<ObjectModel.TestResult>(),
+                    FailedResultList = new List<ObjectModel.TestResult>(),
+                };
+                ResultCollectionDictionary.TryAdd(e.Result.TestCase.Source, testResultCollection);
+                TestRunDetails.ResultCollectionList.Add(testResultCollection);
+            }
+            testResultCollection.Id= testResultCollection.Source.GetHashCode();
+
             this.TotalTests++;
-            testResult.ResultOutcome = e.Result.Outcome;
             if (e.Result.Outcome == TestOutcome.Failed)
             {
-                this.FailedTests++;
+                this.FailedTests++;   
             }
             else if (e.Result.Outcome == TestOutcome.Passed)
             {
@@ -191,7 +209,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             if (parentExecutionId == Guid.Empty)
             {
-                TestRunDetails.Results.Add(testResult);
+                if (e.Result.Outcome == TestOutcome.Failed)
+                {
+                    testResultCollection.FailedResultList.Add(testResult);
+                }
+
+                testResultCollection.ResultList.Add(testResult);
             }
 
             Results.TryAdd(executionId, testResult);
@@ -201,13 +224,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
         }
 
-        private void AddToParentResult( Guid parentExecutionId, TestResult testResult)
+        private void AddToParentResult( Guid parentExecutionId, ObjectModel.TestResult testResult)
         {
-            TestResult parentTestResult;
+            ObjectModel.TestResult parentTestResult;
             this.Results.TryGetValue(parentExecutionId, out parentTestResult);
 
             if (parentTestResult.InnerTestResults == null)
-                parentTestResult.InnerTestResults = new List<TestResult>();
+                parentTestResult.InnerTestResults = new List<ObjectModel.TestResult>();
 
             parentTestResult.InnerTestResults.Add(testResult);
         }
@@ -248,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
             try
             {
-                using (Stream xmlStream = this.filehelper.GetStream(XmlFilePath, FileMode.Create))
+                using (Stream xmlStream = this.fileHelper.GetStream(XmlFilePath, FileMode.Create))
                 {
                     xmlSerializer.WriteObject(xmlStream, TestRunDetails);
                 }
@@ -270,15 +293,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 return;
             }
 
-            string htmlfilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, HtmlFilePath);
-            EqtTrace.Info(htmlfilePathMessage);
-            ConsoleOutput.Instance.Information(false, htmlfilePathMessage);
+            string htmlFilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, HtmlFilePath);
+            EqtTrace.Info(htmlFilePathMessage);
+            ConsoleOutput.Instance.Information(false, htmlFilePathMessage);
         }
 
         private string GetFilePath(string fileFormat,string FileName)
         {  
-            var fullfileformat = string.Concat("." + fileFormat);
-            return Path.Combine(this.TestResultsDirPath, string.Concat("TestResult_", FileName, fullfileformat));
+            var fullFileFormat = string.Concat("." + fileFormat);
+            return Path.Combine(this.TestResultsDirPath, string.Concat("TestResult_", FileName, fullFileFormat));
         }
 
         private static string FormatDateTimeForRunName(DateTime timeStamp)
@@ -291,7 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>
-        private Guid GetParentExecutionId(ObjectModel.TestResult testResult)
+        private Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
         {
             TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(HtmlLoggerConstants.ParentExecutionIdPropertyIdentifier));
             return parentExecutionIdProperty == null ? Guid.Empty : testResult.GetPropertyValue(parentExecutionIdProperty, Guid.Empty);
@@ -302,7 +325,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>
-        private Guid GetExecutionId(ObjectModel.TestResult testResult)
+        private Guid GetExecutionId(TestPlatform.ObjectModel.TestResult testResult)
         {
             TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(property => property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
             var executionId = Guid.Empty;

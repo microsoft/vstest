@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.IO;
 using System.Xml;
 
@@ -90,7 +89,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             var htmlLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", htmlFileName);
-            // var expectedHtmlFilePath = @".\TestResults.html";
             IsFileAndContentEqual(htmlLogFilePath);
         }
 
@@ -118,10 +116,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 sb.Append(sr.ReadToEnd());
             }
             string filePathContent = sb.ToString();
-
             string[] divs = { "Total tests", "Passed", "Failed", "Skipped", "Run duration", "Pass percentage", "SampleUnitTestProject.UnitTest1.PassingTest" };
-            
-
             foreach (string str in divs)
             {
                 StringAssert.Contains(filePathContent, str);

@@ -1,10 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
+namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
 {
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System;
     using System.Collections.Generic;
 
     public class TestResult
@@ -13,6 +14,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// Fully qualified name of the Test Result.
         /// </summary>
         public string FullyQualifiedName { get; set; }
+
+        /// <summary>
+        /// Unique identifier for test result
+        /// </summary>
+        public Guid TestResultId { get; set; }
 
         /// <summary>
         /// Display Name for the particular Test Result
