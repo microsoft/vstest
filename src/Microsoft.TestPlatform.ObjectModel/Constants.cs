@@ -216,6 +216,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         // Denotes target location for test run resutls
         // For ex. TrxLogger saves test run results at this target
         public const string TestRunDirectory = "TestRunDirectory";
+
+        // Denotes target framework for the tests.
+        public const string TargetFramework = "TargetFramework";
     }
 
 }

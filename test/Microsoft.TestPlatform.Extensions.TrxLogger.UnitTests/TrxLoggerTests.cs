@@ -712,6 +712,41 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             }
         }
 
+        [TestMethod]
+        [DataRow("results")]
+        [DataRow("results.trx")]
+        public void CustomTrxFileNameShouldBeConstructedFromRelativeLogFilePrefixParameter(string prefixName)
+        {
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = prefixName;
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.testableTrxLogger.Initialize(events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
+
+            Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results.trx"), this.testableTrxLogger.trxFile, "Expected framework name to appear in file name");
+            Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net451.trx"), this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net451"), actualFileNameWithoutTimestamp);
+        }
+
+        [TestMethod]
+        public void CustomTrxFileNameShouldBeConstructedFromAbsoluteLogFilePrefixParameter()
+        {
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = @"e:\results";
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.testableTrxLogger.Initialize(events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
+
+            Assert.AreNotEqual(@"e:\results.trx", this.testableTrxLogger.trxFile, "Expected framework name to appear in file name");
+            Assert.AreNotEqual(@"e:\results_net451.trx", this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+
+            Assert.AreEqual(@"e:\results_net451", actualFileNameWithoutTimestamp);
+        }
+
         private void ValidateTestIdAndNameInTrx(bool isMstestAdapter)
         {
             ObjectModel.TestCase testCase = CreateTestCase("TestCase");
