@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputDoesNotContains("Options:");
 
             //Check for help examples text
-            this.StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");          
-        }       
+            this.StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
+        }
     }
 }
