@@ -733,7 +733,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void CustomTrxFileNameShouldBeConstructedFromAbsoluteLogFilePrefixParameter()
         {
-            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = @"e:\results";
+            var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
             this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
             this.testableTrxLogger.Initialize(events.Object, this.parameters);
 
@@ -741,10 +742,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
 
-            Assert.AreNotEqual(@"e:\results.trx", this.testableTrxLogger.trxFile, "Expected framework name to appear in file name");
-            Assert.AreNotEqual(@"e:\results_net451.trx", this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(trxPrefix + "_net451", actualFileNameWithoutTimestamp);
 
-            Assert.AreEqual(@"e:\results_net451", actualFileNameWithoutTimestamp);
+            File.Delete(this.testableTrxLogger.trxFile);
         }
 
         private void ValidateTestIdAndNameInTrx(bool isMstestAdapter)
