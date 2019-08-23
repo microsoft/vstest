@@ -50,7 +50,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             //Check for help examples text
             this.StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
+
+            //Check for message which guides using help option
+            this.StdErrorContains("Please use the /help option to check the list of valid arguments");
         }
-       
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void PassingInvalidArgumentsToVsTestConsoleShouldPrintHowToUseHelpMessage(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /badArgument");
+
+            this.InvokeVsTest(arguments);
+
+            //Check for message which guides using help option
+            this.StdErrorContains("Please use the /help option to check the list of valid arguments");
+        }
+
     }
 }
