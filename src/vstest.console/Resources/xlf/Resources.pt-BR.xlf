@@ -1647,7 +1647,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       </trans-unit>
       <trans-unit id="InvalidArgument">
         <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
-        <target state="new">The given argument {0} .Kindly use /help option to know more about the valid args. Know more at : https://docs.microsoft.com/en-us/visualstudio/test/vstest-console-options</target>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
