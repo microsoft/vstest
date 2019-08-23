@@ -295,12 +295,14 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      지정한 파일에서 테스트를 실행합니다. 테스트 파일 이름이 여러 개이면 공백으로
-      구분합니다.
+        <target state="translated">[TestFileNames]
+      지정된 파일 또는 와일드카드 패턴에서 테스트를 실행합니다. 여러 테스트 파일 이름 또는 패턴을
+      공백으로 구분합니다. 일치한 테스트 파일을 보려면 콘솔 로거 세부 정보 표시를 [상세]로 설정합니다.
       예: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
-        <note></note>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1206,7 +1208,8 @@
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
         <target state="translated"> 총 시간: {0:0.0000} {1}</target>
-        <note></note>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1524,7 +1527,8 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
         <target state="translated">총 테스트 수: 알 수 없음</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1618,37 +1622,44 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="translated">Framework35가 지원되지 않습니다. .NET Framework 3.5를 대상으로 하는 프로젝트의 경우 테스트가 CLR 4.0 "호환 모드"에서 실행됩니다.</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="translated">테스트 실행 중</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
         <target state="translated">총 테스트 수: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
         <target state="translated">     실패: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
         <target state="translated">     통과: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="translated">    건너뜀: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
-        <note></note>
+        <target state="translated">지정된 패턴과 일치한 총 테스트 파일 수는 {0}개입니다.</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

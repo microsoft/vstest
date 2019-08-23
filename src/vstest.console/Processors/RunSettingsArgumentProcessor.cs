@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
@@ -137,6 +138,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.runSettingsManager.AddDefaultRunSettings();
 
                 this.commandLineOptions.SettingsFile = argument;
+
+                if (this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.EnvironmentVariables") != null)
+                {
+                    this.commandLineOptions.InIsolation = true;
+                    this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
+                }
             }
             catch (XmlException exception)
             {

@@ -154,8 +154,9 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="new">Le processus testhost s'est arrêté avec l'erreur : {0}.</target>
-        <note></note>
+        <target state="translated">Le processus Testhost s'est arrêté. Erreur : {0}. Pour plus d'informations, consultez les journaux de diagnostic.</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
@@ -204,8 +205,9 @@
       </trans-unit>
       <trans-unit id="TestDiscoveryCancelled">
         <source>Discovery of tests cancelled.</source>
-        <target state="new">Discovery of tests cancelled.</target>
-        <note></note>
+        <target state="translated">Découverte de tests annulée.</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>
