@@ -51,5 +51,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             //Check for help examples text
             this.StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
         }
+       
     }
 }
