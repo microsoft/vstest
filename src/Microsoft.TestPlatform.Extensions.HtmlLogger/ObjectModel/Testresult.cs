@@ -8,6 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Test results stores the relevant information to show on html file
+    /// </summary>
     public class TestResult
     {
         /// <summary>
@@ -36,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         public string ErrorMessage { get; set; }
 
         /// <summary>
-        /// Enum that deteremines the outcome of the test case
+        /// Enum that determines the outcome of the test case
         /// </summary>
         public TestOutcome ResultOutcome { get; set; }
 

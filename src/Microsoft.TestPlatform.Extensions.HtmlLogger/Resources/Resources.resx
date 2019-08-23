@@ -120,4 +120,7 @@
   <data name="HtmlFilePath" xml:space="preserve">
     <value>Html test results file : {0}</value>
   </data>
+  <data name="HtmlLoggerError" xml:space="preserve">
+    <value>Html Logger Error : {0}</value>
+  </data>
 </root>

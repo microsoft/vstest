@@ -68,5 +68,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.Resources {
                 return ResourceManager.GetString("HtmlFilePath", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Html Logger Error : {0}.
+        /// </summary>
+        internal static string HtmlLoggerError {
+            get {
+                return ResourceManager.GetString("HtmlLoggerError", resourceCulture);
+            }
+        }
     }
 }

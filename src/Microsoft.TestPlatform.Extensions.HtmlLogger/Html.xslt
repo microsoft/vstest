@@ -121,7 +121,7 @@
       <xsl:variable name="Source" select="tp:Id" />
       <xsl:if test="tp:FailedResultList!=''">
         <div class ="listRow" onclick="ToggleClass('{concat($Source,'-failedResult')}')"><xsl:value-of select = "tp:Source" /> </div>
-        <div class ="resultDivision" Id="{concat($Source,'-failedResult')}" style="display:none;">
+        <div class ="resultDivision" Id="{concat($Source,'-failedResult')}" style="display:block;">
           <xsl:for-each select ="tp:FailedResultList/tp:TestResult"><xsl:call-template name ="TestResult"/></xsl:for-each>
         </div>
       </xsl:if>

@@ -6,10 +6,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
     public interface IHtmlTransformer
     {
         /// <summary>
-        /// It transforms the xmlfile to htmlfile.
+        /// It transforms the xml file to html file.
         /// </summary>
-        /// <param name="xmlfile"></param>
-        /// <param name="htmlfile"></param>
-        void Transform(string xmlfile, string htmlfile);
+        /// <param name="xmlFile"></param>
+        /// <param name="htmlFile"></param>
+        void Transform(string xmlFile, string htmlFile);
     }
 }
