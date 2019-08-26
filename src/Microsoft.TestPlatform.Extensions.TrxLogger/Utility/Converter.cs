@@ -527,16 +527,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             List<string> resultFiles = new List<string>();
             foreach (ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
             {
-                string sourceFile;
-
-                if (!uriDataAttachment.Uri.IsAbsoluteUri)
-                {
-                    sourceFile = new UriBuilder() { Scheme = "file", Path = uriDataAttachment.Uri.ToString(), Host = "" }.Uri.LocalPath;
-                }
-                else
-                {
-                    sourceFile = uriDataAttachment.Uri.LocalPath;
-                }
+                string sourceFile = uriDataAttachment.Uri.IsAbsoluteUri ? uriDataAttachment.Uri.LocalPath : uriDataAttachment.Uri.ToString();
 
                 if (ObjectModel.EqtTrace.IsVerboseEnabled)
                 {
