@@ -33,7 +33,6 @@
   </Target>-->
 
   <Target Name="_CreateLocalizeXLF">
-    <!--Condition="$('EmbeddedResource.EndsWith('resx')') != 'true'">-->
     <Message Importance="High" Text="Create localized xlf for '$(AssemblyName)'" />
     <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>

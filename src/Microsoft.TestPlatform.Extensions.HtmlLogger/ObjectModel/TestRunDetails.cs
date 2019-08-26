@@ -15,8 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         /// <summary>
         /// Test run summary of all test results.
         /// </summary>
-        [DataMember]
-        public TestRunSummary Summary { get; set; }
+        [DataMember] public TestRunSummary Summary { get; set; }
 
         /// <summary>
         /// List of informational run level messages.

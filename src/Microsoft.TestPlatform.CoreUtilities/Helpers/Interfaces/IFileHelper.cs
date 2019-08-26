@@ -134,5 +134,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="searchOption">Search option</param>
         /// <returns>string[]</returns>
         string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
+
+        /// <summary>
+        /// Deletes the specified file
+        /// </summary>
+        /// <param name="path"></param>
+        void Delete(string path);
     }
 }

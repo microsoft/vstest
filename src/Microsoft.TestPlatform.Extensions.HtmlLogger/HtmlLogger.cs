@@ -89,7 +89,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         public int SkippedTests { get; private set; }
 
+        /// <summary>
+        /// Path to the xml file.
+        /// </summary>
         public string XmlFilePath { get; private set; }
+
+        /// <summary>
+        /// path to html file.
+        /// </summary>
         public string HtmlFilePath { get; private set; }
 
         public void Initialize(TestLoggerEvents events, string testResultsDirPath)
@@ -166,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void TestResultHandler(object sender, TestResultEventArgs e)
-        { 
+        {
             ValidateArg.NotNull(sender, "sender");
             ValidateArg.NotNull(e, "e");
 
@@ -281,6 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 var fileName = string.Format(CultureInfo.CurrentCulture, "{0}_{1}_{2}",
                     Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
                     FormatDateTimeForRunName(DateTime.Now));
+
                 XmlFilePath = GetFilePath(HtmlLoggerConstants.XmlFileExtension, fileName);
 
                 using (var xmlStream = fileHelper.GetStream(XmlFilePath, FileMode.Create))
@@ -301,6 +309,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                     ex.ToString());
                 ConsoleOutput.Instance.Error(false, string.Concat(HtmlResource.HtmlLoggerError), ex.Message);
                 return;
+            }
+            finally
+            {
+                if (XmlFilePath != null)
+                {
+                    this.fileHelper.Delete(XmlFilePath);
+                }
             }
 
             var htmlFilePathMessage = string.Format(CultureInfo.CurrentCulture, HtmlResource.HtmlFilePath, HtmlFilePath);

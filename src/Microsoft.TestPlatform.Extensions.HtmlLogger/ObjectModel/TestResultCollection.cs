@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Runtime.Serialization;
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
 {
@@ -10,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
     /// <summary>
     /// Stores the list of failed results and list of all results corresponding to the source.
     /// </summary>
+    [DataContract]
     public class TestResultCollection
     {
         private readonly string source;
@@ -19,21 +21,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         /// <summary>
         /// Source of the test dll.
         /// </summary>
-        public string Source => this.source;
+        [DataMember] public string Source
+        {
+            get => this.source;
+            private set { }
+        }
 
         /// <summary>
         /// Hash id of source.
         /// </summary>
-        public int Id => this.source.GetHashCode();
+        [DataMember] public int Id
+        {
+            get => this.source.GetHashCode();
+            private set { }
+        }
 
         /// <summary>
         /// List of test results.
         /// </summary>
-        public List<TestResult> ResultList { get; set; }
+        [DataMember] public List<TestResult> ResultList { get; set; }
 
         /// <summary>
         /// List of failed test results.
         /// </summary>
-        public List<TestResult> FailedResultList { get; set; }
+        [DataMember] public List<TestResult> FailedResultList { get; set; }
     }
 }
