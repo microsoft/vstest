@@ -87,10 +87,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldThrowIfGivenPathisIllegal()
         {
             var folder = @"c:\som>\illegal\path\";
-            var message = string.Format(
+            string message;
+
+            message = string.Format(
+                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
+                folder,
+                "The filename, directory name, or volume label syntax is incorrect : \'c:\\som>\\illegal\\path\\\'");
+
+#if NET451
+            message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
                 "Illegal characters in path.");
+#endif
             this.InitializeExceptionTestTemplate(folder, message);
         }
 
@@ -99,11 +108,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
 
             var folder = @"c:\path\to\in:valid";
-
-            var message = string.Format(
+            string message;
+            message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
-                "Illegal characters in path.");
+                "The directory name is invalid : \'c:\\path\\to\\in:valid\'");
+#if NET451
+            message = string.Format(
+                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
+                folder,
+                "The given path's format is not supported.");
+#endif
             this.InitializeExceptionTestTemplate(folder, message);
         }
 
@@ -138,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
-            var absolutePath = @"c:\Users\someone\testresults";
+            var absolutePath = @"c:\random\someone\testresults";
             this.executor.Initialize(absolutePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
             Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
