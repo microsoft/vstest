@@ -31,6 +31,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="NuGet.Frameworks" Version="$(NuGetFrameworksVersion)" />
     <PackageReference Include="System.Reflection.Metadata">
       <Version>1.6.0</Version>
     </PackageReference>
