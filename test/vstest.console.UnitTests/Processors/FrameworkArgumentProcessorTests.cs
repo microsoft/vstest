@@ -111,8 +111,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void InitializeShouldSetCommandLineOptionsFrameworkForCaseInsensitiveFramework()
         {
             this.executor.Initialize(".netcoreApp,Version=v1.0");
-            Assert.AreEqual(".netcoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
-            Assert.AreEqual(".netcoreApp,Version=v1.0", this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]

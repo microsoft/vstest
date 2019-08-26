@@ -558,6 +558,84 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(expectedExecutionAttributes, legacySettings["ExecutionAttributes"]);
         }
 
+        [TestMethod]
+        public void GetEnvironmentVariablesWithValidValuesInRunSettingsShouldReturnValidDictionary()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                          <EnvironmentVariables>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
+                                             <RANDOM_PATH2>C:\temp2</RANDOM_PATH2>
+                                          </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+
+            Assert.AreEqual(2, envVars.Count);
+            Assert.AreEqual(envVars["RANDOM_PATH"], @"C:\temp");
+            Assert.AreEqual(envVars["RANDOM_PATH2"], @"C:\temp2");
+        }
+
+        [TestMethod]
+        public void GetEnvironmentVariablesWithDuplicateEnvValuesInRunSettingsShouldReturnValidDictionary()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                          <EnvironmentVariables>
+                                             <RANDOM_PATH>C:\temp</RANDOM_PATH>
+                                             <RANDOM_PATH>C:\temp2</RANDOM_PATH>
+                                          </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+
+            Assert.AreEqual(1, envVars.Count);
+            Assert.AreEqual(envVars["RANDOM_PATH"], @"C:\temp");
+        }
+
+        [TestMethod]
+        public void GetEnvironmentVariablesWithEmptyVariablesInRunSettingsShouldReturnEmptyDictionary()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                         <EnvironmentVariables>
+                                         </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+            Assert.AreEqual(0, envVars.Count);
+        }
+
+        [TestMethod]
+        public void GetEnvironmentVariablesWithInvalidValuesInRunSettingsShouldReturnNull()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                         <EnvironmentVariables>
+                                            <Foo>
+                                         </EnvironmentVariables>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+            Assert.IsNull(envVars);
+        }
+
+        [TestMethod]
+        public void GetEnvironmentVariablesWithoutEnvVarNodeInRunSettingsShouldReturnNull()
+        {
+            string runSettingsXml = @"<RunSettings>
+                                       <RunConfiguration>
+                                       </RunConfiguration>
+                                      </RunSettings>";
+
+            var envVars = InferRunSettingsHelper.GetEnvironmentVariables(runSettingsXml);
+            Assert.IsNull(envVars);
+        }
+
         #region RunSettingsIncompatibeWithTestSettings Tests
 
         [TestMethod]

@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.baseTestDiscoveryEventsHandler = eventHandler;
             try
             {
-                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources);
+                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, discoveryCriteria.RunSettings);
 
                 if (this.isCommunicationEstablished)
                 {

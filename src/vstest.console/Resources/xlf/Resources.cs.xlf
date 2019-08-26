@@ -295,12 +295,14 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      Spustí testy ze zadaných souborů. Pokud máte názvů souborů více, oddělte je
-      mezerami.
-      Příklad: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
-        <note></note>
+        <target state="translated">[TestFileNames]
+      Spusťte testy ze zadaných souborů nebo ze vzoru se zástupnými znaky. Oddělte více názvů nebo vzorů testovacích souborů pomocí mezer.
+      Nastavte úroveň podrobností protokolovacího nástroje konzoly na podrobnou, aby se zobrazily odpovídající testovací soubory.
+      Příklady: mytestproject.dll
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1206,7 +1208,8 @@
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
         <target state="translated"> Celkový čas: {0:0.0000} {1}</target>
-        <note></note>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1524,7 +1527,8 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
         <target state="translated">Celkový počet testů: neznámý</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1618,37 +1622,44 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="translated">Rozhraní Framework35 není podporováno. Pro projekty, které cílí na rozhraní .Net Framework 3.5, bude test spuštěn v „režimu kompatibility“ CLR 4.0.</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="translated">Probíhá testovací běh</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
         <target state="translated">Celkový počet testů: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
         <target state="translated">     Neúspěšné: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
         <target state="translated">     Úspěšné: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="translated">    Přeskočené: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
-        <note></note>
+        <target state="translated">Celkový počet testovacích souborů, které odpovídají zadanému vzoru: {0}</target>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>

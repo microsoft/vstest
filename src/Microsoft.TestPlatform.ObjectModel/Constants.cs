@@ -203,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public const string DotNetFrameworkCore10 = ".NETCoreApp,Version=v1.0";
 
-        public const string DotNetFrameworkUap10 = "Uap,Version=v10.0";
+        public const string DotNetFrameworkUap10 = "UAP,Version=v10.0";
 
         public const string TargetFrameworkName = "TargetFrameworkName";
     }

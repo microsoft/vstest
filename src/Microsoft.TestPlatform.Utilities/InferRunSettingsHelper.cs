@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System;
     using System.Collections.Generic;
+    using System.Dynamic;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -36,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
         private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
+        private const string EnvironmentVariablesNodePath = @"/RunSettings/RunConfiguration/EnvironmentVariables";
         private const string multiTargettingForwardLink = @"http://go.microsoft.com/fwlink/?LinkID=236877&clcid=0x409";
 
         // To make things compatible for older runsettings
@@ -375,6 +377,50 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns a dictionary of environment variables given in run settings
+        /// </summary>
+        /// <param name="runsettingsXml">The run settings xml string</param>
+        /// <returns>Environment Variables Dictionary</returns>
+        public static Dictionary<string, string> GetEnvironmentVariables(string runSettings)
+        {
+            Dictionary<string, string> environmentVariables = null;
+            try
+            {
+                using (var stream = new StringReader(runSettings))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    var node = runSettingsNavigator.SelectSingleNode(EnvironmentVariablesNodePath);
+                    if (node == null)
+                    {
+                        return null;
+                    }
+
+                    environmentVariables = new Dictionary<string, string>();
+                    var childNodes = node.SelectChildren(XPathNodeType.Element);
+
+                    while (childNodes.MoveNext())
+                    {
+                        if (!environmentVariables.ContainsKey(childNodes.Current.Name))
+                        {
+                            environmentVariables.Add(childNodes.Current.Name, childNodes.Current?.Value);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("Error while trying to read environment variables settings. Message: {0}", ex.ToString());
+                return null;
+            }
+
+            return environmentVariables;
         }
 
         /// <summary>

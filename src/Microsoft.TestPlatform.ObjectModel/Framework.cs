@@ -3,8 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    using System;
-    using System.Runtime.Versioning;
+    using NuGet.Frameworks;
+    using static NuGet.Frameworks.FrameworkConstants;
 
     /// <summary>
     /// Class for target Framework for the test container
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return null;
             }
 
-            FrameworkName frameworkName;
+            NuGetFramework nugetFramework;
             try
             {
                 // IDE always sends framework in form of ENUM, which always throws exception
@@ -56,23 +56,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 switch (frameworkString.Trim().ToLower())
                 {
                     case "framework35":
-                        frameworkName = new FrameworkName(Constants.DotNetFramework35);
+                        nugetFramework = CommonFrameworks.Net35;
                         break;
                     case "framework40":
-                        frameworkName = new FrameworkName(Constants.DotNetFramework40);
+                        nugetFramework = CommonFrameworks.Net4;
                         break;
                     case "framework45":
-                        frameworkName = new FrameworkName(Constants.DotNetFramework45);
+                        nugetFramework = CommonFrameworks.Net45;
                         break;
                     case "frameworkcore10":
-                        frameworkName = new FrameworkName(Constants.DotNetFrameworkCore10);
+                        nugetFramework = CommonFrameworks.NetCoreApp10;
                         break;
                     case "frameworkuap10":
-                        frameworkName = new FrameworkName(Constants.DotNetFrameworkUap10);
+                        nugetFramework = CommonFrameworks.UAP10;
                         break;
                     default:
-                        // FrameworkName already trims the input identifier.
-                        frameworkName = new FrameworkName(frameworkString);
+                        nugetFramework = NuGetFramework.Parse(frameworkString);
+                        if (nugetFramework.IsUnsupported)
+                            return null;
                         break;
                 }
             }
@@ -81,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return null;
             }
 
-            return new Framework() { Name = frameworkName.FullName, Version = frameworkName.Version.ToString() };
+            return new Framework() { Name = nugetFramework.DotNetFrameworkName, Version = nugetFramework.Version.ToString() };
         }
 
         /// <summary>

@@ -56,6 +56,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         internal static bool AppendPrefix;
 
         /// <summary>
+        /// Bool to decide whether progress indicator should be disabled.
+        /// </summary>
+        internal static bool DisableProgress;
+
+        /// <summary>
         /// Uri used to uniquely identify the console logger.
         /// </summary>
         public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v1";
@@ -74,6 +79,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Parameter for log message prefix
         /// </summary>
         public const string PrefixParam = "prefix";
+
+        /// <summary>
+        /// Parameter for disabling progress
+        /// </summary>
+        public const string NoProgressParam = "noprogress";
 
         #endregion
 
@@ -166,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 ConsoleLogger.Output = ConsoleOutput.Instance;
             }
 
-            if (this.progressIndicator == null && !Console.IsOutputRedirected)
+            if (this.progressIndicator == null && !Console.IsOutputRedirected && !DisableProgress)
             {
                 // Progress indicator needs to be displayed only for cli experience.
                 this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
@@ -207,6 +217,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (prefixExists)
             {
                 bool.TryParse(prefix, out AppendPrefix);
+            }
+
+            var noprogressExists = parameters.TryGetValue(ConsoleLogger.NoProgressParam, out string noprogress);
+            if (noprogressExists)
+            {
+                bool.TryParse(noprogress, out DisableProgress);
             }
 
             Initialize(events, String.Empty);

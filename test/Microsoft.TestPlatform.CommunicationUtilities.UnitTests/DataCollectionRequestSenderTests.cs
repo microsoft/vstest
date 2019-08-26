@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void SendAfterTestRunStartAndGetResultShouldReturnAttachments()
+        public void SendAfterTestRunEndAndGetResultShouldReturnAttachments()
         {
             var datacollectorUri = new Uri("my://custom/datacollector");
             var attachmentUri = new Uri("my://filename.txt");
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataSerializer.Setup(x => x.DeserializePayload<Collection<AttachmentSet>>(It.IsAny<Message>())).Returns(new Collection<AttachmentSet>() { attachment });
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestRunEndResult, Payload = null });
 
-            var attachmentSets = this.requestSender.SendAfterTestRunStartAndGetResult(null, false);
+            var attachmentSets = this.requestSender.SendAfterTestRunEndAndGetResult(null, false);
 
             Assert.IsNotNull(attachmentSets);
             Assert.AreEqual(attachmentSets.Count, 1);
@@ -54,9 +54,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void SendAfterTestRunStartAndGetResultShouldNotReturnAttachmentsWhenRequestCancelled()
+        public void SendAfterTestRunEndAndGetResultShouldNotReturnAttachmentsWhenRequestCancelled()
         {
-            var attachmentSets = this.requestSender.SendAfterTestRunStartAndGetResult(null, true);
+            var attachmentSets = this.requestSender.SendAfterTestRunEndAndGetResult(null, true);
 
             Assert.IsNull(attachmentSets);
         }

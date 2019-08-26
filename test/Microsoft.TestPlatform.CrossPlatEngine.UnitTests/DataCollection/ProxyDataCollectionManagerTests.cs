@@ -229,7 +229,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var attachmentSet = new AttachmentSet(uri, dispName);
             attachments.Add(attachmentSet);
 
-            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunStartAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(attachments);
+            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(attachments);
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
@@ -245,7 +245,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             var mockRunEventsHandler = new Mock<ITestMessageEventHandler>();
             this.mockDataCollectionRequestSender.Setup(
-                    x => x.SendAfterTestRunStartAndGetResult(It.IsAny<ITestMessageEventHandler>(), It.IsAny<bool>()))
+                    x => x.SendAfterTestRunEndAndGetResult(It.IsAny<ITestMessageEventHandler>(), It.IsAny<bool>()))
                 .Throws<Exception>();
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, mockRunEventsHandler.Object);

@@ -26,6 +26,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
         [NetCoreTargetFrameworkDataSource]
+        public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(GetSampleTestAssembly(), string.Empty, string.Empty, this.testEnvironment.TargetFramework);
+            arguments = string.Concat(arguments, " ", $"/Framework:{this.testEnvironment.TargetFramework}");
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 1, 1);
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
         public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
