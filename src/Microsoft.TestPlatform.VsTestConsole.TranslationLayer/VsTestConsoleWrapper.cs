@@ -36,6 +36,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool sessionStarted;
 
+        private const int ENDSESSIONTIMEOUT = 5000;
+
         /// <summary>
         /// Path to additional extensions to reinitialize vstest.console
         /// </summary>
@@ -258,10 +260,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {            
             this.requestSender.EndSession();
             this.requestSender.Close();
-            this.sessionStarted = false;
+            
+            // Wait fot vstest.console to die by itself
+            // This ensures that we return from here only when the vstest.cosole process has actually died
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            do { } while (this.vstestConsoleProcessManager.IsProcessInitialized() && watch.ElapsedMilliseconds < ENDSESSIONTIMEOUT);
+            watch.Stop();
 
-            EqtTrace.Info("VsTestConsoleWrapper.EndSession: Terminating vstest.cosole process");
+            // If vstest.console is still hanging around, it should be explicitly killed.
             this.vstestConsoleProcessManager.ShutdownProcess();
+
+            this.sessionStarted = false;
         }
 
         #endregion

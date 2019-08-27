@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -50,6 +51,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        [NetCoreTargetFrameworkDataSource]
+        public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
+        {
+            var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
+
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            this.Setup();
+            
+            this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
+            this.vstestConsoleWrapper?.EndSession();
+
+            // Assert
+            Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
+
+            this.vstestConsoleWrapper = null;
         }
 
         [TestMethod]
