@@ -69,5 +69,35 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             //Check for message which guides using help option
             this.StdErrorContains("Please use the /help option to check the list of valid arguments");
         }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void PassingInvalidArgumentWithPrefixToVsTestConsoleShouldPrintHowToUseHelpMessage(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, "-");
+
+            this.InvokeVsTest(arguments);
+
+            //Check for message which guides using help option
+            this.StdErrorContains("Please use the /help option to check the list of valid arguments");
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource]
+        public void PassingInvalidArgumentWithAValueToVsTestConsoleShouldPrintHowToUseHelpMessage(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, "/badArgument:abc");
+
+            this.InvokeVsTest(arguments);
+
+            //Check for message which guides using help option
+            this.StdErrorContains("Please use the /help option to check the list of valid arguments");
+        }
     }
 }

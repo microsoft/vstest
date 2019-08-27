@@ -240,7 +240,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                         result = 1;
                         this.showHelp = false;
                         break;
-
                     }
                     else
                     {
