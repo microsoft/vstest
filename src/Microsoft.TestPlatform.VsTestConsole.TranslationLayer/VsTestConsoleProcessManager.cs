@@ -150,7 +150,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             // Ideally process should die by itself
             if(!processExitedEvent.WaitOne(ENDSESSIONTIMEOUT) && IsProcessInitialized())
-            { 
+            {
+                EqtTrace.Info($"VsTestConsoleProcessManager.ShutDownProcess : Terminating vstest.console process after waiting for {ENDSESSIONTIMEOUT} milliseconds.");
                 vstestConsoleExited = true;
                 this.process.OutputDataReceived -= Process_OutputDataReceived;
                 this.process.ErrorDataReceived -= Process_ErrorDataReceived;
@@ -180,9 +181,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             lock (syncObject)
             {
                 processExitedEvent.Set();
-
-                ShutdownProcess();
-
+                vstestConsoleExited = true;
                 this.ProcessExited?.Invoke(sender, e);
             }
         }
