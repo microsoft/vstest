@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         {
             this.fileHelper = fileHelper;
             this.htmlTransformer = htmlTransformer;
-            xmlSerializer = dataContractSerializer;
+            this.xmlSerializer = dataContractSerializer;
         }
 
         /// <summary>
@@ -99,6 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         public string HtmlFilePath { get; private set; }
 
+        /// <inheritdoc/>
         public void Initialize(TestLoggerEvents events, string testResultsDirPath)
         {
             if (events == null)
@@ -136,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             parametersDictionary = parameters;
-            Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
+            this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
         }
 
         /// <summary>
@@ -181,10 +182,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             {
                 DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,
                 FullyQualifiedName = e.Result.TestCase.FullyQualifiedName,
-                Duration = GetFormattedDurationString(e.Result.Duration),
                 ErrorStackTrace = e.Result.ErrorStackTrace,
                 ErrorMessage = e.Result.ErrorMessage,
                 TestResultId = e.Result.TestCase.Id,
+                Duration = GetFormattedDurationString(e.Result.Duration),
                 ResultOutcome = e.Result.Outcome
             };
 
@@ -215,12 +216,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 case TestOutcome.Skipped:
                     SkippedTests++;
                     break;
-                case TestOutcome.None:
-                    break;
-                case TestOutcome.NotFound:
-                    break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    break;
             }
 
             Results.TryAdd(executionId, testResult);
@@ -243,12 +240,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
         private void AddToParentResult(Guid parentExecutionId, ObjectModel.TestResult testResult)
         {
-            Results.TryGetValue(parentExecutionId, out var parentTestResult);
+            if (Results.TryGetValue(parentExecutionId, out var parentTestResult))
+            {
+                if (parentTestResult.InnerTestResults == null)
+                    parentTestResult.InnerTestResults = new List<ObjectModel.TestResult>();
 
-            if (parentTestResult != null && parentTestResult.InnerTestResults == null)
-                parentTestResult.InnerTestResults = new List<ObjectModel.TestResult>();
-
-            parentTestResult?.InnerTestResults.Add(testResult);
+                parentTestResult.InnerTestResults.Add(testResult);
+            }
         }
 
         /// <summary>
@@ -267,15 +265,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassPercentage = (PassedTests * 100) / TotalTests,
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
-
-            if (parametersDictionary != null)
+            var isLogFileNameParameterExists = parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey,
+                               out string logFileNameValue);
+            if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
             {
-                var isLogFileNameParameterExists = parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey,
-                    out string logFileNameValue);
-                if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
-                {
-                    HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
-                }
+                HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
             }
 
             PopulateHtmlFile();
@@ -325,16 +319,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
         private string GetFilePath(string fileExtension, string fileName)
         {
-            if (fileExtension == null)
-            {
-                return null;
-            }
-
             var fullFileFormat = $".{fileExtension}";
             return Path.Combine(TestResultsDirPath, string.Concat("TestResult_", fileName, fullFileFormat));
         }
 
-        private static string FormatDateTimeForRunName(DateTime timeStamp)
+        private string FormatDateTimeForRunName(DateTime timeStamp)
         {
             return timeStamp.ToString("yyyyMMdd_HHmmss", DateTimeFormatInfo.InvariantInfo);
         }
@@ -344,7 +333,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>
-        private static Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
+        private Guid GetParentExecutionId(TestPlatform.ObjectModel.TestResult testResult)
         {
             var parentExecutionIdProperty = testResult.Properties.FirstOrDefault(property =>
                 property.Id.Equals(HtmlLoggerConstants.ParentExecutionIdPropertyIdentifier));
@@ -358,7 +347,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns></returns>
-        private static Guid GetExecutionId(TestObject testResult)
+        private Guid GetExecutionId(TestPlatform.ObjectModel.TestResult testResult)
         {
             var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
                 property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
@@ -377,7 +366,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
         /// </summary>
         /// <param name="duration"></param>
         /// <returns></returns>
-        private static string GetFormattedDurationString(TimeSpan duration)
+        internal string GetFormattedDurationString(TimeSpan duration)
         {
             if (duration == default(TimeSpan))
             {
@@ -385,6 +374,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             var time = new List<string>();
+            if(duration.Days>0)
+            {
+                time.Add(duration.Days + "d");
+            }
+
             if (duration.Hours > 0)
             {
                 time.Add(duration.Hours + "h");
