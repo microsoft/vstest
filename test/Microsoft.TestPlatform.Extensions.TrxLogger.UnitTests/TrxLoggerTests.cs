@@ -179,12 +179,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> fail1 = new Mock<TestResultEventArgs>(failResult1);
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-
             this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
-
 
             Assert.AreEqual(this.testableTrxLogger.PassedTestCount, 2, "Passed Tests");
             Assert.AreEqual(this.testableTrxLogger.FailedTestCount, 1, "Failed Tests");
@@ -215,12 +213,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> fail1 = new Mock<TestResultEventArgs>(failResult1);
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-
             this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
-
 
             Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 4, "Passed Tests");
         }
