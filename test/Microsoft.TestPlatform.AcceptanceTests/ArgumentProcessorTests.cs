@@ -77,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, "-");
+            arguments = string.Concat(arguments, " -");
 
             this.InvokeVsTest(arguments);
 
@@ -92,7 +92,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, "/badArgument:abc");
+            arguments = string.Concat(arguments, " /badArgument:abc");
 
             this.InvokeVsTest(arguments);
 
