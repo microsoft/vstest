@@ -62,7 +62,7 @@ function Verify-Assemblies
                     elseif ($signature.SignerCertificate.Thumbprint -eq "9DC17888B5CFAD98B3CB35C1994E96227F061675") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
-            # For some dlls sign certificate is different signature. Skip such binaries.
+		    # For some dlls sign certificate is different signature. Skip such binaries.
                     elseif ($signature.SignerCertificate.Thumbprint -eq "62009AAABDAE749FD47D19150958329BF6FF4B34") {
                         Write-Log "Valid (Prod Signed): $($_.FullName)."
                     }
