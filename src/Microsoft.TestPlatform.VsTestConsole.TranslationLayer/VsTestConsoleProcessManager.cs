@@ -141,6 +141,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.process.ErrorDataReceived += Process_ErrorDataReceived;
             this.process.BeginOutputReadLine();
             this.process.BeginErrorReadLine();
+            processExitedEvent.Reset();
         }
 
         /// <summary>
