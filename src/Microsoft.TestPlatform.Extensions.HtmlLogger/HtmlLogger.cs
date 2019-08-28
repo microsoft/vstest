@@ -374,33 +374,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             var time = new List<string>();
-            if(duration.Days>0)
+            if (duration.Days > 0)
             {
-                time.Add(duration.Days + "d");
+                time.Add("> 1d");
             }
-
-            if (duration.Hours > 0)
+            else
             {
-                time.Add(duration.Hours + "h");
-            }
-
-            if (duration.Minutes > 0)
-            {
-                time.Add(duration.Minutes + "m");
-            }
-
-            if (duration.Hours == 0)
-            {
-                if (duration.Seconds > 0)
+                if (duration.Hours > 0)
                 {
-                    time.Add(duration.Seconds + "s");
+                    time.Add(duration.Hours + "h");
                 }
 
-                if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                if (duration.Minutes > 0)
                 {
-                    time.Add(duration.Milliseconds + "ms");
+                    time.Add(duration.Minutes + "m");
                 }
-            }
+
+                if (duration.Hours == 0)
+                {
+                    if (duration.Seconds > 0)
+                    {
+                        time.Add(duration.Seconds + "s");
+                    }
+
+                    if (duration.Milliseconds > 0 && duration.Minutes == 0)
+                    {
+                        time.Add(duration.Milliseconds + "ms");
+                    }
+                }
+            }     
 
             return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
         }

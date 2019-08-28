@@ -276,7 +276,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts8), "< 1ms");
 
             TimeSpan ts10 = new TimeSpan(1, 0, 0, 1, 3);
-            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts10), "1d 1s 3ms");
+            Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts10), "> 1d");
 
             TimeSpan ts9 = new TimeSpan(0, 0, 0, 0, 0);
             Assert.AreEqual(htmlLogger.GetFormattedDurationString(ts9), null);
