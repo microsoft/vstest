@@ -314,7 +314,7 @@ function publish_package()
 
         # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
         # Ideally we should just be publishing the loggers to the Extensions folder.
-        loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
+        loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb" "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.pdb")
         for i in ${loggers[@]}; do
             mv $packageDir/${i} $extensionsDir
         done
