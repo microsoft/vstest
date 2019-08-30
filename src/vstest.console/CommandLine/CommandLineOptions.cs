@@ -15,6 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using System.IO;
     using vstest.console.Internal;
+    using System.Globalization;
+    using System.Collections;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -22,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     internal class CommandLineOptions
     {
         #region Constants/Readonly 
-        
+
         /// <summary>
         /// The default batch size.
         /// </summary>
@@ -37,14 +39,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// The default use vsix extensions value.
         /// </summary>
         public const bool DefaultUseVsixExtensionsValue = false;
-        
+
         /// <summary>
         /// The default retrieval timeout for fetching of test results or test cases
         /// </summary>
-        private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500); 
-        
+        private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500);
+
         #endregion
-        
+
         #region PrivateMembers
 
         private static CommandLineOptions instance;
@@ -52,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         private List<string> sources = new List<string>();
 
         private Architecture architecture;
-        
+
         private Framework frameworkVersion;
 
         #endregion
@@ -89,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 #endif
         }
 
-#endregion
+        #endregion
 
         #region Properties
 
@@ -158,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Directory containing the binaries to run
         /// </summary>
         public string Output { get; set; }
-        
+
         /// <summary>
         /// Specifies the frequency of the runStats/discoveredTests event
         /// </summary>
@@ -194,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 return !string.IsNullOrEmpty(TargetDevice);
             }
         }
-        
+
         /// <summary>
         /// Specifies the target platform type for test run.
         /// </summary>
@@ -230,7 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 return IsDesignMode;
             }
-        }        
+        }
 
         /// <summary>
         /// Specifies if /Platform has been specified on command line or not.
@@ -284,20 +286,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(source))
             {
-                throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
+                throw new TestSourceException(CommandLineResources.CannotBeNullOrEmpty);
             }
-            
+
             source = source.Trim();
-            
-            // Convert the relative path to absolute path
-            if (!Path.IsPathRooted(source))
+
+            List<string> matchingFiles;
+            try
             {
-                source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
+                // Get matching files from file pattern parser
+                matchingFiles = FilePatternParser.GetMatchingFiles(source);
             }
-
-            // Get matching files from file pattern parser
-            var matchingFiles = FilePatternParser.GetMatchingFiles(source);
-
+            catch(TestSourceException ex)
+            {
+                if(source.StartsWith("-") || source.StartsWith("/"))
+                {
+                    throw new TestSourceException(
+                        string.Format(CultureInfo.CurrentUICulture, CommandLineResources.InvalidArgument, source));
+                }
+                throw ex;
+            }
             // Add the matching files to source list
             this.sources = this.sources.Union(matchingFiles).ToList();
         }

@@ -1645,6 +1645,11 @@
         <target state="translated">    跳过数: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
         <target state="translated">总共 {0} 个测试文件与指定模式相匹配。</target>

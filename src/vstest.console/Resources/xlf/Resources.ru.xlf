@@ -1646,6 +1646,11 @@
         <target state="translated">    Пропущено: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
         <target state="translated">Общее количество тестовых файлов ({0}), соответствующих указанному шаблону.</target>

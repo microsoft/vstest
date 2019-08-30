@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForNullSource()
         {
-            Assert.ThrowsException<CommandLineException>(() => CommandLineOptions.Instance.AddSource(null));
+            Assert.ThrowsException<TestSourceException>(() => CommandLineOptions.Instance.AddSource(null));
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForInvalidSource()
         {
-            Assert.ThrowsException<CommandLineException>(() => CommandLineOptions.Instance.AddSource("DummySource"));
+            Assert.ThrowsException<TestSourceException>(() => CommandLineOptions.Instance.AddSource("DummySource"));
         }
 
         [TestMethod]

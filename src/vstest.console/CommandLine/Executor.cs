@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Globalization;
     using System.IO;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
@@ -40,8 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;  
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -173,14 +171,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
         {
             processors = new List<IArgumentProcessor>();
-
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
-
             for (var index = 0; index < args.Length; index++)
             {
                 var arg = args[index];
-
                 // If argument is '--', following arguments are key=value pairs for run settings.
                 if (arg.Equals("--"))
                 {
@@ -188,7 +183,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     processors.Add(cliRunSettingsProcessor);
                     break;
                 }
-
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
@@ -234,16 +228,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (Exception ex)
                 {
-                    if (ex is CommandLineException || ex is TestPlatformException)
-                    {
-                        this.Output.Error(false, ex.Message);
-                        result = 1;
-                    }
-                    else if (ex is SettingsException)
+                    if (ex is CommandLineException || ex is TestPlatformException || ex is SettingsException)
                     {
                         this.Output.Error(false, ex.Message);
                         result = 1;
                         this.showHelp = false;
+                    }
+                    else if(ex is TestSourceException)
+                    {
+                        this.Output.Error(false, ex.Message);
+                        result = 1;
+                        this.showHelp = false;
+                        break;
                     }
                     else
                     {
@@ -298,7 +294,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                     }
                 }
             }
-
             return result;
         }
 
@@ -373,7 +368,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 continueExecution = false;
             }
-
             return continueExecution;
         }
 
@@ -384,10 +378,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             string assemblyVersion = string.Empty;
             assemblyVersion = Product.Version;
-
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
-
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
             this.Output.WriteLine(string.Empty, OutputLevel.Information);
         }
