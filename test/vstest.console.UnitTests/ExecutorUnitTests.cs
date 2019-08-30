@@ -134,6 +134,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
         }
 
+        [TestMethod]
+        public void ExecutorWithInvalidArgsShouldPrintHowToUseHelpOption()
+        {
+            var mockOutput = new MockOutput();
+            string badArg = "--invalidArg";
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(badArg);
+
+            Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
+
+            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        }
+
+        [TestMethod]
+        public void ExecutorWithInvalidArgsAndValueShouldPrintErrorMessage()
+        {
+            var mockOutput = new MockOutput();
+            string badArg = "--invalidArg:xyz";
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(badArg);
+
+            Assert.AreEqual(1, exitCode, "Exit code must be One when no arguments are provided.");
+
+            Assert.IsTrue(mockOutput.Messages.Any(message => message.Message.Contains(string.Format(CommandLineResources.InvalidArgument, badArg))));
+        }
+
         /// <summary>
         /// Executor should set default runsettings value even there is no processor
         /// </summary>
