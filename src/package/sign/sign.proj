@@ -177,6 +177,7 @@
 
       <!-- NetFullExtensions -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
@@ -267,6 +268,7 @@
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" />
