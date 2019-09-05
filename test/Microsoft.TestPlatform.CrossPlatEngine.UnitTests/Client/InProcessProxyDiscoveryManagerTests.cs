@@ -9,6 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -48,8 +49,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldCallInitialize()
         {
             var manualResetEvent = new ManualResetEvent(false);
-
-            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
+            var eventHandler = new TestDiscoveryEventHandler(new TestRequestHandler());
+            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), eventHandler)).Callback(
                 () => manualResetEvent.Set());
 
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
@@ -62,7 +63,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldUpdateTestPluginCacheWithExtensionsReturnByTestHost()
         {
             var manualResetEvent = new ManualResetEvent(false);
-            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
+            var eventHandler = new TestDiscoveryEventHandler(new TestRequestHandler());
+            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), eventHandler)).Callback(
                 () => manualResetEvent.Set());
 
             this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\DiscoveryDummy.dll" });

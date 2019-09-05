@@ -11,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -52,11 +53,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void InitializeShouldUpdateAdditionalExtenions()
         {
             var mockFileHelper = new Mock<IFileHelper>();
+            var eventHandler = new TestDiscoveryEventHandler(new TestRequestHandler());
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
             TestPluginCache.Instance = new TestableTestPluginCache();
 
             this.discoveryManager.Initialize(
-                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
+                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location }, eventHandler);
 
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
