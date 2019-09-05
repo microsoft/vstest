@@ -12,7 +12,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -137,6 +139,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     {
                         this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
                     }
+                }
+                catch (FileLoadException e)
+                {              
+                        EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
+                        string fileLoadErrorMessage = $"TestPluginDiscoverer: Failed to load extensions from file '" + file + "'";
+                        TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Error, fileLoadErrorMessage);
                 }
                 catch (Exception e)
                 {
