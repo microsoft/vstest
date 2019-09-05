@@ -48,8 +48,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldCallInitialize()
         {
             var manualResetEvent = new ManualResetEvent(false);
-
-            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
+            var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), mockTestDiscoveryEventHandler.Object)).Callback(
                 () => manualResetEvent.Set());
 
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
@@ -62,7 +62,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldUpdateTestPluginCacheWithExtensionsReturnByTestHost()
         {
             var manualResetEvent = new ManualResetEvent(false);
-            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>())).Callback(
+            var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
+            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), mockTestDiscoveryEventHandler.Object)).Callback(
                 () => manualResetEvent.Set());
 
             this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\DiscoveryDummy.dll" });

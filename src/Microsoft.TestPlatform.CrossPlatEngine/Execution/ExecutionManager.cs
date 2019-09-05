@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -20,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
@@ -28,16 +30,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     public class ExecutionManager : IExecutionManager
     {
         private readonly ITestPlatformEventSource testPlatformEventSource;
-
         private BaseRunTests activeTestRun;
-
         private IRequestData requestData;
+        private readonly TestSessionMessageLogger sessionMessageLogger;
+        private ITestMessageEventHandler testMessageEventsHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
         public ExecutionManager(IRequestData requestData) : this(TestPlatformEventSource.Instance, requestData)
         {
+            this.sessionMessageLogger = TestSessionMessageLogger.Instance;
+            this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
+        }
+
+        private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
+        {
+            if (this.testMessageEventsHandler != null)
+            {
+                this.testMessageEventsHandler.HandleLogMessage(e.Level, e.Message);
+            }
+            else
+            {
+                if (EqtTrace.IsWarningEnabled)
+                {
+                    EqtTrace.Warning(
+                        "ExecutionManager: Could not pass the log message  '{0}' as the callback is null.",
+                        e.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -56,8 +77,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Initializes the execution manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
+        public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestMessageEventHandler testMessageEventsHandler)
         {
+            this.testMessageEventsHandler = testMessageEventsHandler;
             this.testPlatformEventSource.AdapterSearchStart();
 
             if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())

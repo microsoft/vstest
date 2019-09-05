@@ -74,13 +74,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void InitializeShouldLoadAndInitializeAllExtension()
         {
             var commonAssemblyLocation = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
-
+            var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
             TestPluginCacheTests.SetupMockExtensions(
                 new string[] { commonAssemblyLocation },
                 () => { });
 
 
-            this.executionManager.Initialize(new List<string> { commonAssemblyLocation });
+            this.executionManager.Initialize(new List<string> { commonAssemblyLocation }, mockTestMessageEventHandler.Object);
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 

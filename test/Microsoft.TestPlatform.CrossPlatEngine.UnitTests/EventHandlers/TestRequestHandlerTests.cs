@@ -174,12 +174,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsDiscoveryInitializeShouldSetExtensionPaths()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.DiscoveryInitialize, new[] { "testadapter.dll" });
+            var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
             this.jobQueue.Flush();
 
-            this.mockDiscoveryManager.Verify(d => d.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
+            this.mockDiscoveryManager.Verify(d => d.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll"))), mockTestDiscoveryEventHandler.Object));
             this.SendSessionEnd();
         }
 
@@ -218,13 +219,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequestsExecutionInitializeShouldSetExtensionPaths()
         {
             var message = this.dataSerializer.SerializePayload(MessageType.ExecutionInitialize, new[] { "testadapter.dll" });
-
+            var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
             this.ProcessRequestsAsync(this.mockTestHostManagerFactory.Object);
 
             this.SendMessageOnChannel(message);
             this.jobQueue.Flush();
 
-            this.mockExecutionManager.Verify(e => e.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
+            this.mockExecutionManager.Verify(e => e.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll"))), mockTestDiscoveryEventHandler.Object));
             this.SendSessionEnd();
         }
 

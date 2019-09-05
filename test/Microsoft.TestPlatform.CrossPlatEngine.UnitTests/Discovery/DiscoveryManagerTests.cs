@@ -52,11 +52,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void InitializeShouldUpdateAdditionalExtenions()
         {
             var mockFileHelper = new Mock<IFileHelper>();
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
             TestPluginCache.Instance = new TestableTestPluginCache();
 
             this.discoveryManager.Initialize(
-                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
+                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location }, mockLogger.Object);
 
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
