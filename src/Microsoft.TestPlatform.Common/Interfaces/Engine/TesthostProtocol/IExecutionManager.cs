@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
+
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
     /// </summary>
@@ -18,7 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// Initializes the execution manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        void Initialize(IEnumerable<string> pathToAdditionalExtensions);
+        /// <param name="testExtenstionInitizlizeEventsHandler"> EventHandler for handling execution events from Engine. </param>
+        void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestExtenstionInitializeEventsHandler testExtenstionInitizlizeEventsHandler);
 
         /// <summary>
         /// Starts the test run with sources.

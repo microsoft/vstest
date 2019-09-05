@@ -179,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.SendMessageOnChannel(message);
             this.jobQueue.Flush();
 
-            this.mockDiscoveryManager.Verify(d => d.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
+            this.mockDiscoveryManager.Verify(d => d.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll"))),null));
             this.SendSessionEnd();
         }
 
@@ -224,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.SendMessageOnChannel(message);
             this.jobQueue.Flush();
 
-            this.mockExecutionManager.Verify(e => e.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll")))));
+            this.mockExecutionManager.Verify(e => e.Initialize(It.Is<IEnumerable<string>>(paths => paths.Any(p => p.Equals("testadapter.dll"))),null));
             this.SendSessionEnd();
         }
 

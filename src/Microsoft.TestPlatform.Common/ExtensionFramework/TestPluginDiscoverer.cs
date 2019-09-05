@@ -7,12 +7,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using System.Security.Cryptography.X509Certificates;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -22,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestPluginDiscoverer
     {
         private IFileHelper fileHelper;
+        private static bool flag = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
@@ -85,7 +89,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
 
             this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
-
             return pluginInfos;
         }
 
@@ -137,6 +140,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     {
                         this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
                     }
+                }
+                catch (FileLoadException e)
+                {
+                    if (!flag) {
+                    flag = true;
+                    EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
+                    string fileLoadErrorMessage = $"TestPluginDiscoverer: Failed to load extensions from file '" + file + "'";
+                    TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Error, fileLoadErrorMessage);
+                    }
+                    EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
                 }
                 catch (Exception e)
                 {

@@ -36,6 +36,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     }
 
     /// <summary>
+    /// Interface contract for handling test extenstion initialize events during run operation
+    /// </summary>
+    public interface ITestExtenstionInitializeEventsHandler : ITestMessageEventHandler
+    {
+        /// <summary>
+        /// Subscribe to SessionEvent
+        /// </summary>
+        void SubscribetoSessionEvent();
+
+        /// <summary>
+        /// UnSubscribe to SessionEvent
+        /// </summary>
+        void UnSubscribetoSessionEvent();
+    }
+
+    /// <summary>
     /// Interface for handling generic message events during test discovery or execution
     /// </summary>
     public interface ITestMessageEventHandler

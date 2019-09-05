@@ -50,7 +50,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
+            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(),null), Times.Once, "StartTestRun should call Initialize if not already initialized");
         }
 
         [TestMethod]

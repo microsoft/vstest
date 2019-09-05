@@ -80,7 +80,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 () => { });
 
 
-            this.executionManager.Initialize(new List<string> { commonAssemblyLocation });
+            this.executionManager.Initialize(new List<string> { commonAssemblyLocation }, null);
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 

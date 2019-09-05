@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -20,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
@@ -56,7 +58,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Initializes the execution manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
+        /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine. </param>
+        public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestExtenstionInitializeEventsHandler testExtenstionInitializeEventsHandler)
         {
             this.testPlatformEventSource.AdapterSearchStart();
 
@@ -66,7 +69,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
             }
 
+            testExtenstionInitializeEventsHandler?.SubscribetoSessionEvent();
+
             this.LoadExtensions();
+
+            testExtenstionInitializeEventsHandler?.UnSubscribetoSessionEvent();
 
             this.testPlatformEventSource.AdapterSearchStop();
         }

@@ -63,8 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Initializes the discovery manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
+        public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            this.testDiscoveryEventsHandler = eventHandler;
             this.testPlatformEventSource.AdapterSearchStart();
 
             if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
