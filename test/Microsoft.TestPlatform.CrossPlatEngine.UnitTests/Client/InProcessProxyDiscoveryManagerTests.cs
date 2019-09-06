@@ -49,7 +49,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var manualResetEvent = new ManualResetEvent(false);
             var mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler2>();
-            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), mockTestDiscoveryEventHandler.Object)).Callback(
+            this.mockDiscoveryManager.Setup(o => o.Initialize(Enumerable.Empty<string>(), null)).Callback(
                 () => manualResetEvent.Set());
 
             var discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);

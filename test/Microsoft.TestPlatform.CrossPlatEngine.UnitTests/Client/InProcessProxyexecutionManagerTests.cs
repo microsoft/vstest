@@ -51,7 +51,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockTestMessageEventHandler = new Mock<ITestMessageEventHandler>();
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(), mockTestMessageEventHandler.Object), Times.Once, "StartTestRun should call Initialize if not already initialized");
+            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>(), It.IsAny<ITestMessageEventHandler>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
         }
 
         [TestMethod]
