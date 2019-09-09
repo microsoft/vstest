@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <param name="message">Message for the exception.</param>
         /// <param name="innerException">The inner exception.</param>
         public CommandLineException(string message, Exception innerException)
-            : base (message, innerException)
+            : base(message, innerException)
         {
         }
 

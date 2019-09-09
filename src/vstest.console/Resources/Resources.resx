@@ -728,6 +728,9 @@
   <data name="ProgressIndicatorString" xml:space="preserve">
     <value>Test run in progress</value>
   </data>
+  <data name="InvalidArgument" xml:space="preserve">
+    <value>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</value>
+  </data>
   <data name="TestSourcesDiscovered" xml:space="preserve">
     <value>A total of {0} test files matched the specified pattern.</value>
   </data>

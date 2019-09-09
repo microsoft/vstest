@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="new">Процесс testhost завершен с ошибкой {0}</target>
+        <target state="translated">Процесс testhost завершился с ошибкой: {0}. Дополнительные сведения см. в журналах диагностики.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
@@ -204,7 +204,7 @@
       </trans-unit>
       <trans-unit id="TestDiscoveryCancelled">
         <source>Discovery of tests cancelled.</source>
-        <target state="new">Discovery of tests cancelled.</target>
+        <target state="translated">Обнаружение тестов отменено.</target>
         <note></note>
       </trans-unit>
     </body>

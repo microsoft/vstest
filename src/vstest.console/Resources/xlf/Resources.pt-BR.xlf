@@ -295,11 +295,12 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      Executar testes dos arquivos especificados. Use espaços para separar vários nomes 
-      de arquivo de teste.
+        <target state="translated">[TestFileNames]
+      Execute testes por meio dos arquivos especificados ou do padrão curinga. Separe vários nomes de arquivos de teste ou padrões
+      por espaços. Defina o detalhamento do agente do console como detalhado para exibir os arquivos de teste correspondentes.
       Exemplos: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1645,9 +1646,14 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <target state="translated">    Ignorados: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">{0} arquivos de teste no total corresponderam ao padrão especificado.</target>
         <note></note>
       </trans-unit>
     </body>

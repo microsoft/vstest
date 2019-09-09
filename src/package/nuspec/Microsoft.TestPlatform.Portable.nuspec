@@ -92,6 +92,20 @@
     <file src="net451\$Runtime$\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\net451\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll"	target="tools\net451\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
+    <file src="net451\$Runtime$\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
+    <file src="net451\$Runtime$\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\net451\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="net451\$Runtime$\Extensions\cs\Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"	target="tools\net451\Extensions\cs\Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll" />
     <file src="net451\$Runtime$\Extensions\fr\Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"	target="tools\net451\Extensions\fr\Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll" />
     <file src="net451\$Runtime$\Extensions\it\Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"	target="tools\net451\Extensions\it\Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll" />
@@ -256,6 +270,7 @@
     <file src="netcoreapp2.1\cs\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\cs\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\cs\vstest.console.resources.dll"	target="tools\netcoreapp2.1\cs\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -267,6 +282,7 @@
     <file src="netcoreapp2.1\de\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\de\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\de\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\de\vstest.console.resources.dll"	target="tools\netcoreapp2.1\de\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -278,11 +294,13 @@
     <file src="netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\es\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\es\vstest.console.resources.dll"	target="tools\netcoreapp2.1\es\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
     <file src="netcoreapp2.1\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
     <file src="netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+    <file src="netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll"	target="tools\netcoreapp2.1\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" />
     <file src="netcoreapp2.1\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="netcoreapp2.1\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
     <file src="netcoreapp2.1\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.TestPlatform.CrossPlatEngine.resources.dll" />
@@ -292,6 +310,7 @@
     <file src="netcoreapp2.1\fr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\fr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\fr\vstest.console.resources.dll"	target="tools\netcoreapp2.1\fr\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -303,6 +322,7 @@
     <file src="netcoreapp2.1\it\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\it\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\it\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\it\vstest.console.resources.dll"	target="tools\netcoreapp2.1\it\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -314,6 +334,7 @@
     <file src="netcoreapp2.1\ja\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\ja\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\ja\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\ja\vstest.console.resources.dll"	target="tools\netcoreapp2.1\ja\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -325,6 +346,7 @@
     <file src="netcoreapp2.1\ko\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\ko\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\ko\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\ko\vstest.console.resources.dll"	target="tools\netcoreapp2.1\ko\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -336,6 +358,7 @@
     <file src="netcoreapp2.1\pl\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\pl\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\pl\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\pl\vstest.console.resources.dll"	target="tools\netcoreapp2.1\pl\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -347,6 +370,7 @@
     <file src="netcoreapp2.1\pt-BR\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\pt-BR\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\pt-BR\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\pt-BR\vstest.console.resources.dll"	target="tools\netcoreapp2.1\pt-BR\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -358,6 +382,7 @@
     <file src="netcoreapp2.1\ru\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\ru\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\ru\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\ru\vstest.console.resources.dll"	target="tools\netcoreapp2.1\ru\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\TestHost\datacollector.exe"	target="tools\netcoreapp2.1\TestHost\datacollector.exe" />
@@ -469,6 +494,7 @@
     <file src="netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\tr\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\tr\vstest.console.resources.dll"	target="tools\netcoreapp2.1\tr\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -480,6 +506,7 @@
     <file src="netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\zh-Hans\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\zh-Hans\vstest.console.resources.dll"	target="tools\netcoreapp2.1\zh-Hans\vstest.console.resources.dll" />
     <file src="netcoreapp2.1\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
@@ -491,6 +518,7 @@
     <file src="netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Client.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Client.resources.dll" />
     <file src="netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" />
     <file src="netcoreapp2.1\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll" />
+    <file src="netcoreapp2.1\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll"	target="tools\netcoreapp2.1\Extensions\zh-Hant\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.resources.dll" />
     <file src="netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     <file src="netcoreapp2.1\zh-Hant\vstest.console.resources.dll"	target="tools\netcoreapp2.1\zh-Hant\vstest.console.resources.dll" />
   </files>

@@ -45,15 +45,21 @@ namespace vstest.console.Internal
         {
             var matchingFiles = new List<string>();
 
+            // Convert the relative path to absolute path
+            if (!Path.IsPathRooted(filePattern))
+            {
+                filePattern = Path.Combine(this.fileHelper.GetCurrentDirectory(), filePattern);
+            }
+
             // If there is no wildcard simply add the file to the list of matching files.
-            if(filePattern.IndexOfAny(wildCardCharacters) == -1)
+            if (filePattern.IndexOfAny(wildCardCharacters) == -1)
             {
                 EqtTrace.Info($"FilePatternParser: The given file {filePattern} is a full path.");
 
                 // Check if the file exists.
                 if (!this.fileHelper.Exists(filePattern))
                 {
-                    throw new CommandLineException(
+                    throw new TestSourceException(
                         string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, filePattern));
                 }
 

@@ -295,11 +295,12 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[NomiFileTest]
-      Esegue test dai file specificati. Separare più nomi di file di test
-      con spazi.
+        <target state="translated">[NomiFileDiTest]
+      Esegue i test corrispondenti ai file specificati o al carattere jolly. Separare più nomi di file di test o
+       caratteri jolly con uno spazio. Impostare il livello di dettaglio del logger della console su dettagliato per visualizzare i file di test corrispondenti.
       Esempi: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1645,9 +1646,14 @@
         <target state="translated">    Ignorati: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">Un totale di {0} file di test corrisponde al criterio specificato.</target>
         <note></note>
       </trans-unit>
     </body>

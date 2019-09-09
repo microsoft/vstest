@@ -10,9 +10,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
     using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
@@ -22,6 +24,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     /// </summary>
     internal class Converter
     {
+        private IFileHelper fileHelper;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Converter"/> class. 
+        /// </summary>
+        public Converter(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
+
         /// <summary>
         /// Converts platform test case to trx test element.
         /// </summary>
@@ -32,7 +44,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testType"></param>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Trx test element</returns>
-        public static ITestElement ToTestElement(
+        public ITestElement ToTestElement(
             Guid testId,
             Guid executionId,
             Guid parentExecutionId,
@@ -71,7 +83,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testRun"></param>
         /// <param name="rockSteadyTestResult"></param>
         /// <returns>Trx test result object</returns>
-        public static ITestResult ToTestResult(
+        public ITestResult ToTestResult(
             Guid testId,
             Guid executionId,
             Guid parentExecutionId,
@@ -121,7 +133,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// The <see cref="TestOutcome"/>.
         /// </returns>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static TrxObjectModel.TestOutcome ToOutcome(ObjectModel.TestOutcome rockSteadyOutcome)
+        public TrxObjectModel.TestOutcome ToOutcome(ObjectModel.TestOutcome rockSteadyOutcome)
         {
             TrxObjectModel.TestOutcome outcome = TrxObjectModel.TestOutcome.Failed;
 
@@ -146,7 +158,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return outcome;
         }
 
-        public static List<CollectorDataEntry> ToCollectionEntries(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory)
+        public List<CollectorDataEntry> ToCollectionEntries(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory)
         {
 
             List<CollectorDataEntry> collectorEntries = new List<CollectorDataEntry>();
@@ -173,7 +185,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return collectorEntries;
         }
 
-        public static IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory, List<string> errorMessages)
+
+        public IList<String> ToResultFiles(IEnumerable<ObjectModel.AttachmentSet> attachmentSets, TestRun testRun, string trxFileDirectory, 
+            List<string> errorMessages)
         {
             List<String> resultFiles = new List<string>();
             if (attachmentSets == null)
@@ -216,7 +230,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="unitTestResult">TRX TestResult</param>
         /// <param name="testResult"> rock steady test result</param>
-        private static void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
+        private void UpdateResultMessages(TrxObjectModel.TestResult unitTestResult, ObjectModel.TestResult testResult)
         {
             StringBuilder debugTrace = new StringBuilder();
             StringBuilder stdErr = new StringBuilder();
@@ -257,7 +271,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testCase">TestCase object extracted from the TestResult</param>
         /// <param name="categoryID">Property Name from the list of properties in TestCase</param>
         /// <returns> list of properties</returns>
-        public static List<string> GetCustomPropertyValueFromTestCase(ObjectModel.TestCase testCase, string categoryID)
+        public List<string> GetCustomPropertyValueFromTestCase(ObjectModel.TestCase testCase, string categoryID)
         {
             var customProperty = testCase.Properties.FirstOrDefault(t => t.Id.Equals(categoryID));
 
@@ -283,7 +297,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Test id</returns>
-        public static Guid GetTestId(ObjectModel.TestCase rockSteadyTestCase)
+        public Guid GetTestId(ObjectModel.TestCase rockSteadyTestCase)
         {
             Guid testId = Guid.Empty;
 
@@ -306,7 +320,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns>Parent execution id.</returns>
-        public static Guid GetParentExecutionId(ObjectModel.TestResult testResult)
+        public Guid GetParentExecutionId(ObjectModel.TestResult testResult)
         {
             TestProperty parentExecutionIdProperty = testResult.Properties.FirstOrDefault(
                 property => property.Id.Equals(Constants.ParentExecutionIdPropertyIdentifier));
@@ -321,7 +335,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns>Execution id.</returns>
-        public static Guid GetExecutionId(ObjectModel.TestResult testResult)
+        public Guid GetExecutionId(ObjectModel.TestResult testResult)
         {
             TestProperty executionIdProperty = testResult.Properties.FirstOrDefault(
                 property => property.Id.Equals(Constants.ExecutionIdPropertyIdentifier));
@@ -339,7 +353,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns>Test type</returns>
-        public static TestType GetTestType(ObjectModel.TestResult testResult)
+        public TestType GetTestType(ObjectModel.TestResult testResult)
         {
             var testTypeGuid = Constants.UnitTestTypeGuid;
 
@@ -361,7 +375,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testRun"></param>
         /// <param name="trxFileDirectory"></param>
         /// <param name="addAttachments"></param>
-        private static void UpdateTestResultAttachments(ObjectModel.TestResult rockSteadyTestResult, TrxObjectModel.TestResult testResult, TestRun testRun, string trxFileDirectory, bool addAttachments)
+        private void UpdateTestResultAttachments(ObjectModel.TestResult rockSteadyTestResult, TrxObjectModel.TestResult testResult, TestRun testRun, string trxFileDirectory, bool addAttachments)
         {
             if (rockSteadyTestResult.Attachments == null || rockSteadyTestResult.Attachments.Count == 0)
             {
@@ -430,7 +444,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         }
 
         // Returns a list of collector entry
-        private static CollectorDataEntry ToCollectorEntry(ObjectModel.AttachmentSet attachmentSet, Guid testResultExecutionId, TestRun testRun, string trxFileDirectory)
+        private CollectorDataEntry ToCollectorEntry(ObjectModel.AttachmentSet attachmentSet, Guid testResultExecutionId, TestRun testRun, string trxFileDirectory)
         {
             string runDirectoryName = Path.Combine(trxFileDirectory, testRun.RunConfiguration.RunDeploymentRootDirectory);
             string inDirectory = Path.Combine(runDirectoryName, "In");
@@ -493,7 +507,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         }
 
         // Get the path to the result files
-        private static IList<string> ToResultFiles(ObjectModel.AttachmentSet attachmentSet, Guid testResultExecutionId, TestRun testRun, string trxFileDirectory)
+        private IList<string> ToResultFiles(ObjectModel.AttachmentSet attachmentSet, Guid testResultExecutionId, TestRun testRun, string trxFileDirectory)
         {
             string runDirectoryName = Path.Combine(trxFileDirectory, testRun.RunConfiguration.RunDeploymentRootDirectory);
             string testResultDirectory = Path.Combine(runDirectoryName, "In");
@@ -513,12 +527,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             List<string> resultFiles = new List<string>();
             foreach (ObjectModel.UriDataAttachment uriDataAttachment in attachmentSet.Attachments)
             {
+                string sourceFile = uriDataAttachment.Uri.IsAbsoluteUri ? uriDataAttachment.Uri.LocalPath : uriDataAttachment.Uri.ToString();
+
                 if (ObjectModel.EqtTrace.IsVerboseEnabled)
                 {
-                    ObjectModel.EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + uriDataAttachment.Uri.LocalPath);
+                    ObjectModel.EqtTrace.Verbose("TrxLogger: ToResultFiles: Got attachment " + uriDataAttachment.Uri + " with local path " + sourceFile);
                 }
 
-                string sourceFile = uriDataAttachment.Uri.LocalPath;
                 Debug.Assert(Path.IsPathRooted(sourceFile), "Source file is not rooted");
                 // copy the source file to the target location
                 string targetFileName = FileHelper.GetNextIterationFileName(testResultDirectory, Path.GetFileName(sourceFile), false);
@@ -544,11 +559,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             return resultFiles;
         }
 
-        private static void CopyFile(string sourceFile, string targetFile)
+        private void CopyFile(string sourceFile, string targetFile)
         {
             try
             {
-                File.Copy(sourceFile, targetFile, true);
+                this.fileHelper.CopyFile(sourceFile, targetFile);
             }
             catch (Exception ex)
             {
@@ -566,7 +581,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Priority</returns>
-        private static int GetPriority(ObjectModel.TestCase rockSteadyTestCase)
+        private int GetPriority(ObjectModel.TestCase rockSteadyTestCase)
         {
             int priority = int.MaxValue;
 
@@ -582,7 +597,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// </summary>
         /// <param name="rockSteadyTestCase"></param>
         /// <returns>Owner</returns>
-        private static string GetOwner(ObjectModel.TestCase rockSteadyTestCase)
+        private string GetOwner(ObjectModel.TestCase rockSteadyTestCase)
         {
             string owner = null;
 
@@ -600,7 +615,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="fullyQualifiedName">Fully qualified name.</param>
         /// <param name="source">Source.</param>
         /// <returns>Test class name.</returns>
-        private static string GetTestClassName(string testName, string fullyQualifiedName, string source)
+        private string GetTestClassName(string testName, string fullyQualifiedName, string source)
         {
             var className = "DefaultClassName";
 
@@ -657,7 +672,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="source"></param>
         /// <param name="testType"></param>
         /// <returns>Trx test element</returns>
-        private static TestElement CreateTestElement(Guid testId, string name, string fullyQualifiedName, string adapter, string source, TestType testType)
+        private TestElement CreateTestElement(Guid testId, string name, string fullyQualifiedName, string adapter, string source, TestType testType)
         {
             TestElement testElement = null;
 
@@ -692,7 +707,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         /// <param name="testType"></param>
         /// <param name="testCategoryId"></param>
         /// <returns>Trx test result</returns>
-        private static TrxObjectModel.TestResult CreateTestResult(
+        private TrxObjectModel.TestResult CreateTestResult(
             Guid runId,
             Guid testId,
             Guid executionId,

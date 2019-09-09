@@ -258,6 +258,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.requestSender.EndSession();
             this.requestSender.Close();
+
+            // If vstest.console is still hanging around, it should be explicitly killed.
+            this.vstestConsoleProcessManager.ShutdownProcess();
+
             this.sessionStarted = false;
         }
 

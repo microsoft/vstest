@@ -29,6 +29,8 @@
   </ItemGroup>
 
   <Target Name="Localize" Condition="'$(ProductProject)' == 'true' and @(EmbeddedResource) != ''" DependsOnTargets="_CreateLocalizeXLF;_CreateLocalizeResx" />
+    <!--<Message Importance="High" Text="resources are @(EmbeddedResource)" />
+  </Target>-->
 
   <Target Name="_CreateLocalizeXLF">
     <Message Importance="High" Text="Create localized xlf for '$(AssemblyName)'" />
@@ -37,10 +39,10 @@
     </CreateItem>
 
     <!-- Create language based xlf files -->
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" Condition="%(LocResourceFile.Filename) != 'DefaultCodeCoverageConfig'"/>
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" Condition="%(LocResourceFile.Filename) != 'DefaultCodeCoverageConfig' and %(LocResourceFile.Filename) != 'html'"/>
 
     <!-- Create neutral xlf -->
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" Condition="%(EmbeddedResource.Filename) != 'DefaultCodeCoverageConfig'"/>
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" Condition="%(EmbeddedResource.Filename) != 'DefaultCodeCoverageConfig' and %(EmbeddedResource.Filename) != 'html'"/>
   </Target>
 
   <Target Name="_CreateLocalizeResx">
@@ -50,7 +52,7 @@
     </CreateItem>
 
     <!-- Convert language specific xlf files to resx -->
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" Condition="%(LocResourceFile.Filename) != 'DefaultCodeCoverageConfig'"/>
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" Condition="%(LocResourceFile.Filename) != 'DefaultCodeCoverageConfig' and %(LocResourceFile.Filename) != 'html'"/>
     <ItemGroup>
       <EmbeddedResource Include="$(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx" />
     </ItemGroup>

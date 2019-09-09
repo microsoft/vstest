@@ -295,11 +295,13 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[NombresDeArchivosDePrueba]
-      Ejecutar pruebas de los archivos especificados. Separe 
-      varios nombres de archivo con espacios.
+        <target state="translated">[TestFileNames]
+      Ejecuta las pruebas del patrón con comodines o los archivos especificados. Separe varios patrones o
+      nombres de archivo de prueba con espacios. Establezca el nivel de detalle del
+      registrador en detallado para ver los archivos de prueba coincidentes.
       Ejemplos: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1647,9 +1649,14 @@
         <target state="translated">    Omitido: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">{0} archivos de prueba en total coincidieron con el patrón especificado.</target>
         <note></note>
       </trans-unit>
     </body>

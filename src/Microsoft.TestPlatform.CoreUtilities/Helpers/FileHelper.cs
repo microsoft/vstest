@@ -132,5 +132,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return Directory.GetFiles(path, searchPattern, searchOption);
         }
+
+        /// <inheritdoc/>
+        public void Delete(string path)
+        {
+            File.Delete(path);
+        }
     }
 }

@@ -295,11 +295,12 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      Выполнение тестов из указанных файлов. При вводе нескольких имен файла теста они разделяются
-      пробелами.
+        <target state="translated">[TestFileNames]
+      Выполняйте тесты из указанных файлов или шаблона с подстановочными знаками. Разделяйте несколько шаблонов или имен тестовых файлов
+      пробелами. Задайте высокий уровень детализации для средства ведения журнала консоли, чтобы просмотреть соответствующие тестовые файлы.
       Примеры: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1645,9 +1646,14 @@
         <target state="translated">    Пропущено: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">Общее количество тестовых файлов ({0}), соответствующих указанному шаблону.</target>
         <note></note>
       </trans-unit>
     </body>
