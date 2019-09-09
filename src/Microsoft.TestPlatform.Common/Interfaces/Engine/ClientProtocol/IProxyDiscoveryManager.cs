@@ -33,5 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Send a EndSession message to close the test host and channel gracefully.
         /// </summary>
         void Close();
+
+        string WarningMessage { get; }
     }
 }

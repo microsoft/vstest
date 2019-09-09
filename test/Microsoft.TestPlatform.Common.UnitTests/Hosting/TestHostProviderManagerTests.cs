@@ -160,6 +160,7 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             public bool Shared { get; private set; }
 
+            public string WarningMessage { get; set; }
 
             public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
             {
@@ -237,6 +238,8 @@ namespace TestPlatform.Common.UnitTests.Logging
             public event EventHandler<HostProviderEventArgs> HostExited;
 
             public bool Shared { get; private set; }
+
+            public string WarningMessage { get; private set; }
 
             public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
             {

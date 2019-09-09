@@ -88,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.skipDefaultAdapters = skipDefaultAdapters;
         }
 
+        public string WarningMessage { get; private set; }
         /// <summary>
         /// Discovers tests
         /// </summary>
@@ -103,6 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
+                    this.WarningMessage = this.testHostManager.WarningMessage;
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, this);

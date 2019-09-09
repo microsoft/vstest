@@ -91,6 +91,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public bool Shared { get; private set; }
 
+        public string WarningMessage { get; private set; }
+
         /// <summary>
         /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
         /// </summary>
@@ -320,8 +322,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (conflictingExtensions.Any())
             {
                 var extensionsString = string.Join("\n", conflictingExtensions.Select(kv => string.Format("  {0} : {1}", kv.Key, kv.Value)));
-                string message = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
-                this.messageLogger.SendMessage(TestMessageLevel.Warning, message);
+                this.WarningMessage = string.Format(CultureInfo.CurrentCulture, Resources.MultipleFileVersions, extensionsString);
+                this.messageLogger.SendMessage(TestMessageLevel.Warning, this.WarningMessage);
             }
 
             return selectedExtensions.Values;

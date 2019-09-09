@@ -104,6 +104,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </remarks>
         public bool Shared => false;
 
+        public string WarningMessage { get; private set; }
+
         /// <summary>
         /// Gets a value indicating whether the test host supports protocol version check
         /// </summary>

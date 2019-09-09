@@ -32,6 +32,8 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementatio
 
         public bool Shared { get; }
 
+        public string WarningMessage { get; private set; }
+
         public void Initialize(IMessageLogger logger, string runsettingsXml)
         {
         }

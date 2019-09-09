@@ -48,6 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
         }
 
+        public string WarningMessage { get; private set; }
         /// <summary>
         /// Discovers tests
         /// </summary>
@@ -61,9 +62,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // Initialize extension before discovery
                     this.InitializeExtensions(discoveryCriteria.Sources);
+                    this.WarningMessage = this.testHostManager.WarningMessage;
                     discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
                     this.discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
+                    
                 }
                 catch (Exception exception)
                 {

@@ -37,6 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// </summary>
         bool Shared { get; }
 
+        string WarningMessage { get; }
+
         /// <summary>
         /// Sets a Message Logger
         /// </summary>

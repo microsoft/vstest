@@ -47,6 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         private object discoveryStatusLockObject = new object();
 
+        public string WarningMessage { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         #endregion
 
         public ParallelProxyDiscoveryManager(IRequestData requestData, Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)

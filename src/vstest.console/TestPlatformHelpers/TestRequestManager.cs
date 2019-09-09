@@ -178,6 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     // Start the discovery of tests and wait for completion
                     this.currentDiscoveryRequest.DiscoverAsync();
+                    discoveryEventsRegistrar?.LogWarning(this.currentDiscoveryRequest.WarningMessage);
                     this.currentDiscoveryRequest.WaitForCompletion();
                 }
                 finally

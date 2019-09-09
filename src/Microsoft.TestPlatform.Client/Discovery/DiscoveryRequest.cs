@@ -57,6 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             this.dataSerializer = dataSerializer;
         }
 
+        public string WarningMessage { get; private set; }
         /// <summary>
         /// Start the discovery request
         /// </summary>
@@ -91,6 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     this.OnDiscoveryStart.SafeInvoke(this, discoveryStartEvent, "DiscoveryRequest.DiscoveryStart");
 
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
+                    this.WarningMessage = this.DiscoveryManager.WarningMessage;
                 }
                 catch
                 {
