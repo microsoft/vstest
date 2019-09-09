@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         }
 
         /// <summary>
-        /// Gets the taregt framework from the run configuration
+        /// Gets the target framework from the run configuration
         /// </summary>
         /// <param name="runConfiguration">Test run configuration</param>
         /// <returns>Target Framework</returns>

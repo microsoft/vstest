@@ -615,9 +615,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception ex)
             {
+                var loggerUri = string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri;
                 EqtTrace.Error(
-                    "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}",
-                    string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri, ex);
+                    "TestLoggerManager: Error while initializing logger: {0}, Exception details: {1}", loggerUri, ex);
 
                 this.messageLogger.SendMessage(
                     TestMessageLevel.Error,
@@ -627,7 +627,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         string.IsNullOrEmpty(extensionUri) ? "type" : "uri",
                         string.IsNullOrEmpty(extensionUri) ? logger.GetType().ToString() : extensionUri,
                         ex));
-                return false;
+
+                throw new InvalidLoggerException($"Error while initializing logger: {loggerUri}, Exception details: {ex.Message}");
             }
 
             return true;

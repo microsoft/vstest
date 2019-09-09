@@ -61,6 +61,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private DateTime testRunStartTime;
 
+        private string trxFileExtension = ".trx";
+
         /// <summary>
         /// Parameters dictionary for logger. Ex: {"LogFileName":"TestResults.trx"}.
         /// </summary>
@@ -94,7 +96,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             events.TestRunComplete += this.TestRunCompleteHandler;
 
             this.testResultsDirPath = testResultsDirPath;
-
             this.InitializeInternal();
         }
 
@@ -109,6 +110,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (parameters.Count == 0)
             {
                 throw new ArgumentException("No default parameters added", nameof(parameters));
+            }
+
+            var isLogFilePrefixParameterExists = parameters.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue);
+            var isLogFileNameParameterExists = parameters.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue);
+
+            if (isLogFilePrefixParameterExists && isLogFileNameParameterExists)
+            {
+                var trxParameterErrorMsg = string.Format(CultureInfo.CurrentCulture,
+                        TrxLoggerResources.PrefixAndNameProvidedError);
+
+                EqtTrace.Error(trxParameterErrorMsg);
+                throw new ArgumentException(trxParameterErrorMsg);
             }
 
             this.parametersDictionary = parameters;
@@ -442,35 +455,42 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private void DeriveTrxFilePath()
         {
-            if (this.parametersDictionary != null)
-            {
-                var isLogFilePrefixParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue);
+            var isLogFilePrefixParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue);
+            var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue);
 
-                if (isLogFilePrefixParameterExists && !string.IsNullOrWhiteSpace(logFilePrefixValue))              
+            if (isLogFilePrefixParameterExists)
+            {
+                if (!string.IsNullOrWhiteSpace(logFilePrefixValue))              
                 {
                     var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework] ?? string.Empty;
                     framework = NuGetFramework.Parse(framework).GetShortFolderName();
 
-                    logFilePrefixValue = logFilePrefixValue.Replace(".trx", string.Empty) + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmssfff", DateTimeFormatInfo.InvariantInfo) + ".trx";
+                    logFilePrefixValue = logFilePrefixValue.Replace(".trx", string.Empty) + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + this.trxFileExtension;
                     this.trxFilePath = Path.Combine(this.testResultsDirPath, logFilePrefixValue);
                 }
                 else
                 {
-                    var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string logFileNameValue);
-                    if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
-                    {
-                        this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
-                    }
-                    else
-                    {
-                        this.SetDefaultTrxFilePath();
-                    }
+                    this.SetDefaultTrxFilePath();
                 }
+
+                return;
             }
-            else
+
+            if (isLogFileNameParameterExists)
             {
-                this.SetDefaultTrxFilePath();
+                if (!string.IsNullOrWhiteSpace(logFileNameValue))
+                {
+                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                }
+                else
+                {
+                    this.SetDefaultTrxFilePath();
+                }
+
+                return;
             }
+
+            this.SetDefaultTrxFilePath();
         }
 
         /// <summary>
