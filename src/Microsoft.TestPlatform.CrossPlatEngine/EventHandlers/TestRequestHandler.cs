@@ -266,11 +266,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         EqtTrace.Info("Execution Session Initialize.");
                         this.testHostManagerFactoryReady.Wait();
-                        var testExtensionInitializeEventsHandler = new TestExtensionInitializeEventsHandler(this);
+                        var testInitializeEventsHandler = new TestInitializeEventsHandler(this);
                         var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                         jobQueue.QueueJob(
                                 () =>
-                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testExtensionInitializeEventsHandler), 0);
+                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions, testInitializeEventsHandler), 0);
                         break;
                     }
 

@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -169,6 +169,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to TestPluginDiscoverer: Failed to load extensions from file &apos;{0}&apos;. Please use /diag for more information..
+        /// </summary>
+        internal static string FailedToLoadAdapaterFile {
+            get {
+                return ResourceManager.GetString("FailedToLoadAdapaterFile", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to An error occured while creating Fast filter..
         /// </summary>

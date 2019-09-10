@@ -153,6 +153,9 @@
   <data name="FailedToFindInstalledUnitTestExtensions" xml:space="preserve">
     <value>Failed to find the list of installed unit test extensions. Reason: {0}</value>
   </data>
+  <data name="FailedToLoadAdapaterFile" xml:space="preserve">
+    <value>TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</value>
+  </data>
   <data name="FastFilterException" xml:space="preserve">
     <value>An error occured while creating Fast filter.</value>
   </data>

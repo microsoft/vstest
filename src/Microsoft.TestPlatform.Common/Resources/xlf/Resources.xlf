@@ -146,6 +146,11 @@
         <target state="new">Cancelling the operation as requested.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="FailedToLoadAdapaterFile">
+        <source>TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
+        <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

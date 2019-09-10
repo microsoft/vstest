@@ -48,6 +48,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testMessageEventsHandler != null)
             {
+                if (e.Level == TestMessageLevel.Error)
+                {
+                    // Downgrade the message severity to Warning...
+                    e.Level = TestMessageLevel.Warning;
+                }
                 this.testMessageEventsHandler.HandleLogMessage(e.Level, e.Message);
             }
             else
@@ -118,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 this.activeTestRun.RunTests();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
                 this.Abort(runEventsHandler);
@@ -149,12 +154,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             try
             {
                 this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(tests));
-                 
+
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 runEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
                 this.Abort(runEventsHandler);
@@ -237,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
             }
-             
+
             // Initialize inproc data collectors if declared in run settings.
             if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
             {

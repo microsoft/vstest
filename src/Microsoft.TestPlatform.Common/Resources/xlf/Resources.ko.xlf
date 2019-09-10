@@ -269,6 +269,11 @@
         <target state="translated">요청한 대로 작업을 취소하는 중입니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="FailedToLoadAdapaterFile">
+        <source>TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
+        <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

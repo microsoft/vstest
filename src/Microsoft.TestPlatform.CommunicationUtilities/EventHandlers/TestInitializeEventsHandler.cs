@@ -15,15 +15,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
     /// <summary>
     /// The test run events handler.
     /// </summary>
-    public class TestExtensionInitializeEventsHandler : ITestMessageEventHandler
+    public class TestInitializeEventsHandler : ITestMessageEventHandler
     {
         private ITestRequestHandler requestHandler;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestExtensionInitializeEventsHandler"/> class.
+        /// Initializes a new instance of the <see cref="TestInitializeEventsHandler"/> class.
         /// </summary>
         /// <param name="requestHandler">test request handler</param>
-        public TestExtensionInitializeEventsHandler(ITestRequestHandler requestHandler)
+        public TestInitializeEventsHandler(ITestRequestHandler requestHandler)
         {
             this.requestHandler = requestHandler;
         }
