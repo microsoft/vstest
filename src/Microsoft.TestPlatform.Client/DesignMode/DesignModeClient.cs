@@ -319,7 +319,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            if(e.Level!=TestMessageLevel.Informational)
+            if(e.Level==TestMessageLevel.Error || e.Level ==TestMessageLevel.Warning)
             {
                 var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
                 this.communicationManager.SendMessage(MessageType.TestMessage, payload);
