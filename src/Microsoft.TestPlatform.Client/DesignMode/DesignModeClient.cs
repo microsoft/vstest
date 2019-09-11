@@ -5,12 +5,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Globalization;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -41,6 +43,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         protected Action<Message> onAckMessageReceived;
 
+        private TestSessionMessageLogger testSessionMessageLogger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
         /// </summary>
@@ -66,6 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
             this.platformEnvironment = platformEnvironment;
+            this.testSessionMessageLogger = TestSessionMessageLogger.Instance;
+            this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
         }
 
         /// <summary>
@@ -308,6 +314,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public void SendTestMessage(TestMessageLevel level, string message)
         {
             var payload = new TestMessagePayload { MessageLevel = level, Message = message };
+            this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+        }
+
+        public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
+        {
+            var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
             this.communicationManager.SendMessage(MessageType.TestMessage, payload);
         }
 

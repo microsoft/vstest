@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 {
     using System;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -63,6 +65,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         {
             DesignModeClient.Initialize();
             Assert.IsNotNull(DesignModeClient.Instance);
+        }
+
+        [TestMethod]
+        public void TestRunMessageHandlerShouldCallCommmunicationManager()
+        {
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
+        
+            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Warning, "message"));
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(),It.IsAny<TestMessagePayload>()), Times.Once());
         }
 
         [TestMethod]
