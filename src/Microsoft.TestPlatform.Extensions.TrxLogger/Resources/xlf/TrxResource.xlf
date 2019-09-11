@@ -129,7 +129,7 @@ Error Details: {1}:{2}</source>
         <note></note>
       </trans-unit>
       <trans-unit id="PrefixAndNameProvidedError">
-        <source>The parameters LogFileName and LogFilePrefix cannot be given together. </source>
+        <source>The parameters LogFileName and LogFilePrefix cannot be used together. </source>
         <target state="new">The parameters LogFileName and LogFilePrefix cannot be given together. </target>
         <note></note>
       </trans-unit>

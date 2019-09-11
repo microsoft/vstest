@@ -467,27 +467,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                     logFilePrefixValue = logFilePrefixValue.Replace(".trx", string.Empty) + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + this.trxFileExtension;
                     this.trxFilePath = Path.Combine(this.testResultsDirPath, logFilePrefixValue);
-                }
-                else
-                {
-                    this.SetDefaultTrxFilePath();
-                }
 
-                return;
+                    return;
+                }
             }
 
-            if (isLogFileNameParameterExists)
+            else if (isLogFileNameParameterExists)
             {
                 if (!string.IsNullOrWhiteSpace(logFileNameValue))
                 {
                     this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                    return;
                 }
-                else
-                {
-                    this.SetDefaultTrxFilePath();
-                }
-
-                return;
             }
 
             this.SetDefaultTrxFilePath();
