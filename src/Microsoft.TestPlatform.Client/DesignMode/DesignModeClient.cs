@@ -101,7 +101,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
             this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
-
             var connectionTimeoutInSecs = EnvironmentHelper.GetConnectionTimeout();
 
             // Wait for the connection to the server and listen for requests.
@@ -319,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         }
 
         /// <summary>
-        /// sends the test session logger warning and error and messages to IDE; 
+        /// Sends the test session logger warning and error messages to IDE; 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
