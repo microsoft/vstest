@@ -302,7 +302,8 @@
       Ejemplos: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</target>
-        <note></note>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Führen Sie Tests aus den angegebenen Dateien. Trennen Sie mehrere Test-Dateinamen
@@ -1210,7 +1211,8 @@
       <trans-unit id="ExecutionTimeFormatString">
         <source> Total time: {0:0.0000} {1}</source>
         <target state="translated"> Tiempo total: {0:0.0000} {1}</target>
-        <note></note>
+        <note>
+        </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testen der Ausführungszeit: {0:0.0000} {1}</target>
         </alt-trans>
@@ -1528,7 +1530,8 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown</source>
         <target state="translated">Pruebas totales: desconocido</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="StringFormatToJoinTwoStrings">
         <source>{0} {1}</source>
@@ -1622,42 +1625,50 @@
       <trans-unit id="Framework35NotSupported">
         <source>Framework35 is not supported. For projects targeting .Net Framework 3.5, test will run in CLR 4.0 "compatibility mode".</source>
         <target state="translated">No se admite Framework35. Para los proyectos que tienen como destino .NET Framework 3.5, la prueba se ejecutará en el "modo de compatibilidad" de CLR 4.0.</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="ProgressIndicatorString">
         <source>Test run in progress</source>
         <target state="translated">Serie de pruebas en curso</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryTotalTests">
         <source>Total tests: {0}</source>
         <target state="translated">Pruebas totales: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryFailedTests">
         <source>     Failed: {0}</source>
         <target state="translated">     Incorrecto: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummaryPassedTests">
         <source>     Passed: {0}</source>
         <target state="translated">     Correcto: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestRunSummarySkippedTests">
         <source>    Skipped: {0}</source>
         <target state="translated">    Omitido: {0}</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="InvalidArgument">
         <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
-        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
-        <note></note>
+        <target state="translated">El argumento {0} no es válido. Use la opción /help para comprobar la lista de argumentos válidos.</target>
+        <note>
+        </note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
         <target state="translated">{0} archivos de prueba en total coincidieron con el patrón especificado.</target>
-        <note></note>
+        <note>
+        </note>
       </trans-unit>
     </body>
   </file>
