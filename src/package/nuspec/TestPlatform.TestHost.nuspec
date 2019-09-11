@@ -37,7 +37,8 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.Utilities.dll" target="lib\netcoreapp2.1\" />
-
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.dll" target="lib\netcoreapp2.1\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.deps.json" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x86\msdia140.dll" target="lib\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x64\msdia140.dll" target="lib\netcoreapp2.1\x64\" />
     

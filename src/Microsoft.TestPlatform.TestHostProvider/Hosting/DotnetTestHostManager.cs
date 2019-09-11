@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private const string DataCollectorRegexPattern = @"Collector.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
-
+        private IEnvironment platformEnvironment;
         private IProcessHelper processHelper;
 
         private IFileHelper fileHelper;
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
         public DotnetTestHostManager()
-            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper())
+            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper(), new PlatformEnvironment())
         {
         }
 
@@ -81,14 +81,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="processHelper">Process helper instance.</param>
         /// <param name="fileHelper">File helper instance.</param>
         /// <param name="dotnetHostHelper">DotnetHostHelper helper instance.</param>
+        /// <param name="platformEnvironment">Platform Environment</param>
         internal DotnetTestHostManager(
             IProcessHelper processHelper,
             IFileHelper fileHelper,
-            IDotnetHostHelper dotnetHostHelper)
+            IDotnetHostHelper dotnetHostHelper,
+            IEnvironment platformEnvironment)
         {
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dotnetHostHelper = dotnetHostHelper;
+            this.platformEnvironment = platformEnvironment;
         }
 
         /// <inheritdoc />
@@ -203,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // If Testhost.exe is available use it
             var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
             var fullExePath = Path.Combine(sourceDirectory, exeName);
-            if (this.fileHelper.Exists(fullExePath))
+            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) && this.fileHelper.Exists(fullExePath))
             {
                 startInfo.FileName = fullExePath;
             }
