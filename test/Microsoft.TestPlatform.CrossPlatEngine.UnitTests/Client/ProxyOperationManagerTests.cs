@@ -528,7 +528,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 bool checkRequired,
                 IProcessHelper processHelper,
                 IFileHelper fileHelper,
-                IEnvironment environment) : base(processHelper, fileHelper, new DotnetHostHelper(fileHelper, environment))
+                IEnvironment environment) : base(processHelper, fileHelper, new DotnetHostHelper(fileHelper, environment), environment)
             {
                 this.isVersionCheckRequired = checkRequired;
             }
