@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
-{ 
+{
     using System;
     using System.Reflection;
 
@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -38,19 +38,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("vstest.console.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("vstest.console.Resources.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -677,6 +674,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument {0} is invalid. Please use the /help option to check the list of valid arguments..
+        /// </summary>
+        internal static string InvalidArgument {
+            get {
+                return ResourceManager.GetString("InvalidArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10.
         /// </summary>
         internal static string InvalidBatchSize {
@@ -1139,23 +1145,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Test run in progress.
-        /// </summary>
-        public static string ProgressIndicatorString
-        {
-            get
-            {
-                return ResourceManager.GetString("ProgressIndicatorString", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to --Port|/Port:&lt;Port&gt;
         ///      The Port for socket connection and receiving the event messages..
         /// </summary>
         internal static string PortArgumentHelp {
             get {
                 return ResourceManager.GetString("PortArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Test run in progress.
+        /// </summary>
+        internal static string ProgressIndicatorString {
+            get {
+                return ResourceManager.GetString("ProgressIndicatorString", resourceCulture);
             }
         }
         
@@ -1259,10 +1263,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         
         /// <summary>
         ///   Looks up a localized string similar to [TestFileNames]
-        ///      Run tests from the specified files. Separate multiple test file names
-        ///      by spaces.
+        ///      Run tests from the specified files or wild card pattern. Separate multiple test file names or pattern
+        ///      by spaces. Set console logger verbosity to detailed to view matched test files.
         ///      Examples: mytestproject.dll
-        ///                mytestproject.dll myothertestproject.exe.
+        ///                mytestproject.dll myothertestproject.exe
+        ///                testproject*.dll my*project.dll.
         /// </summary>
         internal static string RunTestsArgumentHelp {
             get {
@@ -1607,19 +1612,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("TestSourceFileNotFound", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to A total of {0} test source files are discovered..
+        ///   Looks up a localized string similar to A total of {0} test files matched the specified pattern..
         /// </summary>
-        internal static string TestSourcesDiscovered
-        {
-            get
-            {
+        internal static string TestSourcesDiscovered {
+            get {
                 return ResourceManager.GetString("TestSourcesDiscovered", resourceCulture);
             }
         }
-
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Time elapsed :.
         /// </summary>

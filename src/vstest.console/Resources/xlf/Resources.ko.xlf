@@ -295,11 +295,12 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      지정한 파일에서 테스트를 실행합니다. 테스트 파일 이름이 여러 개이면 공백으로
-      구분합니다.
+        <target state="translated">[TestFileNames]
+      지정된 파일 또는 와일드카드 패턴에서 테스트를 실행합니다. 여러 테스트 파일 이름 또는 패턴을
+      공백으로 구분합니다. 일치한 테스트 파일을 보려면 콘솔 로거 세부 정보 표시를 [상세]로 설정합니다.
       예: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1645,9 +1646,14 @@
         <target state="translated">    건너뜀: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">지정된 패턴과 일치한 총 테스트 파일 수는 {0}개입니다.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -295,11 +295,12 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[テストファイル名]
-      指定されたファイルからテストを実行します。複数のテスト ファイルがある場合は、
-      名前をスペースで区切ってください。
+        <target state="translated">[TestFileNames]
+      指定されたファイルまたはワイルド カード パターンからテストを実行します。複数のテスト ファイル名または
+      パターンをスペースで区切ります。一致したテスト ファイルを表示するには、コンソール ロガーの詳細度を detailed に設定します。
       例: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1645,9 +1646,14 @@
         <target state="translated">    スキップ: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">合計 {0} 個のテスト ファイルが指定されたパターンと一致しました。</target>
         <note></note>
       </trans-unit>
     </body>

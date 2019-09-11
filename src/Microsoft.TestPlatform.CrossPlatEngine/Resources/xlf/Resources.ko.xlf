@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="new">Testhost 프로세스가 종료되었습니다(오류: {0}).</target>
+        <target state="translated">Testhost 프로세스가 종료되었습니다(오류: {0}). 자세한 내용은 진단 로그를 확인하세요.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
@@ -204,7 +204,7 @@
       </trans-unit>
       <trans-unit id="TestDiscoveryCancelled">
         <source>Discovery of tests cancelled.</source>
-        <target state="new">Discovery of tests cancelled.</target>
+        <target state="translated">테스트 검색이 취소되었습니다.</target>
         <note></note>
       </trans-unit>
     </body>

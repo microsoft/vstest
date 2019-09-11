@@ -57,12 +57,12 @@
       </trans-unit>
       <trans-unit id="InactivityTimeout">
         <source>The specified inactivity time of {0} minute/s has elapsed. Collecting a dump and killing the test host process.</source>
-        <target state="new">The specified inactivity time {0} has elapsed. Collecting a dump and killing the test host process.</target>
+        <target state="translated">Указанное время бездействия ({0} мин) прошло. Сбор дампа и завершение хост-процесса тестирования.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="UnexpectedValueForInactivityTimespanValue">
         <source>Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input.</source>
-        <target state="new">Unexpected value {0} provided for ExpectedExecutionTimeOfLongestRunningTestInMinutes. Please provide a positive integer as input.</target>
+        <target state="translated">Для ExpectedExecutionTimeOfLongestRunningTestInMinutes указано непредвиденное значение {0}. Введите положительное целое число в качестве входных данных.</target>
         <note></note>
       </trans-unit>
     </body>

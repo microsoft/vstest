@@ -294,11 +294,12 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      从指定文件运行测试。使用空格分隔多个测试文件
-      名称。
-      实例: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+        <target state="translated">[TestFileNames]
+      从指定的文件或通配符模式运行测试。通过空格将多个测试文件或模式分隔开来。
+      将控制台记录器详细级别设置为“详细”以查看匹配的测试文件。
+      示例: mytestproject.dll
+                mytestproject.dll myothertestproject.exe
+                testproject*.dll my*project.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1644,9 +1645,14 @@
         <target state="translated">    跳过数: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">总共 {0} 个测试文件与指定模式相匹配。</target>
         <note></note>
       </trans-unit>
     </body>

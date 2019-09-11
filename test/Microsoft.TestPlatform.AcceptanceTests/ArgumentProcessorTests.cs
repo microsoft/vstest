@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [TestMethod]
         [NetFullTargetFrameworkDataSource]
-        public void PassingInvalidArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
+        public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
@@ -41,15 +41,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             //Check for help usage, description and arguments text.
-            this.StdOutputContains("Usage: vstest.console.exe");
-            this.StdOutputContains("Description: Runs tests from the specified files.");
-            this.StdOutputContains("Arguments:");
+            this.StdOutputDoesNotContains("Usage: vstest.console.exe");
+            this.StdOutputDoesNotContains("Description: Runs tests from the specified files.");
+            this.StdOutputDoesNotContains("Arguments:");
 
             //Check for help options text
-            this.StdOutputContains("Options:");
+            this.StdOutputDoesNotContains("Options:");
 
             //Check for help examples text
-            this.StdOutputContains("To run tests: >vstest.console.exe tests.dll");
+            this.StdOutputDoesNotContains("To run tests: >vstest.console.exe tests.dll");
+
+            //Check for message which guides using help option
+            this.StdErrorContains("Please use the /help option to check the list of valid arguments");
         }
     }
 }

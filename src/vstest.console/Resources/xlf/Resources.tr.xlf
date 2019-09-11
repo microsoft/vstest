@@ -295,11 +295,12 @@
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe
                 testproject*.dll my*project.dll</source>
-        <target state="new">[TestFileNames]
-      Belirtilen dosyalardan testleri çalıştırır. Birden fazla test dosyası
-      adını boşlukla ayırın.
-      Örnekler: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
+        <target state="translated">[TestFileNames]
+      Belirtilen dosyalardaki veya joker karakter desenindeki testleri çalıştırın. Birden çok test dosyası adını veya desenini
+      boşluklarla ayırın. Eşleşen test dosyalarını görüntülemek için konsol günlükçüsü ayrıntı düzeyini ayrıntılı olarak ayarlayın.
+      Örnekler: testprojem.dll
+                testprojem.dll diğertestprojem.exe
+                testprojem*.dll diğer*projem.dll</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
@@ -1645,9 +1646,14 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
         <target state="translated">    Atlandı: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InvalidArgument">
+        <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
+        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
         <source>A total of {0} test files matched the specified pattern.</source>
-        <target state="new">A total of {0} test source files are discovered.</target>
+        <target state="translated">Toplam {0} test dosyası belirtilen desenle eşleşti.</target>
         <note></note>
       </trans-unit>
     </body>

@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="new">Testhost işleminden hata ile çıkıldı: {0}</target>
+        <target state="translated">Testhost işleminden şu hatayla çıkıldı: {0}. Daha fazla bilgi için lütfen tanılama günlüklerine bakın.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
@@ -204,7 +204,7 @@
       </trans-unit>
       <trans-unit id="TestDiscoveryCancelled">
         <source>Discovery of tests cancelled.</source>
-        <target state="new">Discovery of tests cancelled.</target>
+        <target state="translated">Test bulma iptal edildi.</target>
         <note></note>
       </trans-unit>
     </body>

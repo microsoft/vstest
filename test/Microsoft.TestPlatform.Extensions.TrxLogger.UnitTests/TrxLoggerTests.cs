@@ -14,6 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     using System.Xml.Linq;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using VisualStudio.TestPlatform.ObjectModel;
@@ -179,12 +180,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> fail1 = new Mock<TestResultEventArgs>(failResult1);
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-
             this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
-
 
             Assert.AreEqual(this.testableTrxLogger.PassedTestCount, 2, "Passed Tests");
             Assert.AreEqual(this.testableTrxLogger.FailedTestCount, 1, "Failed Tests");
@@ -215,12 +214,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> fail1 = new Mock<TestResultEventArgs>(failResult1);
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-
             this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
-
 
             Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 4, "Passed Tests");
         }
@@ -656,7 +653,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
 
-            List<String> listCategoriesActual = Converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
+            var converter = new Converter(new Mock<IFileHelper>().Object);
+            List<String> listCategoriesActual = converter.GetCustomPropertyValueFromTestCase(testCase1, "MSTestDiscoverer.TestCategory");
 
             List<String> listCategoriesExpected = new List<string>();
             listCategoriesExpected.Add("ClassLevel");

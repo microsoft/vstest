@@ -19,6 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using NuGet.Frameworks;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using ObjectModel.Logging;
     using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
@@ -33,10 +35,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     {
         #region Fields
 
+        #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// </summary>
+        public TrxLogger():
+            this (new Utilities.Helpers.FileHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrxLogger"/> class. 
+        /// Constructor with Dependency injection. Used for unit testing.
+        /// </summary>
+        /// <param name="fileHelper">The file helper interface.</param>
+        protected TrxLogger(IFileHelper fileHelper)
+        {
+            this.converter = new Converter(fileHelper);
+        }
+
+        #endregion
+
         /// <summary>
         /// Cache the TRX file path
         /// </summary>
         private string trxFilePath;
+
+        // The converter class
+        private Converter converter;
 
         private TrxLoggerObjectModel.TestRun testRun;
         private ConcurrentDictionary<Guid, TrxLoggerObjectModel.ITestResult> results;
@@ -244,11 +271,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             if (e.Result.Outcome == ObjectModel.TestOutcome.Skipped)
                 this.HandleSkippedTest(e.Result);
 
-            var testType = Converter.GetTestType(e.Result);
-            var executionId = Converter.GetExecutionId(e.Result);
+            var testType = this.converter.GetTestType(e.Result);
+            var executionId = this.converter.GetExecutionId(e.Result);
 
             // Setting parent properties like parent result, parent test element, parent execution id.
-            var parentExecutionId = Converter.GetParentExecutionId(e.Result);
+            var parentExecutionId = this.converter.GetParentExecutionId(e.Result);
             var parentTestResult = GetTestResult(parentExecutionId);
             var parentTestElement = (parentTestResult != null) ? GetTestElement(parentTestResult.Id.TestId) : null;
 
@@ -335,8 +362,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             List<string> errorMessages = new List<string>();
-            List<CollectorDataEntry> collectorEntries = Converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
-            IList<String> resultFiles = Converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
+            List<CollectorDataEntry> collectorEntries = this.converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
+            IList<String> resultFiles = this.converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
 
             if (errorMessages.Count > 0)
             {
@@ -490,7 +517,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private void SetDefaultTrxFilePath()
         {
             var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory + ".trx";
-            this.trxFilePath = FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
+            this.trxFilePath = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 
         /// <summary>
@@ -512,7 +539,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.testRun.Started = this.testRunStartTime;
 
             // Save default test settings
-            string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
+            string runDeploymentRoot = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
             TestRunConfiguration testrunConfig = new TestRunConfiguration("default");
             testrunConfig.RunDeploymentRootDirectory = runDeploymentRoot;
             this.testRun.RunConfiguration = testrunConfig;
@@ -569,7 +596,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             TestCase testCase = rockSteadyTestResult.TestCase;
-            Guid testId = Converter.GetTestId(testCase);
+            Guid testId = this.converter.GetTestId(testCase);
 
             // Scenario for inner test case when parent test element is not present.
             var testName = testCase.DisplayName;
@@ -591,7 +618,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             // Create test element
             if (testElement == null)
             {
-                testElement = Converter.ToTestElement(testId, executionId, parentExecutionId, testName, testType, testCase);
+                testElement = this.converter.ToTestElement(testId, executionId, parentExecutionId, testName, testType, testCase);
                 testElements.TryAdd(testId, testElement);
             }
 
@@ -628,8 +655,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             ITestElement testElement, ITestElement parentTestElement, ITestResult parentTestResult, ObjectModel.TestResult rocksteadyTestResult)
         {
             // Create test result
-            TrxLoggerObjectModel.TestOutcome testOutcome = Converter.ToOutcome(rocksteadyTestResult.Outcome);
-            var testResult = Converter.ToTestResult(testElement.Id.Id, executionId, parentExecutionId, testElement.Name,
+            TrxLoggerObjectModel.TestOutcome testOutcome = this.converter.ToOutcome(rocksteadyTestResult.Outcome);
+            var testResult = this.converter.ToTestResult(testElement.Id.Id, executionId, parentExecutionId, testElement.Name,
                 this.testResultsDirPath, testType, testElement.CategoryId, testOutcome, this.testRun, rocksteadyTestResult);
 
             // Normal result scenario

@@ -1,13 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using System.IO;
-using System.Xml;
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Linq;
+    using System.Text;
+    using System.IO;
+    using System.Xml;
 
     [TestClass]
     public class LoggerTests : AcceptanceTestBase
@@ -30,6 +30,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var trxLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults",  trxFileName);
             Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        public void HtmlLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var htmlFileName = "TestResults.html";
+            arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
+            this.InvokeVsTest(arguments);
+
+            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /logger:\"html;LogFileName={htmlFileName}\"");
+            arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
+            this.InvokeVsTest(arguments);
+
+            var htmlLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", htmlFileName);
+            IsFileAndContentEqual(htmlLogFilePath);
         }
 
         [TestMethod]
@@ -70,6 +90,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var trxFilePaths = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "TestResults"), trxFileNamePattern + "_net*.trx");
             Assert.IsTrue(trxFilePaths.Count() > 1);
+            
+        }
+        
+        [TestMethod]
+        [NetCoreTargetFrameworkDataSource]
+        public void HtmlLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            var htmlFileName = "TestResults.html";
+            arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/htmlLogger/v1;LogFileName{htmlFileName}\"");
+            this.InvokeVsTest(arguments);
+
+            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/htmlLogger/v1;LogFileName={htmlFileName}\"");
+            arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
+            this.InvokeVsTest(arguments);
+
+            var htmlLogFilePath = Path.Combine(Directory.GetCurrentDirectory(), "TestResults", htmlFileName);
+            IsFileAndContentEqual(htmlLogFilePath);
         }
 
         private bool IsValidXml(string xmlFilePath)
@@ -85,6 +126,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             catch (XmlException)
             {
                 return false;
+            }
+        }
+
+        private void IsFileAndContentEqual(string filePath)
+        {
+            StringBuilder sb = new StringBuilder();
+            using (var sr = new StreamReader(filePath))
+            {
+                sb.Append(sr.ReadToEnd());
+            }
+            string filePathContent = sb.ToString();
+            string[] divs = { "Total tests", "Passed", "Failed", "Skipped", "Run duration", "Pass percentage", "SampleUnitTestProject.UnitTest1.PassingTest" };
+            foreach (string str in divs)
+            {
+                StringAssert.Contains(filePathContent, str);
             }
         }
     }

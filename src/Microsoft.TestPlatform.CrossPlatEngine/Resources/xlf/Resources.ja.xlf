@@ -154,7 +154,7 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
-        <target state="new">Testhost プロセスが次のエラーにより終了しました: {0}</target>
+        <target state="translated">Testhost プロセスがエラーで終了しました: {0}。詳細については、診断ログを確認してください。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
@@ -204,7 +204,7 @@
       </trans-unit>
       <trans-unit id="TestDiscoveryCancelled">
         <source>Discovery of tests cancelled.</source>
-        <target state="new">Discovery of tests cancelled.</target>
+        <target state="translated">テストの検出が取り消されました。</target>
         <note></note>
       </trans-unit>
     </body>
