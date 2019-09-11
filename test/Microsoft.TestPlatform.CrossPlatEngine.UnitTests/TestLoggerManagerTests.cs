@@ -110,6 +110,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         }
 
         [TestMethod]
+        public void GetTargetFrameworkShouldReturnFrameworkProvidedInRunSettings()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?> 
+                                        <RunSettings>     
+                                          <RunConfiguration> 
+                                            <MaxCpuCount>0</MaxCpuCount>       
+                                            <TargetPlatform> x64 </TargetPlatform>     
+                                            <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion> 
+                                          </RunConfiguration>     
+                                        </RunSettings> ";
+
+            var testLoggerManager = new DummyTestLoggerManager();
+            var framework = testLoggerManager.GetTargetFramework(runSettingsXml);
+
+            Assert.AreEqual(framework.Name, ".NETFramework,Version=v4.5");
+        }
+
+        [TestMethod]
         public void HandleTestRunMessageShouldInvokeTestRunMessageHandlerOfLoggers()
         {
             counter = 0;
@@ -1065,7 +1083,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
             
@@ -1105,7 +1123,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(2, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.IsFalse(ValidLoggerWithParameters.parameters.TryGetValue("Key1", out var key1Value));
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
 
@@ -1146,7 +1164,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value3", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
 
@@ -1217,7 +1235,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
             mockMetricsCollection.Verify(
@@ -1255,7 +1273,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
             mockMetricsCollection.Verify(
@@ -1293,7 +1311,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
             mockMetricsCollection.Verify(
@@ -1331,7 +1349,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
             mockMetricsCollection.Verify(
@@ -1375,7 +1393,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual("DummyTestResultsFolder", ValidLoggerWithParameters.parameters["testRunDirectory"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);
@@ -1419,7 +1437,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             testLoggerManager.Initialize(settingsXml);
 
             Assert.AreEqual(1, ValidLoggerWithParameters.counter);
-            Assert.AreEqual(3, ValidLoggerWithParameters.parameters.Count); // One additional because of testRunDirectory
+            Assert.AreEqual(4, ValidLoggerWithParameters.parameters.Count); // Two additional because of testRunDirectory and targetFramework
             Assert.AreEqual("Value1", ValidLoggerWithParameters.parameters["Key1"]);
             Assert.AreEqual(Constants.DefaultResultsDirectory, ValidLoggerWithParameters.parameters["testRunDirectory"]);
             Assert.AreEqual("Value2", ValidLoggerWithParameters.parameters["Key2"]);

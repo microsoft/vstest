@@ -1,13 +1,13 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using System.IO;
-using System.Xml;
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.Linq;
     using System.Text;
+    using System.IO;
+    using System.Xml;
 
     [TestClass]
     public class LoggerTests : AcceptanceTestBase
@@ -72,6 +72,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(IsValidXml(trxLogFilePath), "Invalid content in Trx log file");
         }
 
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+        public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);            
+            var trxFileNamePattern = "TestResults";
+
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFilePrefix={trxFileNamePattern}\"");
+            this.InvokeVsTest(arguments);
+
+            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /logger:\"logger://Microsoft/TestPlatform/TrxLogger/v1;LogFilePrefix={trxFileNamePattern}\"");
+            arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
+            this.InvokeVsTest(arguments);
+
+            var trxFilePaths = Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), "TestResults"), trxFileNamePattern + "_net*.trx");
+            Assert.IsTrue(trxFilePaths.Count() > 1);
+            
+        }
+        
         [TestMethod]
         [NetCoreTargetFrameworkDataSource]
         public void HtmlLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)

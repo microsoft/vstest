@@ -48,6 +48,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         }
 
         /// <summary>
+        /// Gets the target framework from the run configuration
+        /// </summary>
+        /// <param name="runConfiguration">Test run configuration</param>
+        /// <returns>Target Framework</returns>
+        public static Framework GetTargetFramework(RunConfiguration runConfiguration)
+        {
+            Framework targetFramework = null;
+            if (runConfiguration != null)
+            {
+                // It will get target framework from runsettings 
+                targetFramework = runConfiguration.TargetFramework;
+            }
+
+            return targetFramework;
+        }
+
+        /// <summary>
         /// Gets the solution directory from run configuration
         /// </summary>
         /// <param name="runConfiguration">Test run configuration</param>
