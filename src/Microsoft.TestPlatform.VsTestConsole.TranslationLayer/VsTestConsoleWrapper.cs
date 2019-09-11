@@ -140,7 +140,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         /// <inheritdoc/>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
-        {            
+        {
             this.EnsureInitialized();
 
             this.pathToAdditionalExtensions = pathToAdditionalExtensions.ToList();

@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <returns>Port Number of hosted server on this side</returns>
         public int InitializeCommunication()
         {
-            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Initializing Communication with vstest.console.exe.");
+            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
 
             this.processExitCancellationTokenSource = new CancellationTokenSource();
             this.handShakeSuccessful = false;
@@ -92,6 +92,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.handShakeComplete.Set();
             }
 
+            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
+
             return port;
         }
 
@@ -109,7 +111,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
         {
-            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Initializing Communication with vstest.console.exe.");
+            EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
 
             this.processExitCancellationTokenSource = new CancellationTokenSource();
             this.handShakeSuccessful = false;
@@ -130,13 +132,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.handShakeComplete.Set();
             }
 
+            EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
+
             return this.handShakeSuccessful ? port : -1;
         }
 
         /// <inheritdoc/>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
-            EqtTrace.Info("VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions.");
+            EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToArray())}.");
             this.communicationManager.SendMessage(MessageType.ExtensionsInitialize, pathToAdditionalExtensions, this.protocolVersion);
         }
 
@@ -354,7 +358,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was revceived from the runner");
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was received from the runner");
                 }
                 else
                 {
