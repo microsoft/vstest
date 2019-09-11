@@ -68,13 +68,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         }
 
         [TestMethod]
-        public void TestRunMessageHandlerShouldCallCommmunicationManager()
+        public void TestRunMessageHandlerShouldCallCommmunicationManagerIfMessageisError()
         {
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
         
-            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Warning, "message"));
+            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Error, "message"));
 
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(),It.IsAny<TestMessagePayload>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunMessageHandlerShouldCallCommmunicationManagerIfMessageisWarning()
+        {
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
+
+            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Warning, "message"));
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunMessageHandlerShouldNotCallCommmunicationManagerIfMessageisInformational()
+        {
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>()));
+
+            this.designModeClient.TestRunMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, "message"));
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<TestMessagePayload>()), Times.Never());
         }
 
         [TestMethod]

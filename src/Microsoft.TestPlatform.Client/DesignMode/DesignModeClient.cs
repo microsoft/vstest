@@ -319,8 +319,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+            if(e.Level!=TestMessageLevel.Informational)
+            {
+                var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
+                this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+            }           
         }
 
         private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool skipTestHostLaunch)
