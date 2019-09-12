@@ -114,7 +114,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void StartSession()
         {
-            EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
+            }
 
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
