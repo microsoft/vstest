@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -145,7 +145,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 catch (FileLoadException e)
                 {
                     EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
-                    string fileLoadErrorMessage = string.Format(CultureInfo.CurrentUICulture, CommonResources.FailedToLoadAdapaterFile, file);
+                    string entensionTypeInfo = TestPlatformConstants.entensionTypeInfo.Where(x => x.Equals(pluginInfos.GetType().GetGenericArguments()[1].GetTypeInfo().Name)).Select(x=>x).FirstOrDefault().ToString();                
+                    string fileLoadErrorMessage = string.Format(CultureInfo.CurrentUICulture, CommonResources.FailedToLoadAdapaterFile, entensionTypeInfo, file);
                     TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, fileLoadErrorMessage);
                 }
                 catch (Exception e)

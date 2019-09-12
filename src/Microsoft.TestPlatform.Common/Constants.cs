@@ -1,8 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
+
 namespace Microsoft.VisualStudio.TestPlatform.Common
 {
+    using System.Collections.Generic;
     /// <summary>
     /// Defines the defaults used across different components.
     /// </summary>
@@ -12,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// string in the vstest.console.exe.config that specifies the bound on no of jobs in the job queue.
         /// </summary>
         public const string MaxNumberOfEventsLoggerEventQueueCanHold = "MaxNumberOfEventsLoggerEventQueueCanHold";
-        
+
         /// <summary>
         /// Default bound on the job queue.
         /// </summary>
@@ -63,5 +66,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Pattern used to find the run time providers library using String.EndWith
         /// </summary>
         public const string RunTimeEndsWithPattern = @"RuntimeProvider.dll";
+
+        /// <summary>
+        /// entensionTypeInfo lists the type info of extensions
+        /// </summary>
+        public static readonly  IList<string> entensionTypeInfo = new List<string>()
+        {
+            {"TestExecutorPluginInformation"},
+            {"TestDiscovererPluginInformation"},
+            {"TestSettingsProviderPluginInformation"}
+        };
     }
 }

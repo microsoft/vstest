@@ -270,7 +270,7 @@
         <note />
       </trans-unit>
       <trans-unit id="FailedToLoadAdapaterFile">
-        <source>TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
+        <source>The extension of type '{0}' is failed to load extensions from file '{1}'.</source>
         <target state="new">TestPluginDiscoverer: Failed to load extensions from file '{0}'. Please use /diag for more information.</target>
         <note></note>
       </trans-unit>
