@@ -5,12 +5,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Globalization;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -41,6 +43,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         protected Action<Message> onAckMessageReceived;
 
+        private TestSessionMessageLogger testSessionMessageLogger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
         /// </summary>
@@ -66,6 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
             this.platformEnvironment = platformEnvironment;
+            this.testSessionMessageLogger = TestSessionMessageLogger.Instance;
+            this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
         }
 
         /// <summary>
@@ -171,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.StartDiscovery:
                             {
-                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message); 
+                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
                                 this.StartDiscovery(discoveryPayload, testRequestManager);
                                 break;
                             }
@@ -309,6 +315,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         {
             var payload = new TestMessagePayload { MessageLevel = level, Message = message };
             this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+        }
+
+        /// <summary>
+        /// Sends the test session logger warning and error messages to IDE; 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
+        {
+            if (e.Level == TestMessageLevel.Error || e.Level == TestMessageLevel.Warning)
+            {
+                var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
+                this.communicationManager.SendMessage(MessageType.TestMessage, payload);
+            }
         }
 
         private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool skipTestHostLaunch)
