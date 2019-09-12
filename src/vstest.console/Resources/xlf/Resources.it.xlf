@@ -1648,7 +1648,7 @@
       </trans-unit>
       <trans-unit id="InvalidArgument">
         <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
-        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <target state="translated">L'argomento {0} non è valido. Usare l'opzione/help per verificare l'elenco di argomenti validi.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
