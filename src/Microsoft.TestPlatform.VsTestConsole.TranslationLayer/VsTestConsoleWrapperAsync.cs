@@ -90,6 +90,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task StartSessionAsync()
         {
+            EqtTrace.Info("VsTestConsoleWrapperAsync.StartSessionAsync: Starting VsTestConsoleWrapper session");
+
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
             var timeout = EnvironmentHelper.GetConnectionTimeout();

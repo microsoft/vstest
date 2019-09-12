@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package >
   <metadata>
     <id>Microsoft.TestPlatform.TestHost</id>
@@ -41,7 +41,14 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\testhost.deps.json" target="lib\netcoreapp2.1\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x86\msdia140.dll" target="lib\netcoreapp2.1\x86\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\x64\msdia140.dll" target="lib\netcoreapp2.1\x64\" />
+    
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.dll" target="build\netcoreapp2.1\x64" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x64\testhost.exe" target="build\netcoreapp2.1\x64" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.dll" target="build\netcoreapp2.1\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\win7-x86\testhost.x86.exe" target="build\netcoreapp2.1\x86\" />
 
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp2.1\Microsoft.TestPlatform.TestHost.props" target="build\netcoreapp2.1\" />
+    
     <!-- UWP -->
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\testhost.dll" target="lib\uap10.0\" />
     <file src="Microsoft.TestPlatform.TestHost\uap10.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\uap10.0\" />

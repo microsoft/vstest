@@ -1648,7 +1648,7 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
       </trans-unit>
       <trans-unit id="InvalidArgument">
         <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
-        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <target state="translated">O argumento {0} é inválido. Use a opção /help para verificar a lista de argumentos válidos.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">
