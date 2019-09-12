@@ -155,8 +155,7 @@
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}. Please check the diagnostic logs for more information.</source>
         <target state="translated">Testhost 處理序已結束。錯誤: {0}。如需詳細資訊，請查看診斷記錄。</target>
-        <note>
-        </note>
+        <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
@@ -206,8 +205,7 @@
       <trans-unit id="TestDiscoveryCancelled">
         <source>Discovery of tests cancelled.</source>
         <target state="translated">已取消測試的探索。</target>
-        <note>
-        </note>
+        <note></note>
       </trans-unit>
     </body>
   </file>
