@@ -228,6 +228,8 @@ function Publish-Package
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20")
     $testhostCorePackageX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
     $testhostCorePackageX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
+    $testhostCorePackageTempX64Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X64_Runtime")
+    $testhostCorePackageTempX86Dir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\publishTemp\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore20\$TPB_X86_Runtime")
     $testhostUapPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkUap")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $settingsMigratorProject = Join-Path $env:TP_ROOT_DIR "src\SettingsMigrator\SettingsMigrator.csproj"
@@ -257,12 +259,18 @@ function Publish-Package
     Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostCorePackageDir
     Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore20 $testhostUapPackageDir
-    Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore20 $TPB_X64_Runtime false $testhostCorePackageX64Dir
+    Publish-PackageWithRuntimeInternal $testHostProject $TPB_TargetFrameworkCore20 $TPB_X64_Runtime false $testhostCorePackageTempX64Dir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
-    Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore20 $TPB_X86_Runtime false $testhostCorePackageX86Dir
-	
+    Publish-PackageWithRuntimeInternal $testHostx86Project $TPB_TargetFrameworkCore20 $TPB_X86_Runtime false $testhostCorePackageTempX86Dir
+
+    # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
+    New-Item -ItemType directory -Path $testhostCorePackageX64Dir -Force | Out-Null
+    Copy-Item $testhostCorePackageTempX64Dir\testhost* $testhostCorePackageX64Dir -Force -recurse
+    New-Item -ItemType directory -Path $testhostCorePackageX86Dir -Force | Out-Null
+    Copy-Item $testhostCorePackageTempX86Dir\testhost.x86* $testhostCorePackageX86Dir -Force -recurse
+
     # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $coreCLRFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $coreCLRFull_Dir
