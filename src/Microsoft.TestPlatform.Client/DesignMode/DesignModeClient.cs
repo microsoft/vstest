@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.StartDiscovery:
                             {
-                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message); 
+                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
                                 this.StartDiscovery(discoveryPayload, testRequestManager);
                                 break;
                             }
@@ -324,11 +324,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="e"></param>
         public void TestRunMessageHandler(object sender, TestRunMessageEventArgs e)
         {
-            if(e.Level==TestMessageLevel.Error || e.Level ==TestMessageLevel.Warning)
+            if (e.Level == TestMessageLevel.Error || e.Level == TestMessageLevel.Warning)
             {
                 var payload = new TestMessagePayload { MessageLevel = e.Level, Message = e.Message };
                 this.communicationManager.SendMessage(MessageType.TestMessage, payload);
-            }           
+            }
         }
 
         private void StartTestRun(TestRunRequestPayload testRunPayload, ITestRequestManager testRequestManager, bool skipTestHostLaunch)
