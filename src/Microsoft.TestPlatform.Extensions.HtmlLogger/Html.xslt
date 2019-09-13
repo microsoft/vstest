@@ -109,7 +109,7 @@
   
    <xsl:template match="tp:RunLevelMessageInformational">
     <div>
-    <h2>Run Level Information messages</h2>
+    <h2>Informational messages</h2>
       <xsl:for-each select ="a:string">
         <span><xsl:value-of select = "." /></span><br />
       </xsl:for-each>
@@ -118,7 +118,7 @@
   
   <xsl:template match="tp:RunLevelMessageErrorAndWarning">
     <div>
-      <h2>Run Level error and warning messages</h2>
+      <h2>Error and Warning messages</h2>
       <xsl:for-each select ="a:string">
         <span><xsl:value-of select = "." /></span><br />
       </xsl:for-each>
