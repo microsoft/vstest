@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The extension of type &apos;{0}&apos; is failed to load extensions from file &apos;{1}&apos;..
+        ///   Looks up a localized string similar to Failed to load extensions from file &apos;{0}&apos;. Please use /diag for more information..
         /// </summary>
         internal static string FailedToLoadAdapaterFile {
             get {

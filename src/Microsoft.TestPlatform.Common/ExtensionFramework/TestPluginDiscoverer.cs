@@ -27,6 +27,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     {
         private IFileHelper fileHelper;
 
+        private static List<string> UnloadableFiles = new List<string>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginDiscoverer"/> class. 
         /// </summary>
@@ -103,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.
             // Include these two dll's if so far no adapters(extensions) were found, & let Assembly.Load() fail if they are not present.
             extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
-        }
+        }       
 
         /// <summary>
         /// Gets test extension information from the given colletion of files.
@@ -132,6 +134,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // Scan each of the files for data extensions.
             foreach (var file in files)
             {
+                if(UnloadableFiles.Contains(file))
+                {
+                    continue;
+                }
                 try
                 {
                     Assembly assembly = null;
@@ -142,17 +148,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
                     }
                 }
-                catch (FileLoadException e)
-                {
-                    EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
-                    string entensionTypeInfo = TestPlatformConstants.entensionTypeInfo.Where(x => x.Equals(pluginInfos.GetType().GetGenericArguments()[1].GetTypeInfo().Name)).Select(x=>x).FirstOrDefault().ToString();                
-                    string fileLoadErrorMessage = string.Format(CultureInfo.CurrentUICulture, CommonResources.FailedToLoadAdapaterFile, entensionTypeInfo, file);
-                    TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, fileLoadErrorMessage);
-                }
                 catch (Exception e)
                 {
                     EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
-                    continue;
+
+                    if (e is FileLoadException)
+                    {             
+                        string fileLoadErrorMessage = string.Format(CultureInfo.CurrentUICulture, CommonResources.FailedToLoadAdapaterFile, file);
+                        TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, fileLoadErrorMessage);
+                        UnloadableFiles.Add(file);
+                    }
                 }
             }
         }
@@ -172,8 +177,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(pluginInfos != null, "null pluginInfos");
-
             Type[] types;
+
             try
             {
                 types = assembly.GetTypes();
@@ -189,7 +194,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         EqtTrace.Warning("LoaderExceptions: {0}", ex);
                     }
                 }
-
                 return;
             }
 

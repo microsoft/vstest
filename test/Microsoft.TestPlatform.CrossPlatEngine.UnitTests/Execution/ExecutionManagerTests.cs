@@ -11,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
@@ -33,16 +34,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private ExecutionManager executionManager;
         private TestExecutionContext testExecutionContext;
         private Mock<IRequestData> mockRequestData;
+        private TestSessionMessageLogger sessionLogger;
 
         [TestInitialize]
         public void TestInit()
         {
             this.mockRequestData = new Mock<IRequestData>();
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(new NoOpMetricsCollection());
+            this.sessionLogger = TestSessionMessageLogger.Instance;
             this.executionManager = new ExecutionManager(new RequestData
-                                                             {
-                                                                 MetricsCollection = new NoOpMetricsCollection()
-                                                             });
+            {
+                MetricsCollection = new NoOpMetricsCollection()
+            });
 
             TestPluginCache.Instance = null;
 
@@ -209,6 +212,49 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             // Verify that TestRunComplete get called and error message are getting logged
             mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
             mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldVerifyWarningMessageIfAdapterFailedToLoad()
+        {
+            var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
+            var mockLogger = new Mock<ITestMessageEventHandler>();
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { assemblyLocation },
+                () => { });
+
+            //Act
+            this.executionManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);           
+
+            //when handler instance returns warning       
+            sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning");
+
+            // Verify.
+            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning"), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldVerifyThatItIsNotNullIfAdapterFailedToLoad()
+        {
+            var mockLogger = new Mock<ITestMessageEventHandler>();
+
+            //when handler instance is not null
+            sessionLogger.SendMessage(TestMessageLevel.Informational, "verify that it is not null");
+
+            // Verify.
+            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Informational, "verify that it is not null"), Times.Never);
+        }
+
+        [TestMethod]
+        public void InitializeShouldVerifyThatItIsNullIfAdapterFailedToLoad()
+        {
+            var mockLogger = new Mock<ITestMessageEventHandler>();
+            
+            //when handler instance is null
+            sessionLogger.SendMessage(It.IsAny<TestMessageLevel>(), "verify null");
+
+            // Verify.
+            mockLogger.Verify(rd => rd.HandleLogMessage(It.IsAny<TestMessageLevel>(), "verify null"), Times.Never);
         }
     }
 }
