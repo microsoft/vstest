@@ -317,10 +317,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             else
             {
                 //Should be logged only when tests found - if adapter failed to load then there would be no tests to process
-                EqtTrace.Warning(string.Format(
-                        CultureInfo.CurrentUICulture,
-                        CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
-                        sourcesString));
+                logger.SendMessage(
+                   TestMessageLevel.Warning, string.Format(
+                       CultureInfo.CurrentUICulture,
+                       CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
+                       sourcesString));
             }
         }
 
