@@ -66,15 +66,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Pattern used to find the run time providers library using String.EndWith
         /// </summary>
         public const string RunTimeEndsWithPattern = @"RuntimeProvider.dll";
-
-        /// <summary>
-        /// entensionTypeInfo lists the type info of extensions
-        /// </summary>
-        public static readonly  IList<string> entensionTypeInfo = new List<string>()
-        {
-            {"TestExecutorPluginInformation"},
-            {"TestDiscovererPluginInformation"},
-            {"TestSettingsProviderPluginInformation"}
-        };
     }
 }
