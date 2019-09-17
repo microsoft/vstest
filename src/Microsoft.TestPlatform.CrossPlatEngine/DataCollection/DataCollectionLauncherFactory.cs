@@ -28,7 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
                 foreach (var dataCollectorSettings in dataCollectionRunSettings.DataCollectorSettingsList)
                 {
-                    if (dataCollectorSettings.FriendlyName.ToLower().Equals("event log"))
+                    if (dataCollectorSettings.FriendlyName!=null && dataCollectorSettings.FriendlyName.ToLower().Equals("event log"))
+                    {
+                        return new DefaultDataCollectionLauncher();
+                    }
+                    if(dataCollectorSettings.Uri!=null && dataCollectorSettings.Uri.ToString().ToLower().Equals(@"datacollector://Microsoft/EventLog/2.0"))
                     {
                         return new DefaultDataCollectionLauncher();
                     }

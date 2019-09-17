@@ -422,7 +422,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 // Look up the extension and initialize it if one is found.
                 var extensionManager = this.DataCollectorExtensionManager;
                 var dataCollectorUri = string.Empty;
-                this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri);
+
+                if (!this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
+                {
+                    dataCollectorUri = dataCollectorSettings.Uri.ToString();
+                }
 
                 DataCollector dataCollector = null;
                 if (!string.IsNullOrWhiteSpace(dataCollectorUri))
