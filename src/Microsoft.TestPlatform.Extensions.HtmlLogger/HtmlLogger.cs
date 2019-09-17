@@ -161,13 +161,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                     TestRunDetails.RunLevelMessageInformational.Add(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    if (TestRunDetails.RunLevelMessageErrorAndWarning == null)
-                    {
-                        TestRunDetails.RunLevelMessageErrorAndWarning = new List<string>();
-                    }
-
-                    TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
-                    break;
                 case TestMessageLevel.Error:
                     if (TestRunDetails.RunLevelMessageErrorAndWarning == null)
                     {
