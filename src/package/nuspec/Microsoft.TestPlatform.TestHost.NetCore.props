@@ -12,7 +12,7 @@
       <Visible>False</Visible>
     </Content>
   </ItemGroup>
-  <ItemGroup Condition=" '$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'" >
+  <ItemGroup Condition=" '$(Platform)' != 'x86' AND '$(OS)' == 'Windows_NT'" >
     <Content Include="$(MSBuildThisFileDirectory)x64\testhost.exe">
       <Link>testhost.exe</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
