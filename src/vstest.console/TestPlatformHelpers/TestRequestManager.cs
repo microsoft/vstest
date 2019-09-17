@@ -379,7 +379,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     var loggerRunSettings = XmlRunSettingsUtilities.GetLoggerRunSettings(runsettingsXml) ?? new LoggerRunSettings();
 
                     settingsUpdated |= this.UpdateFramework(document, navigator, sources, sourceFrameworks, registrar, out Framework chosenFramework);
-                    settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, out Architecture chosenPlatform);
+
+                    // Choose default architecture based on the framework
+                    // For .NET core, the default platform architecture should be x64.
+                    var defaultArchitecture = chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0 ? Architecture.X64 : Architecture.X86; 
+
+                    settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
                     this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);
                     settingsUpdated |= this.UpdateDesignMode(document, runConfiguration);
                     settingsUpdated |= this.UpdateCollectSourceInformation(document, runConfiguration);
@@ -460,10 +466,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
         }
 
-        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Architecture> sourcePlatforms, out Architecture chosenPlatform)
+        private bool UpdatePlatform(XmlDocument document, XPathNavigator navigator, List<string> sources, IDictionary<string, Architecture> sourcePlatforms, Architecture defaultArchitecture, out Architecture chosenPlatform)
         {
             // Get platform from sources
-            var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms);
+            var inferedPlatform = inferHelper.AutoDetectArchitecture(sources, sourcePlatforms, defaultArchitecture);
 
             // Get platform from runsettings
             bool updatePlatform = IsAutoPlatformDetectRequired(navigator, out chosenPlatform);
