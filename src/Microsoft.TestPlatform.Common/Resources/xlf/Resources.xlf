@@ -146,6 +146,11 @@
         <target state="new">Cancelling the operation as requested.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="CannotFetchByFriendlyName">
+        <source>Cannot Fetch Uri with {0}.</source>
+        <target state="new">Cannot Fetch Uri with {0}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

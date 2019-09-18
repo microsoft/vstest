@@ -120,6 +120,9 @@
   <data name="CancellationRequested" xml:space="preserve">
     <value>Cancelling the operation as requested.</value>
   </data>
+  <data name="CannotFetchByFriendlyName" xml:space="preserve">
+    <value>Cannot Fetch Uri with {0}.</value>
+  </data>
   <data name="DataCollectionMessageFormat" xml:space="preserve">
     <value>Data collection : {0}</value>
   </data>
