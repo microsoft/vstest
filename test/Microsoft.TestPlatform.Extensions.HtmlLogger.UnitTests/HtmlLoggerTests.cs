@@ -115,6 +115,12 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             Assert.AreEqual(message, actualMessage);
         }
 
+        [TestMethod]
+        public void TestMessageHandlerShouldNotInitializelistForInformationErrorAndWarningMessages()
+        {
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageInformational,null);
+            Assert.AreEqual(this.htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning, null);
+        }
 
         [TestMethod]
         public void TestCompleteHandlerShouldThrowExceptionIfParametersAreNull()
