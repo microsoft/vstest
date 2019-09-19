@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
 
@@ -57,7 +58,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 .Returns(new string[] { });
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
-            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
 
             var processDumpUtility = new ProcessDumpUtility(
@@ -83,7 +84,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var processId = 12345;
             var testResultsDirectory = "D:\\TestResults";
 
-            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Throws(new Exception());
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
@@ -113,7 +114,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 .Returns(new string[] { "dump.dmp" });
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
-            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
 
             var processDumpUtility = new ProcessDumpUtility(
@@ -141,7 +142,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var args = $"-accepteula -e 1 -g -t -f STACK_OVERFLOW -f ACCESS_VIOLATION {processId} {filename}";
             var testResultsDirectory = "D:\\TestResults";
 
-            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
@@ -157,7 +158,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory);
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()), Times.Once);
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
         }
 
@@ -174,7 +175,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var args = $"-accepteula -e 1 -g -t -ma -f STACK_OVERFLOW -f ACCESS_VIOLATION {processId} {filename}";
             var testResultsDirectory = "D:\\TestResults";
 
-            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
@@ -189,7 +190,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()), Times.Once);
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
         }
 
@@ -206,7 +207,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var args = $"-accepteula -n 1 -ma {processId} {filename}";
             var testResultsDirectory = "D:\\TestResults";
 
-            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null))
+            this.mockProcessHelper.Setup(x => x.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()))
                 .Returns(this.mockProcDumpProcess.Object);
             this.mockProcessHelper.Setup(x => x.GetProcessName(processId))
                 .Returns(process);
@@ -221,7 +222,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartHangBasedProcessDump(processId, guid, testResultsDirectory, isFullDump: true);
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null), Times.Once);
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(It.IsAny<string>(), args, It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()), Times.Once);
             Assert.AreEqual(Path.Combine(testResultsDirectory, filename), processDumpUtility.GetDumpFile());
         }
 
@@ -267,7 +268,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, guid, testResultsDirectory);
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()));
         }
 
         /// <summary>
@@ -293,7 +294,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, "guid", "D:\\");
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump64.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump64.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()));
         }
 
         /// <summary>
@@ -319,7 +320,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             processDumpUtility.StartTriggerBasedProcessDump(processId, "guid", "D:\\");
 
-            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null));
+            this.mockProcessHelper.Verify(x => x.LaunchProcess(Path.Combine("D:\\procdump", "procdump.exe"), It.IsAny<string>(), It.IsAny<string>(), null, null, null, It.IsAny<Action<object, string>>()));
         }
 
         /// <summary>
