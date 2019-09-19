@@ -112,7 +112,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             null,
                                             null,
                                             null,
-                                            null,
                                             this.OutputReceivedCallback) as Process;
         }
 
@@ -136,7 +135,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             this.GetProcDumpExecutable(processId),
                                             procDumpArgs,
                                             testResultsDirectory,
-                                            null,
                                             null,
                                             null,
                                             null,
