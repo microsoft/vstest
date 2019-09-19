@@ -38,7 +38,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             this.ConsoleHelper = consoleHelper;
             this.testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
         }
-
         /// <inheritdoc />
         public void Start()
         {
@@ -54,6 +53,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // Print the string based on the previous state, that is dotCounter
                 // This is required for smooth transition
                 this.ConsoleOutput.Write(testRunProgressString.Substring(0, testRunProgressString.Length + dotCounter - 2), OutputLevel.Information);
+                this.IsRunning = true;
+            }
+        }
+
+        /// <inheritdoc />
+        public void Start(string testsStatus)
+        {
+            lock (syncObject)
+            {
+                if (timer == null)
+                {
+                    this.timer = new Timer(1000);
+                    this.timer.Elapsed += Timer_Elapsed;
+                    this.timer.Start();
+                }
+
+                // Print the string based on the previous state, that is dotCounter
+                // This is required for smooth transition
+                this.ConsoleOutput.Write(testRunProgressString.Substring(0, testRunProgressString.Length + dotCounter - 2)+testsStatus, OutputLevel.Information);
                 this.IsRunning = true;
             }
         }
