@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 process.StartInfo.FileName = processPath;
                 process.StartInfo.Arguments = arguments;
                 process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardOutput = true;
 
                 process.EnableRaisingEvents = true;
 
