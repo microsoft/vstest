@@ -10,10 +10,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -29,12 +31,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         private DiscoveryManager discoveryManager;
         private Mock<IRequestData> mockRequestData;
         private Mock<IMetricsCollection> mockMetricsCollection;
+        private TestSessionMessageLogger sessionLogger;
 
         [TestInitialize]
         public void TestInit()
         {
             this.mockRequestData = new Mock<IRequestData>();
             this.mockMetricsCollection = new Mock<IMetricsCollection>();
+            this.sessionLogger = TestSessionMessageLogger.Instance;
             this.mockRequestData.Setup(rd => rd.MetricsCollection).Returns(this.mockMetricsCollection.Object);
             this.discoveryManager = new DiscoveryManager(this.mockRequestData.Object);
         }
@@ -52,11 +56,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         public void InitializeShouldUpdateAdditionalExtenions()
         {
             var mockFileHelper = new Mock<IFileHelper>();
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
             TestPluginCache.Instance = new TestableTestPluginCache();
 
             this.discoveryManager.Initialize(
-                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
+                new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location }, mockLogger.Object);
 
             var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
 
@@ -147,7 +152,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
-            
+
             // Assert that the tests are passed on via the handletestruncomplete event.
             mockLogger.Verify(l => l.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()), Times.Once);
         }
@@ -219,6 +224,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             // Verify.
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.DiscoveryState, It.IsAny<string>()), Times.Once);
             mockMetricsCollector.Verify(rd => rd.Add(TelemetryDataConstants.TotalTestsDiscovered, It.IsAny<object>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoveryInitializeShouldVerifyWarningMessageIfAdapterFailedToLoad()
+        {
+            var assemblyLocation = typeof(DiscoveryManagerTests).GetTypeInfo().Assembly.Location;
+            var mockLogger = new Mock<ITestDiscoveryEventsHandler2>();
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { assemblyLocation },
+                () => { });
+
+            //Act
+            this.discoveryManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);
+
+            //when handler instance returns warning              
+            sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning");
+
+            // Verify.
+            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning"), Times.Once);
         }
 
         #endregion

@@ -63,10 +63,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Initializes the discovery manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
+        public void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler)
         {
             this.testPlatformEventSource.AdapterSearchStart();
-
+            this.testDiscoveryEventsHandler = eventHandler;
             if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
             {
                 // Start using these additional extensions
@@ -247,6 +247,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             if (this.testDiscoveryEventsHandler != null)
             {
+                if (e.Level == TestMessageLevel.Error)
+                {
+                    // Downgrade the message severity to Warning...
+                    e.Level = TestMessageLevel.Warning;
+                }
                 this.testDiscoveryEventsHandler.HandleLogMessage(e.Level, e.Message);
             }
             else
