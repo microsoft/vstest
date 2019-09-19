@@ -19,7 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             string workingDirectory,
             IDictionary<string, string> environmentVariables,
             Action<object, string> errorCallback,
-            Action<object> exitCallBack)
+            Action<object> exitCallBack,
+            Action<object, string> ouputCallBack)
         {
             throw new NotImplementedException();
         }

@@ -42,6 +42,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.nativeMethodsHelper = nativeMethodsHelper;
         }
 
+        protected Action<object, string> OutputReceivedCallback => (process, data) =>
+        {
+            // Log all standard output message of procdump in diag files.
+            // Otherwise they end up coming on console in pipleine.
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("ProcessDumpUtility.OutputReceivedCallback: Output received from procdump process: " + data);
+            }
+        };
+
         /// <inheritdoc/>
         public string GetDumpFile()
         {
@@ -101,7 +111,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             testResultsDirectory,
                                             null,
                                             null,
-                                            null) as Process;
+                                            null,
+                                            null,
+                                            this.OutputReceivedCallback) as Process;
         }
 
         /// <inheritdoc/>
@@ -126,7 +138,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                                             testResultsDirectory,
                                             null,
                                             null,
-                                            null) as Process;
+                                            null,
+                                            null,
+                                            this.OutputReceivedCallback) as Process;
         }
 
         /// <inheritdoc/>
@@ -171,8 +185,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 }
                 else
                 {
-                     filename = this.nativeMethodsHelper.Is64Bit(this.processHelper.GetProcessHandle(processId)) ?
-                     Constants.Procdump64Process : Constants.ProcdumpProcess;
+                    filename = this.nativeMethodsHelper.Is64Bit(this.processHelper.GetProcessHandle(processId)) ?
+                    Constants.Procdump64Process : Constants.ProcdumpProcess;
                 }
 
                 var procDumpExe = Path.Combine(procdumpPath, filename);

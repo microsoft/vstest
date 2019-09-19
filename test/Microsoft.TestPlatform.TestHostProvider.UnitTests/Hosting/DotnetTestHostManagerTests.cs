@@ -799,7 +799,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
                             It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>()))
+                            It.IsAny<Action<object>>(),
+                            It.IsAny<Action<object, string>>()))
                 .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
                     (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
@@ -822,7 +823,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
                             It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>()))
+                            It.IsAny<Action<object>>(),
+                            It.IsAny<Action<object, string>>()))
                 .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
                     (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
