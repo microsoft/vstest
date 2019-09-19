@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (this.discoveryResultCache.TotalDiscoveredTests == 0)
                 {
-                        LogWarningOnNoTestsDiscovered(sources, testCaseFilter, logger);
+                    LogWarningOnNoTestsDiscovered(sources, testCaseFilter, logger);
                 }
             }
             finally
@@ -316,7 +316,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
             else
             {
-                //Should be logged only when tests found - if adapter failed to load then there would be no tests to process
                 logger.SendMessage(
                    TestMessageLevel.Warning, string.Format(
                        CultureInfo.CurrentUICulture,

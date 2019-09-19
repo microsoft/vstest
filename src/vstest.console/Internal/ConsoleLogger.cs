@@ -112,7 +112,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsFailed = 0;
         private int testsSkipped = 0;
         private bool testRunHasErrorMessages = false;
-        private string testsStatus = string.Empty;
 
         #endregion
 
@@ -182,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // Progress indicator needs to be displayed only for cli experience.
                 this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
             }
-            
+
             // Register for the events.
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
@@ -505,10 +504,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             DisplayFullInformation(e.Result);
                         }
 
-                        // Resume the progress indicator after displaying the test result information
-
-                        UpdateTestsStatus();
-                        this.progressIndicator?.Start(testsStatus);
+                        // Resume the progress indicator after displaying the test result informationUpdateTestsStatus();
+                        this.progressIndicator?.Start();
 
                         break;
                     }
@@ -520,7 +517,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         {
                             break;
                         }
-                        
+
                         // Pause the progress indicator before displaying test result information
                         this.progressIndicator?.Pause();
 
@@ -529,8 +526,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         DisplayFullInformation(e.Result);
 
                         // Resume the progress indicator after displaying the test result information
-                        UpdateTestsStatus();
-                        this.progressIndicator?.Start(testsStatus);
+                        this.progressIndicator?.Start();
 
                         break;
                     }
@@ -551,8 +547,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             }
 
                             // Resume the progress indicator after displaying the test result information
-                            UpdateTestsStatus();
-                            this.progressIndicator?.Start(testsStatus);
+                            this.progressIndicator?.Start();
                         }
 
                         break;
@@ -576,8 +571,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         }
 
                         // Resume the progress indicator after displaying the test result information
-                        UpdateTestsStatus();
-                        this.progressIndicator?.Start(testsStatus);
+                        this.progressIndicator?.Start();
 
                         break;
                     }
@@ -705,14 +699,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
 
             Output.Warning(AppendPrefix, warningMessage);
-        }
-
-        /// <summary>
-        /// updates the test results
-        /// </summary>
-        public void UpdateTestsStatus()
-        {
-            testsStatus = "| Executed :" + testsTotal + "  | Passed :" + testsPassed + "  | Failed: " + testsFailed + "  | Skipped: " + testsSkipped + "";
         }
     }
 }

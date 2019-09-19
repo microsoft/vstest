@@ -5,7 +5,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common
 {
-    using System.Collections.Generic;
     /// <summary>
     /// Defines the defaults used across different components.
     /// </summary>

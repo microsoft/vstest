@@ -11,12 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         void Start();
 
         /// <summary>
-        /// Marks the start of the progress indicator
-        /// </summary>
-        /// <param name="testsStatus"></param>
-        void Start(string testsStatus);
-
-        /// <summary>
         /// Pause the progress indicator
         /// </summary>
         void Pause();

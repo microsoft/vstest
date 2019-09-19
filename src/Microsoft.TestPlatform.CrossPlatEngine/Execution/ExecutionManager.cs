@@ -44,28 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
         }
 
-        private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
-        {
-            if (this.testMessageEventsHandler != null)
-            {
-                if (e.Level == TestMessageLevel.Error)
-                {
-                    // Downgrade the message severity to Warning...
-                    e.Level = TestMessageLevel.Warning;
-                }
-                this.testMessageEventsHandler.HandleLogMessage(e.Level, e.Message);
-            }
-            else
-            {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning(
-                        "ExecutionManager: Could not pass the log message  '{0}' as the callback is null.",
-                        e.Message);
-                }
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecutionManager"/> class.
         /// </summary>
@@ -96,6 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.LoadExtensions();
 
             this.testPlatformEventSource.AdapterSearchStop();
+            this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
         }
 
         /// <summary>
@@ -250,6 +229,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
+        private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
+        {
+            if (this.testMessageEventsHandler != null)
+            {
+                if (e.Level == TestMessageLevel.Error)
+                {
+                    // Downgrade the message severity to Warning...
+                    e.Level = TestMessageLevel.Warning;
+                }
+                this.testMessageEventsHandler.HandleLogMessage(e.Level, e.Message);
+            }
+            else
+            {
+                if (EqtTrace.IsWarningEnabled)
+                {
+                    EqtTrace.Warning(
+                        "ExecutionManager: Could not pass the log message  '{0}' as the callback is null.",
+                        e.Message);
+                }
+            }
+        }
         #endregion
     }
 }
