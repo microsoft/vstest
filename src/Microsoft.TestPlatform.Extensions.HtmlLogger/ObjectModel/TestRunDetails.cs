@@ -20,12 +20,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel
         /// <summary>
         /// List of informational run level messages.
         /// </summary>
-        [DataMember] public List<string> RunLevelMessageInformational = new List<string>();
+        [DataMember] public List<string> RunLevelMessageInformational;
 
         /// <summary>
         /// List of error and warning messages.
         /// </summary>
-        [DataMember] public List<string> RunLevelMessageErrorAndWarning = new List<string>();
+        [DataMember] public List<string> RunLevelMessageErrorAndWarning;
 
         /// <summary>
         /// List of all the results
