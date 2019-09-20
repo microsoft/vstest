@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
 
             var argumentsString = string.Join(" ", commandLineArguments);
-            var dataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
+            var dataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, Directory.GetCurrentDirectory(), environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack, null) ;
             this.DataCollectorProcessId = this.processHelper.GetProcessId(dataCollectorProcess);
             return this.DataCollectorProcessId;
         }

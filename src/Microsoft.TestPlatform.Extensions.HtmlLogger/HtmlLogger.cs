@@ -153,12 +153,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
+                    if(TestRunDetails.RunLevelMessageInformational == null)
+                    {
+                        TestRunDetails.RunLevelMessageInformational = new List<string>();
+                    }
+
                     TestRunDetails.RunLevelMessageInformational.Add(e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
-                    break;
                 case TestMessageLevel.Error:
+                    if (TestRunDetails.RunLevelMessageErrorAndWarning == null)
+                    {
+                        TestRunDetails.RunLevelMessageErrorAndWarning = new List<string>();
+                    }
+
                     TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
                     break;
                 default:
