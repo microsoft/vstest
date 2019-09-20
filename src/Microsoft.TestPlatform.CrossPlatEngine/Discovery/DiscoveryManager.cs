@@ -108,8 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
                 }
 
-                //unsubscribe TestRunMessage session
-                this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
+                
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
