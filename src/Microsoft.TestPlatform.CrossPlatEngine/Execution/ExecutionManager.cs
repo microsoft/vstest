@@ -73,8 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             this.LoadExtensions();
 
-            this.testPlatformEventSource.AdapterSearchStop();
-            this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
+            this.testPlatformEventSource.AdapterSearchStop();          
         }
 
         /// <summary>
@@ -94,6 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler runEventsHandler)
         {
+            //unsubscrive session logger
+            this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
             try
             {
                 this.InitializeDataCollectors(runSettings, testCaseEventsHandler as ITestEventsPublisher, TestSourcesUtility.GetDefaultCodebasePath(adapterSourceMap));
@@ -137,6 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.activeTestRun = new RunTestsWithTests(this.requestData, tests, package, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
 
                 this.activeTestRun.RunTests();
+                
             }
             catch (Exception e)
             {
@@ -250,6 +252,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
         }
+
+        
         #endregion
     }
 }

@@ -220,9 +220,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
             var mockLogger = new Mock<ITestMessageEventHandler>();
             TestPluginCacheTests.SetupMockExtensions(
-                new string[] { assemblyLocation },
-                () => { });
-
+               new string[] { assemblyLocation },
+               () => { });
             //Act
             this.executionManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);           
 

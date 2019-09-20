@@ -76,6 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
             this.testPlatformEventSource.AdapterSearchStop();
+            this.testDiscoveryEventsHandler = null;
         }
 
         /// <summary>
@@ -107,6 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     }
                 }
 
+                this.sessionMessageLogger.TestRunMessage -= this.TestSessionMessageHandler;
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
