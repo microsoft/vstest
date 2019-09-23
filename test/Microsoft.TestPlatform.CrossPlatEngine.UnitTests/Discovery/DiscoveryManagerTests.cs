@@ -239,10 +239,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discoveryManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);
 
             //when handler instance returns warning              
-            sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning");
+            sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once");
 
             // Verify.
-            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning"), Times.Once);
+            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that the HandleLogMessage method getting invoked at least once"), Times.Once);
         }
 
         #endregion

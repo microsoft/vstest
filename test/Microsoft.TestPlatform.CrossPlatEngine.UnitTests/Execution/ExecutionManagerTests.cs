@@ -214,46 +214,34 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
         }
 
-        [TestMethod]
-        public void InitializeShouldVerifyWarningMessageIfAdapterFailedToLoad()
-        {
-            var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
-            var mockLogger = new Mock<ITestMessageEventHandler>();
-            TestPluginCacheTests.SetupMockExtensions(
-               new string[] { assemblyLocation },
-               () => { });
-            //Act
-            this.executionManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);           
+        //[TestMethod]
+        //public void InitializeShouldVerifyWarningMessageIfAdapterFailedToLoad()
+        //{
+        //    var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
+        //    var mockLogger = new Mock<ITestMessageEventHandler>();
+        //    TestPluginCacheTests.SetupMockExtensions(
+        //       new string[] { assemblyLocation },
+        //       () => { });
+        //    //Act
+        //    this.executionManager.Initialize(new List<string> { assemblyLocation }, mockLogger.Object);           
 
-            //when handler instance returns warning       
-            sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning");
+        //    //when handler instance returns warning       
+        //    sessionLogger.SendMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning");
 
-            // Verify.
-            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning"), Times.Once);
-        }
-
-        [TestMethod]
-        public void InitializeShouldVerifyThatItIsNotNullIfAdapterFailedToLoad()
-        {
-            var mockLogger = new Mock<ITestMessageEventHandler>();
-
-            //when handler instance is not null
-            sessionLogger.SendMessage(TestMessageLevel.Informational, "verify that it is not null");
-
-            // Verify.
-            mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Informational, "verify that it is not null"), Times.Never);
-        }
+        //    // Verify.
+        //    mockLogger.Verify(rd => rd.HandleLogMessage(TestMessageLevel.Warning, "verify that it is downgraded to warning"), Times.Once);
+        //}
 
         [TestMethod]
-        public void InitializeShouldVerifyThatItIsNullIfAdapterFailedToLoad()
+        public void InitializeShouldVerifyTheHandlerInitializationWhenAdapterIsFailedToLoad()
         {
             var mockLogger = new Mock<ITestMessageEventHandler>();
-            
+
             //when handler instance is null
-            sessionLogger.SendMessage(It.IsAny<TestMessageLevel>(), "verify null");
+            sessionLogger.SendMessage(It.IsAny<TestMessageLevel>(), "verify that the HandleLogMessage method will not be invoked when handler is not initialized");
 
             // Verify.
-            mockLogger.Verify(rd => rd.HandleLogMessage(It.IsAny<TestMessageLevel>(), "verify null"), Times.Never);
+            mockLogger.Verify(rd => rd.HandleLogMessage(It.IsAny<TestMessageLevel>(), "verify that the HandleLogMessage method will not be invoked when handler is not initialized"), Times.Never);
         }
     }
 }

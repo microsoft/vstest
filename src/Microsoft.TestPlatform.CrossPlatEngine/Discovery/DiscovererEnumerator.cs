@@ -317,10 +317,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             else
             {
                 logger.SendMessage(
-                   TestMessageLevel.Warning, string.Format(
-                       CultureInfo.CurrentUICulture,
-                       CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
-                       sourcesString));
+                    TestMessageLevel.Warning,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
+                        sourcesString));
             }
         }
 

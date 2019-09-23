@@ -249,11 +249,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             if (this.testDiscoveryEventsHandler != null)
             {
-                if (e.Level == TestMessageLevel.Error)
-                {
-                    // Downgrade the message severity to Warning...
-                    e.Level = TestMessageLevel.Warning;
-                }
                 this.testDiscoveryEventsHandler.HandleLogMessage(e.Level, e.Message);
             }
             else

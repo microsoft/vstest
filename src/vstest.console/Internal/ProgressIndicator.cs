@@ -38,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             this.ConsoleHelper = consoleHelper;
             this.testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
         }
+
         /// <inheritdoc />
         public void Start()
         {

@@ -504,7 +504,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                             DisplayFullInformation(e.Result);
                         }
 
-                        // Resume the progress indicator after displaying the test result informationUpdateTestsStatus();
+                        // Resume the progress indicator after displaying the test result information
                         this.progressIndicator?.Start();
 
                         break;
