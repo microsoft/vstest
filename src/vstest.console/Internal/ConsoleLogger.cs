@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using CommandLineResources =Resources.Resources;
+    using CommandLineResources = Resources.Resources;
     /// <summary>
     /// Logger for sending output to the console.
     /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
@@ -155,16 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public Verbosity VerbosityLevel => verbosityLevel;
 
-        public class Summary
-        {
-            public int Totaltests { get; set; }
-            public int Passedtests { get; set; }
-            public int Failedtests { get; set; }
-            public int Skippedtests { get; set; }
-            public TimeSpan timespan { get; set; }
-        }
-
-        public ConcurrentDictionary<string, Summary> SummaryDictionary { get; private set; }
+        public ConcurrentDictionary<string, SourceSummary> SummaryDictionary { get; private set; }
 
         #endregion
 
@@ -201,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
             // Register for the discovery events.
             events.DiscoveryMessage += this.TestMessageHandler;
-            SummaryDictionary = new ConcurrentDictionary<string, Summary>();
+            SummaryDictionary = new ConcurrentDictionary<string, SourceSummary>();
 
             // TODO Get changes from https://github.com/Microsoft/vstest/pull/1111/
             // events.DiscoveredTests += DiscoveredTestsHandler;
@@ -479,17 +470,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestResultEventArgs>(e, "e");
-            SummaryDictionary.TryGetValue(e.Result.TestCase.Source, out var summary);
-            if (summary == null)
+            SourceSummary summary;
+            if (!SummaryDictionary.TryGetValue(e.Result.TestCase.Source, out summary))
             {
-                summary = new Summary();
+                summary = new SourceSummary();
                 SummaryDictionary.TryAdd(e.Result.TestCase.Source, summary);
             }
 
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
-            summary.Totaltests++;
-            summary.timespan += e.Result.EndTime - e.Result.StartTime;
+            summary.TotalTests++;
+            summary.TimeSpan += e.Result.EndTime - e.Result.StartTime;
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))
@@ -508,7 +499,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 case TestOutcome.Skipped:
                     {
                         this.testsSkipped++;
-                        summary.Skippedtests++;
+                        summary.SkippedTests++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
                             break;
@@ -533,7 +524,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 case TestOutcome.Failed:
                     {
                         this.testsFailed++;
-                        summary.Failedtests++;
+                        summary.FailedTests++;
                         if (this.verbosityLevel == Verbosity.Quiet)
                         {
                             break;
@@ -555,7 +546,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 case TestOutcome.Passed:
                     {
                         this.testsPassed++;
-                        summary.Passedtests++;
+                        summary.PassedTests++;
                         if (this.verbosityLevel == Verbosity.Normal || this.verbosityLevel == Verbosity.Detailed)
                         {
                             // Pause the progress indicator before displaying test result information
@@ -650,14 +641,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     var summary = SummaryDictionary[sd.Key];
 
                     // Failed! Pass {1} Failed {2} skipped {3} Time : 233 se ({4})
-                    if (summary.Failedtests > 0)
+                    if (summary.FailedTests > 0)
                     {
-                        Output.Information(false, ConsoleColor.White, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.Passedtests,summary.Failedtests,summary.Skippedtests, GetFormattedDurationString(summary.timespan),sd.Key.Split('\\').Last()));
+                        Output.Information(false, ConsoleColor.Red, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
                     }
                     else
                     {
-                        Output.Information(false, ConsoleColor.White, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed,summary.Totaltests, summary.Passedtests, summary.Failedtests, summary.Skippedtests, GetFormattedDurationString(summary.timespan), sd.Key.Split('\\').Last()));
-                    }   
+                        Output.Information(false, ConsoleColor.Green, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, summary.TotalTests, summary.PassedTests, summary.FailedTests, summary.SkippedTests, GetFormattedDurationString(summary.TimeSpan), sd.Key.Split('\\').Last()));
+                    }
                 }
                 return;
             }
