@@ -161,7 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                         return;
                     }
 
-                    this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap, context, discoverySink, logger, ref totalAdaptersUsed, ref totalTimeTakenByAdapters);
+                    var result = this.DiscoverTestsFromSingleDiscoverer(discoverer, discovererToSourcesMap[discoverer], context, discoverySink, logger, cancellationToken);
+                    totalAdaptersUsed += result.TotalAdaptersUsed;
+                    totalTimeTakenByAdapters += result.TotalTimeSpentInAdapaters;
                 }
 
                 if (this.discoveryResultCache.TotalDiscoveredTests == 0)
@@ -191,19 +193,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 totalAdaptersUsed);
         }
 
-        private void DiscoverTestsFromSingleDiscoverer(
+        private DiscoveryResult DiscoverTestsFromSingleDiscoverer(
             LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer,
-            Dictionary<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>, IEnumerable<string>> discovererToSourcesMap,
+            IEnumerable<string> sources,
             DiscoveryContext context,
             TestCaseDiscoverySink discoverySink,
             IMessageLogger logger,
-            ref double totalAdaptersUsed,
-            ref double totalTimeTakenByAdapters)
+            CancellationToken cancellationToken)
         {
+            var result = new DiscoveryResult();
             if (DiscovererEnumerator.TryToLoadDiscoverer(discoverer, logger, out var discovererType) == false)
             {
                 // Fail to instantiate the discoverer type.
-                return;
+                return result;
             }
 
             // on instantiated successfully, get tests
@@ -217,12 +219,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 var newTimeStart = DateTime.UtcNow;
 
                 this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);
-                discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
+                foreach (var testSource in sources)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        EqtTrace.Info("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Cancellation Requested. Aborting the discovery");
+                        break;
+                    }
+
+                    discoverer.Value.DiscoverTests(new[] { testSource }, context, logger, discoverySink);
+                }
 
                 var totalAdapterRunTime = DateTime.UtcNow - newTimeStart;
-
-                this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests -
-                                                                  currentTotalTests);
+                this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
 
                 // Record Total Tests Discovered By each Discoverer.
                 var totalTestsDiscoveredByCurrentDiscoverer = this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests;
@@ -230,8 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     string.Format("{0}.{1}", TelemetryDataConstants.TotalTestsByAdapter,
                         discoverer.Metadata.DefaultExecutorUri), totalTestsDiscoveredByCurrentDiscoverer);
 
-                totalAdaptersUsed++;
-
+                result.TotalAdaptersUsed++;
 
                 EqtTrace.Verbose("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: Done loading tests for {0}",
                         discoverer.Value.GetType().FullName);
@@ -244,22 +252,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 }
 
                 // Collecting Data Point for Time Taken to Discover Tests by each Adapter
-                this.requestData.MetricsCollection.Add(
-                    string.Format("{0}.{1}", TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter,
-                        discoverer.Metadata.DefaultExecutorUri), totalAdapterRunTime.TotalSeconds);
-                totalTimeTakenByAdapters += totalAdapterRunTime.TotalSeconds;
+                this.requestData.MetricsCollection.Add($"{TelemetryDataConstants.TimeTakenToDiscoverTestsByAnAdapter}.{discoverer.Metadata.DefaultExecutorUri}", totalAdapterRunTime.TotalSeconds);
+                result.TotalTimeSpentInAdapaters += totalAdapterRunTime.TotalSeconds;
             }
             catch (Exception e)
             {
-                var message = string.Format(
-                    CultureInfo.CurrentUICulture,
-                    CrossPlatEngineResources.ExceptionFromLoadTests,
-                    discovererType.Name,
-                    e.Message);
+                var message = string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.ExceptionFromLoadTests, discovererType.Name, e.Message);
 
                 logger.SendMessage(TestMessageLevel.Error, message);
                 EqtTrace.Error("DiscovererEnumerator.DiscoverTestsFromSingleDiscoverer: {0} ", e);
             }
+
+            return result;
         }
 
         private static bool TryToLoadDiscoverer(LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities> discoverer, IMessageLogger logger, out Type discovererType)
@@ -493,6 +497,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 return null;
             }
+        }
+
+        private class DiscoveryResult
+        {
+            public double TotalTimeSpentInAdapaters { get; set; }
+            public int TotalAdaptersUsed { get; set; }
         }
 
     }
