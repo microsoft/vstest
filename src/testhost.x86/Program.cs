@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -83,25 +84,34 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         }
 
         private static void WaitForDebuggerIfEnabled()
-        {
-            IProcessHelper processHelper = new ProcessHelper();
-            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+        {   
+            // Check if native debugging is enabled and OS is windows.
+            var nativeDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
+
+            if (!string.IsNullOrEmpty(nativeDebugEnabled) && nativeDebugEnabled.Equals("1", StringComparison.Ordinal)
+                && new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
-                ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
-
-                var currentProcessId = processHelper.GetCurrentProcessId();
-                var currentProcessName = processHelper.GetProcessName(currentProcessId);
-                ConsoleOutput.Instance.WriteLine(
-                    string.Format("Process Id: {0}, Name: {1}", currentProcessId, currentProcessName),
-                    OutputLevel.Information);
-
-                while (!Debugger.IsAttached)
+                while (!IsDebuggerPresent())
                 {
                     System.Threading.Tasks.Task.Delay(1000).Wait();
                 }
 
-                Debugger.Break();
+                DebugBreak();
+            }
+            // else check for host debugging enabled
+            else
+            {
+                var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+
+                if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+                {
+                    while (!Debugger.IsAttached)
+                    {
+                        System.Threading.Tasks.Task.Delay(1000).Wait();
+                    }
+
+                    Debugger.Break();
+                }
             }
         }
 
@@ -120,5 +130,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
             }
         }
+
+        // Native APIs for enabling native debugging.
+        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool IsDebuggerPresent();
+
+        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        internal static extern void DebugBreak();
     }
 }

@@ -147,7 +147,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Warn the user that execution will wait for debugger attach.
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+                var nativeHostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_NATIVE_DEBUG");
+
+                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal) ||
+                    new PlatformEnvironment().OperatingSystem.Equals(PlatformOperatingSystem.Windows) && 
+                    !string.IsNullOrEmpty(nativeHostDebugEnabled) && nativeHostDebugEnabled.Equals("1", StringComparison.Ordinal))
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
                     ConsoleOutput.Instance.WriteLine(
