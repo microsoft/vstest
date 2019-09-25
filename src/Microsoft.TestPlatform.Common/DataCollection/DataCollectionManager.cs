@@ -391,6 +391,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             return false;
         }
 
+        protected virtual bool IsUriValid(string uri)
+        {
+            var extensionManager = this.dataCollectorExtensionManager;
+            foreach (var extension in extensionManager.TestExtensions)
+            {
+                if (string.Compare(uri, extension.Metadata.ExtensionUri, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Gets the extension using uri.
         /// </summary>
@@ -421,12 +434,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 // Look up the extension and initialize it if one is found.
                 var extensionManager = this.DataCollectorExtensionManager;
-                var dataCollectorUri = string.Empty;
+                var dataCollectorUri = dataCollectorSettings.Uri?.ToString();
 
-                if (!this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
+                if (!IsUriValid(dataCollectorUri) && !this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
                 {
                     this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.CannotFetchByFriendlyName, dataCollectorSettings.FriendlyName));
-                    dataCollectorUri = dataCollectorSettings.Uri?.ToString();
                 }
 
                 DataCollector dataCollector = null;
