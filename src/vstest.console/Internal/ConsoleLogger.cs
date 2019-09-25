@@ -181,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 // Progress indicator needs to be displayed only for cli experience.
                 this.progressIndicator = new ProgressIndicator(Output, new ConsoleHelper());
             }
-            
+
             // Register for the events.
             events.TestRunMessage += this.TestMessageHandler;
             events.TestResult += this.TestResultHandler;
@@ -517,7 +517,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                         {
                             break;
                         }
-                        
+
                         // Pause the progress indicator before displaying test result information
                         this.progressIndicator?.Pause();
 
