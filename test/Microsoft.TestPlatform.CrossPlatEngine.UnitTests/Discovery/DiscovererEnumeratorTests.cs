@@ -637,13 +637,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [Category("managed")]
         private class ManagedDllTestDiscoverer : DllTestDiscoverer
         {
+            static ManagedDllTestDiscoverer()
+            {
+                Sources = new List<string>();
+            }
+
             public static bool IsManagedDiscoverTestCalled { get; private set; }
 
-            public static IEnumerable<string> Sources { get; set; }
+            public static List<string> Sources { get; private set; }
 
             public override void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
-                Sources = sources;
+                Sources.AddRange(sources);
                 IsManagedDiscoverTestCalled = true;
                 base.DiscoverTests(sources, discoveryContext, logger, discoverySink);
             }
@@ -651,7 +656,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             public static void Reset()
             {
                 IsManagedDiscoverTestCalled = false;
-                Sources = null;
+                Sources = new List<string>();
             }
         }
 
@@ -721,9 +726,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [DefaultExecutorUri("discoverer://jsondiscoverer")]
         private class JsonTestDiscoverer : ITestDiscoverer
         {
+            static JsonTestDiscoverer()
+            {
+                Sources = new List<string>();
+            }
+
             public static bool IsDiscoverTestCalled { get; private set; }
 
-            public static IEnumerable<string> Sources { get; private set; }
+            public static List<string> Sources { get; private set; }
 
             public static IDiscoveryContext DiscoveryContext { get; private set; }
 
@@ -734,7 +744,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
             {
                 IsDiscoverTestCalled = true;
-                Sources = sources;
+                Sources.AddRange(sources);
                 DiscoveryContext = discoveryContext;
                 MessageLogger = logger;
                 DiscoverySink = discoverySink;
@@ -743,6 +753,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             public static void Reset()
             {
                 IsDiscoverTestCalled = false;
+                Sources = new List<string>();
             }
         }
 
