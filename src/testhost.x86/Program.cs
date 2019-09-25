@@ -101,7 +101,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             // else check for host debugging enabled
             else
             {
-                IProcessHelper processHelper = new ProcessHelper();
                 var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
 
                 if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
