@@ -70,15 +70,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot Fetch Uri with {0}..
-        /// </summary>
-        internal static string CannotFetchByFriendlyName {
-            get {
-                return ResourceManager.GetString("CannotFetchByFriendlyName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Data collection : {0}.
         /// </summary>
         internal static string DataCollectionMessageFormat {
@@ -345,6 +336,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string TestCaseFilterFormatException {
             get {
                 return ResourceManager.GetString("TestCaseFilterFormatException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to find a datacollector with friendly name &apos;[0}&apos;..
+        /// </summary>
+        internal static string UnableToFetchUriString {
+            get {
+                return ResourceManager.GetString("UnableToFetchUriString", resourceCulture);
             }
         }
         

@@ -269,9 +269,9 @@
         <target state="translated">Операция отменяется в соответствии с запросом.</target>
         <note />
       </trans-unit>
-      <trans-unit id="CannotFetchByFriendlyName">
-        <source>Cannot Fetch Uri with {0}.</source>
-        <target state="new">Cannot Fetch Uri with {0}.</target>
+      <trans-unit id="UnableToFetchUriString">
+        <source>Unable to find a datacollector with friendly name '[0}'.</source>
+        <target state="new">Unable to find a datacollector with friendly name '[0}'.</target>
         <note></note>
       </trans-unit>
     </body>

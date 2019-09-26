@@ -438,7 +438,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
                 if (!IsUriValid(dataCollectorUri) && !this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri))
                 {
-                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.CannotFetchByFriendlyName, dataCollectorSettings.FriendlyName));
+                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToFetchUriString, dataCollectorSettings.FriendlyName));
                 }
 
                 DataCollector dataCollector = null;
