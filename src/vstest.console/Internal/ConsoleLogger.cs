@@ -480,7 +480,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             // Update the test count statistics based on the result of the test. 
             this.testsTotal++;
             summary.TotalTests++;
-            summary.TimeSpan += e.Result.EndTime - e.Result.StartTime;
+            summary.TimeSpan += e.Result.Duration;
             var testDisplayName = e.Result.DisplayName;
 
             if (string.IsNullOrWhiteSpace(e.Result.DisplayName))

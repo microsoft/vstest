@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using vstest.console.Internal;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using CommandLineResources = Resources.Resources;
 
     [TestClass]
     public class ConsoleLoggerTests
@@ -366,7 +366,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             loggerEvents.WaitForEventCompletion();
 
             // Verify
-            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(message, OutputLevel.Error), Times.Once());
         }
 
@@ -570,6 +569,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine("TestName", OutputLevel.Information), Times.Exactly(3));
             this.mockProgressIndicator.Verify(pi => pi.Pause(), Times.Exactly(5));
             this.mockProgressIndicator.Verify(pi => pi.Start(), Times.Exactly(5));
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldWriteToConsoleShouldShowFailedTestsForQuietVebosity()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "quiet");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            foreach (var testResult in this.GetTestResultsObject())
+            {
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
+            }
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+            loggerEvents.WaitForEventCompletion();
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryFailed, 5, 1, 1, 1, "1h 6m", "TestSource"), OutputLevel.Information), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldWriteToConsoleShouldShowPassedTestsForQuietVebosity()
+        {
+            var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+            loggerEvents.EnableEvents();
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "quiet");
+            this.consoleLogger.Initialize(loggerEvents, parameters);
+
+            foreach (var testResult in this.GetPassedTestResultsObject())
+            {
+                loggerEvents.RaiseTestResult(new TestResultEventArgs(testResult));
+            }
+            loggerEvents.RaiseTestRunComplete(new TestRunCompleteEventArgs(new Mock<ITestRunStatistics>().Object, false, false, null, new Collection<AttachmentSet>(), TimeSpan.FromSeconds(1)));
+            loggerEvents.WaitForEventCompletion();
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryPassed, 2, 1, 0, 1, "1m 2s", "TestSource"), OutputLevel.Information), Times.Once);
         }
 
         [TestMethod]
@@ -977,7 +1014,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.consoleLogger.Initialize(loggerEvents, parameters);
 
             var testresults = this.GetTestResultObject(TestOutcome.Passed);
-            testresults[0].Messages.Add(new TestResultMessage (TestResultMessage.StandardOutCategory, "Hello"));
+            testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "Hello"));
 
             foreach (var testResult in testresults)
             {
@@ -1096,7 +1133,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             return testresultList;
         }
 
-        
+        private List<ObjectModel.TestResult> GetPassedTestResultsObject()
+        {
+            var testcase = new TestCase("DymmyNamespace.DummyClass.TestName", new Uri("some://uri"), "TestSource")
+            {
+                DisplayName = "TestName"
+            };
+
+            var testresult = new ObjectModel.TestResult(testcase)
+            {
+                Outcome = TestOutcome.Passed,
+                Duration = new TimeSpan(0, 0, 1, 2, 3)
+            };
+
+            var testresult1 = new ObjectModel.TestResult(testcase)
+            {
+                Outcome = TestOutcome.Skipped
+            };
+
+            var testresultList = new List<ObjectModel.TestResult> { testresult, testresult1 };
+
+            return testresultList;
+        }
 
 
         private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
