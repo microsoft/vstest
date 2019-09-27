@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
 
     using HtmlResource = Resources.Resources;
     using HtmlLoggerConstants = Constants;
+    using NuGet.Frameworks;
 
     /// <summary>
     /// Logger for generating Html.
@@ -153,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
-                    if(TestRunDetails.RunLevelMessageInformational == null)
+                    if (TestRunDetails.RunLevelMessageInformational == null)
                     {
                         TestRunDetails.RunLevelMessageInformational = new List<string>();
                     }
@@ -273,11 +274,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                 PassPercentage = (PassedTests * 100) / TotalTests,
                 TotalRunTime = GetFormattedDurationString(e.ElapsedTimeInRunningTests),
             };
-            var isLogFileNameParameterExists = parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey,
-                               out string logFileNameValue);
-            if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
+
+            if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
-                HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+
+                var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework] ?? string.Empty;
+                logFilePrefixValue = logFilePrefixValue.Replace(".html", string.Empty) + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
+                this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
+            }
+            else
+            {
+                if (parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue))
+                {
+                    HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+                }
             }
 
             PopulateHtmlFile();
@@ -410,7 +420,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
                         time.Add(duration.Milliseconds + "ms");
                     }
                 }
-            }     
+            }
 
             return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
         }
