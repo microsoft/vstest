@@ -279,6 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             {
 
                 var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework] ?? string.Empty;
+                framework = NuGetFramework.Parse(framework).GetShortFolderName();
                 logFilePrefixValue = logFilePrefixValue.Replace(".html", string.Empty) + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
                 this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
             }

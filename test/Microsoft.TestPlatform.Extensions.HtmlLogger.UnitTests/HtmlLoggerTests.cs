@@ -401,7 +401,7 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
         }
 
         [TestMethod]
-        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameIfParameterDirectoryIsNull()
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNamewithLogFileNameKey()
         {
             var parameters = new Dictionary<string, string>();
             parameters[HtmlLoggerConstants.LogFileNameKey] = null;
@@ -415,6 +415,62 @@ namespace Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests
             this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
             this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
             Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("TestResult"));
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefix()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample.html";
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = "net451";
+
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+            Assert.IsTrue(this.htmlLogger.HtmlFilePath.Contains("sample_net451"));
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldCreateCustumHtmlFileNameWithLogPrefixNull()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = null;
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            parameters[DefaultLoggerParameterNames.TargetFramework] = "net451";
+
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);            
+
+            this.mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite)).Callback<string, FileMode, FileAccess>((x, y, z) =>
+            {
+            }).Returns(new Mock<Stream>().Object);
+
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero));
+
+            this.mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.Create, FileAccess.ReadWrite), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestCompleteHandlerShouldThrowExceptionWithLogPrefixIfTargetFrameworkKeyIsNotPresent()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters[HtmlLoggerConstants.LogFilePrefixKey] = "sample.html";
+            parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dsa";
+            var testCase1 = CreateTestCase("TestCase1");
+            var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+            var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+            this.htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+            this.htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.ThrowsException<KeyNotFoundException>(() => this.htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, TimeSpan.Zero)));
         }
 
         [TestMethod]
