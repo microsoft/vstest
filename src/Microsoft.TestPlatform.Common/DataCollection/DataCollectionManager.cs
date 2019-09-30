@@ -393,6 +393,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
         protected virtual bool IsUriValid(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+            {
+                return false;
+            }
+
             var extensionManager = this.dataCollectorExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
