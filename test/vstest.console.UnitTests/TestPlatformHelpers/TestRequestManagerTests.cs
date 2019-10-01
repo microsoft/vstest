@@ -262,7 +262,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var payload = new DiscoveryRequestPayload()
                               {
-                                  Sources = new List<string>() { "a", "b" },
+                                  Sources = new List<string>() { "a.dll", "b.dll" },
                                   RunSettings = @"<RunSettings>
                                 <RunConfiguration>
                                     <MaxCpuCount>2</MaxCpuCount>
@@ -1063,7 +1063,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var payload = new TestRunRequestPayload()
             {
-                Sources = new List<string>() { "a" },
+                Sources = new List<string>() { "a.dll" },
                 RunSettings = @"<RunSettings>
                                 <RunConfiguration>
                                     <MaxCpuCount>2</MaxCpuCount>

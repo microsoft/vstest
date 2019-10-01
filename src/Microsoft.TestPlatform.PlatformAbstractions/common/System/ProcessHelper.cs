@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
@@ -19,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         private static readonly string ARM = "arm";
 
         /// <inheritdoc/>
-        public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack)
+        public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack, Action<object, string> outputCallBack)
         {
             var process = new Process();
             try
@@ -31,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 process.StartInfo.FileName = processPath;
                 process.StartInfo.Arguments = arguments;
                 process.StartInfo.RedirectStandardError = true;
+
                 process.EnableRaisingEvents = true;
 
                 if (envVariables != null)
@@ -39,6 +39,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     {
                         process.StartInfo.AddEnvironmentVariable(kvp.Key, kvp.Value);
                     }
+                }
+
+                if (outputCallBack != null)
+                {
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.OutputDataReceived += (sender, args) => outputCallBack(sender as Process, args.Data);
                 }
 
                 if (errorCallback != null)
@@ -72,6 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 if (errorCallback != null)
                 {
                     process.BeginErrorReadLine();
+                }
+
+                if (outputCallBack != null)
+                {
+                    process.BeginOutputReadLine();
                 }
             }
             catch (Exception)

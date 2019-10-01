@@ -1649,7 +1649,7 @@
       </trans-unit>
       <trans-unit id="InvalidArgument">
         <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
-        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <target state="translated">{0} 的引數無效。請使用 /help 選項查看有效引數的清單。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">

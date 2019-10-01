@@ -1648,7 +1648,7 @@
       </trans-unit>
       <trans-unit id="InvalidArgument">
         <source>The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</source>
-        <target state="new">The argument {0} is invalid. Please use the /help option to check the list of valid arguments.</target>
+        <target state="translated">引数 {0} が無効です。有効な引数の一覧を確認するには、/help オプションを使用してください。</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestSourcesDiscovered">

@@ -77,6 +77,12 @@
   <xsl:template match="/tp:TestRunDetails">
     <xsl:apply-templates select ="/tp:TestRunDetails/tp:Summary"/>
     <xsl:apply-templates select ="/tp:TestRunDetails/tp:ResultCollectionList"/>
+    <xsl:if test="tp:RunLevelMessageInformational != ''">
+    <xsl:apply-templates select ="tp:RunLevelMessageInformational"/>
+    </xsl:if>
+    <xsl:if test="tp:RunLevelMessageErrorAndWarning != ''">
+      <xsl:apply-templates select ="tp:RunLevelMessageErrorAndWarning"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="tp:TestRunDetails/tp:Summary">
@@ -100,7 +106,25 @@
     </xsl:if>
     <h2>All Results</h2><xsl:call-template name ="Results"/>
   </xsl:template>
-
+  
+   <xsl:template match="tp:RunLevelMessageInformational">
+    <div>
+    <h2>Informational messages</h2>
+      <xsl:for-each select ="a:string">
+        <span><xsl:value-of select = "." /></span><br />
+      </xsl:for-each>
+    </div>
+  </xsl:template>
+  
+  <xsl:template match="tp:RunLevelMessageErrorAndWarning">
+    <div>
+      <h2>Error and Warning messages</h2>
+      <xsl:for-each select ="a:string">
+        <span><xsl:value-of select = "." /></span><br />
+      </xsl:for-each>
+    </div>
+  </xsl:template>
+  
   <xsl:template name ="Results">
     <xsl:for-each select ="tp:TestResultCollection">
       <xsl:variable name="Source" select="tp:Id" />

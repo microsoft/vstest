@@ -710,6 +710,54 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             }
         }
 
+        [TestMethod]
+        [DataRow("results")]
+        [DataRow("results.trx")]
+        public void CustomTrxFileNameShouldBeConstructedFromRelativeLogFilePrefixParameter(string prefixName)
+        {
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = prefixName;
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.testableTrxLogger.Initialize(events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
+
+            Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results.trx"), this.testableTrxLogger.trxFile, "Expected framework name to appear in file name");
+            Assert.AreNotEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net451.trx"), this.testableTrxLogger.trxFile, "Expected time stamp to appear in file name");
+            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, "results_net451"), actualFileNameWithoutTimestamp);
+        }
+
+        [TestMethod]
+        public void CustomTrxFileNameShouldBeConstructedFromAbsoluteLogFilePrefixParameter()
+        {
+            this.parameters.Remove(TrxLoggerConstants.LogFileNameKey);
+            var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+            this.testableTrxLogger.Initialize(events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            string actualFileNameWithoutTimestamp = this.testableTrxLogger.trxFile.Substring(0, this.testableTrxLogger.trxFile.LastIndexOf('_'));
+
+            Assert.AreEqual(trxPrefix + "_net451", actualFileNameWithoutTimestamp);
+
+            File.Delete(this.testableTrxLogger.trxFile);
+        }
+
+        [TestMethod]
+        public void IntializeShouldThrowExceptionIfBothPrefixAndNameProvided()
+        {
+            this.parameters[TrxLoggerConstants.LogFileNameKey] = "results.trx";
+            var trxPrefix = Path.Combine(Path.GetTempPath(), "results");
+            this.parameters[TrxLoggerConstants.LogFilePrefixKey] = trxPrefix;
+            this.parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
+
+            Assert.ThrowsException<ArgumentException>(() => this.testableTrxLogger.Initialize(events.Object, this.parameters));
+        }
+
         private void ValidateTestIdAndNameInTrx(bool isMstestAdapter)
         {
             ObjectModel.TestCase testCase = CreateTestCase("TestCase");

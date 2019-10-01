@@ -114,6 +114,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void StartSession()
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleWrapper.StartSession: Starting VsTestConsoleWrapper session.");
+            }
+
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
             // Start communication
@@ -140,6 +145,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
             this.EnsureInitialized();
+
             this.pathToAdditionalExtensions = pathToAdditionalExtensions.ToList();
             this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
         }
@@ -256,6 +262,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void EndSession()
         {
+            EqtTrace.Info("VsTestConsoleWrapper.EndSession: Endinhg VsTestConsoleWrapper session");
+
             this.requestSender.EndSession();
             this.requestSender.Close();
 
