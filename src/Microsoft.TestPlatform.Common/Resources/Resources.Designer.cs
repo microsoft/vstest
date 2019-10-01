@@ -349,6 +349,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to find a datacollector with friendly name &apos;[0}&apos;..
+        /// </summary>
+        internal static string UnableToFetchUriString {
+            get {
+                return ResourceManager.GetString("UnableToFetchUriString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This option works only with vstest.console.exe installed as part of Visual Studio..
         /// </summary>
         internal static string VSInstallationNotFound {
