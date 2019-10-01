@@ -16,7 +16,7 @@
       </trans-unit>
       <trans-unit id="SuggestPublishTestProject">
         <source>Unable to find {0}. Please publish your test project and retry.</source>
-        <target state="translated">{0} を見つけることができません。テスト プロジェクトを発行してもう一度お試しください。</target>
+        <target state="translated">{0} を見つけることができません。テスト プロジェクトを公開してもう一度お試しください。</target>
         <note />
       </trans-unit>
     </body>

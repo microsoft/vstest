@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             // We don't need to pass list of extension as we are running inside vstest.console and
             // it will use TestPluginCache of vstest.console
-            discoveryManager.Initialize(Enumerable.Empty<string>());
+            discoveryManager.Initialize(Enumerable.Empty<string>(), null);
         }
     }
 }

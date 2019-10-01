@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// Initializes the discovery manager.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        void Initialize(IEnumerable<string> pathToAdditionalExtensions);
+        void Initialize(IEnumerable<string> pathToAdditionalExtensions, ITestDiscoveryEventsHandler2 eventHandler);
 
         /// <summary>
         /// Discovers tests

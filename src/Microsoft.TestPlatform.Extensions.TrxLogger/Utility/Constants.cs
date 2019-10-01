@@ -30,6 +30,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         public const string LogFileNameKey = "LogFileName";
 
         /// <summary>
+        /// Log file prefix key
+        /// </summary>
+        public const string LogFilePrefixKey = "LogFilePrefix";
+
+        /// <summary>
         /// Ordered test element name
         /// </summary>
         public const string OrderedTestElementName = "OrderedTest";

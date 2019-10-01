@@ -68,6 +68,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <returns>Port Number of hosted server on this side</returns>
         public int InitializeCommunication()
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
+            }
+
             this.processExitCancellationTokenSource = new CancellationTokenSource();
             this.handShakeSuccessful = false;
             this.handShakeComplete.Reset();
@@ -90,6 +95,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.handShakeComplete.Set();
             }
 
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Ended.");
+            }
+
             return port;
         }
 
@@ -107,6 +117,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task<int> InitializeCommunicationAsync(int clientConnectionTimeout)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
+            }
+
             this.processExitCancellationTokenSource = new CancellationTokenSource();
             this.handShakeSuccessful = false;
             this.handShakeComplete.Reset();
@@ -126,18 +141,31 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.handShakeComplete.Set();
             }
 
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunicationAsync: Ended.");
+            }
+
             return this.handShakeSuccessful ? port : -1;
         }
 
         /// <inheritdoc/>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info($"VsTestConsoleRequestSender.InitializeExtensions: Initializing extensions with additional extensions path {string.Join(",", pathToAdditionalExtensions.ToList())}.");
+            }
             this.communicationManager.SendMessage(MessageType.ExtensionsInitialize, pathToAdditionalExtensions, this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void DiscoverTests(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTests: Starting test discovery.");
+            }
             this.SendMessageAndListenAndReportTestCases(sources, runSettings, options, eventHandler);
         }
 
@@ -146,12 +174,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public async Task DiscoverTestsAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestDiscoveryEventsHandler2 eventHandler)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.DiscoverTestsAsync: Starting test discovery.");
+            }
             await this.SendMessageAndListenAndReportTestCasesAsync(sources, runSettings, options, eventHandler);
         }
 
         /// <inheritdoc/>
         public void StartTestRun(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
+            }
+
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestPlatformOptions = options },
@@ -162,6 +199,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
+            }
             await this.SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, TestPlatformOptions = options },
@@ -172,6 +213,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRun: Starting test run.");
+            }
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings, TestPlatformOptions = options },
@@ -182,6 +227,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task StartTestRunAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunAsync: Starting test run.");
+            }
+
             await this.SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.TestRunAllSourcesWithDefaultHost,
                 new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings, TestPlatformOptions = options },
@@ -197,6 +247,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
+            }
+
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.GetTestRunnerProcessStartInfoForRunAll,
                 new TestRunRequestPayload()
@@ -218,6 +273,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
+            }
+
             await this.SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.GetTestRunnerProcessStartInfoForRunAll,
                 new TestRunRequestPayload()
@@ -234,6 +294,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customHostLauncher)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHost: Starting test run.");
+            }
+
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.GetTestRunnerProcessStartInfoForRunSelected,
                 new TestRunRequestPayload
@@ -250,6 +315,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public async Task StartTestRunWithCustomHostAsync(IEnumerable<TestCase> testCases, string runSettings, TestPlatformOptions options, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customHostLauncher)
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.StartTestRunWithCustomHostAsync: Starting test run.");
+            }
+
             await this.SendMessageAndListenAndReportTestResultsAsync(
                 MessageType.GetTestRunnerProcessStartInfoForRunSelected,
                 new TestRunRequestPayload()
@@ -266,18 +336,30 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <inheritdoc/>
         public void CancelTestRun()
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.CancelTestRun: Cancelling test run.");
+            }
             this.communicationManager.SendMessage(MessageType.CancelTestRun);
         }
 
         /// <inheritdoc/>
         public void AbortTestRun()
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.AbortTestRun: Aborting test run.");
+            }
             this.communicationManager.SendMessage(MessageType.AbortTestRun);
         }
 
         /// <inheritdoc/>
         public void CancelDiscovery()
         {
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("VsTestConsoleRequestSender.CancelDiscovery: Cancelling test discovery.");
+            }
             this.communicationManager.SendMessage(MessageType.CancelDiscovery);
         }
 
@@ -328,7 +410,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was revceived from the runner");
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was received from the runner");
                 }
                 else
                 {
@@ -400,6 +482,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                     {
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCases: Discovery complete.");
+                        }
+
                         var discoveryCompletePayload =
                             this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
@@ -461,6 +548,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                     {
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportTestCasesAsync: Discovery complete.");
+                        }
+
                         var discoveryCompletePayload =
                             this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
@@ -520,6 +612,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                     {
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResults: Execution complete.");
+                        }
+
                         var testRunCompletePayload =
                             this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
@@ -578,6 +675,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                     {
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("VsTestConsoleRequestSender.SendMessageAndListenAndReportTestResultsAsync: Execution complete.");
+                        }
+
                         var testRunCompletePayload =
                             this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 

@@ -169,6 +169,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to load extensions from file &apos;{0}&apos;. Please use /diag for more information..
+        /// </summary>
+        internal static string FailedToLoadAdapaterFile {
+            get {
+                return ResourceManager.GetString("FailedToLoadAdapaterFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured while creating Fast filter..
         /// </summary>
         internal static string FastFilterException {

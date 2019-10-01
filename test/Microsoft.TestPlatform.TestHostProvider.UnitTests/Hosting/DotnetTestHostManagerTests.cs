@@ -19,6 +19,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,6 +39,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly Mock<IFileHelper> mockFileHelper;
 
         private readonly Mock<IMessageLogger> mockMessageLogger;
+
+        private readonly Mock<IEnvironment> mockEnvironment;
 
         private readonly TestRunnerConnectionInfo defaultConnectionInfo;
 
@@ -60,7 +63,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockMessageLogger = new Mock<IMessageLogger>();
-            var mockEnvironment = new Mock<IEnvironment>();
+            this.mockEnvironment = new Mock<IEnvironment>();
             this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
             string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
@@ -68,7 +71,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object, mockEnvironment.Object));
+                                         new DotnetHostHelper(this.mockFileHelper.Object, this.mockEnvironment.Object),
+                                         this.mockEnvironment.Object);
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
@@ -233,6 +237,43 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             var ex = Assert.ThrowsException<TestPlatformException>(() => this.GetDefaultStartInfo());
             Assert.AreEqual(ex.Message, "Unable to find testhost.dll. Please publish your test project and retry.");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseTestHostX86ExePresentOnWindows()
+        {
+            var testhostExePath = "testhost.x86.exe";
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+
+            var startInfo = this.GetDefaultStartInfo();
+
+            StringAssert.Contains(startInfo.FileName, testhostExePath);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseDotnetExeOnUnix()
+        {
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+
+            var startInfo = this.GetDefaultStartInfo();
+
+            StringAssert.Contains(startInfo.FileName, "dotnet");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseTestHostExeIsPresentOnWindows()
+        {
+            var testhostExePath = "testhost.exe";
+            this.mockFileHelper.Setup(ph => ph.Exists(testhostExePath)).Returns(true);
+            this.mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+            var startInfo = this.GetDefaultStartInfo();
+
+            StringAssert.Contains(startInfo.FileName, testhostExePath);
         }
 
         [TestMethod]
@@ -758,9 +799,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
                             It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
-                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                            It.IsAny<Action<object>>(),
+                            It.IsAny<Action<object, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
 
@@ -781,9 +823,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
                             It.IsAny<Action<object, string>>(),
-                            It.IsAny<Action<object>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
-                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                            It.IsAny<Action<object>>(),
+                            It.IsAny<Action<object, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>, Action<object, string>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback, outputCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
                         exitCallback(process);
@@ -806,8 +849,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             public TestableDotnetTestHostManager(
                 IProcessHelper processHelper,
                 IFileHelper fileHelper,
-                IDotnetHostHelper dotnetTestHostHelper)
-                : base(processHelper, fileHelper, dotnetTestHostHelper)
+                IDotnetHostHelper dotnetTestHostHelper,
+                IEnvironment environment)
+                : base(processHelper, fileHelper, dotnetTestHostHelper, environment)
             {
             }
         }
