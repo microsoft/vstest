@@ -38,6 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.envVarList = new List<KeyValuePair<string, string>>();
             this.mockDataCollector = new Mock<DataCollector2>();
             this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(this.envVarList);
+            this.dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, this.friendlyName, this.uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
             this.mockMessageSink = new Mock<IMessageSink>();
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
@@ -93,7 +94,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
 
-
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsNotCorrectAndUriIsCorrect()
         {
@@ -103,7 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.AreEqual(1, this.dataCollectionManager.RunDataCollectors.Count);
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
-
 
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollectorIfFriendlyNameIsCorrectAndUriIsNotCorrect()
@@ -159,7 +158,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
         }
 
-
         [TestMethod]
         public void InitializeDataCollectorsShouldNotAddSameDataCollectorMoreThanOnce()
         {
@@ -171,7 +169,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
-
 
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollectorAndReturnEnvironmentVariables()
