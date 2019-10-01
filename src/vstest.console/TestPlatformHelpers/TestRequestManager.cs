@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -29,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -47,6 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private readonly object syncObject = new object();
         private readonly Task<IMetricsPublisher> metricsPublisher;
         private bool isDisposed;
+        private IProcessHelper processHelper;
 
         /// <summary>
         /// Maintains the current active execution request
@@ -69,7 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                   TestRunResultAggregator.Instance,
                   TestPlatformEventSource.Instance,
                   new InferHelper(AssemblyMetadataProvider.Instance),
-                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode))
+                  MetricsPublisherFactory.GetMetricsPublisher(IsTelemetryOptedIn(), CommandLineOptions.Instance.IsDesignMode),
+                  new ProcessHelper())
         {
         }
 
@@ -81,6 +85,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.testPlatformEventSource = testPlatformEventSource;
             this.inferHelper = inferHelper;
             this.metricsPublisher = metricsPublisher;
+            this.processHelper = new ProcessHelper();
+        }
+
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestRunResultAggregator testRunResultAggregator, ITestPlatformEventSource testPlatformEventSource, InferHelper inferHelper, Task<IMetricsPublisher> metricsPublisher, IProcessHelper processHelper)
+        {
+            this.testPlatform = testPlatform;
+            this.commandLineOptions = commandLineOptions;
+            this.testRunResultAggregator = testRunResultAggregator;
+            this.testPlatformEventSource = testPlatformEventSource;
+            this.inferHelper = inferHelper;
+            this.metricsPublisher = metricsPublisher;
+            this.processHelper = processHelper;
         }
 
         #endregion
@@ -382,8 +398,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     // Choose default architecture based on the framework
                     // For .NET core, the default platform architecture should be x64.
-                    var defaultArchitecture = chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0 ? Architecture.X64 : Architecture.X86; 
+                    Architecture defaultArchitecture = Architecture.X64;
+                    if (chosenFramework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                    || chosenFramework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        string currentProcess = this.processHelper.GetProcessName(this.processHelper.GetCurrentProcessId());
+                        if (currentProcess.StartsWith("vstest.console"))
+                        {
+                            defaultArchitecture = Architecture.X64;
+                        }
+                        else
+                        {
+                            if (Environment.Is64BitProcess)
+                            {
+                                defaultArchitecture = Architecture.X64;
+                            }
+                            else
+                            {
+                                defaultArchitecture = Architecture.X86;
+                            }
+                        }
+                    }
 
                     settingsUpdated |= this.UpdatePlatform(document, navigator, sources, sourcePlatforms, defaultArchitecture, out Architecture chosenPlatform);
                     this.CheckSourcesForCompatibility(chosenFramework, chosenPlatform, sourcePlatforms, sourceFrameworks, registrar);

@@ -203,14 +203,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", depsFilePath);
             }
 
+            var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
+            var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
+
             // If Testhost.exe is available use it
-            var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
-            var fullExePath = Path.Combine(sourceDirectory, exeName);
-            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) && this.fileHelper.Exists(fullExePath))
+            bool testHostExeFound = false;
+            if (this.platformEnvironment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
-                startInfo.FileName = fullExePath;
+                var exeName = this.architecture == Architecture.X86 ? "testhost.x86.exe" : "testhost.exe";
+                var fullExePath = Path.Combine(sourceDirectory, exeName);
+
+                // check for testhost.exe in sourceDirectory. If not found, check this in nuget folder.
+                if (this.fileHelper.Exists(fullExePath))
+                {
+                    startInfo.FileName = fullExePath;
+                    testHostExeFound = true;
+                }
+                else
+                {
+                    // Check if testhost.dll is found in nuget folder.
+                    if (testHostPath.Contains("microsoft.testplatform.testhost"))
+                    {
+                        var folderName = this.architecture == Architecture.X86 ? "x86" : "x64";
+                        var testHostNugetPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(testHostPath).FullName).FullName);
+
+                        var testHostExePath = Path.Combine(testHostNugetPath.FullName, "build", "netcoreapp2.1", folderName, exeName);
+
+                        if (this.fileHelper.Exists(testHostExePath))
+                        {
+                            EqtTrace.Verbose("DotnetTestHostManager: testhost.exe/testhost.x86.exe found at path: " + testHostExePath);
+                            startInfo.FileName = testHostExePath;
+                            testHostExeFound = true;
+                        }
+                    }
+                }
             }
-            else
+            else if (!testHostExeFound)
             {
                 var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
@@ -226,9 +254,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 {
                     startInfo.FileName = this.dotnetHostHelper.GetDotnetPath();
                 }
-
-                var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
-                var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
 
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
                 args = "exec" + args;
