@@ -138,6 +138,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             }
 
             parametersDictionary = parameters;
+
+            if (parameters.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && parameters.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue))
+            {
+                var htmlParameterErrorMsg = string.Format(CultureInfo.CurrentCulture,
+                        HtmlResource.PrefixAndNameProvidedError);
+
+                EqtTrace.Error(htmlParameterErrorMsg);
+                 throw new ArgumentException(htmlParameterErrorMsg);
+            }
+
             this.Initialize(events, parameters[DefaultLoggerParameterNames.TestRunDirectory]);
         }
 
@@ -278,16 +288,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger
             if (this.parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFilePrefixKey, out string logFilePrefixValue) && !string.IsNullOrWhiteSpace(logFilePrefixValue))
             {
 
-                var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework] ?? string.Empty;
-                framework = NuGetFramework.Parse(framework).GetShortFolderName();
-                logFilePrefixValue = logFilePrefixValue.Replace(".html", string.Empty) + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
+                var framework = this.parametersDictionary[DefaultLoggerParameterNames.TargetFramework];
+                if (framework != null)
+                {
+                    framework = NuGetFramework.Parse(framework).GetShortFolderName();
+                }
+
+                logFilePrefixValue = logFilePrefixValue + "_" + framework + DateTime.Now.ToString("_yyyyMMddHHmmss", DateTimeFormatInfo.InvariantInfo) + $".{HtmlLoggerConstants.HtmlFileExtension}";
                 this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFilePrefixValue);
             }
             else
             {
                 if (parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string logFileNameValue) && !string.IsNullOrWhiteSpace(logFileNameValue))
                 {
-                    HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
+                    this.HtmlFilePath = Path.Combine(TestResultsDirPath, logFileNameValue);
                 }
             }
 

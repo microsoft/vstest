@@ -123,4 +123,7 @@
   <data name="HtmlLoggerError" xml:space="preserve">
     <value>Html Logger Error : {0}</value>
   </data>
+  <data name="PrefixAndNameProvidedError" xml:space="preserve">
+    <value>The parameters LogFileName and LogFilePrefix cannot be given together.</value>
+  </data>
 </root>
